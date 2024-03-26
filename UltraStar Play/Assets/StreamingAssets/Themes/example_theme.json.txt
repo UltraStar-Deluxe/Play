@@ -12,6 +12,11 @@
 
 // ## Example JSON
 {
+    // Name of a theme that should be inherited.
+    // You only need to specify properties that you want to overwrite.
+    // Relative file paths in the parent theme are interpreted relative to the parent theme file.
+    "parentTheme": "vinyl",
+
     // List of Unity Style Sheets (USS).
     // See https://docs.unity3d.com/Manual/UIE-about-uss.html
     // File references in these style sheets are not supported (e.g. referencing an image or font is not supported).

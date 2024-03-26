@@ -4,6 +4,26 @@ using NUnit.Framework;
 public class StringUtilsTest
 {
     [Test]
+    public void TrimStartAndEndTest()
+    {
+        string prefix = "prefix-";
+        string suffix = "-suffix";
+        string middle = "-middle-";
+        string text = $"{prefix}{prefix}{middle}{suffix}{suffix}";
+
+        // Should remove only first prefix resp. suffix
+        Assert.AreEqual($"{prefix}{middle}{suffix}{suffix}", text.TrimStart(prefix));
+        Assert.AreEqual($"{prefix}{prefix}{middle}{suffix}", text.TrimEnd(suffix));
+
+        // Test empty string and empty pattern
+        Assert.AreEqual($"", "".TrimStart(prefix));
+        Assert.AreEqual($"", "".TrimEnd(suffix));
+
+        Assert.AreEqual($"abc", "abc".TrimStart(""));
+        Assert.AreEqual($"abc", "abc".TrimEnd(""));
+    }
+
+    [Test]
     public void ReplaceInvalidCharactersTest()
     {
         Assert.AreEqual("dummy-file__-name", StringUtils.ReplaceInvalidChars(

@@ -449,10 +449,14 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         string host = new Uri(url).Host;
-        if (settings.AcceptedWebViewHosts.Contains(host))
+        string hostWithoutWww = host.TrimStart("www.");
+        string hostWithWww = $"www.{hostWithoutWww}";
+        if (settings.AcceptedWebViewHosts.Contains(hostWithoutWww)
+            || settings.AcceptedWebViewHosts.Contains(hostWithWww))
         {
             return DoLoadUrl(url);
         }
+        Debug.LogWarning($"Asking to accept host before loading URI into WebView. host: '{host}', uri: '{url}'");
 
         MessageDialogControl messageDialogControl = uiManager.CreateDialogControl("Open in Embedded Browser");
         messageDialogControl.Message = $"The song file references an external website.\n"

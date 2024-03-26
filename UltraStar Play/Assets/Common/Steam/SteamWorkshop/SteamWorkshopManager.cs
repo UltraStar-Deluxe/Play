@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Steamworks;
@@ -263,6 +264,11 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         if (!FileUtils.Exists(previewImagePath))
         {
             return "Preview image does not exist";
+        }
+
+        if (new FileInfo(previewImagePath).Length > 1_000_000)
+        {
+            return "Preview image must be smaller than 1 MB";
         }
 
         if (title.IsNullOrEmpty())

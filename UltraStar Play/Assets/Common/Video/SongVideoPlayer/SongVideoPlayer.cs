@@ -415,7 +415,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
         else
         {
-            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongVideoLoadedEvent>(
                 new SongAudioPlayerException($"Unsupported video resource '{videoUri}'."));
         }
     }
@@ -490,7 +490,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
             Debug.LogException(e);
             Debug.LogError($"Failed to load '{videoUri}' using vlc");
-            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongVideoLoadedEvent>(
                 new SongAudioPlayerException($"Failed to load '{videoUri}'"));
         }
 
@@ -554,7 +554,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             // The url is empty if loading the video failed.
             VideoSupportProvider = EVideoSupportProvider.None;
-            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(new SongVideoPlayerException($"Unable to load video '{uri}' with Unity's VideoPlayer"));
+            return ObservableUtils.LogExceptionThenThrow<SongVideoLoadedEvent>(new SongVideoPlayerException($"Unable to load video '{uri}' with Unity's VideoPlayer"));
         }
 
         // Start VideoPlayer to trigger loading
@@ -876,19 +876,19 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         if (videoUri.IsNullOrEmpty())
         {
-            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongVideoLoadedEvent>(
                 new SongVideoPlayerException($"Ignoring empty video resource"));
         }
 
         if (ignoredVideoFiles.Contains(songMeta.Video))
         {
-            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongVideoLoadedEvent>(
                 new SongVideoPlayerException($"Ignoring video resource: '{videoUri}'"));
         }
 
         if (!SongMetaUtils.ResourceExists(songMeta, videoUri))
         {
-            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongVideoLoadedEvent>(
                 new SongVideoPlayerException($"Video resource does not exist: {videoUri}"));
         }
 

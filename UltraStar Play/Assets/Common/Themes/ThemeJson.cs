@@ -9,6 +9,8 @@ using UnityEngine;
 [Serializable]
 public class ThemeJson
 {
+    public string parentTheme;
+
     public List<string> styleSheets;
 
     public StaticBackgroundJson staticBackground;

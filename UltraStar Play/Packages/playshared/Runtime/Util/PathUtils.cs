@@ -194,4 +194,18 @@ public static class PathUtils
         }
         return Path.GetExtension(path).TrimStart('.');
     }
+
+    public static string GetAbsoluteFilePath(string absoluteFolderPath, string pathOrUri)
+    {
+        if (absoluteFolderPath.IsNullOrEmpty()
+            || pathOrUri.IsNullOrEmpty()
+            || WebRequestUtils.IsHttpOrHttpsUri(pathOrUri)
+            || WebRequestUtils.IsNetworkPath(pathOrUri)
+            || IsAbsolutePath(pathOrUri))
+        {
+            return pathOrUri;
+        }
+
+        return $"{absoluteFolderPath}/{pathOrUri}";
+    }
 }

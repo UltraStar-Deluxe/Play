@@ -1,0 +1,12 @@
+{
+    "primaryFontColor":  "#AAAAAA",
+    "secondaryFontColor": "#BBBBBB",
+    "warningFontColor":  "#CCCCCC",
+    "errorFontColor": "#DDDDDD",
+
+    "videoPreviewColor":"#EEEEEE",
+
+    "staticBackground": {
+        "imagePath": "some/path_relative_to/base_theme.png"
+    },
+}

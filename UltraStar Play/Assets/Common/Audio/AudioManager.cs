@@ -206,7 +206,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
     {
         if (uri.IsNullOrEmpty())
         {
-            return ObservableUtils.LogErrorThenThrow<AudioClip>(new NullReferenceException("Cannot load AudioClip, URI is null or empty"));
+            return ObservableUtils.LogExceptionThenThrow<AudioClip>(new NullReferenceException("Cannot load AudioClip, URI is null or empty"));
         }
 
         if (!ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))

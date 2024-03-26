@@ -85,7 +85,11 @@ public class SongEditorPlayModeTests : AbstractPlayModeTest
 
         // Assert changes have been persisted and loaded as expected
         SongMeta loadedEditedSongMeta = new LazyLoadedFromFileSongMeta(copiedSongMetaPath);
-        Assert.AreEqual(JsonConverter.ToJson(editedSongMeta), JsonConverter.ToJson(loadedEditedSongMeta));
+        string expectedJson = JsonConverter.ToJson(editedSongMeta);
+        string actualJson = JsonConverter.ToJson(loadedEditedSongMeta);
+        Debug.Log($"Expected JSON: {expectedJson}");
+        Debug.Log($"Actual JSON: {actualJson}");
+        Assert.AreEqual(expectedJson, actualJson);
 
         // Assert that there is a change compared to the original song
         Assert.AreNotEqual(JsonConverter.ToJson(originalSongMetaPath), JsonConverter.ToJson(loadedEditedSongMeta));

@@ -85,7 +85,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
     {
         if (uri.IsNullOrEmpty())
         {
-            return ObservableUtils.LogErrorThenThrow<Sprite>(new NullReferenceException("Cannot load Sprite, URI is null or empty"));
+            return ObservableUtils.LogExceptionThenThrow<Sprite>(new NullReferenceException("Cannot load Sprite, URI is null or empty"));
         }
 
         if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)

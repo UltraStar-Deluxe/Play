@@ -968,6 +968,8 @@ public static partial class R
         public const string unityTransportIpAddressField = "unityTransportIpAddressField";
         public const string unityTransportPortField = "unityTransportPortField";
         public const string unityVersionLabel = "unityVersionLabel";
+        public const string updateSteamWorkshopItemsButton = "updateSteamWorkshopItemsButton";
+        public const string updateSteamWorkshopItemsIcon = "updateSteamWorkshopItemsIcon";
         public const string uploadProgressBar = "uploadProgressBar";
         public const string uploadWorkshopItemButton = "uploadWorkshopItemButton";
         public const string urlChooserButton = "urlChooserButton";

@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-public static class ThemeMetaUtils
+﻿public static class ThemeMetaUtils
 {
     public static string GetDisplayName(ThemeMeta themeMeta)
     {
@@ -14,14 +12,7 @@ public static class ThemeMetaUtils
 
     public static string GetAbsoluteFilePath(ThemeMeta themeMeta, string path)
     {
-        if (WebRequestUtils.IsHttpOrHttpsUri(path)
-            || WebRequestUtils.IsNetworkPath(path)
-            || PathUtils.IsAbsolutePath(path))
-        {
-            return path;
-        }
-
-        return $"{Path.GetDirectoryName(themeMeta.AbsoluteFilePath)}/{path}";
+        return PathUtils.GetAbsoluteFilePath(themeMeta.AbsoluteFilePath, path);
     }
 
     public static bool HasStaticBackground(ThemeMeta themeMeta, Settings settings, EScene scene)
