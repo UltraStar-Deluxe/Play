@@ -14,24 +14,24 @@ public class ArchUnitTests
      * Checks that UI label setters (e.g. UnityEngine.UIElements.BaseField.label) are not called directly.
      * Instead, a custom extension method that takes a translation object as input should be used.
      */
-    // [Test]
-    // [Ignore("Not all label assignments refactored yet to use a translation object with custom extension method")]
-    // public void UiLabelsAreNotAssignedDirectly()
-    // {
-    //     Architecture architecture = ArchUnitTestUtils.LoadArchitectureByAssemblyNames(new List<string>()
-    //     {
-    //         // "playshared",
-    //         // "playsharedui",
-    //         "Common",
-    //         // "Scenes",
-    //         // "SongEditorScene",
-    //     });
-    //
-    //     // Types().That().Are(typeof(GameRoundModifierDialogEntryControl))
-    //     Types()
-    //         .Should().FollowCustomCondition(NotCallLabelSetter())
-    //         .Check(architecture);
-    // }
+    [Test]
+    [Ignore("Not all label assignments refactored yet to use a translation object with custom extension method")]
+    public void UiLabelsAreNotAssignedDirectly()
+    {
+        Architecture architecture = ArchUnitTestUtils.LoadArchitectureByAssemblyNames(new List<string>()
+        {
+            // "playshared",
+            // "playsharedui",
+            "Common",
+            // "Scenes",
+            // "SongEditorScene",
+        });
+
+        Types().That().Are(typeof(GameRoundModifierDialogEntryControl))
+        // Types()
+            .Should().FollowCustomCondition(NotCallLabelPropertySetter())
+            .Check(architecture);
+    }
 
     [Test]
     public void CommonOnlineMultiplayerDoesNotReferenceSpecificOnlineMultiplayer()
@@ -59,7 +59,7 @@ public class ArchUnitTests
         .Check(architecture);
     }
 
-    private static ICondition<IType> NotCallLabelSetter()
+    private static ICondition<IType> NotCallLabelPropertySetter()
     {
         return new SimpleCondition<IType>(type =>
             {
