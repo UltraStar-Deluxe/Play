@@ -15,11 +15,11 @@
       "hash": "3e338c7cbf22ac7df71d3949ee94855720899e59"
     },
     "com.achimmihca.protrans": {
-      "version": "https://github.com/achimmihca/ProTrans.git?path=ProTrans/Packages/com.achimmihca.ProTrans#29e1cb49b63407e929282cd8ce2a2f83cabb3d4e",
+      "version": "https://github.com/achimmihca/ProTrans.git?path=ProTrans/Packages/com.achimmihca.ProTrans#634b65f926b4ab31bcae3a028fc3385a7ae7aa0b",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "29e1cb49b63407e929282cd8ce2a2f83cabb3d4e"
+      "hash": "634b65f926b4ab31bcae3a028fc3385a7ae7aa0b"
     },
     "com.achimmihca.scenechangeanimations": {
       "version": "https://github.com/achimmihca/SceneChangeAnimations.git?path=SceneChangeAnimations/Packages/com.achimmihca.scenechangeanimations#v1.0.0",
