@@ -1,6 +1,5 @@
 ﻿using System;
 using PrimeInputActions;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;

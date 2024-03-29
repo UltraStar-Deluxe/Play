@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using PrimeInputActions;
-using ProTrans;
 using Serilog.Events;
 using UniInject;
 using UniRx;

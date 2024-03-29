@@ -1,5 +1,4 @@
-﻿using ProTrans;
-using UniInject;
+﻿using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;

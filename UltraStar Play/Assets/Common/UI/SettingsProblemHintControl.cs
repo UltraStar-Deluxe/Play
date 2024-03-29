@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ProTrans;
-using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 

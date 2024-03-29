@@ -1,6 +1,4 @@
-﻿using ProTrans;
-
-public static class EnumExtensions
+﻿public static class EnumExtensions
 {
     public static string GetTranslatedName(this ESongOrder songOrder)
     {

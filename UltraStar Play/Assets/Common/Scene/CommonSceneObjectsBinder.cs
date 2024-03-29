@@ -2,7 +2,6 @@
 using CommonOnlineMultiplayer;
 using Netcode.Transports.Facepunch;
 using PrimeInputActions;
-using ProTrans;
 using SimpleHttpServerForUnity;
 using SteamOnlineMultiplayer;
 using UniInject;

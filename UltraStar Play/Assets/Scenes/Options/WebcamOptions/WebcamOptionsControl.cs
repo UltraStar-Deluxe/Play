@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;

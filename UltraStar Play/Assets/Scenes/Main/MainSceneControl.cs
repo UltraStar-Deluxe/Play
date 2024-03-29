@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
-using ProTrans;
 using SteamOnlineMultiplayer;
 using UniInject;
 using UniRx;

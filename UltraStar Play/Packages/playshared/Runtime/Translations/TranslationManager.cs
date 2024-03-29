@@ -1,4 +1,3 @@
-using ProTrans;
 using UniInject;
 
 public class TranslationManager : AbstractSingletonBehaviour, INeedInjection

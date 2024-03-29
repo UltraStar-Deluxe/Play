@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using CommonOnlineMultiplayer;
-using ProTrans;
 using UniInject;
 using UniRx;
 using Unity.Netcode;

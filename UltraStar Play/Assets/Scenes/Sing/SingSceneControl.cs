@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommonOnlineMultiplayer;
-using ProTrans;
 using UniInject;
 using UniInject.Extensions;
 using UniRx;

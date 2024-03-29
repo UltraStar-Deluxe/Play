@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
@@ -140,7 +139,7 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
 
     private void UpdateButtons()
     {
-        openSongFolderButton.SetEnabled(!FullPath.IsNullOrEmpty() 
+        openSongFolderButton.SetEnabled(!FullPath.IsNullOrEmpty()
                                         && DirectoryUtils.Exists(FullPath));
     }
 

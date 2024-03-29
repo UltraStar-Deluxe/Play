@@ -1,6 +1,4 @@
-﻿using ProTrans;
-
-public static class NoteDisplayModeExtensions
+﻿public static class NoteDisplayModeExtensions
 {
     public static string GetTranslation(this ENoteDisplayMode noteDisplayMode)
     {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using PrimeInputActions;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;

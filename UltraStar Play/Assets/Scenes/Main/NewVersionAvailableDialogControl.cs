@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using ProTrans;
 using UniInject;
 using UnityEngine.UIElements;
 

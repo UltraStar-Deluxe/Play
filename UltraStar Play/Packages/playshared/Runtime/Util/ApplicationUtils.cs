@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using PortAudioForUnity;
-using ProTrans;
 using UnityEditor;
 using UnityEngine;
 

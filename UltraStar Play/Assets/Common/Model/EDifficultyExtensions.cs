@@ -1,5 +1,4 @@
-﻿using ProTrans;
-using UnityEngine;
+﻿using UnityEngine;
 
 public static class EDifficultyExtensions
 {
