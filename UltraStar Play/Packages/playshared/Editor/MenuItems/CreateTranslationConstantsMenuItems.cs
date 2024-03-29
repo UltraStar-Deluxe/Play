@@ -24,9 +24,11 @@ public static class CreateTranslationConstantsMenuItems
     [MenuItem("Generate/Generate C# constants for translation properties")]
     public static void CreateTranslationConstants()
     {
-        string generatedConstantsFolder = "Common";
+        InitTranslationConfig();
+
+        string generatedConstantsFolder = "Assets/Common/R";
         string subClassName = "Messages";
-        string targetPath = $"{generatedConstantsFolder}/{className}{subClassName}.cs";
+        string targetPath = new FileInfo($"{generatedConstantsFolder}/{className}{subClassName}.cs").FullName;
 
         List<string> translationKeys = GetTranslationKeys();
         if (translationKeys.IsNullOrEmpty())
@@ -43,10 +45,23 @@ public static class CreateTranslationConstantsMenuItems
         Debug.Log("Generated file " + targetPath);
     }
 
+    private static void InitTranslationConfig()
+    {
+        TranslationConfig translationConfig = TranslationConfig.Singleton;
+        if (translationConfig.PropertiesFileProvider is not ResourcesFolderPropertiesFileProvider)
+        {
+            translationConfig.PropertiesFileProvider = new ResourcesFolderPropertiesFileProvider();
+        }
+    }
+
     private static List<string> GetTranslationKeys()
     {
         HashSet<string> keys = new HashSet<string>();
         PropertiesFile propertiesFile = Translation.GetPropertiesFile(Translation.GetFallbackCultureInfo(null));
+        if (propertiesFile == null)
+        {
+            return new List<string>();
+        }
         keys.AddRange(propertiesFile.Dictionary.Keys);
 
         return keys
