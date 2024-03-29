@@ -12,11 +12,11 @@ public class ArchUnitTests
 {
     /**
      * Checks that UI label setters (e.g. UnityEngine.UIElements.BaseField.label) are not called directly.
-     * Instead, a custom extension method that takes a translation object as input should be used.
+     * Instead, a custom extension method that takes a translation result as input should be used.
      */
     [Test]
     [Ignore("Not all label assignments refactored yet to use a translation object with custom extension method")]
-    public void UiLabelsAreNotAssignedDirectly()
+    public void UiLabelAssignmentsAreTranslated()
     {
         Architecture architecture = ArchUnitTestUtils.LoadArchitectureByAssemblyNames(new List<string>()
         {
