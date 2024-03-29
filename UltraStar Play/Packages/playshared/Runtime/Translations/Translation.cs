@@ -4,6 +4,8 @@ using ProTrans;
 
 public static class Translation
 {
+    public static string TranslationKeyPrefix = "§";
+
     public static TranslationResult Get(string key, params object[] placeholderStrings)
     {
         return TranslationResult.Of(ProTrans.Translation.Get(key, placeholderStrings));
