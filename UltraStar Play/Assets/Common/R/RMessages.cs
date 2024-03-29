@@ -75,6 +75,11 @@ public static partial class R
         public static readonly string i18nDemoScene_love = "i18nDemoScene_love";
         public static readonly string i18nDemoScene_multiline = "i18nDemoScene_multiline";
         public static readonly string language = "language";
+        public static readonly string language_de = "language_de";
+        public static readonly string language_en = "language_en";
+        public static readonly string language_es = "language_es";
+        public static readonly string language_fr = "language_fr";
+        public static readonly string language_pl = "language_pl";
         public static readonly string load = "load";
         public static readonly string loading = "loading";
         public static readonly string loadingScene_unexpectedErrorMessage = "loadingScene_unexpectedErrorMessage";
