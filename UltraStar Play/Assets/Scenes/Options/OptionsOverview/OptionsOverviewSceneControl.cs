@@ -100,9 +100,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
     private SceneNavigator sceneNavigator;
 
     [Inject]
-    private TranslationManager translationManager;
-
-    [Inject]
     private Settings settings;
 
     [Inject]

@@ -85,7 +85,6 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
         {
             TranslationConfig.Singleton.CurrentCultureInfo = cultureInfo;
             settings.CultureInfoName = cultureInfo.ToString();
-            TranslationManager.ReloadTranslationsAndUpdateScene();
         }
         catch (Exception ex)
         {

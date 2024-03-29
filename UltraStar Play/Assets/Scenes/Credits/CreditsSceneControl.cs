@@ -14,9 +14,6 @@ public class CreditsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private SceneNavigator sceneNavigator;
 
-    [Inject]
-    private TranslationManager translationManager;
-
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 

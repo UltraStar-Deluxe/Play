@@ -40,9 +40,6 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
     [Inject]
     private SceneNavigator sceneNavigator;
 
-    [Inject]
-    private TranslationManager translationManager;
-
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 

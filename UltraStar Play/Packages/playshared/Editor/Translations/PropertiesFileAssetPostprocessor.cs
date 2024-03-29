@@ -13,12 +13,6 @@ public class PropertiesFileAssetPostprocessor : AssetPostprocessor
         string[] movedAssets,
         string[] movedFromAssetPaths)
     {
-        TranslationManager translationManager = TranslationManager.Instance;
-        if (translationManager == null)
-        {
-            return;
-        }
-
         string currentLanguagePropertiesFileNameSuffix = PropertiesFileParser.GetLanguageAndRegionSuffix(TranslationConfig.Singleton.CurrentCultureInfo);
         string currentPropertiesFileName = $"messages{currentLanguagePropertiesFileNameSuffix}";
         bool propertiesFileChanged = false;
@@ -37,12 +31,7 @@ public class PropertiesFileAssetPostprocessor : AssetPostprocessor
             }
         }
 
-        if (propertiesFileChanged)
-        {
-            TranslationManager.ReloadTranslationsAndUpdateScene();
-        }
-
-        if (translationManager.generateConstantsOnResourceChange)
+        if (TranslationManager.Instance.generateConstantsOnResourceChange)
         {
             CreateTranslationConstantsMenuItems.CreateTranslationConstants();
         }

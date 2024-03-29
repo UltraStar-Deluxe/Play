@@ -24,13 +24,6 @@ public static class CreateTranslationConstantsMenuItems
     [MenuItem("Generate/Generate C# constants for translation properties")]
     public static void CreateTranslationConstants()
     {
-        TranslationManager translationManager = TranslationManager.Instance;
-        if (translationManager == null)
-        {
-            Debug.LogError("No TranslationManager found. Not creating properties file constants.");
-            return;
-        }
-
         string generatedConstantsFolder = "Common";
         string subClassName = "Messages";
         string targetPath = $"{generatedConstantsFolder}/{className}{subClassName}.cs";

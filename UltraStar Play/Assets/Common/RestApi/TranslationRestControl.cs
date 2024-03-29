@@ -11,9 +11,6 @@ public class TranslationRestControl : AbstractRestControl, INeedInjection
 {
     public static TranslationRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<TranslationRestControl>();
 
-    [Inject]
-    private TranslationManager translationManager;
-
     protected override object GetInstance()
     {
         return Instance;

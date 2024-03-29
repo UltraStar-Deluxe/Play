@@ -15,9 +15,6 @@ public abstract class AbstractOptionsSceneControl : MonoBehaviour, INeedInjectio
     protected SceneNavigator sceneNavigator;
 
     [Inject]
-    protected TranslationManager translationManager;
-
-    [Inject]
     protected Settings settings;
 
     [Inject]
