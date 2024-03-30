@@ -7,6 +7,11 @@
         this.value = value ?? "";
     }
 
+    public override string ToString()
+    {
+        return value;
+    }
+
     public static implicit operator string(TranslationResult it) => it?.value ?? "";
 
     public static TranslationResult Of(string value)
