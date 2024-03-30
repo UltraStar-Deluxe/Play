@@ -58,13 +58,6 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
                 newValue => settings.TargetFps = newValue);
     }
 
-    public void UpdateTranslation()
-    {
-        resolutionPicker.Label = Translation.Get(R.Messages.options_resolution);
-        targetFpsPicker.Label = Translation.Get(R.Messages.options_targetFps);
-        fullscreenModePicker.Label = Translation.Get(R.Messages.options_fullscreenMode);
-    }
-
     private void ApplyGraphicSettings()
     {
         if (!PlatformUtils.IsStandalone)

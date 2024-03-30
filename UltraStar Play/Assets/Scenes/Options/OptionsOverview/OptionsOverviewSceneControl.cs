@@ -270,6 +270,8 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
         // Define usable scroll wheel increments for ScrollView.
         ScrollViewScrollWheelSpeedControl.UpdateScrollWheelSpeedOfAllScrollViews(loadedSceneVisualElement);
+
+        UpdateTranslation();
     }
 
     private void UnloadLastOptionsScene()
@@ -317,6 +319,8 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
     public void UpdateTranslation()
     {
+        using DisposableStopwatch d = new("UpdateTranslations");
+
         sceneTitle.text = Translation.Get(R.Messages.options);
 
         UpdateSceneToNameMap();

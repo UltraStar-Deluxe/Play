@@ -134,11 +134,4 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
         base.OnDestroy();
         backgroundMusicManager.BackgroundMusicAudioSource.mute = false;
     }
-
-    public void UpdateTranslation()
-    {
-        backgroundMusicVolumeChooser.Label = Translation.Get(R.Messages.options_backgroundMusicEnabled);
-        previewVolumeChooser.Label = Translation.Get(R.Messages.options_previewVolume);
-        volumeChooser.Label = Translation.Get(R.Messages.options_volume);
-    }
 }

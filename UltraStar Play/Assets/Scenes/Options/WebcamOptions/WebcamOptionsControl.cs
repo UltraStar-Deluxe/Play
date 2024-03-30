@@ -27,15 +27,10 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
     {
         base.Start();
 
-        InitWebcamPicker();
-    }
-
-    public void UpdateTranslation()
-    {
-        useWebcamToggle.label = Translation.Get(R.Messages.options_webcam_useAsBackGroundInSingingScene);
         useWebcamToggle.value = settings.UseWebcamAsBackgroundInSingScene;
         useWebcamToggle.RegisterValueChangedCallback(evt => settings.UseWebcamAsBackgroundInSingScene = evt.newValue);
-        devicePicker.Label = Translation.Get(R.Messages.options_webcam_device);
+
+        InitWebcamPicker();
     }
 
     private void InitWebcamPicker()

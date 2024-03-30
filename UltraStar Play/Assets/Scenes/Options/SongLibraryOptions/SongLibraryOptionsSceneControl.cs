@@ -114,6 +114,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         }.Bind(() => settings.SongDataFetchType,
             newValue => settings.SongDataFetchType = newValue);
 
+        UpdateTranslation();
+
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
             && AndroidUtils.GetAppSpecificStorageAbsolutePath(true).IsNullOrEmpty())

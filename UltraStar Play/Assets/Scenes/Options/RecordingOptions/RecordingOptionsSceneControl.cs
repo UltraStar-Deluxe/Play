@@ -495,19 +495,6 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         }
     }
 
-    public void UpdateTranslation()
-    {
-        deleteButton.text = Translation.Get(R.Messages.delete);
-        colorPicker.Label = Translation.Get(R.Messages.options_color);
-        delayPicker.Label = Translation.Get(R.Messages.options_delay);
-        amplificationPicker.Label = Translation.Get(R.Messages.options_amplification);
-        noiseSuppressionPicker.Label = Translation.Get(R.Messages.options_noiseSuppression);
-        sampleRatePicker.Label = Translation.Get(R.Messages.options_sampleRate);
-        noteLabel.text = Translation.Get(R.Messages.options_note, "value", "?");
-        calibrateDelayButton.text = Translation.Get(R.Messages.options_delay_calibrate);
-        notConnectedLabel.text = Translation.Get(R.Messages.options_deviceNotConnected);
-    }
-
     private List<MicProfile> CreateAndPersistMicProfiles()
     {
         return MicProfileUtils.CreateAndPersistMicProfiles(

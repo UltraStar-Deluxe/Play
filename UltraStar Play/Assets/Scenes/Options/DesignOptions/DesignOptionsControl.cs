@@ -108,11 +108,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection
         themeManager.SetCurrentTheme(themeMeta);
     }
 
-    public void UpdateTranslation()
-    {
-        themePicker.Label = Translation.Get(R.Messages.options_design_theme);
-    }
-
     public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=Theme";
 
     public override bool HasHelpDialog => true;

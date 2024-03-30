@@ -645,13 +645,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.DevelopmentOptionsScene));
     }
 
-    public void UpdateTranslation()
-    {
-        showFpsToggle.label = Translation.Get(R.Messages.options_showFps);
-        pitchDetectionAlgorithmPicker.Label = Translation.Get(R.Messages.options_pitchDetectionAlgorithm);
-        analyzeBeatsWithoutTargetNoteToggle.label = Translation.Get(R.Messages.options_analyzeBeatsWithoutTargetNote);
-    }
-
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new BindingBuilder();
