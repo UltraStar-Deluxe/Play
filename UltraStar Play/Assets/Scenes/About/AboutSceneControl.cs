@@ -149,9 +149,4 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
             aboutTextScrollView.Add(textField);
         }
     }
-
-    public void UpdateTranslation()
-    {
-        sceneTitle.text = Translation.Get(R.Messages.aboutScene_title);
-    }
 }

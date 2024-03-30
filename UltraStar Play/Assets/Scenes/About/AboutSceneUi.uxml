@@ -7,7 +7,7 @@
                 </ui:Button>
                 <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
                     <ui:VisualElement name="titleAndDescription">
-                        <ui:Label text="About" name="sceneTitle" class="titleText" style="-unity-font-style: bold; flex-shrink: 1; min-width: 120px;" />
+                        <ui:Label text="$aboutScene_title" name="sceneTitle" class="titleText" style="-unity-font-style: bold; flex-shrink: 1; min-width: 120px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
