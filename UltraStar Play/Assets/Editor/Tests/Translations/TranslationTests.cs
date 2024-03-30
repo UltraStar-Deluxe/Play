@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -67,11 +68,11 @@ public class TranslationTests
         {
             string ignoredMissingTranslationFileName = Path.GetFileName(ignoredMissingTranslation.File);
             return (ignoredMissingTranslationFileName == "*"
-                    || ignoredMissingTranslationFileName == missingTranslationFileName)
+                    || string.Equals(ignoredMissingTranslationFileName, missingTranslationFileName, StringComparison.InvariantCultureIgnoreCase))
                    && (ignoredMissingTranslation.ElementLocalName == "*"
-                       || ignoredMissingTranslation.ElementLocalName == missingTranslation.ElementLocalName)
+                       || string.Equals(ignoredMissingTranslation.ElementLocalName, missingTranslation.ElementLocalName, StringComparison.InvariantCultureIgnoreCase))
                    && (ignoredMissingTranslation.NameAttributeValue == "*"
-                       || ignoredMissingTranslation.NameAttributeValue == missingTranslation.NameAttributeValue);
+                       || string.Equals(ignoredMissingTranslation.NameAttributeValue, missingTranslation.NameAttributeValue, StringComparison.InvariantCultureIgnoreCase));
         });
     }
 
