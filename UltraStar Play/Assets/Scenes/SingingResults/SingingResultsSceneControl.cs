@@ -573,17 +573,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         return SongRating.ToneDeaf;
     }
 
-    public void UpdateTranslation()
-    {
-        continueButton.text = Translation.Get(R.Messages.continue_);
-        singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
-
-        if (HasPartyModeSceneData)
-        {
-            //sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundCount}";
-        }
-    }
-
     private void OnDestroy()
     {
         singingResultsPlayerUiControls.ForEach(it => it.Dispose());

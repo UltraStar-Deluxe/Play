@@ -70,6 +70,7 @@ public static partial class R
         public static readonly string graph_legend_good = "graph_legend_good";
         public static readonly string graph_legend_missed = "graph_legend_missed";
         public static readonly string graph_legend_perfect = "graph_legend_perfect";
+        public static readonly string highscores = "highscores";
         public static readonly string highscoreScene_title = "highscoreScene_title";
         public static readonly string i18nDemoScene_hello = "i18nDemoScene_hello";
         public static readonly string i18nDemoScene_love = "i18nDemoScene_love";
@@ -259,6 +260,7 @@ public static partial class R
         public static readonly string rating_song_ultraStar = "rating_song_ultraStar";
         public static readonly string rating_song_wannabe = "rating_song_wannabe";
         public static readonly string refresh = "refresh";
+        public static readonly string replay = "replay";
         public static readonly string save = "save";
         public static readonly string score_goldenNotes = "score_goldenNotes";
         public static readonly string score_notes = "score_notes";
@@ -327,6 +329,7 @@ public static partial class R
         public static readonly string songSelectScene_videoLegendLabel = "songSelectScene_videoLegendLabel";
         public static readonly string start = "start";
         public static readonly string submit = "submit";
+        public static readonly string teamResults = "teamResults";
         public static readonly string timeUppercase = "timeUppercase";
         public static readonly string uri_howToAddAndCreateSongs = "uri_howToAddAndCreateSongs";
         public static readonly string uri_howToCompanionApp = "uri_howToCompanionApp";
@@ -340,5 +343,6 @@ public static partial class R
         public static readonly string viewMore = "viewMore";
         public static readonly string warning = "warning";
         public static readonly string yes = "yes";
+        public static readonly string yourResults = "yourResults";
     }
 }
