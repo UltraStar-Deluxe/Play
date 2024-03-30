@@ -18,6 +18,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
 
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement visualElement;
+
     [Inject(UxmlName = R.UxmlNames.searchTextField)]
     private TextField searchTextField;
 
@@ -102,13 +105,10 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     private readonly Subject<bool> submitEventStream = new();
     public IObservable<bool> SubmitEventStream => submitEventStream;
 
-    private bool isInjectionFinished;
-
     public void OnInjectionFinished()
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSearchControl.OnInjectionFinished");
 
-        isInjectionFinished = true;
         searchProperties = new HashSet<ESearchProperty>(settings.SearchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
         {
@@ -166,6 +166,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
             .Subscribe(_ => UpdateSearchTextFieldStyle());
         songSelectSceneControl.IsSongRepositorySearchRunning
             .Subscribe(_ => UpdateSearchTextFieldStyle());
+
+        TranslationManager.ApplyTranslations(visualElement);
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(visualElement);
     }
 
     private void UpdateSearchTextFieldStyle()
@@ -440,22 +443,5 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     public class SearchTextChangedEvent : SearchChangedEvent
     {
 
-    }
-
-    public void UpdateTranslation()
-    {
-        if (!isInjectionFinished)
-        {
-            return;
-        }
-
-        artistPropertyToggle.label = Translation.Get(R.Messages.songProperty_artist);
-        titlePropertyToggle.label = Translation.Get(R.Messages.songProperty_title);
-        editionPropertyToggle.label = Translation.Get(R.Messages.songProperty_edition);
-        genrePropertyToggle.label = Translation.Get(R.Messages.songProperty_genre);
-        languagePropertyToggle.label = Translation.Get(R.Messages.songProperty_language);
-        lyricsPropertyToggle.label = Translation.Get(R.Messages.songProperty_lyrics);
-        yearPropertyToggle.label = Translation.Get(R.Messages.songProperty_year);
-        searchTextFieldHint.text = "What do you want to sing today?";
     }
 }

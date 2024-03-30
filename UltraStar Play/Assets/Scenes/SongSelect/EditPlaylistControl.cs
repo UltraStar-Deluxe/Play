@@ -174,9 +174,4 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
         }
         HideEditPlaylistDialog();
     }
-
-    public void UpdateTranslation()
-    {
-        playlistChooserDropdownTitle.text = Translation.Get(R.Messages.songSelectScene_playlistDropdownTitle);
-    }
 }

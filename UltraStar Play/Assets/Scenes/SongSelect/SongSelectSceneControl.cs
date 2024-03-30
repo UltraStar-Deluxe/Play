@@ -344,11 +344,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         InitSongRoulette();
 
-        UpdateInputLegend();
-        inputManager.InputDeviceChangeEventStream
-            .Subscribe(_ => UpdateInputLegend())
-            .AddTo(gameObject);
-
         importSongsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.SongLibraryOptionsScene)));
 
         if (settings.NavigateByFoldersInSongSelect)
@@ -372,6 +367,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         InitHideSlideInControlsViaClick();
 
         InitOnlineMultiplayer();
+
+        UpdateTranslation();
     }
 
     private void UpdateAvailableSongsAndUi(bool isSongScanFinished)
@@ -1641,14 +1638,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public void UpdateTranslation()
     {
-        sceneTitle.text = Translation.Get(R.Messages.songSelectScene_title);
         if (HasPartyModeSceneData)
         {
-            sceneTitle.text += $"\n{PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}";
+            sceneTitle.text += $"{Translation.Get(R.Messages.songSelectScene_title)}\n" +
+                               $"{PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}";
         }
-
-        songSearchControl.UpdateTranslation();
-        UpdateInputLegend();
     }
 
     public void OnSubmitSearch()
@@ -1656,41 +1650,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         selectedEntryBeforeSearch = songRouletteControl.SelectedEntry;
         songSearchControl.ResetSearchText();
         songRouletteControl.Focus();
-    }
-
-    private void UpdateInputLegend()
-    {
-        // inputLegend.Query<Label>()
-        //     .Where(label => label is not FontIcon)
-        //     .ForEach(label => label.RemoveFromHierarchy());
-        //
-        // if (IsPlayerSelectOverlayVisible)
-        // {
-        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
-        //         Translation.Get(R.Messages.back),
-        //         inputLegend);
-        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_togglePlayers,
-        //         Translation.Get(R.Messages.action_togglePlayers),
-        //         inputLegend);
-        // }
-        // else
-        // {
-        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
-        //         Translation.Get(R.Messages.back),
-        //         inputLegend);
-        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.ui_submit,
-        //         Translation.Get(R.Messages.submit),
-        //         inputLegend);
-        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleSongMenu,
-        //         Translation.Get(R.Messages.action_openSongMenu),
-        //         inputLegend);
-        // }
-        // if (inputManager.InputDeviceEnum == EInputDevice.Touch)
-        // {
-        //     inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
-        //         Translation.Get(R.Messages.action_openSongMenu),
-        //         Translation.Get(R.Messages.action_longPress))));
-        // }
     }
 
     public void ShowCannotUseJokerMessage()
