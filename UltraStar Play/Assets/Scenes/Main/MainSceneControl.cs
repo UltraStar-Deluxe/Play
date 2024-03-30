@@ -209,12 +209,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             .Subscribe(_ => OnBack());
     }
 
-    public void UpdateTranslation()
-    {
-        startButton.text = Translation.Get(R.Messages.mainScene_button_sing_label);
-        partyButton.text = Translation.Get(R.Messages.mainScene_button_party_label);
-    }
-
     public void CloseQuitGameDialog()
     {
         if (quitGameDialogControl == null)

@@ -1,2 +1,6 @@
 ﻿fileName,elementName,nameAttributeValue
 MessageDialogUi.uxml, *, *
+MainSceneUi.uxml, *, semanticVersionLabel
+MainSceneUi.uxml, *, commitHashLabel
+MainSceneUi.uxml, *, unityVersionLabel
+MainSceneUi.uxml, *, buildTimeStampLabel
