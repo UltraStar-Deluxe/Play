@@ -126,9 +126,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     private void Start()
     {
-        TextAsset textAsset = Resources.Load<TextAsset>("Translations/messages_de");
-        Debug.Log("messages_de: " + textAsset.text);
-
         if (!hasLoggedVersionInfo)
         {
             hasLoggedVersionInfo = true;

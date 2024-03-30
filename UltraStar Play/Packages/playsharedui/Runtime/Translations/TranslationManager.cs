@@ -36,7 +36,7 @@ public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, IS
 
         rootVisualElement ??= translationManager.uiDocument.rootVisualElement;
 
-        Log.Debug(() => $"Apply translations starting from {rootVisualElement.name}");
+        Log.Debug(() => $"Apply translations starting from element '{rootVisualElement.name}'");
 
         rootVisualElement.Query<Label>().ForEach(label => ApplyTranslation(
             () => label.text,
