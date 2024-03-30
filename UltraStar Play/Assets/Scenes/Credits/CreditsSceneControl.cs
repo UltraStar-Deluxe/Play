@@ -28,11 +28,6 @@ public class CreditsSceneControl : MonoBehaviour, INeedInjection, IBinder
         backButton.Focus();
     }
 
-    public void UpdateTranslation()
-    {
-        sceneTitle.text = Translation.Get(R.Messages.aboutScene_title);
-    }
-
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new BindingBuilder();
