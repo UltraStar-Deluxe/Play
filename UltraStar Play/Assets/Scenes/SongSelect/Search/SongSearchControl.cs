@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -11,13 +10,16 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITranslator
+public class SongSearchControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private Settings settings;
 
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
+
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement visualElement;
 
     [Inject(UxmlName = R.UxmlNames.searchTextField)]
     private TextField searchTextField;
@@ -103,13 +105,10 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     private readonly Subject<bool> submitEventStream = new();
     public IObservable<bool> SubmitEventStream => submitEventStream;
 
-    private bool isInjectionFinished;
-
     public void OnInjectionFinished()
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSearchControl.OnInjectionFinished");
 
-        isInjectionFinished = true;
         searchProperties = new HashSet<ESearchProperty>(settings.SearchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
         {
@@ -167,6 +166,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             .Subscribe(_ => UpdateSearchTextFieldStyle());
         songSelectSceneControl.IsSongRepositorySearchRunning
             .Subscribe(_ => UpdateSearchTextFieldStyle());
+
+        TranslationManager.ApplyTranslations(visualElement);
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(visualElement);
     }
 
     private void UpdateSearchTextFieldStyle()
@@ -206,19 +208,19 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         switch (searchProperty)
         {
             case ESearchProperty.Artist:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_artist);
+                return Translation.Get(R.Messages.songProperty_artist);
             case ESearchProperty.Title:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_title);
+                return Translation.Get(R.Messages.songProperty_title);
             case ESearchProperty.Year:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_year);
+                return Translation.Get(R.Messages.songProperty_year);
             case ESearchProperty.Genre:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_genre);
+                return Translation.Get(R.Messages.songProperty_genre);
             case ESearchProperty.Language:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_language);
+                return Translation.Get(R.Messages.songProperty_language);
             case ESearchProperty.Edition:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_edition);
+                return Translation.Get(R.Messages.songProperty_edition);
             case ESearchProperty.Lyrics:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
+                return Translation.Get(R.Messages.songProperty_lyrics);
             default:
                 return searchProperty.ToString();
         }
@@ -253,7 +255,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             {
                 Debug.Log($"Invalid search expression '{searchExp}': {e.Message}. Stack trace:\n{e.StackTrace}");
                 searchErrorIcon.ShowByDisplay();
-                searchErrorIconTooltipControl.TooltipText = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionError,
+                searchErrorIconTooltipControl.TooltipText = Translation.Get(R.Messages.songSelectScene_searchExpressionError,
                     "errorDetails", e.Message);
                 return new List<SongMeta>();
             }
@@ -441,22 +443,5 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public class SearchTextChangedEvent : SearchChangedEvent
     {
 
-    }
-
-    public void UpdateTranslation()
-    {
-        if (!isInjectionFinished)
-        {
-            return;
-        }
-
-        artistPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_artist);
-        titlePropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_title);
-        editionPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_edition);
-        genrePropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_genre);
-        languagePropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_language);
-        lyricsPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
-        yearPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_year);
-        searchTextFieldHint.text = "What do you want to sing today?";
     }
 }

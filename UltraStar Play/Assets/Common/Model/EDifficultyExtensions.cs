@@ -1,12 +1,11 @@
-﻿using ProTrans;
-using UnityEngine;
+﻿using UnityEngine;
 
 public static class EDifficultyExtensions
 {
     public static string GetTranslatedName(this EDifficulty difficulty)
     {
         string i18nCode = difficulty.GetI18NCode();
-        return TranslationManager.GetTranslation(i18nCode);
+        return Translation.Get(i18nCode);
     }
 
     private static string GetI18NCode(this EDifficulty difficulty)

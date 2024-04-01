@@ -1,5 +1,4 @@
 using AudioSynthesis.Midi;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
@@ -7,28 +6,28 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
+public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
     private static readonly string streamingAssetsMidiTestFile = "Midi/fur-elise-beginning.mid";
-    
+
     [Inject]
     private MidiManager midiManager;
-    
+
     [Inject]
     private BackgroundMusicManager backgroundMusicManager;
-    
+
     [Inject]
     private UIDocument uiDoc;
 
     [Inject(UxmlName = R.UxmlNames.volumeChooser)]
     private ItemPicker volumeChooser;
-    
+
     [Inject(UxmlName = R.UxmlNames.vocalsAudioVolumeChooser)]
     private ItemPicker vocalsAudioVolumeChooser;
 
     [Inject(UxmlName = R.UxmlNames.musicVolumeChooser)]
     private ItemPicker musicVolumeChooser;
-    
+
     [Inject(UxmlName = R.UxmlNames.previewVolumeChooser)]
     private ItemPicker previewVolumeChooser;
 
@@ -40,36 +39,36 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
 
     [Inject(UxmlName = R.UxmlNames.sfxVolumeChooser)]
     private ItemPicker sfxVolumeChooser;
-    
+
     [Inject(UxmlName = R.UxmlNames.soundfontPathTextField)]
     private TextField soundfontPathTextField;
 
     [Inject(UxmlName = R.UxmlNames.testSoundfontButton)]
     private Button testSoundfontButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.selectSoundfontButton)]
     private Button selectSoundfontButton;
-    
+
     protected override void Start()
     {
         base.Start();
-        
+
         PercentNumberPickerControl volumePickerControl = new(volumeChooser);
         volumePickerControl.Bind(() => settings.VolumePercent,
             newValue => settings.VolumePercent = (int)newValue);
-        
+
         PercentNumberPickerControl musicVolumePickerControl = new(musicVolumeChooser);
         musicVolumePickerControl.Bind(() => settings.MusicVolumePercent,
             newValue => settings.MusicVolumePercent = (int)newValue);
-        
+
         PercentNumberPickerControl previewVolumePickerControl = new(previewVolumeChooser);
         previewVolumePickerControl.Bind(() => settings.PreviewVolumePercent,
             newValue => settings.PreviewVolumePercent = (int)newValue);
-        
+
         PercentNumberPickerControl backgroundMusicVolumePickerControl = new(backgroundMusicVolumeChooser);
         backgroundMusicVolumePickerControl.Bind(() => settings.BackgroundMusicVolumePercent,
             newValue => settings.BackgroundMusicVolumePercent = (int)newValue);
-        
+
         // Volume can be changed via REST API
         settings.ObserveEveryValueChanged(it => it.VolumePercent)
             .Subscribe(newValue =>
@@ -98,7 +97,7 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
             () => settings.SoundfontPath,
             newValue => settings.SoundfontPath = newValue);
         new TextFieldHintControl(soundfontPathTextField);
-        
+
         testSoundfontButton.RegisterCallbackButtonTriggered(_ => TestSoundfont());
         new TooltipControl(testSoundfontButton, "Test soundfont", false);
 
@@ -134,12 +133,5 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
     {
         base.OnDestroy();
         backgroundMusicManager.BackgroundMusicAudioSource.mute = false;
-    }
-
-    public void UpdateTranslation()
-    {
-        backgroundMusicVolumeChooser.Label = TranslationManager.GetTranslation(R.Messages.options_backgroundMusicEnabled);
-        previewVolumeChooser.Label = TranslationManager.GetTranslation(R.Messages.options_previewVolume);
-        volumeChooser.Label = TranslationManager.GetTranslation(R.Messages.options_volume);
     }
 }

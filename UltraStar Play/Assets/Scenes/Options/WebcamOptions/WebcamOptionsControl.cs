@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -8,7 +7,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
+public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
     [Inject(UxmlName = R.UxmlNames.devicePicker)]
     private ItemPicker devicePicker;
@@ -27,16 +26,11 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     protected override void Start()
     {
         base.Start();
-        
-        InitWebcamPicker();
-    }
 
-    public void UpdateTranslation()
-    {
-        useWebcamToggle.label = TranslationManager.GetTranslation(R.Messages.options_webcam_useAsBackGroundInSingingScene);
         useWebcamToggle.value = settings.UseWebcamAsBackgroundInSingScene;
         useWebcamToggle.RegisterValueChangedCallback(evt => settings.UseWebcamAsBackgroundInSingScene = evt.newValue);
-        devicePicker.Label = TranslationManager.GetTranslation(R.Messages.options_webcam_device);
+
+        InitWebcamPicker();
     }
 
     private void InitWebcamPicker()
@@ -60,7 +54,7 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         else
         {
             Debug.Log("No webcam found");
-            devicePickerControl.GetLabelTextFunction = nullDevice => TranslationManager.GetTranslation(R.Messages.options_webcam_noWebcamsAvailable);
+            devicePickerControl.GetLabelTextFunction = nullDevice => Translation.Get(R.Messages.options_webcam_noWebcamsAvailable);
             devicePickerControl.Items.Add(new WebCamDevice());
         }
     }

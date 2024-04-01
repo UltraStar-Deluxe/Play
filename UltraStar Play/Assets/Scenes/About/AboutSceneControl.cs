@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using PrimeInputActions;
-using ProTrans;
 using Truncon.Collections;
 using UniInject;
 using UniRx;
@@ -13,7 +12,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class AboutSceneControl : MonoBehaviour, INeedInjection
 {
     private static readonly InsertionOrderedDictionary<string, string> aboutTextFilesInStreamingAssets = new()
     {
@@ -41,9 +40,6 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject]
     private SceneNavigator sceneNavigator;
 
-    [Inject]
-    private TranslationManager translationManager;
-
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -52,7 +48,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
 
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.aboutTextsScrollView)]
     private ScrollView aboutTextsScrollView;
 
@@ -60,7 +56,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
 
     private readonly List<ToggleButton> toggleButtons = new();
     private ToggleButton lastActiveToggleButton;
-    
+
     private void Start()
     {
         CreateAboutTextButtons();
@@ -70,7 +66,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
 
         backButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.MainScene));
         backButton.Focus();
-        
+
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.MainScene));
     }
@@ -84,7 +80,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         ToggleButton firstToggleButton = toggleButtons.FirstOrDefault();
         firstToggleButton.SetActive(true);
         lastActiveToggleButton = firstToggleButton;
-        
+
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(aboutTextsScrollView);
     }
 
@@ -102,7 +98,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
                 lastActiveToggleButton.SetActive(false);
             }
             lastActiveToggleButton = button;
-            
+
             button.SetActive(true);
         });
         aboutTextsScrollView.Add(button);
@@ -120,11 +116,11 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         }
         return File.ReadAllText(fullPath);
     }
-    
+
     private void ShowAboutText(string title, string text)
     {
         aboutTextScrollView.Clear();
-        
+
         // A Unity label has a maximum length. So the text needs to be split into multiple labels.
         // Otherwise there is a warning message: "Generated text will be truncated because it exceeds 49152 vertices"
         // Split text into parts of 10000 characters.
@@ -134,14 +130,14 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         {
             Debug.Log($"Splitting about text '{title}' into {numberOfLabels} labels.");
         }
-        
+
         string[] textParts = new string[numberOfLabels];
         for (int i = 0; i < numberOfLabels; i++)
         {
             int startIndex = i * maxCharactersPerLabel;
             int length = Math.Min(maxCharactersPerLabel, text.Length - startIndex);
             textParts[i] = text.Substring(startIndex, length);
-            
+
             TextField textField = new TextField();
             textField.DisableParseEscapeSequences();
             textField.isReadOnly = true;
@@ -152,10 +148,5 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
             textField.value = textParts[i];
             aboutTextScrollView.Add(textField);
         }
-    }
-
-    public void UpdateTranslation()
-    {
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.aboutScene_title);
     }
 }

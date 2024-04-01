@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using CommonOnlineMultiplayer;
-using ProTrans;
 using UniInject;
 using UniRx;
 using Unity.Netcode;
@@ -18,7 +17,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, ITranslator, IInjectionFinishedListener
+public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
     private readonly IComparer<object> songMetaPropertyComparer = new NullOrEmptyValueLastComparer();
 
@@ -345,11 +344,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         InitSongRoulette();
 
-        UpdateInputLegend();
-        inputManager.InputDeviceChangeEventStream
-            .Subscribe(_ => UpdateInputLegend())
-            .AddTo(gameObject);
-
         importSongsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.SongLibraryOptionsScene)));
 
         if (settings.NavigateByFoldersInSongSelect)
@@ -373,6 +367,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         InitHideSlideInControlsViaClick();
 
         InitOnlineMultiplayer();
+
+        UpdateTranslation();
     }
 
     private void UpdateAvailableSongsAndUi(bool isSongScanFinished)
@@ -717,9 +713,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         Dictionary<string, string> titleToContentMap = new()
         {
             { "Search Expressions",
-                TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo) },
+                Translation.Get(R.Messages.songSelectScene_searchExpressionInfo) },
             { "Syntax",
-                TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo_syntaxTips) },
+                Translation.Get(R.Messages.songSelectScene_searchExpressionInfo_syntaxTips) },
         };
         searchExpressionHelpDialogControl = uiManager.CreateHelpDialogControl(
             "Advanced Search Expressions",
@@ -942,7 +938,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
-            UiManager.CreateNotification(TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_title));
+            UiManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_noPlayerSelected_title));
             return null;
         }
         singScenePlayerData.SelectedPlayerProfiles = selectedPlayerProfiles;
@@ -1242,7 +1238,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
             UiManager.CreateNotification(
-                TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_message));
+                Translation.Get(R.Messages.songSelectScene_noPlayerSelected_message));
             return;
         }
 
@@ -1295,9 +1291,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             $"Suggest song\n" +
             $"'{SongMetaUtils.GetArtistDashTitle(songMeta)}'\n" +
             $"to host?",
-            TranslationManager.GetTranslation(R.Messages.yes),
+            Translation.Get(R.Messages.yes),
             _ => SendSuggestSongMessageForOnlineMultiplayer(songMeta),
-            TranslationManager.GetTranslation(R.Messages.no));
+            Translation.Get(R.Messages.no));
     }
 
     private void SendSuggestSongMessageForOnlineMultiplayer(SongMeta songMeta)
@@ -1324,7 +1320,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             CloseAskToAssignMicsDialog();
             onIgnoreAndStart?.Invoke();
         });
-        askToAssignMicsDialog.AddButton(TranslationManager.GetTranslation(R.Messages.cancel), _ =>
+        askToAssignMicsDialog.AddButton(Translation.Get(R.Messages.cancel), _ =>
         {
             CloseAskToAssignMicsDialog();
         });
@@ -1642,14 +1638,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void UpdateTranslation()
     {
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
         if (HasPartyModeSceneData)
         {
-            sceneTitle.text += $"\n{PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}";
+            sceneTitle.text += $"{Translation.Get(R.Messages.songSelectScene_title)}\n" +
+                               $"{PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}";
         }
-
-        songSearchControl.UpdateTranslation();
-        UpdateInputLegend();
     }
 
     public void OnSubmitSearch()
@@ -1657,41 +1650,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         selectedEntryBeforeSearch = songRouletteControl.SelectedEntry;
         songSearchControl.ResetSearchText();
         songRouletteControl.Focus();
-    }
-
-    private void UpdateInputLegend()
-    {
-        // inputLegend.Query<Label>()
-        //     .Where(label => label is not FontIcon)
-        //     .ForEach(label => label.RemoveFromHierarchy());
-        //
-        // if (IsPlayerSelectOverlayVisible)
-        // {
-        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
-        //         TranslationManager.GetTranslation(R.Messages.back),
-        //         inputLegend);
-        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_togglePlayers,
-        //         TranslationManager.GetTranslation(R.Messages.action_togglePlayers),
-        //         inputLegend);
-        // }
-        // else
-        // {
-        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
-        //         TranslationManager.GetTranslation(R.Messages.back),
-        //         inputLegend);
-        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.ui_submit,
-        //         TranslationManager.GetTranslation(R.Messages.submit),
-        //         inputLegend);
-        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleSongMenu,
-        //         TranslationManager.GetTranslation(R.Messages.action_openSongMenu),
-        //         inputLegend);
-        // }
-        // if (inputManager.InputDeviceEnum == EInputDevice.Touch)
-        // {
-        //     inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
-        //         TranslationManager.GetTranslation(R.Messages.action_openSongMenu),
-        //         TranslationManager.GetTranslation(R.Messages.action_longPress))));
-        // }
     }
 
     public void ShowCannotUseJokerMessage()
@@ -1754,7 +1712,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             dialogControl.CloseDialog();
             createSingAlongSongControl.CreateSingAlongSong(songMeta, false);
         });
-        dialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.cancel), evt =>
+        dialogControl.AddButton(Translation.Get(R.Messages.cancel), evt =>
         {
             dialogControl.CloseDialog();
         });

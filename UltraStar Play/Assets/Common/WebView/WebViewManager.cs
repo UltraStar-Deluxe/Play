@@ -1,6 +1,5 @@
 ﻿using System;
 using PrimeInputActions;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -470,7 +469,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             settings.AcceptedWebViewHosts.Add(host);
             DoLoadUrl(url);
         });
-        messageDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.cancel),
+        messageDialogControl.AddButton(Translation.Get(R.Messages.cancel),
             _ => messageDialogControl.CloseDialog());
 
         return false;

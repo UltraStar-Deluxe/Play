@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using ProTrans;
 using UniInject;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
+public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
     [Inject]
     private ThemeManager themeManager;
@@ -109,11 +108,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         themeManager.SetCurrentTheme(themeMeta);
     }
 
-    public void UpdateTranslation()
-    {
-        themePicker.Label = TranslationManager.GetTranslation(R.Messages.options_design_theme);
-    }
-
     public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=Theme";
 
     public override bool HasHelpDialog => true;
@@ -121,12 +115,12 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     {
         Dictionary<string, string> titleToContentMap = new()
         {
-            { TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes_title),
-                TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes,
+            { Translation.Get(R.Messages.options_design_helpDialog_customThemes_title),
+                Translation.Get(R.Messages.options_design_helpDialog_customThemes,
                     "path", ApplicationUtils.ReplacePathsWithDisplayString(ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath())) },
         };
          MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_title),
+            Translation.Get(R.Messages.options_design_helpDialog_title),
             titleToContentMap);
 
         helpDialogControl.AddButton("Custom Themes Folder",

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -14,7 +13,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
+public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection
 {
     private static readonly string songArchiveInfoJsonUrl = "https://melodymania.org/downloads/song-archives-info.json";
 
@@ -114,6 +113,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                 : "On-demand",
         }.Bind(() => settings.SongDataFetchType,
             newValue => settings.SongDataFetchType = newValue);
+
+        UpdateTranslation();
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
@@ -234,30 +235,30 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     {
         Dictionary<string, string> titleToContentMap = new()
         {
-            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo_title),
-                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo) },
-            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_midiSongFormatInfo_title),
-                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_midiSongFormatInfo) },
-            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo_title),
-                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo) },
-            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo_title),
-                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo) },
-            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
-                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
+            { Translation.Get(R.Messages.options_songLibrary_helpDialog_songFormatInfo_title),
+                Translation.Get(R.Messages.options_songLibrary_helpDialog_songFormatInfo) },
+            { Translation.Get(R.Messages.options_songLibrary_helpDialog_midiSongFormatInfo_title),
+                Translation.Get(R.Messages.options_songLibrary_helpDialog_midiSongFormatInfo) },
+            { Translation.Get(R.Messages.options_songLibrary_helpDialog_addSongInfo_title),
+                Translation.Get(R.Messages.options_songLibrary_helpDialog_addSongInfo) },
+            { Translation.Get(R.Messages.options_songLibrary_helpDialog_createSongInfo_title),
+                Translation.Get(R.Messages.options_songLibrary_helpDialog_createSongInfo) },
+            { Translation.Get(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
+                Translation.Get(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
         };
         if (PlatformUtils.IsAndroid)
         {
             titleToContentMap.Add(
-                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_androidSongFolders_title),
-                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_androidSongFolders,
+                Translation.Get(R.Messages.options_songLibrary_helpDialog_androidSongFolders_title),
+                Translation.Get(R.Messages.options_songLibrary_helpDialog_androidSongFolders,
                     "androidAppSpecificStorageRelativePath", AndroidUtils.GetAppSpecificStorageRelativePath(false)));
         }
 
         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_title),
+            Translation.Get(R.Messages.options_songLibrary_helpDialog_title),
             titleToContentMap);
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
+        helpDialogControl.AddButton(Translation.Get(R.Messages.viewMore),
+            _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToAddAndCreateSongs)));
         return helpDialogControl;
     }
 
@@ -269,7 +270,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         MessageDialogControl issuesDialogControl = injector.WithRootVisualElement(dialog)
             .CreateAndInject<MessageDialogControl>();
-        issuesDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_title);
+        issuesDialogControl.Title = Translation.Get(R.Messages.options_songLibrary_songIssueDialog_title);
 
         if (SongIssueManager.IsSongIssueScanFinished)
         {
@@ -308,11 +309,11 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         AccordionGroup accordionGroup = new();
         issuesDialogControl.AddVisualElement(accordionGroup);
 
-        AccordionItem errorsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors));
+        AccordionItem errorsAccordionItem = new(Translation.Get(R.Messages.options_songLibrary_songIssueDialog_errors));
         accordionGroup.Add(errorsAccordionItem);
         FillWithSongIssues(errorsAccordionItem, SongIssueManager.GetSongErrors(), out List<QuickFixAction> errorQuickFixActions);
 
-        AccordionItem warningsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_warnings));
+        AccordionItem warningsAccordionItem = new(Translation.Get(R.Messages.options_songLibrary_songIssueDialog_warnings));
         accordionGroup.Add(warningsAccordionItem);
         FillWithSongIssues(warningsAccordionItem, SongIssueManager.GetSongWarnings(), out List<QuickFixAction> warningQuickFixActions);
 
@@ -411,7 +412,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             quickFixAllDialog.CloseDialog();
         });
 
-        quickFixAllDialog.AddButton(TranslationManager.GetTranslation(R.Messages.cancel),
+        quickFixAllDialog.AddButton(Translation.Get(R.Messages.cancel),
             _ => quickFixAllDialog.CloseDialog());
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(quickFixAllDialog.DialogRootVisualElement);
@@ -422,7 +423,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         quickFixActions = new();
         if (songIssues.IsNullOrEmpty())
         {
-            accordionItem.Add(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_noIssues)));
+            accordionItem.Add(new Label(Translation.Get(R.Messages.options_songLibrary_songIssueDialog_noIssues)));
             return;
         }
 
@@ -562,7 +563,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     public void UpdateTranslation()
     {
-        androidSongFolderHintLabel.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_androidFolderHint,
+        androidSongFolderHintLabel.text = Translation.Get(R.Messages.options_songLibrary_androidFolderHint,
             // AppSpecificStorageRelativePath is the same for internal memory and sd card.
             "androidAppSpecificStorageRelativePath", AndroidUtils.GetAppSpecificStorageRelativePath(false));
     }
@@ -574,7 +575,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         if (settings.SongDirs.IsNullOrEmpty()
             && downloadSongArchiveUiControls.IsNullOrEmpty())
         {
-            Label noSongsFoundLabel = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
+            Label noSongsFoundLabel = new(Translation.Get(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
             noSongsFoundLabel.AddToClassList("mx-auto");
             noSongsFoundLabel.style.whiteSpace = WhiteSpace.Normal;
             noSongsFoundLabel.style.marginTop = 10;
@@ -662,8 +663,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         deleteSongFolderDialog.DialogClosedEventStream.Subscribe(_ => deleteSongFolderDialog = null);
         deleteSongFolderDialog.Message = $"Do you want to remove the song folder\n'{settings.SongDirs[indexInList]}'?\nNo files will be deleted.";
 
-        deleteSongFolderDialog.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ => deleteSongFolderDialog.CloseDialog());
-        deleteSongFolderDialog.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ =>
+        deleteSongFolderDialog.AddButton(Translation.Get(R.Messages.no), _ => deleteSongFolderDialog.CloseDialog());
+        deleteSongFolderDialog.AddButton(Translation.Get(R.Messages.yes), _ =>
         {
             deleteSongFolderDialog.CloseDialog();
             DoDeleteSongFolder(indexInList);

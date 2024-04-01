@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using PortAudioForUnity;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -12,7 +11,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITranslator, IBinder
+public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 {
     private static readonly List<int> amplificationItems = new() { 0, 3, 6, 9, 12, 15, 18 };
     private static readonly List<int> noiseSuppressionItems= new() { 0, 1, 3, 5, 10, 15, 20, 25, 30 };
@@ -255,7 +254,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
                 else
                 {
                     UiManager.CreateNotification(
-                        TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout));
+                        Translation.Get(R.Messages.options_delay_calibrate_timeout));
                 }
             });
 
@@ -365,7 +364,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             string sampleRateText = SelectedMicProfile.IsInputFromConnectedClient
                 ? ""
                 : $"\n({micPitchTracker.FinalSampleRate.Value} Hz)";
-            return TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto) + sampleRateText;
+            return Translation.Get(R.Messages.options_sampleRate_auto) + sampleRateText;
         }
         return $"{item} Hz";
     }
@@ -466,7 +465,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         deleteButton.SetVisibleByDisplay(!isConnected);
 
         micVisualizer.SetMicProfile(micProfile);
-        noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
+        noteLabel.text = Translation.Get(R.Messages.options_note, "value", "?");
 
         // playRecordedAudioInfoContainer.SetVisibleByDisplay(micProfile.IsInputFromConnectedClient);
 
@@ -496,19 +495,6 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         }
     }
 
-    public void UpdateTranslation()
-    {
-        deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
-        colorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_color);
-        delayPicker.Label = TranslationManager.GetTranslation(R.Messages.options_delay);
-        amplificationPicker.Label = TranslationManager.GetTranslation(R.Messages.options_amplification);
-        noiseSuppressionPicker.Label = TranslationManager.GetTranslation(R.Messages.options_noiseSuppression);
-        sampleRatePicker.Label = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
-        noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
-        calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate);
-        notConnectedLabel.text = TranslationManager.GetTranslation(R.Messages.options_deviceNotConnected);
-    }
-
     private List<MicProfile> CreateAndPersistMicProfiles()
     {
         return MicProfileUtils.CreateAndPersistMicProfiles(
@@ -530,22 +516,22 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     {
         Dictionary<string, string> titleToContentMap = new()
         {
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelay_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelay) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelayCalibration_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelayCalibration) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_amplification_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_amplification) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_noiseSuppression_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_noiseSuppression) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate) },
+            { Translation.Get(R.Messages.options_recording_helpDialog_micDelay_title),
+                Translation.Get(R.Messages.options_recording_helpDialog_micDelay) },
+            { Translation.Get(R.Messages.options_recording_helpDialog_micDelayCalibration_title),
+                Translation.Get(R.Messages.options_recording_helpDialog_micDelayCalibration) },
+            { Translation.Get(R.Messages.options_recording_helpDialog_amplification_title),
+                Translation.Get(R.Messages.options_recording_helpDialog_amplification) },
+            { Translation.Get(R.Messages.options_recording_helpDialog_noiseSuppression_title),
+                Translation.Get(R.Messages.options_recording_helpDialog_noiseSuppression) },
+            { Translation.Get(R.Messages.options_recording_helpDialog_sampleRate_title),
+                Translation.Get(R.Messages.options_recording_helpDialog_sampleRate) },
         };
         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_title),
+            Translation.Get(R.Messages.options_recording_helpDialog_title),
             titleToContentMap);
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToConfigureMicsAndSpeaker)));
+        helpDialogControl.AddButton(Translation.Get(R.Messages.viewMore),
+            _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToConfigureMicsAndSpeaker)));
         return helpDialogControl;
     }
 

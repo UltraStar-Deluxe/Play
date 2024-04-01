@@ -1,5 +1,4 @@
-﻿using ProTrans;
-using UniInject;
+﻿using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -99,7 +98,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         // Show the note that has been detected
         if (pitchEvent != null && pitchEvent.MidiNote > 0)
         {
-            noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note,
+            noteLabel.text = Translation.Get(R.Messages.options_note,
                 "value", MidiUtils.GetAbsoluteName(pitchEvent.MidiNote));
 
             float midiNoteFactor = ((float)pitchEvent.MidiNote - MidiUtils.SingableNoteMin) / (MidiUtils.SingableNoteRange);
@@ -107,7 +106,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         }
         else
         {
-            noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note,
+            noteLabel.text = Translation.Get(R.Messages.options_note,
                 "value", "?");
         }
     }

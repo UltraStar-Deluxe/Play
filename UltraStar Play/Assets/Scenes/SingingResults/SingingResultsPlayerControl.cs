@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using CommonOnlineMultiplayer;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjectionFinishedListener, IDisposable
+public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
     [Inject]
     private SingingResultsSceneControl singingResultsSceneControl;
@@ -300,9 +299,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     public void UpdateTranslation()
     {
-        normalNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = TranslationManager.GetTranslation(R.Messages.score_notes);
-        goldenNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = TranslationManager.GetTranslation(R.Messages.score_goldenNotes);
-        phraseBonusScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = TranslationManager.GetTranslation(R.Messages.score_phraseBonus);
+        normalNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_notes);
+        goldenNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_goldenNotes);
+        phraseBonusScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_phraseBonus);
     }
 
     private void SetScoreRowLabelText(VisualElement container, float interpolatedValue)

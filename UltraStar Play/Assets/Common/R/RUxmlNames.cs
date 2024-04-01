@@ -7,7 +7,7 @@ public static partial class R
         public const string aboutIcon = "aboutIcon";
         public const string aboutTextScrollView = "aboutTextScrollView";
         public const string aboutTextsScrollView = "aboutTextsScrollView";
-        public const string aboutUSPlayButton = "aboutUSPlayButton";
+        public const string aboutTheGameButton = "aboutTheGameButton";
         public const string addButton = "addButton";
         public const string addGuestButton = "addGuestButton";
         public const string addPlayerIcon = "addPlayerIcon";

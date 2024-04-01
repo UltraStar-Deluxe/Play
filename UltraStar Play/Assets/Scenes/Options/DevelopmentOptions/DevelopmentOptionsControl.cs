@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PortAudioForUnity;
-using ProTrans;
 using Serilog.Events;
 using SimpleHttpServerForUnity;
 using UniInject;
@@ -16,7 +15,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator, IBinder
+public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjection, IBinder
 {
     [InjectedInInspector]
     public VisualTreeAsset uploadWorkshopItemDialogUi;
@@ -276,7 +275,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         }
         else
         {
-            httpEndpointExampleLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerNotSupported);
+            httpEndpointExampleLabel.text = Translation.Get(R.Messages.options_httpServerNotSupported);
         }
 
         // View and copy log
@@ -463,10 +462,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 uploadWorkshopItemDialogControl = null;
             });
         uploadWorkshopItemDialogControl.AddButton("Learn More",
-            _ => ApplicationUtils.OpenUrl(TranslationManager.GetTranslation(R.Messages.uri_howToSteamWorkshop)));
+            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToSteamWorkshop)));
         uploadWorkshopItemDialogControl.AddButton("Publish Workshop Item",
             _ => uploadWorkshopItemUiControl.PublishWorkshopItem());
-        uploadWorkshopItemDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.cancel),
+        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.cancel),
             _ => uploadWorkshopItemDialogControl.CloseDialog());
     }
 
@@ -644,13 +643,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     private void RestartScene()
     {
         sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.DevelopmentOptionsScene));
-    }
-
-    public void UpdateTranslation()
-    {
-        showFpsToggle.label = TranslationManager.GetTranslation(R.Messages.options_showFps);
-        pitchDetectionAlgorithmPicker.Label = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
-        analyzeBeatsWithoutTargetNoteToggle.label = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
     }
 
     public List<IBinding> GetBindings()

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using ProTrans;
 using UniInject;
 using UniInject.Extensions;
 using UnityEngine;
@@ -82,23 +81,23 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
     {
         Dictionary<string, string> titleToContentMap = new()
         {
-            { TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_intro_title),
-                TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_intro) },
-            { TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_install_title),
-                TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_install,
+            { Translation.Get(R.Messages.options_mod_helpDialog_intro_title),
+                Translation.Get(R.Messages.options_mod_helpDialog_intro) },
+            { Translation.Get(R.Messages.options_mod_helpDialog_install_title),
+                Translation.Get(R.Messages.options_mod_helpDialog_install,
                     "modsRootFolderPath", ModFolderUtils.GetUserDefinedModsRootFolderAbsolutePath()) },
-            { TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_developMods_title),
-                TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_developMods) },
-            { TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_modLoading_title),
-                TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_modLoading) },
+            { Translation.Get(R.Messages.options_mod_helpDialog_developMods_title),
+                Translation.Get(R.Messages.options_mod_helpDialog_developMods) },
+            { Translation.Get(R.Messages.options_mod_helpDialog_modLoading_title),
+                Translation.Get(R.Messages.options_mod_helpDialog_modLoading) },
         };
         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_title),
+            Translation.Get(R.Messages.options_mod_helpDialog_title),
             titleToContentMap);
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.action_openModsRootFolder),
+        helpDialogControl.AddButton(Translation.Get(R.Messages.action_openModsRootFolder),
             _ => ApplicationUtils.OpenDirectory(ModFolderUtils.GetUserDefinedModsRootFolderAbsolutePath()));
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToMods)));
+        helpDialogControl.AddButton(Translation.Get(R.Messages.viewMore),
+            _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToMods)));
         return helpDialogControl;
     }
 

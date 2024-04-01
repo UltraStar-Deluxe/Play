@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommonOnlineMultiplayer;
-using ProTrans;
 using UniInject;
 using UniInject.Extensions;
 using UniRx;
@@ -13,7 +12,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IBinder, ITranslator
+public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IBinder
 {
     [InjectedInInspector]
     public VisualTreeAsset nPlayerUi;
@@ -572,17 +571,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             }
         }
         return SongRating.ToneDeaf;
-    }
-
-    public void UpdateTranslation()
-    {
-        continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
-        singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
-
-        if (HasPartyModeSceneData)
-        {
-            //sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundCount}";
-        }
     }
 
     private void OnDestroy()

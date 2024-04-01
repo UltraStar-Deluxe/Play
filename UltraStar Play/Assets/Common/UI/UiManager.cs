@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -188,7 +187,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
         closeButtonText = !closeButtonText.IsNullOrEmpty()
             ? closeButtonText
-            : TranslationManager.GetTranslation(R.Messages.close);
+            : Translation.Get(R.Messages.close);
         messageDialogControl.AddButton(closeButtonText, evt =>
         {
             messageDialogControl.CloseDialog();
@@ -214,7 +213,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
         cancelButtonText = !cancelButtonText.IsNullOrEmpty()
             ? cancelButtonText
-            : TranslationManager.GetTranslation(R.Messages.cancel);
+            : Translation.Get(R.Messages.cancel);
         messageDialogControl.AddButton(cancelButtonText, evt =>
         {
             messageDialogControl.CloseDialog();

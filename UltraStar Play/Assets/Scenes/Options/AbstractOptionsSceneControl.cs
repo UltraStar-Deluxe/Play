@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using PrimeInputActions;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -14,9 +13,6 @@ public abstract class AbstractOptionsSceneControl : MonoBehaviour, INeedInjectio
 {
     [Inject]
     protected SceneNavigator sceneNavigator;
-
-    [Inject]
-    protected TranslationManager translationManager;
 
     [Inject]
     protected Settings settings;

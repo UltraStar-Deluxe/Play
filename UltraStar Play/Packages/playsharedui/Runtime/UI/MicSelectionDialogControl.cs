@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ProTrans;
 using UniInject;
 using UnityEngine.UIElements;
 
@@ -26,11 +25,11 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
     public bool ShowInfoLabel { get; set; } = true;
 
     private readonly List<MicWithNameControl> micWithNameControls = new();
-    
+
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
-        AddButton(TranslationManager.GetTranslation("cancel"), _ => CloseDialog());
+        AddButton(Translation.Get("cancel"), _ => CloseDialog());
     }
 
     public void Update()
@@ -39,7 +38,7 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
             .ToList()
             .ForEach(it => it.Update());
     }
-    
+
     private void UpdateMicProfileList()
     {
         dialogMessageContainer.Clear();
@@ -56,7 +55,7 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
                 .WithBindingForInstance(otherMicProfile)
                 .CreateAndInject<MicWithNameControl>();
             micWithNameControl.OnMicSelected = OnMicSelected;
-            
+
             micWithNameControls.Add(micWithNameControl);
         });
 

@@ -70,29 +70,24 @@ public static partial class R
         public static readonly string graph_legend_good = "graph_legend_good";
         public static readonly string graph_legend_missed = "graph_legend_missed";
         public static readonly string graph_legend_perfect = "graph_legend_perfect";
+        public static readonly string highscores = "highscores";
         public static readonly string highscoreScene_title = "highscoreScene_title";
         public static readonly string i18nDemoScene_hello = "i18nDemoScene_hello";
         public static readonly string i18nDemoScene_love = "i18nDemoScene_love";
         public static readonly string i18nDemoScene_multiline = "i18nDemoScene_multiline";
         public static readonly string language = "language";
+        public static readonly string language_de = "language_de";
+        public static readonly string language_en = "language_en";
+        public static readonly string language_es = "language_es";
+        public static readonly string language_fr = "language_fr";
+        public static readonly string language_pl = "language_pl";
         public static readonly string load = "load";
         public static readonly string loading = "loading";
         public static readonly string loadingScene_unexpectedErrorMessage = "loadingScene_unexpectedErrorMessage";
-        public static readonly string mainScene_button_about_description = "mainScene_button_about_description";
-        public static readonly string mainScene_button_about_label = "mainScene_button_about_label";
-        public static readonly string mainScene_button_credits_description = "mainScene_button_credits_description";
-        public static readonly string mainScene_button_description_noImplementation = "mainScene_button_description_noImplementation";
-        public static readonly string mainScene_button_jukebox_label = "mainScene_button_jukebox_label";
-        public static readonly string mainScene_button_newSong_description = "mainScene_button_newSong_description";
-        public static readonly string mainScene_button_newSong_label = "mainScene_button_newSong_label";
-        public static readonly string mainScene_button_party_description = "mainScene_button_party_description";
-        public static readonly string mainScene_button_party_label = "mainScene_button_party_label";
-        public static readonly string mainScene_button_quit_description = "mainScene_button_quit_description";
-        public static readonly string mainScene_button_quit_label = "mainScene_button_quit_label";
-        public static readonly string mainScene_button_settings_description = "mainScene_button_settings_description";
-        public static readonly string mainScene_button_settings_label = "mainScene_button_settings_label";
-        public static readonly string mainScene_button_sing_description = "mainScene_button_sing_description";
-        public static readonly string mainScene_button_sing_label = "mainScene_button_sing_label";
+        public static readonly string mainScene_button_onlineGame = "mainScene_button_onlineGame";
+        public static readonly string mainScene_button_party = "mainScene_button_party";
+        public static readonly string mainScene_button_quit = "mainScene_button_quit";
+        public static readonly string mainScene_button_sing = "mainScene_button_sing";
         public static readonly string mainScene_quitDialog_message = "mainScene_quitDialog_message";
         public static readonly string mainScene_quitDialog_title = "mainScene_quitDialog_title";
         public static readonly string mainScene_title = "mainScene_title";
@@ -265,6 +260,7 @@ public static partial class R
         public static readonly string rating_song_ultraStar = "rating_song_ultraStar";
         public static readonly string rating_song_wannabe = "rating_song_wannabe";
         public static readonly string refresh = "refresh";
+        public static readonly string replay = "replay";
         public static readonly string save = "save";
         public static readonly string score_goldenNotes = "score_goldenNotes";
         public static readonly string score_notes = "score_notes";
@@ -333,6 +329,7 @@ public static partial class R
         public static readonly string songSelectScene_videoLegendLabel = "songSelectScene_videoLegendLabel";
         public static readonly string start = "start";
         public static readonly string submit = "submit";
+        public static readonly string teamResults = "teamResults";
         public static readonly string timeUppercase = "timeUppercase";
         public static readonly string uri_howToAddAndCreateSongs = "uri_howToAddAndCreateSongs";
         public static readonly string uri_howToCompanionApp = "uri_howToCompanionApp";
@@ -346,5 +343,6 @@ public static partial class R
         public static readonly string viewMore = "viewMore";
         public static readonly string warning = "warning";
         public static readonly string yes = "yes";
+        public static readonly string yourResults = "yourResults";
     }
 }

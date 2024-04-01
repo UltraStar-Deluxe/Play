@@ -5,7 +5,7 @@
                 <ui:Label text="New Version Available" name="dialogTitle" class="dialogTitle" />
             </ui:VisualElement>
             <ui:VisualElement name="dialogMessageContainer" style="max-width: 100%; align-items: center; justify-content: center; flex-grow: 1;">
-                <ui:Label text="UltraStar Play xx-yy-zzzz has been released." name="dialogMessage" class="dialogMessage" style="-unity-text-align: upper-center;" />
+                <ui:Label text="Version xx-yy-zzzz has been released." name="dialogMessage" class="dialogMessage" style="-unity-text-align: upper-center;" />
             </ui:VisualElement>
             <ui:VisualElement name="dialogTextButtonContainer" style="flex-direction: column; justify-content: flex-start; width: 100%; padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 2px; align-items: flex-start;">
                 <ui:Button text="Ignore this release" name="ignoreThisVersionButton" class="dialogButton dialogTextButton" style="background-color: rgba(66, 163, 231, 0);" />

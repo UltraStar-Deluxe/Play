@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using PrimeInputActions;
-using ProTrans;
 using UnityEditor;
 
 public static class CreateConstantsMenuItems

@@ -951,6 +951,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4190377001124415443}
   - {fileID: 5257901910265333630}
   - {fileID: 2392547021998789281}
   - {fileID: 6171799238151469095}
@@ -997,7 +998,6 @@ Transform:
   - {fileID: 8635082549009352342}
   - {fileID: 3601633907700374255}
   - {fileID: 6394043851129589506}
-  - {fileID: 4539458775672432122}
   - {fileID: 392402727400235556}
   - {fileID: 6948374851428345165}
   - {fileID: 6169907629867958379}
@@ -1143,7 +1143,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8069444317427349030}
+  m_Father: {fileID: 5483831765678408185}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &9022508001146490944
 MonoBehaviour:
@@ -1157,15 +1157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 713e7f6d00e1ea64bbf2732f88763a68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  propertiesFolderRelativeToResourcesFolder: Translations
-  propertiesFileName: messages
-  logInfoInEditMode: 0
-  logInfoInPlayMode: 1
-  generatedConstantsFolder: Assets/Common/R
   generateConstantsOnResourceChange: 1
-  useFallbackIfNotInCurrentLanguage: 1
-  currentLanguage: 10
-  defaultPropertiesFileLanguage: 10
 --- !u!1 &1125044229191517596
 GameObject:
   m_ObjectHideFlags: 0
@@ -1247,7 +1239,6 @@ Transform:
   - {fileID: 3684749312725033491}
   - {fileID: 7070348881094510559}
   - {fileID: 8815353626146034715}
-  - {fileID: 4190377001124415443}
   - {fileID: 5483831765678408185}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7966,50 +7957,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 28d76e8023e4f5f4a8ac8bad1ab7cf5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &5077495643793114996
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4539458775672432122}
-  - component: {fileID: 4980946144356743718}
-  m_Layer: 0
-  m_Name: ApplyTranslationsOnSceneChangeControl
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4539458775672432122
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5077495643793114996}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 116.26877, y: -87.73337, z: -263.9158}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5483831765678408185}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4980946144356743718
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5077495643793114996}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e3eb005d367f354988932948bc73960, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &5278263641372032629

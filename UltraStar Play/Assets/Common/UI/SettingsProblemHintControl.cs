@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ProTrans;
-using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -52,16 +50,16 @@ public class SettingsProblemHintControl
         List<string> result = new();
         if (settings.SongDirs.IsNullOrEmpty())
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noSongFolders));
+            result.Add(Translation.Get(R.Messages.settingsProblem_noSongFolders));
         }
         else if (settings.SongDirs.AnyMatch(songDir => !Directory.Exists(songDir)))
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_songFolderDoesNotExist));
+            result.Add(Translation.Get(R.Messages.settingsProblem_songFolderDoesNotExist));
         }
 
         if (SongIssueManager.HasSongIssues)
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_thereAreSongIssues));
+            result.Add(Translation.Get(R.Messages.settingsProblem_thereAreSongIssues));
         }
 
         // Check song folders
@@ -73,14 +71,14 @@ public class SettingsProblemHintControl
                 && IsDuplicateFolder(songFolder, settings.SongDirs))
             {
                 hasDuplicateFolder = true;
-                result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_duplicateSongFolders));
+                result.Add(Translation.Get(R.Messages.settingsProblem_duplicateSongFolders));
             }
 
             if (!hasDuplicateSubfolder
                 && IsSubfolderOfAnyOtherFolder(songFolder, settings.SongDirs, out string _))
             {
                 hasDuplicateSubfolder = true;
-                result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_songFolderIsSubfolderOfOtherSongFolder));
+                result.Add(Translation.Get(R.Messages.settingsProblem_songFolderIsSubfolderOfOtherSongFolder));
             }
         }
 
@@ -94,12 +92,12 @@ public class SettingsProblemHintControl
             || !settings.MicProfiles
                 .AnyMatch(micProfile => micProfile.IsEnabled))
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noMicProfiles));
+            result.Add(Translation.Get(R.Messages.settingsProblem_noMicProfiles));
         }
         else if (settings.MicProfiles
                  .AllMatch(micProfile => !micProfile.IsEnabled || !micProfile.IsConnected(ServerSideConnectRequestManager.Instance)))
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noConnectedAndEnabledMicProfile));
+            result.Add(Translation.Get(R.Messages.settingsProblem_noConnectedAndEnabledMicProfile));
         }
         return result;
     }
@@ -109,11 +107,11 @@ public class SettingsProblemHintControl
         List<string> result = new();
         if (settings.PlayerProfiles.IsNullOrEmpty())
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noPlayerProfile));
+            result.Add(Translation.Get(R.Messages.settingsProblem_noPlayerProfile));
         }
         else if (!settings.PlayerProfiles.AnyMatch(playerProfile => playerProfile.IsEnabled))
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noEnabledPlayerProfile));
+            result.Add(Translation.Get(R.Messages.settingsProblem_noEnabledPlayerProfile));
         }
         return result;
     }

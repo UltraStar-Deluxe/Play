@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -415,7 +414,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
         if (playlist is UltraStarAllSongsPlaylist)
         {
-            return TranslationManager.GetTranslation(R.Messages.playlistName_allSongs);
+            return Translation.Get(R.Messages.playlistName_allSongs);
         }
 
         return playlist.Name;

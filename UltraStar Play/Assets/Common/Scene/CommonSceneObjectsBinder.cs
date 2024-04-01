@@ -2,7 +2,6 @@
 using CommonOnlineMultiplayer;
 using Netcode.Transports.Facepunch;
 using PrimeInputActions;
-using ProTrans;
 using SimpleHttpServerForUnity;
 using SteamOnlineMultiplayer;
 using UniInject;
@@ -29,7 +28,6 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(ImageManager.Instance);
         bb.BindExistingInstance(AudioManager.Instance);
         bb.BindExistingInstance(TranslationManager.Instance);
-        bb.BindExistingInstance(UltraStarPlayTranslationManager.Instance);
         bb.BindExistingInstance(ContextMenuPopupManager.Instance);
         bb.BindExistingInstance(WebCamManager.Instance);
         bb.BindExistingInstance(RenderTextureManager.Instance);

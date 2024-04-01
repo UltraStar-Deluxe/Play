@@ -1,4 +1,3 @@
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -7,7 +6,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
+public class EditPlaylistControl : MonoBehaviour, INeedInjection
 {
     [Inject(UxmlName = R.UxmlNames.editPlaylistButton)]
     private Button editPlaylistButton;
@@ -17,7 +16,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
 
     [Inject(UxmlName = R.UxmlNames.editPlaylistOverlay)]
     private VisualElement editPlaylistOverlay;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownOverlay)]
     private VisualElement searchPropertyDropdownOverlay;
 
@@ -102,15 +101,15 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         {
             case EPlaylistNameIssue.Invalid:
                 editPlaylistDialogTitle.text = "Invalid playlist name";
-                submitEditPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.cancel);
+                submitEditPlaylistButton.text = Translation.Get(R.Messages.cancel);
                 break;
             case EPlaylistNameIssue.Duplicate:
                 editPlaylistDialogTitle.text = "Duplicate playlist name";
-                submitEditPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.cancel);
+                submitEditPlaylistButton.text = Translation.Get(R.Messages.cancel);
                 break;
             default:
                 editPlaylistDialogTitle.text = titleText;
-                submitEditPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
+                submitEditPlaylistButton.text = Translation.Get(R.Messages.continue_);
                 break;
         }
     }
@@ -174,10 +173,5 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
             UiManager.CreateNotification(errorMessage);
         }
         HideEditPlaylistDialog();
-    }
-
-    public void UpdateTranslation()
-    {
-        playlistChooserDropdownTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_playlistDropdownTitle);
     }
 }

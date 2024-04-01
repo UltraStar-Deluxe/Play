@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
@@ -77,11 +76,11 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
     private void CreateSongPropertiesInputControls()
     {
         CreateSongPropertiesInputControl(ESongProperty.Artist,
-            TranslationManager.GetTranslation(R.Messages.songProperty_artist),
+            Translation.Get(R.Messages.songProperty_artist),
             () => songMeta.Artist,
             null);
         CreateSongPropertiesInputControl(ESongProperty.Title,
-            TranslationManager.GetTranslation(R.Messages.songProperty_title),
+            Translation.Get(R.Messages.songProperty_title),
             () => songMeta.Title,
             null);
         CreateSongPropertiesInputControl(ESongProperty.Mp3,
@@ -133,19 +132,19 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
             PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.MedleyEndInMillis, true, "0"),
             PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.MedleyEndInMillis = (int)newValue));
         CreateSongPropertiesInputControl(ESongProperty.Language,
-            TranslationManager.GetTranslation(R.Messages.songProperty_language),
+            Translation.Get(R.Messages.songProperty_language),
             () => songMeta.Language,
             (newValue) => songMeta.Language = newValue);
         CreateSongPropertiesInputControl(ESongProperty.Edition,
-            TranslationManager.GetTranslation(R.Messages.songProperty_edition),
+            Translation.Get(R.Messages.songProperty_edition),
             () => songMeta.Edition,
             (newValue) => songMeta.Edition = newValue);
         CreateSongPropertiesInputControl(ESongProperty.Genre,
-            TranslationManager.GetTranslation(R.Messages.songProperty_genre),
+            Translation.Get(R.Messages.songProperty_genre),
             () => songMeta.Genre,
             (newValue) => songMeta.Genre = newValue);
         CreateSongPropertiesInputControl(ESongProperty.Year,
-            TranslationManager.GetTranslation(R.Messages.songProperty_year),
+            Translation.Get(R.Messages.songProperty_year),
             PropertyUtils.CreateStringGetterFromUintGetter(() => songMeta.Year, true),
             PropertyUtils.CreateStringSetterFromUintSetter(newValue => songMeta.Year = newValue));
         CreateSongPropertiesInputControl(ESongProperty.VocalsAudio,

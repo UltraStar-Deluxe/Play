@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using PrimeInputActions;
-using ProTrans;
 using Serilog.Events;
 using UniInject;
 using UniRx;
@@ -100,9 +99,6 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         // Extract StreamingAssets on Android from the JAR
         AndroidStreamingAssets.Extract();
 
-        // Wait for Theme and I18N resources
-        TranslationManager.Instance.ReloadTranslationsAndUpdateScene();
-
         // Ask for microphone and webcam permissions on Android
         if (PlatformUtils.IsAndroid)
         {
@@ -189,10 +185,10 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     {
         Debug.LogWarning("Showing general error message in loading scene. Probably something went wrong.");
         unexpectedErrorContainer.ShowByDisplay();
-        unexpectedErrorLabel.text = TranslationManager.GetTranslation(R.Messages.loadingScene_unexpectedErrorMessage,
+        unexpectedErrorLabel.text = Translation.Get(R.Messages.loadingScene_unexpectedErrorMessage,
             "path", ApplicationUtils.ReplacePathsWithDisplayString(Log.logFilePath));
-        viewMoreButton.text = TranslationManager.GetTranslation(R.Messages.viewMore);
-        viewMoreButton.RegisterCallbackButtonTriggered(_ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_logFiles)));
+        viewMoreButton.text = Translation.Get(R.Messages.viewMore);
+        viewMoreButton.RegisterCallbackButtonTriggered(_ => Application.OpenURL(Translation.Get(R.Messages.uri_logFiles)));
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));

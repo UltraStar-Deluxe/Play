@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using ProTrans;
 
-public class TranslatedLabeledItemPickerControl<T> : LabeledItemPickerControl<T>, ITranslator
+public class TranslatedLabeledItemPickerControl<T> : LabeledItemPickerControl<T>
 {
     public TranslatedLabeledItemPickerControl(
         ItemPicker itemPicker,
