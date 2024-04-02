@@ -256,4 +256,10 @@ public static class VisualElementUtils
                    && !ancestor.ClassListContains(VisualElementSlideInControl.SlideOutClassName);
         }) ;
     }
+
+    public static void SetAbsoluteWorldBoundPosition(VisualElement element, Vector2 pos)
+    {
+        element.style.left = pos.x - (element.parent != null ? element.parent.worldBound.xMin : 0);
+        element.style.top = pos.y - (element.parent != null ? element.parent.worldBound.yMin : 0);
+    }
 }

@@ -181,7 +181,6 @@ public static partial class R
         public const string dummyHostLobbyControls = "dummyHostLobbyControls";
         public const string dummyJoinLobbyControls = "dummyJoinLobbyControls";
         public const string dummyPermissionToggle = "dummyPermissionToggle";
-        public const string dummyToggle = "dummyToggle";
         public const string durationLabel = "durationLabel";
         public const string editingGroup = "editingGroup";
         public const string editionPropertyToggle = "editionPropertyToggle";
