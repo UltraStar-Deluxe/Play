@@ -319,8 +319,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
     public void UpdateTranslation()
     {
-        using DisposableStopwatch d = new("UpdateTranslations");
-
         sceneTitle.text = Translation.Get(R.Messages.options);
 
         UpdateSceneToNameMap();
