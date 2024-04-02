@@ -14,11 +14,11 @@ public class TooltipControl
     public string TooltipText { get; set; }
 
     private readonly VisualElement visualElement;
-    
+
     private Label label;
     private IEnumerator showTooltipCoroutine;
     private IEnumerator closeTooltipCoroutine;
-    private bool showTooltipByPointerDown;
+    private bool tooltipVisibleWithAutoClose;
 
     public bool ShowTooltipOnPointerDown { get; set; } = true;
 
@@ -31,9 +31,9 @@ public class TooltipControl
         this.TooltipText = tooltipText;
         this.ShowTooltipOnPointerDown = showTooltipOnPointerDown;
 
-        this.visualElement.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnter());
-        this.visualElement.RegisterCallback<PointerLeaveEvent>(evt => OnPointerExit());
-        this.visualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown());
+        this.visualElement.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnter(), TrickleDown.TrickleDown);
+        this.visualElement.RegisterCallback<PointerLeaveEvent>(evt => OnPointerExit(), TrickleDown.TrickleDown);
+        this.visualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(), TrickleDown.TrickleDown);
     }
 
     private void OnPointerDown()
@@ -43,14 +43,8 @@ public class TooltipControl
         {
             return;
         }
-        
-        showTooltipByPointerDown = true;
-        ShowTooltip();
-        GetUiDocument().StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(showTooltipOnPointerDownTimeInSeconds, () =>
-        {
-            showTooltipByPointerDown = false;
-            CloseTooltip();
-        }));
+
+        ShowTooltipWithAutoClose();
     }
 
     private UIDocument GetUiDocument()
@@ -60,7 +54,7 @@ public class TooltipControl
 
     private void OnPointerEnter()
     {
-        if (showTooltipByPointerDown)
+        if (tooltipVisibleWithAutoClose)
         {
             return;
         }
@@ -72,7 +66,7 @@ public class TooltipControl
 
         showTooltipCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(ShowDelayInSeconds, () =>
         {
-            if (showTooltipByPointerDown)
+            if (tooltipVisibleWithAutoClose)
             {
                 return;
             }
@@ -83,7 +77,7 @@ public class TooltipControl
 
     private void OnPointerExit()
     {
-        if (showTooltipByPointerDown)
+        if (tooltipVisibleWithAutoClose)
         {
             return;
         }
@@ -108,14 +102,17 @@ public class TooltipControl
 
     public void ShowTooltip()
     {
+        ShowTooltip(GetDefaultTooltipPosition());
+    }
+
+    public void ShowTooltip(Vector2 pos)
+    {
         CloseTooltip();
 
         if (TooltipText.IsNullOrEmpty())
         {
             return;
         }
-        
-        Vector2 pos = InputUtils.GetPointerPositionInPanelCoordinates(GetPanelHelper(), true) + tooltipOffsetInPx;
 
         label = new Label();
         label.AddToClassList("tooltip");
@@ -128,6 +125,27 @@ public class TooltipControl
         GetUiDocument().rootVisualElement.Add(label);
 
         label.RegisterCallbackOneShot<GeometryChangedEvent>(evt => VisualElementUtils.MoveVisualElementFullyInsideScreen(label, GetPanelHelper()));
+    }
+
+    public void ShowTooltipWithAutoClose()
+    {
+        ShowTooltipWithAutoClose(GetDefaultTooltipPosition());
+    }
+
+    public void ShowTooltipWithAutoClose(Vector2 pos)
+    {
+        tooltipVisibleWithAutoClose = true;
+        ShowTooltip(pos);
+        GetUiDocument().StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(showTooltipOnPointerDownTimeInSeconds, () =>
+        {
+            tooltipVisibleWithAutoClose = false;
+            CloseTooltip();
+        }));
+    }
+
+    private Vector2 GetDefaultTooltipPosition()
+    {
+        return InputUtils.GetPointerPositionInPanelCoordinates(GetPanelHelper(), true) + tooltipOffsetInPx;
     }
 
     private PanelHelper GetPanelHelper()

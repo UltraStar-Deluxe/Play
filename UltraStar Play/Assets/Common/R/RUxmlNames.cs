@@ -181,6 +181,7 @@ public static partial class R
         public const string dummyHostLobbyControls = "dummyHostLobbyControls";
         public const string dummyJoinLobbyControls = "dummyJoinLobbyControls";
         public const string dummyPermissionToggle = "dummyPermissionToggle";
+        public const string dummyToggle = "dummyToggle";
         public const string durationLabel = "durationLabel";
         public const string editingGroup = "editingGroup";
         public const string editionPropertyToggle = "editionPropertyToggle";
@@ -198,6 +199,7 @@ public static partial class R
         public const string enqueueIcon = "enqueueIcon";
         public const string entriesContainer = "entriesContainer";
         public const string entryContainer = "entryContainer";
+        public const string exampleInlineHelpButton = "exampleInlineHelpButton";
         public const string exitSceneButton = "exitSceneButton";
         public const string externalToolsGroup = "externalToolsGroup";
         public const string ffmpegConversionCommandsJsonPicker = "ffmpegConversionCommandsJsonPicker";
