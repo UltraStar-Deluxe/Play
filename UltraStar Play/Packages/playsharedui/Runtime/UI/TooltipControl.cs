@@ -25,6 +25,8 @@ public class TooltipControl
 
     private readonly VisualElement visualElement;
 
+    private bool isPointerOver;
+
     private Label label;
     private IEnumerator showTooltipCoroutine;
     private IEnumerator closeTooltipCoroutine;
@@ -64,6 +66,8 @@ public class TooltipControl
 
     private void OnPointerEnter()
     {
+        isPointerOver = true;
+
         if (tooltipVisibleWithAutoClose)
         {
             return;
@@ -76,7 +80,8 @@ public class TooltipControl
 
         showTooltipCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(ShowDelayInSeconds, () =>
         {
-            if (tooltipVisibleWithAutoClose)
+            if (tooltipVisibleWithAutoClose
+                || !isPointerOver)
             {
                 return;
             }
@@ -87,6 +92,8 @@ public class TooltipControl
 
     private void OnPointerExit()
     {
+        isPointerOver = false;
+
         if (tooltipVisibleWithAutoClose)
         {
             return;
