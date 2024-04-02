@@ -1,9 +1,19 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class TooltipControl
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        openTooltipControls.Clear();
+    }
+
+    private static readonly HashSet<TooltipControl> openTooltipControls = new();
+    public static IReadOnlyCollection<TooltipControl> OpenTooltipControls => openTooltipControls;
+
     private static readonly float defaultShowDelayInSeconds = 1f;
     private static readonly float defaultCloseDelayInSeconds = 0.2f;
     private static readonly Vector2 tooltipOffsetInPx = new(10, 10);
@@ -98,6 +108,9 @@ public class TooltipControl
             return;
         }
         label.RemoveFromHierarchy();
+        label = null;
+
+        openTooltipControls.Remove(this);
     }
 
     public void ShowTooltip()
@@ -125,6 +138,8 @@ public class TooltipControl
         GetUiDocument().rootVisualElement.Add(label);
 
         label.RegisterCallbackOneShot<GeometryChangedEvent>(evt => VisualElementUtils.MoveVisualElementFullyInsideScreen(label, GetPanelHelper()));
+
+        openTooltipControls.Add(this);
     }
 
     public void ShowTooltipWithAutoClose()
