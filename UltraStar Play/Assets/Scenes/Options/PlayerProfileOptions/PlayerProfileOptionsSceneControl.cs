@@ -198,30 +198,5 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
 
     public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=PlayerProfileImage";
 
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
-    {
-        string absolutePlayerProfileImagesFolder = PlayerProfileUtils.GetDefaultPlayerProfileImageFolderAbsolutePath();
-
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { Translation.Get(R.Messages.options_playerProfiles_helpDialog_activateProfile_title),
-                Translation.Get(R.Messages.options_playerProfiles_helpDialog_activateProfile) },
-            { Translation.Get(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages_title),
-                Translation.Get(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages) },
-            { Translation.Get(R.Messages.options_playerProfiles_helpDialog_customProfileImages_title),
-                Translation.Get(R.Messages.options_playerProfiles_helpDialog_customProfileImages,
-                    "path", ApplicationUtils.ReplacePathsWithDisplayString(absolutePlayerProfileImagesFolder)) },
-        };
-        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            Translation.Get(R.Messages.options_playerProfiles_helpDialog_title),
-            titleToContentMap);
-        helpDialogControl.AddButton("Images Folder",
-            _ =>
-            {
-                DirectoryUtils.CreateDirectory(absolutePlayerProfileImagesFolder);
-                ApplicationUtils.OpenDirectory(absolutePlayerProfileImagesFolder);
-            });
-        return helpDialogControl;
-    }
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToPlayerProfiles);
 }

@@ -78,21 +78,5 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
         return visualElement;
     }
 
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
-    {
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { Translation.Get(R.Messages.options_companionApp_helpDialog_features_title),
-                Translation.Get(R.Messages.options_companionApp_helpDialog_features) },
-            { Translation.Get(R.Messages.options_companionApp_helpDialog_install_title),
-                Translation.Get(R.Messages.options_companionApp_helpDialog_install) },
-        };
-        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            Translation.Get(R.Messages.options_companionApp_helpDialog_title),
-            titleToContentMap);
-        helpDialogControl.AddButton(Translation.Get(R.Messages.viewMore),
-            _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToCompanionApp)));
-        return helpDialogControl;
-    }
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToCompanionApp);
 }
