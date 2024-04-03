@@ -44,16 +44,6 @@ public static partial class R
         public static readonly string companionApp_title = "companionApp_title";
         public static readonly string companionApp_troubleShootingHints = "companionApp_troubleShootingHints";
         public static readonly string companionApp_visualizeMicInput = "companionApp_visualizeMicInput";
-        public static readonly string contentDownloadScene_archiveUrlLabel = "contentDownloadScene_archiveUrlLabel";
-        public static readonly string contentDownloadScene_cancelDownloadButton = "contentDownloadScene_cancelDownloadButton";
-        public static readonly string contentDownloadScene_helpDialog_thirdPartyDownloads = "contentDownloadScene_helpDialog_thirdPartyDownloads";
-        public static readonly string contentDownloadScene_helpDialog_thirdPartyDownloads_title = "contentDownloadScene_helpDialog_thirdPartyDownloads_title";
-        public static readonly string contentDownloadScene_helpDialog_title = "contentDownloadScene_helpDialog_title";
-        public static readonly string contentDownloadScene_startDownloadButton = "contentDownloadScene_startDownloadButton";
-        public static readonly string contentDownloadScene_status_canceled = "contentDownloadScene_status_canceled";
-        public static readonly string contentDownloadScene_status_failed = "contentDownloadScene_status_failed";
-        public static readonly string contentDownloadScene_status_finished = "contentDownloadScene_status_finished";
-        public static readonly string contentDownloadScene_title = "contentDownloadScene_title";
         public static readonly string continue_ = "continue";
         public static readonly string delete = "delete";
         public static readonly string devMode = "devMode";
