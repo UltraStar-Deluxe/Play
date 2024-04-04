@@ -70,12 +70,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1004155338201936937}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7793846928896407034}
+  m_Father: {fileID: 5970054433468432184}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5626457258006968070
 MonoBehaviour:
@@ -89,15 +89,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 713e7f6d00e1ea64bbf2732f88763a68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  propertiesFolderRelativeToResourcesFolder: Translations
-  propertiesFileName: messages
-  logInfoInEditMode: 0
-  logInfoInPlayMode: 1
-  generatedConstantsFolder: Assets/Common/R
   generateConstantsOnResourceChange: 1
-  useFallbackIfNotInCurrentLanguage: 1
-  currentLanguage: 10
-  defaultPropertiesFileLanguage: 10
 --- !u!1 &1847614473704255988
 GameObject:
   m_ObjectHideFlags: 0
@@ -227,6 +219,7 @@ Transform:
   m_Children:
   - {fileID: 7793846927334274923}
   - {fileID: 5848255959784561741}
+  - {fileID: 4946081707020677670}
   - {fileID: 4959958248036601200}
   - {fileID: 7793846928232682641}
   - {fileID: 4190712076537908168}
@@ -645,7 +638,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7793846927809945224}
-  - {fileID: 4946081707020677670}
   - {fileID: 7793846928700202826}
   - {fileID: 7793846928701339893}
   - {fileID: 4360400099301771181}
@@ -754,7 +746,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11414302, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_Size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11414302, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_Value

@@ -2,7 +2,7 @@
     <ui:VisualElement name="loadedOptionsRoot">
         <ui:ScrollView>
             <ui:Toggle name="searchMidiFilesWithLyricsToggle" label="Search MIDI files with lyrics" class="noBackgroundInHierarchy" style="flex-shrink: 0;" />
-            <ItemPicker name="songDataFetchTypeChooser" label="Song data loading.&#10;Upfront = smoother during song select&#10;On-demand = faster song folder scan" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+            <ItemPicker name="songDataFetchTypeChooser" label="Song data loading" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ui:Label tabindex="-1" text="Song Folders" name="songFolderListTitle" class="noBackgroundInHierarchy" style="-unity-font-style: bold;" />
             <ui:VisualElement name="androidSongFolderHintContainer" style="width: 100%; margin-bottom: 10px; flex-shrink: 0;">
                 <ui:Label text="Android requires songs to be stored in the folder ..." display-tooltip-when-elided="true" name="androidSongFolderHintLabel" class="noBackgroundInHierarchy" style="width: 100%; white-space: normal;" />

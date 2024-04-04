@@ -230,37 +230,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(issuesIcon);
     }
 
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
-    {
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { Translation.Get(R.Messages.options_songLibrary_helpDialog_songFormatInfo_title),
-                Translation.Get(R.Messages.options_songLibrary_helpDialog_songFormatInfo) },
-            { Translation.Get(R.Messages.options_songLibrary_helpDialog_midiSongFormatInfo_title),
-                Translation.Get(R.Messages.options_songLibrary_helpDialog_midiSongFormatInfo) },
-            { Translation.Get(R.Messages.options_songLibrary_helpDialog_addSongInfo_title),
-                Translation.Get(R.Messages.options_songLibrary_helpDialog_addSongInfo) },
-            { Translation.Get(R.Messages.options_songLibrary_helpDialog_createSongInfo_title),
-                Translation.Get(R.Messages.options_songLibrary_helpDialog_createSongInfo) },
-            { Translation.Get(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
-                Translation.Get(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
-        };
-        if (PlatformUtils.IsAndroid)
-        {
-            titleToContentMap.Add(
-                Translation.Get(R.Messages.options_songLibrary_helpDialog_androidSongFolders_title),
-                Translation.Get(R.Messages.options_songLibrary_helpDialog_androidSongFolders,
-                    "androidAppSpecificStorageRelativePath", AndroidUtils.GetAppSpecificStorageRelativePath(false)));
-        }
-
-        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            Translation.Get(R.Messages.options_songLibrary_helpDialog_title),
-            titleToContentMap);
-        helpDialogControl.AddButton(Translation.Get(R.Messages.viewMore),
-            _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToAddAndCreateSongs)));
-        return helpDialogControl;
-    }
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToAddAndCreateSongs);
 
     public override bool HasIssuesDialog => true;
     public override MessageDialogControl CreateIssuesDialogControl()

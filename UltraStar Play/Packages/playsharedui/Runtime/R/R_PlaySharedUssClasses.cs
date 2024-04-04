@@ -76,6 +76,7 @@ public static partial class R_PlayShared
         public const string iconImageTextSized = "iconImageTextSized";
         public const string ignoreTheme = "ignoreTheme";
         public const string inactiveOverlay = "inactiveOverlay";
+        public const string inlineHelpButton = "inlineHelpButton";
         public const string inputLegendBar = "inputLegendBar";
         public const string inputLegendLabel = "inputLegendLabel";
         public const string intermediateTeamResults = "intermediateTeamResults";

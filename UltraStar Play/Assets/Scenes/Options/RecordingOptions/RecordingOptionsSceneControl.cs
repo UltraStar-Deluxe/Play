@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortAudioForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -511,29 +510,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         }
     }
 
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
-    {
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { Translation.Get(R.Messages.options_recording_helpDialog_micDelay_title),
-                Translation.Get(R.Messages.options_recording_helpDialog_micDelay) },
-            { Translation.Get(R.Messages.options_recording_helpDialog_micDelayCalibration_title),
-                Translation.Get(R.Messages.options_recording_helpDialog_micDelayCalibration) },
-            { Translation.Get(R.Messages.options_recording_helpDialog_amplification_title),
-                Translation.Get(R.Messages.options_recording_helpDialog_amplification) },
-            { Translation.Get(R.Messages.options_recording_helpDialog_noiseSuppression_title),
-                Translation.Get(R.Messages.options_recording_helpDialog_noiseSuppression) },
-            { Translation.Get(R.Messages.options_recording_helpDialog_sampleRate_title),
-                Translation.Get(R.Messages.options_recording_helpDialog_sampleRate) },
-        };
-        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            Translation.Get(R.Messages.options_recording_helpDialog_title),
-            titleToContentMap);
-        helpDialogControl.AddButton(Translation.Get(R.Messages.viewMore),
-            _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToConfigureMicsAndSpeaker)));
-        return helpDialogControl;
-    }
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToConfigureMicsAndSpeaker);
 
     private void InitPitchDetectionFromConnectionClient()
     {

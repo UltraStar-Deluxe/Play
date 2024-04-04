@@ -110,27 +110,5 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection
 
     public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=Theme";
 
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
-    {
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { Translation.Get(R.Messages.options_design_helpDialog_customThemes_title),
-                Translation.Get(R.Messages.options_design_helpDialog_customThemes,
-                    "path", ApplicationUtils.ReplacePathsWithDisplayString(ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath())) },
-        };
-         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            Translation.Get(R.Messages.options_design_helpDialog_title),
-            titleToContentMap);
-
-        helpDialogControl.AddButton("Custom Themes Folder",
-            _ => ApplicationUtils.OpenDirectory(ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath()));
-
-        if (PlatformUtils.IsStandalone)
-        {
-            helpDialogControl.AddButton("Default Themes Folder",
-                        _ => ApplicationUtils.OpenDirectory(ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath()));
-        }
-        return helpDialogControl;
-    }
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToThemes);
 }

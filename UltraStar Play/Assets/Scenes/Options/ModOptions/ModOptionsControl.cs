@@ -76,30 +76,7 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
 
     public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=Mod";
 
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
-    {
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { Translation.Get(R.Messages.options_mod_helpDialog_intro_title),
-                Translation.Get(R.Messages.options_mod_helpDialog_intro) },
-            { Translation.Get(R.Messages.options_mod_helpDialog_install_title),
-                Translation.Get(R.Messages.options_mod_helpDialog_install,
-                    "modsRootFolderPath", ModFolderUtils.GetUserDefinedModsRootFolderAbsolutePath()) },
-            { Translation.Get(R.Messages.options_mod_helpDialog_developMods_title),
-                Translation.Get(R.Messages.options_mod_helpDialog_developMods) },
-            { Translation.Get(R.Messages.options_mod_helpDialog_modLoading_title),
-                Translation.Get(R.Messages.options_mod_helpDialog_modLoading) },
-        };
-        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            Translation.Get(R.Messages.options_mod_helpDialog_title),
-            titleToContentMap);
-        helpDialogControl.AddButton(Translation.Get(R.Messages.action_openModsRootFolder),
-            _ => ApplicationUtils.OpenDirectory(ModFolderUtils.GetUserDefinedModsRootFolderAbsolutePath()));
-        helpDialogControl.AddButton(Translation.Get(R.Messages.viewMore),
-            _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToMods)));
-        return helpDialogControl;
-    }
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToMods);
 
     public List<IBinding> GetBindings()
     {

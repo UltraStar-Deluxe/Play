@@ -14,7 +14,7 @@ public class Settings : ISettings
 
     public string ClientName { get; set; } = "MyCompanionApp";
 
-    public SystemLanguage Language { get; set; } = SystemLanguage.English;
+    public string CultureInfoName { get; set; } = "en";
     public MicProfile MicProfile { get; set; } = new MicProfile();
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; }
     public int TargetFps { get; set; } = 60;

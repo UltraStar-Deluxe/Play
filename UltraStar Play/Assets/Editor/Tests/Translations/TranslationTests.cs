@@ -4,14 +4,63 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
+using ProTrans;
 using UnityEngine;
 
 public class TranslationTests
 {
-    private List<MissingTranslation> ignoredMissingTranslations;
+    private List<TranslatableAttribute> ignoredMissingTranslations;
 
     [Test]
     public void UxmlFilesAreTranslated()
+    {
+        List<TranslatableAttribute> allMissingTranslations = GetAllTranslatableAttributes()
+            .Where(translatableAttribute => IsMissingTranslation(translatableAttribute)
+                                            && !IsIgnoredMissingTranslation(translatableAttribute))
+            .ToList();
+
+        AssertTranslatableAttributesAreEmpty(allMissingTranslations, "missing translations");
+    }
+
+    [Test]
+    public void UxmlFilesUseExistingTranslationKeys()
+    {
+        List<TranslatableAttribute> allInvalidTranslations = GetAllTranslatableAttributes()
+            .Where(translatableAttribute => IsInvalidTranslation(translatableAttribute))
+            .ToList();
+
+        AssertTranslatableAttributesAreEmpty(allInvalidTranslations, "invalid translation keys");
+    }
+
+    private bool IsMissingTranslation(TranslatableAttribute translatableAttribute)
+    {
+        string translationKeyWithPrefix = translatableAttribute.TranslatableAttributeValue;
+        if (translationKeyWithPrefix.IsNullOrEmpty())
+        {
+            // Ignore
+            return false;
+        }
+
+        return !translatableAttribute.TranslatableAttributeValue.StartsWith(Translation.TranslationKeyPrefix);
+    }
+
+    private bool IsInvalidTranslation(TranslatableAttribute translatableAttribute)
+    {
+        string translationKeyWithPrefix = translatableAttribute.TranslatableAttributeValue;
+        if (translationKeyWithPrefix.IsNullOrEmpty()
+            || !translationKeyWithPrefix.StartsWith(Translation.TranslationKeyPrefix))
+        {
+            // Not using a translation key
+            return false;
+        }
+
+        string translationKey = translationKeyWithPrefix.Substring(1);
+
+        TranslationConfig.Singleton.MissingPlaceholderStrategy = MissingPlaceholderStrategy.Ignore;
+        return !Translation.TryGet(translationKey, null, out TranslationResult _);
+    }
+
+    private List<TranslatableAttribute> GetAllTranslatableAttributes()
     {
         List<string> uxmlFilesInAssets = GetFilesInFolderRecursive("Assets", "*.uxml")
             .ToList();
@@ -22,23 +71,28 @@ public class TranslationTests
             .Where(uxmlFile => !IsIgnoredFile(uxmlFile))
             .ToList();
 
-        List<MissingTranslation> allMissingTranslations = uxmlFiles
-            .SelectMany(uxmlFile => GetMissingTranslationsInUxmlFile(uxmlFile))
-            .Where(missingTranslation => !IsIgnoredMissingTranslation(missingTranslation))
+        return uxmlFiles
+            .SelectMany(uxmlFile => GetTranslatableAttributesInUxmlFile(uxmlFile))
             .ToList();
-        Dictionary<string, List<MissingTranslation>> uxmlFileToMissingTranslations = allMissingTranslations
+    }
+
+    private void AssertTranslatableAttributesAreEmpty(
+        List<TranslatableAttribute> allTranslatableAttributes,
+        string errorMessagePrefix)
+    {
+        Dictionary<string, List<TranslatableAttribute>> uxmlFileToTranslatableAttributes = allTranslatableAttributes
             .GroupBy(it => it.File)
             .ToDictionary(it => it.Key, it => it.ToList());
 
-        uxmlFileToMissingTranslations.Keys.ForEach(uxmlFile =>
+        uxmlFileToTranslatableAttributes.Keys.ForEach(uxmlFile =>
         {
-            List<MissingTranslation> missingTranslations = uxmlFileToMissingTranslations[uxmlFile];
-            Debug.LogError($"Missing translations in file: {Path.GetFileName(uxmlFile)}\n    "
-                           + missingTranslations.Select(it => it.ToUxmlString())
+            List<TranslatableAttribute> translatableAttributes = uxmlFileToTranslatableAttributes[uxmlFile];
+            Debug.LogError($"{errorMessagePrefix} in file: {Path.GetFileName(uxmlFile)}\n    "
+                           + translatableAttributes.Select(it => it.ToUxmlString())
                                .JoinWith("\n    "));
         });
 
-        Assert.IsEmpty(allMissingTranslations, "There are missing translations in UXML files");
+        Assert.IsEmpty(allTranslatableAttributes, $"{errorMessagePrefix} in UXML files");
     }
 
     private bool IsIgnoredFile(string file)
@@ -56,23 +110,23 @@ public class TranslationTests
         return false;
     }
 
-    private bool IsIgnoredMissingTranslation(MissingTranslation missingTranslation)
+    private bool IsIgnoredMissingTranslation(TranslatableAttribute translatableAttribute)
     {
         if (ignoredMissingTranslations.IsNullOrEmpty())
         {
             LoadIgnoredMissingTranslations();
         }
 
-        string missingTranslationFileName = Path.GetFileName(missingTranslation.File);
+        string missingTranslationFileName = Path.GetFileName(translatableAttribute.File);
         return ignoredMissingTranslations.AnyMatch(ignoredMissingTranslation =>
         {
             string ignoredMissingTranslationFileName = Path.GetFileName(ignoredMissingTranslation.File);
             return (ignoredMissingTranslationFileName == "*"
                     || string.Equals(ignoredMissingTranslationFileName, missingTranslationFileName, StringComparison.InvariantCultureIgnoreCase))
                    && (ignoredMissingTranslation.ElementLocalName == "*"
-                       || string.Equals(ignoredMissingTranslation.ElementLocalName, missingTranslation.ElementLocalName, StringComparison.InvariantCultureIgnoreCase))
+                       || string.Equals(ignoredMissingTranslation.ElementLocalName, translatableAttribute.ElementLocalName, StringComparison.InvariantCultureIgnoreCase))
                    && (ignoredMissingTranslation.NameAttributeValue == "*"
-                       || string.Equals(ignoredMissingTranslation.NameAttributeValue, missingTranslation.NameAttributeValue, StringComparison.InvariantCultureIgnoreCase));
+                       || string.Equals(ignoredMissingTranslation.NameAttributeValue, translatableAttribute.NameAttributeValue, StringComparison.InvariantCultureIgnoreCase));
         });
     }
 
@@ -89,7 +143,7 @@ public class TranslationTests
             string fileName = values[0].Trim();
             string elementName = values[1].Trim();
             string nameAttribute = values[2].Trim();
-            ignoredMissingTranslations.Add(new MissingTranslation(fileName, elementName, nameAttribute));
+            ignoredMissingTranslations.Add(new TranslatableAttribute(fileName, elementName, nameAttribute));
         }
 
         if (!ignoredMissingTranslations.IsNullOrEmpty())
@@ -98,116 +152,110 @@ public class TranslationTests
         }
     }
 
-    private List<MissingTranslation> GetMissingTranslationsInUxmlFile(string uxmlFile)
+    private List<TranslatableAttribute> GetTranslatableAttributesInUxmlFile(string uxmlFile)
     {
-        List<MissingTranslation> missingTranslations = new();
+        List<TranslatableAttribute> translatableAttributes = new();
 
         XDocument xDocument = XDocument.Parse(File.ReadAllText(uxmlFile));
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants(XName.Get("Label", "UnityEngine.UIElements")),
             "text");
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants(XName.Get("Button", "UnityEngine.UIElements")),
             "text");
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants(XName.Get("Toggle", "UnityEngine.UIElements")),
             "label");
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants(XName.Get("TextField", "UnityEngine.UIElements")),
             "label");
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants(XName.Get("IntegerField", "UnityEngine.UIElements")),
             "label");
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants(XName.Get("FloatField", "UnityEngine.UIElements")),
             "label");
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants(XName.Get("LongField", "UnityEngine.UIElements")),
             "label");
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants(XName.Get("DoubleField", "UnityEngine.UIElements")),
             "label");
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants(XName.Get("DropdownField", "UnityEngine.UIElements")),
             "label");
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants(XName.Get("EnumField", "UnityEngine.UIElements")),
             "label");
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants("ItemPicker"),
             "label");
 
-        AddMissingTranslations(
+        AddTranslatableAttributes(
             uxmlFile,
-            missingTranslations,
+            translatableAttributes,
             xDocument.Descendants("AccordionItem"),
             "label");
 
-        return missingTranslations;
+        return translatableAttributes;
     }
 
-    private void AddMissingTranslations(string uxmlFile, List<MissingTranslation> missingTranslations, IEnumerable<XElement> xElements, string attributeName)
+    private void AddTranslatableAttributes(string uxmlFile, List<TranslatableAttribute> translatableAttributes, IEnumerable<XElement> xElements, string translatableAttributeName)
     {
         foreach (XElement xElement in xElements)
         {
-            if (TryGetMissingTranslationInElement(uxmlFile, xElement, xElement.Attribute(attributeName), out MissingTranslation missingTranslation))
+            if (TryGetTranslatableAttributeInElement(uxmlFile, xElement, xElement.Attribute(translatableAttributeName), out TranslatableAttribute translatableAttribute))
             {
-                missingTranslations.Add(missingTranslation);
+                translatableAttributes.Add(translatableAttribute);
             }
         }
     }
 
-    private bool TryGetMissingTranslationInElement(string uxmlFile, XElement xElement, XAttribute xAttribute, out MissingTranslation missingTranslation)
+    private bool TryGetTranslatableAttributeInElement(string uxmlFile, XElement xElement, XAttribute xAttribute, out TranslatableAttribute translatableAttribute)
     {
         if (xElement == null
             || xElement.Attribute("name") == null
             || xAttribute == null)
         {
-            missingTranslation = new MissingTranslation();
+            translatableAttribute = new TranslatableAttribute();
             return false;
         }
 
-        if (!xAttribute.Value.StartsWith(Translation.TranslationKeyPrefix))
-        {
-            missingTranslation = new MissingTranslation(uxmlFile, xElement, xAttribute);
-            return true;
-        }
-
-        missingTranslation = new MissingTranslation();
-        return false;
+        translatableAttribute = new TranslatableAttribute(uxmlFile, xElement, xAttribute);
+        return true;
     }
 
     private static List<string> GetFilesInFolderRecursive(string folderPath, params string[] fileExtensions)
@@ -216,28 +264,28 @@ public class TranslationTests
             .ToList();
     }
 
-    private struct MissingTranslation
+    private struct TranslatableAttribute
     {
         public string File { get; private set; }
         public string ElementLocalName { get; private set; }
         public string NameAttributeValue { get; private set; }
-        public string UntranslatedAttributeName { get; private set; }
-        public string UntranslatedAttributeValue { get; private set; }
+        public string TranslatableAttributeName { get; private set; }
+        public string TranslatableAttributeValue { get; private set; }
 
-        public MissingTranslation(string file, string xElementLocalName, string nameAttributeValue)
+        public TranslatableAttribute(string file, string xElementLocalName, string nameAttributeValue)
         {
             File = file;
             ElementLocalName = xElementLocalName;
             NameAttributeValue = nameAttributeValue;
-            UntranslatedAttributeName = "";
-            UntranslatedAttributeValue = "";
+            TranslatableAttributeName = "";
+            TranslatableAttributeValue = "";
         }
 
-        public MissingTranslation(string file, XElement xElement, XAttribute untranslatedAttribute)
+        public TranslatableAttribute(string file, XElement xElement, XAttribute untranslatedAttribute)
             : this(file, xElement.Name.LocalName, xElement.Attribute("name").Value)
         {
-            UntranslatedAttributeName = untranslatedAttribute.Name.LocalName;
-            UntranslatedAttributeValue = untranslatedAttribute.Value;
+            TranslatableAttributeName = untranslatedAttribute.Name.LocalName;
+            TranslatableAttributeValue = untranslatedAttribute.Value;
         }
 
         public override string ToString()
@@ -247,8 +295,8 @@ public class TranslationTests
 
         public string ToUxmlString()
         {
-            return !UntranslatedAttributeName.IsNullOrEmpty()
-                ? $"<{ElementLocalName} name=\"{NameAttributeValue}\" {UntranslatedAttributeName}=\"{UntranslatedAttributeValue}\"/>"
+            return !TranslatableAttributeName.IsNullOrEmpty()
+                ? $"<{ElementLocalName} name=\"{NameAttributeValue}\" {TranslatableAttributeName}=\"{TranslatableAttributeValue}\"/>"
                 : $"<{ElementLocalName} name=\"{NameAttributeValue}\"/>";
         }
     }

@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using System.Linq;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -24,8 +23,6 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
     [Inject(UxmlName = R.UxmlNames.defaultMedleyTargetDurationPicker)]
     private ItemPicker defaultMedleyTargetDurationPicker;
 
-    private DropdownFieldControl<CultureInfo> languageDropdownFieldControl;
-
     protected override void Start()
     {
         base.Start();
@@ -47,18 +44,8 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
             () => settings.DefaultMedleyTargetDurationInSeconds,
             newValue => settings.DefaultMedleyTargetDurationInSeconds = (int)newValue);
 
-        InitLanguageChooser();
-    }
-
-    private void InitLanguageChooser()
-    {
-        languageDropdownFieldControl = new DropdownFieldControl<CultureInfo>(
-            languageDropdownField,
-            Translation.GetTranslatedCultureInfos(),
-            TranslationConfig.Singleton.CurrentCultureInfo,
-            GetCultureInfoDisplayString);
-        languageDropdownFieldControl.Selection
-            .Subscribe(newValue => OnLanguageChanged(newValue));
+        LanguageChooserControl languageChooserControl = new LanguageChooserControl(languageDropdownField);
+        languageChooserControl.Selection.Subscribe(newValue => OnLanguageChanged(newValue));
     }
 
     private void OnLanguageChanged(CultureInfo newValue)
@@ -71,12 +58,6 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
 
         // Reload scene to update translations
         sceneNavigator.LoadScene(EScene.OptionsScene);
-    }
-
-    private string GetCultureInfoDisplayString(CultureInfo cultureInfo)
-    {
-        string suffix = PropertiesFileParser.GetLanguageAndRegionSuffix(cultureInfo).ToLowerInvariant();
-        return Translation.Get($"language{suffix}");
     }
 
     private void SetCurrentLanguage(CultureInfo cultureInfo)

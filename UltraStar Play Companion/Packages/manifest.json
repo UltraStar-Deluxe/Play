@@ -2,7 +2,7 @@
   "dependencies": {
     "com.achimmihca.portaudioforunity": "https://github.com/achimmihca/PortAudioForUnity.git?path=PortAudioForUnity/Packages/com.achimmihca.portaudioforunity#dd0bd8e5f3b06ab7c0758ccb7c7dc1da179aa77f",
     "com.achimmihca.primeinputactions": "https://github.com/achimmihca/PrimeInputActions.git?path=PrimeInputActions/Packages/com.achimmihca.primeinputactions#v1.0.0",
-    "com.achimmihca.protrans": "https://github.com/achimmihca/ProTrans.git?path=ProTrans/Packages/com.achimmihca.ProTrans#v1.0.0",
+    "com.achimmihca.protrans": "https://github.com/achimmihca/ProTrans.git?path=ProTrans/Packages/com.achimmihca.ProTrans#e028454ac0b340a6556bad0ef80c98f6e6456c6e",
     "com.achimmihca.uniinject": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#2aca140060bf59f18a496ade55db4ee88965ab8a",
     "com.achimmihca.utfunknownunity": "https://github.com/achimmihca/UTF-Unknown-Unity.git?path=UTF-Unknown-Unity/Packages/com.achimmihca.utfunknownunity#v1.0.1",
     "com.singularitygroup.hotreload": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.5",

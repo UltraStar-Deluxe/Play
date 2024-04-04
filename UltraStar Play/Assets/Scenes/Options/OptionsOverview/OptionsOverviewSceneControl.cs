@@ -127,7 +127,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         .Select(it => it.GetComponentInChildren<AbstractOptionsSceneControl>())
         .FirstOrDefault();
 
-    private MessageDialogControl helpDialogControl;
     private MessageDialogControl issuesDialogControl;
 
     private void Start()
@@ -257,7 +256,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         loadedSceneTitle.text = sceneToLongNameMap[loadedSceneRecipe.scene];
 
         // Hide buttons in top row
-        helpButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasHelpDialog);
+        helpButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.HelpUri.IsNullOrEmpty());
         issuesButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasIssuesDialog);
         openSteamWorkshopButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty());
         updateSteamWorkshopItemsButton.SetVisibleByDisplay(openSteamWorkshopButton.IsVisibleByDisplay());
@@ -319,8 +318,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
     public void UpdateTranslation()
     {
-        using DisposableStopwatch d = new("UpdateTranslations");
-
         sceneTitle.text = Translation.Get(R.Messages.options);
 
         UpdateSceneToNameMap();
@@ -395,40 +392,29 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
     public void ShowHelp()
     {
-        if (helpDialogControl != null)
+        if (LoadedOptionsSceneControl.HelpUri.IsNullOrEmpty())
         {
             return;
         }
 
-        if (LoadedOptionsSceneControl.HasHelpDialog)
-        {
-            helpDialogControl = LoadedOptionsSceneControl.CreateHelpDialogControl();
-            helpDialogControl.DialogClosedEventStream.Subscribe(_ =>
-            {
-                helpDialogControl = null;
-                helpButton.Focus();
-            });
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(helpDialogControl.DialogRootVisualElement);
-        }
+        ApplicationUtils.OpenUrl(LoadedOptionsSceneControl.HelpUri);
     }
 
     public void ShowIssuesDialog()
     {
-        if (issuesDialogControl != null)
+        if (issuesDialogControl != null
+            || !LoadedOptionsSceneControl.HasIssuesDialog)
         {
             return;
         }
 
-        if (LoadedOptionsSceneControl.HasHelpDialog)
+        issuesDialogControl = LoadedOptionsSceneControl.CreateIssuesDialogControl();
+        issuesDialogControl.DialogClosedEventStream.Subscribe(_ =>
         {
-            issuesDialogControl = LoadedOptionsSceneControl.CreateIssuesDialogControl();
-            issuesDialogControl.DialogClosedEventStream.Subscribe(_ =>
-            {
-                issuesDialogControl = null;
-                issuesButton.Focus();
-            });
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(issuesDialogControl.DialogRootVisualElement);
-        }
+            issuesDialogControl = null;
+            issuesButton.Focus();
+        });
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(issuesDialogControl.DialogRootVisualElement);
     }
 
     private void OnDestroy()
