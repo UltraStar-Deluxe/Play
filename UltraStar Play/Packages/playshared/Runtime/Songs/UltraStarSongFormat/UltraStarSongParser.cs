@@ -86,7 +86,7 @@ public static class UltraStarSongParser
         AddSongIssuesForMissingMandatoryHeaderFields(headerFields, songIssues);
         Dictionary<EVoiceId, string> voiceIdToDisplayName = GetCustomVoiceIdDisplayNames(headerFields);
 
-        float txtFileBpm = GetTxtFileBpm(headerFields);
+        double txtFileBpm = GetTxtFileBpm(headerFields);
         UltraStarSongFormatVersion version = new(headerFields.GetValueOrDefault("VERSION", ""));
 
         UltraStarSongMeta songMeta = new(
@@ -120,11 +120,11 @@ public static class UltraStarSongParser
         return songMeta;
     }
 
-    private static float GetTxtFileBpm(Dictionary<string,string> headerFields)
+    private static double GetTxtFileBpm(Dictionary<string,string> headerFields)
     {
         if (headerFields.TryGetValue("BPM", out string txtFileBpmString))
         {
-            return ParseFloat("BPM", txtFileBpmString);
+            return ParseNumber("BPM", txtFileBpmString);
         }
         return 0;
     }
@@ -310,26 +310,38 @@ public static class UltraStarSongParser
     {
         switch (key)
         {
+            case "BPM":
+                songMeta.TxtFileBpm = ParseNumber(key, value);
+                break;
             case "ARTIST":
                 songMeta.Artist = value;
                 break;
             case "AUDIO":
                 songMeta.Audio = value;
                 break;
+            case "AUDIOURL":
+                songMeta.AudioUrl = value;
+                break;
             case "BACKGROUND":
                 songMeta.Background = value;
                 break;
+            case "BACKGROUNDURL":
+                songMeta.BackgroundUrl = value;
+                break;
             case "COVER":
                 songMeta.Cover = value;
+                break;
+            case "COVERURL":
+                songMeta.CoverUrl = value;
                 break;
             case "EDITION":
                 songMeta.Edition = value;
                 break;
             case "END":
-                songMeta.TxtFileEndInMillis = ParseFloat(key, value);
+                songMeta.EndInMillis = ParseNumber(key, value);
                 break;
             case "GAP":
-                songMeta.GapInMillis = ParseFloat(key, value);
+                songMeta.GapInMillis = ParseNumber(key, value);
                 break;
             case "GENRE":
                 songMeta.Genre = value;
@@ -341,19 +353,46 @@ public static class UltraStarSongParser
                 songMeta.Language = value;
                 break;
             case "MEDLEYENDBEAT":
-                songMeta.TxtFileMedleyEndBeat = ParseInt32(key, value);
+                songMeta.TxtFileMedleyEndBeat = ParseNumber(key, value);
+                break;
+            case "MEDLEYEND":
+                songMeta.MedleyEndInMillis = ParseNumber(key, value);
                 break;
             case "MEDLEYSTARTBEAT":
-                songMeta.TxtFileMedleyStartBeat = ParseInt32(key, value);
+                songMeta.TxtFileMedleyStartBeat = ParseNumber(key, value);
+                break;
+            case "MEDLEYSTART":
+                songMeta.MedleyStartInMillis = ParseNumber(key, value);
                 break;
             case "PREVIEWEND":
-                songMeta.TxtFilePreviewEndInSeconds = ParseFloat(key, value);
+                if (songMeta.Version.IsBefore(UltraStarSongFormatVersion.v200))
+                {
+                    songMeta.TxtFilePreviewEndInSeconds = ParseNumber(key, value);
+                }
+                else
+                {
+                    songMeta.PreviewEndInMillis = ParseNumber(key, value);
+                }
                 break;
             case "PREVIEWSTART":
-                songMeta.TxtFilePreviewStartInSeconds = ParseFloat(key, value);
+                if (songMeta.Version.IsBefore(UltraStarSongFormatVersion.v200))
+                {
+                    songMeta.TxtFilePreviewStartInSeconds = ParseNumber(key, value);
+                }
+                else
+                {
+                    songMeta.PreviewStartInMillis = ParseNumber(key, value);
+                }
                 break;
-            case "STAR":
-                songMeta.TxtFileStartInSeconds = ParseFloat(key, value);
+            case "START":
+                if (songMeta.Version.IsBefore(UltraStarSongFormatVersion.v200))
+                {
+                    songMeta.TxtFileStartInSeconds = ParseNumber(key, value);
+                }
+                else
+                {
+                    songMeta.StartInMillis = ParseNumber(key, value);
+                }
                 break;
             case "TITLE":
                 songMeta.Title = value;
@@ -361,8 +400,18 @@ public static class UltraStarSongParser
             case "VIDEO":
                 songMeta.Video = value;
                 break;
+            case "VIDEOURL":
+                songMeta.VideoUrl = value;
+                break;
             case "VIDEOGAP":
-                songMeta.TxtFileVideoGapInSeconds = ParseFloat(key, value);
+                if (songMeta.Version.IsBefore(UltraStarSongFormatVersion.v200))
+                {
+                    songMeta.TxtFileVideoGapInSeconds = ParseNumber(key, value);
+                }
+                else
+                {
+                    songMeta.VideoGapInMillis = ParseNumber(key, value);
+                }
                 break;
             case "VOCALS":
                 songMeta.VocalsAudio = value;
@@ -371,7 +420,7 @@ public static class UltraStarSongParser
                 songMeta.Website = value;
                 break;
             case "YEAR":
-                songMeta.Year = ParseUInt32(key, value);
+                songMeta.Year = (uint)ParseNumber(key, value);
                 break;
             default:
                 songMeta.SetAdditionalHeaderEntry(key, value);
@@ -392,7 +441,7 @@ public static class UltraStarSongParser
         return s.Replace(",", ".").Trim();
     }
 
-    private static float ParseFloat(string headerFieldName, string value)
+    private static double ParseNumber(string headerFieldName, string value)
     {
         if (value.IsNullOrEmpty())
         {
@@ -400,49 +449,13 @@ public static class UltraStarSongParser
         }
 
         string normalizedValue = NormalizeNumber(value);
-        if (float.TryParse(normalizedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float res))
+        if (double.TryParse(normalizedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double res))
         {
             return res;
         }
         else
         {
-            throw new UltraStarSongParserException($"Failed to parse float. Header field: {headerFieldName}, value: {value}");
-        }
-    }
-
-    private static uint ParseUInt32(string headerFieldName, string value)
-    {
-        if (value.IsNullOrEmpty())
-        {
-            return 0;
-        }
-
-        string valueNormalized = NormalizeNumber(value);
-        if (uint.TryParse(valueNormalized, out uint res))
-        {
-            return res;
-        }
-        else
-        {
-            throw new UltraStarSongParserException($"Failed to parse uint. Header field: {headerFieldName}, value: {value}");
-        }
-    }
-
-    private static int ParseInt32(string headerFieldName, string value)
-    {
-        if (value.IsNullOrEmpty())
-        {
-            return 0;
-        }
-
-        string normalizedValue = NormalizeNumber(value);
-        if (int.TryParse(normalizedValue, out int res))
-        {
-            return res;
-        }
-        else
-        {
-            throw new UltraStarSongParserException($"Failed to parse int. Header field: {headerFieldName}, value: {value}");
+            throw new UltraStarSongParserException($"Failed to parse number. Header field: {headerFieldName}, value: {value}");
         }
     }
 

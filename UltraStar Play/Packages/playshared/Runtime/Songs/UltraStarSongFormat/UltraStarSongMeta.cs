@@ -59,18 +59,6 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
         }
     }
 
-    public double TxtFileEndInMillis
-    {
-        get
-        {
-            return EndInMillis;
-        }
-        set
-        {
-            EndInMillis = value;
-        }
-    }
-
     public double TxtFileVideoGapInSeconds
     {
         get
@@ -130,7 +118,19 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
     public UltraStarSongMeta(SongMeta other)
     {
         CopyValues(other);
-        Version = (other as UltraStarSongMeta)?.Version ?? UltraStarSongFormatVersion.v100;
+    }
+
+    public override void CopyValues(SongMeta other)
+    {
+        base.CopyValues(other);
+        if (other is UltraStarSongMeta otherUltraStarSongMeta)
+        {
+            Version = otherUltraStarSongMeta.Version;
+        }
+        else
+        {
+            Version = UltraStarSongFormatVersion.unknown;
+        }
     }
 
     public UltraStarSongMeta(
@@ -146,7 +146,7 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
     public UltraStarSongMeta(
         string artist,
         string title,
-        float txtFileBpm,
+        double txtFileBpm,
         string audioFile,
         Dictionary<EVoiceId, string> voiceIdToDisplayName,
         UltraStarSongFormatVersion version)

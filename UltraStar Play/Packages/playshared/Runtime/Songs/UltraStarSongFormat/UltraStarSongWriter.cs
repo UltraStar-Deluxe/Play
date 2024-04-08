@@ -103,18 +103,27 @@ public static class UltraStarFormatWriter
 
     private static void AppendHeader(StringBuilder sb, UltraStarSongMeta songMeta)
     {
+        AppendHeaderField(sb, "version", songMeta.Version.StringValue);
+
         AppendHeaderField(sb, "title", songMeta.Title);
         AppendHeaderField(sb, "artist", songMeta.Artist);
+
         AppendHeaderField(sb, "mp3", songMeta.Audio);
-        AppendHeaderField(sb, "Vocals", songMeta.VocalsAudio);
-        AppendHeaderField(sb, "Instrumental", songMeta.InstrumentalAudio);
+        AppendHeaderField(sb, "audiourl", songMeta.AudioUrl);
+        AppendHeaderField(sb, "vocals", songMeta.VocalsAudio);
+        AppendHeaderField(sb, "vocalsurl", songMeta.VocalsAudioUrl);
+        AppendHeaderField(sb, "instrumental", songMeta.InstrumentalAudio);
+        AppendHeaderField(sb, "instrumentalurl", songMeta.InstrumentalAudioUrl);
         AppendNumberHeaderField(sb, "bpm", songMeta.TxtFileBpm);
         AppendNumberHeaderField(sb, "gap", songMeta.GapInMillis);
 
         AppendHeaderField(sb, "cover", songMeta.Cover);
+        AppendHeaderField(sb, "coverurl", songMeta.CoverUrl);
         AppendHeaderField(sb, "background", songMeta.Background);
+        AppendHeaderField(sb, "backgroundurl", songMeta.BackgroundUrl);
 
         AppendHeaderField(sb, "video", songMeta.Video);
+        AppendHeaderField(sb, "videourl", songMeta.VideoUrl);
         AppendNumberHeaderField(sb, "videogap", songMeta.TxtFileVideoGapInSeconds);
 
         AppendHeaderField(sb, "website", songMeta.Website);
@@ -126,7 +135,7 @@ public static class UltraStarFormatWriter
         AppendHeaderField(sb, "edition", songMeta.Edition);
 
         AppendNumberHeaderField(sb, "start", songMeta.TxtFileStartInSeconds);
-        AppendNumberHeaderField(sb, "end", songMeta.TxtFileEndInMillis);
+        AppendNumberHeaderField(sb, "end", songMeta.EndInMillis);
         AppendNumberHeaderField(sb, "previewstart", songMeta.TxtFilePreviewStartInSeconds);
         AppendNumberHeaderField(sb, "previewend", songMeta.TxtFilePreviewEndInSeconds);
         AppendNumberHeaderField(sb, "medleystartbeat", (int)songMeta.TxtFileMedleyStartBeat);

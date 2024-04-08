@@ -51,4 +51,24 @@ public struct UltraStarSongFormatVersion
         }
         return versionString.TrimStart('v').TrimStart('V');
     }
+
+    public bool IsBefore(UltraStarSongFormatVersion other)
+    {
+        if (EnumValue is EUltraStarSongFormatVersion.Unknown
+            || other.EnumValue is EUltraStarSongFormatVersion.Unknown)
+        {
+            return false;
+        }
+        return (int)EnumValue < (int)other.EnumValue;
+    }
+
+    public bool IsAfter(UltraStarSongFormatVersion other)
+    {
+        if (EnumValue is EUltraStarSongFormatVersion.Unknown
+            || other.EnumValue is EUltraStarSongFormatVersion.Unknown)
+        {
+            return false;
+        }
+        return (int)EnumValue > (int)other.EnumValue;
+    }
 }

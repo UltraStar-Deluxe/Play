@@ -38,16 +38,34 @@ public class SongMeta
     public virtual string Audio { get; set; } = "";
 
     /**
+     * URL to an audio resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
+     */
+    public string AudioUrl { get; set; }
+
+    /**
      * Path or URI to the audio file that contains only the voice of the singers.
      * This audio file can be created from the source audio file using AI.
      */
     public virtual string VocalsAudio { get; set; } = "";
 
     /**
+     * URL to an audio resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
+     */
+    public string VocalsAudioUrl { get; set; }
+
+    /**
      * Path or URI to the audio file that contains only the instruments and no singing.
      * This audio file can be created from the source audio file using AI.
      */
     public virtual string InstrumentalAudio { get; set; } = "";
+
+    /**
+     * URL to an audio resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
+     */
+    public string InstrumentalAudioUrl { get; set; }
 
     /**
      * URI to load the song in the embedded WebView.
@@ -60,9 +78,21 @@ public class SongMeta
     public virtual string Background { get; set; } = "";
 
     /**
+     * URL to a background image resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
+     */
+    public string BackgroundUrl { get; set; }
+
+    /**
      * Path or URI to an image file that should be displayed as preview in song selection.
      */
     public virtual string Cover { get; set; } = "";
+
+    /**
+     * URL to a cover image resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
+     */
+    public string CoverUrl { get; set; }
 
     /**
      * Edition of the song.
@@ -84,6 +114,12 @@ public class SongMeta
      * Path or URI to a background video.
      */
     public virtual string Video { get; set; } = "";
+
+    /**
+     * URL to a video resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
+     */
+    public string VideoUrl { get; set; }
 
     /**
      * Beats per minute of the audio.
@@ -242,9 +278,12 @@ public class SongMeta
     {
         Artist = other.Artist;
         Audio = other.Audio;
+        AudioUrl = other.AudioUrl;
         Background = other.Background;
+        BackgroundUrl = other.BackgroundUrl;
         BeatsPerMinute = other.BeatsPerMinute;
         Cover = other.Cover;
+        CoverUrl = other.CoverUrl;
         Edition = other.Edition;
         EndInMillis = other.EndInMillis;
         FileEncoding = other.FileEncoding;
@@ -252,6 +291,7 @@ public class SongMeta
         GapInMillis = other.GapInMillis;
         Genre = other.Genre;
         InstrumentalAudio = other.InstrumentalAudio;
+        InstrumentalAudioUrl = other.InstrumentalAudioUrl;
         Language = other.Language;
         MedleyEndInMillis = other.MedleyEndInMillis;
         MedleyStartInMillis = other.MedleyStartInMillis;
@@ -261,7 +301,9 @@ public class SongMeta
         Title = other.Title;
         Video = other.Video;
         VideoGapInMillis = other.VideoGapInMillis;
+        VideoUrl = other.VideoUrl;
         VocalsAudio = other.VocalsAudio;
+        VocalsAudioUrl = other.VocalsAudioUrl;
         Website = other.Website;
         Year = other.Year;
         CopyVoices(other);
