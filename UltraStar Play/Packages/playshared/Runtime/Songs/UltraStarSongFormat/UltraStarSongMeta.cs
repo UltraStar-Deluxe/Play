@@ -4,6 +4,11 @@ using System.Collections.Generic;
 public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
 {
     /**
+     * The UltraStar format version that was used when loading the song.
+     */
+    public UltraStarSongFormatVersion Version { get; set; }
+
+    /**
      * The "bars-per-minute" in four-four-time (i.e. (beats-per-minute / 4)) of the song.
      * Example: a BPM value of 60 in a txt file would define a beat every 0.25 seconds (60*4=240 beats-per-minute).
      */
@@ -125,6 +130,7 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
     public UltraStarSongMeta(SongMeta other)
     {
         CopyValues(other);
+        Version = (other as UltraStarSongMeta)?.Version ?? UltraStarSongFormatVersion.v100;
     }
 
     public UltraStarSongMeta(
@@ -133,11 +139,23 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
         float txtFileBpm,
         string audioFile,
         Dictionary<EVoiceId, string> voiceIdToDisplayName)
+    : this(artist, title, txtFileBpm, audioFile, voiceIdToDisplayName, UltraStarSongFormatVersion.unknown)
+    {
+    }
+
+    public UltraStarSongMeta(
+        string artist,
+        string title,
+        float txtFileBpm,
+        string audioFile,
+        Dictionary<EVoiceId, string> voiceIdToDisplayName,
+        UltraStarSongFormatVersion version)
     {
         Artist = artist;
         TxtFileBpm = txtFileBpm;
         Audio = audioFile;
         Title = title;
+        Version = version;
 
         if (voiceIdToDisplayName == null)
         {

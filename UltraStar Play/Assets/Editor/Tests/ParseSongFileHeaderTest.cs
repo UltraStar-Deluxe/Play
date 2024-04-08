@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -21,6 +22,25 @@ public class ParseSongFileHeaderTest
         Assert.NotNull(songMeta);
         Assert.IsEmpty(songMeta.Language);
         Assert.AreEqual(0, songMeta.Year);
+    }
+
+    [Test]
+    [TestCase("1.0.0", "1.0.0", EUltraStarSongFormatVersion.V100)]
+    [TestCase("v1.0.0", "1.0.0", EUltraStarSongFormatVersion.V100)]
+    [TestCase("1.1.0", "1.1.0", EUltraStarSongFormatVersion.V110)]
+    [TestCase("1.2.0", "1.2.0", EUltraStarSongFormatVersion.V120)]
+    [TestCase("V2.0.0", "2.0.0", EUltraStarSongFormatVersion.V200)]
+    [TestCase("", "1.0.0", EUltraStarSongFormatVersion.V100)]
+    [TestCase(null, "1.0.0", EUltraStarSongFormatVersion.V100)]
+    [TestCase("InvalidVersion", "InvalidVersion", EUltraStarSongFormatVersion.Unknown)]
+    public void VersionShouldBeParsed(string inputVersionString, string expectedVersionString, EUltraStarSongFormatVersion expectedVersionEnum)
+    {
+        string songFileContentWithVersionPlaceholder = File.ReadAllText(folderPath + "TestSong-ParseVersion.txt");
+        string songFileContentWithoutPlaceholder = songFileContentWithVersionPlaceholder.Replace("VERSION_PLACEHOLDER", inputVersionString);
+        UltraStarSongMeta songMeta = UltraStarSongParser.ParseString(songFileContentWithoutPlaceholder, out List<SongIssue> songIssues, true);
+        Assert.NotNull(songMeta);
+        Assert.AreEqual(songMeta.Version.StringValue, expectedVersionString);
+        Assert.AreEqual(songMeta.Version.EnumValue, expectedVersionEnum);
     }
 
     [Test]

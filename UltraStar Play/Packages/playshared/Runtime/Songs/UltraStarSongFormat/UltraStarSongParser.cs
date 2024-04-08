@@ -87,13 +87,15 @@ public static class UltraStarSongParser
         Dictionary<EVoiceId, string> voiceIdToDisplayName = GetCustomVoiceIdDisplayNames(headerFields);
 
         float txtFileBpm = GetTxtFileBpm(headerFields);
+        UltraStarSongFormatVersion version = new(headerFields.GetValueOrDefault("VERSION", ""));
 
         UltraStarSongMeta songMeta = new(
             headerFields.GetValueOrDefault("ARTIST", ""),
             headerFields.GetValueOrDefault("TITLE", ""),
             txtFileBpm,
             headerFields.GetValueOrDefault("AUDIO", ""),
-            voiceIdToDisplayName);
+            voiceIdToDisplayName,
+            version);
         foreach (KeyValuePair<string, string> item in headerFields)
         {
             try
