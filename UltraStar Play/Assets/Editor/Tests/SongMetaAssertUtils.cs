@@ -18,6 +18,7 @@ public static class SongMetaAssertUtils
         Assert.AreEqual(expected.EndInMillis, actual.EndInMillis);
         Assert.AreEqual(expected.GapInMillis, actual.GapInMillis);
         Assert.AreEqual(expected.Genre, actual.Genre);
+        Assert.AreEqual(expected.Tag, actual.Tag);
         Assert.AreEqual(expected.InstrumentalAudio, actual.InstrumentalAudio);
         Assert.AreEqual(expected.InstrumentalAudioUrl, actual.InstrumentalAudioUrl);
         Assert.AreEqual(expected.Language, actual.Language);
