@@ -133,7 +133,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void LoadAndSaveSongDoesNotChangeFields()
+    public void LoadAndSaveSongDoesNotChangeFieldsOfUltraStarSongMeta()
     {
         string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
         UltraStarSongMeta originalSongMeta = LoadSong(originalFilePath);
@@ -142,6 +142,20 @@ public class UltraStarSongFormatTests
         UltraStarFormatWriter.WriteFile(savedFilePath, originalSongMeta);
 
         UltraStarSongMeta savedSongMeta = LoadSong(savedFilePath);
+
+        SongMetaAssertUtils.AssertSongMetasAreEqual(originalSongMeta, savedSongMeta);
+    }
+
+    [Test]
+    public void LoadAndSaveSongDoesNotChangeFieldsOfLazyLoadedFromFileSongMeta()
+    {
+        string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
+        LazyLoadedFromFileSongMeta originalSongMeta = new LazyLoadedFromFileSongMeta(originalFilePath);
+
+        string savedFilePath = $"{Application.temporaryCachePath}/LoadAndSaveProperties-TestSong-Saved.txt";
+        UltraStarFormatWriter.WriteFile(savedFilePath, originalSongMeta);
+
+        LazyLoadedFromFileSongMeta savedSongMeta = new LazyLoadedFromFileSongMeta(savedFilePath);
 
         SongMetaAssertUtils.AssertSongMetasAreEqual(originalSongMeta, savedSongMeta);
     }

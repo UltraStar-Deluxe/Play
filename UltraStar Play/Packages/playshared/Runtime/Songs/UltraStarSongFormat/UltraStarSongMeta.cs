@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
+public class UltraStarSongMeta : LazyLoadedSongMeta
 {
     /**
      * The UltraStar format version that was used when loading the song.
