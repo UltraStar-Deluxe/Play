@@ -95,20 +95,29 @@ public class SongMeta
     public string CoverUrl { get; set; }
 
     /**
-     * Edition of the song.
+     * Editions of the song.
+     * Multiple values can be separated by comma.
      * This is typically the name of the game or the TV show it was featured in.
      */
     public virtual string Edition { get; set; } = "";
 
     /**
-     * Genre of the song.
+     * Genres of the song.
+     * Multiple values can be separated by comma.
      */
     public virtual string Genre { get; set; } = "";
 
     /**
-     * The language of the lyrics.
+     * The languages of the lyrics.
+     * Multiple values can be separated by comma.
      */
     public virtual string Language { get; set; } = "";
+
+    /**
+     * User defined tags for the song.
+     * Multiple values can be separated by comma.
+     */
+    public virtual string Tag { get; set; } = "";
 
     /**
      * Path or URI to a background video.
@@ -290,6 +299,7 @@ public class SongMeta
         FileInfo = other.FileInfo;
         GapInMillis = other.GapInMillis;
         Genre = other.Genre;
+        Tag = other.Tag;
         InstrumentalAudio = other.InstrumentalAudio;
         InstrumentalAudioUrl = other.InstrumentalAudioUrl;
         Language = other.Language;

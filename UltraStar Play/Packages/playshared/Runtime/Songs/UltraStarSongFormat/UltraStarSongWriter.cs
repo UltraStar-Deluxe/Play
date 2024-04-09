@@ -132,6 +132,7 @@ public static class UltraStarFormatWriter
         AppendNumberHeaderField(sb, "year", songMeta.Year);
 
         AppendHeaderField(sb, "language", songMeta.Language);
+        AppendHeaderField(sb, "tags", songMeta.Tag);
         AppendHeaderField(sb, "edition", songMeta.Edition);
 
         AppendNumberHeaderField(sb, "start", songMeta.TxtFileStartInSeconds);

@@ -20,6 +20,7 @@
 #WEBSITE:https://SomeWebsite.com
 #EDITION:SomeEdition
 #LANGUAGE:English
+#TAGS:Foo,Bar
 #START:2
 #YEAR:2012
 #END:4

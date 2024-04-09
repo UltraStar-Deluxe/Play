@@ -346,6 +346,9 @@ public static class UltraStarSongParser
             case "GENRE":
                 songMeta.Genre = value;
                 break;
+            case "TAGS":
+                songMeta.Tag = value;
+                break;
             case "INSTRUMENTAL":
                 songMeta.InstrumentalAudio = value;
                 break;
