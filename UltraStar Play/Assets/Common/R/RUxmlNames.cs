@@ -198,7 +198,6 @@ public static partial class R
         public const string enqueueIcon = "enqueueIcon";
         public const string entriesContainer = "entriesContainer";
         public const string entryContainer = "entryContainer";
-        public const string exampleInlineHelpButton = "exampleInlineHelpButton";
         public const string exitSceneButton = "exitSceneButton";
         public const string externalToolsGroup = "externalToolsGroup";
         public const string ffmpegConversionCommandsJsonPicker = "ffmpegConversionCommandsJsonPicker";
@@ -880,6 +879,7 @@ public static partial class R
         public const string syncLyricsAreaToggle = "syncLyricsAreaToggle";
         public const string systemAudioBackendDelayPicker = "systemAudioBackendDelayPicker";
         public const string tabGroup = "tabGroup";
+        public const string tagPropertyToggle = "tagPropertyToggle";
         public const string takeWebCamImageButton = "takeWebCamImageButton";
         public const string takeWebCamImageIcon = "takeWebCamImageIcon";
         public const string targetFpsPicker = "targetFpsPicker";
