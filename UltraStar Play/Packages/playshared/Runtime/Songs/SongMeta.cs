@@ -18,6 +18,11 @@ public class SongMeta
     public virtual Encoding FileEncoding { get; private set; }
 
     /**
+     * The UltraStar format version that was used when loading the song.
+     */
+    public virtual UltraStarSongFormatVersion Version { get; set; }
+
+    /**
      * Artist of the song.
      */
     public virtual string Artist { get; set; } = "";

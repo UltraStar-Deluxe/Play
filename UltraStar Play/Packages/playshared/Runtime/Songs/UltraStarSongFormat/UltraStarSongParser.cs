@@ -400,6 +400,9 @@ public static class UltraStarSongParser
             case "TITLE":
                 songMeta.Title = value;
                 break;
+            case "VERSION":
+                // Ignore because has already been loaded and should not be considered as AdditionalHeaderField.
+                break;
             case "VIDEO":
                 songMeta.Video = value;
                 break;

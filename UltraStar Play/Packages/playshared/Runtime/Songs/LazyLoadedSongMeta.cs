@@ -47,6 +47,21 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         }
     }
 
+    private bool hasSetVersion;
+    public override UltraStarSongFormatVersion Version
+    {
+        get
+        {
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetVersion);
+            return base.Version;
+        }
+        set
+        {
+            hasSetVersion = true;
+            base.Version = value;
+        }
+    }
+
     protected bool hasSetArtist;
     public override string Artist {
         get

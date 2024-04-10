@@ -4,11 +4,6 @@ using System.Collections.Generic;
 public class UltraStarSongMeta : LazyLoadedSongMeta
 {
     /**
-     * The UltraStar format version that was used when loading the song.
-     */
-    public UltraStarSongFormatVersion Version { get; set; }
-
-    /**
      * The "bars-per-minute" in four-four-time (i.e. (beats-per-minute / 4)) of the song.
      * Example: a BPM value of 60 in a txt file would define a beat every 0.25 seconds (60*4=240 beats-per-minute).
      */
