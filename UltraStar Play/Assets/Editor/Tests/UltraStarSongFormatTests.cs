@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -36,7 +38,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void V100InconsistentTimeUnits()
+    public void V100LoadInconsistentTimeUnits()
     {
         UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-v1.0.0.txt", out List<SongIssue> songIssues, null, true);
         Assert.NotNull(songMeta);
@@ -56,7 +58,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void V200ConsistentMillisecondsTimeUnit()
+    public void V200LoadConsistentMillisecondsTimeUnit()
     {
         UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-v2.0.0.txt", out List<SongIssue> songIssues, null, true);
         Assert.NotNull(songMeta);
@@ -124,7 +126,7 @@ public class UltraStarSongFormatTests
     public void CopyValuesFromSongMetaToUltraStarSongMetaTest()
     {
         string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
-        SongMeta originalSongMeta = LoadSong(originalFilePath);
+        SongMeta originalSongMeta = UltraStarSongParser.ParseFile(originalFilePath, out List<SongIssue> _);
 
         SongMeta copiedSongMeta = new UltraStarSongMeta();
         copiedSongMeta.CopyValues(originalSongMeta);
@@ -133,35 +135,50 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void LoadAndSaveSongDoesNotChangeFieldsOfUltraStarSongMeta()
+    [TestCase("1.0.0")]
+    [TestCase("1.1.0")]
+    [TestCase("1.2.0")]
+    [TestCase("2.0.0")]
+    public void LoadAndSaveSongDoesNotChangeFieldsOfUltraStarSongMeta(string formatVersion)
     {
-        string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
-        UltraStarSongMeta originalSongMeta = LoadSong(originalFilePath);
-
-        string savedFilePath = $"{Application.temporaryCachePath}/LoadAndSaveProperties-TestSong-Saved.txt";
-        UltraStarFormatWriter.WriteFile(savedFilePath, originalSongMeta);
-
-        UltraStarSongMeta savedSongMeta = LoadSong(savedFilePath);
-
-        SongMetaAssertUtils.AssertSongMetasAreEqual(originalSongMeta, savedSongMeta);
+        LoadAndSaveSongDoesNotChangeFieldsOfSongMeta(
+            formatVersion,
+            path => UltraStarSongParser.ParseFile(path, out List<SongIssue> _));
     }
 
     [Test]
-    public void LoadAndSaveSongDoesNotChangeFieldsOfLazyLoadedFromFileSongMeta()
+    [TestCase("1.0.0")]
+    [TestCase("1.1.0")]
+    [TestCase("1.2.0")]
+    [TestCase("2.0.0")]
+    public void LoadAndSaveSongDoesNotChangeFieldsOfLazyLoadedFromFileSongMeta(string formatVersion)
     {
-        string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
-        LazyLoadedFromFileSongMeta originalSongMeta = new LazyLoadedFromFileSongMeta(originalFilePath);
-
-        string savedFilePath = $"{Application.temporaryCachePath}/LoadAndSaveProperties-TestSong-Saved.txt";
-        UltraStarFormatWriter.WriteFile(savedFilePath, originalSongMeta);
-
-        LazyLoadedFromFileSongMeta savedSongMeta = new LazyLoadedFromFileSongMeta(savedFilePath);
-
-        SongMetaAssertUtils.AssertSongMetasAreEqual(originalSongMeta, savedSongMeta);
+        LoadAndSaveSongDoesNotChangeFieldsOfSongMeta(
+            formatVersion,
+            path => new LazyLoadedFromFileSongMeta(path));
     }
 
-    private static UltraStarSongMeta LoadSong(string path)
+    private static void LoadAndSaveSongDoesNotChangeFieldsOfSongMeta(string formatVersion, Func<string, SongMeta> loadSongMeta)
     {
-        return UltraStarSongParser.ParseFile(path, out List<SongIssue> songIssues, null, true);
+        // Load file content with modified formatVersion
+        string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
+        string originalFileContent = File.ReadAllText(originalFilePath);
+        string originalFileContentWithModifiedVersion = Regex.Replace(originalFileContent, @"#VERSION:.+", $"#VERSION:{formatVersion}");
+
+        // Load song
+        string copiedOriginalFilePath = $"{Application.temporaryCachePath}/LoadAndSaveProperties-TestSong-Original.txt";
+        File.WriteAllText(copiedOriginalFilePath, originalFileContentWithModifiedVersion);
+        SongMeta originalSongMeta = loadSongMeta(copiedOriginalFilePath);
+
+        // Check loaded formatVersion matches modified formatVersion
+        Assert.AreEqual(formatVersion, originalSongMeta.Version.StringValue);
+
+        // Save song and check that no properties changed
+        string savedFilePath = $"{Application.temporaryCachePath}/LoadAndSaveProperties-TestSong-Saved.txt";
+        UltraStarFormatWriter.WriteFile(savedFilePath, originalSongMeta, originalSongMeta.Version);
+
+        SongMeta savedSongMeta = loadSongMeta(savedFilePath);
+
+        SongMetaAssertUtils.AssertSongMetasAreEqual(originalSongMeta, savedSongMeta);
     }
 }

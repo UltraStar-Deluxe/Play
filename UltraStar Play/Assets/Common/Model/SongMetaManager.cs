@@ -497,8 +497,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
         try
         {
             // Write the song data structure to the file.
-            Debug.Log($"Saving song {songFilePath}");
-            UltraStarFormatWriter.WriteFile(songFilePath, songMeta, settings.WriteUltraStarTxtFileWithByteOrderMark);
+            UltraStarSongFormatVersion version = SettingsUtils.GetUltraStarSongFormatVersionForSave(settings, songMeta.Version);
+            Debug.Log($"Saving song {songFilePath} using UltraStar format version {version.StringValue}");
+            UltraStarFormatWriter.WriteFile(songFilePath, songMeta, version, settings.WriteUltraStarTxtFileWithByteOrderMark);
 
             // Update creation and modification time
             songMeta.FileInfo?.Refresh();

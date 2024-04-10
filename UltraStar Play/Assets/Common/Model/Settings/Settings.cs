@@ -1,11 +1,9 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Serilog.Events;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [Serializable]
 public class Settings : ISettings
@@ -77,6 +75,16 @@ public class Settings : ISettings
     public string GeneratedFolderPath { get; set; } = "";
     public bool SaveVocalsAndInstrumentalAudioInFolderOfSong { get; set; }
     public EFetchType SongDataFetchType { get; set; } = EFetchType.Eager;
+
+    /**
+     * The UltraStar song format version that is used to save a song when otherwise none is specified or unknown.
+     */
+    public EKnownUltraStarSongFormatVersion DefaultUltraStarSongFormatVersionForSave { get; set; }
+
+    /**
+     * The UltraStar song format version that is used to upgrade a song on save when it has a lower version.
+     */
+    public EUpgradeUltraStarSongFormatVersion UpgradeUltraStarSongFormatVersionForSave { get; set; }
 
     // Theme settings
     public string ThemeName { get; set; } = ThemeManager.DefaultThemeName;
