@@ -79,12 +79,12 @@ public class Settings : ISettings
     /**
      * The UltraStar song format version that is used to save a song when otherwise none is specified or unknown.
      */
-    public EKnownUltraStarSongFormatVersion DefaultUltraStarSongFormatVersionForSave { get; set; }
+    public EKnownUltraStarSongFormatVersion DefaultUltraStarSongFormatVersionForSave { get; set; } = EKnownUltraStarSongFormatVersion.V120;
 
     /**
      * The UltraStar song format version that is used to upgrade a song on save when it has a lower version.
      */
-    public EUpgradeUltraStarSongFormatVersion UpgradeUltraStarSongFormatVersionForSave { get; set; }
+    public EUpgradeUltraStarSongFormatVersion UpgradeUltraStarSongFormatVersionForSave { get; set; } = EUpgradeUltraStarSongFormatVersion.None;
 
     // Theme settings
     public string ThemeName { get; set; } = ThemeManager.DefaultThemeName;
