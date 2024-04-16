@@ -311,16 +311,14 @@ public class SongIssueManager : AbstractSingletonBehaviour
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Audio),
                 ESongIssueSeverity.Error);
         }
-        // Check WebView URI is supported when specified
-        else if (!WebViewUtils.CanHandleWebViewUrl(songMeta.Website))
+        // Check WebView URI is supported when needed
+        else if (!SongMetaUtils.ResourceExists(songMeta, songMeta.Audio)
+                 && !WebViewUtils.CanHandleWebViewUrl(SongMetaUtils.GetWebViewUrl(songMeta)))
         {
-            if (!SongMetaUtils.LocalAudioResourceExists(songMeta))
-            {
-                // Cannot use the local audio file and not the website. This song cannot be played.
-                songIssues.Add(SongIssue.CreateError(songMeta,
-                    $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetLocalAudioUri(songMeta))}' and website is not supported '{songMeta.Website}'. " +
-                          $"Add the local audio file or provide JavaScript code to integrate the website in the embedded browser."));
-            }
+            // Cannot use the local audio file and not the website. This song cannot be played.
+            songIssues.Add(SongIssue.CreateError(songMeta,
+                $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(songMeta.Audio)}' and website is not supported '{songMeta.Website}'. " +
+                      $"Add the local audio file or provide JavaScript code to integrate the website in the embedded browser."));
         }
 
         // Vocals audio and instrumental audio must use formats that are supported by Unity. Ffmpeg can only be used for the main audio.
