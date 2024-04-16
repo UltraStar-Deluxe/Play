@@ -141,6 +141,7 @@ public static partial class R
         public const string dateLabel = "dateLabel";
         public const string defaultCloseDialogButton = "defaultCloseDialogButton";
         public const string defaultMedleyTargetDurationPicker = "defaultMedleyTargetDurationPicker";
+        public const string defaultUltraStarFormatVersionForSave = "defaultUltraStarFormatVersionForSave";
         public const string delayPicker = "delayPicker";
         public const string deleteButton = "deleteButton";
         public const string deleteGuestButton = "deleteGuestButton";
@@ -198,7 +199,6 @@ public static partial class R
         public const string enqueueIcon = "enqueueIcon";
         public const string entriesContainer = "entriesContainer";
         public const string entryContainer = "entryContainer";
-        public const string exampleInlineHelpButton = "exampleInlineHelpButton";
         public const string exitSceneButton = "exitSceneButton";
         public const string externalToolsGroup = "externalToolsGroup";
         public const string ffmpegConversionCommandsJsonPicker = "ffmpegConversionCommandsJsonPicker";
@@ -880,6 +880,7 @@ public static partial class R
         public const string syncLyricsAreaToggle = "syncLyricsAreaToggle";
         public const string systemAudioBackendDelayPicker = "systemAudioBackendDelayPicker";
         public const string tabGroup = "tabGroup";
+        public const string tagPropertyToggle = "tagPropertyToggle";
         public const string takeWebCamImageButton = "takeWebCamImageButton";
         public const string takeWebCamImageIcon = "takeWebCamImageIcon";
         public const string targetFpsPicker = "targetFpsPicker";
@@ -971,6 +972,7 @@ public static partial class R
         public const string unityVersionLabel = "unityVersionLabel";
         public const string updateSteamWorkshopItemsButton = "updateSteamWorkshopItemsButton";
         public const string updateSteamWorkshopItemsIcon = "updateSteamWorkshopItemsIcon";
+        public const string upgradeUltraStarFormatVersionForSave = "upgradeUltraStarFormatVersionForSave";
         public const string uploadProgressBar = "uploadProgressBar";
         public const string uploadWorkshopItemButton = "uploadWorkshopItemButton";
         public const string urlChooserButton = "urlChooserButton";

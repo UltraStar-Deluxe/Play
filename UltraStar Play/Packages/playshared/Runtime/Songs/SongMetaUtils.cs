@@ -27,11 +27,6 @@ public static class SongMetaUtils
         return ResourceExists(songMeta, GetVideoUriPreferAudioUriIfWebView(songMeta, canHandleUri));
     }
 
-    public static bool LocalAudioResourceExists(SongMeta songMeta)
-    {
-        return ResourceExists(songMeta, GetLocalAudioUri(songMeta));
-    }
-
     public static bool AudioResourceExists(SongMeta songMeta)
     {
         return ResourceExists(songMeta, GetAudioUri(songMeta));
@@ -49,56 +44,42 @@ public static class SongMetaUtils
 
     public static string GetCoverUri(SongMeta songMeta)
     {
-        return GetUri(songMeta, songMeta.Cover);
+        return GetExistingResourceUriOrFirst(songMeta, songMeta.Cover, songMeta.CoverUrl);
     }
 
     public static string GetBackgroundUri(SongMeta songMeta)
     {
-        return GetUri(songMeta, songMeta.Background);
+        return GetExistingResourceUriOrFirst(songMeta, songMeta.Background, songMeta.BackgroundUrl);
     }
 
     public static string GetVideoUri(SongMeta songMeta)
     {
-        return GetUri(songMeta, songMeta.Video);
-    }
-
-    public static string GetLocalAudioUri(SongMeta songMeta)
-    {
-        return GetUri(songMeta, songMeta.Audio);
-    }
-
-    public static string GetWebsiteUri(SongMeta songMeta)
-    {
-        return GetUri(songMeta, songMeta.Website);
+        return GetExistingResourceUriOrFirst(songMeta, songMeta.Video, songMeta.VideoUrl);
     }
 
     public static string GetAudioUri(SongMeta songMeta)
     {
-        string absoluteLocalAudioFilePath = GetAbsoluteFilePath(songMeta, songMeta.Audio);
-        if (FileUtils.Exists(absoluteLocalAudioFilePath)
-            || songMeta.Website.IsNullOrEmpty())
-        {
-            return GetLocalAudioUri(songMeta);
-        }
-        else
-        {
-            return GetWebsiteUri(songMeta);
-        }
+        return GetExistingResourceUriOrFirst(songMeta, songMeta.Audio, songMeta.AudioUrl, songMeta.VideoUrl);
     }
 
     public static string GetVocalsAudioUri(SongMeta songMeta)
     {
-        return GetUri(songMeta, songMeta.VocalsAudio);
+        return GetExistingResourceUriOrFirst(songMeta, songMeta.VocalsAudio, songMeta.VocalsAudioUrl);
     }
 
     public static string GetInstrumentalAudioUri(SongMeta songMeta)
     {
-        return GetUri(songMeta, songMeta.InstrumentalAudio);
+        return GetExistingResourceUriOrFirst(songMeta, songMeta.InstrumentalAudio, songMeta.InstrumentalAudioUrl);
+    }
+
+    public static string GetWebViewUrl(SongMeta songMeta)
+    {
+        return GetExistingResourceUriOrFirst(songMeta, songMeta.AudioUrl, songMeta.VideoUrl);
     }
 
     /**
-     * Checks if a file exists.
-     * Assumes that the resource behind a http and https URI exists (always returns true for these URIs).
+     * When given a file path, checks if the file exists.
+     * When given a URI, assumes that the resource exists (always returns true for http and https URIs).
      */
     public static bool ResourceExists(SongMeta songMeta, string pathOrUri)
     {
@@ -134,6 +115,20 @@ public static class SongMetaUtils
         // The given path is relative to the song file. Make it absolute.
         string absoluteFilePath = GetAbsoluteFilePath(songMeta, pathOrUri);
         return WebRequestUtils.AbsoluteFilePathToUri(absoluteFilePath);
+    }
+
+    private static string GetExistingResourceUriOrFirst(SongMeta songMeta, params string[] pathOrUris)
+    {
+        foreach (string pathOrUri in pathOrUris)
+        {
+            if (!pathOrUri.IsNullOrEmpty()
+                && ResourceExists(songMeta, pathOrUri))
+            {
+                return GetUri(songMeta, pathOrUri);
+            }
+        }
+
+        return pathOrUris.FirstOrDefault();
     }
 
     public static string GetAbsoluteFilePath(SongMeta songMeta, string pathOrUri)
@@ -925,5 +920,11 @@ public static class SongMetaUtils
         }
 
         RemoveVoice(songMeta, voice.Id);
+    }
+
+    public static bool HasFailedToLoadVoices(SongMeta songMeta)
+    {
+        return songMeta is LazyLoadedVoicesSongMeta lazyLoadedVoicesSongMeta
+               && lazyLoadedVoicesSongMeta.LoadVoicesPhase is LazyLoadedVoicesSongMeta.ELoadVoicesPhase.Failed;
     }
 }

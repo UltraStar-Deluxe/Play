@@ -62,7 +62,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         Assert.IsFalse(simulatedMicSampleRecorder.IsRecording.Value, "Microphone simulation not set up correctly. Should not be recording.");
     }
 
-    private static string GetAbsoluteTestSongFilePath(string songPathRelativeToTestSongFolderInAssets)
+    protected static string GetAbsoluteTestSongFilePath(string songPathRelativeToTestSongFolderInAssets)
     {
         return $"{Application.dataPath}/Editor/Tests/TestSongs/{songPathRelativeToTestSongFolderInAssets}";
     }

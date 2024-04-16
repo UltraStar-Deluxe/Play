@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-public class LazyLoadedFromFileSongMeta : LazyLoadedSongMeta, IHasSongIssues
+public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
 {
     public List<SongIssue> SongIssues { get; private set; } = new();
 

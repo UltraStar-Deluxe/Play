@@ -2,9 +2,10 @@
 {
     Artist,
     Title,
-    Year,
-    Genre,
     Language,
+    Genre,
+    Tag,
     Edition,
+    Year,
     Lyrics,
 }

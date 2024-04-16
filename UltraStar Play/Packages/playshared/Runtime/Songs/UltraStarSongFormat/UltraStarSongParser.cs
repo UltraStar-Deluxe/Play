@@ -49,8 +49,8 @@ public static class UltraStarSongParser
 
     public static UltraStarSongMeta ParseString(string text, out List<SongIssue> songIssues, bool logIssues = true)
     {
-        MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
-        StreamReader streamReader = new StreamReader(memoryStream, Encoding.UTF8);
+        using MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        using StreamReader streamReader = new StreamReader(memoryStream, Encoding.UTF8);
         UltraStarSongMeta songMeta = ParseStreamReader(streamReader, out songIssues);
 
         if (logIssues)
@@ -75,276 +75,356 @@ public static class UltraStarSongParser
     {
         songIssues = new();
 
-        Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
-        Dictionary<string, string> headerFields = new();
+        Dictionary<string, string> headerFields = ParseHeaderFields(reader, songIssues);
+        NormalizeHeaderFields(headerFields);
+
+        if (headerFields.TryGetValue("ENCODING", out string explicitlyDefinedEncodingName))
+        {
+            CheckEncodingHeaderMatches(explicitlyDefinedEncodingName, reader);
+        }
+
+        AddSongIssuesForMissingMandatoryHeaderFields(headerFields, songIssues);
+        Dictionary<EVoiceId, string> voiceIdToDisplayName = GetCustomVoiceIdDisplayNames(headerFields);
+
+        double txtFileBpm = GetTxtFileBpm(headerFields);
+        UltraStarSongFormatVersion version = new(headerFields.GetValueOrDefault("VERSION", ""));
+
+        UltraStarSongMeta songMeta = new(
+            headerFields.GetValueOrDefault("ARTIST", ""),
+            headerFields.GetValueOrDefault("TITLE", ""),
+            txtFileBpm,
+            headerFields.GetValueOrDefault("AUDIO", ""),
+            voiceIdToDisplayName,
+            version);
+        foreach (KeyValuePair<string, string> item in headerFields)
+        {
+            try
+            {
+                ApplyOptionalHeaderField(songMeta, item.Key, item.Value);
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = $"Failed to handle header field '{item.Key}' with value '{item.Value}'";
+                Debug.LogException(ex);
+                Debug.LogError(errorMessage);
+                songIssues.Add(SongIssue.CreateWarning(songMeta, errorMessage));
+            }
+        }
+
+        // Recreate issues with proper SongMeta
+        songIssues = songIssues.Select(songIssue =>
+                new SongIssue(songIssue.Severity, new SongIssueData(songMeta),
+                    songIssue.Message, songIssue.StartBeat, songIssue.EndBeat))
+            .ToList();
+
+        return songMeta;
+    }
+
+    private static double GetTxtFileBpm(Dictionary<string,string> headerFields)
+    {
+        if (headerFields.TryGetValue("BPM", out string txtFileBpmString))
+        {
+            return ParseNumber("BPM", txtFileBpmString);
+        }
+        return 0;
+    }
+
+    private static void AddSongIssuesForMissingMandatoryHeaderFields(Dictionary<string,string> headerFields, List<SongIssue> songIssues)
+    {
+        List<List<string>> mandatoryHeaderFieldsWithAlternatives = new List<List<string>>()
+        {
+            new List<string>() { "AUDIO", "AUDIOURL", "VIDEOURL" },
+            new List<string>() { "BPM" },
+            new List<string>() { "TITLE" },
+        };
+
+        foreach (List<string> mandatoryHeaderFieldWithAlternatives in mandatoryHeaderFieldsWithAlternatives)
+        {
+            if (mandatoryHeaderFieldWithAlternatives.AllMatch(mandatoryHeaderField =>
+                    !headerFields.TryGetValue(mandatoryHeaderField, out string mandatoryHeaderFieldValue)
+                    || mandatoryHeaderFieldValue.IsNullOrEmpty()))
+            {
+                songIssues.Add(SongIssue.CreateError(null,
+                    $"Missing required header field. Specify {mandatoryHeaderFieldsWithAlternatives.JoinWith(" or ")}"));
+            }
+        }
+    }
+
+    private static Dictionary<EVoiceId,string> GetCustomVoiceIdDisplayNames(Dictionary<string,string> headerFields)
+    {
+        Dictionary<EVoiceId, string> result = new();
+        foreach (KeyValuePair<string,string> headerField in headerFields)
+        {
+            if (TryParseCustomVoiceIdDisplayNameHeader(headerField.Key, headerField.Value, out EVoiceId voiceId, out string displayName))
+            {
+                result[voiceId] = displayName;
+            }
+        }
+        return result;
+    }
+
+    private static bool TryParseCustomVoiceIdDisplayNameHeader(string key, string value, out EVoiceId voiceId, out string displayName)
+    {
+        if (key.StartsWith('P')
+            && key.Length == 2
+            && char.IsDigit(key, 1)
+            && Enum.TryParse(key, out voiceId))
+        {
+            displayName = value;
+            return true;
+        }
+
+        voiceId = EVoiceId.P1;
+        displayName = "";
+        return false;
+    }
+
+    private static void CheckEncodingHeaderMatches(string explicitlyDefinedEncodingName, StreamReader reader)
+    {
+        if (explicitlyDefinedEncodingName.IsNullOrEmpty()
+            && string.Equals(explicitlyDefinedEncodingName, "auto", StringComparison.InvariantCultureIgnoreCase))
+        {
+            return;
+        }
+
+        Encoding explicitlyDefinedEncoding;
+        try
+        {
+            explicitlyDefinedEncoding = EncodingUtils.GetEncoding(explicitlyDefinedEncodingName);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to find encoding for name '{explicitlyDefinedEncodingName}'. " +
+                           $"Using guessed encoding '{reader.CurrentEncoding}' instead. " +
+                           $"Error message: {ex.Message}");
+            explicitlyDefinedEncoding = null;
+        }
+
+        if (explicitlyDefinedEncoding == null
+            || explicitlyDefinedEncoding.Equals(reader.CurrentEncoding))
+        {
+            return;
+        }
+
+        throw new ExplicitEncodingMismatchException(explicitlyDefinedEncoding, reader.CurrentEncoding);
+    }
+
+    private static Dictionary<string,string> ParseHeaderFields(StreamReader reader, List<SongIssue> songIssues)
+    {
+        Dictionary<string, string> headerFields = new(StringComparer.InvariantCultureIgnoreCase);
 
         uint lineNumber = 0;
         while (!reader.EndOfStream)
         {
-            ++lineNumber;
+            lineNumber++;
             string line = reader.ReadLine();
-            if (line.TrimStart().IsNullOrEmpty())
+            if (TryParseHeaderField(line, out string key, out string value))
+            {
+                if (headerFields.ContainsKey(key))
+                {
+                    songIssues.Add(SongIssue.CreateWarning(null, $"Cannot set '{key}' multiple times"));
+                }
+                else
+                {
+                    headerFields.Add(key, value);
+                }
+            }
+            else if (lineNumber == 1)
+            {
+                // Headers are mandatory
+                throw new UltraStarSongParserException("Does not look like a song file, ignoring");
+            }
+            else if (line.IsNullOrEmpty())
             {
                 // Ignore empty line
                 continue;
             }
-
-            if (!line.StartsWith("#", StringComparison.InvariantCultureIgnoreCase))
+            else if (line.StartsWith('#'))
             {
-                if (lineNumber == 1)
-                {
-                    throw new UltraStarSongParserException("Does not look like a song file, ignoring");
-                }
-
-                // Finished headers
+                // This could be a header fields with invalid syntax, e.g., using the wrong separator for key and value.
+                songIssues.Add(SongIssue.CreateWarning(null, $"Invalid formatting of header field on line {lineNumber}: '{line}'"));
+            }
+            else
+            {
+                // Reached end of header fields
                 break;
             }
-
-            char[] separator = { ':' };
-            string[] parts = line.Substring(1).Split(separator, 2);
-            if (parts.Length < 2)
-            {
-                songIssues.Add(SongIssue.CreateWarning(null, "Invalid formatting on line " + line));
-                // Ignore this line. Continue with the next line.
-                continue;
-            }
-
-            string tagName = parts[0].TrimEnd();
-            string tagNameLowerCase = tagName.ToLowerInvariant();
-            if (tagNameLowerCase.Length < 1)
-            {
-                songIssues.Add(SongIssue.CreateWarning(null, "Missing tag name on line " + line));
-                // Ignore this line. Continue with the next line.
-                continue;
-            }
-
-            string tagValue = parts[1].TrimStart();
-            if (tagValue.TrimStart().IsNullOrEmpty())
-            {
-                // Ignore empty tags
-                continue;
-            }
-
-            if (string.Equals(tagNameLowerCase, "encoding", StringComparison.InvariantCultureIgnoreCase)
-                && !string.Equals(tagValue, "auto", StringComparison.InvariantCultureIgnoreCase))
-            {
-                Encoding explicitlyDefinedEncoding;
-                try
-                {
-                    explicitlyDefinedEncoding = EncodingUtils.GetEncoding(tagValue);
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to find encoding for explicitly specified encoding name '{tagValue}'. " +
-                                   $"Using guessed encoding '{reader.CurrentEncoding}' instead. " +
-                                   $"Error message: {ex.Message}");
-                    explicitlyDefinedEncoding = null;
-                }
-
-                if (explicitlyDefinedEncoding != null
-                    && !explicitlyDefinedEncoding.Equals(reader.CurrentEncoding))
-                {
-                    reader.Dispose();
-                    throw new ExplicitEncodingMismatchException(explicitlyDefinedEncoding, reader.CurrentEncoding);
-                }
-            }
-            else if (tagNameLowerCase.StartsWith("p", StringComparison.Ordinal)
-                     && tagNameLowerCase.Length == 2
-                     && char.IsDigit(tagNameLowerCase, 1)
-                     && Enum.TryParse(tagNameLowerCase.ToUpperInvariant(), out EVoiceId pTagVoiceId))
-            {
-                headerFields.Add(tagNameLowerCase, tagValue);
-                if (!voiceIdToDisplayName.ContainsKey(pTagVoiceId))
-                {
-                    voiceIdToDisplayName[pTagVoiceId] = tagValue;
-                }
-                else
-                {
-                    // silently ignore already set voice names
-                }
-            }
-            else if (tagNameLowerCase.StartsWith("duetsingerp", StringComparison.Ordinal)
-                     && tagNameLowerCase.Length == 12
-                     && char.IsDigit(tagNameLowerCase, 11)
-                    // Get P1 resp. P2 from DUETSINGERP1 resp. DUETSINGERP2
-                     && Enum.TryParse(tagNameLowerCase.Substring(10).ToUpperInvariant(), out EVoiceId duetSingerPTagVoiceId))
-            {
-                headerFields.Add(tagNameLowerCase, tagValue);
-                if (!voiceIdToDisplayName.ContainsKey(duetSingerPTagVoiceId))
-                {
-                    voiceIdToDisplayName.Add(duetSingerPTagVoiceId, tagValue);
-                }
-                else
-                {
-                    // silently ignore already set voice names
-                }
-            }
-            else
-            {
-                if (headerFields.ContainsKey(tagNameLowerCase))
-                {
-                    songIssues.Add(SongIssue.CreateWarning(null, $"Cannot set '{tagName}' multiple times"));
-                }
-                else
-                {
-                    headerFields[tagNameLowerCase] = tagValue;
-                }
-            }
         }
 
-        // Check that required tags are set.
-        if (!headerFields.ContainsKey("mp3"))
+        return headerFields;
+    }
+
+    private static bool TryParseHeaderField(string line, out string key, out string value)
+    {
+        key = null;
+        value = null;
+        if (line.IsNullOrEmpty()
+            || !line.StartsWith('#'))
         {
-            if (!headerFields.ContainsKey("website"))
-            {
-                songIssues.Add(SongIssue.CreateError(null, $"Missing required tag #MP3 or #WEBSITE"));
-            }
+            return false;
         }
 
-        if (!headerFields.ContainsKey("bpm"))
+        int indexOfSeparator = line.IndexOf(':');
+        if (indexOfSeparator <= 2)
         {
-            songIssues.Add(SongIssue.CreateError(null, $"Missing required tag #BPM"));
+            return false;
         }
 
-        if (!headerFields.ContainsKey("title"))
+        key = line.Substring(1, indexOfSeparator -1).Trim();
+        value = line.Substring(indexOfSeparator + 1, line.Length - indexOfSeparator - 1).Trim();
+
+        return !key.IsNullOrEmpty();
+    }
+
+    private static void NormalizeHeaderFields(Dictionary<string, string> headerFields)
+    {
+        NormalizeHeaderFieldKeys(headerFields);
+    }
+
+    private static void NormalizeHeaderFieldKeys(Dictionary<string,string> headerFields)
+    {
+        Dictionary<string, string> headerKeyToNormalizedHeaderKey = new Dictionary<string, string>()
         {
-            songIssues.Add(SongIssue.CreateError(null, $"Missing required tag #TITLE"));
-        }
+            { "MP3", "AUDIO" },
+            { "WEBSITE", "AUDIOURL" },
+            { "INSTRUMENTALAUDIO", "INSTRUMENTAL" },
+            { "VOCALSAUDIO", "VOCALS" },
+            { "AUDIOGAP", "GAP" },
+            { "DUETSINGERP1", "P1" },
+            { "DUETSINGERP2", "P2" },
+        };
 
-        try
+        foreach (KeyValuePair<string,string> entry in headerKeyToNormalizedHeaderKey)
         {
-            headerFields.TryGetValue("artist", out string artist);
-            if (artist == null)
+            string headerKey = entry.Key;
+            string normalizedHeaderKey = entry.Value;
+            if (headerFields.TryGetValue(headerKey, out string value))
             {
-                artist = "";
+                headerFields.Remove(headerKey);
+                headerFields.Add(normalizedHeaderKey, value);
             }
-
-            float txtFileBpm;
-            if (headerFields.TryGetValue("bpm", out string txtFileBpmString))
-            {
-                try
-                {
-                    txtFileBpm = ConvertToFloat(txtFileBpmString);
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                    throw new UltraStarSongParserException($"Failed to parse BPM value {txtFileBpmString}");
-                }
-            }
-            else
-            {
-                txtFileBpm = 0;
-            }
-
-            headerFields.TryGetValue("mp3", out string audioFile);
-            headerFields.TryGetValue("title", out string title);
-            UltraStarSongMeta songMeta = new(
-                artist,
-                title,
-                txtFileBpm,
-                audioFile,
-                voiceIdToDisplayName);
-            foreach (KeyValuePair<string, string> item in headerFields)
-            {
-                try
-                {
-                    ConsumeOptionalHeaderField(songMeta, item.Key, item.Value);
-                }
-                catch (Exception ex)
-                {
-                    string errorMessage = $"Failed to handle header field '{item.Key}' with value '{item.Value}'";
-                    Debug.LogException(ex);
-                    Debug.LogError(errorMessage);
-                    songIssues.Add(SongIssue.CreateWarning(songMeta, errorMessage));
-                }
-            }
-
-            // Recreate issues with proper SongMeta
-            songIssues = songIssues.Select(songIssue =>
-                    new SongIssue(songIssue.Severity, new SongIssueData(songMeta),
-                        songIssue.Message, songIssue.StartBeat, songIssue.EndBeat))
-                .ToList();
-
-            return songMeta;
-        }
-        catch (ArgumentNullException e)
-        {
-            // if you get these with e.ParamName == "s", it's probably one of the non-nullable things (ie, float, uint, etc)
-            throw new UltraStarSongParserException("Required tag '" + e.ParamName + "' was not set");
         }
     }
 
-    private static void ConsumeOptionalHeaderField(UltraStarSongMeta songMeta, string key, string value)
+    private static void ApplyOptionalHeaderField(UltraStarSongMeta songMeta, string key, string value)
     {
         switch (key)
         {
-            case "artist":
+            case "BPM":
+                songMeta.TxtFileBpm = ParseNumber(key, value);
+                break;
+            case "ARTIST":
                 songMeta.Artist = value;
                 break;
-            case "audio":
+            case "AUDIO":
                 songMeta.Audio = value;
                 break;
-            case "background":
+            case "AUDIOURL":
+                songMeta.AudioUrl = value;
+                break;
+            case "BACKGROUND":
                 songMeta.Background = value;
                 break;
-            case "cover":
+            case "BACKGROUNDURL":
+                songMeta.BackgroundUrl = value;
+                break;
+            case "COVER":
                 songMeta.Cover = value;
                 break;
-            case "edition":
+            case "COVERURL":
+                songMeta.CoverUrl = value;
+                break;
+            case "EDITION":
                 songMeta.Edition = value;
                 break;
-            case "end":
-                songMeta.TxtFileEndInMillis = ConvertToFloat(value);
+            case "END":
+                songMeta.EndInMillis = ParseNumber(key, value);
                 break;
-            case "gap":
-            case "audiogap":
-                songMeta.GapInMillis = ConvertToFloat(value);
+            case "GAP":
+                songMeta.GapInMillis = ParseNumber(key, value);
                 break;
-            case "genre":
+            case "GENRE":
                 songMeta.Genre = value;
                 break;
-            case "instrumentalaudio":
-            case "instrumental":
+            case "TAGS":
+                songMeta.Tag = value;
+                break;
+            case "INSTRUMENTAL":
                 songMeta.InstrumentalAudio = value;
                 break;
-            case "language":
+            case "LANGUAGE":
                 songMeta.Language = value;
                 break;
-            case "medleyendbeat":
-                songMeta.TxtFileMedleyEndBeat = ConvertToInt32(value);
+            case "MEDLEYENDBEAT":
+                songMeta.TxtFileMedleyEndBeat = ParseNumber(key, value);
                 break;
-            case "medleystartbeat":
-                songMeta.TxtFileMedleyStartBeat = ConvertToInt32(value);
+            case "MEDLEYEND":
+                songMeta.MedleyEndInMillis = ParseNumber(key, value);
                 break;
-            case "previewend":
-                songMeta.TxtFilePreviewEndInSeconds = ConvertToFloat(value);
+            case "MEDLEYSTARTBEAT":
+                songMeta.TxtFileMedleyStartBeat = ParseNumber(key, value);
                 break;
-            case "previewstart":
-                songMeta.TxtFilePreviewStartInSeconds = ConvertToFloat(value);
+            case "MEDLEYSTART":
+                songMeta.MedleyStartInMillis = ParseNumber(key, value);
                 break;
-            case "start":
-                songMeta.TxtFileStartInSeconds = ConvertToFloat(value);
+            case "PREVIEWEND":
+                if (songMeta.Version.IsBefore(UltraStarSongFormatVersion.v200))
+                {
+                    songMeta.TxtFilePreviewEndInSeconds = ParseNumber(key, value);
+                }
+                else
+                {
+                    songMeta.PreviewEndInMillis = ParseNumber(key, value);
+                }
                 break;
-            case "title":
+            case "PREVIEWSTART":
+                if (songMeta.Version.IsBefore(UltraStarSongFormatVersion.v200))
+                {
+                    songMeta.TxtFilePreviewStartInSeconds = ParseNumber(key, value);
+                }
+                else
+                {
+                    songMeta.PreviewStartInMillis = ParseNumber(key, value);
+                }
+                break;
+            case "START":
+                if (songMeta.Version.IsBefore(UltraStarSongFormatVersion.v200))
+                {
+                    songMeta.TxtFileStartInSeconds = ParseNumber(key, value);
+                }
+                else
+                {
+                    songMeta.StartInMillis = ParseNumber(key, value);
+                }
+                break;
+            case "TITLE":
                 songMeta.Title = value;
                 break;
-            case "video":
+            case "VERSION":
+                // Ignore because has already been loaded and should not be considered as AdditionalHeaderField.
+                break;
+            case "VIDEO":
                 songMeta.Video = value;
                 break;
-            case "videogap":
-                songMeta.TxtFileVideoGapInSeconds = ConvertToFloat(value);
+            case "VIDEOURL":
+                songMeta.VideoUrl = value;
                 break;
-            case "vocalsaudio":
-            case "vocals":
+            case "VIDEOGAP":
+                if (songMeta.Version.IsBefore(UltraStarSongFormatVersion.v200))
+                {
+                    songMeta.TxtFileVideoGapInSeconds = ParseNumber(key, value);
+                }
+                else
+                {
+                    songMeta.VideoGapInMillis = ParseNumber(key, value);
+                }
+                break;
+            case "VOCALS":
                 songMeta.VocalsAudio = value;
                 break;
-            case "website":
-                songMeta.Website = value;
-                break;
-            case "year":
-                songMeta.Year = ConvertToUInt32(value);
+            case "YEAR":
+                songMeta.Year = (uint)ParseNumber(key, value);
                 break;
             default:
                 songMeta.SetAdditionalHeaderEntry(key, value);
@@ -352,64 +432,34 @@ public static class UltraStarSongParser
         }
     }
 
+    /**
+     * Normalizes the decimal separator and surrounding whitespace.
+     */
     private static string NormalizeNumber(string s)
     {
         if (s.IsNullOrEmpty())
         {
-            return s;
+            return "";
         }
 
         return s.Replace(",", ".").Trim();
     }
 
-    private static float ConvertToFloat(string s)
+    private static double ParseNumber(string headerFieldName, string value)
     {
-        // Some txt files use comma as decimal separator (e.g. "12,34" instead "12.34").
-        // Convert this to English notation.
-        string sNormalized = NormalizeNumber(s);
-        if (float.TryParse(sNormalized, NumberStyles.Any, CultureInfo.InvariantCulture, out float res))
+        if (value.IsNullOrEmpty())
+        {
+            return 0;
+        }
+
+        string normalizedValue = NormalizeNumber(value);
+        if (double.TryParse(normalizedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double res))
         {
             return res;
         }
         else
         {
-            throw new UltraStarSongParserException($"Could not convert string '{s}' to a float.");
-        }
-    }
-
-    private static uint ConvertToUInt32(string s)
-    {
-        if (s.IsNullOrEmpty())
-        {
-            return 0;
-        }
-
-        string sNormalized = NormalizeNumber(s);
-        try
-        {
-            return Convert.ToUInt32(sNormalized, 10);
-        }
-        catch (FormatException e)
-        {
-            throw new UltraStarSongParserException("Could not convert " + s + " to an uint. Reason: " + e.Message, e);
-        }
-    }
-
-    private static int ConvertToInt32(string s)
-    {
-        if (s.IsNullOrEmpty())
-        {
-            return 0;
-        }
-
-        string sNormalized = NormalizeNumber(s);
-        try
-        {
-            return Convert.ToInt32(sNormalized, 10);
-        }
-        catch (FormatException e)
-        {
-            throw new UltraStarSongParserException("Could not convert " + s + " to an int. Reason: " + e.Message, e);
+            throw new UltraStarSongParserException($"Failed to parse number. Header field: {headerFieldName}, value: {value}");
         }
     }
 
@@ -419,7 +469,7 @@ public static class UltraStarSongParser
 
         public ExplicitEncodingMismatchException(Encoding explicitlyDefinedEncoding, Encoding otherEncoding)
             : base($"Encoding used to parse song '{otherEncoding}' " +
-                   $"does not match explicitly defined encoding '{explicitlyDefinedEncoding}'")
+                   $"does not match explicitly defined explicitlyDefinedEncodingName '{explicitlyDefinedEncoding}'")
         {
             ExplicitlyDefinedEncoding = explicitlyDefinedEncoding;
         }

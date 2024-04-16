@@ -54,6 +54,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.genrePropertyToggle)]
     private Toggle genrePropertyToggle;
 
+    [Inject(UxmlName = R.UxmlNames.tagPropertyToggle)]
+    private Toggle tagPropertyToggle;
+
     [Inject(UxmlName = R.UxmlNames.yearPropertyToggle)]
     private Toggle yearPropertyToggle;
 
@@ -153,10 +156,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
 
         RegisterToggleSearchPropertyCallback(artistPropertyToggle, ESearchProperty.Artist);
         RegisterToggleSearchPropertyCallback(titlePropertyToggle, ESearchProperty.Title);
-        RegisterToggleSearchPropertyCallback(genrePropertyToggle, ESearchProperty.Genre);
-        RegisterToggleSearchPropertyCallback(yearPropertyToggle, ESearchProperty.Year);
-        RegisterToggleSearchPropertyCallback(editionPropertyToggle, ESearchProperty.Edition);
         RegisterToggleSearchPropertyCallback(languagePropertyToggle, ESearchProperty.Language);
+        RegisterToggleSearchPropertyCallback(genrePropertyToggle, ESearchProperty.Genre);
+        RegisterToggleSearchPropertyCallback(tagPropertyToggle, ESearchProperty.Tag);
+        RegisterToggleSearchPropertyCallback(editionPropertyToggle, ESearchProperty.Edition);
+        RegisterToggleSearchPropertyCallback(yearPropertyToggle, ESearchProperty.Year);
         RegisterToggleSearchPropertyCallback(lyricsPropertyToggle, ESearchProperty.Lyrics);
 
         new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
@@ -329,6 +333,12 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         if (searchProperties.Contains(ESearchProperty.Edition)
             && !songMeta.Edition.IsNullOrEmpty()
             && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Edition, searchText))
+        {
+            return true;
+        }
+        if (searchProperties.Contains(ESearchProperty.Tag)
+            && !songMeta.Tag.IsNullOrEmpty()
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Tag, searchText))
         {
             return true;
         }

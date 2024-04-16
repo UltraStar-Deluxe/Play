@@ -7,7 +7,8 @@ public class YouTubeCoverImageProvider : ISongCoverImageProvider
 {
     public IObservable<string> GetCoverImageUri(SongMeta songMeta)
     {
-        if (TryGetYouTubeUri(songMeta.Website, out Uri uri))
+        string webViewUri = SongMetaUtils.GetWebViewUrl(songMeta);
+        if (TryGetYouTubeUri(webViewUri, out Uri uri))
         {
             return Observable.Return(GetCoverImageFromYouTube(uri));
         }
