@@ -88,18 +88,19 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             : "";
 
         return Observable.Create<bool>(o =>
-            {
-                string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
-                if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
                 {
-                    o.OnError(new Exception(
-                        $"Vocals isolation not supported for this audio file.\n" +
-                        $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.ToCsv(",", "", "")}"));
-                }
-                o.OnNext(true);
-                return Disposable.Empty;
-            })
-            .SelectMany(_ => DoProcessSongMetaAsObservable(
+                    string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
+                    if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
+                    {
+                        o.OnError(new Exception(
+                            $"Vocals isolation not supported for this audio file.\n" +
+                            $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.ToCsv(",", "", "")}"));
+                    }
+                    o.OnNext(true);
+                    o.OnCompleted();
+                    return Disposable.Empty;
+                })
+            .ContinueWith(DoProcessSongMetaAsObservable(
                         songMeta,
                         generatedSongFolderAbsolutePath,
                         cancellationTokenSource.Token,

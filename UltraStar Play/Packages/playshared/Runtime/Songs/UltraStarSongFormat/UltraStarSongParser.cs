@@ -302,7 +302,7 @@ public static class UltraStarSongParser
             if (headerFields.TryGetValue(headerKey, out string value))
             {
                 headerFields.Remove(headerKey);
-                headerFields.Add(normalizedHeaderKey, value);
+                headerFields[normalizedHeaderKey] = value;
             }
         }
     }

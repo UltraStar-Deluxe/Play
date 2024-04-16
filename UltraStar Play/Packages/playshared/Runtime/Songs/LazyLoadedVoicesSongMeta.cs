@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FullSerializer;
 using UnityEngine;
 
 [Serializable]
@@ -15,6 +16,7 @@ public abstract class LazyLoadedVoicesSongMeta : SongMeta
 
     public virtual Action DoLoadVoices { get; set; }
 
+    [fsIgnore]
     public ELoadVoicesPhase LoadVoicesPhase { get; private set; }
 
     public string FailedToLoadVoicesExceptionMessage => failedToLoadVoicesExceptionMessage;

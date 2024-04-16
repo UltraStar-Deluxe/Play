@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using FullSerializer;
 using UnityEngine;
 
 [Serializable]
@@ -17,6 +18,7 @@ public abstract class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
 
     public virtual Action DoLoadSong { get; set; }
 
+    [fsIgnore]
     public ELoadSongPhase LoadSongPhase { get; private set; }
 
     private bool hasSetFileInfo;
