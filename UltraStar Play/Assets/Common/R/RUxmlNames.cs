@@ -141,6 +141,7 @@ public static partial class R
         public const string dateLabel = "dateLabel";
         public const string defaultCloseDialogButton = "defaultCloseDialogButton";
         public const string defaultMedleyTargetDurationPicker = "defaultMedleyTargetDurationPicker";
+        public const string defaultUltraStarFormatVersionForSave = "defaultUltraStarFormatVersionForSave";
         public const string delayPicker = "delayPicker";
         public const string deleteButton = "deleteButton";
         public const string deleteGuestButton = "deleteGuestButton";
@@ -971,6 +972,7 @@ public static partial class R
         public const string unityVersionLabel = "unityVersionLabel";
         public const string updateSteamWorkshopItemsButton = "updateSteamWorkshopItemsButton";
         public const string updateSteamWorkshopItemsIcon = "updateSteamWorkshopItemsIcon";
+        public const string upgradeUltraStarFormatVersionForSave = "upgradeUltraStarFormatVersionForSave";
         public const string uploadProgressBar = "uploadProgressBar";
         public const string uploadWorkshopItemButton = "uploadWorkshopItemButton";
         public const string urlChooserButton = "urlChooserButton";
