@@ -57,14 +57,9 @@ public static class SongMetaUtils
         return GetExistingResourceUriOrFirst(songMeta, songMeta.Video, songMeta.VideoUrl);
     }
 
-    public static string GetWebsiteUri(SongMeta songMeta)
-    {
-        return GetUri(songMeta, songMeta.Website);
-    }
-
     public static string GetAudioUri(SongMeta songMeta)
     {
-        return GetExistingResourceUriOrFirst(songMeta, songMeta.Audio, songMeta.AudioUrl, songMeta.VideoUrl, songMeta.Website);
+        return GetExistingResourceUriOrFirst(songMeta, songMeta.Audio, songMeta.AudioUrl, songMeta.VideoUrl);
     }
 
     public static string GetVocalsAudioUri(SongMeta songMeta)
@@ -79,7 +74,7 @@ public static class SongMetaUtils
 
     public static string GetWebViewUrl(SongMeta songMeta)
     {
-        return GetExistingResourceUriOrFirst(songMeta, songMeta.AudioUrl, songMeta.VideoUrl, songMeta.Website);
+        return GetExistingResourceUriOrFirst(songMeta, songMeta.AudioUrl, songMeta.VideoUrl);
     }
 
     /**

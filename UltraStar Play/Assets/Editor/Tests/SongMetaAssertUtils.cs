@@ -29,11 +29,10 @@ public static class SongMetaAssertUtils
         Assert.AreEqual(expected.StartInMillis, actual.StartInMillis);
         Assert.AreEqual(expected.Title, actual.Title);
         Assert.AreEqual(expected.Video, actual.Video);
-        Assert.AreEqual(expected.VideoGapInMillis, actual.VideoGapInMillis);
         Assert.AreEqual(expected.VideoUrl, actual.VideoUrl);
+        Assert.AreEqual(expected.VideoGapInMillis, actual.VideoGapInMillis);
         Assert.AreEqual(expected.VocalsAudio, actual.VocalsAudio);
         Assert.AreEqual(expected.VocalsAudioUrl, actual.VocalsAudioUrl);
-        Assert.AreEqual(expected.Website, actual.Website);
         Assert.AreEqual(expected.Year, actual.Year);
 
         if (expected is UltraStarSongMeta expectedUltraStarSongMeta &&

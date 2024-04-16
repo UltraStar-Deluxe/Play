@@ -152,21 +152,6 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         }
     }
 
-    private bool hasSetWebsite;
-    public override string Website
-    {
-        get
-        {
-            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetWebsite);
-            return base.Website;
-        }
-        set
-        {
-            hasSetWebsite = true;
-            base.Website = value;
-        }
-    }
-
     private bool hasSetBackground;
     public override string Background
     {

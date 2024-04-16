@@ -133,7 +133,7 @@ public static class UltraStarSongParser
     {
         List<List<string>> mandatoryHeaderFieldsWithAlternatives = new List<List<string>>()
         {
-            new List<string>() { "AUDIO", "AUDIOURL", "VIDEOURL", "WEBSITE", },
+            new List<string>() { "AUDIO", "AUDIOURL", "VIDEOURL" },
             new List<string>() { "BPM" },
             new List<string>() { "TITLE" },
         };
@@ -287,6 +287,7 @@ public static class UltraStarSongParser
         Dictionary<string, string> headerKeyToNormalizedHeaderKey = new Dictionary<string, string>()
         {
             { "MP3", "AUDIO" },
+            { "WEBSITE", "AUDIOURL" },
             { "INSTRUMENTALAUDIO", "INSTRUMENTAL" },
             { "VOCALSAUDIO", "VOCALS" },
             { "AUDIOGAP", "GAP" },
@@ -421,9 +422,6 @@ public static class UltraStarSongParser
                 break;
             case "VOCALS":
                 songMeta.VocalsAudio = value;
-                break;
-            case "WEBSITE":
-                songMeta.Website = value;
                 break;
             case "YEAR":
                 songMeta.Year = (uint)ParseNumber(key, value);

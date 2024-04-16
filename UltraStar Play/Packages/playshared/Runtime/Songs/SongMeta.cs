@@ -73,11 +73,6 @@ public class SongMeta
     public string InstrumentalAudioUrl { get; set; }
 
     /**
-     * URI to load the song in the embedded WebView.
-     */
-    public virtual string Website { get; set; } = "";
-
-    /**
      * Path or URI to an image file that should be displayed as background when singing.
      */
     public virtual string Background { get; set; } = "";
@@ -319,7 +314,6 @@ public class SongMeta
         VideoUrl = other.VideoUrl;
         VocalsAudio = other.VocalsAudio;
         VocalsAudioUrl = other.VocalsAudioUrl;
-        Website = other.Website;
         Year = other.Year;
         CopyVoices(other);
         CopyAdditionalHeaderEntries(other);

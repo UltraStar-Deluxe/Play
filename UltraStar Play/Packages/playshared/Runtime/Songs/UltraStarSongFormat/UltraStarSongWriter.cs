@@ -135,8 +135,6 @@ public static class UltraStarFormatWriter
         AppendHeaderField(sb, "videourl", songMeta.VideoUrl);
         AppendNumberHeaderField(sb, "videogap", version.IsBefore(UltraStarSongFormatVersion.v200) ? songMeta.TxtFileVideoGapInSeconds : songMeta.VideoGapInMillis);
 
-        AppendHeaderField(sb, "website", songMeta.Website);
-
         AppendNumberHeaderField(sb, "year", songMeta.Year);
         AppendHeaderField(sb, "edition", songMeta.Edition);
         AppendHeaderField(sb, "language", songMeta.Language);
