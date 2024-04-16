@@ -131,7 +131,7 @@ public class UltraStarSongMeta : LazyLoadedSongMeta
     public UltraStarSongMeta(
         string artist,
         string title,
-        float txtFileBpm,
+        double txtFileBpm,
         string audioFile,
         Dictionary<EVoiceId, string> voiceIdToDisplayName)
     : this(artist, title, txtFileBpm, audioFile, voiceIdToDisplayName, UltraStarSongFormatVersion.unknown)

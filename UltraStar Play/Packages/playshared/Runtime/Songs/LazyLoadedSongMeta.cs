@@ -7,7 +7,7 @@ using UnityEngine;
 [Serializable]
 public abstract class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
 {
-    private enum ELoadSongPhase
+    public enum ELoadSongPhase
     {
         Pending,
         Started,
@@ -17,8 +17,7 @@ public abstract class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
 
     public virtual Action DoLoadSong { get; set; }
 
-    public bool HasFailedToLoadSong => loadSongPhase is ELoadSongPhase.Failed;
-    private ELoadSongPhase loadSongPhase;
+    public ELoadSongPhase LoadSongPhase { get; private set; }
 
     private bool hasSetFileInfo;
     public override FileInfo FileInfo
@@ -420,24 +419,24 @@ public abstract class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
 
     public virtual void LoadSongIfNotDoneYet()
     {
-        if (loadSongPhase is not ELoadSongPhase.Pending)
+        if (LoadSongPhase is not ELoadSongPhase.Pending)
         {
             return;
         }
 
         try
         {
-            loadSongPhase = ELoadSongPhase.Started;
+            LoadSongPhase = ELoadSongPhase.Started;
             DoLoadSong?.Invoke();
         }
         catch (Exception ex)
         {
-            loadSongPhase = ELoadSongPhase.Failed;
+            LoadSongPhase = ELoadSongPhase.Failed;
             Debug.LogException(ex);
             Debug.LogError($"Failed load song '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
             return;
         }
 
-        loadSongPhase = ELoadSongPhase.FinishedSuccessfully;
+        LoadSongPhase = ELoadSongPhase.FinishedSuccessfully;
     }
 }

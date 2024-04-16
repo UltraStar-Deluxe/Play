@@ -921,4 +921,10 @@ public static class SongMetaUtils
 
         RemoveVoice(songMeta, voice.Id);
     }
+
+    public static bool HasFailedToLoadVoices(SongMeta songMeta)
+    {
+        return songMeta is LazyLoadedVoicesSongMeta lazyLoadedVoicesSongMeta
+               && lazyLoadedVoicesSongMeta.LoadVoicesPhase is LazyLoadedVoicesSongMeta.ELoadVoicesPhase.Failed;
+    }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 [Serializable]
 public abstract class LazyLoadedVoicesSongMeta : SongMeta
 {
-    private enum ELoadVoicesPhase
+    public enum ELoadVoicesPhase
     {
         Pending,
         Started,
@@ -15,8 +15,7 @@ public abstract class LazyLoadedVoicesSongMeta : SongMeta
 
     public virtual Action DoLoadVoices { get; set; }
 
-    public bool HasFailedToLoadVoices => loadVoicesPhase is ELoadVoicesPhase.Failed;
-    private ELoadVoicesPhase loadVoicesPhase;
+    public ELoadVoicesPhase LoadVoicesPhase { get; private set; }
 
     public string FailedToLoadVoicesExceptionMessage => failedToLoadVoicesExceptionMessage;
     private string failedToLoadVoicesExceptionMessage;
@@ -61,23 +60,23 @@ public abstract class LazyLoadedVoicesSongMeta : SongMeta
     {
         base.AddVoice(voice);
 
-        if (loadVoicesPhase is ELoadVoicesPhase.Pending)
+        if (LoadVoicesPhase is ELoadVoicesPhase.Pending)
         {
             // No need to load the voices anymore.
-            loadVoicesPhase = ELoadVoicesPhase.FinishedSuccessfully;
+            LoadVoicesPhase = ELoadVoicesPhase.FinishedSuccessfully;
         }
     }
 
     public virtual void LoadVoicesIfNotDoneYet()
     {
-        if (loadVoicesPhase is not ELoadVoicesPhase.Pending)
+        if (LoadVoicesPhase is not ELoadVoicesPhase.Pending)
         {
             return;
         }
 
         try
         {
-            loadVoicesPhase = ELoadVoicesPhase.Started;
+            LoadVoicesPhase = ELoadVoicesPhase.Started;
             if (DoLoadVoices == null)
             {
                 LoadDefaultVoices();
@@ -89,14 +88,14 @@ public abstract class LazyLoadedVoicesSongMeta : SongMeta
         }
         catch (Exception ex)
         {
-            loadVoicesPhase = ELoadVoicesPhase.Failed;
+            LoadVoicesPhase = ELoadVoicesPhase.Failed;
             failedToLoadVoicesExceptionMessage = ex.Message;
             Debug.LogException(ex);
             Debug.LogError($"Failed to load voices of '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
             return;
         }
 
-        loadVoicesPhase = ELoadVoicesPhase.FinishedSuccessfully;
+        LoadVoicesPhase = ELoadVoicesPhase.FinishedSuccessfully;
     }
 
     private void LoadDefaultVoices()

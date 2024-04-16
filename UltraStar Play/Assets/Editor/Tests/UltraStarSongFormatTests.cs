@@ -163,7 +163,7 @@ public class UltraStarSongFormatTests
         // Load file content with modified formatVersion
         string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
         string originalFileContent = File.ReadAllText(originalFilePath);
-        string originalFileContentWithModifiedVersion = Regex.Replace(originalFileContent, @"#VERSION:.+", $"#VERSION:{formatVersion}");
+        string originalFileContentWithModifiedVersion = ReplaceHeaderField(originalFileContent, "VERSION", formatVersion);
 
         // Load song
         string copiedOriginalFilePath = $"{Application.temporaryCachePath}/LoadAndSaveProperties-TestSong-Original.txt";
@@ -180,5 +180,10 @@ public class UltraStarSongFormatTests
         SongMeta savedSongMeta = loadSongMeta(savedFilePath);
 
         SongMetaAssertUtils.AssertSongMetasAreEqual(originalSongMeta, savedSongMeta);
+    }
+
+    private static string ReplaceHeaderField(string originalFileContent, string headerName, string newValue)
+    {
+        return Regex.Replace(originalFileContent, $"#{headerName}:.+", $"#{headerName}:{newValue}");
     }
 }
