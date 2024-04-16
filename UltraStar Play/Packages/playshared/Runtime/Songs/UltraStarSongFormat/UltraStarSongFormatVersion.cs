@@ -71,4 +71,9 @@ public struct UltraStarSongFormatVersion
         }
         return (int)EnumValue > (int)other.EnumValue;
     }
+
+    public override string ToString()
+    {
+        return $"{nameof(UltraStarSongFormatVersion)}({StringValue})";
+    }
 }
