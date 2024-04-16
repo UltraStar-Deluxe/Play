@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 
 [Serializable]
-public class SongMeta
+public abstract class SongMeta
 {
     /**
      * File name of the song's txt file (not including any directories).

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class LazyLoadedVoicesSongMeta : SongMeta
+public abstract class LazyLoadedVoicesSongMeta : SongMeta
 {
     private enum ELoadVoicesPhase
     {

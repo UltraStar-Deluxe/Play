@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 
 [Serializable]
-public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
+public abstract class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
 {
     private enum ELoadSongPhase
     {
