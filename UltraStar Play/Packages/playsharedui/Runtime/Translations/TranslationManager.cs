@@ -1,4 +1,5 @@
 using System;
+using ProTrans;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -10,6 +11,14 @@ using UnityEngine.UIElements;
 public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
     public static TranslationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<TranslationManager>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        TranslationConfig.Singleton.PropertiesFileProvider = new CachingPropertiesFileProvider(new ResourcesFolderPropertiesFileProvider());
+        TranslationConfig.Singleton.MissingPlaceholderStrategy = Application.isEditor ? MissingPlaceholderStrategy.Throw : MissingPlaceholderStrategy.Log;
+        TranslationConfig.Singleton.UnexpectedPlaceholderStrategy = Application.isEditor ? UnexpectedPlaceholderStrategy.Throw : UnexpectedPlaceholderStrategy.Log;
+    }
 
     public bool generateConstantsOnResourceChange = true;
 
@@ -28,7 +37,7 @@ public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, IS
 
     public static void ApplyTranslations(VisualElement rootVisualElement = null)
     {
-        TranslationManager translationManager = TranslationManager.Instance;
+        TranslationManager translationManager = Instance;
         if (translationManager == null)
         {
             return;

@@ -4,12 +4,6 @@ using UnityEngine;
 
 public class ResourcesFolderPropertiesFileProvider : IPropertiesFileProvider
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        TranslationConfig.Singleton.PropertiesFileProvider = new CachingPropertiesFileProvider(new ResourcesFolderPropertiesFileProvider());
-    }
-
     public PropertiesFile GetPropertiesFile(CultureInfo cultureInfo)
     {
         string languageAndRegionSuffix = PropertiesFileParser.GetLanguageAndRegionSuffix(cultureInfo);
