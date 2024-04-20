@@ -88,6 +88,8 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         toggleStartAndCancelButton.RegisterCallbackButtonTriggered(_ => ToggleStartAndCancel());
         startIcon.ShowByDisplay();
         cancelIcon.HideByDisplay();
+
+        TranslationManager.ApplyTranslations(VisualElement);
     }
 
     private void ToggleStartAndCancel()
