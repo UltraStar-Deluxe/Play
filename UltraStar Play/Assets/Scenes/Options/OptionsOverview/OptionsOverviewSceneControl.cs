@@ -261,8 +261,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         openSteamWorkshopButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty());
         updateSteamWorkshopItemsButton.SetVisibleByDisplay(openSteamWorkshopButton.IsVisibleByDisplay());
 
-        // Apply theme to loaded UI
+        // Apply theme and translations to loaded UI
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(loadedSceneVisualElement);
+        TranslationManager.ApplyTranslations(loadedSceneVisualElement);
 
         // Scroll with mouse drag
         MouseEventScrollControl.RegisterMouseScrollEvents();

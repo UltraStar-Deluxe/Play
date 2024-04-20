@@ -1,16 +1,16 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%; height: 10%; flex-grow: 1; margin-bottom: 20px;">
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="themePicker" label="Theme" class="noBackgroundInHierarchy" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="backgroundLightItemPicker" label="Background Lights" class="noBackgroundInHierarchy" />
-            <ItemPicker name="sceneChangeAnimationPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Scene Transition" class="noBackgroundInHierarchy" />
-            <ItemPicker name="sceneChangeDurationPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Scene Transition Duration" class="noBackgroundInHierarchy" />
-            <ItemPicker name="previewFadeInDurationChooser" label="Preview Fade-in Duration" wrap-around="true" min-value="0" max-value="5" step-value="0.5" class="noBackgroundInHierarchy" />
-            <ItemPicker name="songBackgroundScaleModePicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Song Background Scale Mode" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="imageAsCursorToggle" label="Use Image as Cursor" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="showSongIndexInSongSelectToggle" label="Show Index in Song Select" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="showScrollBarInSongSelectToggle" label="Show Scroll Bar in Song Select" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="navigateFoldersInSongSelectToggle" label="Navigate Folders in Song Select" class="noBackgroundInHierarchy" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="themePicker" label="$options_theme" class="noBackgroundInHierarchy" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="backgroundLightItemPicker" label="$options_backgroundLights" class="noBackgroundInHierarchy" />
+            <ItemPicker name="sceneChangeAnimationPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="$options_sceneTransition" class="noBackgroundInHierarchy" />
+            <ItemPicker name="sceneChangeDurationPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="$options_sceneTransitionDuration" class="noBackgroundInHierarchy" />
+            <ItemPicker name="previewFadeInDurationChooser" label="$options_previewFadeInDuration" wrap-around="true" min-value="0" max-value="5" step-value="0.5" class="noBackgroundInHierarchy" />
+            <ItemPicker name="songBackgroundScaleModePicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="$options_songBackgroundScaleMode" class="noBackgroundInHierarchy" />
+            <ui:Toggle name="imageAsCursorToggle" label="$options_useImageAsCursor" class="noBackgroundInHierarchy" />
+            <ui:Toggle name="showSongIndexInSongSelectToggle" label="$options_showIndexInSongSelect" class="noBackgroundInHierarchy" />
+            <ui:Toggle name="showScrollBarInSongSelectToggle" label="$options_showScrollBarInSongSelect" class="noBackgroundInHierarchy" />
+            <ui:Toggle name="navigateFoldersInSongSelectToggle" label="$options_navigateFoldersInSongSelect" class="noBackgroundInHierarchy" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>
