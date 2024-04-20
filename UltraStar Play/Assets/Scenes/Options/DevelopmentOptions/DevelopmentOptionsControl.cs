@@ -167,6 +167,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.uploadWorkshopItemButton)]
     private Button uploadWorkshopItemButton;
 
+    [Inject(UxmlName = R.UxmlNames.defaultUltraStarFormatVersionForSave)]
+    private ItemPicker defaultUltraStarFormatVersionForSave;
+
+    [Inject(UxmlName = R.UxmlNames.upgradeUltraStarFormatVersionForSave)]
+    private ItemPicker upgradeUltraStarFormatVersionForSave;
+
     private MessageDialogControl uploadWorkshopItemDialogControl;
 
     protected override void Start()
@@ -343,6 +349,15 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(writeUltraStarTxtFileWithByteOrderMarkToggle,
             () => settings.WriteUltraStarTxtFileWithByteOrderMark,
             newValue => settings.WriteUltraStarTxtFileWithByteOrderMark = newValue);
+
+        // UltraStar format versions
+        new EnumItemPickerControl<EKnownUltraStarSongFormatVersion>(defaultUltraStarFormatVersionForSave)
+            .Bind(() => settings.DefaultUltraStarSongFormatVersionForSave,
+                newValue => settings.DefaultUltraStarSongFormatVersionForSave = newValue);
+
+        new EnumItemPickerControl<EUpgradeUltraStarSongFormatVersion>(upgradeUltraStarFormatVersionForSave)
+            .Bind(() => settings.UpgradeUltraStarSongFormatVersionForSave,
+                newValue => settings.UpgradeUltraStarSongFormatVersionForSave = newValue);
 
         // Ffmpeg playback / conversion
         FieldBindingUtils.Bind(ffmpegConversionCommandsJsonPicker,

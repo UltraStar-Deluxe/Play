@@ -97,7 +97,7 @@ public class BatchIsolateVocalsModSettings : IModSettings
         {
             return;
         }
-        Debug.Log($"Starting vocals isolation of batch song {i + 1} / {songMetas.Count}.");
+        Debug.Log($"Starting vocals isolation of batch song {i + 1} / {songMetas.Count}: '{SongMetaUtils.GetArtistDashTitle(songMetas[i])}'.");
 
         SongMeta songMeta = songMetas[i];
         Job audioSeparationJob = audioSeparationJobs[i];

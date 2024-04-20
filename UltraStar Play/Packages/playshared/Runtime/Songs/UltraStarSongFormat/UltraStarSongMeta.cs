@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
+public class UltraStarSongMeta : LazyLoadedSongMeta
 {
     /**
      * The "bars-per-minute" in four-four-time (i.e. (beats-per-minute / 4)) of the song.
@@ -51,18 +51,6 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
         set
         {
             StartInMillis = value * 1000.0;
-        }
-    }
-
-    public double TxtFileEndInMillis
-    {
-        get
-        {
-            return EndInMillis;
-        }
-        set
-        {
-            EndInMillis = value;
         }
     }
 
@@ -127,17 +115,42 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
         CopyValues(other);
     }
 
+    public override void CopyValues(SongMeta other)
+    {
+        base.CopyValues(other);
+        if (other is UltraStarSongMeta otherUltraStarSongMeta)
+        {
+            Version = otherUltraStarSongMeta.Version;
+        }
+        else
+        {
+            Version = UltraStarSongFormatVersion.unknown;
+        }
+    }
+
     public UltraStarSongMeta(
         string artist,
         string title,
-        float txtFileBpm,
+        double txtFileBpm,
         string audioFile,
         Dictionary<EVoiceId, string> voiceIdToDisplayName)
+    : this(artist, title, txtFileBpm, audioFile, voiceIdToDisplayName, UltraStarSongFormatVersion.unknown)
+    {
+    }
+
+    public UltraStarSongMeta(
+        string artist,
+        string title,
+        double txtFileBpm,
+        string audioFile,
+        Dictionary<EVoiceId, string> voiceIdToDisplayName,
+        UltraStarSongFormatVersion version)
     {
         Artist = artist;
         TxtFileBpm = txtFileBpm;
         Audio = audioFile;
         Title = title;
+        Version = version;
 
         if (voiceIdToDisplayName == null)
         {

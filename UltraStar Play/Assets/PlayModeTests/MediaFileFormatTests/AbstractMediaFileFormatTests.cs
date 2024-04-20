@@ -93,7 +93,7 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
             })
             .Subscribe(evt =>
             {
-                Debug.Log($"Successfully loaded song media (audio: '{songMeta.Audio}', website: '{songMeta.Website}') after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. Song duration: {songAudioPlayer.DurationOfSongInMillis} ms");
+                Debug.Log($"Successfully loaded song media (audio: '{songMeta.Audio}', audioUrl: '{songMeta.AudioUrl}', videoUrl: '{songMeta.VideoUrl}') after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. Song duration: {songAudioPlayer.DurationOfSongInMillis} ms");
             });
 
         yield return new WaitUntil(() => SongAudioPlayer.DurationOfSongInMillis > 0
@@ -106,7 +106,7 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
         }
         else if (TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis))
         {
-            Assert.Fail($"Failed to load song media (audio: '{songMeta.Audio}', website: '{songMeta.Website}') after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms.");
+            Assert.Fail($"Failed to load song media (audio: '{songMeta.Audio}', audioUrl: '{songMeta.AudioUrl}', videoUrl: '{songMeta.VideoUrl}') after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms.");
         }
     }
 

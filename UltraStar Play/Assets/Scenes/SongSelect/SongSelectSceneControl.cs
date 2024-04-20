@@ -965,8 +965,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void StartSingSceneWithGivenSongAndSettings(SongMeta songMeta)
     {
-        if (songMeta is UltraStarSongMeta ultraStarSongMeta
-            && ultraStarSongMeta.HasFailedToLoadVoices)
+        if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
         {
             UiManager.CreateNotification("Failed to load song. Check log for details.");
             return;
@@ -1031,8 +1030,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        if (songMeta is UltraStarSongMeta ultraStarSongMeta
-            && ultraStarSongMeta.HasFailedToLoadVoices)
+        if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
         {
             UiManager.CreateNotification("Failed to load song. Check log for details.");
             return;
@@ -1078,8 +1076,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         // Check that there is associated sing-along data. If not, ask to open song editor.
         if (!SongMetaUtils.HasSingAlongData(songMeta))
         {
-            if (songMeta is LazyLoadedVoicesSongMeta lazyLoadedVoicesSongMeta
-                && lazyLoadedVoicesSongMeta.HasFailedToLoadVoices)
+            if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
             {
                 ShowFailedToLoadVoicesDialog(songMeta);
                 return;

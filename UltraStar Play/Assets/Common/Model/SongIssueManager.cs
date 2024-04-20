@@ -259,7 +259,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
         List<SongIssue> songIssues = new();
 
         // Check video exists and uses a supported format.
-        if (SongMetaUtils.GetWebsiteUri(songMeta).IsNullOrEmpty())
+        if (SongMetaUtils.GetWebViewUrl(songMeta).IsNullOrEmpty())
         {
             string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
             CheckResourceExists(songIssues, songMeta, videoUri,
@@ -300,7 +300,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
         // Check audio format.
         // Audio is mandatory. Without working audio file, the song cannot be played.
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-        if (SongMetaUtils.GetWebsiteUri(songMeta).IsNullOrEmpty())
+        if (SongMetaUtils.GetWebViewUrl(songMeta).IsNullOrEmpty())
         {
             // Must have local audio file in supported format because no website is specified.
             CheckResourceExists(songIssues, songMeta, audioUri,
@@ -311,14 +311,15 @@ public class SongIssueManager : AbstractSingletonBehaviour
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Audio),
                 ESongIssueSeverity.Error);
         }
-        // Check WebView URI is supported when specified
-        else if (!WebViewUtils.CanHandleWebViewUrl(songMeta.Website))
+        // Check WebView URI is supported when needed
+        else if (!SongMetaUtils.ResourceExists(songMeta, songMeta.Audio))
         {
-            if (!SongMetaUtils.LocalAudioResourceExists(songMeta))
+            string webViewUrl = SongMetaUtils.GetWebViewUrl(songMeta);
+            if (!WebViewUtils.CanHandleWebViewUrl(webViewUrl))
             {
                 // Cannot use the local audio file and not the website. This song cannot be played.
                 songIssues.Add(SongIssue.CreateError(songMeta,
-                    $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetLocalAudioUri(songMeta))}' and website is not supported '{songMeta.Website}'. " +
+                    $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(songMeta.Audio)}' and website is not supported '{webViewUrl}'. " +
                           $"Add the local audio file or provide JavaScript code to integrate the website in the embedded browser."));
             }
         }

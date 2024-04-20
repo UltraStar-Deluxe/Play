@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 
 [Serializable]
-public class SongMeta
+public abstract class SongMeta
 {
     /**
      * File name of the song's txt file (not including any directories).
@@ -16,6 +16,11 @@ public class SongMeta
      * Default is UTF-8.
      */
     public virtual Encoding FileEncoding { get; private set; }
+
+    /**
+     * The UltraStar format version that was used when loading the song.
+     */
+    public virtual UltraStarSongFormatVersion Version { get; set; }
 
     /**
      * Artist of the song.
@@ -38,10 +43,22 @@ public class SongMeta
     public virtual string Audio { get; set; } = "";
 
     /**
+     * URL to an audio resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
+     */
+    public string AudioUrl { get; set; }
+
+    /**
      * Path or URI to the audio file that contains only the voice of the singers.
      * This audio file can be created from the source audio file using AI.
      */
     public virtual string VocalsAudio { get; set; } = "";
+
+    /**
+     * URL to an audio resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
+     */
+    public string VocalsAudioUrl { get; set; }
 
     /**
      * Path or URI to the audio file that contains only the instruments and no singing.
@@ -50,9 +67,10 @@ public class SongMeta
     public virtual string InstrumentalAudio { get; set; } = "";
 
     /**
-     * URI to load the song in the embedded WebView.
+     * URL to an audio resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
      */
-    public virtual string Website { get; set; } = "";
+    public string InstrumentalAudioUrl { get; set; }
 
     /**
      * Path or URI to an image file that should be displayed as background when singing.
@@ -60,30 +78,57 @@ public class SongMeta
     public virtual string Background { get; set; } = "";
 
     /**
+     * URL to a background image resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
+     */
+    public string BackgroundUrl { get; set; }
+
+    /**
      * Path or URI to an image file that should be displayed as preview in song selection.
      */
     public virtual string Cover { get; set; } = "";
 
     /**
-     * Edition of the song.
+     * URL to a cover image resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
+     */
+    public string CoverUrl { get; set; }
+
+    /**
+     * Editions of the song.
+     * Multiple values can be separated by comma.
      * This is typically the name of the game or the TV show it was featured in.
      */
     public virtual string Edition { get; set; } = "";
 
     /**
-     * Genre of the song.
+     * Genres of the song.
+     * Multiple values can be separated by comma.
      */
     public virtual string Genre { get; set; } = "";
 
     /**
-     * The language of the lyrics.
+     * The languages of the lyrics.
+     * Multiple values can be separated by comma.
      */
     public virtual string Language { get; set; } = "";
+
+    /**
+     * User defined tags for the song.
+     * Multiple values can be separated by comma.
+     */
+    public virtual string Tag { get; set; } = "";
 
     /**
      * Path or URI to a background video.
      */
     public virtual string Video { get; set; } = "";
+
+    /**
+     * URL to a video resource.
+     * Intended as fallback, e.g., when the regular property points to a local file.
+     */
+    public string VideoUrl { get; set; }
 
     /**
      * Beats per minute of the audio.
@@ -242,16 +287,21 @@ public class SongMeta
     {
         Artist = other.Artist;
         Audio = other.Audio;
+        AudioUrl = other.AudioUrl;
         Background = other.Background;
+        BackgroundUrl = other.BackgroundUrl;
         BeatsPerMinute = other.BeatsPerMinute;
         Cover = other.Cover;
+        CoverUrl = other.CoverUrl;
         Edition = other.Edition;
         EndInMillis = other.EndInMillis;
         FileEncoding = other.FileEncoding;
         FileInfo = other.FileInfo;
         GapInMillis = other.GapInMillis;
         Genre = other.Genre;
+        Tag = other.Tag;
         InstrumentalAudio = other.InstrumentalAudio;
+        InstrumentalAudioUrl = other.InstrumentalAudioUrl;
         Language = other.Language;
         MedleyEndInMillis = other.MedleyEndInMillis;
         MedleyStartInMillis = other.MedleyStartInMillis;
@@ -261,8 +311,9 @@ public class SongMeta
         Title = other.Title;
         Video = other.Video;
         VideoGapInMillis = other.VideoGapInMillis;
+        VideoUrl = other.VideoUrl;
         VocalsAudio = other.VocalsAudio;
-        Website = other.Website;
+        VocalsAudioUrl = other.VocalsAudioUrl;
         Year = other.Year;
         CopyVoices(other);
         CopyAdditionalHeaderEntries(other);

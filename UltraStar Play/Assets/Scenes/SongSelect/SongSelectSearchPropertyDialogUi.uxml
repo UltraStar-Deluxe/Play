@@ -18,10 +18,11 @@
                     <ui:VisualElement name="toggles" class="child-mb-2" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                         <ui:Toggle name="artistPropertyToggle" label="Artist" class="mt-2" />
                         <ui:Toggle name="titlePropertyToggle" label="Title" />
-                        <ui:Toggle name="genrePropertyToggle" label="Genre" />
-                        <ui:Toggle name="yearPropertyToggle" label="Year" />
                         <ui:Toggle name="languagePropertyToggle" label="Language" />
+                        <ui:Toggle name="genrePropertyToggle" label="Genre" />
+                        <ui:Toggle name="tagPropertyToggle" label="Tags" />
                         <ui:Toggle name="editionPropertyToggle" label="Edition" />
+                        <ui:Toggle name="yearPropertyToggle" label="Year" />
                         <ui:Toggle name="lyricsPropertyToggle" label="Lyrics" />
                     </ui:VisualElement>
                 </AccordionItem>
