@@ -130,7 +130,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         }
 
         modSettingsDialogControl = uiManager.CreateDialogControl($"{ModDisplayName} Settings");
-        modSettingsDialogControl.AddButton(Translation.Get(R.Messages.ok),
+        modSettingsDialogControl.AddButton(Translation.Get(R.Messages.button_ok),
             _ => modSettingsDialogControl.CloseDialog());
         modSettingsDialogControl.DialogClosedEventStream.Subscribe(_ => modSettingsDialogControl = null);
 

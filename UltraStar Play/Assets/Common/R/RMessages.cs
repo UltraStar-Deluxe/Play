@@ -39,6 +39,7 @@ public static partial class R
         public static readonly string button_continue = "button_continue";
         public static readonly string button_delete = "button_delete";
         public static readonly string button_downloadArchive = "button_downloadArchive";
+        public static readonly string button_ok = "button_ok";
         public static readonly string button_quit = "button_quit";
         public static readonly string button_refresh = "button_refresh";
         public static readonly string button_replay = "button_replay";
@@ -115,7 +116,6 @@ public static partial class R
         public static readonly string menu = "menu";
         public static readonly string new_ = "new";
         public static readonly string no = "no";
-        public static readonly string ok = "ok";
         public static readonly string open = "open";
         public static readonly string options = "options";
         public static readonly string options_amplification = "options_amplification";
