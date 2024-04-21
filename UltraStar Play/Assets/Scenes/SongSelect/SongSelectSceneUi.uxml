@@ -131,7 +131,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="songQueueOverlay" class="overlay absolutePositionTransition staticPanel focusableNavigatorRoot pt-1 px-1 pb-2" style="max-width: 40%; justify-content: flex-start; align-items: stretch; width: auto; right: 0; display: none;">
             <ui:VisualElement name="row" style="align-items: center;">
-                <ui:Label tabindex="-1" text="$songSelectScene_songQueue_title" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center; flex-grow: 1;" />
+                <ui:Label tabindex="-1" text="$songQueue_title" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center; flex-grow: 1;" />
                 <ui:Button display-tooltip-when-elided="true" name="closeSongQueueButton" class="circle mb-1 transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">
                     <MaterialIcon tabindex="-1" picking-mode="Ignore" name="closeIcon" icon="close" class="noTextShadow" style="font-size: 20px;" />
                 </ui:Button>

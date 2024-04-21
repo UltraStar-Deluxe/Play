@@ -11,7 +11,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label text="Loaded Scene" name="loadedSceneTitle" class="noBackgroundInHierarchy" style="-unity-font-style: bold; margin-left: 20px;" />
+            <ui:Label text="$options_game_title" name="loadedSceneTitle" class="noBackgroundInHierarchy" style="-unity-font-style: bold; margin-left: 20px;" />
             <ui:VisualElement name="topButtonRow" class="ml-auto" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
                 <ui:Button name="openSteamWorkshopButton" text="$button_steamWorkshop" />
                 <ui:Button name="updateSteamWorkshopItemsButton" class="mr-2 squareButton">
@@ -57,10 +57,6 @@
                 <ToggleButton name="soundOptionsButton" class="optionsOverviewButton">
                     <MaterialIcon icon="campaign" name="image" />
                     <ui:Label text="$options_sound_button" name="label" />
-                </ToggleButton>
-                <ToggleButton name="internetOptionsButton" class="optionsOverviewButton" style="display: none;">
-                    <MaterialIcon icon="cloud" name="image" />
-                    <ui:Label text="Internet" name="label" />
                 </ToggleButton>
                 <ToggleButton name="webcamOptionsButton" class="optionsOverviewButton">
                     <MaterialIcon icon="videocam" name="image" />

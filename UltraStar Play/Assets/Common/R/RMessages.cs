@@ -170,6 +170,8 @@ public static partial class R
         public static readonly string options_playRecordedAudioInfo = "options_playRecordedAudioInfo";
         public static readonly string options_previewFadeInDuration = "options_previewFadeInDuration";
         public static readonly string options_recording_button = "options_recording_button";
+        public static readonly string options_recording_noConnectedMic = "options_recording_noConnectedMic";
+        public static readonly string options_recording_noConnectedMic_hint = "options_recording_noConnectedMic_hint";
         public static readonly string options_recording_title = "options_recording_title";
         public static readonly string options_reduceAudioVolume = "options_reduceAudioVolume";
         public static readonly string options_reloadModsOnFileChange = "options_reloadModsOnFileChange";
@@ -309,6 +311,8 @@ public static partial class R
         public static readonly string songProperty_tag = "songProperty_tag";
         public static readonly string songProperty_title = "songProperty_title";
         public static readonly string songProperty_year = "songProperty_year";
+        public static readonly string songQueue_nextEntry = "songQueue_nextEntry";
+        public static readonly string songQueue_title = "songQueue_title";
         public static readonly string songSelectScene_advancedSearch = "songSelectScene_advancedSearch";
         public static readonly string songSelectScene_advancedSearch_info = "songSelectScene_advancedSearch_info";
         public static readonly string songSelectScene_duetLegendLabel = "songSelectScene_duetLegendLabel";
@@ -341,7 +345,6 @@ public static partial class R
         public static readonly string songSelectScene_songMenu_openSongEditor = "songSelectScene_songMenu_openSongEditor";
         public static readonly string songSelectScene_songMenu_openSongFolder = "songSelectScene_songMenu_openSongFolder";
         public static readonly string songSelectScene_songMenu_startButton = "songSelectScene_songMenu_startButton";
-        public static readonly string songSelectScene_songQueue_title = "songSelectScene_songQueue_title";
         public static readonly string songSelectScene_stats_localBest = "songSelectScene_stats_localBest";
         public static readonly string songSelectScene_stats_startedFinished = "songSelectScene_stats_startedFinished";
         public static readonly string songSelectScene_stats_webBest = "songSelectScene_stats_webBest";
