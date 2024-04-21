@@ -636,11 +636,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         if (settings.ScoreMode == EScoreMode.None)
         {
-            currentDifficultyLabel.text = "No Scores";
+            currentDifficultyLabel.text = Translation.Get(R.Messages.difficulty_noScores);
         }
         else
         {
-            currentDifficultyLabel.text = settings.Difficulty.ToString();
+            currentDifficultyLabel.text = settings.Difficulty.TranslatedName();
         }
     }
 
@@ -1317,7 +1317,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             CloseAskToAssignMicsDialog();
             onIgnoreAndStart?.Invoke();
         });
-        askToAssignMicsDialog.AddButton(Translation.Get(R.Messages.cancel), _ =>
+        askToAssignMicsDialog.AddButton(Translation.Get(R.Messages.button_cancel), _ =>
         {
             CloseAskToAssignMicsDialog();
         });
@@ -1709,7 +1709,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             dialogControl.CloseDialog();
             createSingAlongSongControl.CreateSingAlongSong(songMeta, false);
         });
-        dialogControl.AddButton(Translation.Get(R.Messages.cancel), evt =>
+        dialogControl.AddButton(Translation.Get(R.Messages.button_cancel), evt =>
         {
             dialogControl.CloseDialog();
         });

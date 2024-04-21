@@ -469,7 +469,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             settings.AcceptedWebViewHosts.Add(host);
             DoLoadUrl(url);
         });
-        messageDialogControl.AddButton(Translation.Get(R.Messages.cancel),
+        messageDialogControl.AddButton(Translation.Get(R.Messages.button_cancel),
             _ => messageDialogControl.CloseDialog());
 
         return false;

@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="searchPropertyDialogRoot" style="flex-grow: 1;">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="searchPropertyScrollView" style="flex-grow: 1;">
-            <ui:Label text="Playlist" display-tooltip-when-elided="true" name="playlistChooserTitle" class="smallFont" style="margin-bottom: 5px;" />
+            <ui:Label text="$songSelectScene_filter_playlist" display-tooltip-when-elided="true" name="playlistChooserTitle" class="smallFont" style="margin-bottom: 5px;" />
             <ui:VisualElement name="row" class="mb-3" style="background-color: rgba(0, 0, 0, 0); width: 100%; flex-shrink: 0;">
                 <ui:DropdownField choices="PlaylistA, PlaylistB" name="playlistDropdownField" class="mr-2 roundCorners" style="flex-grow: 1;" />
                 <ui:Button display-tooltip-when-elided="true" name="createPlaylistButton" class="squareButton mr-2">
@@ -11,27 +11,27 @@
                     <MaterialIcon tabindex="-1" name="editPlaylistIcon" picking-mode="Ignore" icon="edit" />
                 </ui:Button>
             </ui:VisualElement>
-            <ui:Label text="Order" display-tooltip-when-elided="true" name="orderChooserTitle" class="smallFont" style="margin-bottom: 5px;" />
+            <ui:Label text="$songSelectScene_order" display-tooltip-when-elided="true" name="orderChooserTitle" class="smallFont" style="margin-bottom: 5px;" />
             <ui:EnumField choices="Order by Title, Order by Artist" name="songOrderDropdownField" type="ESongOrder, Common" class="roundCorners mb-3" style="flex-grow: 1;" />
             <AccordionGroup>
-                <AccordionItem label="Search In" name="searchPropertyAccordionItem" content-visible="false">
+                <AccordionItem label="$songSelectScene_searchProperty_title" name="searchPropertyAccordionItem" content-visible="false">
                     <ui:VisualElement name="toggles" class="child-mb-2" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                        <ui:Toggle name="artistPropertyToggle" label="Artist" class="mt-2" />
-                        <ui:Toggle name="titlePropertyToggle" label="Title" />
-                        <ui:Toggle name="languagePropertyToggle" label="Language" />
-                        <ui:Toggle name="genrePropertyToggle" label="Genre" />
-                        <ui:Toggle name="tagPropertyToggle" label="Tags" />
-                        <ui:Toggle name="editionPropertyToggle" label="Edition" />
-                        <ui:Toggle name="yearPropertyToggle" label="Year" />
-                        <ui:Toggle name="lyricsPropertyToggle" label="Lyrics" />
+                        <ui:Toggle name="artistPropertyToggle" label="$songProperty_artist" class="mt-2" />
+                        <ui:Toggle name="titlePropertyToggle" label="$songProperty_title" />
+                        <ui:Toggle name="languagePropertyToggle" label="$songProperty_language" />
+                        <ui:Toggle name="genrePropertyToggle" label="$songProperty_genre" />
+                        <ui:Toggle name="tagPropertyToggle" label="$songProperty_tag" />
+                        <ui:Toggle name="editionPropertyToggle" label="$songProperty_edition" />
+                        <ui:Toggle name="yearPropertyToggle" label="$songProperty_year" />
+                        <ui:Toggle name="lyricsPropertyToggle" label="$songProperty_lyrics" />
                     </ui:VisualElement>
                 </AccordionItem>
-                <AccordionItem name="filtersAccordionItem" label="Filter By" content-visible="false">
-                    <ui:Toggle label="Duet" name="showOnlyDuetsToggle" class="mb-2 mt-2" />
+                <AccordionItem name="filtersAccordionItem" label="$songSelectScene_filterBy" content-visible="false">
+                    <ui:Toggle label="$songSelectScene_filter_duets" name="showOnlyDuetsToggle" class="mb-2 mt-2" />
                     <ui:VisualElement name="filterListContainer" class="child-mb-2" style="width: 100%; align-items: stretch;" />
                 </AccordionItem>
-                <AccordionItem name="advancedSearchAccordionItem" label="Advanced Search" content-visible="false">
-                    <ui:Label text="Advanced search available" display-tooltip-when-elided="true" name="showSearchExpressionInfoTitle" class="smallFont" style="margin-bottom: 5px;" />
+                <AccordionItem name="advancedSearchAccordionItem" label="$songSelectScene_advancedSearch">
+                    <ui:Label text="$songSelectScene_advancedSearch_info" display-tooltip-when-elided="true" name="showSearchExpressionInfoTitle" class="smallFont" style="margin-bottom: 5px;" />
                     <ui:VisualElement style="align-items: auto; width: 100%;">
                         <ui:Button display-tooltip-when-elided="true" name="showSearchExpressionInfoButton" class="squareButton" style="width: auto; height: auto;">
                             <MaterialIcon name="helpIcon" icon="help_outline" />

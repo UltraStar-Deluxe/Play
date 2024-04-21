@@ -1,6 +1,6 @@
-﻿public static class EnumExtensions
+﻿public static class SongOrderExtensions
 {
-    public static string GetTranslatedName(this ESongOrder songOrder)
+    public static string TranslatedName(this ESongOrder songOrder)
     {
         switch (songOrder)
         {

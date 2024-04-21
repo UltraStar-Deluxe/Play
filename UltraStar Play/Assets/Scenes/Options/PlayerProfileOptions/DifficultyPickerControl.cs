@@ -3,6 +3,6 @@
     public DifficultyPicker(ItemPicker itemPicker)
         : base(itemPicker, EnumUtils.GetValuesAsList<EDifficulty>())
     {
-        GetLabelTextFunction = item => item.GetTranslatedName();
+        GetLabelTextFunction = item => item.TranslatedName();
     }
 }

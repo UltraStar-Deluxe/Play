@@ -20,9 +20,6 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownOverlay)]
     private VisualElement searchPropertyDropdownOverlay;
 
-    [Inject(UxmlName = R.UxmlNames.playlistChooserDropdownTitle)]
-    private Label playlistChooserDropdownTitle;
-
     [Inject(UxmlName = R.UxmlNames.submitEditPlaylistButton)]
     private Button submitEditPlaylistButton;
 
@@ -101,11 +98,11 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
         {
             case EPlaylistNameIssue.Invalid:
                 editPlaylistDialogTitle.text = "Invalid playlist name";
-                submitEditPlaylistButton.text = Translation.Get(R.Messages.cancel);
+                submitEditPlaylistButton.text = Translation.Get(R.Messages.button_cancel);
                 break;
             case EPlaylistNameIssue.Duplicate:
                 editPlaylistDialogTitle.text = "Duplicate playlist name";
-                submitEditPlaylistButton.text = Translation.Get(R.Messages.cancel);
+                submitEditPlaylistButton.text = Translation.Get(R.Messages.button_cancel);
                 break;
             default:
                 editPlaylistDialogTitle.text = titleText;

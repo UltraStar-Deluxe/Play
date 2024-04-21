@@ -2,7 +2,7 @@
 
 public static class EDifficultyExtensions
 {
-    public static string GetTranslatedName(this EDifficulty difficulty)
+    public static string TranslatedName(this EDifficulty difficulty)
     {
         string i18nCode = difficulty.GetI18NCode();
         return Translation.Get(i18nCode);

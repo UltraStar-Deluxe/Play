@@ -382,7 +382,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             quickFixAllDialog.CloseDialog();
         });
 
-        quickFixAllDialog.AddButton(Translation.Get(R.Messages.cancel),
+        quickFixAllDialog.AddButton(Translation.Get(R.Messages.button_cancel),
             _ => quickFixAllDialog.CloseDialog());
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(quickFixAllDialog.DialogRootVisualElement);

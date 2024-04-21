@@ -213,7 +213,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
         cancelButtonText = !cancelButtonText.IsNullOrEmpty()
             ? cancelButtonText
-            : Translation.Get(R.Messages.cancel);
+            : Translation.Get(R.Messages.button_cancel);
         messageDialogControl.AddButton(cancelButtonText, evt =>
         {
             messageDialogControl.CloseDialog();
