@@ -40,6 +40,8 @@ public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInj
         remoteVersionProperties.TryGetValue("release", out remoteRelease);
         remoteVersionProperties.TryGetValue("name", out releaseName);
         remoteVersionProperties.TryGetValue("website_link", out websiteLink);
+
+        TranslationManager.ApplyTranslations(dialogRootVisualElement);
     }
 
     public override void OnInjectionFinished()
@@ -82,9 +84,6 @@ public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInj
         string displayName = releaseName.IsNullOrEmpty()
             ? remoteRelease.NullToEmpty()
             : releaseName.NullToEmpty();
-        dialogMessage.text = Translation.Get(R.Messages.newVersionAvailableDialog_message, "remoteRelease", displayName, "websiteLink", websiteLink.NullToEmpty());
-        dialogTitle.text = Translation.Get(R.Messages.newVersionAvailableDialog_title);
-        ignoreThisVersionButton.text = Translation.Get(R.Messages.newVersionAvailableDialog_ignoreThisVersion);
-        ignoreAllFutureVersionsButton.text = Translation.Get(R.Messages.newVersionAvailableDialog_ignoreAllFutureVersions);
+        dialogMessage.text = Translation.Get(R.Messages.mainScene_newVersionDialog_message, "remoteRelease", displayName, "websiteLink", websiteLink.NullToEmpty());
     }
 }
