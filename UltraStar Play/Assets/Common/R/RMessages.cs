@@ -29,10 +29,18 @@ public static partial class R
         public static readonly string androidSdCardStorage = "androidSdCardStorage";
         public static readonly string back = "back";
         public static readonly string buildTimeStamp = "buildTimeStamp";
+        public static readonly string button_addGuest = "button_addGuest";
         public static readonly string button_addPlayer = "button_addPlayer";
         public static readonly string button_addSongFolder = "button_addSongFolder";
+        public static readonly string button_addTeam = "button_addTeam";
         public static readonly string button_apply = "button_apply";
+        public static readonly string button_continue = "button_continue";
         public static readonly string button_downloadArchive = "button_downloadArchive";
+        public static readonly string button_refresh = "button_refresh";
+        public static readonly string button_replay = "button_replay";
+        public static readonly string button_showHighscores = "button_showHighscores";
+        public static readonly string button_showOwnResults = "button_showOwnResults";
+        public static readonly string button_showTeamResults = "button_showTeamResults";
         public static readonly string button_skip = "button_skip";
         public static readonly string button_steamWorkshop = "button_steamWorkshop";
         public static readonly string cancel = "cancel";
@@ -50,7 +58,6 @@ public static partial class R
         public static readonly string companionApp_title = "companionApp_title";
         public static readonly string companionApp_troubleShootingHints = "companionApp_troubleShootingHints";
         public static readonly string companionApp_visualizeMicInput = "companionApp_visualizeMicInput";
-        public static readonly string continue_ = "continue";
         public static readonly string delete = "delete";
         public static readonly string devMode = "devMode";
         public static readonly string difficulty = "difficulty";
@@ -66,7 +73,6 @@ public static partial class R
         public static readonly string graph_legend_good = "graph_legend_good";
         public static readonly string graph_legend_missed = "graph_legend_missed";
         public static readonly string graph_legend_perfect = "graph_legend_perfect";
-        public static readonly string highscores = "highscores";
         public static readonly string highscoreScene_title = "highscoreScene_title";
         public static readonly string i18nDemoScene_hello = "i18nDemoScene_hello";
         public static readonly string i18nDemoScene_love = "i18nDemoScene_love";
@@ -227,6 +233,13 @@ public static partial class R
         public static readonly string order_Language = "order_Language";
         public static readonly string order_Title = "order_Title";
         public static readonly string order_Year = "order_Year";
+        public static readonly string partyModeScene_freeForAll = "partyModeScene_freeForAll";
+        public static readonly string partyModeScene_jokerCount = "partyModeScene_jokerCount";
+        public static readonly string partyModeScene_knockOutTournament = "partyModeScene_knockOutTournament";
+        public static readonly string partyModeScene_playlist = "partyModeScene_playlist";
+        public static readonly string partyModeScene_rounds = "partyModeScene_rounds";
+        public static readonly string partyModeScene_songSelection = "partyModeScene_songSelection";
+        public static readonly string partyModeScene_title = "partyModeScene_title";
         public static readonly string playlistName_allSongs = "playlistName_allSongs";
         public static readonly string playlistName_favorites = "playlistName_favorites";
         public static readonly string quit = "quit";
@@ -246,8 +259,6 @@ public static partial class R
         public static readonly string rating_song_toneDeaf = "rating_song_toneDeaf";
         public static readonly string rating_song_ultraStar = "rating_song_ultraStar";
         public static readonly string rating_song_wannabe = "rating_song_wannabe";
-        public static readonly string refresh = "refresh";
-        public static readonly string replay = "replay";
         public static readonly string save = "save";
         public static readonly string score_goldenNotes = "score_goldenNotes";
         public static readonly string score_notes = "score_notes";
@@ -262,6 +273,11 @@ public static partial class R
         public static readonly string settingsProblem_songFolderDoesNotExist = "settingsProblem_songFolderDoesNotExist";
         public static readonly string settingsProblem_songFolderIsSubfolderOfOtherSongFolder = "settingsProblem_songFolderIsSubfolderOfOtherSongFolder";
         public static readonly string settingsProblem_thereAreSongIssues = "settingsProblem_thereAreSongIssues";
+        public static readonly string singingResultsScene_newHighScore = "singingResultsScene_newHighScore";
+        public static readonly string singingResultsScene_scores_goldenNotes = "singingResultsScene_scores_goldenNotes";
+        public static readonly string singingResultsScene_scores_modBonus = "singingResultsScene_scores_modBonus";
+        public static readonly string singingResultsScene_scores_notes = "singingResultsScene_scores_notes";
+        public static readonly string singingResultsScene_scores_phraseBonus = "singingResultsScene_scores_phraseBonus";
         public static readonly string singingResultsScene_title = "singingResultsScene_title";
         public static readonly string singScene_missingMicrophones_message = "singScene_missingMicrophones_message";
         public static readonly string singScene_missingMicrophones_title = "singScene_missingMicrophones_title";
@@ -316,7 +332,6 @@ public static partial class R
         public static readonly string songSelectScene_videoLegendLabel = "songSelectScene_videoLegendLabel";
         public static readonly string start = "start";
         public static readonly string submit = "submit";
-        public static readonly string teamResults = "teamResults";
         public static readonly string timeUppercase = "timeUppercase";
         public static readonly string uri_howToAddAndCreateSongs = "uri_howToAddAndCreateSongs";
         public static readonly string uri_howToCompanionApp = "uri_howToCompanionApp";
@@ -332,6 +347,5 @@ public static partial class R
         public static readonly string viewMore = "viewMore";
         public static readonly string warning = "warning";
         public static readonly string yes = "yes";
-        public static readonly string yourResults = "yourResults";
     }
 }

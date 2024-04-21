@@ -60,7 +60,6 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
                 micVisualElement.ShowByDisplay();
                 micVisualElement.style.color = new StyleColor(micProfileDto.Color);
                 micVisualElement.style.unityBackgroundImageTintColor = new StyleColor(micProfileDto.Color);
-                Debug.Log("Set mic color: " + micProfileDto.Color);
             }
             else
             {

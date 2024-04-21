@@ -109,7 +109,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
                 break;
             default:
                 editPlaylistDialogTitle.text = titleText;
-                submitEditPlaylistButton.text = Translation.Get(R.Messages.continue_);
+                submitEditPlaylistButton.text = Translation.Get(R.Messages.button_continue);
                 break;
         }
     }

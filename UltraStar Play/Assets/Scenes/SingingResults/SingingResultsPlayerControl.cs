@@ -28,6 +28,9 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
     [Inject]
     private SingingResultsSceneData sceneData;
 
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement visualElement;
+
     [Inject(UxmlName = R.UxmlNames.normalNoteScore)]
     private VisualElement normalNoteScoreContainer;
 
@@ -302,6 +305,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
         normalNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_notes);
         goldenNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_goldenNotes);
         phraseBonusScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_phraseBonus);
+        TranslationManager.ApplyTranslations(visualElement);
     }
 
     private void SetScoreRowLabelText(VisualElement container, float interpolatedValue)
