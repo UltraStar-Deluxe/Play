@@ -108,6 +108,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         partyModeSettings.TeamSettings.Teams.ForEach(team => CreateTeamUi(team));
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(teamList);
+        TranslationManager.ApplyTranslations(teamList);
     }
 
     private void CreateTeamUi(PartyModeTeamSettings team)
