@@ -147,8 +147,6 @@ public static partial class R
         public static readonly string options_graphics_title = "options_graphics_title";
         public static readonly string options_httpServerNotSupported = "options_httpServerNotSupported";
         public static readonly string options_httpServerPortWithExampleUri = "options_httpServerPortWithExampleUri";
-        public static readonly string options_internet_button = "options_internet_button";
-        public static readonly string options_internet_title = "options_internet_title";
         public static readonly string options_ipAddress = "options_ipAddress";
         public static readonly string options_micNotConnected = "options_micNotConnected";
         public static readonly string options_micPlaybackVolume = "options_micPlaybackVolume";

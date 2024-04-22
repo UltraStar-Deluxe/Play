@@ -10,17 +10,6 @@
             <ui:VisualElement name="categoryNameContainer" picking-mode="Ignore" style="width: 100%; align-items: center; position: absolute; height: 100%;">
                 <ui:Label text="Credits Category" display-tooltip-when-elided="true" name="categoryNameLabel" picking-mode="Ignore" class="xxlFont" style="position: absolute; text-shadow: 1px 1px 0 rgb(0, 0, 0); -unity-font-style: bold; border-bottom-width: 2px; border-bottom-color: rgba(255, 255, 255, 0.5); padding-left: 10px; padding-right: 10px; padding-bottom: 5px;" />
             </ui:VisualElement>
-            <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px; display: none;">
-                <ui:VisualElement name="titleContainer" picking-mode="Ignore" style="align-items: flex-start; width: 40%;">
-                    <ui:VisualElement name="titleImageAndText" picking-mode="Ignore" style="flex-direction: row; align-items: center;">
-                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&quot;project://database/Packages/playshared/Runtime/Graphics/Icons/ultrastardx-icon-contour.svg?fileID=7388822144124034973&amp;guid=2784df2e61772dc448202fc152a4fcfc&amp;type=3#ultrastardx-icon-contour&quot;);" />
-                        <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Credits" name="sceneTitle" class="titleText" />
-                            <ui:Label text="UltraStar Play" name="sceneTitle" class="titleSubText" style="width: auto;" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
             <ui:VisualElement name="centerContent" picking-mode="Ignore" style="width: 100%; flex-grow: 1; align-items: flex-start;">
                 <ui:VisualElement name="entriesContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;">
                     <ui:Instance template="CreditsEntryUi" name="CreditsEntryUi" />

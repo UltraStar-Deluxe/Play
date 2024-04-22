@@ -48,9 +48,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
     [Inject(UxmlName = R.UxmlNames.designOptionsButton)]
     private ToggleButton designOptionsButton;
 
-    [Inject(UxmlName = R.UxmlNames.internetOptionsButton)]
-    private ToggleButton internetOptionsButton;
-
     [Inject(UxmlName = R.UxmlNames.appOptionsButton)]
     private ToggleButton appOptionsButton;
 
@@ -345,7 +342,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         sceneToShortNameMap.Add(EScene.RecordingOptionsScene, Translation.Get(R.Messages.options_recording_button));
         sceneToShortNameMap.Add(EScene.PlayerProfileSetupScene, Translation.Get(R.Messages.options_playerProfiles_button));
         sceneToShortNameMap.Add(EScene.ThemeOptionsScene, Translation.Get(R.Messages.options_design_button));
-        sceneToShortNameMap.Add(EScene.NetworkOptionsScene, Translation.Get(R.Messages.options_internet_button));
         sceneToShortNameMap.Add(EScene.CompanionAppOptionsScene, Translation.Get(R.Messages.options_companionApp_button));
         sceneToShortNameMap.Add(EScene.WebcamOptionsSecene, Translation.Get(R.Messages.options_webcam_button));
         sceneToShortNameMap.Add(EScene.DevelopmentOptionsScene, Translation.Get(R.Messages.options_development_button));
@@ -359,7 +355,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         sceneToLongNameMap.Add(EScene.RecordingOptionsScene, Translation.Get(R.Messages.options_recording_title));
         sceneToLongNameMap.Add(EScene.PlayerProfileSetupScene, Translation.Get(R.Messages.options_playerProfiles_title));
         sceneToLongNameMap.Add(EScene.ThemeOptionsScene, Translation.Get(R.Messages.options_design_title));
-        sceneToLongNameMap.Add(EScene.NetworkOptionsScene, Translation.Get(R.Messages.options_internet_title));
         sceneToLongNameMap.Add(EScene.CompanionAppOptionsScene, Translation.Get(R.Messages.options_companionApp_title));
         sceneToLongNameMap.Add(EScene.WebcamOptionsSecene, Translation.Get(R.Messages.options_webcam_title));
         sceneToLongNameMap.Add(EScene.DevelopmentOptionsScene, Translation.Get(R.Messages.options_development_title));
@@ -375,7 +370,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         sceneToButtonMap.Add(EScene.RecordingOptionsScene, recordingOptionsButton);
         sceneToButtonMap.Add(EScene.PlayerProfileSetupScene, profileOptionsButton);
         sceneToButtonMap.Add(EScene.ThemeOptionsScene, designOptionsButton);
-        sceneToButtonMap.Add(EScene.NetworkOptionsScene, internetOptionsButton);
         sceneToButtonMap.Add(EScene.CompanionAppOptionsScene, appOptionsButton);
         sceneToButtonMap.Add(EScene.DevelopmentOptionsScene, developerOptionsButton);
         sceneToButtonMap.Add(EScene.WebcamOptionsSecene, webcamOptionsButton);

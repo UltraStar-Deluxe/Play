@@ -14,9 +14,6 @@ public class CreditsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private SceneNavigator sceneNavigator;
 
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
