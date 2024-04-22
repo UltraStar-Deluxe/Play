@@ -17,7 +17,7 @@
                 <MaterialIcon tabindex="-1" picking-mode="Ignore" icon="delete" name="deleteIcon" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:Label text="Click the button to start the download" display-tooltip-when-elided="true" name="statusLabel" class="noBackgroundInHierarchy" style="-unity-font-definition: url(&quot;project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/static/RobotoMono-Medium%20SDF.asset?fileID=11400000&amp;guid=9c5ee68429ab94b45a2e23f4a735885c&amp;type=2#RobotoMono-Medium SDF&quot;); white-space: normal;" />
+        <ui:Label text="$options_songLibrary_downloadSongArchive_initialStatus" display-tooltip-when-elided="true" name="statusLabel" class="noBackgroundInHierarchy" style="-unity-font-definition: url(&quot;project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/static/RobotoMono-Medium%20SDF.asset?fileID=11400000&amp;guid=9c5ee68429ab94b45a2e23f4a735885c&amp;type=2#RobotoMono-Medium SDF&quot;); white-space: normal;" />
         <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
     </ui:VisualElement>
 </ui:UXML>

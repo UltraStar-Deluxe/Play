@@ -42,7 +42,7 @@
             <ui:VisualElement name="topCenterContent" style="background-color: rgba(0, 0, 0, 0); width: 33.33%;">
                 <ui:VisualElement name="searchBarContainer" style="flex-direction: row; flex-shrink: 1;">
                     <ui:TextField picking-mode="Ignore" name="searchTextField" hide-placeholder-on-focus="true" style="align-items: center; flex-shrink: 1; width: 100px; flex-grow: 1;">
-                        <ui:Label tabindex="-1" text="What do you want to sing today?" display-tooltip-when-elided="true" name="searchTextFieldHint" picking-mode="Ignore" class="textFieldHint secondaryFontColor" />
+                        <ui:Label tabindex="-1" text="$songSelectScene_searchTextFieldHint" display-tooltip-when-elided="true" name="searchTextFieldHint" picking-mode="Ignore" class="textFieldHint secondaryFontColor" />
                         <ui:Label text="quick-search-text" display-tooltip-when-elided="true" name="fuzzySearchTextLabel" picking-mode="Ignore" class="pr-3 secondaryFontColor smallFont ml-auto" style="position: absolute; -unity-text-align: middle-right; display: flex; justify-content: center; right: 8px;" />
                     </ui:TextField>
                     <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="squareButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; overflow: visible;">

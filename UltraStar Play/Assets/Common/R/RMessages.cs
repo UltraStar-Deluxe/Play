@@ -196,6 +196,7 @@ public static partial class R
         public static readonly string options_songLibrary_androidOtherStorage = "options_songLibrary_androidOtherStorage";
         public static readonly string options_songLibrary_androidSdCardStorage = "options_songLibrary_androidSdCardStorage";
         public static readonly string options_songLibrary_button = "options_songLibrary_button";
+        public static readonly string options_songLibrary_downloadSongArchive_initialStatus = "options_songLibrary_downloadSongArchive_initialStatus";
         public static readonly string options_songLibrary_noSongFoldersFoundInfo = "options_songLibrary_noSongFoldersFoundInfo";
         public static readonly string options_songLibrary_songFolder_doesNotExist = "options_songLibrary_songFolder_doesNotExist";
         public static readonly string options_songLibrary_songFolder_duplicate = "options_songLibrary_songFolder_duplicate";
