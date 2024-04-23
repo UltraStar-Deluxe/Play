@@ -22,7 +22,6 @@ public class TranslationTests
     }
 
     [Test]
-    [Ignore("Not all UXML files are translated yet")]
     public void UxmlFilesAreTranslated()
     {
         List<TranslatableAttribute> allMissingTranslations = GetAllTranslatableAttributes()
