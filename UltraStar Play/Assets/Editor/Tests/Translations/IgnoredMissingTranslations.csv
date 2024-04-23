@@ -89,6 +89,8 @@ CurrentNetcodeLobbyUi.uxml, *, connectedClientsListTitle
 PlayerInfoUi.uxml, *, *
 SentenceRatingUi.uxml, *, *
 CurrentSteamLobbyUi.uxml, *, connectedClientsListTitle
+CurrentSteamLobbyUi.uxml, *, lobbyInfoLabel
 HostSteamLobbyUi.uxml, *, *
 JoinSteamLobbyUi.uxml, *, joinHostedGameButton
 NoteUi.uxml, *, *
+UploadWorkshopItemUi.uxml, *, statusLabel

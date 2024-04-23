@@ -3,8 +3,8 @@
         <ui:VisualElement name="dialogContent" class="focusableNavigatorRoot dialogBackground roundCorners" style="width: 682px; height: 468px; justify-content: flex-start; align-items: center; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; max-height: 380px;">
             <ui:VisualElement name="row" class="mb-2" style="width: 100%; align-items: center;">
                 <ui:VisualElement name="tabGroup" class="child-mr-1 mr-auto" style="align-items: flex-start; flex-direction: row;">
-                    <ToggleButton text="Join Online Game" parse-escape-sequences="true" display-tooltip-when-elided="true" name="joinOnlineGameTabButton" />
-                    <ToggleButton text="Host Online Game" parse-escape-sequences="true" display-tooltip-when-elided="true" name="hostOnlineGameTabButton" />
+                    <ToggleButton text="$onlineGame_join" parse-escape-sequences="true" display-tooltip-when-elided="true" name="joinOnlineGameTabButton" />
+                    <ToggleButton text="$onlineGame_host" parse-escape-sequences="true" display-tooltip-when-elided="true" name="hostOnlineGameTabButton" />
                 </ui:VisualElement>
                 <ui:Button text="Backend: Steam" parse-escape-sequences="true" display-tooltip-when-elided="true" name="toggleOnlineMultiplayerBackendButton" class="mr-1" />
                 <ui:Button display-tooltip-when-elided="true" name="defaultCloseDialogButton" class="circle transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">

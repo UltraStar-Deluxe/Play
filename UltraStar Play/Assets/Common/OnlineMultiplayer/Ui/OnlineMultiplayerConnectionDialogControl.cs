@@ -95,6 +95,8 @@ namespace SteamOnlineMultiplayer
             disposables.Add(hostLobbyUiControl);
             disposables.Add(joinLobbyUiControl);
             disposables.Add(currentLobbyUiControl);
+
+            TranslationManager.ApplyTranslations(DialogRootVisualElement);
         }
 
         private void ToggleOnlineMultiplayerBackend()
