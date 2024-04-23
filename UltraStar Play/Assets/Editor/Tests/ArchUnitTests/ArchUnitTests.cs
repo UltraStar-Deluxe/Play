@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using ArchUnitNET.Domain;
 using ArchUnitNET.Domain.Extensions;
-using ArchUnitNET.Fluent.Conditions;
 using ArchUnitNET.Fluent.Predicates;
 using ArchUnitNET.NUnit;
 using NUnit.Framework;
@@ -10,47 +7,6 @@ using static ArchUnitNET.Fluent.ArchRuleDefinition;
 
 public class ArchUnitTests
 {
-    private static readonly HashSet<string> typesWithUiLabels = new()
-    {
-        "TextElement",
-        "BaseField`1",
-        "Label",
-        "Button",
-        "Toggle",
-        "TextField",
-        "IntegerField",
-        "FloatField",
-        "LongField",
-        "DoubleField",
-        "DropdownField",
-        "EnumFieldItemPicker",
-        "ItemPicker",
-        "AccordionItem",
-    };
-
-    /**
-     * Checks that UI label setters (e.g. UnityEngine.UIElements.BaseField.label) are not called directly.
-     * Instead, a custom extension method that takes a translation result as input should be used.
-     */
-    [Test]
-    [Ignore("Not all label assignments refactored yet to use a translation object via custom extension method")]
-    public void UiLabelAssignmentsAreTranslated()
-    {
-        Architecture architecture = ArchUnitTestUtils.LoadArchitectureByAssemblyNames(new List<string>()
-        {
-            // "playshared",
-            // "playsharedui",
-            "Common",
-            // "Scenes",
-            // "SongEditorScene",
-        });
-
-        Types().That().Are(typeof(NextGameRoundUiControl))
-        // Types()
-            .Should().FollowCustomCondition(NotCallLabelPropertySetter())
-            .Check(architecture);
-    }
-
     [Test]
     public void CommonOnlineMultiplayerDoesNotReferenceSpecificOnlineMultiplayer()
     {
@@ -75,22 +31,6 @@ public class ArchUnitTests
         .Should().ImplementInterface("UniInject.INeedInjection")
         // Run check on Architecture
         .Check(architecture);
-    }
-
-    private static ICondition<IType> NotCallLabelPropertySetter()
-    {
-        return new SimpleCondition<IType>(type =>
-            {
-                return new ConditionResult(type, !type.GetCalledMethods().AnyMatch(IsLabelSetter));
-            },
-            $"not call label setter");
-    }
-
-    private static bool IsLabelSetter(MethodMember methodMember)
-    {
-        return typesWithUiLabels.Contains(methodMember.DeclaringType.Name)
-               && (string.Equals(methodMember.Name, "set_label(System.String)", StringComparison.InvariantCultureIgnoreCase)
-                   || string.Equals(methodMember.Name, "set_text(System.String)", StringComparison.InvariantCultureIgnoreCase));
     }
 
     private static IPredicate<Class> HaveMemberWithAttribute(string attributeFullName)
