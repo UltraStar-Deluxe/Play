@@ -128,9 +128,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.speechRecognitionPhrasesTextField)]
     private TextField speechRecognitionPhrasesTextField;
 
-    [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmItemPicker)]
-    private ItemPicker pitchDetectionAlgorithmItemPicker;
-
     [Inject(UxmlName = R.UxmlNames.audioSeparationButton)]
     private Button audioSeparationButton;
 
@@ -412,11 +409,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         splitSyllablesInSelectionButton.RegisterCallbackButtonTriggered(_ => SplitSyllablesInSelection());
 
         // Pitch detection
-        new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmItemPicker)
-            .Bind(() => settings.SongEditorSettings.PitchDetectionAlgorithm,
-                newValue => settings.SongEditorSettings.PitchDetectionAlgorithm = newValue);
-        new AutoFitLabelControl(pitchDetectionAlgorithmItemPicker.ItemLabel, 8, 15);
-
         pitchDetectionAudioItemPickerControl = new(pitchDetectionAudioPicker, speechAndPitchAnalysisSampleSources);
         pitchDetectionAudioItemPickerControl.Bind(
             () => settings.SongEditorSettings.PitchDetectionSamplesSource,

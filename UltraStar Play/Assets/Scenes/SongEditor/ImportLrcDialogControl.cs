@@ -8,43 +8,46 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private Injector injector;
-    
+
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private SongMeta songMeta;
-    
+
     [Inject]
     private SongEditorLayerManager layerManager;
-    
+
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
-    
+
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
-    
+
     [Inject(UxmlName = R.UxmlNames.importLrcDialogOverlay)]
     private VisualElement importLrcDialogOverlay;
-    
+
     [Inject(UxmlName = R.UxmlNames.importLrcTextField)]
     private TextField importLrcTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.importLrcIssueContainer)]
     private VisualElement importLrcIssueContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.importLrcIssueLabel)]
     private Label importLrcIssueLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.openImportLrcDialogButton)]
     private Button openImportLrcDialogButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.closeImportLrcDialogButton)]
     private Button closeImportLrcDialogButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.importLrcFormatDialogButton)]
     private Button importLrcFormatDialogButton;
-    
+
+    [Inject(UxmlName = R.UxmlNames.lrcImportHelpButton)]
+    private Button lrcImportHelpButton;
+
     private readonly LrcFormatImporter lrcFormatImporter = new();
 
     private readonly Subject<bool> lrcTextChangedEventStream = new();
@@ -58,16 +61,17 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
         importLrcTextField.RegisterValueChangedCallback(evt => lrcTextChangedEventStream.OnNext(true));
         lrcTextChangedEventStream.Throttle(new TimeSpan(0, 0, 0, 0, 200))
             .Subscribe(_ => UpdateErrorMessage());
-        
+
         importLrcFormatDialogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ImportLrcFormat();
             CloseDialog();
         });
+        lrcImportHelpButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToSongEditor)));
         openImportLrcDialogButton.RegisterCallbackButtonTriggered(_ => OpenDialog());
         closeImportLrcDialogButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
         VisualElementUtils.RegisterDirectClickCallback(importLrcDialogOverlay, CloseDialog);
-        
+
         CloseDialog();
     }
 
@@ -77,11 +81,11 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
         {
             return;
         }
-        
+
         // Remove old notes
         editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.Import);
         layerManager.ClearEnumLayer(ESongEditorLayer.Import);
-        
+
         // Import new notes
         List<Note> importedNotes = lrcFormatImporter.ImportLrcFormat(importLrcTextField.value, songMeta, settings);
         if (importedNotes.IsNullOrEmpty())
@@ -93,10 +97,10 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
             importedNotes.ForEach(note => layerManager.AddNoteToEnumLayer(ESongEditorLayer.Import, note));
             UiManager.CreateNotification($"Imported {importedNotes.Count} notes");
         }
-        
+
         songMetaChangeEventStream.OnNext(new ImportedNotesEvent());
     }
-    
+
     public void OpenDialog()
     {
         importLrcDialogOverlay.ShowByDisplay();
@@ -113,7 +117,7 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
         string errorMessage = lrcFormatImporter.GetLrcFormatErrorMessage(importLrcTextField.text);
         SetErrorMessage(errorMessage);
     }
-    
+
     private void SetErrorMessage(string errorMessage)
     {
         bool hasError = !errorMessage.IsNullOrEmpty();
