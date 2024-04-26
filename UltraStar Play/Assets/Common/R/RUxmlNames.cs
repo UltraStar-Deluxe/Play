@@ -666,7 +666,8 @@ public static partial class R
         public const string ScrollView = "ScrollView";
         public const string searchBarContainer = "searchBarContainer";
         public const string searchContainer = "searchContainer";
-        public const string searchErrorIcon = "searchErrorIcon";
+        public const string searchExpressionIcon = "searchExpressionIcon";
+        public const string searchExpressionToggle = "searchExpressionToggle";
         public const string searchHostedGamesButton = "searchHostedGamesButton";
         public const string searchLobbiesIcon = "searchLobbiesIcon";
         public const string searchMidiFilesWithLyricsToggle = "searchMidiFilesWithLyricsToggle";
@@ -744,7 +745,6 @@ public static partial class R
         public const string showRightSideBarToggle = "showRightSideBarToggle";
         public const string showScrollBarInSongSelectToggle = "showScrollBarInSongSelectToggle";
         public const string showSearchExpressionInfoButton = "showSearchExpressionInfoButton";
-        public const string showSearchExpressionInfoTitle = "showSearchExpressionInfoTitle";
         public const string showSongIndexInSongSelectToggle = "showSongIndexInSongSelectToggle";
         public const string showStatusBarToggle = "showStatusBarToggle";
         public const string showTeamResultsButton = "showTeamResultsButton";

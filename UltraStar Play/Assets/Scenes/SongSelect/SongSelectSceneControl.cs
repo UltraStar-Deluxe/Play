@@ -147,6 +147,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject(UxmlName = R.UxmlNames.showSearchExpressionInfoButton)]
     private Button showSearchExpressionInfoButton;
 
+    [Inject(UxmlName = R.UxmlNames.searchExpressionToggle)]
+    private Toggle searchExpressionToggle;
+
     [Inject(UxmlName = R.UxmlNames.toggleMicCheckButton)]
     private ToggleButton toggleMicCheckButton;
 
@@ -306,7 +309,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         });
 
         selectRandomSongButton.RegisterCallbackButtonTriggered(_ => SelectRandomSong());
-        showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(_ => ShowSearchExpressionHelpDialog());
+        FieldBindingUtils.Bind(searchExpressionToggle,
+            () => nonPersistentSettings.IsSearchExpressionsEnabled.Value,
+            newValue => nonPersistentSettings.IsSearchExpressionsEnabled.Value = newValue);
+        showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(_ => ShowSearchExpressionHelp());
 
         fuzzySearchTextLabel.ShowByDisplay();
         songSelectSceneInputControl.FuzzySearchText
@@ -703,26 +709,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         return songQueueEntryDto;
     }
 
-    private void ShowSearchExpressionHelpDialog()
+    private void ShowSearchExpressionHelp()
     {
-        if (searchExpressionHelpDialogControl != null)
-        {
-            return;
-        }
-
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { "Search Expressions",
-                Translation.Get(R.Messages.songSelectScene_searchExpressionInfo) },
-            { "Syntax",
-                Translation.Get(R.Messages.songSelectScene_searchExpressionInfo_syntaxTips) },
-        };
-        searchExpressionHelpDialogControl = uiManager.CreateHelpDialogControl(
-            "Advanced Search Expressions",
-            titleToContentMap);
-        searchExpressionHelpDialogControl.DialogClosedEventStream.Subscribe(_ => searchExpressionHelpDialogControl = null);
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(searchExpressionHelpDialogControl.DialogRootVisualElement);
+        ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToSearchExpressions));
     }
 
     public void ShowLyricsAndInfoPopup(SongMeta songMeta)

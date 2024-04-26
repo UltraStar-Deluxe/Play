@@ -30,13 +30,11 @@
                     <ui:Toggle label="$songSelectScene_filter_duets" name="showOnlyDuetsToggle" class="mb-2 mt-2" />
                     <ui:VisualElement name="filterListContainer" class="child-mb-2" style="width: 100%; align-items: stretch;" />
                 </AccordionItem>
-                <AccordionItem name="advancedSearchAccordionItem" label="$songSelectScene_advancedSearch">
-                    <ui:Label text="$songSelectScene_advancedSearch_info" display-tooltip-when-elided="true" name="showSearchExpressionInfoTitle" class="smallFont" style="margin-bottom: 5px;" />
-                    <ui:VisualElement style="align-items: auto; width: 100%;">
-                        <ui:Button display-tooltip-when-elided="true" name="showSearchExpressionInfoButton" class="squareButton" style="width: auto; height: auto;">
-                            <MaterialIcon name="helpIcon" icon="help_outline" />
-                        </ui:Button>
-                    </ui:VisualElement>
+                <AccordionItem name="advancedSearchAccordionItem" label="$songSelectScene_advancedSearch" content-visible="false">
+                    <ui:Toggle label="$songSelectScene_searchExpressionToggle" name="searchExpressionToggle" />
+                    <ui:Button display-tooltip-when-elided="true" name="showSearchExpressionInfoButton" class="squareButton ml-auto mt-1">
+                        <MaterialIcon name="helpIcon" icon="help_outline" />
+                    </ui:Button>
                 </AccordionItem>
             </AccordionGroup>
         </ui:ScrollView>

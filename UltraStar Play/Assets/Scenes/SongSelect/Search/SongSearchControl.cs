@@ -69,8 +69,8 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.lyricsPropertyToggle)]
     private Toggle lyricsPropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.searchErrorIcon)]
-    private VisualElement searchErrorIcon;
+    [Inject(UxmlName = R.UxmlNames.searchExpressionIcon)]
+    private VisualElement searchExpressionIcon;
 
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownContainer)]
     private VisualElement searchPropertyDropdownContainer;
@@ -96,7 +96,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SongSelectSceneInputControl songSelectSceneInputControl;
 
-    private TooltipControl searchErrorIconTooltipControl;
+    private TooltipControl searchExpressionIconTooltipControl;
 
     public bool IsSearchPropertyDropdownVisible => searchPropertyDropdownOverlay.IsVisibleByDisplay();
 
@@ -123,8 +123,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
 
         songSelectSceneInputControl.FuzzySearchText.Subscribe(newValue => searchTextFieldHint.SetVisibleByVisibility(newValue.IsNullOrEmpty()));
 
-        searchErrorIcon.HideByDisplay();
-        searchErrorIconTooltipControl = new(searchErrorIcon);
+        searchExpressionIcon.HideByDisplay();
+        nonPersistentSettings.IsSearchExpressionsEnabled.Subscribe(newValue => searchExpressionIcon.SetVisibleByDisplay(newValue));
+        searchExpressionIconTooltipControl = new(searchExpressionIcon);
 
         HideSearchPropertyDropdownOverlay();
         searchPropertyButton.RegisterCallbackButtonTriggered(_ =>
@@ -245,8 +246,10 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     public List<SongMeta> GetFilteredSongMetas(List<SongMeta> songMetas)
     {
         string searchExp = searchTextField.value;
-        searchErrorIcon.HideByDisplay();
-        if (IsSearchExpression(searchExp))
+        searchExpressionIcon.RemoveFromClassList("errorFontColor");
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(searchExpressionIcon);
+        searchExpressionIconTooltipControl.TooltipText = Translation.Get(R.Messages.songSelectScene_searchExpressionEnabled);
+        if (nonPersistentSettings.IsSearchExpressionsEnabled.Value)
         {
             try
             {
@@ -258,8 +261,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
             catch (Exception e)
             {
                 Debug.Log($"Invalid search expression '{searchExp}': {e.Message}. Stack trace:\n{e.StackTrace}");
-                searchErrorIcon.ShowByDisplay();
-                searchErrorIconTooltipControl.TooltipText = Translation.Get(R.Messages.songSelectScene_searchExpressionError,
+                searchExpressionIcon.AddToClassList("errorFontColor");
+                ThemeManager.ApplyThemeSpecificStylesToVisualElements(searchExpressionIcon);
+                searchExpressionIconTooltipControl.TooltipText = Translation.Get(R.Messages.songSelectScene_searchExpressionError,
                     "errorDetails", e.Message);
                 return new List<SongMeta>();
             }
@@ -274,25 +278,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
                                || SongMetaMatchesSearchedProperties(songMeta, searchText))
             .ToList();
         return filteredSongs;
-    }
-
-    private bool IsSearchExpression(string searchExp)
-    {
-        bool IsSongPropertyRelation(ESongProperty songProperty)
-        {
-            List<string> relations = new() { "=", "!=", "<", ">", ">=", "<=" };
-            List<string> methods = new() { ".Contains(", ".StartsWith(", ".EndsWith(",
-                ".ToLower(", ".ToUpper(", ".ToLowerInvariant(", ".ToUpperInvariant(" };
-            string searchExpNoWhitespace = searchExp.Replace(" ", "");
-            return relations.AnyMatch(relation =>
-                       searchExpNoWhitespace.StartsWith($"{songProperty}{relation}")
-                       || searchExpNoWhitespace.Contains($"{relation}{songProperty}"))
-                   || methods.AnyMatch(boolMethod =>
-                       searchExpNoWhitespace.StartsWith($"{songProperty}{boolMethod}"));
-        }
-
-        return !searchExp.IsNullOrEmpty()
-               && EnumUtils.GetValuesAsList<ESongProperty>().AnyMatch(songProperty => IsSongPropertyRelation(songProperty));
     }
 
     private bool SongMetaMatchesSearchedProperties(SongMeta songMeta, string searchText)

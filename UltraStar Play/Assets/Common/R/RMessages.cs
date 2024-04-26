@@ -413,7 +413,6 @@ public static partial class R
         public static readonly string songQueue_nextEntry = "songQueue_nextEntry";
         public static readonly string songQueue_title = "songQueue_title";
         public static readonly string songSelectScene_advancedSearch = "songSelectScene_advancedSearch";
-        public static readonly string songSelectScene_advancedSearch_info = "songSelectScene_advancedSearch_info";
         public static readonly string songSelectScene_duetLegendLabel = "songSelectScene_duetLegendLabel";
         public static readonly string songSelectScene_editPlaylistDialog_title = "songSelectScene_editPlaylistDialog_title";
         public static readonly string songSelectScene_filter_duets = "songSelectScene_filter_duets";
@@ -435,9 +434,9 @@ public static partial class R
         public static readonly string songSelectScene_onlineTopScoresTitle = "songSelectScene_onlineTopScoresTitle";
         public static readonly string songSelectScene_order = "songSelectScene_order";
         public static readonly string songSelectScene_playlistDropdownTitle = "songSelectScene_playlistDropdownTitle";
+        public static readonly string songSelectScene_searchExpressionEnabled = "songSelectScene_searchExpressionEnabled";
         public static readonly string songSelectScene_searchExpressionError = "songSelectScene_searchExpressionError";
-        public static readonly string songSelectScene_searchExpressionInfo = "songSelectScene_searchExpressionInfo";
-        public static readonly string songSelectScene_searchExpressionInfo_syntaxTips = "songSelectScene_searchExpressionInfo_syntaxTips";
+        public static readonly string songSelectScene_searchExpressionToggle = "songSelectScene_searchExpressionToggle";
         public static readonly string songSelectScene_searchProperty_title = "songSelectScene_searchProperty_title";
         public static readonly string songSelectScene_searchPropertyDropdownTitle = "songSelectScene_searchPropertyDropdownTitle";
         public static readonly string songSelectScene_searchTextFieldHint = "songSelectScene_searchTextFieldHint";
@@ -465,6 +464,7 @@ public static partial class R
         public static readonly string uri_howToConfigureMicsAndSpeaker = "uri_howToConfigureMicsAndSpeaker";
         public static readonly string uri_howToMods = "uri_howToMods";
         public static readonly string uri_howToPlayerProfiles = "uri_howToPlayerProfiles";
+        public static readonly string uri_howToSearchExpressions = "uri_howToSearchExpressions";
         public static readonly string uri_howToSongEditor = "uri_howToSongEditor";
         public static readonly string uri_howToSteamWorkshop = "uri_howToSteamWorkshop";
         public static readonly string uri_howToThemes = "uri_howToThemes";

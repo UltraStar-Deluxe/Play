@@ -48,8 +48,8 @@
                     <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="squareButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; overflow: visible;">
                         <MaterialIcon tabindex="-1" name="filterActiveIcon" icon="filter_alt" picking-mode="Ignore" class="warningFontColor" />
                         <MaterialIcon tabindex="-1" name="filterInactiveIcon" icon="filter_alt_off" picking-mode="Ignore" />
-                        <MaterialIcon name="searchErrorIcon" icon="warning" class="rounded warningFontColor" />
                     </ui:Button>
+                    <MaterialIcon name="searchExpressionIcon" icon="terminal" class="rounded" style="position: absolute; right: 100%;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="topRightContent" class="child-mb-2 child-ml-2 ml-auto" style="background-color: rgba(0, 0, 0, 0); flex-direction: row-reverse;">
