@@ -100,7 +100,7 @@ public class TranslationTests
         string translationKey = translationKeyWithPrefix.Substring(1);
 
         TranslationConfig.Singleton.MissingPlaceholderStrategy = MissingPlaceholderStrategy.Ignore;
-        return !Translation.TryGet(translationKey, null, out TranslationResult _);
+        return !Translation.TryGet(translationKey, null, out Translation _);
     }
 
     private List<TranslatableAttribute> GetAllTranslatableAttributes()

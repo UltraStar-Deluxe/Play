@@ -3,24 +3,45 @@ using System.Globalization;
 using ProTrans;
 using UnityEngine;
 
-public static class Translation
+public readonly struct Translation
 {
     public const string TranslationKeyPrefix = "$";
 
-    public static TranslationResult Get(string key, params object[] placeholderStrings)
+    public static Translation Empty { get; } = Of("");
+
+    public string Value { get; }
+
+    private Translation(string value)
     {
-        return TranslationResult.Of(ProTrans.Translation.Get(key, placeholderStrings));
+        this.Value = value ?? "";
     }
 
-    public static TranslationResult Get(string key, Dictionary<string, string> placeholders)
+    public override string ToString()
     {
-        return TranslationResult.Of(ProTrans.Translation.Get(key, placeholders));
+        return Value;
     }
 
-    public static bool TryGet(string key, Dictionary<string, string> placeholders, out TranslationResult translationResult)
+    public static implicit operator string(Translation it) => it.Value ?? "";
+
+    public static Translation Of(string value)
+    {
+        return new Translation(value);
+    }
+
+    public static Translation Get(string key, params object[] placeholderStrings)
+    {
+        return Of(ProTrans.Translation.Get(key, placeholderStrings));
+    }
+
+    public static Translation Get(string key, Dictionary<string, string> placeholders)
+    {
+        return Of(ProTrans.Translation.Get(key, placeholders));
+    }
+
+    public static bool TryGet(string key, Dictionary<string, string> placeholders, out Translation translationResult)
     {
         bool result = ProTrans.Translation.TryGet(key, placeholders, out string translation);
-        translationResult = TranslationResult.Of(translation);
+        translationResult = Of(translation);
         return result;
     }
 
