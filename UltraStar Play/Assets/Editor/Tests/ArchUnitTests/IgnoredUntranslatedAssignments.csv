@@ -1,2 +1,10 @@
 ﻿typeFullName,methodDeclaringTypeName,methodName
+TranslationExtensions, *, *
+ItemPicker, *, *
 ItemPicker+UxmlTraits, *, *
+AccordionItem, *, *
+AccordionItem+UxmlTraits, *, *
+ChipsCombo, *, *
+FontIcon, *, *
+RadialProgressBar, *, *
+BaseListViewH, *, *

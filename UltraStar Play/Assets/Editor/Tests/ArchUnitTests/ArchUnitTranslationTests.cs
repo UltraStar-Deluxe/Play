@@ -16,21 +16,12 @@ using Type = System.Type;
 
 public class ArchUnitTranslationTests
 {
-    private static List<TranslatableAssignment> ignoredUntranslatedAssignments = new();
+    private static List<TranslatableAssignment> ignoredUntranslatedAssignments;
 
     private static readonly HashSet<string> typesWithUiLabels = new()
     {
         "TextElement",
         "BaseField`1",
-        "Label",
-        "Button",
-        "Toggle",
-        "TextField",
-        "IntegerField",
-        "FloatField",
-        "LongField",
-        "DoubleField",
-        "DropdownField",
         "EnumFieldItemPicker",
         "ItemPicker",
         "AccordionItem",
@@ -44,15 +35,15 @@ public class ArchUnitTranslationTests
     // [Ignore("Not all label assignments refactored yet to use a translation object via custom extension method")]
     public void UiLabelAssignmentsAreTranslated()
     {
+        LoadIgnoredUntranslatedAssignments();
         Architecture architecture = ArchUnitTestUtils.LoadArchitectureByAssemblyNames(new List<string>()
         {
             "playsharedui",
-            // "Common",
+            // "Common", // Common takes pretty long to run. The other assemblies finish the test faster.
             // "Scenes",
             // "SongEditorScene",
         });
 
-        // Types().That().Are(typeof(NextGameRoundUiControl))
         Types()
             .Should().FollowCustomCondition(NotCallUntranslatedUiLabelSetter())
             .Check(architecture);
@@ -69,6 +60,8 @@ public class ArchUnitTranslationTests
             typeof(UntranslatedButtonTextSetterExample),
             typeof(UntranslatedLabelTextSetterExample),
             typeof(UntranslatedTextFieldLabelSetterExample),
+            typeof(UntranslatedItemPickerLabelSetterExample),
+            typeof(UntranslatedAccordionItemTitleSetterExample),
         };
 
         foreach (Type type in types)
@@ -97,11 +90,6 @@ public class ArchUnitTranslationTests
 
     private static bool IsIgnoredTranslatableAssignment(IType type, MethodMember method)
     {
-        if (ignoredUntranslatedAssignments.IsNullOrEmpty())
-        {
-            LoadIgnoredUntranslatedAssignments();
-        }
-
         return ignoredUntranslatedAssignments.AnyMatch(ignoredAssignment =>
         {
             return (ignoredAssignment.TypeFullName == "*"
@@ -117,7 +105,8 @@ public class ArchUnitTranslationTests
     {
         return typesWithUiLabels.Contains(methodMember.DeclaringType.Name)
                && (string.Equals(methodMember.Name, "set_label(System.String)", StringComparison.InvariantCultureIgnoreCase)
-                   || string.Equals(methodMember.Name, "set_text(System.String)", StringComparison.InvariantCultureIgnoreCase));
+                   || string.Equals(methodMember.Name, "set_text(System.String)", StringComparison.InvariantCultureIgnoreCase)
+                   || string.Equals(methodMember.Name, "set_title(System.String)", StringComparison.InvariantCultureIgnoreCase));
     }
 
     private static void LoadIgnoredUntranslatedAssignments()
@@ -160,8 +149,7 @@ public class ArchUnitTranslationTests
     {
         private static void Init()
         {
-            Button button = new();
-            button.text = "untranslated button text";
+            new Button().text = "untranslated text";
         }
     }
 
@@ -169,8 +157,7 @@ public class ArchUnitTranslationTests
     {
         private static void Init()
         {
-            Label label = new();
-            label.text = "untranslated label text";
+            new Label().text = "untranslated text";
         }
     }
 
@@ -178,8 +165,23 @@ public class ArchUnitTranslationTests
     {
         private static void Init()
         {
-            TextField textField = new();
-            textField.label = "untranslated TextField label";
+            new TextField().label = "untranslated text";
+        }
+    }
+
+    private struct UntranslatedItemPickerLabelSetterExample
+    {
+        private static void Init()
+        {
+            new ItemPicker().Label = "untranslated text";
+        }
+    }
+
+    private struct UntranslatedAccordionItemTitleSetterExample
+    {
+        private static void Init()
+        {
+            new AccordionItem().Title = "untranslated text";
         }
     }
 }
