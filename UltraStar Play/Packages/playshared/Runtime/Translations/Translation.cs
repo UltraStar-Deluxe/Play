@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using ProTrans;
+using UnityEngine;
 
 public static class Translation
 {
@@ -36,5 +37,12 @@ public static class Translation
     public static CultureInfo GetFallbackCultureInfo(CultureInfo cultureInfo = null)
     {
         return ProTrans.Translation.GetFallbackCultureInfo(cultureInfo);
+    }
+
+    public static void InitTranslationConfig()
+    {
+        TranslationConfig.Singleton.PropertiesFileProvider = new CachingPropertiesFileProvider(new ResourcesFolderPropertiesFileProvider());
+        TranslationConfig.Singleton.MissingPlaceholderStrategy = Application.isEditor ? MissingPlaceholderStrategy.Throw : MissingPlaceholderStrategy.Log;
+        TranslationConfig.Singleton.UnexpectedPlaceholderStrategy = Application.isEditor ? UnexpectedPlaceholderStrategy.Throw : UnexpectedPlaceholderStrategy.Log;
     }
 }

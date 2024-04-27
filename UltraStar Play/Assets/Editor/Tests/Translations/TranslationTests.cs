@@ -14,10 +14,43 @@ public class TranslationTests
     [SetUp]
     public void SetUp()
     {
-        TranslationConfig translationConfig = TranslationConfig.Singleton;
-        if (translationConfig.PropertiesFileProvider is not ResourcesFolderPropertiesFileProvider)
+        Translation.InitTranslationConfig();
+    }
+
+    [Test]
+    public void AllTranslationKeysArePresentInDefaultPropertiesFiles()
+    {
+        Dictionary<PropertiesFile, List<string>> propertiesFileToKeys = new();
+
+        PropertiesFile defaultPropertiesFile = Translation.GetPropertiesFile(Translation.GetFallbackCultureInfo());
+        Translation.GetTranslatedCultureInfos()
+            .ForEach(cultureInfo =>
+            {
+                PropertiesFile propertiesFile = Translation.GetPropertiesFile(cultureInfo);
+                if (propertiesFile == null)
+                {
+                    return;
+                }
+
+                List<string> keys = propertiesFile.Dictionary.Keys
+                    .Where(key => !defaultPropertiesFile.Dictionary.ContainsKey(key))
+                    .ToList();
+                if (!keys.IsNullOrEmpty())
+                {
+                    propertiesFileToKeys.Add(propertiesFile, keys);
+                }
+            });
+
+        if (!propertiesFileToKeys.IsNullOrEmpty())
         {
-            translationConfig.PropertiesFileProvider = new ResourcesFolderPropertiesFileProvider();
+            Assert.Fail("Found keys not present in default properties files:\n"
+             + propertiesFileToKeys.Keys
+                 .Select(propertiesFile =>
+                 {
+                     List<string> keys = propertiesFileToKeys[propertiesFile];
+                     return $"{propertiesFile.CultureInfo}\n    {keys.JoinWith("\n    ")}";
+                 })
+                 .JoinWith("\n"));
         }
     }
 
