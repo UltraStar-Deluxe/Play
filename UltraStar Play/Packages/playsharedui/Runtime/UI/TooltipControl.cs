@@ -22,6 +22,7 @@ public class TooltipControl
     public float ShowDelayInSeconds { get; set; } = defaultShowDelayInSeconds;
     public float CloseDelayInSeconds { get; set; } = defaultCloseDelayInSeconds;
     public string TooltipText { get; set; }
+    public float Margin { get; set; } = 4;
 
     private readonly VisualElement visualElement;
 
@@ -135,6 +136,7 @@ public class TooltipControl
         }
 
         label = new Label();
+        label.name = "tooltipLabel";
         label.AddToClassList("tooltip");
         label.pickingMode = PickingMode.Ignore;
         label.text = TooltipText;
@@ -144,7 +146,8 @@ public class TooltipControl
 
         GetUiDocument().rootVisualElement.Add(label);
 
-        label.RegisterCallbackOneShot<GeometryChangedEvent>(evt => VisualElementUtils.MoveVisualElementFullyInsideScreen(label, GetPanelHelper()));
+        label.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+            VisualElementUtils.MoveVisualElementFullyInsideScreen(label, GetPanelHelper(), Margin, Margin, Margin, Margin));
 
         openTooltipControls.Add(this);
     }
