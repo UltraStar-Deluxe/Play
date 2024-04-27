@@ -128,6 +128,12 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         nonPersistentSettings.IsSearchExpressionsEnabled.Subscribe(newValue => searchExpressionIcon.SetVisibleByDisplay(newValue));
         searchExpressionIconTooltipControl = new(searchExpressionIcon);
 
+        // Apply last search expression if any
+        if (!nonPersistentSettings.LastValidSearchExpression.Value.IsNullOrEmpty())
+        {
+            searchTextField.value = nonPersistentSettings.LastValidSearchExpression.Value;
+        }
+
         HideSearchPropertyDropdownOverlay();
         searchPropertyButton.RegisterCallbackButtonTriggered(_ =>
         {
@@ -259,6 +265,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
                 List<SongMeta> searchExpSongMetas = songMetas.AsQueryable()
                     .Where(searchExp)
                     .ToList();
+                nonPersistentSettings.LastValidSearchExpression.Value = searchExp;
                 return searchExpSongMetas;
             }
             catch (Exception e)
@@ -270,6 +277,10 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
                     "errorDetails", e.Message);
                 return new List<SongMeta>();
             }
+        }
+        else
+        {
+            nonPersistentSettings.LastValidSearchExpression.Value = "";
         }
 
         // Ignore prefix for special search syntax
