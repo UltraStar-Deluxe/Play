@@ -1,9 +1,9 @@
 ﻿public class ValueInputDialogValidationResult
 {
     public EValueInputDialogValidationResultSeverity Severity { get; private set; }
-    public string Message { get; private set; }
+    public Translation Message { get; private set; }
 
-    private ValueInputDialogValidationResult(EValueInputDialogValidationResultSeverity severity, string message)
+    private ValueInputDialogValidationResult(EValueInputDialogValidationResultSeverity severity, Translation message)
     {
         Severity = severity;
         Message = message;
@@ -11,15 +11,15 @@
 
     public static ValueInputDialogValidationResult CreateValidResult()
     {
-        return new ValueInputDialogValidationResult(EValueInputDialogValidationResultSeverity.None, "");
+        return new ValueInputDialogValidationResult(EValueInputDialogValidationResultSeverity.None, Translation.Empty);
     }
 
-    public static ValueInputDialogValidationResult CreateWarningResult(string warningMessage)
+    public static ValueInputDialogValidationResult CreateWarningResult(Translation warningMessage)
     {
         return new ValueInputDialogValidationResult(EValueInputDialogValidationResultSeverity.Warning, warningMessage);
     }
 
-    public static ValueInputDialogValidationResult CreateErrorResult(string errorMessage)
+    public static ValueInputDialogValidationResult CreateErrorResult(Translation errorMessage)
     {
         return new ValueInputDialogValidationResult(EValueInputDialogValidationResultSeverity.Error, errorMessage);
     }

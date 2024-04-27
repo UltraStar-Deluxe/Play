@@ -13,7 +13,7 @@ public class PathInputDialogControl : TextInputDialogControl
         {
             if (newValue.IsNullOrEmpty())
             {
-                return ValueInputDialogValidationResult.CreateErrorResult("Enter a value please");
+                return ValueInputDialogValidationResult.CreateErrorResult(Translation.Get("validation_missingValue"));
             }
 
             if (File.Exists(newValue)
@@ -22,7 +22,7 @@ public class PathInputDialogControl : TextInputDialogControl
                 return ValueInputDialogValidationResult.CreateValidResult();
             }
 
-            return ValueInputDialogValidationResult.CreateErrorResult("File not found");
+            return ValueInputDialogValidationResult.CreateErrorResult(Translation.Get("validation_fileNotFound"));
         };
     }
 }

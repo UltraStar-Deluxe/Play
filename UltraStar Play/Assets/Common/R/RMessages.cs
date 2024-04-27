@@ -390,6 +390,9 @@ public static partial class R
         public static readonly string songEditor_options_syncLyricsArea = "songEditor_options_syncLyricsArea";
         public static readonly string songEditor_options_title = "songEditor_options_title";
         public static readonly string songEditor_options_volume = "songEditor_options_volume";
+        public static readonly string songEditor_setBpmChangeNoteDurationDialog_title = "songEditor_setBpmChangeNoteDurationDialog_title";
+        public static readonly string songEditor_setBpmDialog_message = "songEditor_setBpmDialog_message";
+        public static readonly string songEditor_setBpmKeepNoteDurationDialog_title = "songEditor_setBpmKeepNoteDurationDialog_title";
         public static readonly string songEditor_sideBar_analyzePitch = "songEditor_sideBar_analyzePitch";
         public static readonly string songEditor_sideBar_back = "songEditor_sideBar_back";
         public static readonly string songEditor_sideBar_folder = "songEditor_sideBar_folder";
@@ -489,6 +492,8 @@ public static partial class R
         public static readonly string uri_howToThemes = "uri_howToThemes";
         public static readonly string uri_logFiles = "uri_logFiles";
         public static readonly string uri_songEditorVideoTutorials = "uri_songEditorVideoTutorials";
+        public static readonly string validation_fileNotFound = "validation_fileNotFound";
+        public static readonly string validation_missingValue = "validation_missingValue";
         public static readonly string viewMore = "viewMore";
         public static readonly string warning = "warning";
         public static readonly string yes = "yes";
