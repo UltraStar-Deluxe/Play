@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic;
+using System.Reflection;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -248,8 +249,10 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         string searchExp = searchTextField.value;
         searchExpressionIcon.RemoveFromClassList("errorFontColor");
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(searchExpressionIcon);
-        searchExpressionIconTooltipControl.TooltipText = Translation.Get(R.Messages.songSelectScene_searchExpressionEnabled);
-        if (nonPersistentSettings.IsSearchExpressionsEnabled.Value)
+        searchExpressionIconTooltipControl.TooltipText = Translation.Get(R.Messages.songSelectScene_searchExpressionEnabled,
+            "properties", GetAvailableSearchExpressionPropertiesCsv());
+        if (nonPersistentSettings.IsSearchExpressionsEnabled.Value
+            && !searchExp.IsNullOrEmpty())
         {
             try
             {
@@ -278,6 +281,14 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
                                || SongMetaMatchesSearchedProperties(songMeta, searchText))
             .ToList();
         return filteredSongs;
+    }
+
+    private string GetAvailableSearchExpressionPropertiesCsv()
+    {
+        return typeof(SongMeta).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Select(property => property.Name)
+            .OrderBy(propertyName => propertyName)
+            .JoinWith(", ");
     }
 
     private bool SongMetaMatchesSearchedProperties(SongMeta songMeta, string searchText)
