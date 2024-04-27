@@ -46,28 +46,28 @@ public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, IS
 
         rootVisualElement.Query<Label>().ForEach(label => ApplyTranslation(
             () => label.text,
-            newValue => label.text = newValue));
+            newValue => label.SetTranslatedText(newValue)));
 
         rootVisualElement.Query<Button>().ForEach(button => ApplyTranslation(
             () => button.text,
-            newValue => button.text = newValue));
+            newValue => button.SetTranslatedText(newValue)));
 
         rootVisualElement.Query<BaseField<object>>().ForEach(field => ApplyTranslation(
             () => field.label,
-            newValue => field.label = newValue));
+            newValue => field.SetTranslatedLabel(newValue)));
 
         rootVisualElement.Query<ItemPicker>().ForEach(itemPicker => ApplyTranslation(
             () => itemPicker.Label,
-            newValue => itemPicker.Label = newValue));
+            newValue => itemPicker.SetTranslatedLabel(newValue)));
 
         rootVisualElement.Query<AccordionItem>().ForEach(accordionItem => ApplyTranslation(
             () => accordionItem.Title,
-            newValue => accordionItem.Title = newValue));
+            newValue => accordionItem.SetTranslatedTitle(newValue)));
     }
 
     private static void ApplyTranslation(
         Func<string> textGetter,
-        Action<string> textSetter)
+        Action<Translation> textSetter)
 
     {
         string currentText = textGetter();
@@ -77,7 +77,7 @@ public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, IS
         }
 
         string translationKey = currentText.Substring(1).Trim();
-        string translation = Translation.Get(translationKey);
+        Translation translation = Translation.Get(translationKey);
         textSetter(translation);
     }
 }

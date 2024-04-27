@@ -8,3 +8,9 @@ ChipsCombo, *, *
 FontIcon, *, *
 RadialProgressBar, *, *
 BaseListViewH, *, *
+NumberPickerControl, *, *
+PicturedItemPickerControl`1, *, *
+MicWithNameControl, *, *
+SongQueueEntryUiControl, *, *
+ListViewHController, *, *
+HashSetChipsComboControl`1, *, *
