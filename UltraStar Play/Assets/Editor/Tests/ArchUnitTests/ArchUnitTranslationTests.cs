@@ -5,10 +5,14 @@ using System.Linq;
 using ArchUnitNET.Domain;
 using ArchUnitNET.Domain.Extensions;
 using ArchUnitNET.Fluent.Conditions;
+using ArchUnitNET.Loader;
 using ArchUnitNET.NUnit;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
+using Assembly = System.Reflection.Assembly;
+using Type = System.Type;
 
 public class ArchUnitTranslationTests
 {
@@ -52,6 +56,29 @@ public class ArchUnitTranslationTests
         Types()
             .Should().FollowCustomCondition(NotCallUntranslatedUiLabelSetter())
             .Check(architecture);
+    }
+
+    [Test]
+    public void UntranslatedUiLabelAssignmentsAreFound()
+    {
+        Architecture architecture = new ArchLoader()
+            .LoadAssemblies(Assembly.GetAssembly(typeof(UntranslatedButtonTextSetterExample)))
+            .Build();
+
+        List<Type> types = new List<Type>(){
+            typeof(UntranslatedButtonTextSetterExample),
+            typeof(UntranslatedLabelTextSetterExample),
+            typeof(UntranslatedTextFieldLabelSetterExample),
+        };
+
+        foreach (Type type in types)
+        {
+            Assert.Throws<AssertionException>(() =>
+                    Types().That().Are(type)
+                        .Should().FollowCustomCondition(NotCallUntranslatedUiLabelSetter())
+                        .Check(architecture),
+                $"Untranslated UI label assignment was not found in type {type.FullName}");
+        }
     }
 
     private static ICondition<IType> NotCallUntranslatedUiLabelSetter()
@@ -126,6 +153,33 @@ public class ArchUnitTranslationTests
             TypeFullName = typeFullName;
             MethodDeclaringTypeName = methodDeclaringTypeName;
             MethodName = methodName;
+        }
+    }
+
+    private struct UntranslatedButtonTextSetterExample
+    {
+        private static void Init()
+        {
+            Button button = new();
+            button.text = "untranslated button text";
+        }
+    }
+
+    private struct UntranslatedLabelTextSetterExample
+    {
+        private static void Init()
+        {
+            Label label = new();
+            label.text = "untranslated label text";
+        }
+    }
+
+    private struct UntranslatedTextFieldLabelSetterExample
+    {
+        private static void Init()
+        {
+            TextField textField = new();
+            textField.label = "untranslated TextField label";
         }
     }
 }
