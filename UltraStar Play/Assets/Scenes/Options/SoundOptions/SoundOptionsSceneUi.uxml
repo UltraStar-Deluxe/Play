@@ -8,8 +8,8 @@
             <ItemPicker name="backgroundMusicVolumeChooser" label="$options_volume_backgroundMusic" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="animateSceneChangeVolumePicker" label="$options_volume_sceneTransition" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="sfxVolumeChooser" label="$options_volume_soundEffects" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
-            <ui:TextField picking-mode="Ignore" label="$options_soundFontPath" name="soundfontPathTextField" is-delayed="true" class="noBackgroundInHierarchy" style="align-items: center; flex-grow: 1; margin-bottom: 4px;">
-                <ui:Label tabindex="-1" text="$options_soundFontPath_hint" display-tooltip-when-elided="true" name="soundfontPathTextFieldHintLabel" class="textFieldHint secondaryFontColor" style="left: auto; right: 10px;" />
+            <ui:TextField picking-mode="Ignore" label="$options_soundFont_path" name="soundfontPathTextField" is-delayed="true" class="noBackgroundInHierarchy" style="align-items: center; flex-grow: 1; margin-bottom: 4px;">
+                <ui:Label tabindex="-1" text="$options_soundFont_path_hint" display-tooltip-when-elided="true" name="soundfontPathTextFieldHintLabel" class="textFieldHint secondaryFontColor" style="left: auto; right: 10px;" />
             </ui:TextField>
             <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0); justify-content: flex-end;">
                 <ui:Button display-tooltip-when-elided="true" name="testSoundfontButton" class="squareButton mr-1" style="align-self: flex-end;">

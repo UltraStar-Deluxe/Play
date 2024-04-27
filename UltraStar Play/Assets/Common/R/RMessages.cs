@@ -28,7 +28,10 @@ public static partial class R
         public static readonly string androidInternalStorage = "androidInternalStorage";
         public static readonly string androidSdCardStorage = "androidSdCardStorage";
         public static readonly string back = "back";
-        public static readonly string buildTimeStamp = "buildTimeStamp";
+        public static readonly string buildInfo_commit = "buildInfo_commit";
+        public static readonly string buildInfo_timeStamp = "buildInfo_timeStamp";
+        public static readonly string buildInfo_unityVersion = "buildInfo_unityVersion";
+        public static readonly string buildInfo_version = "buildInfo_version";
         public static readonly string button_addGuest = "button_addGuest";
         public static readonly string button_addPlayer = "button_addPlayer";
         public static readonly string button_addSongFolder = "button_addSongFolder";
@@ -55,7 +58,7 @@ public static partial class R
         public static readonly string button_toggleCoopMode = "button_toggleCoopMode";
         public static readonly string button_toggleMicTest = "button_toggleMicTest";
         public static readonly string close = "close";
-        public static readonly string commit = "commit";
+        public static readonly string common_fps = "common_fps";
         public static readonly string companionApp_connectedTo = "companionApp_connectedTo";
         public static readonly string companionApp_connecting = "companionApp_connecting";
         public static readonly string companionApp_connectingWithFailedAttempts = "companionApp_connectingWithFailedAttempts";
@@ -228,8 +231,10 @@ public static partial class R
         public static readonly string options_songLibrary_title = "options_songLibrary_title";
         public static readonly string options_sound_button = "options_sound_button";
         public static readonly string options_sound_title = "options_sound_title";
-        public static readonly string options_soundFontPath = "options_soundFontPath";
-        public static readonly string options_soundFontPath_hint = "options_soundFontPath_hint";
+        public static readonly string options_soundFont_path = "options_soundFont_path";
+        public static readonly string options_soundFont_path_hint = "options_soundFont_path_hint";
+        public static readonly string options_soundFont_select_tooltip = "options_soundFont_select_tooltip";
+        public static readonly string options_soundFont_test_tooltip = "options_soundFont_test_tooltip";
         public static readonly string options_targetFps = "options_targetFps";
         public static readonly string options_theme = "options_theme";
         public static readonly string options_useForSinging = "options_useForSinging";
@@ -290,6 +295,7 @@ public static partial class R
         public static readonly string score_phraseBonus = "score_phraseBonus";
         public static readonly string score_total = "score_total";
         public static readonly string settingsProblem_duplicateSongFolders = "settingsProblem_duplicateSongFolders";
+        public static readonly string settingsProblem_modFailedToLoad = "settingsProblem_modFailedToLoad";
         public static readonly string settingsProblem_noConnectedAndEnabledMicProfile = "settingsProblem_noConnectedAndEnabledMicProfile";
         public static readonly string settingsProblem_noEnabledPlayerProfile = "settingsProblem_noEnabledPlayerProfile";
         public static readonly string settingsProblem_noMicProfiles = "settingsProblem_noMicProfiles";
@@ -402,6 +408,18 @@ public static partial class R
         public static readonly string songEditor_songProperties_bpm = "songEditor_songProperties_bpm";
         public static readonly string songEditor_songProperties_clickToFindBpm = "songEditor_songProperties_clickToFindBpm";
         public static readonly string songEditor_songProperties_title = "songEditor_songProperties_title";
+        public static readonly string songIssue_headerField = "songIssue_headerField";
+        public static readonly string songIssue_headerField_duplicate = "songIssue_headerField_duplicate";
+        public static readonly string songIssue_headerField_invalidFormat = "songIssue_headerField_invalidFormat";
+        public static readonly string songIssue_headerField_missing = "songIssue_headerField_missing";
+        public static readonly string songIssue_media_doesNotExist = "songIssue_media_doesNotExist";
+        public static readonly string songIssue_media_missingAudioAndUnsupportedWebsite = "songIssue_media_missingAudioAndUnsupportedWebsite";
+        public static readonly string songIssue_media_unsupported = "songIssue_media_unsupported";
+        public static readonly string songIssue_media_videoDiffersFromAudio = "songIssue_media_videoDiffersFromAudio";
+        public static readonly string songIssue_missingLyricsOnNote = "songIssue_missingLyricsOnNote";
+        public static readonly string songIssue_notesOverlap = "songIssue_notesOverlap";
+        public static readonly string songIssue_phrasesOverlap = "songIssue_phrasesOverlap";
+        public static readonly string songIssue_unusualPitch = "songIssue_unusualPitch";
         public static readonly string songProperty_artist = "songProperty_artist";
         public static readonly string songProperty_edition = "songProperty_edition";
         public static readonly string songProperty_genre = "songProperty_genre";
@@ -457,6 +475,7 @@ public static partial class R
         public static readonly string steamWorkshop_item_description = "steamWorkshop_item_description";
         public static readonly string steamWorkshop_item_previewImage_hint = "steamWorkshop_item_previewImage_hint";
         public static readonly string steamWorkshop_item_title = "steamWorkshop_item_title";
+        public static readonly string steamWorkshop_updateTooltip = "steamWorkshop_updateTooltip";
         public static readonly string submit = "submit";
         public static readonly string timeUppercase = "timeUppercase";
         public static readonly string uri_howToAddAndCreateSongs = "uri_howToAddAndCreateSongs";
@@ -470,7 +489,6 @@ public static partial class R
         public static readonly string uri_howToThemes = "uri_howToThemes";
         public static readonly string uri_logFiles = "uri_logFiles";
         public static readonly string uri_songEditorVideoTutorials = "uri_songEditorVideoTutorials";
-        public static readonly string version = "version";
         public static readonly string viewMore = "viewMore";
         public static readonly string warning = "warning";
         public static readonly string yes = "yes";

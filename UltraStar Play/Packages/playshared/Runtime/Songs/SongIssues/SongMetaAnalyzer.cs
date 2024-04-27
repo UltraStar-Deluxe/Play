@@ -30,7 +30,7 @@ public static class SongMetaAnalyzer
         {
             if (lastSentence != null && sentence.MinBeat < lastSentence.ExtendedMaxBeat)
             {
-                SongIssue issue = SongIssue.CreateError(songMeta, "Phrases overlap", sentence.MinBeat, lastSentence.ExtendedMaxBeat);
+                SongIssue issue = SongIssue.CreateError(songMeta, Translation.Get("songIssue_phrasesOverlap"), sentence.MinBeat, lastSentence.ExtendedMaxBeat);
                 AddSongIssue(messageToIssues, issue, maxSongIssueCountPerMessage);
             }
             lastSentence = sentence;
@@ -52,21 +52,21 @@ public static class SongMetaAnalyzer
             // Find overlapping notes
             if (lastNote != null && note.StartBeat < lastNote.EndBeat)
             {
-                SongIssue issue = SongIssue.CreateError(songMeta, "Notes overlap", note.StartBeat, lastNote.EndBeat);
+                SongIssue issue = SongIssue.CreateError(songMeta, Translation.Get("songIssue_notesOverlap"), note.StartBeat, lastNote.EndBeat);
                 AddSongIssue(messageToIssues, issue, maxSongIssueCountPerMessage);
             }
 
             // Find pitches outside of the singable range
             if (note.MidiNote < MidiUtils.SingableNoteMin || note.MidiNote > MidiUtils.SingableNoteMax)
             {
-                SongIssue issue = SongIssue.CreateWarning(songMeta, "Unusual pitch (human range is roughly from C2 to C6).", note.StartBeat, note.EndBeat);
+                SongIssue issue = SongIssue.CreateWarning(songMeta, Translation.Get("songIssue_unusualPitch"), note.StartBeat, note.EndBeat);
                 AddSongIssue(messageToIssues, issue, maxSongIssueCountPerMessage);
             }
 
             // Check that each note has lyrics
             if (note.Text.IsNullOrEmpty())
             {
-                SongIssue issue = SongIssue.CreateWarning(songMeta, "Missing lyrics on note", note.StartBeat, note.EndBeat);
+                SongIssue issue = SongIssue.CreateWarning(songMeta, Translation.Get("songIssue_missingLyricsOnNote"), note.StartBeat, note.EndBeat);
                 AddSongIssue(messageToIssues, issue, maxSongIssueCountPerMessage);
             }
 

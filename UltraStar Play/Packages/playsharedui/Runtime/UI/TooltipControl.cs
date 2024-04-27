@@ -21,7 +21,7 @@ public class TooltipControl
 
     public float ShowDelayInSeconds { get; set; } = defaultShowDelayInSeconds;
     public float CloseDelayInSeconds { get; set; } = defaultCloseDelayInSeconds;
-    public string TooltipText { get; set; }
+    public Translation TooltipText { get; set; }
     public float Margin { get; set; } = 4;
 
     private readonly VisualElement visualElement;
@@ -37,7 +37,7 @@ public class TooltipControl
 
     public TooltipControl(
         VisualElement visualElement,
-        string tooltipText = "",
+        Translation tooltipText = default,
         bool showTooltipOnPointerDown = true)
     {
         this.visualElement = visualElement;
@@ -130,7 +130,7 @@ public class TooltipControl
     {
         CloseTooltip();
 
-        if (TooltipText.IsNullOrEmpty())
+        if (TooltipText.Value.IsNullOrEmpty())
         {
             return;
         }
@@ -139,7 +139,7 @@ public class TooltipControl
         label.name = "tooltipLabel";
         label.AddToClassList("tooltip");
         label.pickingMode = PickingMode.Ignore;
-        label.text = TooltipText;
+        label.SetTranslatedText(TooltipText);
         label.style.position = new StyleEnum<Position>(Position.Absolute);
         label.style.left = pos.x;
         label.style.top = pos.y;

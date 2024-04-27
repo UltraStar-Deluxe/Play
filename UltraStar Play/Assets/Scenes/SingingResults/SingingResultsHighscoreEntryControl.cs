@@ -43,7 +43,7 @@ public class SingingResultsHighscoreEntryControl : INeedInjection, IInjectionFin
         highScoreSourceIcon.SetVisibleByDisplay(!highScoreEntry.RemoteSource.IsNullOrEmpty());
         if (!highScoreEntry.RemoteSource.IsNullOrEmpty())
         {
-            new TooltipControl(highScoreSourceIcon, highScoreEntry.RemoteSource);
+            new TooltipControl(highScoreSourceIcon, Translation.Of(highScoreEntry.RemoteSource));
         }
     }
 }

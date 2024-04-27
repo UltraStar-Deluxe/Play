@@ -9,11 +9,12 @@ public readonly struct Translation
 
     public static Translation Empty { get; } = Of("");
 
-    public string Value { get; }
+    private readonly string value;
+    public string Value => value ?? "";
 
     private Translation(string value)
     {
-        this.Value = value ?? "";
+        this.value = value;
     }
 
     public override string ToString()
@@ -21,7 +22,7 @@ public readonly struct Translation
         return Value;
     }
 
-    public static implicit operator string(Translation it) => it.Value ?? "";
+    public static implicit operator string(Translation it) => it.Value;
 
     public static Translation Of(string value)
     {

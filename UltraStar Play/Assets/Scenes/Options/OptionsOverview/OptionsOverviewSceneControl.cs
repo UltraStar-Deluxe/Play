@@ -153,7 +153,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         openSteamWorkshopButton.RegisterCallbackButtonTriggered(_ => OpenSteamWorkshop());
 
         updateSteamWorkshopItemsButton.RegisterCallbackButtonTriggered(_ => UpdateSteamWorkshopItems());
-        new TooltipControl(updateSteamWorkshopItemsButton, "Update Steam Workshop items.");
+        new TooltipControl(updateSteamWorkshopItemsButton, Translation.Get(R.Messages.steamWorkshop_updateTooltip));
 
         helpButton.RegisterCallbackButtonTriggered(_ => ShowHelp());
         issuesButton.RegisterCallbackButtonTriggered(_ => ShowIssuesDialog());
