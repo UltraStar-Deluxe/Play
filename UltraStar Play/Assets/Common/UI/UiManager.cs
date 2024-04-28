@@ -140,7 +140,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         });
     }
 
-    public MessageDialogControl CreateDialogControl(string dialogTitle)
+    public MessageDialogControl CreateDialogControl(Translation dialogTitle)
     {
         VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(dialogVisualElement);
@@ -155,37 +155,39 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     }
 
     public MessageDialogControl CreateErrorInfoDialogControl(
-        string dialogTitle,
-        string dialogMessage,
-        string errorMessage,
-        string closeButtonText = null)
+        Translation dialogTitle,
+        Translation dialogMessage,
+        Translation errorMessage,
+        Translation closeButtonText = default)
     {
-        MessageDialogControl messageDialogControl = CreateInfoDialogControl(dialogTitle,dialogMessage, closeButtonText);
+        MessageDialogControl messageDialogControl = CreateInfoDialogControl(dialogTitle, dialogMessage, closeButtonText);
 
         // Add accordion item to show error message.
-        if (!errorMessage.IsNullOrEmpty())
+        if (errorMessage.Value.IsNullOrEmpty())
         {
-            AccordionItem accordionItem = new AccordionItem();
-            accordionItem.Title = "Details";
-            Label errorMessageLabel = new();
-            errorMessageLabel.text = errorMessage;
-            accordionItem.Add(errorMessageLabel);
-            accordionItem.HideAccordionContent();
-            messageDialogControl.AddVisualElement(accordionItem);
+            return messageDialogControl;
         }
+
+        AccordionItem accordionItem = new AccordionItem();
+        accordionItem.SetTranslatedTitle(Translation.Get(R.Messages.common_details));
+        Label errorMessageLabel = new();
+        errorMessageLabel.text = errorMessage;
+        accordionItem.Add(errorMessageLabel);
+        accordionItem.HideAccordionContent();
+        messageDialogControl.AddVisualElement(accordionItem);
 
         return messageDialogControl;
     }
 
     public MessageDialogControl CreateInfoDialogControl(
-        string dialogTitle,
-        string dialogMessage,
-        string closeButtonText = null)
+        Translation dialogTitle,
+        Translation dialogMessage,
+        Translation closeButtonText = default)
     {
         MessageDialogControl messageDialogControl = CreateDialogControl(dialogTitle);
         messageDialogControl.Message = dialogMessage;
 
-        closeButtonText = !closeButtonText.IsNullOrEmpty()
+        closeButtonText = !closeButtonText.Value.IsNullOrEmpty()
             ? closeButtonText
             : Translation.Get(R.Messages.close);
         messageDialogControl.AddButton(closeButtonText, evt =>
@@ -196,11 +198,11 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     }
 
     public MessageDialogControl CreateConfirmationDialogControl(
-        string dialogTitle,
-        string dialogMessage,
-        string confirmButtonText,
+        Translation dialogTitle,
+        Translation dialogMessage,
+        Translation confirmButtonText,
         Action<EventBase> onConfirm,
-        string cancelButtonText = "",
+        Translation cancelButtonText = default,
         Action<EventBase> onCancel = null)
     {
         MessageDialogControl messageDialogControl = CreateDialogControl(dialogTitle);
@@ -211,7 +213,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
             onConfirm?.Invoke(evt);
         });
 
-        cancelButtonText = !cancelButtonText.IsNullOrEmpty()
+        cancelButtonText = !cancelButtonText.Value.IsNullOrEmpty()
             ? cancelButtonText
             : Translation.Get(R.Messages.button_cancel);
         messageDialogControl.AddButton(cancelButtonText, evt =>
@@ -223,7 +225,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     }
 
     public MessageDialogControl CreateHelpDialogControl(
-        string dialogTitle,
+        Translation dialogTitle,
         Dictionary<string, string> titleToContentMap)
     {
         VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();

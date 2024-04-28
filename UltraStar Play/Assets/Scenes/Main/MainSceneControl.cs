@@ -227,7 +227,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
         quitGameDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_quitDialog_title));
         quitGameDialogControl.DialogClosedEventStream.Subscribe(_ => quitGameDialogControl = null);
-        quitGameDialogControl.Message = $"\n{Translation.Get(R.Messages.mainScene_quitDialog_message)}\n";
+        quitGameDialogControl.Message = Translation.Get(R.Messages.mainScene_quitDialog_message);
 
         quitGameDialogControl.AddButton(Translation.Get(R.Messages.no), _ => CloseQuitGameDialog());
         quitGameDialogControl.AddButton(Translation.Get(R.Messages.yes), _ => ApplicationUtils.QuitOrStopPlayMode());

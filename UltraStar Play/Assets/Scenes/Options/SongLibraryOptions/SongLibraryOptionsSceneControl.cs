@@ -300,18 +300,18 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         // Quick fix all buttons
         if (!errorQuickFixActions.IsNullOrEmpty())
         {
-            Button quickFixAllErrorsButton = CreateQuickFixAllButton("Auto-fix errors", errorQuickFixActions);
+            Button quickFixAllErrorsButton = CreateQuickFixAllButton(Translation.Get(R.Messages.options_songLibrary_action_quickFixSongIssueErrors), errorQuickFixActions);
             issuesDialogControl.AddButton(quickFixAllErrorsButton);
         }
 
         if (!warningQuickFixActions.IsNullOrEmpty())
         {
-            Button quickFixAllWarningsButton = CreateQuickFixAllButton("Auto-fix warnings", warningQuickFixActions);
+            Button quickFixAllWarningsButton = CreateQuickFixAllButton(Translation.Get(R.Messages.options_songLibrary_action_quickFixSongIssueWarnings), warningQuickFixActions);
             issuesDialogControl.AddButton(quickFixAllWarningsButton);
         }
 
         // Refresh button
-        issuesDialogControl.AddButton("Refresh Issues in Loaded Songs", _ =>
+        issuesDialogControl.AddButton(Translation.Get(R.Messages.options_songLibrary_refreshIssues), _ =>
         {
             songMetaManager.ReloadSongMetas();
             songIssueManager.ReloadSongIssues();
@@ -322,7 +322,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         });
     }
 
-    private Button CreateQuickFixAllButton(string title, List<QuickFixAction> quickFixActions)
+    private Button CreateQuickFixAllButton(Translation title, List<QuickFixAction> quickFixActions)
     {
         Button button = new();
         button.text = title;
@@ -331,7 +331,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         return button;
     }
 
-    private void CreateQuickFixAllDialog(string title, List<QuickFixAction> quickFixActions)
+    private void CreateQuickFixAllDialog(Translation title, List<QuickFixAction> quickFixActions)
     {
         MessageDialogControl quickFixAllDialog = uiManager.CreateDialogControl(title);
 
@@ -363,7 +363,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         }
 
         // Add buttons
-        quickFixAllDialog.AddButton("Auto-fix selected issues", _ =>
+        quickFixAllDialog.AddButton(Translation.Get(R.Messages.options_songLibrary_action_quickFixSongIssues), _ =>
         {
             List<QuickFixAction> selectedQuickFixActions = scrollView.Query<Toggle>()
                 .Where(toggle => toggle.value)
@@ -629,9 +629,10 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             return;
         }
 
-        deleteSongFolderDialog = uiManager.CreateDialogControl("Delete Song Folder");
+        deleteSongFolderDialog = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_songLibrary_action_deleteSongFolderDialog_title));
         deleteSongFolderDialog.DialogClosedEventStream.Subscribe(_ => deleteSongFolderDialog = null);
-        deleteSongFolderDialog.Message = $"Do you want to remove the song folder\n'{settings.SongDirs[indexInList]}'?\nNo files will be deleted.";
+        deleteSongFolderDialog.Message = Translation.Get(R.Messages.options_songLibrary_action_deleteSongFolderDialog_message,
+            "songFolder", settings.SongDirs[indexInList]);
 
         deleteSongFolderDialog.AddButton(Translation.Get(R.Messages.no), _ => deleteSongFolderDialog.CloseDialog());
         deleteSongFolderDialog.AddButton(Translation.Get(R.Messages.yes), _ =>

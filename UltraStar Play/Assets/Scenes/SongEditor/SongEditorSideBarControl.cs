@@ -259,8 +259,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
         helpDialogControl.AddButton(Translation.Get(R.Messages.viewMore),
             _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToSongEditor)));
-        helpDialogControl.AddButton("Video Tutorials",
-            _ => Application.OpenURL(Translation.Get(R.Messages.uri_songEditorVideoTutorials)));
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(helpDialogControl.DialogRootVisualElement);
     }

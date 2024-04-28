@@ -457,13 +457,12 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
         Debug.LogWarning($"Asking to accept host before loading URI into WebView. host: '{host}', uri: '{url}'");
 
-        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl("Open in Embedded Browser");
-        messageDialogControl.Message = $"The song file references an external website.\n"
-                                       + $"Do you want to open {host} in the embedded browser?";
+        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.webView_askToOpenWebsiteDialog_title));
+        messageDialogControl.Message = Translation.Get(R.Messages.webView_askToOpenWebsiteDialog_message);
 
         messageDialogControl.AddInformationMessage($"You can open the embedded browser anytime by pressing F8 or Ctrl+B.");
 
-        messageDialogControl.AddButton("Yes, do not ask again", _ =>
+        messageDialogControl.AddButton(Translation.Get(R.Messages.webView_askToOpenWebsiteDialog_confirm), _ =>
         {
             messageDialogControl.CloseDialog();
             settings.AcceptedWebViewHosts.Add(host);

@@ -468,7 +468,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .WithRootVisualElement(visualElement)
             .CreateAndInject<UploadWorkshopItemUiControl>();
 
-        uploadWorkshopItemDialogControl = uiManager.CreateDialogControl("Upload New Steam Workshop Item");
+        uploadWorkshopItemDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.steamWorkshop_uploadDialog_title));
         uploadWorkshopItemDialogControl.AddVisualElement(visualElement);
         uploadWorkshopItemDialogControl.DialogClosedEventStream
             .Subscribe(evt =>
@@ -476,9 +476,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 uploadWorkshopItemUiControl.Dispose();
                 uploadWorkshopItemDialogControl = null;
             });
-        uploadWorkshopItemDialogControl.AddButton("Learn More",
+        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.common_learnMore),
             _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToSteamWorkshop)));
-        uploadWorkshopItemDialogControl.AddButton("Publish Workshop Item",
+        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.steamWorkshop_action_publish),
             _ => uploadWorkshopItemUiControl.PublishWorkshopItem());
         uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.button_cancel),
             _ => uploadWorkshopItemDialogControl.CloseDialog());
@@ -511,9 +511,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     private void ShowPortAudioDeviceInfo()
     {
-        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl("PortAudio host APIs and devices");
-        messageDialogControl.AddButton("Copy CSV", _ => CopyPortAudioDeviceListCsv());
-        messageDialogControl.AddButton("Close", _ => messageDialogControl.CloseDialog());
+        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_development_portAudioDialog_title));
+        messageDialogControl.AddButton(Translation.Get(R.Messages.options_development_action_copyCsv), _ => CopyPortAudioDeviceListCsv());
+        messageDialogControl.AddButton(Translation.Get(R.Messages.close), _ => messageDialogControl.CloseDialog());
 
         Label defaultHostApiLabel = new Label();
         defaultHostApiLabel.text = $"Default host API: {PortAudioConversionUtils.GetDefaultHostApi()}";

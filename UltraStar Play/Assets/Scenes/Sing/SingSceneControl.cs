@@ -632,13 +632,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             .Select(it => it.Name)
             .ToList()
             .JoinWith(", ");
-        string title = Translation.Get(R.Messages.singScene_missingMicrophones_title);
-        string message = Translation.Get(R.Messages.singScene_missingMicrophones_message,
-            "playerNameCsv", playerNameCsv);
 
-        dialogControl = UiManager.Instance.CreateDialogControl(title);
+        dialogControl = UiManager.Instance.CreateDialogControl(Translation.Get(R.Messages.singScene_missingMicrophones_title));
         dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
-        dialogControl.Message = message;
+        dialogControl.Message = Translation.Get(R.Messages.singScene_missingMicrophones_message,
+            "playerNames", playerNameCsv);
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);
     }

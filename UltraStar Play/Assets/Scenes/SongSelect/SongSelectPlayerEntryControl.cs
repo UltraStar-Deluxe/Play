@@ -293,7 +293,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         micSelectionDialogControl = injector
             .WithRootVisualElement(dialog)
             .CreateAndInject<MicSelectionDialogControl>();
-        micSelectionDialogControl.Title = $"Select Microphone for {PlayerProfile.Name}";
+        micSelectionDialogControl.Title = Translation.Get(R.Messages.songSelectScene_selectMicDialog_title, "playerName", PlayerProfile.Name);
         micSelectionDialogControl.DialogClosedEventStream.Subscribe(_ =>
         {
             if (micSelectionDialogControl == null)

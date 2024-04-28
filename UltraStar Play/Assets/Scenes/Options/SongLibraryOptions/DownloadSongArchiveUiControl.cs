@@ -169,7 +169,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
             return;
         }
 
-        urlChooserDialogControl = uiManager.CreateDialogControl("Archive URL");
+        urlChooserDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_songLibrary_urlChooserDialog_title));
         urlChooserDialogControl.DialogClosedEventStream.Subscribe(_ => urlChooserDialogControl = null);
 
         // Create a button in the dialog for every archive URL

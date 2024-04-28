@@ -21,6 +21,7 @@ public static partial class R
         public static readonly string action_removeFromPlaylist = "action_removeFromPlaylist";
         public static readonly string action_restart = "action_restart";
         public static readonly string action_separateAudio = "action_separateAudio";
+        public static readonly string action_showAttribution = "action_showAttribution";
         public static readonly string action_showInfo = "action_showInfo";
         public static readonly string action_skipToNextLyrics = "action_skipToNextLyrics";
         public static readonly string action_toggleFavorites = "action_toggleFavorites";
@@ -62,7 +63,9 @@ public static partial class R
         public static readonly string button_toggleCoopMode = "button_toggleCoopMode";
         public static readonly string button_toggleMicTest = "button_toggleMicTest";
         public static readonly string close = "close";
+        public static readonly string common_details = "common_details";
         public static readonly string common_fps = "common_fps";
+        public static readonly string common_learnMore = "common_learnMore";
         public static readonly string companionApp_connectedTo = "companionApp_connectedTo";
         public static readonly string companionApp_connecting = "companionApp_connecting";
         public static readonly string companionApp_connectingWithFailedAttempts = "companionApp_connectingWithFailedAttempts";
@@ -157,7 +160,9 @@ public static partial class R
         public static readonly string options_delay_calibrate_timeout = "options_delay_calibrate_timeout";
         public static readonly string options_design_button = "options_design_button";
         public static readonly string options_design_title = "options_design_title";
+        public static readonly string options_development_action_copyCsv = "options_development_action_copyCsv";
         public static readonly string options_development_button = "options_development_button";
+        public static readonly string options_development_portAudioDialog_title = "options_development_portAudioDialog_title";
         public static readonly string options_development_title = "options_development_title";
         public static readonly string options_deviceNotConnected = "options_deviceNotConnected";
         public static readonly string options_downloadSongs_button = "options_downloadSongs_button";
@@ -175,7 +180,9 @@ public static partial class R
         public static readonly string options_micNotConnected = "options_micNotConnected";
         public static readonly string options_micPlaybackVolume = "options_micPlaybackVolume";
         public static readonly string options_mod_button = "options_mod_button";
+        public static readonly string options_mod_infoDialog_title = "options_mod_infoDialog_title";
         public static readonly string options_mod_securityWarning = "options_mod_securityWarning";
+        public static readonly string options_mod_settingsDialog_title = "options_mod_settingsDialog_title";
         public static readonly string options_mod_title = "options_mod_title";
         public static readonly string options_navigateFoldersInSongSelect = "options_navigateFoldersInSongSelect";
         public static readonly string options_noiseSuppression = "options_noiseSuppression";
@@ -214,6 +221,11 @@ public static partial class R
         public static readonly string options_songArchiveUrl_hint = "options_songArchiveUrl_hint";
         public static readonly string options_songBackgroundScaleMode = "options_songBackgroundScaleMode";
         public static readonly string options_songDataFetchType = "options_songDataFetchType";
+        public static readonly string options_songLibrary_action_deleteSongFolderDialog_message = "options_songLibrary_action_deleteSongFolderDialog_message";
+        public static readonly string options_songLibrary_action_deleteSongFolderDialog_title = "options_songLibrary_action_deleteSongFolderDialog_title";
+        public static readonly string options_songLibrary_action_quickFixSongIssueErrors = "options_songLibrary_action_quickFixSongIssueErrors";
+        public static readonly string options_songLibrary_action_quickFixSongIssues = "options_songLibrary_action_quickFixSongIssues";
+        public static readonly string options_songLibrary_action_quickFixSongIssueWarnings = "options_songLibrary_action_quickFixSongIssueWarnings";
         public static readonly string options_songLibrary_addInternalSongFolder = "options_songLibrary_addInternalSongFolder";
         public static readonly string options_songLibrary_addSdCardSongFolder = "options_songLibrary_addSdCardSongFolder";
         public static readonly string options_songLibrary_androidFolderHint = "options_songLibrary_androidFolderHint";
@@ -223,6 +235,7 @@ public static partial class R
         public static readonly string options_songLibrary_button = "options_songLibrary_button";
         public static readonly string options_songLibrary_downloadSongArchive_initialStatus = "options_songLibrary_downloadSongArchive_initialStatus";
         public static readonly string options_songLibrary_noSongFoldersFoundInfo = "options_songLibrary_noSongFoldersFoundInfo";
+        public static readonly string options_songLibrary_refreshIssues = "options_songLibrary_refreshIssues";
         public static readonly string options_songLibrary_songFolder_doesNotExist = "options_songLibrary_songFolder_doesNotExist";
         public static readonly string options_songLibrary_songFolder_duplicate = "options_songLibrary_songFolder_duplicate";
         public static readonly string options_songLibrary_songFolder_missingValue = "options_songLibrary_songFolder_missingValue";
@@ -234,6 +247,7 @@ public static partial class R
         public static readonly string options_songLibrary_songIssueDialog_title = "options_songLibrary_songIssueDialog_title";
         public static readonly string options_songLibrary_songIssueDialog_warnings = "options_songLibrary_songIssueDialog_warnings";
         public static readonly string options_songLibrary_title = "options_songLibrary_title";
+        public static readonly string options_songLibrary_urlChooserDialog_title = "options_songLibrary_urlChooserDialog_title";
         public static readonly string options_sound_button = "options_sound_button";
         public static readonly string options_sound_title = "options_sound_title";
         public static readonly string options_soundFont_path = "options_soundFont_path";
@@ -478,6 +492,8 @@ public static partial class R
         public static readonly string songSelectScene_advancedSearch = "songSelectScene_advancedSearch";
         public static readonly string songSelectScene_duetLegendLabel = "songSelectScene_duetLegendLabel";
         public static readonly string songSelectScene_editPlaylistDialog_title = "songSelectScene_editPlaylistDialog_title";
+        public static readonly string songSelectScene_failedToLoadSongDialog_message = "songSelectScene_failedToLoadSongDialog_message";
+        public static readonly string songSelectScene_failedToLoadSongDialog_title = "songSelectScene_failedToLoadSongDialog_title";
         public static readonly string songSelectScene_filter_duets = "songSelectScene_filter_duets";
         public static readonly string songSelectScene_filter_playlist = "songSelectScene_filter_playlist";
         public static readonly string songSelectScene_filterBy = "songSelectScene_filterBy";
@@ -485,9 +501,16 @@ public static partial class R
         public static readonly string songSelectScene_highscore = "songSelectScene_highscore";
         public static readonly string songSelectScene_loadingSongs_title = "songSelectScene_loadingSongs_title";
         public static readonly string songSelectScene_localTopScoresTitle = "songSelectScene_localTopScoresTitle";
+        public static readonly string songSelectScene_lyricsDialog_title = "songSelectScene_lyricsDialog_title";
+        public static readonly string songSelectScene_missingMicDialog_ignoreAndStart = "songSelectScene_missingMicDialog_ignoreAndStart";
+        public static readonly string songSelectScene_missingMicDialog_message = "songSelectScene_missingMicDialog_message";
+        public static readonly string songSelectScene_missingMicDialog_title = "songSelectScene_missingMicDialog_title";
         public static readonly string songSelectScene_noMicsFound = "songSelectScene_noMicsFound";
         public static readonly string songSelectScene_noPlayerSelected_message = "songSelectScene_noPlayerSelected_message";
         public static readonly string songSelectScene_noPlayerSelected_title = "songSelectScene_noPlayerSelected_title";
+        public static readonly string songSelectScene_noSingAlongDataDialog_createSingAlongData = "songSelectScene_noSingAlongDataDialog_createSingAlongData";
+        public static readonly string songSelectScene_noSingAlongDataDialog_message = "songSelectScene_noSingAlongDataDialog_message";
+        public static readonly string songSelectScene_noSingAlongDataDialog_title = "songSelectScene_noSingAlongDataDialog_title";
         public static readonly string songSelectScene_noSongsFound = "songSelectScene_noSongsFound";
         public static readonly string songSelectScene_noSongsFound_addSongFolderButton = "songSelectScene_noSongsFound_addSongFolderButton";
         public static readonly string songSelectScene_noSongsFound_downloadSongsButton = "songSelectScene_noSongsFound_downloadSongsButton";
@@ -497,12 +520,21 @@ public static partial class R
         public static readonly string songSelectScene_onlineTopScoresTitle = "songSelectScene_onlineTopScoresTitle";
         public static readonly string songSelectScene_order = "songSelectScene_order";
         public static readonly string songSelectScene_playlistDropdownTitle = "songSelectScene_playlistDropdownTitle";
+        public static readonly string songSelectScene_receivedSongSuggestionDialog_message = "songSelectScene_receivedSongSuggestionDialog_message";
+        public static readonly string songSelectScene_receivedSongSuggestionDialog_title = "songSelectScene_receivedSongSuggestionDialog_title";
+        public static readonly string songSelectScene_recreateSongDialog_message = "songSelectScene_recreateSongDialog_message";
+        public static readonly string songSelectScene_recreateSongDialog_recreateAndSave = "songSelectScene_recreateSongDialog_recreateAndSave";
+        public static readonly string songSelectScene_recreateSongDialog_recreateButDoNotSave = "songSelectScene_recreateSongDialog_recreateButDoNotSave";
+        public static readonly string songSelectScene_recreateSongDialog_title = "songSelectScene_recreateSongDialog_title";
         public static readonly string songSelectScene_searchExpressionEnabled = "songSelectScene_searchExpressionEnabled";
         public static readonly string songSelectScene_searchExpressionError = "songSelectScene_searchExpressionError";
         public static readonly string songSelectScene_searchExpressionToggle = "songSelectScene_searchExpressionToggle";
         public static readonly string songSelectScene_searchProperty_title = "songSelectScene_searchProperty_title";
         public static readonly string songSelectScene_searchPropertyDropdownTitle = "songSelectScene_searchPropertyDropdownTitle";
         public static readonly string songSelectScene_searchTextFieldHint = "songSelectScene_searchTextFieldHint";
+        public static readonly string songSelectScene_selectMicDialog_title = "songSelectScene_selectMicDialog_title";
+        public static readonly string songSelectScene_sendSongSuggestionDialog_message = "songSelectScene_sendSongSuggestionDialog_message";
+        public static readonly string songSelectScene_sendSongSuggestionDialog_title = "songSelectScene_sendSongSuggestionDialog_title";
         public static readonly string songSelectScene_songMenu_openSongEditor = "songSelectScene_songMenu_openSongEditor";
         public static readonly string songSelectScene_songMenu_openSongFolder = "songSelectScene_songMenu_openSongFolder";
         public static readonly string songSelectScene_songMenu_startButton = "songSelectScene_songMenu_startButton";
@@ -514,13 +546,17 @@ public static partial class R
         public static readonly string songSelectScene_timesClearedInfo = "songSelectScene_timesClearedInfo";
         public static readonly string songSelectScene_title = "songSelectScene_title";
         public static readonly string songSelectScene_toggleSongDetailsButton = "songSelectScene_toggleSongDetailsButton";
+        public static readonly string songSelectScene_useJokerDialog_message = "songSelectScene_useJokerDialog_message";
+        public static readonly string songSelectScene_useJokerDialog_title = "songSelectScene_useJokerDialog_title";
         public static readonly string songSelectScene_videoLegendLabel = "songSelectScene_videoLegendLabel";
         public static readonly string start = "start";
+        public static readonly string steamWorkshop_action_publish = "steamWorkshop_action_publish";
         public static readonly string steamWorkshop_item_contentFolder_hint = "steamWorkshop_item_contentFolder_hint";
         public static readonly string steamWorkshop_item_description = "steamWorkshop_item_description";
         public static readonly string steamWorkshop_item_previewImage_hint = "steamWorkshop_item_previewImage_hint";
         public static readonly string steamWorkshop_item_title = "steamWorkshop_item_title";
         public static readonly string steamWorkshop_updateTooltip = "steamWorkshop_updateTooltip";
+        public static readonly string steamWorkshop_uploadDialog_title = "steamWorkshop_uploadDialog_title";
         public static readonly string submit = "submit";
         public static readonly string timeUppercase = "timeUppercase";
         public static readonly string uri_howToAddAndCreateSongs = "uri_howToAddAndCreateSongs";
@@ -533,11 +569,13 @@ public static partial class R
         public static readonly string uri_howToSteamWorkshop = "uri_howToSteamWorkshop";
         public static readonly string uri_howToThemes = "uri_howToThemes";
         public static readonly string uri_logFiles = "uri_logFiles";
-        public static readonly string uri_songEditorVideoTutorials = "uri_songEditorVideoTutorials";
         public static readonly string validation_fileNotFound = "validation_fileNotFound";
         public static readonly string validation_missingValue = "validation_missingValue";
         public static readonly string viewMore = "viewMore";
         public static readonly string warning = "warning";
+        public static readonly string webView_askToOpenWebsiteDialog_confirm = "webView_askToOpenWebsiteDialog_confirm";
+        public static readonly string webView_askToOpenWebsiteDialog_message = "webView_askToOpenWebsiteDialog_message";
+        public static readonly string webView_askToOpenWebsiteDialog_title = "webView_askToOpenWebsiteDialog_title";
         public static readonly string yes = "yes";
     }
 }
