@@ -70,29 +70,32 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection
             () => settings.NavigateByFoldersInSongSelect,
             newValue => settings.NavigateByFoldersInSongSelect = newValue);
 
-        LabeledItemPickerControl<float> audioPreviewFadeInDurationChooserControl = new(previewFadeInDurationChooser, NumberUtils.CreateFloatList(0.5f, 5f, 0.5f));
+        LabeledItemPickerControl<float> audioPreviewFadeInDurationChooserControl = new(previewFadeInDurationChooser,
+            NumberUtils.CreateFloatList(0.5f, 5f, 0.5f),
+            newValue => Translation.Of($"{newValue.ToStringInvariantCulture("0.00")} s"));
         audioPreviewFadeInDurationChooserControl.Bind(() => settings.PreviewFadeInDurationInSeconds,
             newValue => settings.PreviewFadeInDurationInSeconds = newValue);
-        audioPreviewFadeInDurationChooserControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture("0.00")} s";
 
-        EnumItemPickerControl<ESongBackgroundScaleMode> songBackgroundScaleModePickerControl = new EnumItemPickerControl<ESongBackgroundScaleMode>(songBackgroundScaleModePicker);
+        EnumItemPickerControl<ESongBackgroundScaleMode> songBackgroundScaleModePickerControl = new(songBackgroundScaleModePicker);
         songBackgroundScaleModePickerControl.Bind(() => settings.SongBackgroundScaleMode,
             newValue => settings.SongBackgroundScaleMode = newValue);
-        songBackgroundScaleModePickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(ObjectUtils.NullableToString(item, ""));
 
-        LabeledItemPickerControl<float> sceneChangeDurationPickerControl = new(sceneChangeDurationPicker, NumberUtils.CreateFloatList(0, 0.9f, 0.05f));
+        LabeledItemPickerControl<float> sceneChangeDurationPickerControl = new(sceneChangeDurationPicker,
+            NumberUtils.CreateFloatList(0, 0.9f, 0.05f),
+            newValue => Translation.Of($"{newValue.ToStringInvariantCulture("0.00")} s"));
         sceneChangeDurationPickerControl.Bind(() => settings.SceneChangeDurationInSeconds,
                 newValue => settings.SceneChangeDurationInSeconds = newValue);
-        sceneChangeDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture("0.00")} s";
 
-        new LabeledItemPickerControl<int>(backgroundLightItemPicker, NumberUtils.CreateIntList(0, backgroundLightManager.BackgroundLightInstancesCount))
+        new LabeledItemPickerControl<int>(backgroundLightItemPicker,
+                NumberUtils.CreateIntList(0, backgroundLightManager.BackgroundLightInstancesCount),
+                item => Translation.Of(item.ToString()))
             .Bind(() => settings.BackgroundLightIndex,
                 newValue => settings.BackgroundLightIndex = newValue);
 
         // Load available themes:
         List<ThemeMeta> themeMetas = themeManager.GetThemeMetas();
-        LabeledItemPickerControl<ThemeMeta> themePickerControl = new(themePicker, themeMetas);
-        themePickerControl.GetLabelTextFunction = themeMeta => ThemeMetaUtils.GetDisplayName(themeMeta);
+        LabeledItemPickerControl<ThemeMeta> themePickerControl = new(themePicker, themeMetas,
+            themeMeta => Translation.Of(ThemeMetaUtils.GetDisplayName(themeMeta)));
         themePickerControl.Bind(
             () => themeManager.GetCurrentTheme(),
             newValue => ChangeTheme(newValue));

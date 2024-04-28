@@ -2,24 +2,6 @@
 
 public static class EDifficultyExtensions
 {
-    public static string TranslatedName(this EDifficulty difficulty)
-    {
-        string i18nCode = difficulty.GetI18NCode();
-        return Translation.Get(i18nCode);
-    }
-
-    private static string GetI18NCode(this EDifficulty difficulty)
-    {
-        switch (difficulty)
-        {
-            case EDifficulty.Easy: return R.Messages.difficulty_easy;
-            case EDifficulty.Medium: return R.Messages.difficulty_medium;
-            case EDifficulty.Hard: return R.Messages.difficulty_hard;
-            default:
-                throw new UnityException("Unhandled difficulty: " + difficulty);
-        }
-    }
-
     public static float GetRoundingDistanceInMidiNotes(this EDifficulty difficulty)
     {
         switch (difficulty)

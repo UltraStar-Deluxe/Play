@@ -35,8 +35,10 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
 
     private void InitWebcamPicker()
     {
-        devicePickerControl = new LabeledItemPickerControl<WebCamDevice>(devicePicker, webCamManager.GetWebCamDevices());
-        devicePickerControl.GetLabelTextFunction = device => device.name;
+        devicePickerControl = new LabeledItemPickerControl<WebCamDevice>(devicePicker, webCamManager.GetWebCamDevices(),
+            device => devicePickerControl.Items.Count <= 0
+                ? Translation.Get(R.Messages.options_webcam_noWebcamsAvailable)
+                : Translation.Of(device.name));
         if (!TryReSelectLastWebcam() && devicePickerControl.Items.Count > 0)
         {
             devicePickerControl.Selection.Value = devicePickerControl.Items[0];
@@ -54,7 +56,6 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
         else
         {
             Debug.Log("No webcam found");
-            devicePickerControl.GetLabelTextFunction = nullDevice => Translation.Get(R.Messages.options_webcam_noWebcamsAvailable);
             devicePickerControl.Items.Add(new WebCamDevice());
         }
     }

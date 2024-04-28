@@ -139,7 +139,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         playerProfileImagePickerControl.Bind(() => playerProfile.ImagePath,
                 newValue => playerProfile.ImagePath = newValue);
 
-        DifficultyPicker difficultyPicker = new DifficultyPicker(visualElement.Q<ItemPicker>(R.UxmlNames.difficultyPicker));
+        EnumItemPickerControl<EDifficulty> difficultyPicker = new(visualElement.Q<ItemPicker>(R.UxmlNames.difficultyPicker));
         difficultyPicker.Bind(() => playerProfile.Difficulty,
                 newValue => playerProfile.Difficulty = newValue);
 

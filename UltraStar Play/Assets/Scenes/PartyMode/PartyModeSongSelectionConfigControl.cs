@@ -52,16 +52,16 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
 
         // Playlist
         List<IPlaylist> playlists = playlistManager.GetPlaylists(true, true);
-        LabeledItemPickerControl<IPlaylist> playlistItemPickerControl = new(songSelectionPlaylistItemPicker, playlists);
-        playlistItemPickerControl.GetLabelTextFunction = newValue => playlistManager.GetPlaylistName(newValue);
+        LabeledItemPickerControl<IPlaylist> playlistItemPickerControl = new(songSelectionPlaylistItemPicker, playlists,
+            newValue => Translation.Of(playlistManager.GetPlaylistName(newValue)));
         playlistItemPickerControl.Bind(
             () => partyModeSettings.SongSelectionSettings.SongPoolPlaylist,
             newValue => partyModeSettings.SongSelectionSettings.SongPoolPlaylist = newValue);
 
         // Joker count
         LabeledItemPickerControl<int> jokerCountItemPickerControl =
-            new(songSelectionJokerCountItemPicker, new List<int> { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
-        jokerCountItemPickerControl.GetLabelTextFunction = newValue => newValue >= 0 ? newValue.ToString() : "Unlimited";
+            new(songSelectionJokerCountItemPicker, new List<int> { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+                newValue => newValue >= 0 ? Translation.Of(newValue.ToString()) : Translation.Get(R.Messages.options_unlimited));
         jokerCountItemPickerControl.Bind(
             () => partyModeSettings.SongSelectionSettings.JokerCount,
             newValue => partyModeSettings.SongSelectionSettings.JokerCount = newValue);

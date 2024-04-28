@@ -228,7 +228,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.MusicVolumePercent = (int) newValue);
 
         drawNoteLayerPickerControl = new(drawNoteLayerPicker);
-        drawNoteLayerPickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(ObjectUtils.NullableToString(item, ""));
         drawNoteLayerPickerControl.Bind(
             () => settings.SongEditorSettings.DrawNoteLayer,
             newValue => settings.SongEditorSettings.DrawNoteLayer = newValue);
@@ -262,8 +261,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         List<MicProfile> enabledAndConnectedMicProfiles = micProfiles
             .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
             .ToList();
-        micDeviceItemPickerControl = new(micDeviceItemPicker, enabledAndConnectedMicProfiles);
-        micDeviceItemPickerControl.GetLabelTextFunction = micProfile => micProfile != null ? micProfile.GetDisplayNameWithChannel() : "";
+        micDeviceItemPickerControl = new(micDeviceItemPicker, enabledAndConnectedMicProfiles,
+            micProfile => micProfile != null ? Translation.Of(micProfile.GetDisplayNameWithChannel()) : Translation.Empty);
         if (settings.SongEditorSettings.MicProfile == null
             || !settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager))
         {

@@ -218,7 +218,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         List<LogEventLevel> logEventLevels = EnumUtils.GetValuesAsList<LogEventLevel>()
             .OrderBy(logEventLevel => (int)logEventLevel)
             .ToList();
-        new LabeledItemPickerControl<LogEventLevel>(minimumLogLevelPicker, logEventLevels)
+        new EnumItemPickerControl<LogEventLevel>(minimumLogLevelPicker, logEventLevels)
             .Bind(() => settings.MinimumLogLevel,
                   newValue =>
                   {
@@ -379,9 +379,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
         // SongVideoPlayback
         new EnumItemPickerControl<ESongVideoPlayback>(songVideoPlaybackPicker)
-        {
-            GetLabelTextFunction = item => item.ToDisplayString()
-        }.Bind(() => settings.SongVideoPlayback,
+            .Bind(() => settings.SongVideoPlayback,
                 newValue => settings.SongVideoPlayback = newValue);
 
         // VLC
@@ -416,16 +414,17 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         portAudioDeviceInfoButton.RegisterCallbackButtonTriggered(_ => ShowPortAudioDeviceInfo());
 
         // PortAudio host API
-        new LabeledItemPickerControl<PortAudioHostApi>(portAudioHostApiPicker, GetAvailablePortAudioHostApis())
+        new EnumItemPickerControl<PortAudioHostApi>(portAudioHostApiPicker, GetAvailablePortAudioHostApis())
             .Bind(() => settings.PortAudioHostApi,
                 newValue => settings.PortAudioHostApi = newValue);
 
         // PortAudio output device
-        LabeledItemPickerControl<string> portAudioOutputDevicePickerControl = new LabeledItemPickerControl<string>(portAudioOutputDevicePicker, GetAvailablePortAudioOutputDeviceNames());
+        LabeledItemPickerControl<string> portAudioOutputDevicePickerControl = new(portAudioOutputDevicePicker,
+            GetAvailablePortAudioOutputDeviceNames(),
+            item => item.IsNullOrEmpty() ? Translation.Get(R.Messages.common_default) : Translation.Of(item));
         portAudioOutputDevicePickerControl.Bind(
             () => settings.PortAudioOutputDeviceName,
             newValue => settings.PortAudioOutputDeviceName = newValue);
-        portAudioOutputDevicePickerControl.GetLabelTextFunction = item => item.IsNullOrEmpty() ? "Default" : item;
 
         settings.ObserveEveryValueChanged(it => it.PortAudioHostApi)
             .Subscribe(newValue => portAudioOutputDevicePickerControl.Items = GetAvailablePortAudioOutputDeviceNames())

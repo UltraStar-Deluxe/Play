@@ -1,6 +1,6 @@
 ﻿public static class NoteDisplayModeExtensions
 {
-    public static string GetTranslation(this ENoteDisplayMode noteDisplayMode)
+    public static Translation GetTranslation(this ENoteDisplayMode noteDisplayMode)
     {
         switch (noteDisplayMode)
         {
@@ -11,7 +11,7 @@
             case ENoteDisplayMode.None:
                 return Translation.Get(R.Messages.options_noteDisplayMode_none);
             default:
-                return noteDisplayMode.ToString();
+                return Translation.Of(noteDisplayMode.ToString());
         }
     }
 }

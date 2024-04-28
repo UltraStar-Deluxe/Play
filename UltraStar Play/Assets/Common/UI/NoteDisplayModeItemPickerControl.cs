@@ -1,4 +1,4 @@
-﻿public class NoteDisplayModeItemPickerControl : TranslatedLabeledItemPickerControl<ENoteDisplayMode>
+﻿public class NoteDisplayModeItemPickerControl : LabeledItemPickerControl<ENoteDisplayMode>
 {
     public NoteDisplayModeItemPickerControl(ItemPicker itemPicker)
         : base(itemPicker,

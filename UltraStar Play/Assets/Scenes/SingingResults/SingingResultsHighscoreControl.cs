@@ -77,7 +77,7 @@ public class SingingResultsHighscoreControl : INeedInjection
 
     private void UpdateHighScores()
     {
-        currentDifficultyLabel.text = currentDifficulty.TranslatedName();
+        currentDifficultyLabel.SetTranslatedText(Translation.Get(currentDifficulty));
 
         highscoreEntryList.Clear();
 

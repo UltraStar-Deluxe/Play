@@ -43,17 +43,7 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
             fullscreenModePicker.HideByDisplay();
         }
 
-        List<int> fpsOptions = new() { -1, 30, 60 };
-        LabeledItemPickerControl<int> targetFpsPickerControl = new(targetFpsPicker, fpsOptions);
-        targetFpsPickerControl.GetLabelTextFunction = newValue =>
-        {
-            if (newValue <= 0)
-            {
-                return Translation.Get(R.Messages.options_sampleRate_auto);
-            }
-
-            return newValue.ToString();
-        };
+        TargetFpsItemPickerControl targetFpsPickerControl = new(targetFpsPicker);
         targetFpsPickerControl.Bind(() => settings.TargetFps,
                 newValue => settings.TargetFps = newValue);
     }

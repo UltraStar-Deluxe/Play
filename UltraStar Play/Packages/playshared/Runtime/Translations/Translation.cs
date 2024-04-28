@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using ProTrans;
+using UnityEditor.Graphs;
 using UnityEngine;
 
 public readonly struct Translation
@@ -27,6 +29,27 @@ public readonly struct Translation
     public static Translation Of(string value)
     {
         return new Translation(value);
+    }
+
+    public static Translation Get<T>(T value) where T : Enum
+    {
+        string typeName = typeof(T).Name;
+        string valueName = value.ToString();
+
+        // For example, ENoteDisplayMode.SentenceBySentence has a translation key enum_noteDisplayMode_sentenceBySentence
+        if (typeName.StartsWith("E")
+            && TryGet($"enum_{typeName.Substring(1)}_{valueName}", new Dictionary<string, string>(), out Translation translationResult1))
+        {
+            return translationResult1;
+        }
+
+        if (TryGet($"enum_{typeName.Substring(1)}_{valueName}", new Dictionary<string, string>(), out Translation translationResult2))
+        {
+            return translationResult2;
+        }
+
+        Debug.LogWarning($"Missing translation for enum {typeName}.{valueName}");
+        return Translation.Of(StringUtils.ToTitleCase(valueName));
     }
 
     public static Translation Get(string key, params object[] placeholderStrings)

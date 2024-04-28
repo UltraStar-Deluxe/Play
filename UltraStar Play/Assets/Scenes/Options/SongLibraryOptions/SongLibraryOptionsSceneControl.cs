@@ -107,12 +107,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             newValue => settings.SearchMidiFilesWithLyrics = newValue);
 
         new EnumItemPickerControl<EFetchType>(songDataFetchTypeChooser)
-        {
-            GetLabelTextFunction = item => item == EFetchType.Eager
-                ? "Upfront"
-                : "On-demand",
-        }.Bind(() => settings.SongDataFetchType,
-            newValue => settings.SongDataFetchType = newValue);
+            .Bind(() => settings.SongDataFetchType,
+                newValue => settings.SongDataFetchType = newValue);
 
         UpdateTranslation();
 
@@ -531,7 +527,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 #endif
     }
 
-    public void UpdateTranslation()
+    private void UpdateTranslation()
     {
         androidSongFolderHintLabel.text = Translation.Get(R.Messages.options_songLibrary_androidFolderHint,
             // AppSpecificStorageRelativePath is the same for internal memory and sd card.

@@ -644,11 +644,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         if (settings.ScoreMode == EScoreMode.None)
         {
-            currentDifficultyLabel.text = Translation.Get(R.Messages.difficulty_noScores);
+            currentDifficultyLabel.SetTranslatedText(Translation.Get(R.Messages.difficulty_noScores));
         }
         else
         {
-            currentDifficultyLabel.text = settings.Difficulty.TranslatedName();
+            currentDifficultyLabel.SetTranslatedText(Translation.Get(settings.Difficulty));
         }
     }
 

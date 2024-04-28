@@ -63,6 +63,7 @@ public static partial class R
         public static readonly string button_toggleCoopMode = "button_toggleCoopMode";
         public static readonly string button_toggleMicTest = "button_toggleMicTest";
         public static readonly string close = "close";
+        public static readonly string common_default = "common_default";
         public static readonly string common_details = "common_details";
         public static readonly string common_fps = "common_fps";
         public static readonly string common_learnMore = "common_learnMore";
@@ -80,14 +81,17 @@ public static partial class R
         public static readonly string companionApp_visualizeMicInput = "companionApp_visualizeMicInput";
         public static readonly string devMode = "devMode";
         public static readonly string difficulty = "difficulty";
-        public static readonly string difficulty_easy = "difficulty_easy";
-        public static readonly string difficulty_hard = "difficulty_hard";
-        public static readonly string difficulty_medium = "difficulty_medium";
         public static readonly string difficulty_noScores = "difficulty_noScores";
         public static readonly string enabled = "enabled";
+        public static readonly string enum_difficulty_easy = "enum_difficulty_easy";
+        public static readonly string enum_difficulty_hard = "enum_difficulty_hard";
+        public static readonly string enum_difficulty_medium = "enum_difficulty_medium";
+        public static readonly string enum_fetchType_eager = "enum_fetchType_eager";
+        public static readonly string enum_fetchType_lazy = "enum_fetchType_lazy";
         public static readonly string enum_scoreMode_commonAverage = "enum_scoreMode_commonAverage";
         public static readonly string enum_scoreMode_individual = "enum_scoreMode_individual";
         public static readonly string enum_scoreMode_none = "enum_scoreMode_none";
+        public static readonly string enum_songVideoPlayback_disabledInSongSelectAndSing = "enum_songVideoPlayback_disabledInSongSelectAndSing";
         public static readonly string exit = "exit";
         public static readonly string graph_button_label = "graph_button_label";
         public static readonly string graph_legend_good = "graph_legend_good";
@@ -256,6 +260,7 @@ public static partial class R
         public static readonly string options_soundFont_test_tooltip = "options_soundFont_test_tooltip";
         public static readonly string options_targetFps = "options_targetFps";
         public static readonly string options_theme = "options_theme";
+        public static readonly string options_unlimited = "options_unlimited";
         public static readonly string options_useForSinging = "options_useForSinging";
         public static readonly string options_useImageAsCursor = "options_useImageAsCursor";
         public static readonly string options_usePortAudio = "options_usePortAudio";
