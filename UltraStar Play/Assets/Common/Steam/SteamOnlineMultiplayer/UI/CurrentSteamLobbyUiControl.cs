@@ -54,9 +54,9 @@ namespace SteamOnlineMultiplayer
 
         public void OnInjectionFinished()
         {
-            connectedClientsListTitle.text = "Connected Players";
+            connectedClientsListTitle.SetTranslatedText(Translation.Get(R.Messages.onlineGame_lobby_connectedClients));
             connectedClientsListScrollView.Clear();
-            SetLobbyInfo("");
+            SetLobbyInfo(Translation.Empty);
 
             disconnectOnlineGameButton.RegisterCallbackButtonTriggered(_ => steamLobbyManager.LeaveCurrentLobby());
 
@@ -80,10 +80,10 @@ namespace SteamOnlineMultiplayer
             UpdateLobbyMemberList();
         }
 
-        private void SetLobbyInfo(string text)
+        private void SetLobbyInfo(Translation text)
         {
-            lobbyInfoLabel.text = text;
-            lobbyInfoContainer.SetVisibleByDisplay(!text.IsNullOrEmpty());
+            lobbyInfoLabel.SetTranslatedText(text);
+            lobbyInfoContainer.SetVisibleByDisplay(!text.Value.IsNullOrEmpty());
         }
 
         private void OnLobbyMembersChanged()
@@ -96,16 +96,17 @@ namespace SteamOnlineMultiplayer
             SteamLobby lobby = steamLobbyManager.CurrentSteamLobby;
             if (lobby != null)
             {
-                string passwordInfo = SteamLobbyManager.IsNonEmptyPassword(lobby.Password)
-                    ? $"Online game is hidden with password: {lobby.Password}"
-                    : "";
+                Translation passwordInfo = SteamLobbyManager.IsNonEmptyPassword(lobby.Password)
+                    ? Translation.Get(R.Messages.onlineGame_lobby_hiddenByPasswordHint, "lobbyPassword", lobby.Password)
+                    : Translation.Empty;
                 SetLobbyInfo(passwordInfo);
-                connectedClientsListTitle.text = $"Members of \"{lobby.Name}\"";
+                connectedClientsListTitle.SetTranslatedText(Translation.Get(R.Messages.onlineGame_lobby_title,
+                    "lobbyName", lobby.Name));
                 UpdateLobbyMemberList();
             }
             else
             {
-                connectedClientsListTitle.text = "Not connected";
+                connectedClientsListTitle.SetTranslatedText(Translation.Get(R.Messages.onlineGame_lobby_list_title_notConnected));
                 UpdateLobbyMemberList();
             }
         }

@@ -128,9 +128,10 @@ public static partial class R
         public const string CreditsEntryUi = "CreditsEntryUi";
         public const string creditsIcon = "creditsIcon";
         public const string creditsSummaryLabel = "creditsSummaryLabel";
-        public const string currentConnectionControlsContainer = "currentConnectionControlsContainer";
         public const string currentDifficultyLabel = "currentDifficultyLabel";
         public const string currentNetcodeLobbyUiRoot = "currentNetcodeLobbyUiRoot";
+        public const string currentOnlineGameControlsContainer = "currentOnlineGameControlsContainer";
+        public const string currentOnlineGameTabButton = "currentOnlineGameTabButton";
         public const string currentSentenceContainer = "currentSentenceContainer";
         public const string currentSteamLobbyUiRoot = "currentSteamLobbyUiRoot";
         public const string customEventSystemOptInOnAndroidToggle = "customEventSystemOptInOnAndroidToggle";

@@ -17,9 +17,10 @@ HashSetChipsComboControl`1, *, *
 BoolModSettingControl, *, *
 ButtonModSettingControl, *, *
 DoubleModSettingControl, *, *
-EnumModSettingControl, *, *
+EnumModSettingControl`1, *, *
 IntModSettingControl, *, *
 StringModSettingControl, *, *
 RuntimeUiInspectionManager, *, *
 InputLegendControl, *, *
 LabelWithSpacer+UxmlTraits, *, *
+LoadingSceneControl, *, *

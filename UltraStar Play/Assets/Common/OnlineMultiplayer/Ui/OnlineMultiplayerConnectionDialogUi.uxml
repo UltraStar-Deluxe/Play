@@ -5,6 +5,7 @@
                 <ui:VisualElement name="tabGroup" class="child-mr-1 mr-auto" style="align-items: flex-start; flex-direction: row;">
                     <ToggleButton text="$onlineGame_join" parse-escape-sequences="true" display-tooltip-when-elided="true" name="joinOnlineGameTabButton" />
                     <ToggleButton text="$onlineGame_host" parse-escape-sequences="true" display-tooltip-when-elided="true" name="hostOnlineGameTabButton" />
+                    <ToggleButton text="$onlineGame_current" parse-escape-sequences="true" display-tooltip-when-elided="true" name="currentOnlineGameTabButton" />
                 </ui:VisualElement>
                 <ui:Button text="Backend: Steam" parse-escape-sequences="true" display-tooltip-when-elided="true" name="toggleOnlineMultiplayerBackendButton" class="mr-1" />
                 <ui:Button display-tooltip-when-elided="true" name="defaultCloseDialogButton" class="circle transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">
@@ -18,7 +19,7 @@
                 <ui:VisualElement name="hostOnlineGameControlsContainer">
                     <ui:Label tabindex="-1" text="Host Lobby Controls" parse-escape-sequences="true" display-tooltip-when-elided="true" name="dummyHostLobbyControls" />
                 </ui:VisualElement>
-                <ui:VisualElement name="currentConnectionControlsContainer">
+                <ui:VisualElement name="currentOnlineGameControlsContainer">
                     <ui:Label tabindex="-1" text="Current Lobby Controls" parse-escape-sequences="true" display-tooltip-when-elided="true" name="dummyCurrentLobbyControls" />
                 </ui:VisualElement>
             </ui:ScrollView>

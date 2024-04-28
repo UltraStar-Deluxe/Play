@@ -17,14 +17,17 @@ namespace SteamOnlineMultiplayer
         [Inject(UxmlName = R.UxmlNames.joinOnlineGameTabButton)]
         private ToggleButton joinOnlineGameTabButton;
 
+        [Inject(UxmlName = R.UxmlNames.currentOnlineGameTabButton)]
+        private ToggleButton currentOnlineGameTabButton;
+
         [Inject(UxmlName = R.UxmlNames.hostOnlineGameControlsContainer)]
         private VisualElement hostOnlineGameControlsContainer;
 
         [Inject(UxmlName = R.UxmlNames.joinOnlineGameControlsContainer)]
         private VisualElement joinOnlineGameControlsContainer;
 
-        [Inject(UxmlName = R.UxmlNames.currentConnectionControlsContainer)]
-        private VisualElement currentConnectionControlsContainer;
+        [Inject(UxmlName = R.UxmlNames.currentOnlineGameControlsContainer)]
+        private VisualElement currentOnlineGameControlsContainer;
 
         [Inject(UxmlName = R.UxmlNames.toggleOnlineMultiplayerBackendButton)]
         private Button toggleOnlineMultiplayerBackendButton;
@@ -51,7 +54,8 @@ namespace SteamOnlineMultiplayer
         {
             base.OnInjectionFinished();
 
-            toggleOnlineMultiplayerBackendButton.text = $"Backend: {settings.EOnlineMultiplayerBackend}";
+            toggleOnlineMultiplayerBackendButton.SetTranslatedText(Translation.Get(R.Messages.onlineGame_backendWithName,
+                "name", Translation.Get(settings.EOnlineMultiplayerBackend)));
             toggleOnlineMultiplayerBackendButton.RegisterCallbackButtonTriggered(_ => ToggleOnlineMultiplayerBackend());
 
             hostLobbyUiControl = onlineMultiplayerManager.BackendManager.CurrentBackend.HostLobbyUiControlFactory();
@@ -67,8 +71,8 @@ namespace SteamOnlineMultiplayer
             joinOnlineGameControlsContainer.Add(joinLobbyControls);
 
             VisualElement currentLobbyControls = currentLobbyUiControl.CreateVisualElement();
-            currentConnectionControlsContainer.Clear();
-            currentConnectionControlsContainer.Add(currentLobbyControls);
+            currentOnlineGameControlsContainer.Clear();
+            currentOnlineGameControlsContainer.Add(currentLobbyControls);
 
             injector
                 .WithRootVisualElement(hostLobbyControls)
@@ -82,11 +86,7 @@ namespace SteamOnlineMultiplayer
 
             tabGroupControl.AddTabGroupButton(hostOnlineGameTabButton, hostOnlineGameControlsContainer);
             tabGroupControl.AddTabGroupButton(joinOnlineGameTabButton, joinOnlineGameControlsContainer);
-
-            ToggleButton showCurrentConnectionsTabButton = new ToggleButton();
-            showCurrentConnectionsTabButton.name = "showCurrentConnectionsTabButton";
-            showCurrentConnectionsTabButton.text = "Current Connection";
-            tabGroupControl.AddTabGroupButton(showCurrentConnectionsTabButton, currentConnectionControlsContainer);
+            tabGroupControl.AddTabGroupButton(currentOnlineGameTabButton, currentOnlineGameControlsContainer);
             UpdateVisibleContainer();
 
             disposables.Add(networkManager
@@ -119,15 +119,17 @@ namespace SteamOnlineMultiplayer
         {
             if (networkManager.IsServer || networkManager.IsClient)
             {
-                tabGroupControl.ShowContainer(currentConnectionControlsContainer);
+                tabGroupControl.ShowContainer(currentOnlineGameControlsContainer);
                 hostOnlineGameTabButton.HideByDisplay();
                 joinOnlineGameTabButton.HideByDisplay();
+                currentOnlineGameTabButton.ShowByDisplay();
             }
             else
             {
                 tabGroupControl.ShowContainer(joinOnlineGameControlsContainer);
                 hostOnlineGameTabButton.ShowByDisplay();
                 joinOnlineGameTabButton.ShowByDisplay();
+                currentOnlineGameTabButton.HideByDisplay();
             }
         }
     }

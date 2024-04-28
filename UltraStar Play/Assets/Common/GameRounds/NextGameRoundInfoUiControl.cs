@@ -41,8 +41,8 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
         List<SongMeta> songMetas = songQueueEntryDtos
             .Select(it => DtoConverter.FromDto(it.SongDto, songMetaManager))
             .ToList();
-        nextGameRoundSongInfoLabel.text = Translation.Get(R.Messages.songQueue_nextEntry,
-            "value", SongMetaUtils.GetMedleyName(songMetas));
+        nextGameRoundSongInfoLabel.SetTranslatedText(Translation.Get(R.Messages.songQueue_nextEntry,
+            "value", SongMetaUtils.GetMedleyName(songMetas)));
 
         nextGameRoundPlayerEntryList.RemoveTemplateContainers();
         SongQueueEntryDto songQueueEntryDto = songQueueEntryDtos.FirstOrDefault();
@@ -52,7 +52,7 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
             nextGameRoundPlayerEntryList.Add(playerEntryVisualElement);
 
             Label playerNameLabel = playerEntryVisualElement.Q<Label>(R.UxmlNames.nextGameRoundPlayerEntryLabel);
-            playerNameLabel.text = playerProfileName;
+            playerNameLabel.SetTranslatedText(Translation.Of(playerProfileName));
 
             VisualElement micVisualElement = playerEntryVisualElement.Q<VisualElement>(R.UxmlNames.nextGameRoundPlayerEntryMicImage);
             if (songQueueEntryDto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap.TryGetValue(playerProfileName, out MicProfileDto micProfileDto))

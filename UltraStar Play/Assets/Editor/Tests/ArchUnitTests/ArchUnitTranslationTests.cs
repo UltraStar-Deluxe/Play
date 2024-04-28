@@ -32,16 +32,17 @@ public class ArchUnitTranslationTests
      * Instead, a custom extension method that takes a translation result as input should be used.
      */
     [Test]
+    [TestCase("playsharedui")]
+    [TestCase("Common")]  // Common takes pretty long to run. The other assemblies finish the test faster.
+    [TestCase("Scenes")]
+    [TestCase("SongEditorScene")]
     // [Ignore("Not all label assignments refactored yet to use a translation object via custom extension method")]
-    public void UiLabelAssignmentsAreTranslated()
+    public void UiLabelAssignmentsAreTranslated(string assemblyName)
     {
         LoadIgnoredUntranslatedAssignments();
         Architecture architecture = ArchUnitTestUtils.LoadArchitectureByAssemblyNames(new List<string>()
         {
-            "playsharedui",
-            // "Common", // Common takes pretty long to run. The other assemblies finish the test faster.
-            // "Scenes",
-            // "SongEditorScene",
+            assemblyName
         });
 
         Types()

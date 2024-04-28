@@ -132,8 +132,10 @@ public static partial class R
         public static readonly string new_ = "new";
         public static readonly string no = "no";
         public static readonly string onlineGame_backendWithName = "onlineGame_backendWithName";
+        public static readonly string onlineGame_current = "onlineGame_current";
         public static readonly string onlineGame_host = "onlineGame_host";
         public static readonly string onlineGame_join = "onlineGame_join";
+        public static readonly string onlineGame_lobby_connectedClients = "onlineGame_lobby_connectedClients";
         public static readonly string onlineGame_lobby_hidden = "onlineGame_lobby_hidden";
         public static readonly string onlineGame_lobby_hiddenByPasswordHint = "onlineGame_lobby_hiddenByPasswordHint";
         public static readonly string onlineGame_lobby_host = "onlineGame_lobby_host";
@@ -143,7 +145,10 @@ public static partial class R
         public static readonly string onlineGame_lobby_joinDirectly = "onlineGame_lobby_joinDirectly";
         public static readonly string onlineGame_lobby_leave = "onlineGame_lobby_leave";
         public static readonly string onlineGame_lobby_list_title = "onlineGame_lobby_list_title";
+        public static readonly string onlineGame_lobby_list_title_notConnected = "onlineGame_lobby_list_title_notConnected";
         public static readonly string onlineGame_lobby_name = "onlineGame_lobby_name";
+        public static readonly string onlineGame_lobby_notFound_tryOtherPasswordHint = "onlineGame_lobby_notFound_tryOtherPasswordHint";
+        public static readonly string onlineGame_lobby_notFound_tryPasswordHint = "onlineGame_lobby_notFound_tryPasswordHint";
         public static readonly string onlineGame_lobby_password = "onlineGame_lobby_password";
         public static readonly string onlineGame_lobby_port = "onlineGame_lobby_port";
         public static readonly string onlineGame_lobby_title = "onlineGame_lobby_title";
@@ -571,6 +576,14 @@ public static partial class R
         public static readonly string steamWorkshop_item_previewImage_hint = "steamWorkshop_item_previewImage_hint";
         public static readonly string steamWorkshop_item_title = "steamWorkshop_item_title";
         public static readonly string steamWorkshop_updateTooltip = "steamWorkshop_updateTooltip";
+        public static readonly string steamWorkshop_uploadDialog_exception_notSuccessful = "steamWorkshop_uploadDialog_exception_notSuccessful";
+        public static readonly string steamWorkshop_uploadDialog_status_contentFolderDoesNotExist = "steamWorkshop_uploadDialog_status_contentFolderDoesNotExist";
+        public static readonly string steamWorkshop_uploadDialog_status_contentFolders = "steamWorkshop_uploadDialog_status_contentFolders";
+        public static readonly string steamWorkshop_uploadDialog_status_contentFoldersNotFound = "steamWorkshop_uploadDialog_status_contentFoldersNotFound";
+        public static readonly string steamWorkshop_uploadDialog_status_downloading = "steamWorkshop_uploadDialog_status_downloading";
+        public static readonly string steamWorkshop_uploadDialog_status_error = "steamWorkshop_uploadDialog_status_error";
+        public static readonly string steamWorkshop_uploadDialog_status_success = "steamWorkshop_uploadDialog_status_success";
+        public static readonly string steamWorkshop_uploadDialog_status_uploading = "steamWorkshop_uploadDialog_status_uploading";
         public static readonly string steamWorkshop_uploadDialog_title = "steamWorkshop_uploadDialog_title";
         public static readonly string submit = "submit";
         public static readonly string timeUppercase = "timeUppercase";

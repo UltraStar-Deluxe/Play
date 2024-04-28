@@ -171,7 +171,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         AccordionItem accordionItem = new AccordionItem();
         accordionItem.SetTranslatedTitle(Translation.Get(R.Messages.common_details));
         Label errorMessageLabel = new();
-        errorMessageLabel.text = errorMessage;
+        errorMessageLabel.SetTranslatedText(errorMessage);
         accordionItem.Add(errorMessageLabel);
         accordionItem.HideAccordionContent();
         messageDialogControl.AddVisualElement(accordionItem);

@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using CommonOnlineMultiplayer;
 using Steamworks.Data;
 using UniInject;
@@ -114,7 +113,8 @@ namespace SteamOnlineMultiplayer
                 foreach (Lobby lobby in lobbies)
                 {
                     Button joinLobbyButton = new Button();
-                    joinLobbyButton.text = $"Join \"{lobby.GetName()}\", members: {lobby.MemberCount}";
+                    joinLobbyButton.SetTranslatedText(Translation.Get(R.Messages.onlineGame_lobby_join,
+                        "lobbyName", lobby.GetName()));
                     joinLobbyButton.RegisterCallbackButtonTriggered(_ => JoinGameOnSteam(lobby));
                     hostedGameList.Add(joinLobbyButton);
                 }
@@ -124,11 +124,11 @@ namespace SteamOnlineMultiplayer
                 hostedGameList.Add(new Label());
                 if (JoinGamePassword.IsNullOrEmpty())
                 {
-                    hostedGameList.Add(new Label("No online games found.\nTry to enter a password to search hidden games."));
+                    hostedGameList.Add(new Label(Translation.Get(R.Messages.onlineGame_lobby_notFound_tryPasswordHint)));
                 }
                 else
                 {
-                    hostedGameList.Add(new Label("No online games found.\nTry a different password to search hidden games."));
+                    hostedGameList.Add(new Label(Translation.Get(R.Messages.onlineGame_lobby_notFound_tryOtherPasswordHint)));
                 }
             }
 
