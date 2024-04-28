@@ -24,20 +24,21 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
     [Inject]
     private JobManager jobManager;
-    
+
     [Inject]
     private PitchDetectionManager pitchDetectionManager;
 
     [Inject]
     private SongEditorMidiFileImporter songEditorMidiFileImporter;
-    
+
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
     private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
 
     public void CreateNotesUsingBasicPitch(bool notify)
     {
         string fileName = Path.GetFileName(songMeta.Audio);
-        Job pitchDetectionJob = JobManager.CreateAndAddJob($"Pitch detection of '{fileName}'");
+        Job pitchDetectionJob = JobManager.CreateAndAddJob(Translation.Get(R.Messages.job_pitchDetectionWithName,
+            "name", fileName));
         IObservable<BasicPitchDetectionResult> pitchDetectionObservable = pitchDetectionManager.ProcessSongMetaAsObservable(songMeta, pitchDetectionJob);
 
         pitchDetectionObservable
@@ -50,7 +51,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
             {
                 pitchDetectionJob.SetResult(EJobResult.Ok);
                 ImportBasicPitchMidiFile(result.MidiFilePath);
-                
+
                 if (notify)
                 {
                     songMetaChangeEventStream.OnNext(new NotesChangedEvent());

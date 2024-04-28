@@ -139,7 +139,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
         IReadOnlyCollection<SongMeta> songMetas = songMetaManager.GetSongMetas();
         CancellationDisposable cancellationDisposable = new();
 
-        Job job = JobManager.CreateAndAddJob("Search issues in songs");
+        Job job = JobManager.CreateAndAddJob(Translation.Get(R.Messages.job_searchSongIssues));
         job.OnCancel = () => cancellationDisposable.Dispose();
         job.SetStatus(EJobStatus.Running);
 

@@ -22,7 +22,7 @@ public static class PitchDetectionUtils
         string fileName = Path.GetFileName(songMeta.Audio);
         if (pitchDetectionJob == null)
         {
-            pitchDetectionJob = JobManager.CreateAndAddJob($"Pitch detection of '{fileName}'");
+            pitchDetectionJob = JobManager.CreateAndAddJob(Translation.Get(R.Messages.job_pitchDetectionWithName, "name", fileName));
         }
 
         return pitchDetectionManager.ProcessSongMetaAsObservable(songMeta, pitchDetectionJob)

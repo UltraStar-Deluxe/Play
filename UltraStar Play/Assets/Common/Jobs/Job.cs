@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Job
 {
-	public string Name { get; private set; }
+	public Translation Name { get; private set; }
 
     public ReactiveProperty<EJobStatus> Status { get; private set; } = new(EJobStatus.Pending);
     public ReactiveProperty<EJobResult> Result { get; private set; }  = new (EJobResult.Pending);
@@ -83,7 +83,7 @@ public class Job
     public ReactiveProperty<bool> IsCanceled { get; private set; } = new(false);
     public ReactiveProperty<bool> IsCancelable { get; private set; } = new(false);
 
-    public Job(string name, Job parentJob = null)
+    public Job(Translation name, Job parentJob = null)
     {
         Name = name;
         if (parentJob != null)

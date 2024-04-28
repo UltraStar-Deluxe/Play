@@ -65,10 +65,10 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         }
         Debug.Log($"Creating sing-along data song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
 
-        Job processSongJob = new($"Create sing-along version of '{Path.GetFileName(songMeta.Audio)}'");
-        Job audioSeparationJob = new("Vocals isolation", processSongJob);
-        Job speechRecognitionJob = new("Speech recognition", processSongJob);
-        Job pitchDetectionJob = new("Pitch detection", processSongJob);
+        Job processSongJob = new(Translation.Get(R.Messages.job_createSingAlongDataWithName, "name", Path.GetFileName(songMeta.Audio)));
+        Job audioSeparationJob = new(Translation.Get(R.Messages.job_audioSeparation), processSongJob);
+        Job speechRecognitionJob = new(Translation.Get(R.Messages.job_speechRecognition), processSongJob);
+        Job pitchDetectionJob = new(Translation.Get(R.Messages.job_pitchDetection), processSongJob);
 
         lastProcessSongJob = processSongJob;
 

@@ -116,7 +116,7 @@ public static class SpeechRecognitionUtils
         }
 
         // Create UI job
-        Job loadSpeechRecognizerJob = new("Load speech recognition model", parentJob);
+        Job loadSpeechRecognizerJob = new(Translation.Get(R.Messages.job_loadSpeechRecognitionModel), parentJob);
         loadSpeechRecognizerJob.EstimatedTotalDurationInMillis = 60000;
         loadSpeechRecognizerJob.SetStatus(EJobStatus.Running);
         JobManager.Instance.AddJob(loadSpeechRecognizerJob);

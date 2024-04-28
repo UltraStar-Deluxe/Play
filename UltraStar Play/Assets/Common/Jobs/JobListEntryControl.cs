@@ -43,7 +43,7 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
 
     public void OnInjectionFinished()
     {
-        jobNameLabel.text = job.Name;
+        jobNameLabel.SetTranslatedText(job.Name);
 
         UpdateIcons();
         job.Result
@@ -108,7 +108,7 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
 
     private void UpdateDurationLabel()
     {
-        jobDurationLabel.text = TimeUtils.GetMinutesAndSecondsDurationString(job.CurrentDurationInMillis);
+        jobDurationLabel.SetTranslatedText(Translation.Of(TimeUtils.GetMinutesAndSecondsDurationString(job.CurrentDurationInMillis)));
     }
 
     private void UpdateProgressBar()

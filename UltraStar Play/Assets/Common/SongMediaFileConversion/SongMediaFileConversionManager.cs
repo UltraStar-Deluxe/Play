@@ -69,7 +69,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         string mediaDescription,
         Func<string> pathGetter,
         Action<string> pathSetter,
-        string jobTitle,
+        Translation jobTitle,
         bool isAudio)
     {
         ConvertSongMetaMediaFileToSupportedFormatWithRetry(
@@ -86,7 +86,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         string mediaDescription,
         Func<string> pathGetter,
         Action<string> pathSetter,
-        string jobTitle,
+        Translation jobTitle,
         bool isAudio)
     {
         string currentValue = pathGetter();
@@ -155,7 +155,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
     public void ConvertFileToSupportedFormat(
         string sourceFilePath,
         string mediaDescription,
-        string jobTitle,
+        Translation jobTitle,
         bool isAudio,
         bool ignoreEqualFileExtension,
         int maxRetry,
@@ -310,7 +310,8 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             "vocals audio",
             () => songMeta.VocalsAudio,
             newValue => songMeta.VocalsAudio = newValue,
-            $"Convert vocals audio of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format",
+            Translation.Get(R.Messages.job_convertVocalsAudioWithName,
+                "name", SongMetaUtils.GetArtistDashTitle(songMeta)),
             true);
     }
 
@@ -321,7 +322,8 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             "instrumental audio",
             () => songMeta.InstrumentalAudio,
             newValue => songMeta.InstrumentalAudio = newValue,
-            $"Convert instrumental audio of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format",
+            Translation.Get(R.Messages.job_convertInstrumentalAudioWithName,
+                "name", SongMetaUtils.GetArtistDashTitle(songMeta)),
             true);
     }
 
@@ -336,7 +338,8 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             "audio",
             () => songMeta.Audio,
             newValue => songMeta.Audio = newValue,
-            $"Convert audio of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format",
+            Translation.Get(R.Messages.job_convertAudioWithName,
+                            "name", SongMetaUtils.GetArtistDashTitle(songMeta)),
             isAudio);
     }
 
@@ -347,7 +350,8 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             "video",
             () => songMeta.Video,
             newValue => songMeta.Video = newValue,
-            $"Convert video of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format",
+            Translation.Get(R.Messages.job_convertVideoWithName,
+                "name", SongMetaUtils.GetArtistDashTitle(songMeta)),
             false);
     }
 

@@ -67,7 +67,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         // Create job to show in UI
         if (audioSeparationJob == null)
         {
-            audioSeparationJob = new Job($"Vocals isolation of '{Path.GetFileName(songMeta.Audio)}'");
+            audioSeparationJob = new Job(Translation.Get(R.Messages.job_audioSeparationWithName,
+                "name", Path.GetFileName(songMeta.Audio)));
             jobManager.AddJob(audioSeparationJob);
         }
         audioSeparationJob.SetStatus(EJobStatus.Running);
@@ -82,7 +83,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         CancellationTokenSource cancellationTokenSource = new();
         audioSeparationJob.OnCancel = () => cancellationTokenSource.Cancel();
 
-        // Set path to spleeter executable if needed
+        // Set path to Spleeter executable if needed
         string fallbackAudioSeparationCommand = PlatformUtils.IsWindows
             ? $"\"{ApplicationUtils.GetStreamingAssetsPath("SpleeterMsvcExe/Spleeter.exe").Replace("/", "\\")}\""
             : "";
