@@ -223,7 +223,8 @@ public static class UltraStarSongParser
             {
                 if (headerFields.ContainsKey(key))
                 {
-                    songIssues.Add(SongIssue.CreateWarning(null, Translation.Get("songIssue_headerField_duplicate")));
+                    songIssues.Add(SongIssue.CreateWarning(null, Translation.Get("songIssue_headerField_duplicate",
+                        "key", key)));
                 }
                 else
                 {
