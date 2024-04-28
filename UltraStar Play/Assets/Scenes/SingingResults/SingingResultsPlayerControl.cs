@@ -304,7 +304,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
     {
         normalNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_notes);
         goldenNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_goldenNotes);
-        phraseBonusScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_phraseBonus);
+        phraseBonusScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_perfectSentenceBonus);
         TranslationManager.ApplyTranslations(visualElement);
     }
 

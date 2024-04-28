@@ -14,3 +14,12 @@ MicWithNameControl, *, *
 SongQueueEntryUiControl, *, *
 ListViewHController, *, *
 HashSetChipsComboControl`1, *, *
+BoolModSettingControl, *, *
+ButtonModSettingControl, *, *
+DoubleModSettingControl, *, *
+EnumModSettingControl, *, *
+IntModSettingControl, *, *
+StringModSettingControl, *, *
+RuntimeUiInspectionManager, *, *
+InputLegendControl, *, *
+LabelWithSpacer+UxmlTraits, *, *

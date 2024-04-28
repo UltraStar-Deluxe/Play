@@ -184,8 +184,8 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private void FillVideoImageContextMenu(ContextMenuPopupControl contextMenu)
     {
-        contextMenu.AddButton("Reset VideoGap", () => setVideoGapAction.ExecuteAndNotify(0));
-        contextMenu.AddButton("Change Video", () => OpenDialogToSetVideo());
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_resetVideoGap), () => setVideoGapAction.ExecuteAndNotify(0));
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_changeVideo), () => OpenDialogToSetVideo());
     }
 
     private void ShowVideoImage()

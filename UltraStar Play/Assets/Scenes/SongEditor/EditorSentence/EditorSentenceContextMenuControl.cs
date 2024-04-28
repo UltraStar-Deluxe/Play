@@ -41,16 +41,17 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
     {
         List<Sentence> selectedSentences = new() { sentenceControl.Sentence };
 
-        contextMenu.AddButton("Fit to notes", () => sentenceFitToNoteAction.ExecuteAndNotify(selectedSentences));
-        contextMenu.AddButton("Fit to notes (all phrases)", () => sentenceFitToNoteAction.ExecuteAndNotify(SongMetaUtils.GetAllSentences(songMeta)));
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_fitSentenceToNotes), () => sentenceFitToNoteAction.ExecuteAndNotify(selectedSentences));
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_fitSentenceToNotesForAllSentences), () => sentenceFitToNoteAction.ExecuteAndNotify(SongMetaUtils.GetAllSentences(songMeta)));
         contextMenu.AddSeparator();
-        contextMenu.AddButton("Edit lyrics", () => sentenceControl.StartEditingLyrics());
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_editLyrics), () => sentenceControl.StartEditingLyrics());
         contextMenu.AddSeparator();
-        contextMenu.AddButton($"Speech recognition on {settings.SongEditorSettings.SpeechRecognitionSamplesSource} audio",
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_speechRecognitionOnAudio,
+                "audio", settings.SongEditorSettings.SpeechRecognitionSamplesSource),
             () => speechRecognitionAction.SetTextToAnalyzedSpeech(sentenceControl.Sentence.Notes.ToList(), settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
-        contextMenu.AddButton($"Move to detected pitch",
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveToDetectedPitch),
             () => pitchDetectionAction.MoveNotesToDetectedPitchUsingPitchDetectionLayer(sentenceControl.Sentence.Notes.ToList(),true));
         contextMenu.AddSeparator();
-        contextMenu.AddButton("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
+        contextMenu.AddButton(Translation.Get(R.Messages.button_delete), () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }
 }

@@ -227,7 +227,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private void FillSongEntryContextMenu(ContextMenuPopupControl contextMenuPopup, SongSelectSongEntry songEntry)
     {
         // Start song
-        contextMenuPopup.AddButton("Start", "play_arrow",
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.songSelectScene_action_start), "play_arrow",
             () =>
             {
                 songSelectSceneControl.AttemptStartEntry(songEntry);
@@ -243,52 +243,54 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                 string playlistName = playlist.Name;
                 if (playlistManager.HasSongEntry(playlist, songEntry.SongMeta))
                 {
-                    contextMenuPopup.AddButton($"Remove from '{playlistName}'", "favorite_border",
+                    contextMenuPopup.AddButton(Translation.Get(R.Messages.songSelectScene_action_removeFromPlaylist,
+                            "playlist", playlistName), "favorite_border",
                         () => playlistManager.RemoveSongFromPlaylist(ultraStarPlaylist, songEntry.SongMeta));
                 }
                 else
                 {
-                    contextMenuPopup.AddButton($"Add to '{playlistName}'", "favorite",
+                    contextMenuPopup.AddButton(Translation.Get(R.Messages.songSelectScene_action_addToPlaylist,
+                            "playlist", playlistName), "favorite",
                         () => playlistManager.AddSongToPlaylist(ultraStarPlaylist, songEntry.SongMeta));
                 }
             });
 
-        contextMenuPopup.AddButton("Enqueue", "playlist_add",
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.button_songQueue_add), "playlist_add",
             () =>
             {
                 songSelectSceneControl.AddSongToSongQueue(songEntry.SongMeta);
             });
 
-        contextMenuPopup.AddButton("Enqueue Medley", "link",
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.button_songQueue_addAsMedley), "link",
             () =>
             {
                 songSelectSceneControl.AddSongToSongQueueAsMedley(songEntry.SongMeta);
             });
 
         // Open song editor / song folder
-        contextMenuPopup.AddButton("Open Editor", "edit",
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.action_openSongEditor), "edit",
             () => songSelectSceneControl.StartSongEditorScene());
         if (PlatformUtils.IsStandalone)
         {
             if (DirectoryUtils.Exists(SongMetaUtils.GetDirectoryPath(songEntry.SongMeta)))
             {
-                contextMenuPopup.AddButton("Open Folder", "open_in_new",
+                contextMenuPopup.AddButton(Translation.Get(R.Messages.action_openFolder), "open_in_new",
                     () => SongMetaUtils.OpenDirectory(songEntry.SongMeta));
             }
-            contextMenuPopup.AddButton("Reload Song", "replay",
+            contextMenuPopup.AddButton(Translation.Get(R.Messages.action_reloadSong), "replay",
                 () => songMetaManager.ReloadSong(songEntry.SongMeta));
         }
 
-        contextMenuPopup.AddButton("Recreate Song", "replay_circle_filled",
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.action_recreateSong), "replay_circle_filled",
         () => songSelectSceneControl.AskToRecreateSingAlongData(songEntry.SongMeta));
 
-        contextMenuPopup.AddButton("Info", "lyrics",
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.action_showInfo), "lyrics",
             () =>
             {
                 songSelectSceneControl.ShowLyricsAndInfoPopup(songEntry.SongMeta);
             });
 
-        VisualElement buttonContainer = contextMenuPopup.AddButton("Vocals Isolation", "call_split",
+        VisualElement buttonContainer = contextMenuPopup.AddButton(Translation.Get(R.Messages.action_separateAudio), "call_split",
             () =>
             {
                 audioSeparationManager.ProcessSongMeta(songEntry.SongMeta, true);
@@ -308,7 +310,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         {
             if (DirectoryUtils.Exists(folderEntry.DirectoryInfo.FullName))
             {
-                contextMenuPopup.AddButton("Open Folder", "open_in_new",
+                contextMenuPopup.AddButton(Translation.Get(R.Messages.action_openFolder), "open_in_new",
                     () => ApplicationUtils.OpenDirectory(folderEntry.DirectoryInfo.FullName));
             }
         }

@@ -49,7 +49,7 @@
                             <FeatherIcon tabindex="-1" icon="music" name="musicNoteIcon" />
                         </ui:VisualElement>
                         <ui:VisualElement name="labels" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap;">
-                            <ui:Label text="$singingResultsScene_scores_phraseBonus" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
+                            <ui:Label text="$singingResultsScene_scores_perfectSentencesBonus" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
                             <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
                         </ui:VisualElement>
                     </ui:VisualElement>

@@ -165,10 +165,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 .CreateAndInject<ContextMenuControl>();
             contextMenuControl.FillContextMenuAction = contextMenuPopupControl =>
             {
-                contextMenuPopupControl.AddButton("Random Color", () =>
-                {
-                    colorPickerControl.SelectItem(Colors.CreateRandomColor());
-                });
+                contextMenuPopupControl.AddButton(Translation.Get(R.Messages.options_recording_action_selectRandomColor),
+                    () => colorPickerControl.SelectItem(Colors.CreateRandomColor()));
             };
         }
 

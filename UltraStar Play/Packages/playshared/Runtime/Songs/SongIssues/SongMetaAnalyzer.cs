@@ -30,7 +30,7 @@ public static class SongMetaAnalyzer
         {
             if (lastSentence != null && sentence.MinBeat < lastSentence.ExtendedMaxBeat)
             {
-                SongIssue issue = SongIssue.CreateError(songMeta, Translation.Get("songIssue_phrasesOverlap"), sentence.MinBeat, lastSentence.ExtendedMaxBeat);
+                SongIssue issue = SongIssue.CreateError(songMeta, Translation.Get("songIssue_sentencesOverlap"), sentence.MinBeat, lastSentence.ExtendedMaxBeat);
                 AddSongIssue(messageToIssues, issue, maxSongIssueCountPerMessage);
             }
             lastSentence = sentence;

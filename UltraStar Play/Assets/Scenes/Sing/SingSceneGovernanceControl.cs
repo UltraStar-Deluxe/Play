@@ -325,8 +325,8 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         }
 
         contextMenuPopup.AddSeparator();
-        contextMenuPopup.AddVisualElement(new Label("¹ Requires restart"));
-        contextMenuPopup.AddButton("Restart Now", "replay",
+        contextMenuPopup.AddVisualElement(new Label(Translation.Get(R.Messages.singScene_action_requiresRestart)));
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.singScene_action_restart), "replay",
             () => singSceneControl.Restart());
     }
 
@@ -337,7 +337,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         contextMenuPopup.AddButton(Translation.Get(R.Messages.action_restart), "replay",
             () => singSceneControl.Restart());
 
-        contextMenuPopup.AddButton("Appearance", "filter_b_and_w", () =>
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.singScene_action_openAppearanceSubmenu), "filter_b_and_w", () =>
         {
             bool wasContextMenuOpenedFromInputAction = isContextMenuOpenedFromInputAction;
             fillAppearanceContextMenu = true;
@@ -346,7 +346,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             contextMenuControl.OpenContextMenu(Vector2.zero, this);
         });
 
-        contextMenuPopup.AddButton("Attribution", "info_outline", () =>
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.singScene_action_openAttributionSubmenu), "info_outline", () =>
         {
             singSceneControl.Pause(true);
             ShowSongInfoDialog();
@@ -381,7 +381,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         }
         else
         {
-            contextMenuPopup.AddButton("Separate audio", "call_split",
+            contextMenuPopup.AddButton(Translation.Get(R.Messages.action_separateAudio), "call_split",
                 () => audioSeparationManager.ProcessSongMeta(singSceneControl.SongMeta, true));
         }
     }
