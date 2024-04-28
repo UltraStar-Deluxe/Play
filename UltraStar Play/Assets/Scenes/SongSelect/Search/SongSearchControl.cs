@@ -19,9 +19,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
 
-    [Inject(Key = Injector.RootVisualElementInjectionKey)]
-    private VisualElement visualElement;
-
     [Inject(UxmlName = R.UxmlNames.searchTextField)]
     private TextField searchTextField;
 
@@ -178,9 +175,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
             .Subscribe(_ => UpdateSearchTextFieldStyle());
         songSelectSceneControl.IsSongRepositorySearchRunning
             .Subscribe(_ => UpdateSearchTextFieldStyle());
-
-        TranslationManager.ApplyTranslations(visualElement);
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(visualElement);
     }
 
     private void UpdateSearchTextFieldStyle()
