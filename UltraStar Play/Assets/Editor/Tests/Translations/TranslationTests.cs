@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using CommonOnlineMultiplayer;
 using NUnit.Framework;
 using ProTrans;
+using SteamOnlineMultiplayer;
 using UnityEngine;
 
 public class TranslationTests
@@ -15,6 +17,76 @@ public class TranslationTests
     public void SetUp()
     {
         Translation.InitTranslationConfig();
+    }
+
+    [Test]
+    public void GenerateEnumTranslationKeys()
+    {
+        // The enum names can be found pretty well via RegEx in the IDE.
+        List<Type> enumTypes = new List<Type>()
+        {
+            typeof(EAudioSupportProvider),
+            typeof(EJobResult),
+            typeof(EJobStatus),
+            typeof(EPartyModeSongSelectionMode),
+            typeof(EFetchType),
+            typeof(EKnownUltraStarSongFormatVersion),
+            typeof(ELyricsEffect),
+            typeof(EMovieSize),
+            typeof(ENoteDisplayMode),
+            typeof(EOnlineMultiplayerBackend),
+            typeof(ESceneChangeAnimation),
+            typeof(EScoreMode),
+            typeof(ESongBackgroundScaleMode),
+            typeof(ESongEditorAudioWaveformSamplesSource),
+            typeof(ESongEditorDrawNoteLayer),
+            typeof(ESongEditorPitchLabelFormat),
+            typeof(ESongEditorRecordingSource),
+            typeof(ESongEditorSamplesSource),
+            typeof(ESongEditorTimeLabelFormat),
+            typeof(ESongProgressBar),
+            typeof(ESongVideoPlayback),
+            typeof(EThirdPartyLibraryUsage),
+            typeof(EUpgradeUltraStarSongFormatVersion),
+            typeof(EWhisperLanguage),
+            typeof(ESearchProperty),
+            typeof(ESongOrder),
+            typeof(EDifficulty),
+            typeof(EInputDevice),
+            typeof(EReliableNetworkDelivery),
+            typeof(ENetcodeMessageType),
+            typeof(EPlaylistNameIssue),
+            typeof(ESentenceRating),
+            typeof(ESongRating),
+            typeof(ESteamLobbyVisibility),
+            typeof(SteamWorkshopManager.EDownloadState),
+            typeof(EDynamicBackgroundGradientType),
+            typeof(ESlotListDirection),
+            typeof(EParticleEffect),
+            typeof(EVideoSupportProvider),
+            typeof(EClassicGameRoundModifierCondition),
+            typeof(ESongEditorDrawNoteLayer),
+            typeof(EPitchDetectionAlgorithm),
+            typeof(ESongIssueSeverity),
+            typeof(FormatNotSupportedSongIssueData.EMediaType),
+            typeof(EUltraStarSongFormatVersion),
+            typeof(EExtendedVoiceId),
+            typeof(ESongProperty),
+            typeof(LazyLoadedSongMeta.ELoadSongPhase),
+            typeof(LazyLoadedVoicesSongMeta.ELoadVoicesPhase),
+            typeof(EKeyboardModifier),
+            typeof(EValueInputDialogValidationResultSeverity),
+            typeof(EDragState),
+        }.Distinct().ToList();
+        foreach (Type enumType in enumTypes)
+        {
+            string typeName = enumType.Name;
+            foreach (object value in Enum.GetValues(enumType))
+            {
+                string valueName = value.ToString();
+                Debug.Log($"translation for enum {typeName}.{valueName}: enum_{typeName.TrimStart('E')}_{valueName}={StringUtils.ToTitleCase(valueName)}");
+            }
+        }
     }
 
     [Test]

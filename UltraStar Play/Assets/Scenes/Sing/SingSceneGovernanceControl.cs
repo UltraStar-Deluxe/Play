@@ -269,7 +269,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         ItemPicker noteDisplayModePicker = new();
         noteDisplayModePicker.SetTranslatedLabel(TranslationThatRequiresRestart(R.Messages.singScene_options_noteDisplayMode));
         contextMenuPopup.AddVisualElement(noteDisplayModePicker);
-        new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
+        new EnumItemPickerControl<ENoteDisplayMode>(noteDisplayModePicker)
             .Bind(() => settings.NoteDisplayMode,
                  newValue => settings.NoteDisplayMode = newValue);
 

@@ -38,17 +38,17 @@ public readonly struct Translation
 
         // For example, ENoteDisplayMode.SentenceBySentence has a translation key enum_noteDisplayMode_sentenceBySentence
         if (typeName.StartsWith("E")
-            && TryGet($"enum_{typeName.Substring(1)}_{valueName}", new Dictionary<string, string>(), out Translation translationResult1))
+            && TryGet($"enum_{typeName.TrimStart('E')}_{valueName}", new Dictionary<string, string>(), out Translation translationResult1))
         {
             return translationResult1;
         }
 
-        if (TryGet($"enum_{typeName.Substring(1)}_{valueName}", new Dictionary<string, string>(), out Translation translationResult2))
+        if (TryGet($"enum_{typeName}_{valueName}", new Dictionary<string, string>(), out Translation translationResult2))
         {
             return translationResult2;
         }
 
-        Debug.LogWarning($"Missing translation for enum {typeName}.{valueName}");
+        Debug.LogWarning($"Missing translation for enum {typeName}.{valueName}, e.g., enum_{typeName.TrimStart('E')}_{valueName}={StringUtils.ToTitleCase(valueName)}");
         return Translation.Of(StringUtils.ToTitleCase(valueName));
     }
 

@@ -539,10 +539,4 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     {
         FieldBindingUtils.Bind(gameObject, baseField, valueGetter, valueSetter, observeValueGetter);
     }
-
-    public enum ERecordNotesOrAudio
-    {
-        RecordNotes,
-        RecordAudio,
-    }
 }
