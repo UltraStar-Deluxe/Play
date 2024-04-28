@@ -261,55 +261,62 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
     private void FillAppearanceContextMenu(ContextMenuPopupControl contextMenuPopup)
     {
-        ItemPicker noteDisplayModePicker = new("Note Display Mode¹");
+        Translation TranslationThatRequiresRestart(string translationKey)
+        {
+            return Translation.Of(Translation.Get(translationKey) + "¹");
+        }
+
+        ItemPicker noteDisplayModePicker = new();
+        noteDisplayModePicker.SetTranslatedLabel(TranslationThatRequiresRestart(R.Messages.singScene_options_noteDisplayMode));
         contextMenuPopup.AddVisualElement(noteDisplayModePicker);
         new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
             .Bind(() => settings.NoteDisplayMode,
                  newValue => settings.NoteDisplayMode = newValue);
 
-        ItemPicker showSongProgressBarPicker = new("Progress Bar");
+        ItemPicker showSongProgressBarPicker = new();
+        showSongProgressBarPicker.SetTranslatedLabel(Translation.Get(R.Messages.singScene_options_showProgressBar));
         contextMenuPopup.AddVisualElement(showSongProgressBarPicker);
         new EnumItemPickerControl<ESongProgressBar>(showSongProgressBarPicker)
             .Bind(() => settings.ShowSongProgressBar,
                 newValue => settings.ShowSongProgressBar = newValue);
 
-        Toggle showLyricsOnNotesToggle = new("Lyrics on Notes¹");
+        Toggle showLyricsOnNotesToggle = new();
+        showLyricsOnNotesToggle.SetTranslatedLabel(TranslationThatRequiresRestart(R.Messages.singScene_options_showLyricsOnNotes));
         contextMenuPopup.AddVisualElement(showLyricsOnNotesToggle);
         FieldBindingUtils.Bind(showLyricsOnNotesToggle,
             () => settings.ShowLyricsOnNotes,
             newValue => settings.ShowLyricsOnNotes = newValue);
 
-        Toggle showStaticLyricsToggle = new("Lyrics Box¹");
+        Toggle showStaticLyricsToggle = new();
+        showStaticLyricsToggle.SetTranslatedLabel(TranslationThatRequiresRestart(R.Messages.singScene_options_showLyricsArea));
         contextMenuPopup.AddVisualElement(showStaticLyricsToggle);
         FieldBindingUtils.Bind(showStaticLyricsToggle,
             () => settings.ShowStaticLyrics,
             newValue => settings.ShowStaticLyrics = newValue);
 
-        // Toggle wipeLyricsToggle = new("Wipe lyrics");
-        // contextMenuPopup.AddVisualElement(wipeLyricsToggle);
-        // FieldBindingUtils.Bind(wipeLyricsToggle,
-        //     () => settings.WipeLyrics,
-        //     newValue => settings.WipeLyrics = newValue);
-
-        Toggle showPitchIndicatorToggle = new("Pitch Arrow");
+        Toggle showPitchIndicatorToggle = new();
+        showPitchIndicatorToggle.SetTranslatedLabel(Translation.Get(R.Messages.singScene_options_showPitchArrow));
         contextMenuPopup.AddVisualElement(showPitchIndicatorToggle);
         FieldBindingUtils.Bind(showPitchIndicatorToggle,
             () => settings.ShowPitchIndicator,
                 newValue => settings.ShowPitchIndicator = newValue);
 
-        Toggle showPlayerNamesToggle = new("Player Name");
+        Toggle showPlayerNamesToggle = new();
+        showPlayerNamesToggle.SetTranslatedLabel(Translation.Get(R.Messages.singScene_options_showPlayerName));
         contextMenuPopup.AddVisualElement(showPlayerNamesToggle);
         FieldBindingUtils.Bind(showPlayerNamesToggle,
             () => settings.ShowPlayerNames,
             newValue => settings.ShowPlayerNames = newValue);
 
-        Toggle showScoreNumbers = new("Player Score");
+        Toggle showScoreNumbers = new();
+        showScoreNumbers.SetTranslatedLabel(Translation.Get(R.Messages.singScene_options_showPlayerScore));
         contextMenuPopup.AddVisualElement(showScoreNumbers);
         FieldBindingUtils.Bind(showScoreNumbers,
             () => settings.ShowScoreNumbers,
             newValue => settings.ShowScoreNumbers = newValue);
 
-        Toggle showPlayerInfoNextToNotesToggle = new("Player alongside notes¹");
+        Toggle showPlayerInfoNextToNotesToggle = new();
+        showPlayerInfoNextToNotesToggle.SetTranslatedLabel(TranslationThatRequiresRestart(R.Messages.singScene_options_showPlayerAlongsideNotes));
         contextMenuPopup.AddVisualElement(showPlayerInfoNextToNotesToggle);
         FieldBindingUtils.Bind(showPlayerInfoNextToNotesToggle,
             () => settings.ShowPlayerInfoNextToNotes,
@@ -317,7 +324,8 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
         if (webcamControl.WebcamsAvailable())
         {
-            Toggle webcamToggle = new("Webcam");
+            Toggle webcamToggle = new();
+            webcamToggle.SetTranslatedLabel(Translation.Get(R.Messages.singScene_options_useWebcamAsBackground));
             contextMenuPopup.AddVisualElement(webcamToggle);
             FieldBindingUtils.Bind(webcamToggle,
                 () => settings.UseWebcamAsBackgroundInSingScene,
@@ -367,7 +375,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         if (SongMetaUtils.VocalsAudioResourceExists(singSceneControl.SongMeta)
             && SongMetaUtils.InstrumentalAudioResourceExists(singSceneControl.SongMeta))
         {
-            contextMenuPopup.AddVisualElement(new Label("Vocals Volume"));
+            contextMenuPopup.AddVisualElement(new Label(Translation.Get(R.Messages.singScene_options_vocalsVolume)));
             Slider vocalsVolumeSlider = new();
             vocalsVolumeSlider.lowValue = 0;
             vocalsVolumeSlider.highValue = 100;

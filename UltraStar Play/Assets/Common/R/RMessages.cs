@@ -335,6 +335,16 @@ public static partial class R
         public static readonly string singScene_action_restart = "singScene_action_restart";
         public static readonly string singScene_missingMicrophones_message = "singScene_missingMicrophones_message";
         public static readonly string singScene_missingMicrophones_title = "singScene_missingMicrophones_title";
+        public static readonly string singScene_options_noteDisplayMode = "singScene_options_noteDisplayMode";
+        public static readonly string singScene_options_showLyricsArea = "singScene_options_showLyricsArea";
+        public static readonly string singScene_options_showLyricsOnNotes = "singScene_options_showLyricsOnNotes";
+        public static readonly string singScene_options_showPitchArrow = "singScene_options_showPitchArrow";
+        public static readonly string singScene_options_showPlayerAlongsideNotes = "singScene_options_showPlayerAlongsideNotes";
+        public static readonly string singScene_options_showPlayerName = "singScene_options_showPlayerName";
+        public static readonly string singScene_options_showPlayerScore = "singScene_options_showPlayerScore";
+        public static readonly string singScene_options_showProgressBar = "singScene_options_showProgressBar";
+        public static readonly string singScene_options_useWebcamAsBackground = "singScene_options_useWebcamAsBackground";
+        public static readonly string singScene_options_vocalsVolume = "singScene_options_vocalsVolume";
         public static readonly string songEditor_action_assignToVoice = "songEditor_action_assignToVoice";
         public static readonly string songEditor_action_changeVideo = "songEditor_action_changeVideo";
         public static readonly string songEditor_action_copyNotes = "songEditor_action_copyNotes";
