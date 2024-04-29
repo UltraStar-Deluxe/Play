@@ -84,9 +84,14 @@ public class TranslationTests
             foreach (object value in Enum.GetValues(enumType))
             {
                 string valueName = value.ToString();
-                Debug.Log($"translation for enum {typeName}.{valueName}: enum_{typeName.TrimStart('E')}_{valueName}={StringUtils.ToTitleCase(valueName)}");
+                Debug.Log($"translation for enum {typeName}.{valueName}: enum_{TrimFirstChar(typeName, 'E')}_{valueName}={StringUtils.ToTitleCase(valueName)}");
             }
         }
+    }
+
+    private string TrimFirstChar(string text, char c)
+    {
+        return text.StartsWith(c) ? text.Substring(1) : text;
     }
 
     [Test]

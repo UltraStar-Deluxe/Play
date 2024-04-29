@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using ProTrans;
-using UnityEditor.Graphs;
 using UnityEngine;
 
 public readonly struct Translation
@@ -38,7 +37,7 @@ public readonly struct Translation
 
         // For example, ENoteDisplayMode.SentenceBySentence has a translation key enum_noteDisplayMode_sentenceBySentence
         if (typeName.StartsWith("E")
-            && TryGet($"enum_{typeName.TrimStart('E')}_{valueName}", new Dictionary<string, string>(), out Translation translationResult1))
+            && TryGet($"enum_{typeName.Substring(1)}_{valueName}", new Dictionary<string, string>(), out Translation translationResult1))
         {
             return translationResult1;
         }
@@ -48,8 +47,13 @@ public readonly struct Translation
             return translationResult2;
         }
 
-        Debug.LogWarning($"Missing translation for enum {typeName}.{valueName}, e.g., enum_{typeName.TrimStart('E')}_{valueName}={StringUtils.ToTitleCase(valueName)}");
-        return Translation.Of(StringUtils.ToTitleCase(valueName));
+        Debug.LogWarning($"Missing translation for enum {typeName}.{valueName}, e.g., enum_{TrimFirstChar(typeName, 'E')}_{valueName}={StringUtils.ToTitleCase(valueName)}");
+        return Of(StringUtils.ToTitleCase(valueName));
+    }
+
+    private static string TrimFirstChar(string text, char c)
+    {
+        return text.StartsWith(c) ? text.Substring(1) : text;
     }
 
     public static Translation Get(string key, params object[] placeholderStrings)
