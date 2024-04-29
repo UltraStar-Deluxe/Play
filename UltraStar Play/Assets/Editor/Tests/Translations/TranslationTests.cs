@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using AhoCorasick;
 using CommonOnlineMultiplayer;
 using NUnit.Framework;
 using ProTrans;
@@ -92,6 +93,55 @@ public class TranslationTests
     private string TrimFirstChar(string text, char c)
     {
         return text.StartsWith(c) ? text.Substring(1) : text;
+    }
+
+    [Test]
+    public void ShouldNotHaveUnusedTranslationKeys()
+    {
+        HashSet<string> unseenTranslationKeys = new();
+        HashSet<string> seenTranslationKeys = new();
+
+        // Ignore enum translations, ignore translations for companion app,
+        // ignore languages because these keys are used dynamically via string concatenation.
+        List<string> ignoredTranslationKeyPrefixes = new List<string>() { "enum_", "companionApp_", "language_"};
+
+        // AhoCorasick search algorithm as recommended by https://stackoverflow.com/questions/46339057/c-sharp-fastest-string-search-in-all-files
+        Trie trie = new();
+        PropertiesFile defaultPropertiesFile = Translation.GetPropertiesFile(Translation.GetFallbackCultureInfo());
+        unseenTranslationKeys.AddRange(defaultPropertiesFile.Dictionary.Keys
+            .Where(key => !ignoredTranslationKeyPrefixes.AnyMatch(prefix => key.StartsWith(prefix))));
+        unseenTranslationKeys.ForEach(key => trie.Add(key));
+        trie.Build();
+
+        // Search in Assets and Packages for .cs and .uxml files
+        List<string> sourceFolders = new List<string>() { Application.dataPath, $"{Application.dataPath}/../Packages" }
+            .Select(folder => new DirectoryInfo(folder).FullName)
+            .ToList();
+        List<string> files = FileScannerUtils.ScanForFiles(sourceFolders, new List<string>() { "*.cs", "*.uxml" });
+
+        foreach (string file in files)
+        {
+            if (Path.GetFileName(file) == "RMessages.cs")
+            {
+                // Skip file with generated constants for translation keys.
+                continue;
+            }
+
+            string fileContent = File.ReadAllText(file);
+            foreach (string match in trie.Find(fileContent))
+            {
+                unseenTranslationKeys.Remove(match);
+                seenTranslationKeys.Add(match);
+            }
+
+            if (unseenTranslationKeys.IsNullOrEmpty())
+            {
+                break;
+            }
+        }
+
+        Debug.Log($"Used translation keys:\n    {seenTranslationKeys.OrderBy(it => it).JoinWith("\n    ")}");
+        Debug.LogWarning($"Unused translation keys:\n    {unseenTranslationKeys.OrderBy(it => it).JoinWith("\n    ")}");
     }
 
     [Test]
