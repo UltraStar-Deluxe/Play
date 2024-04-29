@@ -114,15 +114,15 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateErrorMessage()
     {
-        string errorMessage = lrcFormatImporter.GetLrcFormatErrorMessage(importLrcTextField.text);
+        Translation errorMessage = lrcFormatImporter.GetLrcFormatErrorMessage(importLrcTextField.text);
         SetErrorMessage(errorMessage);
     }
 
-    private void SetErrorMessage(string errorMessage)
+    private void SetErrorMessage(Translation errorMessage)
     {
-        bool hasError = !errorMessage.IsNullOrEmpty();
+        bool hasError = !errorMessage.Value.IsNullOrEmpty();
         importLrcIssueContainer.SetVisibleByDisplay(hasError);
-        importLrcIssueLabel.text = errorMessage;
+        importLrcIssueLabel.SetTranslatedText(errorMessage);
         importLrcFormatDialogButton.SetEnabled(!hasError
                                                && !importLrcTextField.value.IsNullOrEmpty());
     }

@@ -30,7 +30,7 @@ public class SongEditorSideBarLayerEntryControl : INeedInjection, IInjectionFini
 
     [Inject(UxmlName = R.UxmlNames.layerMidiSoundButton)]
     private Button layerMidiSoundButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.layerEditableButton)]
     private Button layerEditableButton;
 
@@ -41,7 +41,7 @@ public class SongEditorSideBarLayerEntryControl : INeedInjection, IInjectionFini
     public void OnInjectionFinished()
     {
         layerColorElement.style.backgroundColor = layerManager.GetLayerColor(layer);
-        layerNameLabel.text = layer.GetDisplayName();
+        layerNameLabel.SetTranslatedText(layer.GetDisplayName());
         selectAllNotesOfLayerButton.RegisterCallbackButtonTriggered(
             _ => selectionControl.SetSelection(layerManager.GetLayerNotes(layer)));
 
@@ -60,7 +60,7 @@ public class SongEditorSideBarLayerEntryControl : INeedInjection, IInjectionFini
             layerManager.IsMidiSoundPlayAlongEnabled(layer));
         layerMidiSoundToggleButtonControl.ValueChangedEventStream
             .Subscribe(evt => layerManager.SetMidiSoundPlayAlongEnabled(layer, evt.NewValue));
-        
+
         // IsEditable
         layerEditableToggleButtonControl = new ToogleButtonControl(layerEditableButton,
             layerEditableButton.Q<VisualElement>(R.UxmlNames.layerEditableIcon),

@@ -29,3 +29,8 @@ CreditsEntryControl, *, *
 LetterCollectorGameControl, *, *
 DevelopmentOptionsControl, *, *
 AbstractSingSceneNoteDisplayer, *, *
+EditorNoteControl, *, *
+EditorSentenceControl, *, *
+SongEditorStatusBarControl, *, *
+SongEditorSideBarGroup+UxmlTraits, *, *
+SongEditorSideBarGroup, *, *

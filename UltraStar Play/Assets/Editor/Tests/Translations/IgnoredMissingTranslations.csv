@@ -98,3 +98,4 @@ TeamResultsTeamUi.uxml, *, teamNameLabel
 TeamResultsTeamUi.uxml, *, teamScoreLabel
 UploadWorkshopItemUi.uxml, *, statusLabel
 ValueInputDialog.uxml, *, *
+SongSelectSceneEditPlaylistDialogUi.uxml, *, invalidValueLabel

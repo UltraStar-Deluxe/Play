@@ -238,7 +238,8 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     {
         setVideoGapAction.Execute(GetNewVideoGap(dragEvent));
         videoAreaLabel.ShowByDisplay();
-        videoAreaLabel.text = $"VideoGap (ms): {songMeta.VideoGapInMillis}";
+        videoAreaLabel.SetTranslatedText(Translation.Get(R.Messages.songEditor_videoArea_videoGapWithValue,
+            "value", songMeta.VideoGapInMillis));
     }
 
     public void OnEndDrag(GeneralDragEvent dragEvent)

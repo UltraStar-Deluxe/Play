@@ -347,6 +347,12 @@ public class TranslationTests
         AddTranslatableAttributes(
             uxmlFile,
             translatableAttributes,
+            xDocument.Descendants("SongEditorSideBarGroup"),
+            "label");
+
+        AddTranslatableAttributes(
+            uxmlFile,
+            translatableAttributes,
             xDocument.Descendants("AccordionItem"),
             "label");
 

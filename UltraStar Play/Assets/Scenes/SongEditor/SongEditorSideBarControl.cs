@@ -337,8 +337,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         double issueStartPositionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, issue.StartBeat);
         int issueStartPositionInSeconds = (int)(issueStartPositionInMillis / 1000);
         visualElement.Q<Button>(R.UxmlNames.goToIssueButton).RegisterCallbackButtonTriggered(_ => GoToIssue(issue));
-        visualElement.Q<Label>(R.UxmlNames.issueMessageLabel).text = issue.Message;
-        visualElement.Q<Label>(R.UxmlNames.issuePositionLabel).text = $"({issueStartPositionInSeconds}s)";
+        visualElement.Q<Label>(R.UxmlNames.issueMessageLabel).SetTranslatedText(issue.Message);
+        visualElement.Q<Label>(R.UxmlNames.issuePositionLabel).SetTranslatedText(Translation.Of($"({issueStartPositionInSeconds}s)"));
 
         VisualElement issueImage = visualElement.Q<VisualElement>(R.UxmlNames.issueImage);
         if (issue.Severity == ESongIssueSeverity.Error)

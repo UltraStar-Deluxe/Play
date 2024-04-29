@@ -88,7 +88,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             }
             int beat = (int)label.userData;
             double beatPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
-            label.text = GetLabelText(beat, beatPosInMillis);
+            label.SetTranslatedText(GetLabelText(beat, beatPosInMillis));
         });
     }
 
@@ -200,26 +200,26 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
                 UpdateLabelPosition(label, beatPosInMillis, labelWidthInMillis);
                 label.style.top = 0;
-                label.text = GetLabelText(beat, beatPosInMillis);
+                label.SetTranslatedText(GetLabelText(beat, beatPosInMillis));
                 label.userData = beat;
             }
         }
     }
 
-    private string GetLabelText(int beat, double beatPosInMillis)
+    private Translation GetLabelText(int beat, double beatPosInMillis)
     {
         switch (settings.SongEditorSettings.TimeLabelFormat)
         {
             case ESongEditorTimeLabelFormat.Beats:
-                return beat.ToString();
+                return Translation.Of(beat.ToString());
             case ESongEditorTimeLabelFormat.Seconds:
                 TimeSpan timeSpan = new(0, 0, 0, 0, (int)beatPosInMillis);
                 double millisFraction = timeSpan.Milliseconds / 1000.0;
                 return timeSpan.TotalMinutes > 0
-                    ? $"{timeSpan.Seconds}{millisFraction.ToStringInvariantCulture(".0")}"
-                    : $"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}{millisFraction.ToStringInvariantCulture(".0")}";
+                    ? Translation.Of($"{timeSpan.Seconds}{millisFraction.ToStringInvariantCulture(".0")}")
+                    : Translation.Of($"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}{millisFraction.ToStringInvariantCulture(".0")}");
             default:
-                return "";
+                return Translation.Empty;
         }
     }
 

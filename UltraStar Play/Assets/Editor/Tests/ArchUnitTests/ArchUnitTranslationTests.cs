@@ -16,7 +16,7 @@ using Type = System.Type;
 
 public class ArchUnitTranslationTests
 {
-    private static List<TranslatableAssignment> ignoredUntranslatedAssignments;
+    private static List<TranslatableAssignment> ignoredUntranslatedAssignments = new();
 
     private static readonly HashSet<string> typesWithUiLabels = new()
     {
@@ -25,6 +25,7 @@ public class ArchUnitTranslationTests
         "EnumFieldItemPicker",
         "ItemPicker",
         "AccordionItem",
+        "SongEditorSideBarGroup",
     };
 
     /**
@@ -63,6 +64,7 @@ public class ArchUnitTranslationTests
             typeof(UntranslatedTextFieldLabelSetterExample),
             typeof(UntranslatedItemPickerLabelSetterExample),
             typeof(UntranslatedAccordionItemTitleSetterExample),
+            typeof(UntranslatedSongEditorSideBarGroupLabelSetterExample),
         };
 
         foreach (Type type in types)
@@ -183,6 +185,14 @@ public class ArchUnitTranslationTests
         private static void Init()
         {
             new AccordionItem().Title = "untranslated text";
+        }
+    }
+
+    private struct UntranslatedSongEditorSideBarGroupLabelSetterExample
+    {
+        private static void Init()
+        {
+            new SongEditorSideBarGroup().Label = "untranslated text";
         }
     }
 }
