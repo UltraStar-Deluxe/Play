@@ -95,6 +95,23 @@ public class TranslationTests
     }
 
     [Test]
+    public void ShouldNotHaveDuplicateTranslationValues()
+    {
+        // TODO: Remove duplicate translation values where it makes sense
+        PropertiesFile defaultPropertiesFile = Translation.GetPropertiesFile(Translation.GetFallbackCultureInfo());
+        foreach (KeyValuePair<string,string> entry in defaultPropertiesFile.Dictionary)
+        {
+            List<KeyValuePair<string, string>> duplicateEntries = defaultPropertiesFile.Dictionary
+                .Where(otherEntry => otherEntry.Key != entry.Key && otherEntry.Value == entry.Value)
+                .ToList();
+            if (!duplicateEntries.IsNullOrEmpty())
+            {
+                Debug.LogWarning($"Duplicate translation values: {entry.Key} & {duplicateEntries.Select(it => it.Key).JoinWith(" & ")} = {entry.Value}");
+            }
+        }
+    }
+
+    [Test]
     public void AllTranslationKeysArePresentInDefaultPropertiesFiles()
     {
         Dictionary<PropertiesFile, List<string>> propertiesFileToKeys = new();
