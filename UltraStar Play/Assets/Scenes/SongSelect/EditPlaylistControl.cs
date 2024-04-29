@@ -35,8 +35,11 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.playlistNameTextField)]
     private TextField playlistNameTextField;
 
-    [Inject(UxmlName = R.UxmlNames.editPlaylistDialogTitle)]
-    private Label editPlaylistDialogTitle;
+    [Inject(UxmlName = R.UxmlNames.validationWarningContainer)]
+    private VisualElement validationWarningContainer;
+
+    [Inject(UxmlName = R.UxmlNames.invalidValueLabel)]
+    private Label invalidValueLabel;
 
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
@@ -48,8 +51,6 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
     private UiManager uiManager;
 
     private IPlaylist currentPlaylist;
-
-    private string titleText;
 
     private void Start()
     {
@@ -97,16 +98,19 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
         switch (playlistNameIssue)
         {
             case EPlaylistNameIssue.Invalid:
-                editPlaylistDialogTitle.text = "Invalid playlist name";
-                submitEditPlaylistButton.text = Translation.Get(R.Messages.button_cancel);
+                validationWarningContainer.ShowByDisplay();
+                invalidValueLabel.SetTranslatedText(Translation.Get(R.Messages.songSelectScene_editPlaylistDialog_error_invalidName));
+                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.button_cancel));
                 break;
             case EPlaylistNameIssue.Duplicate:
-                editPlaylistDialogTitle.text = "Duplicate playlist name";
-                submitEditPlaylistButton.text = Translation.Get(R.Messages.button_cancel);
+                validationWarningContainer.ShowByDisplay();
+                invalidValueLabel.SetTranslatedText(Translation.Get(R.Messages.songSelectScene_editPlaylistDialog_error_duplicateName));
+                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.button_cancel));
                 break;
             default:
-                editPlaylistDialogTitle.text = titleText;
-                submitEditPlaylistButton.text = Translation.Get(R.Messages.button_continue);
+                validationWarningContainer.HideByDisplay();
+                invalidValueLabel.SetTranslatedText(Translation.Empty);
+                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.button_continue));
                 break;
         }
     }
@@ -125,8 +129,8 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        titleText = "Edit Playlist";
-        editPlaylistDialogTitle.text = titleText;
+        validationWarningContainer.HideByDisplay();
+        invalidValueLabel.SetTranslatedText(Translation.Empty);
         playlistNameTextField.value = currentPlaylist.Name;
         editPlaylistOverlay.ShowByDisplay();
         searchPropertyDropdownOverlay.HideByDisplay();

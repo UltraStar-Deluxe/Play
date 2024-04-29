@@ -224,30 +224,30 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     {
         if (selectedVoiceId.Value is EExtendedVoiceId.Merged)
         {
-            voiceIdLabel.text = "Both";
+            voiceIdLabel.SetTranslatedText(Translation.Get(R.Messages.enum_ExtendedVoiceId_Merged));
         }
         else if (selectedVoiceId.Value.TryGetVoiceId(out EVoiceId voiceId)
                  && !voiceIdToDisplayName.IsNullOrEmpty()
                  && voiceIdToDisplayName.ContainsKey(voiceId))
         {
-            voiceIdLabel.text = voiceIdToDisplayName[voiceId];
+            voiceIdLabel.SetTranslatedText(Translation.Of(voiceIdToDisplayName[voiceId]));
         }
         else
         {
-            voiceIdLabel.text = selectedVoiceId.Value.ToString();
+            voiceIdLabel.SetTranslatedText(Translation.Of(selectedVoiceId.Value.ToString()));
         }
     }
 
     public void Init(PlayerProfile playerProfile)
     {
         this.PlayerProfile = playerProfile;
-        nameLabel.text = playerProfile.Name;
+        nameLabel.SetTranslatedText(Translation.Of(playerProfile.Name));
         injector.WithRootVisualElement(playerImage)
             .WithBindingForInstance(playerProfile)
             .Inject(playerProfileImageControl);
         MicProfile = null;
 
-        nameLabel.text = PlayerProfile.Name;
+        nameLabel.SetTranslatedText(Translation.Of(PlayerProfile.Name));
         if (partyModeTeamSettings != null)
         {
             if (songSelectSceneControl.PartyModeSettings.TeamSettings.IsFreeForAll)
@@ -257,7 +257,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             else
             {
                 teamLabel.ShowByDisplay();
-                teamLabel.text = partyModeTeamSettings.name;
+                teamLabel.SetTranslatedText(Translation.Of(partyModeTeamSettings.name));
             }
         }
         else

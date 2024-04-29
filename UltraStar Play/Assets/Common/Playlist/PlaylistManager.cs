@@ -218,15 +218,12 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             return EPlaylistNameIssue.Invalid;
         }
 
-        List<char> invalidCharacters = Path.GetInvalidPathChars()
+        HashSet<char> invalidCharacters = Path.GetInvalidPathChars()
             .Concat(new List<char> { '\\', '/' })
-            .ToList();
-        foreach (char invalidChar in invalidCharacters)
+            .ToHashSet();
+        if (invalidCharacters.AnyMatch(invalidChar => newName.Contains(invalidChar)))
         {
-            if (newName.Contains(invalidChar))
-            {
-                return EPlaylistNameIssue.Invalid;
-            }
+            return EPlaylistNameIssue.Invalid;
         }
 
         if (playlists

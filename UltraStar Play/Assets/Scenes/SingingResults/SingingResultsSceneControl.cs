@@ -354,8 +354,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private void InitSongDetails()
     {
         SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
-        artistLabel.text = songMeta.Artist;
-        titleLabel.text = songMeta.Title;
+        artistLabel.SetTranslatedText(Translation.Of(songMeta.Artist));
+        titleLabel.SetTranslatedText(Translation.Of(songMeta.Title));
         SongMetaImageUtils.SetCoverOrBackgroundImage(songMeta, coverImage);
     }
 

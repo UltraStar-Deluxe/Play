@@ -316,7 +316,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         fuzzySearchTextLabel.ShowByDisplay();
         songSelectSceneInputControl.FuzzySearchText
-            .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
+            .Subscribe(newValue => fuzzySearchTextLabel.SetTranslatedText(Translation.Of(newValue)));
 
         songRouletteControl.SubmitEventStream.Subscribe(_ => AttemptStartSelectedEntry());
         songRouletteControl.Focus();
@@ -518,7 +518,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         if (songQueueLengthLabel.text != newSongQueueLengthAsString)
         {
             songQueueLengthContainer.SetVisibleByDisplay(SongQueueManager.SongQueueLength > 0);
-            songQueueLengthLabel.text = newSongQueueLengthAsString;
+            songQueueLengthLabel.SetTranslatedText(Translation.Of(newSongQueueLengthAsString));
             LeanTween.value(gameObject, Vector3.one * 1.5f, Vector3.one, 1.5f)
                 .setEaseOutBounce()
                 .setOnUpdate(s => songQueueLengthLabel.style.scale = new StyleScale(new Scale(new Vector2(s, s))));
@@ -785,7 +785,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void UpdateSongScanLabels(bool isSongScanFinished)
     {
-        songScanInProgressProgressLabel.text = $"{SongMetaManager.LoadedSongsPercent:00} %";
+        songScanInProgressProgressLabel.SetTranslatedText(Translation.Of($"{SongMetaManager.LoadedSongsPercent:00} %"));
 
         if (isSongScanFinished)
         {
@@ -1626,8 +1626,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         if (HasPartyModeSceneData)
         {
-            sceneTitle.text += $"{Translation.Get(R.Messages.songSelectScene_title)}\n" +
-                               $"{PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}";
+            sceneTitle.SetTranslatedText(Translation.Of(
+                $"{Translation.Get(R.Messages.songSelectScene_title)}\n"
+                + $"{PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}"));
         }
     }
 

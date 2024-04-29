@@ -84,6 +84,8 @@ public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInj
         string displayName = releaseName.IsNullOrEmpty()
             ? remoteRelease.NullToEmpty()
             : releaseName.NullToEmpty();
-        dialogMessage.text = Translation.Get(R.Messages.mainScene_newVersionDialog_message, "remoteRelease", displayName, "websiteLink", websiteLink.NullToEmpty());
+        dialogMessage.SetTranslatedText(Translation.Get(R.Messages.mainScene_newVersionDialog_message,
+            "remoteRelease", displayName,
+             "websiteLink", websiteLink.NullToEmpty()));
     }
 }

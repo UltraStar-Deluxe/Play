@@ -24,3 +24,8 @@ RuntimeUiInspectionManager, *, *
 InputLegendControl, *, *
 LabelWithSpacer+UxmlTraits, *, *
 LoadingSceneControl, *, *
+CreditsCharacterControl, *, *
+CreditsEntryControl, *, *
+LetterCollectorGameControl, *, *
+DevelopmentOptionsControl, *, *
+AbstractSingSceneNoteDisplayer, *, *

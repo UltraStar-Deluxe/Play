@@ -292,6 +292,8 @@ public static partial class R
         public const string inputDeviceIconTouch = "inputDeviceIconTouch";
         public const string inputLegend = "inputLegend";
         public const string inputLegendLabel = "inputLegendLabel";
+        public const string invalidValueIcon = "invalidValueIcon";
+        public const string invalidValueLabel = "invalidValueLabel";
         public const string ip = "ip";
         public const string issueEntryUiRoot = "issueEntryUiRoot";
         public const string issueImage = "issueImage";
@@ -963,6 +965,7 @@ public static partial class R
         public const string useUniversalCharsetDetectorToggle = "useUniversalCharsetDetectorToggle";
         public const string useVlcToPlayMediaFilesPicker = "useVlcToPlayMediaFilesPicker";
         public const string useWebcamToggle = "useWebcamToggle";
+        public const string validationWarningContainer = "validationWarningContainer";
         public const string versionDetailsContainer = "versionDetailsContainer";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";

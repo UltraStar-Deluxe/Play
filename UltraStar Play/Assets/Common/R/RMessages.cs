@@ -108,6 +108,9 @@ public static partial class R
         public static readonly string enum_DynamicBackgroundGradientType_RadialRepeated = "enum_DynamicBackgroundGradientType_RadialRepeated";
         public static readonly string enum_DynamicBackgroundGradientType_Reflected = "enum_DynamicBackgroundGradientType_Reflected";
         public static readonly string enum_DynamicBackgroundGradientType_Repeated = "enum_DynamicBackgroundGradientType_Repeated";
+        public static readonly string enum_ExtendedVoiceId_Merged = "enum_ExtendedVoiceId_Merged";
+        public static readonly string enum_ExtendedVoiceId_P1 = "enum_ExtendedVoiceId_P1";
+        public static readonly string enum_ExtendedVoiceId_P2 = "enum_ExtendedVoiceId_P2";
         public static readonly string enum_FetchType_Eager = "enum_FetchType_Eager";
         public static readonly string enum_FetchType_Lazy = "enum_FetchType_Lazy";
         public static readonly string enum_FullScreenMode_ExclusiveFullScreen = "enum_FullScreenMode_ExclusiveFullScreen";
@@ -317,10 +320,11 @@ public static partial class R
         public static readonly string enum_VideoSupportProvider_UnityVideoPlayer = "enum_VideoSupportProvider_UnityVideoPlayer";
         public static readonly string enum_VideoSupportProvider_Vlc = "enum_VideoSupportProvider_Vlc";
         public static readonly string enum_VideoSupportProvider_WebView = "enum_VideoSupportProvider_WebView";
-        public static readonly string enum_XtendedVoiceId_Merged = "enum_XtendedVoiceId_Merged";
-        public static readonly string enum_XtendedVoiceId_P1 = "enum_XtendedVoiceId_P1";
-        public static readonly string enum_XtendedVoiceId_P2 = "enum_XtendedVoiceId_P2";
         public static readonly string exit = "exit";
+        public static readonly string gameRoundModifier_condition_playerAdvance = "gameRoundModifier_condition_playerAdvance";
+        public static readonly string gameRoundModifier_condition_score = "gameRoundModifier_condition_score";
+        public static readonly string gameRoundModifier_condition_scoreRange = "gameRoundModifier_condition_scoreRange";
+        public static readonly string gameRoundModifier_condition_timeRange = "gameRoundModifier_condition_timeRange";
         public static readonly string graph_button_label = "graph_button_label";
         public static readonly string graph_legend_good = "graph_legend_good";
         public static readonly string graph_legend_missed = "graph_legend_missed";
@@ -429,7 +433,11 @@ public static partial class R
         public static readonly string options_micNotConnected = "options_micNotConnected";
         public static readonly string options_micPlaybackVolume = "options_micPlaybackVolume";
         public static readonly string options_mod_button = "options_mod_button";
+        public static readonly string options_mod_infoDialog_authors = "options_mod_infoDialog_authors";
+        public static readonly string options_mod_infoDialog_license = "options_mod_infoDialog_license";
         public static readonly string options_mod_infoDialog_title = "options_mod_infoDialog_title";
+        public static readonly string options_mod_infoDialog_version = "options_mod_infoDialog_version";
+        public static readonly string options_mod_infoDialog_website = "options_mod_infoDialog_website";
         public static readonly string options_mod_securityWarning = "options_mod_securityWarning";
         public static readonly string options_mod_settingsDialog_title = "options_mod_settingsDialog_title";
         public static readonly string options_mod_title = "options_mod_title";
@@ -472,6 +480,10 @@ public static partial class R
         public static readonly string options_songDataFetchType = "options_songDataFetchType";
         public static readonly string options_songLibrary_action_deleteSongFolderDialog_message = "options_songLibrary_action_deleteSongFolderDialog_message";
         public static readonly string options_songLibrary_action_deleteSongFolderDialog_title = "options_songLibrary_action_deleteSongFolderDialog_title";
+        public static readonly string options_songLibrary_action_quickFix_audioFormat = "options_songLibrary_action_quickFix_audioFormat";
+        public static readonly string options_songLibrary_action_quickFix_instrumentalAudioFormat = "options_songLibrary_action_quickFix_instrumentalAudioFormat";
+        public static readonly string options_songLibrary_action_quickFix_videoFormat = "options_songLibrary_action_quickFix_videoFormat";
+        public static readonly string options_songLibrary_action_quickFix_vocalsAudioFormat = "options_songLibrary_action_quickFix_vocalsAudioFormat";
         public static readonly string options_songLibrary_action_quickFixSongIssueErrors = "options_songLibrary_action_quickFixSongIssueErrors";
         public static readonly string options_songLibrary_action_quickFixSongIssues = "options_songLibrary_action_quickFixSongIssues";
         public static readonly string options_songLibrary_action_quickFixSongIssueWarnings = "options_songLibrary_action_quickFixSongIssueWarnings";
@@ -481,6 +493,10 @@ public static partial class R
         public static readonly string options_songLibrary_androidInternalStorage = "options_songLibrary_androidInternalStorage";
         public static readonly string options_songLibrary_androidOtherStorage = "options_songLibrary_androidOtherStorage";
         public static readonly string options_songLibrary_androidSdCardStorage = "options_songLibrary_androidSdCardStorage";
+        public static readonly string options_songLibrary_archiveDownload_status_canceled = "options_songLibrary_archiveDownload_status_canceled";
+        public static readonly string options_songLibrary_archiveDownload_status_error = "options_songLibrary_archiveDownload_status_error";
+        public static readonly string options_songLibrary_archiveDownload_status_finished = "options_songLibrary_archiveDownload_status_finished";
+        public static readonly string options_songLibrary_archiveDownload_status_initial = "options_songLibrary_archiveDownload_status_initial";
         public static readonly string options_songLibrary_button = "options_songLibrary_button";
         public static readonly string options_songLibrary_downloadSongArchive_initialStatus = "options_songLibrary_downloadSongArchive_initialStatus";
         public static readonly string options_songLibrary_noSongFoldersFoundInfo = "options_songLibrary_noSongFoldersFoundInfo";
@@ -751,6 +767,8 @@ public static partial class R
         public static readonly string songSelectScene_action_start = "songSelectScene_action_start";
         public static readonly string songSelectScene_advancedSearch = "songSelectScene_advancedSearch";
         public static readonly string songSelectScene_duetLegendLabel = "songSelectScene_duetLegendLabel";
+        public static readonly string songSelectScene_editPlaylistDialog_error_duplicateName = "songSelectScene_editPlaylistDialog_error_duplicateName";
+        public static readonly string songSelectScene_editPlaylistDialog_error_invalidName = "songSelectScene_editPlaylistDialog_error_invalidName";
         public static readonly string songSelectScene_editPlaylistDialog_title = "songSelectScene_editPlaylistDialog_title";
         public static readonly string songSelectScene_failedToLoadSongDialog_message = "songSelectScene_failedToLoadSongDialog_message";
         public static readonly string songSelectScene_failedToLoadSongDialog_title = "songSelectScene_failedToLoadSongDialog_title";

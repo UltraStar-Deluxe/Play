@@ -505,18 +505,18 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     {
         if (SongSelectEntry is SongSelectSongEntry songEntry)
         {
-            songArtist.text = songEntry.SongMeta.Artist;
-            songTitle.text = songEntry.SongMeta.Title;
+            songArtist.SetTranslatedText(Translation.Of(songEntry.SongMeta.Artist));
+            songTitle.SetTranslatedText(Translation.Of(songEntry.SongMeta.Title));
         }
         else if (SongSelectEntry is SongSelectFolderEntry folderEntry)
         {
-            songTitle.text = folderEntry.DirectoryInfo.Name;
-            songArtist.text = "";
+            songTitle.SetTranslatedText(Translation.Of(folderEntry.DirectoryInfo.Name));
+            songArtist.SetTranslatedText(Translation.Empty);
         }
         else
         {
-            songTitle.text = "";
-            songArtist.text = "";
+            songTitle.SetTranslatedText(Translation.Empty);
+            songArtist.SetTranslatedText(Translation.Empty);
         }
     }
 

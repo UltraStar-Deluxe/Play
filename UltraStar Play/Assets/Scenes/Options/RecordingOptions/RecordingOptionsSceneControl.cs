@@ -458,7 +458,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         deleteButton.SetVisibleByDisplay(!isConnected);
 
         micVisualizer.SetMicProfile(micProfile);
-        noteLabel.text = Translation.Get(R.Messages.options_note, "value", "?");
+        noteLabel.SetTranslatedText(Translation.Get(R.Messages.options_note, "value", "?"));
 
         // playRecordedAudioInfoContainer.SetVisibleByDisplay(micProfile.IsInputFromConnectedClient);
 

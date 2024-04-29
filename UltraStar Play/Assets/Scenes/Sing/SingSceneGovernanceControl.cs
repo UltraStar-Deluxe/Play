@@ -167,8 +167,8 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         }));
         bottomControlsContainer.style.backgroundColor = new StyleColor(Colors.clearBlack);
 
-        artistLabel.text = songMeta.Artist;
-        titleLabel.text = songMeta.Title;
+        artistLabel.SetTranslatedText(Translation.Of(songMeta.Artist));
+        titleLabel.SetTranslatedText(Translation.Of(songMeta.Title));
 
         // Hide by default, show on mouse move or key press.
         doNotShowOverlayBeforeTimeInSeconds = Time.time + 0.5f;

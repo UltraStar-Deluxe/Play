@@ -71,7 +71,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         modListEntryInactiveOverlay.ShowByDisplay();
-        modNameLabel.text = ModDisplayName;
+        modNameLabel.SetTranslatedText(Translation.Of(ModDisplayName));
 
         enabledToggle.value = IsModEnabled;
         enabledToggle.RegisterValueChangedCallback(evt =>
@@ -179,11 +179,15 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         Label authorsLabel = modInfoDialogVisualElement.Q<Label>(R.UxmlNames.modAuthorsLabel);
         VisualElement modDependenciesContainer = modInfoDialogVisualElement.Q<VisualElement>(R.UxmlNames.modDependenciesContainer);
 
-        SetTextOrHideLabel(descriptionLabel, "",modInfo.description);
-        SetTextOrHideLabel(versionLabel, "Version: " , modInfo.version);
-        SetTextOrHideLabel(websiteLabel, "Website: " , modInfo.website);
-        SetTextOrHideLabel(websiteLabel, "License: " , modInfo.license);
-        SetTextOrHideLabel(authorsLabel, "Authors: " , modInfo.authors);
+        SetTextAndVisibility(descriptionLabel, false, Translation.Of(modInfo.description));
+        SetTextAndVisibility(versionLabel, modInfo.version.IsNullOrEmpty(),
+            Translation.Get(R.Messages.options_mod_infoDialog_version, "value", modInfo.version));
+        SetTextAndVisibility(websiteLabel, modInfo.website.IsNullOrEmpty(),
+            Translation.Get(R.Messages.options_mod_infoDialog_website, "value", modInfo.website));
+        SetTextAndVisibility(websiteLabel, modInfo.license.IsNullOrEmpty(),
+            Translation.Get(R.Messages.options_mod_infoDialog_license, "value", modInfo.license));
+        SetTextAndVisibility(authorsLabel, modInfo.authors.IsNullOrEmpty(),
+            Translation.Get(R.Messages.options_mod_infoDialog_authors, "value", modInfo.authors.JoinWith(", ")));
 
         // TODO: Mod permissions like FileSystem, Networking, etc.
         modDependenciesContainer.Clear();
@@ -201,26 +205,17 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         // }
     }
 
-    private void SetTextOrHideLabel(Label label, string prefix, List<string> texts)
+    private void SetTextAndVisibility(Label label, bool hide, Translation text)
     {
-        if (texts.IsNullOrEmpty())
-        {
-            SetTextOrHideLabel(label, prefix, "");
-            return;
-        }
-        SetTextOrHideLabel(label, prefix, texts.ToCsv(", ", "", ""));
-    }
-
-    private void SetTextOrHideLabel(Label label, string prefix, string text)
-    {
-        if (text.IsNullOrEmpty())
+        if (hide)
         {
             label.HideByDisplay();
+            label.SetTranslatedText(Translation.Empty);
             return;
         }
 
         label.ShowByDisplay();
-        label.text = $"{prefix}{text}";
+        label.SetTranslatedText(text);
     }
 
     private void UpdateInactiveOverlay()

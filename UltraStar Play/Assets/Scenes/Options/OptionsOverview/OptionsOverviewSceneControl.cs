@@ -117,8 +117,8 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
     private SceneRecipe loadedSceneRecipe;
     private readonly List<GameObject> loadedGameObjects = new();
     private readonly Dictionary<EScene, ToggleButton> sceneToButtonMap = new();
-    private readonly Dictionary<EScene, string> sceneToShortNameMap = new();
-    private readonly Dictionary<EScene, string> sceneToLongNameMap = new();
+    private readonly Dictionary<EScene, Translation> sceneToShortNameMap = new();
+    private readonly Dictionary<EScene, Translation> sceneToLongNameMap = new();
 
     private AbstractOptionsSceneControl LoadedOptionsSceneControl => loadedGameObjects
         .Select(it => it.GetComponentInChildren<AbstractOptionsSceneControl>())
@@ -250,7 +250,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         }
 
         // Set loaded scene title
-        loadedSceneTitle.text = sceneToLongNameMap[loadedSceneRecipe.scene];
+        loadedSceneTitle.SetTranslatedText(sceneToLongNameMap[loadedSceneRecipe.scene]);
 
         // Hide buttons in top row
         helpButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.HelpUri.IsNullOrEmpty());
@@ -316,19 +316,19 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
     public void UpdateTranslation()
     {
-        sceneTitle.text = Translation.Get(R.Messages.options);
+        sceneTitle.SetTranslatedText(Translation.Get(R.Messages.options));
 
         UpdateSceneToNameMap();
         sceneToButtonMap.ForEach(entry =>
         {
             Button button = entry.Value;
             Label label = button.Q<Label>(R.UxmlNames.label);
-            label.text = sceneToShortNameMap[entry.Key];
+            label.SetTranslatedText(sceneToShortNameMap[entry.Key]);
         });
 
         if (loadedSceneRecipe != null)
         {
-            loadedSceneTitle.text = sceneToLongNameMap[loadedSceneRecipe.scene];
+            loadedSceneTitle.SetTranslatedText(sceneToLongNameMap[loadedSceneRecipe.scene]);
         }
     }
 

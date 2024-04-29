@@ -98,16 +98,16 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         // Show the note that has been detected
         if (pitchEvent != null && pitchEvent.MidiNote > 0)
         {
-            noteLabel.text = Translation.Get(R.Messages.options_note,
-                "value", MidiUtils.GetAbsoluteName(pitchEvent.MidiNote));
+            noteLabel.SetTranslatedText(Translation.Get(R.Messages.options_note,
+                "value", MidiUtils.GetAbsoluteName(pitchEvent.MidiNote)));
 
             float midiNoteFactor = ((float)pitchEvent.MidiNote - MidiUtils.SingableNoteMin) / (MidiUtils.SingableNoteRange);
             pitchIndicator.style.top = new StyleLength(Length.Percent(100 - (100 * midiNoteFactor)));
         }
         else
         {
-            noteLabel.text = Translation.Get(R.Messages.options_note,
-                "value", "?");
+            noteLabel.SetTranslatedText(Translation.Get(R.Messages.options_note,
+                "value", "?"));
         }
     }
 }

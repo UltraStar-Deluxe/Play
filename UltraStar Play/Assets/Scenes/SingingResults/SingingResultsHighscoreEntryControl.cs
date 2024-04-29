@@ -34,10 +34,10 @@ public class SingingResultsHighscoreEntryControl : INeedInjection, IInjectionFin
     public void OnInjectionFinished()
     {
         visualElement.AddToClassList($"highscoreEntry-{index}");
-        posLabel.text = (index + 1).ToString();
-        playerNameLabel.text = highScoreEntry.PlayerName;
-        scoreLabel.text = highScoreEntry.Score.ToString();
-        dateLabel.text = highScoreEntry.DateTime.ToString("d", CultureInfo.CurrentUICulture);
+        posLabel.SetTranslatedText(Translation.Of((index + 1).ToString()));
+        playerNameLabel.SetTranslatedText(Translation.Of(highScoreEntry.PlayerName));
+        scoreLabel.SetTranslatedText(Translation.Of(highScoreEntry.Score.ToString()));
+        dateLabel.SetTranslatedText(Translation.Of(highScoreEntry.DateTime.ToString("d", CultureInfo.CurrentUICulture)));
         commonScoreIcon.HideByDisplay();
 
         highScoreSourceIcon.SetVisibleByDisplay(!highScoreEntry.RemoteSource.IsNullOrEmpty());

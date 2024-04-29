@@ -199,7 +199,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         }
         else
         {
-            playerNameLabel.text = playerProfile.Name;
+            playerNameLabel.SetTranslatedText(Translation.Of(playerProfile.Name));
         }
 
         // Move player to other team

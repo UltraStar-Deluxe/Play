@@ -145,9 +145,9 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
     private void SetEmptySongDetails()
     {
-        selectedSongArtist.text = "";
-        selectedSongTitle.text = "";
-        songIndexLabel.text = "";
+        selectedSongArtist.SetTranslatedText(Translation.Empty);
+        selectedSongTitle.SetTranslatedText(Translation.Empty);
+        songIndexLabel.SetTranslatedText(Translation.Empty);
         SongMetaImageUtils.SetDefaultSongImage(selectedSongImageOuter, selectedSongImageInner);
         songRatingIconControl.HideSongRatingIcons();
         UpdateHighScores(new List<HighScoreEntry>());
@@ -165,15 +165,15 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         if (selectedEntry is not SongSelectSongEntry songEntry)
         {
             SetEmptySongDetails();
-            songIndexLabel.text = "-";
+            songIndexLabel.SetTranslatedText(Translation.Of("-"));
             return;
         }
 
         SongMeta selectedSong = songEntry.SongMeta;
 
-        selectedSongArtist.text = selectedSong.Artist;
-        selectedSongTitle.text = selectedSong.Title;
-        songIndexLabel.text = $"{selection.Index + 1} / {selection.Count}";
+        selectedSongArtist.SetTranslatedText(Translation.Of(selectedSong.Artist));
+        selectedSongTitle.SetTranslatedText(Translation.Of(selectedSong.Title));
+        songIndexLabel.SetTranslatedText(Translation.Of($"{selection.Index + 1} / {selection.Count}"));
 
         setSongDetailsCoverOrBackgroundImageDisposable?.Dispose();
         setSongDetailsCoverOrBackgroundImageDisposable = SongMetaImageUtils.SetCoverOrBackgroundImage(selectedSong, selectedSongImageInner, selectedSongImageOuter);
@@ -181,7 +181,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         // The song duration requires loading the audio file.
         // Loading every song only to show its duration is slow (e.g. when scrolling through songs).
         // Instead, the label is updated when the AudioClip has been loaded.
-        durationLabel.text = "";
+        durationLabel.SetTranslatedText(Translation.Empty);
 
         UpdateHighScores(selectedSong);
 
@@ -195,7 +195,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
     {
         int min = (int)Math.Floor(durationInMillis / 1000 / 60);
         int seconds = (int)Math.Floor((durationInMillis / 1000) % 60);
-        durationLabel.text = $"{min}:{seconds.ToString().PadLeft(2, '0')}";
+        durationLabel.SetTranslatedText(Translation.Of($"{min}:{seconds.ToString().PadLeft(2, '0')}"));
     }
 
     private void UpdateHighScores(SongMeta songMeta)
@@ -234,7 +234,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
                 ? topScores[i].ToString()
                 : "-";
 
-            labels[i].text = scoreText;
+            labels[i].SetTranslatedText(Translation.Of(scoreText));
         }
     }
 }

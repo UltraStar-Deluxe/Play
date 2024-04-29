@@ -60,7 +60,7 @@ public class SongSelectMicEntryControl : IInjectionFinishedListener, IDisposable
         {
             if (audioWaveForm is Label audioWaveFormLabel)
             {
-                audioWaveFormLabel.text = "";
+                audioWaveFormLabel.SetTranslatedText(Translation.Empty);
             }
             int textureWidth = 256;
             int textureHeight = 128;

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UniInject;
 using UniRx;
-using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
@@ -54,8 +53,8 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
                 connectedClientList.Add(CreateClientEntry(clientHandler));
             });
 
-        connectedClientCountLabel.text = Translation.Get(R.Messages.options_connectedClientCount,
-            "count", serverSideConnectRequestManager.ConnectedClientCount);
+        connectedClientCountLabel.SetTranslatedText(Translation.Get(R.Messages.options_connectedClientCount,
+            "count", serverSideConnectRequestManager.ConnectedClientCount));
 
         bool noConnectedClients = serverSideConnectRequestManager.ConnectedClientCount <= 0;
         noConnectedClientsContainer.SetVisibleByDisplay(noConnectedClients);
