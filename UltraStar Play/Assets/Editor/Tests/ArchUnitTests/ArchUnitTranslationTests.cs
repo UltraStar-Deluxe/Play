@@ -8,6 +8,7 @@ using ArchUnitNET.Fluent.Conditions;
 using ArchUnitNET.Loader;
 using ArchUnitNET.NUnit;
 using NUnit.Framework;
+using ProTrans;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
@@ -17,6 +18,7 @@ using Type = System.Type;
 public class ArchUnitTranslationTests
 {
     private static List<TranslatableAssignment> ignoredUntranslatedAssignments = new();
+    private static HashSet<string> ignoredUntranslatedEnums = new();
 
     private static readonly HashSet<string> typesWithUiLabels = new()
     {
@@ -33,8 +35,9 @@ public class ArchUnitTranslationTests
      * Instead, a custom extension method that takes a translation result as input should be used.
      */
     [Test]
+    [TestCase("playshared")]
     [TestCase("playsharedui")]
-    [TestCase("Common")]  // Common takes pretty long to run. The other assemblies finish the test faster.
+    [TestCase("Common")]  // Common takes long to run (few minutes).
     [TestCase("Scenes")]
     [TestCase("SongEditorScene")]
     // [Ignore("Not all label assignments refactored yet to use a translation object via custom extension method")]
@@ -49,6 +52,90 @@ public class ArchUnitTranslationTests
         Types()
             .Should().FollowCustomCondition(NotCallUntranslatedUiLabelSetter())
             .Check(architecture);
+    }
+
+    [Test]
+    [TestCase("playshared")]
+    [TestCase("playsharedui")]
+    [TestCase("Common")] // Common takes long to run (few minutes).
+    [TestCase("Scenes")]
+    [TestCase("SongEditorScene")]
+    public void EnumsAreTranslated(string assemblyName)
+    {
+        Translation.InitTranslationConfig();
+        LoadIgnoredUntranslatedEnums();
+        Architecture architecture = ArchUnitTestUtils.LoadArchitectureByAssemblyNames(new List<string>()
+        {
+            assemblyName
+        });
+
+        HashSet<string> missingTranslations = new();
+        Types().That().AreEnums()
+            .Should().FollowCustomCondition(Do(type =>
+            {
+                if (IsIgnoredEnum(type))
+                {
+                    return;
+                }
+
+                List<IMember> membersWithoutTranslation = type.Members
+                    .Where(member => member.Name != "value__")
+                    .Where(member => !Translation.TryGet(GetEnumTranslationKey(member), new Dictionary<string, string>(), out Translation _))
+                    .ToList();
+                missingTranslations.AddRange(membersWithoutTranslation.Select(member => $"{GetEnumTranslationKey(member)}={StringUtils.ToTitleCase(member.Name)}"));
+            }))
+            .Check(architecture);
+
+        if (!missingTranslations.IsNullOrEmpty())
+        {
+            Assert.Fail($"Missing enum translations:\n    {missingTranslations.OrderBy(it => it).JoinWith("\n    ")}");
+        }
+    }
+
+    [Test]
+    public void EnumTranslationHasCorrespondingEnumType()
+    {
+        Translation.InitTranslationConfig();
+        // Must load all assemblies to find all enum types
+        Architecture architecture = ArchUnitTestUtils.LoadArchitectureByAssemblyNames(new List<string>()
+        {
+            "playshared",
+            "playsharedui",
+            "Common",
+            "Scenes",
+            "SongEditorScene",
+        });
+
+        // Find all enums types
+        List<IType> enums = new List<IType>();
+        Types().That().AreEnums()
+            .Should().FollowCustomCondition(Do(type => enums.Add(type)))
+            .Check(architecture);
+
+        // Find all valid enum translation keys
+        HashSet<string> enumTranslationKeys = enums
+            .SelectMany(type => type.Members)
+            .Select(member => GetEnumTranslationKey(member))
+            .ToHashSet(StringComparer.InvariantCultureIgnoreCase);
+
+        // Check that actual enum translation keys are present in valid enum translation keys
+        PropertiesFile defaultPropertiesFile = Translation.GetPropertiesFile(Translation.GetFallbackCultureInfo());
+        List<string> translationKeysWithoutCorrespondingEnum = defaultPropertiesFile.Dictionary.Keys
+            .Where(translationKey => translationKey.StartsWith("enum_")
+                                     && !enumTranslationKeys.Contains(translationKey))
+            .ToList();
+
+        List<string> translationKeysWithCorrespondingEnum = defaultPropertiesFile.Dictionary.Keys
+            .Except(translationKeysWithoutCorrespondingEnum)
+            .ToList();
+
+        Debug.Log($"Enum translations with corresponding enum type:\n    "
+                  + translationKeysWithCorrespondingEnum.JoinWith("\n    "));
+        if (!translationKeysWithoutCorrespondingEnum.IsNullOrEmpty())
+        {
+            Assert.Fail($"Enum translations without corresponding enum type:\n    "
+                        + translationKeysWithoutCorrespondingEnum.JoinWith("\n    "));
+        }
     }
 
     [Test]
@@ -77,15 +164,36 @@ public class ArchUnitTranslationTests
         }
     }
 
+    private static ICondition<IType> Do(Action<IType> action)
+    {
+        return new SimpleCondition<IType>(type =>
+        {
+            action(type);
+            return new ConditionResult(type, true, "do action");
+        }, "do action");
+    }
+
+    private static bool IsIgnoredEnum(IType type)
+    {
+        return ignoredUntranslatedEnums.Contains(type.FullName);
+    }
+
+    private static string GetEnumTranslationKey(IMember enumValue)
+    {
+        string typeName = enumValue.DeclaringType.Name;
+        string valueName = enumValue.Name;
+
+        return typeName.StartsWith("E")
+            ? $"enum_{typeName.Substring(1)}_{valueName}"
+            : $"enum_{typeName}_{valueName}";
+    }
+
     private static ICondition<IType> NotCallUntranslatedUiLabelSetter()
     {
         return new SimpleCondition<IType>(type =>
             {
-                List<MethodMember> calledUiLabelSetters = type.GetCalledMethods()
-                    .Where(IsUiLabelSetter)
-                    .Where(method => !IsIgnoredTranslatableAssignment(type, method))
-                    .ToList();
-                string calledUiLabelSettersCsv = calledUiLabelSetters.Select(method => $"{method.DeclaringType.Name}.{method.Name}").JoinWith(", ");
+                List<MethodMember> calledUiLabelSetters = Enumerable.ToList(Enumerable.Where(Enumerable.Where(type.GetCalledMethods(), IsUiLabelSetter), method => !IsIgnoredTranslatableAssignment(type, method)));
+                string calledUiLabelSettersCsv = Enumerable.Select(calledUiLabelSetters, method => $"{method.DeclaringType.Name}.{method.Name}").JoinWith(", ");
                 return new ConditionResult(type, calledUiLabelSetters.IsNullOrEmpty(), $"should not call untranslated UI label setter {calledUiLabelSettersCsv}");
             },
             $"not call untranslated UI label setter");
@@ -117,6 +225,11 @@ public class ArchUnitTranslationTests
         ignoredUntranslatedAssignments = new();
 
         string[] lines = File.ReadAllLines("Assets/Editor/Tests/ArchUnitTests/IgnoredUntranslatedAssignments.csv");
+        if (lines.Length > 1)
+        {
+            Debug.LogWarning($"Ignoring untranslated assignments:\n  {lines.JoinWith("\n  ")}");
+        }
+
         // Start at index 1 to skip header line
         for (int i = 1; i < lines.Length; i++)
         {
@@ -127,11 +240,17 @@ public class ArchUnitTranslationTests
             string methodName = values[2].Trim();
             ignoredUntranslatedAssignments.Add(new TranslatableAssignment(typeName, methodDeclaringTypeName, methodName));
         }
+    }
 
-        if (!ignoredUntranslatedAssignments.IsNullOrEmpty())
+    private static void LoadIgnoredUntranslatedEnums()
+    {
+        string[] lines = File.ReadAllLines("Assets/Editor/Tests/ArchUnitTests/IgnoredUntranslatedEnums.csv");
+        if (lines.Length > 1)
         {
             Debug.LogWarning($"Ignoring untranslated assignments:\n  {lines.JoinWith("\n  ")}");
         }
+        // Start at index 1 to skip header line
+        ignoredUntranslatedEnums = Enumerable.ToHashSet(Enumerable.Select(Enumerable.Skip(lines, 1), it => it.Trim()));
     }
 
     private struct TranslatableAssignment
