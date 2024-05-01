@@ -163,7 +163,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         RegisterToggleSearchPropertyCallback(titlePropertyToggle, ESearchProperty.Title);
         RegisterToggleSearchPropertyCallback(languagePropertyToggle, ESearchProperty.Language);
         RegisterToggleSearchPropertyCallback(genrePropertyToggle, ESearchProperty.Genre);
-        RegisterToggleSearchPropertyCallback(tagPropertyToggle, ESearchProperty.Tag);
+        RegisterToggleSearchPropertyCallback(tagPropertyToggle, ESearchProperty.Tags);
         RegisterToggleSearchPropertyCallback(editionPropertyToggle, ESearchProperty.Edition);
         RegisterToggleSearchPropertyCallback(yearPropertyToggle, ESearchProperty.Year);
         RegisterToggleSearchPropertyCallback(lyricsPropertyToggle, ESearchProperty.Lyrics);
@@ -337,7 +337,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         {
             return true;
         }
-        if (searchProperties.Contains(ESearchProperty.Tag)
+        if (searchProperties.Contains(ESearchProperty.Tags)
             && !songMeta.Tag.IsNullOrEmpty()
             && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Tag, searchText))
         {
