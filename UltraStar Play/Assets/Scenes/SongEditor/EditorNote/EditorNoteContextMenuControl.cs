@@ -125,7 +125,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     private void FillContextMenuToDeleteNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
-        contextMenu.AddButton(Translation.Get(R.Messages.button_delete), () => deleteNotesAction.ExecuteAndNotify(selectedNotes));
+        contextMenu.AddButton(Translation.Get(R.Messages.action_delete), () => deleteNotesAction.ExecuteAndNotify(selectedNotes));
     }
 
     private void FillContextMenuToSetNoteType(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)

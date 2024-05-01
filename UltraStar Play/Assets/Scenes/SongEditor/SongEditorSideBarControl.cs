@@ -257,7 +257,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         controlsAccordionItem.Add(inputLegendContainer);
         helpDialogControl.DialogRootVisualElement.Q<AccordionGroup>().Add(controlsAccordionItem);
 
-        helpDialogControl.AddButton(Translation.Get(R.Messages.viewMore),
+        helpDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
             _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToSongEditor)));
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(helpDialogControl.DialogRootVisualElement);
@@ -381,7 +381,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
         List<InputActionInfo> inputActionInfos = new();
 
-        inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.usplay_back, Translation.Get(R.Messages.back)));
+        inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.usplay_back, Translation.Get(R.Messages.common_back)));
 
         if (inputManager.InputDeviceEnum == EInputDevice.KeyboardAndMouse)
         {

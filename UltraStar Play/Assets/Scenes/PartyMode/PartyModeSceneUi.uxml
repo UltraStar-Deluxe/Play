@@ -14,7 +14,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
-            <ui:Button text="$button_continue" display-tooltip-when-elided="true" name="continueButton" />
+            <ui:Button text="$action_continue" display-tooltip-when-elided="true" name="continueButton" />
         </ui:VisualElement>
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="flex-grow: 1;">
             <ui:Instance template="PartyModeSongSelectionRoundUi" name="partyModeSongSelectionConfigUi" />

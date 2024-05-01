@@ -16,14 +16,14 @@
             <AccordionGroup>
                 <AccordionItem label="$songSelectScene_searchProperty_title" name="searchPropertyAccordionItem" content-visible="false">
                     <ui:VisualElement name="toggles" class="child-mb-2" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                        <ui:Toggle name="artistPropertyToggle" label="$songProperty_artist" class="mt-2" />
-                        <ui:Toggle name="titlePropertyToggle" label="$songProperty_title" />
-                        <ui:Toggle name="languagePropertyToggle" label="$songProperty_language" />
-                        <ui:Toggle name="genrePropertyToggle" label="$songProperty_genre" />
-                        <ui:Toggle name="tagPropertyToggle" label="$songProperty_tag" />
-                        <ui:Toggle name="editionPropertyToggle" label="$songProperty_edition" />
-                        <ui:Toggle name="yearPropertyToggle" label="$songProperty_year" />
-                        <ui:Toggle name="lyricsPropertyToggle" label="$songProperty_lyrics" />
+                        <ui:Toggle name="artistPropertyToggle" label="$enum_SearchProperty_Artist" class="mt-2" />
+                        <ui:Toggle name="titlePropertyToggle" label="$enum_SearchProperty_Title" />
+                        <ui:Toggle name="languagePropertyToggle" label="$enum_SearchProperty_Language" />
+                        <ui:Toggle name="genrePropertyToggle" label="$enum_SearchProperty_Genre" />
+                        <ui:Toggle name="tagPropertyToggle" label="$enum_SearchProperty_Tags" />
+                        <ui:Toggle name="editionPropertyToggle" label="$enum_SearchProperty_Edition" />
+                        <ui:Toggle name="yearPropertyToggle" label="$enum_SearchProperty_Year" />
+                        <ui:Toggle name="lyricsPropertyToggle" label="$enum_SearchProperty_Lyrics" />
                     </ui:VisualElement>
                 </AccordionItem>
                 <AccordionItem name="filtersAccordionItem" label="$songSelectScene_filterBy" content-visible="false">

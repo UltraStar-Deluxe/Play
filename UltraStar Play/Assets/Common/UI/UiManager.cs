@@ -189,7 +189,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
         closeButtonText = !closeButtonText.Value.IsNullOrEmpty()
             ? closeButtonText
-            : Translation.Get(R.Messages.close);
+            : Translation.Get(R.Messages.action_close);
         messageDialogControl.AddButton(closeButtonText, evt =>
         {
             messageDialogControl.CloseDialog();
@@ -215,7 +215,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
         cancelButtonText = !cancelButtonText.Value.IsNullOrEmpty()
             ? cancelButtonText
-            : Translation.Get(R.Messages.button_cancel);
+            : Translation.Get(R.Messages.action_cancel);
         messageDialogControl.AddButton(cancelButtonText, evt =>
         {
             messageDialogControl.CloseDialog();

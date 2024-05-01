@@ -21,17 +21,40 @@ public class TranslationTests
     [Test]
     public void ShouldNotHaveUnusedTranslationKeys()
     {
+        PropertiesFile defaultPropertiesFile = Translation.GetPropertiesFile(Translation.GetFallbackCultureInfo());
+        ShouldNotHaveUnusedTranslationKeys(defaultPropertiesFile.Dictionary.Keys.ToHashSet());
+    }
+
+    [Test]
+    public void ShouldFindUnusedTranslationKeys()
+    {
+        HashSet<string> translationKeys = new HashSet<string>() { "this_is_not_used" };
+        Assert.Throws<AssertionException>(
+            () => ShouldNotHaveUnusedTranslationKeys(translationKeys),
+            "Did not find unused translation");
+    }
+
+    private void ShouldNotHaveUnusedTranslationKeys(HashSet<string> translationKeys)
+    {
+
+        HashSet<string> ignoredFileNames = new()
+        {
+            // Ignore file with generated constants for translation keys.
+            "RMessages.cs",
+            // Ignore this file itself
+            "TranslationTests.cs",
+        };
+
         HashSet<string> unseenTranslationKeys = new();
         HashSet<string> seenTranslationKeys = new();
 
-        // Ignore enum translations, ignore translations for companion app,
-        // ignore languages because these keys are used dynamically via string concatenation.
+        // Ignore translations for companion app
+        // and ignore translations that are used dynamically via string concatenation.
         List<string> ignoredTranslationKeyPrefixes = new List<string>() { "enum_", "companionApp_", "language_"};
 
         // AhoCorasick search algorithm as recommended by https://stackoverflow.com/questions/46339057/c-sharp-fastest-string-search-in-all-files
         Trie trie = new();
-        PropertiesFile defaultPropertiesFile = Translation.GetPropertiesFile(Translation.GetFallbackCultureInfo());
-        unseenTranslationKeys.AddRange(defaultPropertiesFile.Dictionary.Keys
+        unseenTranslationKeys.AddRange(translationKeys
             .Where(key => !ignoredTranslationKeyPrefixes.AnyMatch(prefix => key.StartsWith(prefix))));
         unseenTranslationKeys.ForEach(key => trie.Add(key));
         trie.Build();
@@ -44,9 +67,8 @@ public class TranslationTests
 
         foreach (string file in files)
         {
-            if (Path.GetFileName(file) == "RMessages.cs")
+            if (ignoredFileNames.Contains(Path.GetFileName(file)))
             {
-                // Skip file with generated constants for translation keys.
                 continue;
             }
 
@@ -64,7 +86,10 @@ public class TranslationTests
         }
 
         Debug.Log($"Used translation keys:\n    {seenTranslationKeys.OrderBy(it => it).JoinWith("\n    ")}");
-        Debug.LogWarning($"Unused translation keys:\n    {unseenTranslationKeys.OrderBy(it => it).JoinWith("\n    ")}");
+        if (!unseenTranslationKeys.IsNullOrEmpty())
+        {
+            Assert.Fail($"Unused translation keys:\n    {unseenTranslationKeys.OrderBy(it => it).JoinWith("\n    ")}");
+        }
     }
 
     [Test]

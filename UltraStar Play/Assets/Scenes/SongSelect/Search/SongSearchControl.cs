@@ -209,29 +209,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         filterInactiveIcon.SetVisibleByDisplay(!isAnyFilterOrPlaylistActive);
     }
 
-    private string GetTranslation(ESearchProperty searchProperty)
-    {
-        switch (searchProperty)
-        {
-            case ESearchProperty.Artist:
-                return Translation.Get(R.Messages.songProperty_artist);
-            case ESearchProperty.Title:
-                return Translation.Get(R.Messages.songProperty_title);
-            case ESearchProperty.Year:
-                return Translation.Get(R.Messages.songProperty_year);
-            case ESearchProperty.Genre:
-                return Translation.Get(R.Messages.songProperty_genre);
-            case ESearchProperty.Language:
-                return Translation.Get(R.Messages.songProperty_language);
-            case ESearchProperty.Edition:
-                return Translation.Get(R.Messages.songProperty_edition);
-            case ESearchProperty.Lyrics:
-                return Translation.Get(R.Messages.songProperty_lyrics);
-            default:
-                return searchProperty.ToString();
-        }
-    }
-
     public void ShowSearchPropertyDropdownOverlay()
     {
         searchPropertyDropdownOverlay.ShowByDisplay();

@@ -45,7 +45,7 @@
                     <MaterialIcon name="warningIcon" icon="warning" class="rounded warningFontColor noBackgroundInHierarchy" />
                     <ui:Label text="$options_micNotConnected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warningFontColor noBackgroundInHierarchy" />
                 </ui:VisualElement>
-                <ui:Button text="$button_delete" name="deleteButton" class="controlMinWidth ml-auto" style="visibility: visible; display: flex;" />
+                <ui:Button text="$action_delete" name="deleteButton" class="controlMinWidth ml-auto" style="visibility: visible; display: flex;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

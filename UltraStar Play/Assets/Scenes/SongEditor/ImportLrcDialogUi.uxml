@@ -13,8 +13,8 @@
             </ui:VisualElement>
         </ui:ScrollView>
         <ui:VisualElement name="buttonRow" style="background-color: rgba(0, 0, 0, 0); width: 100%; align-items: center; flex-shrink: 0; flex-direction: row; justify-content: center; margin-top: 10px;">
-            <ui:Button text="$button_cancel" display-tooltip-when-elided="true" name="closeImportLrcDialogButton" class="controlMinWidth mr-1" />
-            <ui:Button text="$button_import" display-tooltip-when-elided="true" name="importLrcFormatDialogButton" class="controlMinWidth mr-1" />
+            <ui:Button text="$action_cancel" display-tooltip-when-elided="true" name="closeImportLrcDialogButton" class="controlMinWidth mr-1" />
+            <ui:Button text="$action_import" display-tooltip-when-elided="true" name="importLrcFormatDialogButton" class="controlMinWidth mr-1" />
             <ui:Button display-tooltip-when-elided="true" name="lrcImportHelpButton" class="squareButton">
                 <MaterialIcon icon="help_outline" name="helpIcon" />
             </ui:Button>

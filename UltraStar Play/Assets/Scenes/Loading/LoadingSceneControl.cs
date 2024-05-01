@@ -187,7 +187,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         unexpectedErrorContainer.ShowByDisplay();
         unexpectedErrorLabel.text = Translation.Get(R.Messages.loadingScene_unexpectedErrorMessage,
             "path", ApplicationUtils.ReplacePathsWithDisplayString(Log.logFilePath));
-        viewMoreButton.text = Translation.Get(R.Messages.viewMore);
+        viewMoreButton.text = Translation.Get(R.Messages.action_learnMore);
         viewMoreButton.RegisterCallbackButtonTriggered(_ => Application.OpenURL(Translation.Get(R.Messages.uri_logFiles)));
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {

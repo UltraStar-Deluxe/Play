@@ -52,6 +52,6 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveToDetectedPitch),
             () => pitchDetectionAction.MoveNotesToDetectedPitchUsingPitchDetectionLayer(sentenceControl.Sentence.Notes.ToList(),true));
         contextMenu.AddSeparator();
-        contextMenu.AddButton(Translation.Get(R.Messages.button_delete), () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
+        contextMenu.AddButton(Translation.Get(R.Messages.action_delete), () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }
 }

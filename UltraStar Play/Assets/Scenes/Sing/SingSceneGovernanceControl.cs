@@ -398,7 +398,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     {
         MessageDialogControl messageDialogControl = UiManager.Instance.CreateDialogControl(Translation.Get(R.Messages.action_showAttribution));
         messageDialogControl.AddVisualElement(AttributionUtils.CreateAttributionVisualElement(songMeta));
-        messageDialogControl.AddButton(Translation.Get(R.Messages.close), _ => messageDialogControl.CloseDialog());
+        messageDialogControl.AddButton(Translation.Get(R.Messages.action_close), _ => messageDialogControl.CloseDialog());
     }
 
     private void OnContextMenuClosed(ContextMenuPopupControl contextMenuPopupControl)

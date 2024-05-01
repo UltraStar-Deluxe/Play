@@ -193,7 +193,8 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             return;
         }
 
-        Label propertyLabel = new(searchProperty.TranslatedName());
+        Label propertyLabel = new();
+        propertyLabel.SetTranslatedText(Translation.Get(searchProperty));
         propertyLabel.AddToClassList("searchFilterLabel");
         filterListContainer.Add(propertyLabel);
         foreach (string value in values)

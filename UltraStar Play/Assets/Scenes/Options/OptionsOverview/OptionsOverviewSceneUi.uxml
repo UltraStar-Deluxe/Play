@@ -13,7 +13,7 @@
             </ui:VisualElement>
             <ui:Label text="$options_game_title" name="loadedSceneTitle" class="noBackgroundInHierarchy" style="-unity-font-style: bold; margin-left: 20px;" />
             <ui:VisualElement name="topButtonRow" class="ml-auto" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
-                <ui:Button name="openSteamWorkshopButton" text="$button_steamWorkshop" />
+                <ui:Button name="openSteamWorkshopButton" text="$action_openSteamWorkshop" />
                 <ui:Button name="updateSteamWorkshopItemsButton" class="mr-2 squareButton">
                     <MaterialIcon name="updateSteamWorkshopItemsIcon" icon="replay" />
                 </ui:Button>

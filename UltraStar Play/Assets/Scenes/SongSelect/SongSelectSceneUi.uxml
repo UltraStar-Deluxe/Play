@@ -66,12 +66,12 @@
                 <ToggleButton display-tooltip-when-elided="true" name="toggleMicCheckButton" class="squareButton transparentButton" style="padding-top: 0; padding-bottom: 0; padding-left: 0; padding-right: 0; overflow: visible;">
                     <MaterialIcon tabindex="-1" name="micCheckIcon" icon="mic" style="font-size: 20px;" />
                     <MaterialIcon tabindex="-1" name="noMicCheckIcon" icon="mic_off" style="font-size: 20px; display: none;" />
-                    <ui:Label tabindex="-1" text="$button_toggleMicTest" display-tooltip-when-elided="true" name="toggleMicCheckButtonLabel" class="tinyFont" />
+                    <ui:Label tabindex="-1" text="$action_toggleMicTest" display-tooltip-when-elided="true" name="toggleMicCheckButtonLabel" class="tinyFont" />
                 </ToggleButton>
                 <ToggleButton display-tooltip-when-elided="true" name="toggleCoopModeButton" class="ml-2 squareButton transparentButton" style="padding-top: 0; padding-bottom: 0; padding-left: 0; padding-right: 0; overflow: visible;">
                     <MaterialIcon tabindex="-1" name="coopIcon" icon="diversity_1" style="font-size: 20px;" />
                     <MaterialIcon tabindex="-1" name="noCoopIcon" icon="groups" style="font-size: 20px; display: none;" />
-                    <ui:Label tabindex="-1" text="$button_toggleCoopMode" display-tooltip-when-elided="true" name="toggleCoopModeButtonLabel" class="tinyFont" />
+                    <ui:Label tabindex="-1" text="$action_toggleCoopMode" display-tooltip-when-elided="true" name="toggleCoopModeButtonLabel" class="tinyFont" />
                 </ToggleButton>
                 <ui:Button name="navigateFolderUpButton" class="squareButton transparentButton">
                     <MaterialIcon name="selectRandomSongIcon" icon="folder" />
@@ -140,20 +140,20 @@
             <ui:VisualElement name="buttonRow" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: center;">
                 <ui:Button display-tooltip-when-elided="true" name="addToSongQueueAsNewButton" enable-rich-text="false" style="margin-right: 5px; height: auto;">
                     <MaterialIcon tabindex="-1" icon="playlist_add" name="enqueueIcon" />
-                    <ui:Label tabindex="-1" text="$button_songQueue_add" display-tooltip-when-elided="true" name="addToSongQueueAsNewLabel" class="tinyFont" />
+                    <ui:Label tabindex="-1" text="$songQueue_action_add" display-tooltip-when-elided="true" name="addToSongQueueAsNewLabel" class="tinyFont" />
                 </ui:Button>
                 <ui:Button display-tooltip-when-elided="true" name="addToSongQueueAsMedleyButton" enable-rich-text="false" style="height: auto;">
                     <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                         <MaterialIcon tabindex="-1" icon="playlist_add" name="enqueueIcon" />
                         <MaterialIcon tabindex="-1" icon="link" name="linkIcon" />
                     </ui:VisualElement>
-                    <ui:Label tabindex="-1" text="$button_songQueue_addAsMedley" display-tooltip-when-elided="true" name="addToSongQueueAsMedleyLabel" class="tinyFont" />
+                    <ui:Label tabindex="-1" text="$songQueue_action_addAsMedley" display-tooltip-when-elided="true" name="addToSongQueueAsMedleyLabel" class="tinyFont" />
                 </ui:Button>
                 <ui:Button display-tooltip-when-elided="true" name="startSongQueueButton" enable-rich-text="false" class="ml-1" style="height: auto;">
                     <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                         <MaterialIcon tabindex="-1" icon="play_arrow" name="startQueueIcon" />
                     </ui:VisualElement>
-                    <ui:Label tabindex="-1" text="$button_songQueue_start" display-tooltip-when-elided="true" name="addToSongQueueAsMedleyLabel" class="tinyFont" />
+                    <ui:Label tabindex="-1" text="$songQueue_action_start" display-tooltip-when-elided="true" name="addToSongQueueAsMedleyLabel" class="tinyFont" />
                 </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>

@@ -7,10 +7,10 @@
             <ui:Label text="Warning about invalid value" display-tooltip-when-elided="true" name="invalidValueLabel" />
         </ui:VisualElement>
         <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: space-around; margin-top: 10px;">
-            <ui:Button text="$button_delete" display-tooltip-when-elided="true" name="deletePlaylistButton" class="controlMinWidth" />
-            <ui:Button text="$button_confirmDelete" display-tooltip-when-elided="true" name="confirmDeletePlaylistButton" class="wideControl controlMinWidth" style="display: none;" />
-            <ui:Button text="$button_cancel" display-tooltip-when-elided="true" name="cancelDeletePlaylistButton" class="controlMinWidth" style="display: none;" />
-            <ui:Button text="$button_continue" display-tooltip-when-elided="true" name="submitEditPlaylistButton" class="controlMinWidth" />
+            <ui:Button text="$action_delete" display-tooltip-when-elided="true" name="deletePlaylistButton" class="controlMinWidth" />
+            <ui:Button text="$action_confirmDelete" display-tooltip-when-elided="true" name="confirmDeletePlaylistButton" class="wideControl controlMinWidth" style="display: none;" />
+            <ui:Button text="$action_cancel" display-tooltip-when-elided="true" name="cancelDeletePlaylistButton" class="controlMinWidth" style="display: none;" />
+            <ui:Button text="$action_continue" display-tooltip-when-elided="true" name="submitEditPlaylistButton" class="controlMinWidth" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

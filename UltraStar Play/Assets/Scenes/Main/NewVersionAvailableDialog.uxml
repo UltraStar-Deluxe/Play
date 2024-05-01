@@ -8,11 +8,11 @@
                 <ui:Label text="New version available" name="dialogMessage" class="dialogMessage" style="-unity-text-align: upper-center;" />
             </ui:VisualElement>
             <ui:VisualElement name="dialogTextButtonContainer" style="flex-direction: column; justify-content: flex-start; width: 100%; padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 2px; align-items: flex-start;">
-                <ui:Button text="$mainScene_newVersionDialog_ignoreThis" name="ignoreThisVersionButton" class="dialogButton dialogTextButton" style="background-color: rgba(66, 163, 231, 0);" />
-                <ui:Button text="$mainScene_newVersionDialog_ignoreAll" name="ignoreAllFutureVersionsButton" class="dialogButton dialogTextButton" style="background-color: rgba(66, 163, 231, 0);" />
+                <ui:Button text="$mainScene_newVersionDialog_ignoreThisVersion" name="ignoreThisVersionButton" class="dialogButton dialogTextButton" style="background-color: rgba(66, 163, 231, 0);" />
+                <ui:Button text="$mainScene_newVersionDialog_ignoreAllFutureVersions" name="ignoreAllFutureVersionsButton" class="dialogButton dialogTextButton" style="background-color: rgba(66, 163, 231, 0);" />
             </ui:VisualElement>
             <ui:VisualElement name="dialogButtonContainer" style="flex-direction: row; justify-content: center; width: 100%; padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 2px; align-items: center;">
-                <ui:Button text="$button_ok" name="dialogCloseButton" class="dialogButton" />
+                <ui:Button text="$common_ok" name="dialogCloseButton" class="dialogButton" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

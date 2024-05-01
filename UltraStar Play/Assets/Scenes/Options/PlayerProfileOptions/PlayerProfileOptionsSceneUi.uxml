@@ -9,7 +9,7 @@
             </ui:ScrollView>
             <ui:Button name="addButton" style="align-self: center; bottom: 0; flex-direction: row;">
                 <MaterialIcon tabindex="-1" picking-mode="Ignore" icon="person_add_alt_1" name="addPlayerIcon" class="mr-2" />
-                <ui:Label tabindex="-1" text="$button_addPlayer" display-tooltip-when-elided="true" name="addPlayerLabel" />
+                <ui:Label tabindex="-1" text="$action_addPlayer" display-tooltip-when-elided="true" name="addPlayerLabel" />
             </ui:Button>
         </ui:VisualElement>
     </ui:VisualElement>

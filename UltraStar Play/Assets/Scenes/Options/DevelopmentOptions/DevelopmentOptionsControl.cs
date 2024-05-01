@@ -476,11 +476,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 uploadWorkshopItemUiControl.Dispose();
                 uploadWorkshopItemDialogControl = null;
             });
-        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.common_learnMore),
+        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
             _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToSteamWorkshop)));
         uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.steamWorkshop_action_publish),
             _ => uploadWorkshopItemUiControl.PublishWorkshopItem());
-        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.button_cancel),
+        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.action_cancel),
             _ => uploadWorkshopItemDialogControl.CloseDialog());
     }
 
@@ -513,7 +513,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     {
         MessageDialogControl messageDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_development_portAudioDialog_title));
         messageDialogControl.AddButton(Translation.Get(R.Messages.options_development_action_copyCsv), _ => CopyPortAudioDeviceListCsv());
-        messageDialogControl.AddButton(Translation.Get(R.Messages.close), _ => messageDialogControl.CloseDialog());
+        messageDialogControl.AddButton(Translation.Get(R.Messages.action_close), _ => messageDialogControl.CloseDialog());
 
         Label defaultHostApiLabel = new Label();
         defaultHostApiLabel.text = $"Default host API: {PortAudioConversionUtils.GetDefaultHostApi()}";

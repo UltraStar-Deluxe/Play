@@ -28,7 +28,7 @@
             <ui:Button name="backButton" value="This is the about text on multiple lines." class="transparentButton circle squareButton">
                 <MaterialIcon tabindex="-1" name="backIcon" icon="arrow_back" />
             </ui:Button>
-            <ui:Button name="skipButton" value="This is the about text on multiple lines." text="$button_skip" class="transparentButton circle squareButton smallFont" />
+            <ui:Button name="skipButton" value="This is the about text on multiple lines." text="$action_skip" class="transparentButton circle squareButton smallFont" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

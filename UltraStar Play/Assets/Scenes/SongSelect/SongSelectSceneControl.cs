@@ -411,9 +411,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                         Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_message,
                             "suggestionName", SongMetaUtils.GetArtistDashTitle(songMeta),
                             "suggestorName", lobbyMember.DisplayName),
-                        Translation.Get(R.Messages.yes),
+                        Translation.Get(R.Messages.common_yes),
                         _ => songRouletteControl.SelectEntryBySongMeta(songMeta),
-                        Translation.Get(R.Messages.no));
+                        Translation.Get(R.Messages.common_no));
                 }
             }));
     }
@@ -644,7 +644,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         if (settings.ScoreMode == EScoreMode.None)
         {
-            currentDifficultyLabel.SetTranslatedText(Translation.Get(R.Messages.difficulty_noScores));
+            currentDifficultyLabel.SetTranslatedText(Translation.Get(R.Messages.options_difficulty_noScores));
         }
         else
         {
@@ -1136,7 +1136,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             StartSongEditorScene(songMeta);
         });
         // noSingAlongDataDialogControl.AddButton("Start anyway", _ => StartSingScene(songMeta));
-        noSingAlongDataDialogControl.AddButton(Translation.Get(R.Messages.button_cancel), _ => noSingAlongDataDialogControl.CloseDialog());
+        noSingAlongDataDialogControl.AddButton(Translation.Get(R.Messages.action_cancel), _ => noSingAlongDataDialogControl.CloseDialog());
         defaultButton.Focus();
     }
 
@@ -1277,9 +1277,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_title),
             Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_message,
                 "suggestionName", SongMetaUtils.GetArtistDashTitle(songMeta)),
-            Translation.Get(R.Messages.yes),
+            Translation.Get(R.Messages.common_yes),
             _ => SendSuggestSongMessageForOnlineMultiplayer(songMeta),
-            Translation.Get(R.Messages.no));
+            Translation.Get(R.Messages.common_no));
     }
 
     private void SendSuggestSongMessageForOnlineMultiplayer(SongMeta songMeta)
@@ -1306,7 +1306,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             CloseAskToAssignMicsDialog();
             onIgnoreAndStart?.Invoke();
         });
-        askToAssignMicsDialog.AddButton(Translation.Get(R.Messages.button_cancel), _ =>
+        askToAssignMicsDialog.AddButton(Translation.Get(R.Messages.action_cancel), _ =>
         {
             CloseAskToAssignMicsDialog();
         });
@@ -1695,7 +1695,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             dialogControl.CloseDialog();
             createSingAlongSongControl.CreateSingAlongSong(songMeta, false);
         });
-        dialogControl.AddButton(Translation.Get(R.Messages.button_cancel), evt =>
+        dialogControl.AddButton(Translation.Get(R.Messages.action_cancel), evt =>
         {
             dialogControl.CloseDialog();
         });

@@ -100,17 +100,17 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
             case EPlaylistNameIssue.Invalid:
                 validationWarningContainer.ShowByDisplay();
                 invalidValueLabel.SetTranslatedText(Translation.Get(R.Messages.songSelectScene_editPlaylistDialog_error_invalidName));
-                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.button_cancel));
+                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.action_cancel));
                 break;
             case EPlaylistNameIssue.Duplicate:
                 validationWarningContainer.ShowByDisplay();
                 invalidValueLabel.SetTranslatedText(Translation.Get(R.Messages.songSelectScene_editPlaylistDialog_error_duplicateName));
-                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.button_cancel));
+                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.action_cancel));
                 break;
             default:
                 validationWarningContainer.HideByDisplay();
                 invalidValueLabel.SetTranslatedText(Translation.Empty);
-                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.button_continue));
+                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.action_continue));
                 break;
         }
     }

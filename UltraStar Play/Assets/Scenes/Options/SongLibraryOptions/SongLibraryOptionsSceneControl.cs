@@ -378,7 +378,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             quickFixAllDialog.CloseDialog();
         });
 
-        quickFixAllDialog.AddButton(Translation.Get(R.Messages.button_cancel),
+        quickFixAllDialog.AddButton(Translation.Get(R.Messages.action_cancel),
             _ => quickFixAllDialog.CloseDialog());
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(quickFixAllDialog.DialogRootVisualElement);
@@ -630,8 +630,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         deleteSongFolderDialog.Message = Translation.Get(R.Messages.options_songLibrary_action_deleteSongFolderDialog_message,
             "songFolder", settings.SongDirs[indexInList]);
 
-        deleteSongFolderDialog.AddButton(Translation.Get(R.Messages.no), _ => deleteSongFolderDialog.CloseDialog());
-        deleteSongFolderDialog.AddButton(Translation.Get(R.Messages.yes), _ =>
+        deleteSongFolderDialog.AddButton(Translation.Get(R.Messages.common_no), _ => deleteSongFolderDialog.CloseDialog());
+        deleteSongFolderDialog.AddButton(Translation.Get(R.Messages.common_yes), _ =>
         {
             deleteSongFolderDialog.CloseDialog();
             DoDeleteSongFolder(indexInList);
