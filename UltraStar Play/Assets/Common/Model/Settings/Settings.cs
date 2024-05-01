@@ -127,7 +127,7 @@ public class Settings : ISettings
     public bool ShowFps { get; set; }
     public bool UseUniversalCharsetDetector { get; set; } = true;
     public bool WriteUltraStarTxtFileWithByteOrderMark { get; set; }
-    public LogEventLevel MinimumLogLevel { get; set; } = LogEventLevel.Information;
+    public ELogEventLevel MinimumLogLevel { get; set; } = ELogEventLevel.Information;
 
     /**
      * Require explicit user action to use custom event system

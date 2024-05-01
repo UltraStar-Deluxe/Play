@@ -19,7 +19,7 @@ public static class Log
     public static readonly string outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{StackTrace}";
     public static readonly string logFileFolder = $"{Application.persistentDataPath}/Logs";
     public static readonly string logFilePath = $"{logFileFolder}/{Application.productName}.log";
-    
+
     private static readonly MessageTemplateTextFormatter textFormatter = new(outputTemplate);
 
     private static LoggingLevelSwitch loggingLevelSwitch;
@@ -33,11 +33,17 @@ public static class Log
     private static readonly Subject<LogEvent> logEventStream = new();
     public static IObservable<LogEvent> LogEventStream => logEventStream;
 
-    public static bool IsUsingDefaultUnityLogHandler => defaultUnityLogHandler == null 
-                                                        || UnityEngine.Debug.unityLogger.logHandler == defaultUnityLogHandler 
+    public static bool IsUsingDefaultUnityLogHandler => defaultUnityLogHandler == null
+                                                        || UnityEngine.Debug.unityLogger.logHandler == defaultUnityLogHandler
                                                         || Application.isEditor;
 
-    public static LogEventLevel MinimumLogLevel
+    public static ELogEventLevel MinimumLogLevel
+    {
+        get => MinimumSerilogLogLevel.ToCustomLogEventLevel();
+        set => MinimumSerilogLogLevel = value.ToSerilogLogEventLevel();
+    }
+
+    private static LogEventLevel MinimumSerilogLogLevel
     {
         get
         {
@@ -56,7 +62,7 @@ public static class Log
             loggingLevelSwitch.MinimumLevel = value;
         }
     }
-    
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
@@ -147,7 +153,7 @@ public static class Log
                 return LogType.Log;
         }
     }
-    
+
     private static string GetSerilogLogMessage(Object context, string format, params object[] args)
     {
         if (context == null)
@@ -157,7 +163,7 @@ public static class Log
 
         return string.Format($"[{context.name}] {format}", args);
     }
-    
+
     public static LogType GetUnityLogType(LogEvent logEvent)
     {
         switch (logEvent.Level)
@@ -176,7 +182,7 @@ public static class Log
                 return LogType.Log;
         }
     }
-    
+
     private static void UseCustomUnityLogHandler()
     {
         if (defaultUnityLogHandler == null)
@@ -192,14 +198,14 @@ public static class Log
         UnityEngine.Debug.unityLogger.logHandler = customUnityLogHandler;
         UnityEngine.Debug.Log("===== Using Custom Unity Log Handler =====");
     }
-    
+
     private static void UseDefaultUnityLogHandler()
     {
         if (defaultUnityLogHandler == null)
         {
             defaultUnityLogHandler = UnityEngine.Debug.unityLogger.logHandler;
         }
-        
+
         if (UnityEngine.Debug.unityLogger.logHandler == defaultUnityLogHandler)
         {
             return;
@@ -208,7 +214,7 @@ public static class Log
         UnityEngine.Debug.unityLogger.logHandler = defaultUnityLogHandler;
         UnityEngine.Debug.Log("===== Using Default Unity Log Handler =====");
     }
-    
+
     public static void Verbose(Func<string> messageGetter)
     {
         if (Logger != null)
@@ -220,7 +226,7 @@ public static class Log
             DoLog(messageGetter, LogEventLevel.Verbose, null);
         }
     }
-    
+
     public static void Debug(Func<string> messageGetter)
     {
         if (Logger != null)
@@ -271,38 +277,38 @@ public static class Log
 
     public static void Exception(Func<Exception> exceptionGetter)
     {
-        if (MinimumLogLevel > LogEventLevel.Fatal)
+        if (MinimumSerilogLogLevel > LogEventLevel.Fatal)
         {
             return;
         }
-        
+
         Exception ex = exceptionGetter();
-        
+
         if (Logger == null
-            && MinimumLogLevel <= LogEventLevel.Fatal)
+            && MinimumSerilogLogLevel <= LogEventLevel.Fatal)
         {
             LogWithDefaultUnityLogHandler(ex);
             return;
         }
-        
+
         Logger.Error(ex, ex.Message);
         if (Application.isEditor)
         {
             LogWithDefaultUnityLogHandler(ex);
         }
     }
-    
+
     private static void DoLog(Func<string> messageGetter, LogEventLevel logEventLevel, Action<string> doLogWithSerilog)
     {
-        if (MinimumLogLevel > logEventLevel)
+        if (MinimumSerilogLogLevel > logEventLevel)
         {
             return;
         }
 
         string message = messageGetter();
-        
+
         if (Logger == null
-            && MinimumLogLevel <= logEventLevel)
+            && MinimumSerilogLogLevel <= logEventLevel)
         {
             LogType logType = GetUnityLogType(logEventLevel);
             LogWithDefaultUnityLogHandler(logType, message);
@@ -325,14 +331,14 @@ public static class Log
         string logLine = stringWriter.ToString();
         LogWithDefaultUnityLogHandler(unityLogType, logLine);
     }
-    
+
     private static void LogWithDefaultUnityLogHandler(LogType unityLogType, string message)
     {
         if (!Application.isEditor)
         {
             return;
         }
-        
+
         if (defaultUnityLogHandler == null)
         {
             defaultUnityLogHandler = UnityEngine.Debug.unityLogger.logHandler;
@@ -356,7 +362,7 @@ public static class Log
             }
         }
     }
-    
+
     private static void LogWithDefaultUnityLogHandler(Exception ex)
     {
         if (defaultUnityLogHandler == null)
@@ -365,7 +371,7 @@ public static class Log
         }
         defaultUnityLogHandler.LogException(ex, null);
     }
-    
+
     private class CustomUnityLogHandler : ILogHandler
     {
         public void LogFormat(LogType logType, Object context, string format, params object[] args)
@@ -375,7 +381,7 @@ public static class Log
                 defaultUnityLogHandler?.LogFormat(logType, context, format, args);
                 return;
             }
-            
+
             switch (logType)
             {
                 case LogType.Log:
@@ -413,9 +419,9 @@ public static class Log
                 defaultUnityLogHandler?.LogException(exception, context);
                 return;
             }
-            
+
             Logger.Error(exception, GetSerilogLogMessage(context, "{0}", exception.Message));
-            
+
             if (Application.isEditor)
             {
                 // Forward to UnityEditor's console via defaultUnityLogHandler.
@@ -424,7 +430,7 @@ public static class Log
             }
         }
     }
-    
+
     private class LogEventStreamSink : ILogEventSink
     {
         public void Emit(LogEvent logEvent)

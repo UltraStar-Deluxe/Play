@@ -18,7 +18,7 @@ public class LoadSongsOnDemandTests : AbstractPlayModeTest
 
     protected override void ConfigureTestSettings(TestSettings settings)
     {
-        Log.MinimumLogLevel = LogEventLevel.Debug;
+        Log.MinimumLogLevel = ELogEventLevel.Debug;
 
         settings.SongDataFetchType = EFetchType.Lazy;
         settings.ShowSongIndexInSongSelect = true;

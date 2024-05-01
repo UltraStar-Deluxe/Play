@@ -215,10 +215,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             });
         new TextFieldHintControl(generatedFolderPathTextField);
 
-        List<LogEventLevel> logEventLevels = EnumUtils.GetValuesAsList<LogEventLevel>()
+        List<ELogEventLevel> logEventLevels = EnumUtils.GetValuesAsList<ELogEventLevel>()
             .OrderBy(logEventLevel => (int)logEventLevel)
             .ToList();
-        new EnumItemPickerControl<LogEventLevel>(minimumLogLevelPicker, logEventLevels)
+        new EnumItemPickerControl<ELogEventLevel>(minimumLogLevelPicker, logEventLevels)
             .Bind(() => settings.MinimumLogLevel,
                   newValue =>
                   {
