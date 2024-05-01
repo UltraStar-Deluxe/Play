@@ -278,7 +278,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         // Recording device
         List<string> deviceNames = Microphone.devices.ToList();
         deviceNames.Sort();
-        recordingDevicePickerControl = new(recordingDevicePicker, deviceNames);
+        recordingDevicePickerControl = new(recordingDevicePicker, deviceNames,
+            item => Translation.Of(item));
         recordingDevicePickerControl.AutoSmallFont = false;
         recordingDevicePickerControl.SelectItem(settings.MicProfile.Name);
         recordingDevicePickerControl.Selection.Subscribe(newValue => settings.SetMicProfileName(newValue));
@@ -296,7 +297,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             .Subscribe(newValue => OnDevModeEnabledChanged(newValue));
 
         // Minimum log level
-        new EnumItemPickerControl<LogEventLevel>(minimumLogLevelPicker).Bind(
+        new EnumItemPickerControl<ELogEventLevel>(minimumLogLevelPicker).Bind(
             () => settings.MinimumLogLevel,
             newValue =>
             {
@@ -305,8 +306,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             });
 
         // Target FPS
-        LabeledItemPickerControl<int> targetFpsPickerControl = new(targetFpsPicker, new List<int> { -1, 5, 10, 15, 20, 30, 60, 90, 120 });
-        targetFpsPickerControl.GetLabelTextFunction = item => item > 0 ? $"{item}" : "Auto";
+        LabeledItemPickerControl<int> targetFpsPickerControl = new(targetFpsPicker, new List<int> { -1, 5, 10, 15, 20, 30, 60, 90, 120 },
+            item => item > 0 ? Translation.Of(item.ToString()) : Translation.Of("Auto"));
         targetFpsPickerControl.Bind(
             () => settings.TargetFps,
             newValue => settings.TargetFps = newValue);
@@ -386,9 +387,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         connectionStatusText.text = Translation.Get(R.Messages.companionApp_connecting);
         recordingDevicePicker.Label = Translation.Get(R.Messages.options_recording_title);
         languagePicker.label = Translation.Get(R.Messages.language);
-        devModePicker.Label = Translation.Get(R.Messages.devMode);
+        devModePicker.Label = Translation.Get(R.Messages.companionApp_devMode);
         visualizeAudioToggle.label = Translation.Get(R.Messages.companionApp_visualizeMicInput);
-        closeMenuButton.text = Translation.Get(R.Messages.back);
+        closeMenuButton.text = Translation.Get(R.Messages.common_back);
 
         recordingDevicePickerControl.UpdateLabelText();
         devModePickerControl.UpdateLabelText();

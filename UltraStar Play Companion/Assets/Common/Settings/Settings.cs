@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using LiteNetLib;
-using Serilog.Events;
-using UnityEngine;
 
 [Serializable]
 public class Settings : ISettings
@@ -21,7 +19,7 @@ public class Settings : ISettings
     public bool ShowAudioWaveForm { get; set; } = true;
     public float MousePadSensitivity { get; set; } = 1f;
     public bool IsDevModeEnabled { get; set; }
-    public LogEventLevel MinimumLogLevel { get; set; } = LogEventLevel.Information;
+    public ELogEventLevel MinimumLogLevel { get; set; } = ELogEventLevel.Information;
 
     public bool PlayRecordedAudio { get; set; }
     public int MicrophonePlaybackVolumePercent { get; set; } = 100;

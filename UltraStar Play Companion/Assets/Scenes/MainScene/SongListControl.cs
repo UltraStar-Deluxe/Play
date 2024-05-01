@@ -278,12 +278,12 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
     public void UpdateTranslation()
     {
         // Search text field hint
-        string searchPropertiesText = new List<string>
+        string searchPropertiesCsv = new List<Translation>
         {
-            Translation.Get(R.Messages.songProperty_artist),
-            Translation.Get(R.Messages.songProperty_title),
+            Translation.Get(R.Messages.enum_SongProperty_Artist),
+            Translation.Get(R.Messages.enum_SongProperty_Title),
         }.ToCsv(", ", "", "");
-        songSearchHint.text = Translation.Get(R.Messages.songSelectScene_searchTextFieldHint, "properties", searchPropertiesText);
+        songSearchHint.SetTranslatedText(Translation.Of($"Search in {searchPropertiesCsv}"));
     }
 
     public void Show()
