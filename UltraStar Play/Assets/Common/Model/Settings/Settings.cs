@@ -10,7 +10,7 @@ public class Settings : ISettings
 {
     // Graphics settings
     public ScreenResolution ScreenResolution { get; set; } = new ScreenResolution(1280, 720, 60);
-    public FullScreenMode FullScreenMode { get; set; } = FullScreenMode.Windowed;
+    public EFullScreenMode FullScreenMode { get; set; } = EFullScreenMode.Windowed;
     public int TargetFps { get; set; } = -1;
 
     // Audio settings

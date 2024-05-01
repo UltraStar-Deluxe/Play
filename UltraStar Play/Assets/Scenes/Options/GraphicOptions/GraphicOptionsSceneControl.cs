@@ -21,7 +21,7 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
     private Button applyResolutionButton;
 
     ScreenResolution lastScreenResolution;
-    FullScreenMode lastFullscreenMode;
+    EFullScreenMode lastFullscreenMode;
 
     protected override void Start()
     {
@@ -35,7 +35,7 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
         if (PlatformUtils.IsStandalone)
         {
             new ScreenResolutionPickerControl(resolutionPicker, settings);
-            new FullscreenModePickerControl(fullscreenModePicker, settings, gameObject);
+            new FullScreenModePickerControl(fullscreenModePicker, settings, gameObject);
         }
         else
         {
@@ -56,7 +56,7 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
         }
 
         ScreenResolution res = settings.ScreenResolution;
-        FullScreenMode fullScreenMode = settings.FullScreenMode;
+        EFullScreenMode fullScreenMode = settings.FullScreenMode;
         if (res.Width > 0
             && res.Height > 0
             && res.RefreshRate > 0
@@ -66,7 +66,7 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
                 || res.RefreshRate != lastScreenResolution.RefreshRate
                 || fullScreenMode != lastFullscreenMode) )
         {
-            Screen.SetResolution(res.Width, res.Height, fullScreenMode, res.RefreshRate);
+            Screen.SetResolution(res.Width, res.Height, fullScreenMode.ToUnityFullScreenMode(), res.RefreshRate);
 
             // Reload scene.
             // The RenderTextures (UI, scene transition) are recreated when the Screen resolution does not match anymore.
