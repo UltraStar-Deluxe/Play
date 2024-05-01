@@ -204,7 +204,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
                 // Show notification to the user when switching to lazy loading of songs is recommended.
                 if (targetSongCount > LazyLoadingSongRecommendationThresholdCount
-                    && settings.SongDataFetchType is EFetchType.Eager)
+                    && settings.SongDataFetchType is EFetchType.Upfront)
                 {
                     UiManager.CreateNotification($"Configure on-demand loading\nof songs for faster setup.");
                 }
@@ -462,7 +462,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         try
         {
             LazyLoadedFromFileSongMeta newSongMeta = new LazyLoadedFromFileSongMeta(path);
-            if (settings.SongDataFetchType is EFetchType.Eager)
+            if (settings.SongDataFetchType is EFetchType.Upfront)
             {
                 newSongMeta.LoadSongIfNotDoneYet();
             }

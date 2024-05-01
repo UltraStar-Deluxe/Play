@@ -72,7 +72,7 @@ public class Settings : ISettings
     public bool SearchMidiFilesWithLyrics { get; set; }
     public string GeneratedFolderPath { get; set; } = "";
     public bool SaveVocalsAndInstrumentalAudioInFolderOfSong { get; set; }
-    public EFetchType SongDataFetchType { get; set; } = EFetchType.Eager;
+    public EFetchType SongDataFetchType { get; set; } = EFetchType.Upfront;
 
     /**
      * The UltraStar song format version that is used to save a song when otherwise none is specified or unknown.

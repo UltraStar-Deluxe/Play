@@ -20,7 +20,7 @@ public class LoadSongsOnDemandTests : AbstractPlayModeTest
     {
         Log.MinimumLogLevel = ELogEventLevel.Debug;
 
-        settings.SongDataFetchType = EFetchType.Lazy;
+        settings.SongDataFetchType = EFetchType.OnDemand;
         settings.ShowSongIndexInSongSelect = true;
 
         string testSongFolder = ApplicationUtils.GetTemporaryCachePath($"{nameof(LoadSongsOnDemandTests)}");
