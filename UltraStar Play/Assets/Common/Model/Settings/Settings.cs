@@ -1,9 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Serilog.Events;
-using Unity.Netcode;
-using UnityEngine;
+using CommonOnlineMultiplayer;
 
 [Serializable]
 public class Settings : ISettings
@@ -196,5 +194,5 @@ public class Settings : ISettings
     public EOnlineMultiplayerBackend EOnlineMultiplayerBackend { get; set; } = EOnlineMultiplayerBackend.Steam;
     public string UnityTransportIpAddress { get; set; } = "127.0.0.1";
     public ushort UnityTransportPort { get; set; } = 7777;
-    public NetworkDelivery BeatAnalyzedEventNetworkDelivery { get; set; } = NetworkDelivery.ReliableSequenced;
+    public ENetworkDelivery BeatAnalyzedEventNetworkDelivery { get; set; } = ENetworkDelivery.ReliableSequenced;
 }

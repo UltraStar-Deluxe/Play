@@ -1,7 +1,9 @@
 ﻿namespace CommonOnlineMultiplayer
 {
-    public enum EReliableNetworkDelivery
+    public enum ENetworkDelivery
     {
+        Unreliable,
+        UnreliableSequenced,
         Reliable,
         ReliableSequenced,
         ReliableFragmentedSequenced

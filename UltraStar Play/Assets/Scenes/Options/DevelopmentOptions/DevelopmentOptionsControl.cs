@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CommonOnlineMultiplayer;
 using PortAudioForUnity;
 using Serilog.Events;
 using SimpleHttpServerForUnity;
@@ -447,7 +448,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             newValue => settings.EnableVfx = newValue);
 
         // Online multiplayer
-        new EnumItemPickerControl<NetworkDelivery>(beatAnalyzedEventNetworkDeliveryPicker)
+        new EnumItemPickerControl<ENetworkDelivery>(beatAnalyzedEventNetworkDeliveryPicker)
             .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,
                 newValue => settings.BeatAnalyzedEventNetworkDelivery = newValue);
 
