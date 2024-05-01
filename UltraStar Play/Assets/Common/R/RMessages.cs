@@ -523,7 +523,6 @@ public static partial class R
         public static readonly string options_soundFont_test_tooltip = "options_soundFont_test_tooltip";
         public static readonly string options_targetFps = "options_targetFps";
         public static readonly string options_theme = "options_theme";
-        public static readonly string options_unlimited = "options_unlimited";
         public static readonly string options_useForSinging = "options_useForSinging";
         public static readonly string options_useImageAsCursor = "options_useImageAsCursor";
         public static readonly string options_usePortAudio = "options_usePortAudio";
@@ -553,6 +552,7 @@ public static partial class R
         public static readonly string order_Year = "order_Year";
         public static readonly string partyModeScene_freeForAll = "partyModeScene_freeForAll";
         public static readonly string partyModeScene_jokerCount = "partyModeScene_jokerCount";
+        public static readonly string partyModeScene_jokerCount_unlimited = "partyModeScene_jokerCount_unlimited";
         public static readonly string partyModeScene_knockOutTournament = "partyModeScene_knockOutTournament";
         public static readonly string partyModeScene_playlist = "partyModeScene_playlist";
         public static readonly string partyModeScene_rounds = "partyModeScene_rounds";

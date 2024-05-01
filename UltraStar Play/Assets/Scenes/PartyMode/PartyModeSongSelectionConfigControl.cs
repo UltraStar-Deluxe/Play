@@ -61,7 +61,7 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
         // Joker count
         LabeledItemPickerControl<int> jokerCountItemPickerControl =
             new(songSelectionJokerCountItemPicker, new List<int> { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-                newValue => newValue >= 0 ? Translation.Of(newValue.ToString()) : Translation.Get(R.Messages.options_unlimited));
+                newValue => newValue >= 0 ? Translation.Of(newValue.ToString()) : Translation.Get(R.Messages.partyModeScene_jokerCount_unlimited));
         jokerCountItemPickerControl.Bind(
             () => partyModeSettings.SongSelectionSettings.JokerCount,
             newValue => partyModeSettings.SongSelectionSettings.JokerCount = newValue);
