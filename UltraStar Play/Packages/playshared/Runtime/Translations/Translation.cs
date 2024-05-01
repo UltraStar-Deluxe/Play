@@ -35,7 +35,7 @@ public readonly struct Translation
         string typeName = typeof(T).Name;
         string valueName = value.ToString();
 
-        // For example, ENoteDisplayMode.SentenceBySentence has a translation key enum_noteDisplayMode_sentenceBySentence
+        // For example, ENoteDisplayMode.SentenceBySentence has a translation key enum_NoteDisplayMode_SentenceBySentence
         if (typeName.StartsWith("E")
             && TryGet($"enum_{typeName.Substring(1)}_{valueName}", new Dictionary<string, string>(), out Translation translationResult1))
         {

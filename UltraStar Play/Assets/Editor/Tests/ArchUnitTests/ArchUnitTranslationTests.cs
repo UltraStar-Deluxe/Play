@@ -175,7 +175,8 @@ public class ArchUnitTranslationTests
 
     private static bool IsIgnoredEnum(IType type)
     {
-        return ignoredUntranslatedEnums.Contains(type.FullName);
+        return ignoredUntranslatedEnums.Contains(type.Name)
+            || (type.Name.StartsWith('E') && ignoredUntranslatedEnums.Contains(type.Name.Substring(1)));
     }
 
     private static string GetEnumTranslationKey(IMember enumValue)
