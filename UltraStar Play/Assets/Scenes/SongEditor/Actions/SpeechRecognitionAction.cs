@@ -172,7 +172,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Create notes from speech recognition failed: {ex.Message}");
-                UiManager.CreateNotification(ex.Message);
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason, "reason", ex.Message));
             })
             .Select(createdNotes =>
             {

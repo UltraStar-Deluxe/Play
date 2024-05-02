@@ -125,7 +125,7 @@ public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinish
     {
         if (!IsInputValid())
         {
-            UiManager.CreateNotification("Please specify the artist and title");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_missingArtistOrTitle));
             return;
         }
 

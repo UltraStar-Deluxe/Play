@@ -360,7 +360,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         createSingAlongSongControl.CreatedSingAlongVersionEventStream.Subscribe(processedSongMeta =>
         {
-            UiManager.CreateNotification($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Audio)}'");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_createdSingAlongDataSuccess,
+                "name", Path.GetFileName(processedSongMeta.Audio)));
         });
 
         // Song queue
@@ -930,7 +931,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
-            UiManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_noPlayerSelected_title));
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_noPlayerSelected_title));
             return null;
         }
         singScenePlayerData.SelectedPlayerProfiles = selectedPlayerProfiles;
@@ -959,7 +960,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
         {
-            UiManager.CreateNotification("Failed to load song. Check log for details.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
             return;
         }
 
@@ -971,7 +972,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                 {
                     Debug.LogException(ex);
                     Debug.LogError($"Failed to get whether all players have song locally: {ex.Message}");
-                    UiManager.CreateNotification("Failed to start song. Check log for details.");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
                 })
                 .Subscribe(result =>
                 {
@@ -981,7 +982,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                     }
                     else
                     {
-                        UiManager.CreateNotification($"The following players do not have this song locally:\n{result.PlayersThatDoNotHaveSongLocally.ToCsv(",", "", "")}.");
+                        NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_playersDontHaveSongLocally,
+                            "names", result.PlayersThatDoNotHaveSongLocally.JoinWith(", ")));
                     }
                 });
         }
@@ -1018,13 +1020,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         if (HasPartyModeSceneData)
         {
-            UiManager.CreateNotification("Song editor not available in Team & Tournament mode.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.partyMode_error_notAvailable));
             return;
         }
 
         if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
         {
-            UiManager.CreateNotification("Failed to load song. Check log for details.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
             return;
         }
 
@@ -1082,9 +1084,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
             string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-            string message = "Audio file resource does not exist: " + audioUri;
-            Debug.Log(message);
-            UiManager.CreateNotification(message);
+            Debug.Log($"");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioNotFound,
+                "name", audioUri));
             return;
         }
 
@@ -1092,11 +1094,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
-                string message = $"Audio file '{songMeta.Audio}' could not be loaded.\n" +
-                                 $"Please use one of {ApplicationUtils.supportedAudioFiles.ToCsv(",", "", "")}\n" +
-                                 $"or a supported website URI.";
-                Debug.LogError(message);
-                UiManager.CreateNotification(message);
+                Debug.LogError( $"Audio file '{songMeta.Audio}' could not be loaded.");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
+                    "name", songMeta.Audio,
+                    "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
             })
             .Subscribe(_ => StartSingScene(songMeta));
     }
@@ -1224,8 +1225,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         // Check that any player is selected
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
-            UiManager.CreateNotification(
-                Translation.Get(R.Messages.songSelectScene_noPlayerSelected_message));
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_noPlayerSelected_message));
             return;
         }
 
@@ -1288,7 +1288,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             nameof(SuggestSongRequestDto),
             FastBufferWriterUtils.WriteJsonValuePacked(new SuggestSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
             NetworkManager.ServerClientId);
-        UiManager.CreateNotification($"Suggested '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to host.");
+        NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_suggestedSongToHost,
+            "name", SongMetaUtils.GetArtistDashTitle(songMeta)));
     }
 
     private void OpenAskToAssignMicsDialog(List<PlayerProfile> playerProfilesWithoutMics, Action onIgnoreAndStart)
@@ -1641,7 +1642,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public void ShowCannotUseJokerMessage()
     {
-        UiManager.CreateNotification("No jokers left to change the song");
+        NotificationManager.CreateNotification(Translation.Get(R.Messages.partyMode_error_noJokers));
     }
 
     public List<PlayerProfile> GetEnabledPlayerProfiles()

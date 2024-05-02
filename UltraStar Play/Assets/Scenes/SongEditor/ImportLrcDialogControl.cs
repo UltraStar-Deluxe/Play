@@ -90,12 +90,13 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
         List<Note> importedNotes = lrcFormatImporter.ImportLrcFormat(importLrcTextField.value, songMeta, settings);
         if (importedNotes.IsNullOrEmpty())
         {
-            UiManager.CreateNotification($"Failed to import");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
         }
         else
         {
             importedNotes.ForEach(note => layerManager.AddNoteToEnumLayer(ESongEditorLayer.Import, note));
-            UiManager.CreateNotification($"Imported {importedNotes.Count} notes");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_lrcImportDialog_success,
+                "count", importedNotes.Count));
         }
 
         songMetaChangeEventStream.OnNext(new ImportedNotesEvent());

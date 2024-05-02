@@ -290,7 +290,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
-            UiManager.CreateNotification("Copied log to clipboard");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
         });
 
         // Open persistent data path
@@ -624,7 +624,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
         ClipboardUtils.CopyToClipboard(sb.ToString());
 
-        UiManager.CreateNotification("Copied to clipboard");
+        NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
     }
 
     private void UpdateLogEventLevel()

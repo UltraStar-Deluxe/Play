@@ -48,9 +48,9 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
-                string errorMessage = $"Vocals isolation failed: {ex.Message}";
-                Debug.LogError(errorMessage);
-                UiManager.CreateNotification(errorMessage);
+                Debug.LogError($"Vocals isolation failed: {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_audioSeparation_errorWithReason,
+                    "reason", ex.Message)));
             })
             // Subscribe to trigger the observable
             .Subscribe(evt => Debug.Log($"Successfully separated audio: {evt}"));
@@ -133,7 +133,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     {
         if (audioSeparationProcessCount > 0)
         {
-            UiManager.CreateNotification("Already performing vocals isolation");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
             return Observable.Throw<AudioSeparationResult>(new IllegalStateException("Already performing vocals isolation"));
         }
 

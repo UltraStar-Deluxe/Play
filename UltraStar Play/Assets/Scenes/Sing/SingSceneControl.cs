@@ -515,8 +515,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 PauseRequestDto pauseRequestDto = FastBufferReaderUtils.ReadJsonValuePacked<PauseRequestDto>(message.MessagePayload);
                 if (pauseRequestDto.ShowSenderName)
                 {
-                    UiManager.CreateNotification(
-                        $"Paused by {CommonOnlineMultiplayerUtils.GetPlayerDisplayName(onlineMultiplayerManager, message)}");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_pausedBy,
+                        "name", CommonOnlineMultiplayerUtils.GetPlayerDisplayName(onlineMultiplayerManager, message)));
                 }
 
                 Pause(false);
@@ -529,7 +529,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 UnpauseRequestDto unpauseRequestDto = FastBufferReaderUtils.ReadJsonValuePacked<UnpauseRequestDto>(message.MessagePayload);
                 if (unpauseRequestDto.ShowSenderName)
                 {
-                    UiManager.CreateNotification($"Resumed by {CommonOnlineMultiplayerUtils.GetPlayerDisplayName(onlineMultiplayerManager, message)}");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_resumedBy,
+                        "name", CommonOnlineMultiplayerUtils.GetPlayerDisplayName(onlineMultiplayerManager, message)));
                 }
 
                 Unpause(false);
@@ -919,13 +920,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         if (sceneData.IsMedley)
         {
-            UiManager.CreateNotification("Cannot skip during medley.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_notAvailableDuringMedley));
             return;
         }
 
         if (onlineMultiplayerManager.IsOnlineGame)
         {
-            UiManager.CreateNotification("Cannot skip during online game.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_notAvailable));
             return;
         }
 
@@ -981,7 +982,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         if (onlineMultiplayerManager.IsOnlineGame
             && !onlineMultiplayerManager.IsHost)
         {
-            UiManager.CreateNotification("The host player must restart.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_hostMustRestart));
             return;
         }
 
@@ -1012,12 +1013,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         if (HasPartyModeSceneData)
         {
-            UiManager.CreateNotification("Song editor not available in Team & Tournament mode.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.partyMode_error_notAvailable));
             return;
         }
         if (sceneData.IsMedley)
         {
-            UiManager.CreateNotification("Song editor not available during medley.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_notAvailableDuringMedley));
             return;
         }
 

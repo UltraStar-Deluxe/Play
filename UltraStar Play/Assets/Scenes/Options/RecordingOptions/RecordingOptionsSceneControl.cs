@@ -247,8 +247,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 }
                 else
                 {
-                    UiManager.CreateNotification(
-                        Translation.Get(R.Messages.options_delay_calibrate_timeout));
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.options_delay_calibrate_timeout));
                 }
             });
 

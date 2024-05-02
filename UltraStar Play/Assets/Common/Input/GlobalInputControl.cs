@@ -65,11 +65,11 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
         volumeControl.ToggleMuteAudio();
         if (volumeControl.IsMuted)
         {
-            UiManager.CreateNotification("Mute");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_mute));
         }
         else
         {
-            UiManager.CreateNotification("Unmute");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_unmute));
         }
     }
 

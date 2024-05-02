@@ -75,11 +75,11 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
         });
         confirmDeletePlaylistButton.RegisterCallbackButtonTriggered(_ =>
         {
-            string errorMessage = playlistManager.TryRemovePlaylist(currentPlaylist);
-            if (!errorMessage.IsNullOrEmpty())
+            Translation errorMessage = playlistManager.TryRemovePlaylist(currentPlaylist);
+            if (!errorMessage.Value.IsNullOrEmpty())
             {
                 Debug.LogError(errorMessage);
-                UiManager.CreateNotification(errorMessage);
+                NotificationManager.CreateNotification(errorMessage);
             }
             HideEditPlaylistDialog();
         });
@@ -167,11 +167,11 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
         }
 
         // Try to rename playlist
-        if (!playlistManager.TrySetPlaylistName(currentPlaylist, newPlaylistName, out string errorMessage))
+        if (!playlistManager.TrySetPlaylistName(currentPlaylist, newPlaylistName, out Translation errorMessage))
         {
             // Show error in UI
             Debug.LogError(errorMessage);
-            UiManager.CreateNotification(errorMessage);
+            NotificationManager.CreateNotification(errorMessage);
         }
         HideEditPlaylistDialog();
     }

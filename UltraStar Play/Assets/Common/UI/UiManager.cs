@@ -12,9 +12,6 @@ using IBinding = UniInject.IBinding;
 
 public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 {
-    private const float NotificationFadeOutDelayInSeconds = 4;
-    private const float NotificationFadeOutDurationInSeconds = 1;
-
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
@@ -24,12 +21,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
 
     private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
-
-    [InjectedInInspector]
-    public VisualTreeAsset notificationOverlayUi;
-
-    [InjectedInInspector]
-    public VisualTreeAsset notificationUi;
 
     [InjectedInInspector]
     public VisualTreeAsset messageDialogUi;
@@ -91,30 +82,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
             .ForEach(contextMenuPopupControl => contextMenuPopupControl.Update());
     }
 
-    private Label DoCreateNotification(
-        string text)
-    {
-        VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
-        if (notificationOverlay == null)
-        {
-            notificationOverlay = notificationOverlayUi.CloneTree()
-                .Children()
-                .First();
-            uiDocument.rootVisualElement.Add(notificationOverlay);
-        }
-
-        TemplateContainer templateContainer = notificationUi.CloneTree();
-        VisualElement notification = templateContainer.Children().First();
-        Label notificationLabel = notification.Q<Label>("notificationLabel");
-        notificationLabel.text = text;
-        notificationOverlay.Add(notification);
-
-        // Fade out then remove
-        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, NotificationFadeOutDelayInSeconds, NotificationFadeOutDurationInSeconds));
-
-        return notificationLabel;
-    }
-
     public void ReloadPlayerProfileImages()
     {
         UpdatePlayerProfileImagePaths();
@@ -124,20 +91,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     {
         List<string> folders = PlayerProfileUtils.GetPlayerProfileImageFolders();
         relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages(folders);
-    }
-
-    public static void CreateNotification(string text)
-    {
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            UiManager uiManager = Instance;
-            if (uiManager == null)
-            {
-                return;
-            }
-
-            uiManager.DoCreateNotification(text);
-        });
     }
 
     public MessageDialogControl CreateDialogControl(Translation dialogTitle)

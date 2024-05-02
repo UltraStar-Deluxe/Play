@@ -110,12 +110,14 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             songMetaManager.SaveSong(songMeta, true);
             songMetaManager.ReloadSong(songMeta);
             Debug.Log($"Successfully converted {mediaDescription} of '{SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta)}' to '{relativeTargetFilePath}'");
-            UiManager.CreateNotification($"Successfully converted '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_convertMediaSuccess,
+                "name", SongMetaUtils.GetArtistDashTitle(songMeta)));
         }
 
         void OnFailure(ConversionError conversionError)
         {
-            UiManager.CreateNotification($"Failed to convert '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format.\nPlease try again.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_failedToConvert,
+                "name", SongMetaUtils.GetArtistDashTitle(songMeta)));
         }
 
         ConvertFileToSupportedFormat(sourceFilePath,
@@ -164,9 +166,9 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
     {
         if (!FileUtils.Exists(sourceFilePath))
         {
-            string errorMessage = $"File not found '{sourceFilePath}'";
-            Debug.Log(errorMessage);
-            UiManager.CreateNotification(errorMessage);
+            Debug.Log($"File not found '{sourceFilePath}'");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_fileNotFoundWithName,
+                "name", sourceFilePath));
             return;
         }
 
@@ -191,18 +193,16 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         string targetFileName = GetTargetFileNameFromFfmpegArguments(ffmpegArguments);
         if (targetFileName.IsNullOrEmpty())
         {
-            string errorMessage = $"Unable to determine target file name for '{sourceFilePath}'";
-            Debug.Log(errorMessage);
-            UiManager.CreateNotification(errorMessage);
+            Debug.Log($"Unable to determine target file name for '{sourceFilePath}'");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
             return;
         }
 
         string targetFileExtension = PathUtils.GetExtensionWithoutDot(targetFileName);
         if (targetFileExtension.IsNullOrEmpty())
         {
-            string errorMessage = $"Unable to determine target file extension for '{sourceFilePath}'";
-            Debug.Log(errorMessage);
-            UiManager.CreateNotification(errorMessage);
+            Debug.Log($"Unable to determine target file extension for '{sourceFilePath}'");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
             return;
         }
 
@@ -218,9 +218,8 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             : ApplicationUtils.IsFfmpegSupportedVideoFormat(sourceFileExtension);
         if (!canConvertToSupportedFormat)
         {
-            string errorMessage = $"Cannot convert {mediaDescription} '{sourceFileExtension}' to supported format";
-            Debug.Log(errorMessage);
-            UiManager.CreateNotification(errorMessage);
+            Debug.Log($"Cannot convert {mediaDescription} '{sourceFileExtension}' to supported format");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
             return;
         }
 

@@ -104,7 +104,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
     {
         if (!IsModEnabled)
         {
-            UiManager.CreateNotification("Cannot access settings of a disabled mod.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_settingsNotAvailable));
             return;
         }
 
@@ -116,7 +116,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         List<IModSettings> allModSettings = ModManager.GetModObjects<IModSettings>(ModFolder);
         if (allModSettings.IsNullOrEmpty())
         {
-            UiManager.CreateNotification("This mod has no settings.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_settingsEmpty));
             return;
         }
 
@@ -125,7 +125,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
             .ToList();
         if (allModSettingControls.IsNullOrEmpty())
         {
-            UiManager.CreateNotification("This mod has no settings.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_settingsEmpty));
             return;
         }
 

@@ -267,7 +267,7 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         }
         else
         {
-            ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_doesNotExist));
+            ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_notFound));
         }
     }
 }

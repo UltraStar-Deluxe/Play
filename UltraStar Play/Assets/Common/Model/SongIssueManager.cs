@@ -263,7 +263,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
         {
             string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
             CheckResourceExists(songIssues, songMeta, videoUri,
-                () => Translation.Get(R.Messages.songIssue_media_doesNotExist,
+                () => Translation.Get(R.Messages.songIssue_media_notFound,
                     "value", ApplicationUtils.ReplacePathsWithDisplayString(videoUri)),
                 ESongIssueSeverity.Warning);
 
@@ -308,7 +308,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
         {
             // Must have local audio file in supported format because no website is specified.
             CheckResourceExists(songIssues, songMeta, audioUri,
-                () => Translation.Get(R.Messages.songIssue_media_doesNotExist,
+                () => Translation.Get(R.Messages.songIssue_media_notFound,
                     "value", ApplicationUtils.ReplacePathsWithDisplayString(audioUri)),
                     ESongIssueSeverity.Error);
             CheckAudioOrVideoFormatIsSupported(songIssues, audioUri,
@@ -334,7 +334,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
         // Vocals audio and instrumental audio must use formats that are supported by Unity. Ffmpeg can only be used for the main audio.
         string vocalsAudioUri = SongMetaUtils.GetVocalsAudioUri(songMeta);
         CheckResourceExists(songIssues, songMeta, vocalsAudioUri,
-            () => Translation.Get(R.Messages.songIssue_media_doesNotExist,
+            () => Translation.Get(R.Messages.songIssue_media_notFound,
                 "value", ApplicationUtils.ReplacePathsWithDisplayString(vocalsAudioUri)),
             ESongIssueSeverity.Warning);
         CheckIsUnitySupportedAudioFormat(songIssues, songMeta.VocalsAudio,
@@ -346,7 +346,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
 
         string instrumentalAudioUri = SongMetaUtils.GetInstrumentalAudioUri(songMeta);
         CheckResourceExists(songIssues, songMeta, instrumentalAudioUri,
-            () => Translation.Get(R.Messages.songIssue_media_doesNotExist,
+            () => Translation.Get(R.Messages.songIssue_media_notFound,
                 "value", ApplicationUtils.ReplacePathsWithDisplayString(instrumentalAudioUri)),
             ESongIssueSeverity.Warning);
         CheckIsUnitySupportedAudioFormat(songIssues, songMeta.InstrumentalAudio,

@@ -61,7 +61,7 @@ namespace SteamOnlineMultiplayer
                 {
                     Debug.LogException(ex);
                     Debug.LogError($"Failed to join lobby: {ex.Message}");
-                    UiManager.CreateNotification("Failed to join lobby");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_failedToJoinLobby));
                 })
                 .Select(joinedLobby =>
                 {
@@ -77,7 +77,7 @@ namespace SteamOnlineMultiplayer
                 })
                 .Subscribe(_ =>
                 {
-                    UiManager.CreateNotification("Successfully joined online game");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_joinSuccess));
                 });
         }
 
@@ -97,7 +97,8 @@ namespace SteamOnlineMultiplayer
                 .CatchIgnore((Exception ex) =>
                 {
                     Debug.LogException(ex);
-                    UiManager.CreateNotification($"Failed to update lobby list: {ex.Message}");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                        "reason", ex.Message));
                     hostedGameList.Add(new Label("Failed to fetch lobbies"));
                 })
                 .Subscribe(lobbies => FillHostedGameList(lobbies));

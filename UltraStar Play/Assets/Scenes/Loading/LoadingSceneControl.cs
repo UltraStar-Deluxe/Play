@@ -192,7 +192,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
-            UiManager.CreateNotification("Copied log to clipboard");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
         });
     }
 

@@ -340,7 +340,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     private void OnWebViewFailedLoading()
     {
         Debug.Log("Failed loading of URL: " + loadedUrl);
-        UiManager.CreateNotification($"Failed to load {loadedUrl}");
+        NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_failedToLoadWithName,
+            "name", loadedUrl));
     }
 
     private void OnWebViewMessageReceived(object sender, EventArgs<string> e)
@@ -517,9 +518,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             if (!hasShownControlsNotification)
             {
                 hasShownControlsNotification = true;
-                UiManager.CreateNotification("Loading website.\n" +
-                                             "Press F8 or Ctrl+B anytime\n" +
-                                             "to switch to embedded browser.");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.webView_info_controls));
             }
 
             if (isContentLoaded && isLoadingUrlOfSameHost && javaScriptCanLoadUrl)

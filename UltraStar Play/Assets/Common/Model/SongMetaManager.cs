@@ -206,7 +206,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 if (targetSongCount > LazyLoadingSongRecommendationThresholdCount
                     && settings.SongDataFetchType is EFetchType.Upfront)
                 {
-                    UiManager.CreateNotification($"Configure on-demand loading\nof songs for faster setup.");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.common_configureOnDemandSongLoading));
                 }
 
                 if (!cancellationToken.IsCancellationRequested)
@@ -507,13 +507,14 @@ public class SongMetaManager : AbstractSingletonBehaviour
         catch (Exception e)
         {
             Debug.LogException(e);
-            UiManager.CreateNotification("Saving the file failed:\n" + e.Message);
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_save,
+                "reason", e.Message));
             return;
         }
 
         if (!isAutoSave)
         {
-            UiManager.CreateNotification("Saved file");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_saveSuccess));
         }
     }
 

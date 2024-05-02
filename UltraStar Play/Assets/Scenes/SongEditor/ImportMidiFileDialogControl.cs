@@ -263,10 +263,11 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             MidiFileUtils.SetFirstDeltaTimeTo(previewMidiFile, 0, 0);
             midiManager.PlayMidiFile(previewMidiFile);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Debug.LogException(e);
-            UiManager.CreateNotification($"Preview failed: {e.Message}");
+            Debug.LogException(ex);
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", ex.Message));
             throw;
         }
     }
@@ -275,7 +276,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     {
         if (!FileUtils.Exists(MidiFilePath))
         {
-            UiManager.CreateNotification("File does not exist");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_fileNotFound));
             return;
         }
 
@@ -306,7 +307,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             voiceId,
             true,
             ESongEditorLayer.Import);
-        UiManager.CreateNotification("Loaded MIDI file successfully");
+        NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_midiImportDialog_success));
     }
 
     public void OpenDialog()
@@ -410,7 +411,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         if (!FileUtils.Exists(MidiFilePath))
         {
-            return Translation.Get(R.Messages.songEditor_midiImportDialog_error_fileDoesNotExist);
+            return Translation.Get(R.Messages.songEditor_midiImportDialog_error_fileNotFound);
         }
 
         List<string> supportedFileExtensions = new() { ".mid", ".midi", ".kar" };

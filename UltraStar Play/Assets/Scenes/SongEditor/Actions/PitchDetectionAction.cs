@@ -45,7 +45,8 @@ public class PitchDetectionAction : AbstractAudioClipAction
             .CatchIgnore((Exception ex) =>
             {
                 pitchDetectionJob.SetResult(EJobResult.Error);
-                UiManager.CreateNotification("Pitch detection failed.");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.job_pitchDetection_errorWithReason,
+                    "reason", ex.Message));
             })
             .Subscribe(result =>
             {
@@ -64,7 +65,8 @@ public class PitchDetectionAction : AbstractAudioClipAction
         if (!FileUtils.Exists(midiFilePath))
         {
             Debug.LogError($"Failed to import MIDI file created by Basic Pitch. File not found: {midiFilePath}");
-            UiManager.CreateNotification($"Failed to import MIDI file with pitch information.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_fileNotFoundWithName,
+                "name", midiFilePath));
             return;
         }
         songEditorMidiFileImporter.ImportMidiFile(
@@ -83,7 +85,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
         List<Note> pitchDetectionLayerNotes = songEditorLayerManager.GetLayerNotes(songEditorLayerManager.GetEnumLayer(ESongEditorLayer.PitchDetection));
         if (pitchDetectionLayerNotes.IsNullOrEmpty())
         {
-            UiManager.CreateNotification("Run pitch detection first");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingPitchDetection));
             return;
         }
 

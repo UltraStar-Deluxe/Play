@@ -418,7 +418,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
                 && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
             {
-                UiManager.CreateNotification("Vocals and instrumental audio already exists");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingInstrumentalAudio));
                 return;
             }
             audioSeparationManager.ProcessSongMeta(songMeta, true);

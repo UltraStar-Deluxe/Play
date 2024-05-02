@@ -22,7 +22,7 @@ public class PathInputDialogControl : TextInputDialogControl
                 return ValueInputDialogValidationResult.CreateValidResult();
             }
 
-            return ValueInputDialogValidationResult.CreateErrorResult(Translation.Get("validation_fileNotFound"));
+            return ValueInputDialogValidationResult.CreateErrorResult(Translation.Get("common_error_fileNotFound"));
         };
     }
 }

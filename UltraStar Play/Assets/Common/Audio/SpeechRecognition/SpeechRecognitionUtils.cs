@@ -84,7 +84,8 @@ public static class SpeechRecognitionUtils
                 Debug.LogException(ex);
                 Debug.LogError($"Create notes from speech recognition failed: {ex.Message}");
                 speechRecognitionJob?.SetResult(EJobResult.Error);
-                UiManager.CreateNotification(ex.Message);
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
                 throw ex;
             })
             .Select(speechRecognitionResult =>
@@ -160,7 +161,7 @@ public static class SpeechRecognitionUtils
     {
         if (speechRecognitionProcessCount > 0)
         {
-            UiManager.CreateNotification("Already performing speech recognition");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
             return Observable.Throw<SpeechRecognizer>(new IllegalStateException("Already performing speech recognition"));
         }
 

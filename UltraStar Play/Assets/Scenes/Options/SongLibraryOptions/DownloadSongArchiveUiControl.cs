@@ -115,7 +115,6 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         if (downloadAndExtractSongArchiveControl != null
             && !downloadAndExtractSongArchiveControl.IsDone.Value)
         {
-            UiManager.CreateNotification("Download still in progress");
             return;
         }
 

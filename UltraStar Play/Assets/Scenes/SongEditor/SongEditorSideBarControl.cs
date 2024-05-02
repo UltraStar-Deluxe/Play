@@ -215,7 +215,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     {
         if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
         {
-            UiManager.CreateNotification("No vocals audio found. Split the audio first.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingVocalsAudio));
             return;
         }
 

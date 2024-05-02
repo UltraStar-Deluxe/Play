@@ -15,7 +15,7 @@ public class SpaceBetweenNotesAction : INeedInjection
     {
         if (spaceInMillis <= 0)
         {
-            UiManager.CreateNotification("Minimum amount of space must be greater than 0.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason, "reason", "value too low"));
             return;
         }
 
