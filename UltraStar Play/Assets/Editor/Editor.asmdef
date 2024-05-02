@@ -25,7 +25,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        ""
+        "Flurl.dll",
+        "Flurl.Http.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
