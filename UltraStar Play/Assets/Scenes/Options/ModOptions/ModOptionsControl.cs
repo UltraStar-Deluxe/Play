@@ -47,7 +47,7 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
             () => settings.ReloadModsOnFileChange,
             newValue => settings.ReloadModsOnFileChange = newValue);
 
-        List<string> modFolders = modManager.GetEnabledModFolders();
+        List<string> modFolders = ModManager.GetModFolders();
         if (modFolders.IsNullOrEmpty())
         {
             modList.Add(new Label("No mods found."));

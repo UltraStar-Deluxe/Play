@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
@@ -11,6 +13,10 @@ public class ModTests : AbstractPlayModeTest
     private const string TestModName = "TESTMOD";
 
     private static string testModFolder;
+
+    private static List<TestCaseData> ModNames => ModManager.GetModFolders()
+        .Select(modFolder => new TestCaseData(ModManager.GetModFolderName(modFolder)).Returns(null))
+        .ToList();
 
     [TearDown]
     public void DeleteTestModFolder()
@@ -25,18 +31,32 @@ public class ModTests : AbstractPlayModeTest
     }
 
     [UnityTest]
-	public IEnumerator ModsLoadSuccessfullyTest() {
+    public IEnumerator NewModLoadsSuccessfully()
+    {
         LogAssert.ignoreFailingMessages = true;
 
-        ModManager modManager = ModManager.Instance;
-
-        testModFolder = modManager.CreateModFolderFromTemplate(TestModName);
+        testModFolder = ModManager.Instance.CreateModFolderFromTemplate(TestModName);
         Assert.IsNotNull(testModFolder);
         Assert.IsTrue(Directory.Exists(testModFolder));
 
-        modManager.LoadAndInstantiateMods(false);
+        SettingsManager.Instance.Settings.EnabledMods.Clear();
+        SettingsManager.Instance.Settings.EnabledMods.Add(TestModName);
+        ModManager.Instance.LoadAndInstantiateMods();
         yield return null;
 
-        Assert.IsEmpty(modManager.FailedToLoadModFolders);
+        Assert.IsEmpty(ModManager.Instance.FailedToLoadModFolders);
+    }
+
+    [UnityTest]
+    [TestCaseSource(nameof(ModNames))]
+	public IEnumerator ModsLoadSuccessfully(string modName) {
+        LogAssert.ignoreFailingMessages = true;
+
+        SettingsManager.Instance.Settings.EnabledMods.Clear();
+        SettingsManager.Instance.Settings.EnabledMods.Add(modName);
+        ModManager.Instance.LoadAndInstantiateMods();
+        yield return null;
+
+        Assert.IsEmpty(ModManager.Instance.FailedToLoadModFolders);
     }
 }
