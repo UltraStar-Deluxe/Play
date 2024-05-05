@@ -15,6 +15,8 @@ public class LanguageChooserControl : DropdownFieldControl<CultureInfo>
     private static string GetCultureInfoDisplayString(CultureInfo cultureInfo)
     {
         string suffix = PropertiesFileParser.GetLanguageAndRegionSuffix(cultureInfo).ToLowerInvariant();
-        return Translation.Get($"language{suffix}");
+        // Always use English name of language, i.e., use default CultureInfo to get language name.
+        Translation translation = Translation.Get($"language{suffix}", TranslationConfig.Singleton.DefaultCultureInfo);
+        return translation;
     }
 }

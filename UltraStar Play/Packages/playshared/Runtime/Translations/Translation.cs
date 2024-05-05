@@ -56,6 +56,21 @@ public readonly struct Translation
         return text.StartsWith(c) ? text.Substring(1) : text;
     }
 
+    public static Translation Get(string key, CultureInfo cultureInfo, params object[] placeholderStrings)
+    {
+        // Switch language to get translation in desired CultureInfo. Afterwards, switch back to current CultureInfo.
+        CultureInfo currentCultureInfo = TranslationConfig.Singleton.CurrentCultureInfo;
+        try
+        {
+            TranslationConfig.Singleton.CurrentCultureInfo = cultureInfo;
+            return Get(key, placeholderStrings);
+        }
+        finally
+        {
+            TranslationConfig.Singleton.CurrentCultureInfo = currentCultureInfo;
+        }
+    }
+
     public static Translation Get(string key, params object[] placeholderStrings)
     {
         return Of(ProTrans.Translation.Get(key, placeholderStrings));

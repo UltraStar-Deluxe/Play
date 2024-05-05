@@ -249,7 +249,13 @@ public static partial class R
         public static readonly string language_en = "language_en";
         public static readonly string language_es = "language_es";
         public static readonly string language_fr = "language_fr";
+        public static readonly string language_it = "language_it";
+        public static readonly string language_ja = "language_ja";
+        public static readonly string language_ko = "language_ko";
         public static readonly string language_pl = "language_pl";
+        public static readonly string language_pt = "language_pt";
+        public static readonly string language_ru = "language_ru";
+        public static readonly string language_zh = "language_zh";
         public static readonly string loadingScene_unexpectedErrorMessage = "loadingScene_unexpectedErrorMessage";
         public static readonly string mainScene_button_onlineGame = "mainScene_button_onlineGame";
         public static readonly string mainScene_button_party = "mainScene_button_party";
