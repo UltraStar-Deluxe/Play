@@ -116,7 +116,7 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
         // Notify user that songs cache changed
         if (newSongsCache.CachedSongs.Count > 0)
         {
-            UiManager.CreateNotification("UltraStar txt files changed.\nPlease restart the game to load them from cache.");
+            NotificationManager.CreateNotification(Translation.Of("UltraStar txt files changed.\nPlease restart the game to load them from cache."));
         }
     }
 

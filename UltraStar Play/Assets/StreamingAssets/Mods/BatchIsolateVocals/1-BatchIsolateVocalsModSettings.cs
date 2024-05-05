@@ -75,7 +75,7 @@ public class BatchIsolateVocalsModSettings : IModSettings
 
         Debug.Log($"BatchIsolateVocals - Batch isolating vocals of {songMetas.Count} songs");
 
-        Job batchJob = new Job("Batch isolate vocals");
+        Job batchJob = new Job(Translation.Of("Batch isolate vocals"));
         jobManager.AddJob(batchJob);
 
         // Create jobs for every song, but only start the first job
@@ -83,7 +83,7 @@ public class BatchIsolateVocalsModSettings : IModSettings
         for (int i = 0; i < songMetas.Count; i++)
         {
             SongMeta songMeta = songMetas[i];
-            Job audioSeparationJob = new Job($"Isolate vocals of '{SongMetaUtils.GetArtistDashTitle(songMeta)}'", batchJob);
+            Job audioSeparationJob = new Job(Translation.Of($"Isolate vocals of '{SongMetaUtils.GetArtistDashTitle(songMeta)}'"), batchJob);
             jobManager.AddJob(audioSeparationJob);
             audioSeparationJobs.Add(audioSeparationJob);
         }
