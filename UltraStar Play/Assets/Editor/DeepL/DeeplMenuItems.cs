@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Flurl.Http;
 using ProTrans;
@@ -15,55 +16,138 @@ public static class DeeplTranslationMenuItems
 
     private static readonly string targetFolder = $"{Application.dataPath}/../Packages/playshared/Runtime/Resources/Translations";
 
+    private static readonly bool debugRun = true;
+
+    private static readonly List<CultureInfo> targetLanguages = new List<CultureInfo>()
+    {
+        // Ordered by total number of speakers ( https://en.wikipedia.org/wiki/List_of_languages_by_total_number_of_speakers )
+        // // 1. English, skipped because default
+        // // 2. Chinese (Simplified, China)
+        // new CultureInfo("zh_CN"),
+        // // 3. Hindi (India)
+        // new CultureInfo("hi"),
+        // // 4. Spanish (Spain)
+        // new CultureInfo("es"),
+        // // 5. French (France)
+        // new CultureInfo("fr"),
+        // // 6. Arabic, TODO: does the UI make sense with right to left text?
+        // new CultureInfo("ar"),
+        // // 7. Bengali (Bangladesh)
+        // new CultureInfo("bn"),
+        // // 8. Portuguese (Portugal)
+        // new CultureInfo("pt"),
+        // // 9. Russian (Russia)
+        // new CultureInfo("ru"),
+        //
+        // // 12. German (Germany)
+        // new CultureInfo("de"),
+        // // 13. Japanese (Japan)
+        // new CultureInfo("jp"),
+        //
+        // // 24. Korean (Korea), because has karaoke culture
+        // new CultureInfo("jp"),
+        //
+        // // 29. Italian (Italy), because had an UltraStar community
+        // new CultureInfo("it"),
+        // // Polish (Poland), because of user contribution on GitHub
+        // new CultureInfo("pl"),
+    };
+
+    /**
+     * Languages where DeepL does not support "formality" parameter.
+     */
+    public static readonly List<string> languagesWithoutFormality = new List<string>() { "zh", };
+
+    /**
+     * List of RegEx patterns for translation keys that should not be translated.
+     */
+    private static readonly List<string> ignoredTranslationKeyPatterns = new List<string>()
+    {
+        // Links to websites are the same for all languages. The website should provide an option to switch language.
+        "uri_.*",
+        "companionApp_title",
+    };
+
     [MenuItem("Tools/DeepL/Translate properties files")]
     public static async void CreateTranslationConstants()
     {
         Translation.InitTranslationConfig();
+        LogWarningAboutNonListedTargetLanguages();
 
         PropertiesFile defaultPropertiesFile = Translation.GetPropertiesFile(Translation.GetFallbackCultureInfo());
-        // List<CultureInfo> nonDefaultCultureInfos = Translation.GetTranslatedCultureInfos()
-        //     .Except(new List<CultureInfo>() { new CultureInfo("en") })
-        //     .ToList();
-
-        // TODO: Remove to translate all
-        List<CultureInfo> nonDefaultCultureInfos = new List<CultureInfo>() { new CultureInfo("de"), new CultureInfo("fr") };
-
         string authKey = Environment.GetEnvironmentVariable(AuthKeyEnvironmentVariable);
 
         List<ProTransTranslation> proTransTranslations = defaultPropertiesFile.Dictionary
-            // TODO: remove to translate all
-            .Take(10)
             .Select(entry => new ProTransTranslation
             {
                 key = entry.Key,
                 value = entry.Value,
             })
             .ToList();
-
-        foreach (CultureInfo cultureInfo in nonDefaultCultureInfos)
+        if (debugRun)
         {
-            PropertiesFile propertiesFile = Translation.GetPropertiesFile(cultureInfo);
-            List<ProTransTranslation> missingProTransTranslations = proTransTranslations
-                .Where(proTransTranslation => !propertiesFile.Dictionary.ContainsKey(proTransTranslation.key))
-                .ToList();
+            Debug.Log("Taking only first few translations because this is a debug run");
+            proTransTranslations = proTransTranslations.Take(10).ToList();
+        }
 
+        foreach (CultureInfo targetLanguage in targetLanguages)
+        {
+            Dictionary<string, string> existingTranslations = GetExistingTranslations(targetLanguage);
+            List<ProTransTranslation> missingProTransTranslations = proTransTranslations
+                .Where(proTransTranslation => !existingTranslations.ContainsKey(proTransTranslation.key)
+                                              && !IsIgnoredTranslationKey(proTransTranslation.key))
+                .ToList();
             if (missingProTransTranslations.IsNullOrEmpty())
             {
-                Debug.Log($"No missing translations for '{cultureInfo}'");
+                Debug.Log($"No missing translations for '{targetLanguage}'");
                 continue;
             }
 
-            Dictionary<string, string> translatedMissingValues = await TranslateViaDeepL(
+            Dictionary<string, string> translationResults = await TranslateViaDeepL(
                 authKey,
-                cultureInfo.ToString(),
+                targetLanguage.ToString(),
                 missingProTransTranslations);
 
-            Dictionary<string, string> updatedDictionary = new(propertiesFile.Dictionary);
-            translatedMissingValues.ForEach(entry => updatedDictionary[entry.Key] = entry.Value);
+            // Merge result with already existing translations
+            Dictionary<string, string> updatedDictionary = new(existingTranslations);
+            translationResults.ForEach(entry => updatedDictionary[entry.Key] = entry.Value);
 
-            PropertiesFile updatedPropertiesFile = new(updatedDictionary, cultureInfo);
+            // Write to file
+            WritePropertiesFile(new PropertiesFile(updatedDictionary, targetLanguage));
 
-            WritePropertiesFile(updatedPropertiesFile);
+            if (debugRun)
+            {
+                Debug.Log("Skipping other languages because this is a debug run");
+                return;
+            }
+        }
+    }
+
+    private static Dictionary<string,string> GetExistingTranslations(CultureInfo targetLanguage)
+    {
+        PropertiesFile propertiesFile = Translation.GetPropertiesFile(targetLanguage);
+        return propertiesFile != null
+            ? propertiesFile.Dictionary.ToDictionary(entry => entry.Key, entry =>entry.Value)
+            : new Dictionary<string, string>();
+    }
+
+    private static bool IsIgnoredTranslationKey(string translationKey)
+    {
+        return ignoredTranslationKeyPatterns.AnyMatch(pattern => Regex.IsMatch(translationKey, pattern));
+    }
+
+    private static void LogWarningAboutNonListedTargetLanguages()
+    {
+        List<CultureInfo> nonDefaultCultureInfos = Translation.GetTranslatedCultureInfos()
+            .Except(new List<CultureInfo>() { new CultureInfo("en") })
+            .ToList();
+        List<CultureInfo> nonListedLanguageCodes = nonDefaultCultureInfos
+            .Where(presentLanguage => targetLanguages.AllMatch(listedLanguage => !Equals(presentLanguage, listedLanguage)))
+            .ToList();
+        if (!nonDefaultCultureInfos.IsNullOrEmpty())
+        {
+            Debug.LogWarning($"The following languages will not be translated. " +
+                             $"Add them to the target translate list to translate them: {nonListedLanguageCodes.JoinWith(", ")}");
         }
     }
 
@@ -88,7 +172,7 @@ public static class DeeplTranslationMenuItems
         Debug.Log($"DeepL response: {response.translations.Count} translations:\n    " +
                   $"{response.translations.Select(it => it.text).JoinWith("\n    ")}");
 
-        // Merge with translation key
+        // Merge with translation translationKey
         Dictionary<string, string> keyToTranslatedValue = new();
         for (int i = 0; i < response.translations.Count; i++)
         {
@@ -114,10 +198,18 @@ public static class DeeplTranslationMenuItems
 
         DirectoryUtils.CreateDirectory(Path.GetDirectoryName(filePath));
         List<string> lines = propertiesFile.Dictionary
-            .Select(entry => $"{entry.Key}={entry.Value}")
-            .OrderBy(line => line, StringComparer.InvariantCultureIgnoreCase)
+            .OrderBy(entry => entry.Key, StringComparer.InvariantCultureIgnoreCase)
+            .Select(entry => $"{entry.Key}={EscapeTranslationValue(entry.Value)}")
             .ToList();
         File.WriteAllLines(filePath, lines);
+    }
+
+    private static string EscapeTranslationValue(string value)
+    {
+        return value
+            .Replace("\n", "\\n")
+            .Replace("\t", "\\t")
+            .Replace("\t", "\\t");
     }
 
     private class ProTransTranslation
@@ -131,11 +223,22 @@ public static class DeeplTranslationMenuItems
         string[] strings,
         string targetLanguage)
     {
-        return await "https://api-free.deepl.com/v2/translate"
-            .WithHeader("Authorization", $"DeepL-Auth-Key {authKey}")
-            .WithHeader("User-Agent", "MyApp/1.2.3")
-            .WithHeader("Content-Type", "application/json")
-            .PostJsonAsync(new
+        object body;
+        if (languagesWithoutFormality.Contains(targetLanguage))
+        {
+            body = new
+            {
+                text = strings,
+                source_lang = "EN",
+                target_lang = targetLanguage,
+                tag_handling = "xml",
+                ignore_tags = new[] { "x" },
+                context = "karaoke game with song editor",
+            };
+        }
+        else
+        {
+            body = new
             {
                 text = strings,
                 source_lang = "EN",
@@ -144,7 +247,17 @@ public static class DeeplTranslationMenuItems
                 tag_handling = "xml",
                 ignore_tags = new[] { "x" },
                 context = "karaoke game with song editor",
-            })
+            };
+        }
+        string jsonBody = NewtonsoftJsonConverter.ToJson(body);
+        ClipboardUtils.CopyToClipboard(jsonBody);
+        Debug.Log($"Copied JSON body to clipboard:\n{jsonBody}");
+
+        return await "https://api-free.deepl.com/v2/translate"
+            .WithHeader("Authorization", $"DeepL-Auth-Key {authKey}")
+            .WithHeader("User-Agent", "MyApp/1.2.3")
+            .WithHeader("Content-Type", "application/json")
+            .PostJsonAsync(body)
             .ReceiveJson<DeeplResponse>();
     }
 
