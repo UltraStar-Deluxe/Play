@@ -93,7 +93,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         playlistManager.GetPlaylists(true, true);
 
         // The SongMetas are loaded on access.
-        songMetaManager.ScanFilesIfNotDoneYet();
+        songMetaManager.ScanSongsIfNotDoneYet();
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.5f, () => PreloadSongMedia()));
 
         // Extract StreamingAssets on Android from the JAR

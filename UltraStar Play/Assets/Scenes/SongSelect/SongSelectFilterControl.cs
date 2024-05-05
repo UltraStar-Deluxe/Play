@@ -91,14 +91,15 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
         }
         isInitialized = true;
 
-        if (SongMetaManager.IsSongScanFinished)
+        if (songMetaManager.IsSongScanFinished)
         {
             UpdateFilterList();
         }
         else
         {
             filterListContainer.Clear();
-            songMetaManager.SongScanFinishedEventStream.Subscribe(_ => UpdateFilterList());
+            songMetaManager.SongScanFinishedEventStream
+                .Subscribe(_ => UpdateFilterList());
         }
     }
 

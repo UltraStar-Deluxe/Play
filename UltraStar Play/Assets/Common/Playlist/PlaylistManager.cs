@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -50,7 +52,8 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     }
 
     private readonly Subject<PlaylistChangeEvent> playlistChangeEventStream = new();
-    public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream;
+    public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream
+        .ObserveOnMainThread();
 
     private string favoritesPlaylistFilePath;
     private string playlistFolder;
@@ -106,25 +109,37 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     private void ScanPlaylists()
     {
-        Debug.Log("Scanning playlists");
-        using DisposableStopwatch d = new("Scanning playlists took <ms> ms");
-
-        playlists = new List<IPlaylist>();
-
-        ScanPlaylistsInFolder(playlistFolder);
-
-        // Scan for playlists in song folders on background thread.
-        ThreadPool.QueueUserWorkItem(_ =>
+        Task.Run(async () =>
         {
-            List<string> songFolders = SettingsUtils.GetEnabledSongFolders(settings);
-            foreach (string songFolder in songFolders)
+            try
             {
-                ScanPlaylistsInFolder(songFolder);
+                await ScanPlaylistsAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to scan playlists: {ex.Message}");
             }
         });
     }
 
-    private void ScanPlaylistsInFolder(string folder)
+    private async Task ScanPlaylistsAsync()
+    {
+        Debug.Log($"Scanning playlists on thread {Thread.CurrentThread.ManagedThreadId}");
+        using DisposableStopwatch d = new("Scanning playlists took <ms> ms");
+
+        playlists = new List<IPlaylist>();
+
+        await ScanPlaylistsInFolderAsync(playlistFolder);
+
+        List<string> songFolders = SettingsUtils.GetEnabledSongFolders(settings);
+        foreach (string songFolder in songFolders)
+        {
+            await ScanPlaylistsInFolderAsync(songFolder);
+        }
+    }
+
+    private async Task ScanPlaylistsInFolderAsync(string folder)
     {
         Debug.Log($"Scanning playlists in folder '{folder}'");
         using DisposableStopwatch d2 = new($"Scanning playlists in folder '{folder}' took <ms> ms");

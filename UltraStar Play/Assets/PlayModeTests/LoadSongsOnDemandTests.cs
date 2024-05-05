@@ -60,7 +60,7 @@ public class LoadSongsOnDemandTests : AbstractPlayModeTest
         .ToYieldInstruction(Executor);
 
     private static ITestInstruction<object> ExpectSongScanFinished()
-        => WaitForCondition("wait for song scan finished", () => SongMetaManager.IsSongScanFinished)
+        => WaitForCondition("wait for song scan finished", () => SongMetaManager.Instance.IsSongScanFinished)
             .ExpectWithinSeconds(5f);
 
     private static ITestInstruction<object> ExpectSongCountNotLoadedYet(int count)

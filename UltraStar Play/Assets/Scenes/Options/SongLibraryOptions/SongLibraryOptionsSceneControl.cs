@@ -87,12 +87,12 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         settingsAtStart = JsonConverter.ToJson(settings);
 
-        if (SongMetaManager.IsSongScanFinished)
+        if (songMetaManager.IsSongScanFinished)
         {
             UpdateSongIssues();
         }
         songMetaManager.SongScanFinishedEventStream
-            .Subscribe(_ => Scheduler.MainThread.Schedule(() => UpdateSongIssues()))
+            .Subscribe(_ => UpdateSongIssues())
             .AddTo(gameObject);
 
         settings.ObserveEveryValueChanged(gameSettings => gameSettings.SongDirs)
@@ -309,7 +309,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         // Refresh button
         issuesDialogControl.AddButton(Translation.Get(R.Messages.options_songLibrary_refreshIssues), _ =>
         {
-            songMetaManager.ReloadSongMetas();
+            songMetaManager.RescanSongs();
             songIssueManager.ReloadSongIssues();
 
             // Update dialog
@@ -661,7 +661,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         if (settingsAtStart != JsonConverter.ToJson(settings))
         {
             Debug.Log("Reloading songs because settings changed");
-            songMetaManager.ReloadSongMetas();
+            songMetaManager.RescanSongs();
         }
     }
 

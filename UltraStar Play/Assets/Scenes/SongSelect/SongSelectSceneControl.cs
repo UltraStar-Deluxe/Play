@@ -266,25 +266,23 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.Start");
 
-        songMetaManager.ScanFilesIfNotDoneYet();
+        songMetaManager.ScanSongsIfNotDoneYet();
         // Give the song search some time, otherwise the "no songs found" label flickers once.
-        if (!SongMetaManager.IsSongScanFinished)
+        if (!songMetaManager.IsSongScanFinished)
         {
             Thread.Sleep(100);
         }
 
         songMetaManager.SongScanFinishedEventStream
-            .ObserveOnMainThread()
             .Subscribe(evt =>
             {
-                UpdateAvailableSongsAndUi(SongMetaManager.IsSongScanFinished || evt != null);
+                UpdateAvailableSongsAndUi(songMetaManager.IsSongScanFinished || evt != null);
             })
             .AddTo(gameObject);
         songMetaManager.AddedSongMetaEventStream
             .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
-            .ObserveOnMainThread()
-            .Subscribe(_ => UpdateAvailableSongsAndUi(SongMetaManager.IsSongScanFinished));
-        UpdateSongScanLabels(SongMetaManager.IsSongScanFinished);
+            .Subscribe(_ => UpdateAvailableSongsAndUi(songMetaManager.IsSongScanFinished));
+        UpdateSongScanLabels(songMetaManager.IsSongScanFinished);
 
         InitSongMetas();
 
@@ -767,7 +765,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public void InitSongMetas()
     {
-        if (!SongMetaManager.IsSongScanFinished)
+        if (!songMetaManager.IsSongScanFinished)
         {
             return;
         }
@@ -786,12 +784,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void UpdateSongScanLabels(bool isSongScanFinished)
     {
-        songScanInProgressProgressLabel.SetTranslatedText(Translation.Of($"{SongMetaManager.LoadedSongsPercent:00} %"));
+        songScanInProgressProgressLabel.SetTranslatedText(Translation.Of($"{songMetaManager.LoadedSongsPercent:00} %"));
 
         if (isSongScanFinished)
         {
             songScanInProgressContainer.HideByDisplay();
-            noSongsFoundContainer.SetVisibleByDisplay(SongMetaManager.LoadedSongsCount <= 0);
+            noSongsFoundContainer.SetVisibleByDisplay(songMetaManager.LoadedSongsCount <= 0);
         }
         else
         {
@@ -803,11 +801,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     private void Update()
     {
         // Check if new songs were loaded in background. Update scene if necessary.
-        if (!SongMetaManager.IsSongScanFinished
+        if (!songMetaManager.IsSongScanFinished
             && Time.time - lastSongMetaCountUpdateTimeInSeconds > 1f )
         {
             lastSongMetaCountUpdateTimeInSeconds = Time.time;
-            UpdateSongScanLabels(SongMetaManager.IsSongScanFinished);
+            UpdateSongScanLabels(songMetaManager.IsSongScanFinished);
         }
     }
 
@@ -1512,7 +1510,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void UpdateFilteredSongs()
     {
-        if (!SongMetaManager.IsSongScanFinished)
+        if (!songMetaManager.IsSongScanFinished)
         {
             return;
         }

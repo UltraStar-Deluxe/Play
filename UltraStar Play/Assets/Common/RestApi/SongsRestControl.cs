@@ -150,7 +150,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
         SongMetaManager songMetaManager = SongMetaManager.Instance;
         requestData.Context.Response.SendResponse(new LoadedSongsDto
         {
-            IsSongScanFinished = SongMetaManager.IsSongScanFinished,
+            IsSongScanFinished = songMetaManager.IsSongScanFinished,
             SongCount = songMetaManager.GetSongMetas().Count,
             SongList = songMetaManager.GetSongMetas()
                 .Select(songMeta => new SongDto

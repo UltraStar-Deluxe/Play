@@ -65,7 +65,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     public void OnInjectionFinished()
     {
-        songMetaManager.ScanFilesIfNotDoneYet();
+        songMetaManager.ScanSongsIfNotDoneYet();
 
         InitPartyModeSettings();
 

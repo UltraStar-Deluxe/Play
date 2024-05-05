@@ -98,8 +98,8 @@ public class SongIssueManager : AbstractSingletonBehaviour
     {
         ResetSongIssues();
 
-        songMetaManager.ScanFilesIfNotDoneYet();
-        if (SongMetaManager.IsSongScanFinished)
+        songMetaManager.ScanSongsIfNotDoneYet();
+        if (songMetaManager.IsSongScanFinished)
         {
             ScanSongIssues();
         }
