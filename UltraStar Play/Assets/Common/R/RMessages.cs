@@ -225,7 +225,6 @@ public static partial class R
         public static readonly string enum_ThirdPartyLibraryUsage_WhenUnsupportedByUnity = "enum_ThirdPartyLibraryUsage_WhenUnsupportedByUnity";
         public static readonly string enum_TopScores_All = "enum_TopScores_All";
         public static readonly string enum_TopScores_CurrentPlayers = "enum_TopScores_CurrentPlayers";
-        public static readonly string exit = "exit";
         public static readonly string gameRoundModifier_condition_playerAdvance = "gameRoundModifier_condition_playerAdvance";
         public static readonly string gameRoundModifier_condition_score = "gameRoundModifier_condition_score";
         public static readonly string gameRoundModifier_condition_scoreRange = "gameRoundModifier_condition_scoreRange";
