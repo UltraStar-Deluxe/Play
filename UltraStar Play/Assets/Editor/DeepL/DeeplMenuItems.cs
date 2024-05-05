@@ -16,47 +16,44 @@ public static class DeeplTranslationMenuItems
 
     private static readonly string targetFolder = $"{Application.dataPath}/../Packages/playshared/Runtime/Resources/Translations";
 
-    private static readonly bool debugRun = true;
+    private static readonly bool debugRun = false;
 
     private static readonly List<CultureInfo> targetLanguages = new List<CultureInfo>()
     {
         // Ordered by total number of speakers ( https://en.wikipedia.org/wiki/List_of_languages_by_total_number_of_speakers )
-        // // 1. English, skipped because default
-        // // 2. Chinese (Simplified, China)
-        // new CultureInfo("zh_CN"),
-        // // 3. Hindi (India)
-        // new CultureInfo("hi"),
-        // // 4. Spanish (Spain)
-        // new CultureInfo("es"),
-        // // 5. French (France)
-        // new CultureInfo("fr"),
-        // // 6. Arabic, TODO: does the UI make sense with right to left text?
-        // new CultureInfo("ar"),
-        // // 7. Bengali (Bangladesh)
-        // new CultureInfo("bn"),
-        // // 8. Portuguese (Portugal)
-        // new CultureInfo("pt"),
-        // // 9. Russian (Russia)
-        // new CultureInfo("ru"),
-        //
-        // // 12. German (Germany)
-        // new CultureInfo("de"),
-        // // 13. Japanese (Japan)
-        // new CultureInfo("jp"),
-        //
-        // // 24. Korean (Korea), because has karaoke culture
-        // new CultureInfo("jp"),
-        //
-        // // 29. Italian (Italy), because had an UltraStar community
-        // new CultureInfo("it"),
-        // // Polish (Poland), because of user contribution on GitHub
-        // new CultureInfo("pl"),
+        // 1. English, skipped because default
+        // 2. Chinese (Simplified)
+        new CultureInfo("zh"),
+        // 3. Hindi (India), skipped because not supported by DeepL
+        // 4. Spanish (Spain)
+        new CultureInfo("es"),
+        // 5. French (France)
+        new CultureInfo("fr"),
+        // 6. Arabic, skipped because Right to Left text not supported by Unity ( https://forum.unity.com/threads/right-to-left-and-arabic-support-for-labels.1311900/ )
+        // 7. Bengali (Bangladesh), skipped because not supported by DeepL
+        // 8. Portuguese (Portugal)
+        new CultureInfo("pt"),
+        // 9. Russian (Russia)
+        new CultureInfo("ru"),
+
+        // 12. German (Germany)
+        new CultureInfo("de"),
+        // 13. Japanese (Japan)
+        new CultureInfo("ja"),
+
+        // 24. Korean (Korea), because has karaoke culture
+        new CultureInfo("ko"),
+
+        // 29. Italian (Italy), because had an UltraStar community
+        new CultureInfo("it"),
+        // Polish (Poland), because of user contribution on GitHub
+        new CultureInfo("pl"),
     };
 
     /**
      * Languages where DeepL does not support "formality" parameter.
      */
-    public static readonly List<string> languagesWithoutFormality = new List<string>() { "zh", };
+    public static readonly List<string> languagesWithoutFormality = new List<string>() { "zh", "ar", "ko" };
 
     /**
      * List of RegEx patterns for translation keys that should not be translated.
@@ -125,10 +122,13 @@ public static class DeeplTranslationMenuItems
 
     private static Dictionary<string,string> GetExistingTranslations(CultureInfo targetLanguage)
     {
+        Dictionary<string, string> result = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         PropertiesFile propertiesFile = Translation.GetPropertiesFile(targetLanguage);
-        return propertiesFile != null
-            ? propertiesFile.Dictionary.ToDictionary(entry => entry.Key, entry =>entry.Value)
-            : new Dictionary<string, string>();
+        if (propertiesFile != null)
+        {
+            propertiesFile.Dictionary.ForEach(entry => result.Add(entry.Key, entry.Value));
+        }
+        return result;
     }
 
     private static bool IsIgnoredTranslationKey(string translationKey)
