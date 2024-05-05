@@ -28,6 +28,9 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
     [Inject]
     private SingingResultsSceneData sceneData;
 
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement visualElement;
+
     [Inject(UxmlName = R.UxmlNames.normalNoteScore)]
     private VisualElement normalNoteScoreContainer;
 
@@ -89,9 +92,9 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
     public void OnInjectionFinished()
     {
         // Player name and image
-        playerNameLabel.text = ShouldShowTeamName()
+        playerNameLabel.SetTranslatedText(Translation.Of(ShouldShowTeamName()
             ? GetTeamName()
-            : PlayerProfile.Name;
+            : PlayerProfile.Name));
         injector.WithRootVisualElement(playerImage)
             .CreateAndInject<PlayerProfileImageControl>();
 
@@ -136,7 +139,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
                     })
                     .setDelay(TotalScoreAnimTimeInSeconds);
             });
-        ratingLabel.text = songRating.Text;
+        ratingLabel.SetTranslatedText(songRating.Translation);
 
         // Score texts (animated)
         ResetScoreRowLabelTexts();
@@ -152,7 +155,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
             .setOnUpdate(interpolatedValue => SetScoreRowLabelText(modBonusScoreContainer, interpolatedValue))
             .setDelay(NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds + PerfectSentenceBonusAnimTimeInSeconds);
         LeanTween.value(singingResultsSceneControl.gameObject, 0f, singingResultsPlayerScore.TotalScore, TotalScoreAnimTimeInSeconds)
-            .setOnUpdate(interpolatedValue => totalScoreLabel.text = interpolatedValue.ToStringInvariantCulture("0"));
+            .setOnUpdate(interpolatedValue => totalScoreLabel.SetTranslatedText(Translation.Of(interpolatedValue.ToStringInvariantCulture("0"))));
 
         // Score bar (animated)
         Color32 scoreBarColor = CommonOnlineMultiplayerUtils.GetPlayerColor(PlayerProfile, micProfile);
@@ -299,14 +302,16 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
 
     public void UpdateTranslation()
     {
-        normalNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_notes);
-        goldenNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_goldenNotes);
-        phraseBonusScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = Translation.Get(R.Messages.score_phraseBonus);
+        normalNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).SetTranslatedText(Translation.Get(R.Messages.score_notes));
+        goldenNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).SetTranslatedText(Translation.Get(R.Messages.score_goldenNotes));
+        phraseBonusScoreContainer.Q<Label>(R.UxmlNames.scoreName).SetTranslatedText(Translation.Get(R.Messages.score_perfectSentenceBonus));
+        TranslationManager.ApplyTranslations(visualElement);
     }
 
     private void SetScoreRowLabelText(VisualElement container, float interpolatedValue)
     {
-        container.Q<Label>(R.UxmlNames.scoreValue).text = interpolatedValue.ToString("0", CultureInfo.InvariantCulture);
+        container.Q<Label>(R.UxmlNames.scoreValue).SetTranslatedText(
+            Translation.Of(interpolatedValue.ToString("0", CultureInfo.InvariantCulture)));
     }
 
     public void Dispose()

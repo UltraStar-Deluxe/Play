@@ -171,16 +171,16 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         if (!androidInternalStoragePath.IsNullOrEmpty()
             && androidDrivePath.Value == androidInternalStoragePath)
         {
-            driveButton.text = Translation.Get(R.Messages.options_songLibrary_androidInternalStorage);
+            driveButton.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_androidInternalStorage));
         }
         else if (!androidSdCardPath.IsNullOrEmpty()
                  && androidDrivePath.Value == androidSdCardPath)
         {
-            driveButton.text = Translation.Get(R.Messages.options_songLibrary_androidSdCardStorage);
+            driveButton.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_androidSdCardStorage));
         }
         else
         {
-            driveButton.text = Translation.Get(R.Messages.options_songLibrary_androidOtherStorage);
+            driveButton.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_androidOtherStorage));
         }
     }
 
@@ -229,13 +229,13 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
     private void HideWarning()
     {
         warningContainer.HideByDisplay();
-        warningLabel.text = "";
+        warningLabel.SetTranslatedText(Translation.Empty);
     }
 
-    private void ShowWarning(string message)
+    private void ShowWarning(Translation message)
     {
         warningContainer.ShowByDisplay();
-        warningLabel.text = message;
+        warningLabel.SetTranslatedText(message);
     }
 
     public void CheckPathIsValid()
@@ -267,7 +267,7 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         }
         else
         {
-            ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_doesNotExist));
+            ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_notFound));
         }
     }
 }

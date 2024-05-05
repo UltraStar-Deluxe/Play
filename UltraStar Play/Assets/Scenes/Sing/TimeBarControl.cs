@@ -43,7 +43,7 @@ public class TimeBarControl : INeedInjection
         double remainingTimeInSeconds = (durationOfSongInMillisConsideringStartAndEndTag - positionInSongConsideringStartTag) / 1000;
         if (remainingTimeInSeconds < 0)
         {
-            timeValueLabel.text = "00:00";
+            timeValueLabel.SetTranslatedText(Translation.Of("00:00"));
             return;
         }
 
@@ -51,7 +51,7 @@ public class TimeBarControl : INeedInjection
         string minsPadding = (mins < 10) ? "0" : "";
         int secs = (int)Math.Floor(remainingTimeInSeconds % 60);
         string secsPadding = (secs < 10) ? "0" : "";
-        timeValueLabel.text = $"{minsPadding}{mins}:{secsPadding}{secs}";
+        timeValueLabel.SetTranslatedText(Translation.Of($"{minsPadding}{mins}:{secsPadding}{secs}"));
     }
 
     public void UpdatePositionIndicator(double positionInSongInMillis, double durationOfSongInMillis)

@@ -13,7 +13,7 @@
             <ui:Button display-tooltip-when-elided="true" name="resetModifiersButton" class="squareButton" style="margin-right: 10px;">
                 <MaterialIcon tabindex="-1" name="rsetIcon" icon="replay" />
             </ui:Button>
-            <ui:Button text="OK" display-tooltip-when-elided="true" name="closeModifierDialogButton" class="controlMinWidth" style="margin-right: 10px;" />
+            <ui:Button text="$action_close" display-tooltip-when-elided="true" name="closeModifierDialogButton" class="controlMinWidth" style="margin-right: 10px;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

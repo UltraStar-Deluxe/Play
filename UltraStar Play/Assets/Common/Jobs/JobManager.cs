@@ -65,9 +65,6 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         CreateJobListUi();
         sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
 
-        // CreateDummyJobs();
-        // StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(5f, () => CreateDummyJobs()));
-
         UpdateJobsUi();
     }
 
@@ -94,7 +91,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public static Job CreateAndAddJob(string title, Job parentJob = null)
+    public static Job CreateAndAddJob(Translation title, Job parentJob = null)
     {
         Job job = new(title, parentJob);
         Instance.AddJob(job);
@@ -305,21 +302,6 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private void CreateDummyJobs()
-    {
-        Subject<bool> testObservable1 = new();
-        Subject<bool> testObservable2 = new();
-
-        Job testParentJob = new("Test Parent Job");
-        Job testChildJob1 = CreateJobFromObservable("Test Child Job 1", testParentJob, testObservable1);
-        CreateJobFromObservable("Test Child Job 2", testParentJob, testObservable2);
-        AddJob(testParentJob);
-        testChildJob1.SetStatus(EJobStatus.Running);
-
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () => testObservable1.OnNext(true)));
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(10f, () => testObservable2.OnNext(true)));
-    }
-
     protected override void OnDestroySingleton()
     {
         Debug.Log("JobManager is destroyed, cancelling remaining jobs");
@@ -342,7 +324,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public static Job CreateJobFromObservable<T>(string jobName, Job parentJob, IObservable<T> observable)
+    public static Job CreateJobFromObservable<T>(Translation jobName, Job parentJob, IObservable<T> observable)
     {
         Job job = new(jobName, parentJob);
         observable

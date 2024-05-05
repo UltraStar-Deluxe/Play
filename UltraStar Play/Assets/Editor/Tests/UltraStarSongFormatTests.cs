@@ -12,8 +12,9 @@ public class UltraStarSongFormatTests
     [Test]
     public void MissingTagNameTest()
     {
+        Translation.InitTranslationConfig();
         SongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-MissingTagName.txt", out List<SongIssue> songIssues, null, true);
-        Assert.That(songIssues.AnyMatch(songIssue => songIssue.Message.ToLowerInvariant().Contains("invalid formatting of header field")));
+        Assert.That(songIssues.AnyMatch(songIssue => songIssue.Message.Value.ToLowerInvariant().Contains("invalid formatting")));
         Assert.NotNull(songMeta);
     }
 

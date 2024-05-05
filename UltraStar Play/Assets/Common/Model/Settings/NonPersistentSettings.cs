@@ -11,6 +11,8 @@ public class NonPersistentSettings
     public ReactiveProperty<bool> MicTestActive { get; private set; } = new();
     public Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveSearchPropertyFilters { get; private set; } = new();
     public ReactiveProperty<bool> IsShowOnlyDuetsFilterActive { get; private set; } = new();
+    public ReactiveProperty<bool> IsSearchExpressionsEnabled { get; private set; } = new();
+    public ReactiveProperty<string> LastValidSearchExpression { get; private set; } = new();
     public DirectoryInfo SongSelectDirectoryInfo { get; set; }
 
     // Song editor settings

@@ -10,9 +10,9 @@
                     <ui:Label text="Some Very Very Very long Title" name="titleLabel" class="ellipsis noBackgroundInHierarchy" style="-unity-font-style: bold; font-size: 20px; white-space: normal; max-height: 55px;" />
                     <ui:Label text="Some Very Very Very long Artist" name="artistLabel" class="secondaryFontColor ellipsis noBackgroundInHierarchy" style="-unity-font-style: normal; font-size: 14px; white-space: normal; max-height: 50px;" />
                 </ui:VisualElement>
-                <ToggleButton text="$yourResults" display-tooltip-when-elided="true" name="showCurrentResultsButton" style="-unity-text-align: middle-left;" />
-                <ToggleButton text="$teamResults" display-tooltip-when-elided="true" name="showTeamResultsButton" style="-unity-text-align: middle-left;" />
-                <ToggleButton text="$highscores" display-tooltip-when-elided="true" name="showHighscoreButton" style="-unity-text-align: middle-left;" />
+                <ToggleButton text="$action_showOwnResults" display-tooltip-when-elided="true" name="showCurrentResultsButton" style="-unity-text-align: middle-left;" />
+                <ToggleButton text="$action_showTeamResults" display-tooltip-when-elided="true" name="showTeamResultsButton" style="-unity-text-align: middle-left;" />
+                <ToggleButton text="$action_showHighscores" display-tooltip-when-elided="true" name="showHighscoreButton" style="-unity-text-align: middle-left;" />
             </ui:VisualElement>
             <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                 <ui:VisualElement name="playerResultsRoot" style="flex-grow: 1; justify-content: center; height: 100%;">
@@ -63,11 +63,11 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="buttonRow" picking-mode="Ignore" style="flex-grow: 0; align-items: center; flex-direction: row; flex-shrink: 0; width: 100%;">
-            <ui:Button name="restartButton" value="This is the about text on multiple lines." text="$replay" class="wideControl controlMinWidth" style="white-space: nowrap;" />
-            <ui:Button name="quitButton" value="This is the about text on multiple lines." text="$quit" class="wideControl controlMinWidth ml-2" style="white-space: nowrap;" />
+            <ui:Button name="restartButton" value="This is the about text on multiple lines." text="$action_replay" class="wideControl controlMinWidth" style="white-space: nowrap;" />
+            <ui:Button name="quitButton" value="This is the about text on multiple lines." text="$action_quit" class="wideControl controlMinWidth ml-2" style="white-space: nowrap;" />
             <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
             <ui:Instance template="NextRoundInfoUi" name="NextRoundInfoUi" class="mr-3" />
-            <ui:Button name="continueButton" value="This is the about text on multiple lines." text="$continue" class="wideControl controlMinWidth" style="white-space: nowrap;" />
+            <ui:Button name="continueButton" value="This is the about text on multiple lines." text="$action_continue" class="wideControl controlMinWidth" style="white-space: nowrap;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

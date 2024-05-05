@@ -147,6 +147,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject(UxmlName = R.UxmlNames.showSearchExpressionInfoButton)]
     private Button showSearchExpressionInfoButton;
 
+    [Inject(UxmlName = R.UxmlNames.searchExpressionToggle)]
+    private Toggle searchExpressionToggle;
+
     [Inject(UxmlName = R.UxmlNames.toggleMicCheckButton)]
     private ToggleButton toggleMicCheckButton;
 
@@ -306,11 +309,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         });
 
         selectRandomSongButton.RegisterCallbackButtonTriggered(_ => SelectRandomSong());
-        showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(_ => ShowSearchExpressionHelpDialog());
+        FieldBindingUtils.Bind(searchExpressionToggle,
+            () => nonPersistentSettings.IsSearchExpressionsEnabled.Value,
+            newValue => nonPersistentSettings.IsSearchExpressionsEnabled.Value = newValue);
+        showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(_ => ShowSearchExpressionHelp());
 
         fuzzySearchTextLabel.ShowByDisplay();
         songSelectSceneInputControl.FuzzySearchText
-            .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
+            .Subscribe(newValue => fuzzySearchTextLabel.SetTranslatedText(Translation.Of(newValue)));
 
         songRouletteControl.SubmitEventStream.Subscribe(_ => AttemptStartSelectedEntry());
         songRouletteControl.Focus();
@@ -354,7 +360,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         createSingAlongSongControl.CreatedSingAlongVersionEventStream.Subscribe(processedSongMeta =>
         {
-            UiManager.CreateNotification($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Audio)}'");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_createdSingAlongDataSuccess,
+                "name", Path.GetFileName(processedSongMeta.Audio)));
         });
 
         // Song queue
@@ -401,11 +408,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                     && songMeta != SelectedSong)
                 {
                     uiManager.CreateConfirmationDialogControl(
-                        "Song Suggestion",
-                        $"Go to song\n'{SongMetaUtils.GetArtistDashTitle(songMeta)}'\nsuggested by {lobbyMember.DisplayName}?",
-                        "Yes",
+                        Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_title),
+                        Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_message,
+                            "suggestionName", SongMetaUtils.GetArtistDashTitle(songMeta),
+                            "suggestorName", lobbyMember.DisplayName),
+                        Translation.Get(R.Messages.common_yes),
                         _ => songRouletteControl.SelectEntryBySongMeta(songMeta),
-                        "No");
+                        Translation.Get(R.Messages.common_no));
                 }
             }));
     }
@@ -510,7 +519,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         if (songQueueLengthLabel.text != newSongQueueLengthAsString)
         {
             songQueueLengthContainer.SetVisibleByDisplay(SongQueueManager.SongQueueLength > 0);
-            songQueueLengthLabel.text = newSongQueueLengthAsString;
+            songQueueLengthLabel.SetTranslatedText(Translation.Of(newSongQueueLengthAsString));
             LeanTween.value(gameObject, Vector3.one * 1.5f, Vector3.one, 1.5f)
                 .setEaseOutBounce()
                 .setOnUpdate(s => songQueueLengthLabel.style.scale = new StyleScale(new Scale(new Vector2(s, s))));
@@ -636,11 +645,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         if (settings.ScoreMode == EScoreMode.None)
         {
-            currentDifficultyLabel.text = "No Scores";
+            currentDifficultyLabel.SetTranslatedText(Translation.Get(R.Messages.options_difficulty_noScores));
         }
         else
         {
-            currentDifficultyLabel.text = settings.Difficulty.ToString();
+            currentDifficultyLabel.SetTranslatedText(Translation.Get(settings.Difficulty));
         }
     }
 
@@ -703,26 +712,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         return songQueueEntryDto;
     }
 
-    private void ShowSearchExpressionHelpDialog()
+    private void ShowSearchExpressionHelp()
     {
-        if (searchExpressionHelpDialogControl != null)
-        {
-            return;
-        }
-
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { "Search Expressions",
-                Translation.Get(R.Messages.songSelectScene_searchExpressionInfo) },
-            { "Syntax",
-                Translation.Get(R.Messages.songSelectScene_searchExpressionInfo_syntaxTips) },
-        };
-        searchExpressionHelpDialogControl = uiManager.CreateHelpDialogControl(
-            "Advanced Search Expressions",
-            titleToContentMap);
-        searchExpressionHelpDialogControl.DialogClosedEventStream.Subscribe(_ => searchExpressionHelpDialogControl = null);
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(searchExpressionHelpDialogControl.DialogRootVisualElement);
+        ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToSearchExpressions));
     }
 
     public void ShowLyricsAndInfoPopup(SongMeta songMeta)
@@ -737,7 +729,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             lyricsDialogControl.CloseDialog();
         }
 
-        lyricsDialogControl = uiManager.CreateDialogControl($"{songMeta.Title}");
+        lyricsDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_lyricsDialog_title,
+            "songName", songMeta.Title));
         lyricsDialogControl.DialogClosedEventStream.Subscribe(_ => lyricsDialogControl = null);
 
         Label CreateLyricsLabel(string lyrics)
@@ -765,7 +758,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
 
         // Add attribution and license info
-        AccordionItem attributionAccordionItem = new("Attribution");
+        AccordionItem attributionAccordionItem = new(Translation.Get(R.Messages.action_showAttribution));
         attributionAccordionItem.Add(AttributionUtils.CreateAttributionVisualElement(songMeta));
         lyricsDialogControl.AddVisualElement(attributionAccordionItem);
 
@@ -793,7 +786,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void UpdateSongScanLabels(bool isSongScanFinished)
     {
-        songScanInProgressProgressLabel.text = $"{SongMetaManager.LoadedSongsPercent:00} %";
+        songScanInProgressProgressLabel.SetTranslatedText(Translation.Of($"{SongMetaManager.LoadedSongsPercent:00} %"));
 
         if (isSongScanFinished)
         {
@@ -938,7 +931,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
-            UiManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_noPlayerSelected_title));
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_noPlayerSelected_title));
             return null;
         }
         singScenePlayerData.SelectedPlayerProfiles = selectedPlayerProfiles;
@@ -967,7 +960,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
         {
-            UiManager.CreateNotification("Failed to load song. Check log for details.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
             return;
         }
 
@@ -979,7 +972,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                 {
                     Debug.LogException(ex);
                     Debug.LogError($"Failed to get whether all players have song locally: {ex.Message}");
-                    UiManager.CreateNotification("Failed to start song. Check log for details.");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
                 })
                 .Subscribe(result =>
                 {
@@ -989,7 +982,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                     }
                     else
                     {
-                        UiManager.CreateNotification($"The following players do not have this song locally:\n{result.PlayersThatDoNotHaveSongLocally.ToCsv(",", "", "")}.");
+                        NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_playersDontHaveSongLocally,
+                            "names", result.PlayersThatDoNotHaveSongLocally.JoinWith(", ")));
                     }
                 });
         }
@@ -1026,13 +1020,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         if (HasPartyModeSceneData)
         {
-            UiManager.CreateNotification("Song editor not available in Team & Tournament mode.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.partyMode_error_notAvailable));
             return;
         }
 
         if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
         {
-            UiManager.CreateNotification("Failed to load song. Check log for details.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
             return;
         }
 
@@ -1090,9 +1084,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
             string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-            string message = "Audio file resource does not exist: " + audioUri;
-            Debug.Log(message);
-            UiManager.CreateNotification(message);
+            Debug.Log($"");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioNotFound,
+                "name", audioUri));
             return;
         }
 
@@ -1100,53 +1094,50 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
-                string message = $"Audio file '{songMeta.Audio}' could not be loaded.\n" +
-                                 $"Please use one of {ApplicationUtils.supportedAudioFiles.ToCsv(",", "", "")}\n" +
-                                 $"or a supported website URI.";
-                Debug.LogError(message);
-                UiManager.CreateNotification(message);
+                Debug.LogError( $"Audio file '{songMeta.Audio}' could not be loaded.");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
+                    "name", songMeta.Audio,
+                    "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
             })
             .Subscribe(_ => StartSingScene(songMeta));
     }
 
     private void ShowFailedToLoadVoicesDialog(SongMeta songMeta)
     {
-        string errorMessage;
+        Translation errorMessage;
         if (songMeta is LazyLoadedVoicesSongMeta lazyLoadedVoicesSongMeta
             && !lazyLoadedVoicesSongMeta.FailedToLoadVoicesExceptionMessage.IsNullOrEmpty())
         {
-            errorMessage = lazyLoadedVoicesSongMeta.FailedToLoadVoicesExceptionMessage;
+            errorMessage = Translation.Of(lazyLoadedVoicesSongMeta.FailedToLoadVoicesExceptionMessage);
         }
         else
         {
-            errorMessage = "";
+            errorMessage = Translation.Empty;
         }
 
         uiManager.CreateErrorInfoDialogControl(
-            "Failed to Load Song",
-            "The UltraStar txt file could not be loaded.\n" +
-            $"Please see the log for details and fix any issues with the file.\n",
+            Translation.Get(R.Messages.songSelectScene_failedToLoadSongDialog_title),
+            Translation.Get(R.Messages.songSelectScene_failedToLoadSongDialog_message),
             errorMessage);
     }
 
     private void ShowAskToCreateSingAlongDataDialog(SongMeta songMeta)
     {
-        noSingAlongDataDialogControl = uiManager.CreateDialogControl("No Sing-Along Data");
-        noSingAlongDataDialogControl.Message = "This song does not yet have associated sing-along data.\n"
-                                               + "Do you want to open the song editor?";
+        noSingAlongDataDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_noSingAlongDataDialog_title));
+        noSingAlongDataDialogControl.Message = Translation.Get(R.Messages.songSelectScene_noSingAlongDataDialog_message);
         noSingAlongDataDialogControl.MessageElement.AddToClassList("my-2");
-        Button defaultButton = noSingAlongDataDialogControl.AddButton("Create sing-along data", _ =>
+        Button defaultButton = noSingAlongDataDialogControl.AddButton(Translation.Get(R.Messages.songSelectScene_noSingAlongDataDialog_createSingAlongData), _ =>
         {
             noSingAlongDataDialogControl.CloseDialog();
             createSingAlongSongControl.CreateSingAlongSong(songMeta, true);
         });
-        noSingAlongDataDialogControl.AddButton("Open song editor", _ =>
+        noSingAlongDataDialogControl.AddButton(Translation.Get(R.Messages.action_openSongEditor), _ =>
         {
             noSingAlongDataDialogControl.CloseDialog();
             StartSongEditorScene(songMeta);
         });
         // noSingAlongDataDialogControl.AddButton("Start anyway", _ => StartSingScene(songMeta));
-        noSingAlongDataDialogControl.AddButton("Cancel", _ => noSingAlongDataDialogControl.CloseDialog());
+        noSingAlongDataDialogControl.AddButton(Translation.Get(R.Messages.action_cancel), _ => noSingAlongDataDialogControl.CloseDialog());
         defaultButton.Focus();
     }
 
@@ -1234,8 +1225,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         // Check that any player is selected
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
-            UiManager.CreateNotification(
-                Translation.Get(R.Messages.songSelectScene_noPlayerSelected_message));
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_noPlayerSelected_message));
             return;
         }
 
@@ -1284,13 +1274,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     private void ShowSuggestSongToHostDialog(SongMeta songMeta)
     {
         uiManager.CreateConfirmationDialogControl(
-            "Suggest Song",
-            $"Suggest song\n" +
-            $"'{SongMetaUtils.GetArtistDashTitle(songMeta)}'\n" +
-            $"to host?",
-            Translation.Get(R.Messages.yes),
+            Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_title),
+            Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_message,
+                "suggestionName", SongMetaUtils.GetArtistDashTitle(songMeta)),
+            Translation.Get(R.Messages.common_yes),
             _ => SendSuggestSongMessageForOnlineMultiplayer(songMeta),
-            Translation.Get(R.Messages.no));
+            Translation.Get(R.Messages.common_no));
     }
 
     private void SendSuggestSongMessageForOnlineMultiplayer(SongMeta songMeta)
@@ -1299,25 +1288,26 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             nameof(SuggestSongRequestDto),
             FastBufferWriterUtils.WriteJsonValuePacked(new SuggestSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
             NetworkManager.ServerClientId);
-        UiManager.CreateNotification($"Suggested '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to host.");
+        NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_suggestedSongToHost,
+            "name", SongMetaUtils.GetArtistDashTitle(songMeta)));
     }
 
     private void OpenAskToAssignMicsDialog(List<PlayerProfile> playerProfilesWithoutMics, Action onIgnoreAndStart)
     {
         CloseAskToAssignMicsDialog();
 
-        askToAssignMicsDialog = uiManager.CreateDialogControl("Missing Microphones");
+        askToAssignMicsDialog = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_missingMicDialog_title));
         string playerNamesCsv = playerProfilesWithoutMics
             .Select(it => it.Name)
             .ToCsv(", ", "", "");
-        askToAssignMicsDialog.Message = $"Missing microphones for player(s): {playerNamesCsv}\n" +
-                                        $"Connect a Companion App or assign another microphone.\n";
-        askToAssignMicsDialog.AddButton("Start anyway", _ =>
+        askToAssignMicsDialog.Message = Translation.Get(R.Messages.songSelectScene_missingMicDialog_message,
+            "playerNames", playerNamesCsv);
+        askToAssignMicsDialog.AddButton(Translation.Get(R.Messages.songSelectScene_missingMicDialog_ignoreAndStart), _ =>
         {
             CloseAskToAssignMicsDialog();
             onIgnoreAndStart?.Invoke();
         });
-        askToAssignMicsDialog.AddButton(Translation.Get(R.Messages.cancel), _ =>
+        askToAssignMicsDialog.AddButton(Translation.Get(R.Messages.action_cancel), _ =>
         {
             CloseAskToAssignMicsDialog();
         });
@@ -1637,8 +1627,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         if (HasPartyModeSceneData)
         {
-            sceneTitle.text += $"{Translation.Get(R.Messages.songSelectScene_title)}\n" +
-                               $"{PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}";
+            sceneTitle.SetTranslatedText(Translation.Of(
+                $"{Translation.Get(R.Messages.songSelectScene_title)}\n"
+                + $"{PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}"));
         }
     }
 
@@ -1651,7 +1642,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public void ShowCannotUseJokerMessage()
     {
-        UiManager.CreateNotification("No jokers left to change the song");
+        NotificationManager.CreateNotification(Translation.Get(R.Messages.partyMode_error_noJokers));
     }
 
     public List<PlayerProfile> GetEnabledPlayerProfiles()
@@ -1693,23 +1684,19 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public void AskToRecreateSingAlongData(SongMeta songMeta)
     {
-        MessageDialogControl dialogControl = uiManager.CreateDialogControl($"Recreate '{songMeta.Title}'");
-        dialogControl.Message = "Do you want to recreate the song?\n\n"
-                                + "This will overwrite the current song files after executing\n"
-                                + "• vocals isolation,\n"
-                                + "• speech recognition,\n"
-                                + "• pitch detection.";
-        dialogControl.AddButton("Recreate and Save", evt =>
+        MessageDialogControl dialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_recreateSongDialog_title, "songName", songMeta.Title));
+        dialogControl.Message = Translation.Get(R.Messages.songSelectScene_recreateSongDialog_message);
+        dialogControl.AddButton(Translation.Get(R.Messages.songSelectScene_recreateSongDialog_recreateAndSave), evt =>
         {
             dialogControl.CloseDialog();
             createSingAlongSongControl.CreateSingAlongSong(songMeta, true);
         });
-        dialogControl.AddButton("Recreate but do not save", evt =>
+        dialogControl.AddButton(Translation.Get(R.Messages.songSelectScene_recreateSongDialog_recreateButDoNotSave), evt =>
         {
             dialogControl.CloseDialog();
             createSingAlongSongControl.CreateSingAlongSong(songMeta, false);
         });
-        dialogControl.AddButton(Translation.Get(R.Messages.cancel), evt =>
+        dialogControl.AddButton(Translation.Get(R.Messages.action_cancel), evt =>
         {
             dialogControl.CloseDialog();
         });

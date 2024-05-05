@@ -10,7 +10,7 @@
     Edition,
     Genre,
     Language,
-    Tag,
+    Tags,
     Year,
     Gap,
     VideoGap,

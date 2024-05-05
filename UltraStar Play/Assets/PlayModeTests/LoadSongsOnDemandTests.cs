@@ -18,9 +18,9 @@ public class LoadSongsOnDemandTests : AbstractPlayModeTest
 
     protected override void ConfigureTestSettings(TestSettings settings)
     {
-        Log.MinimumLogLevel = LogEventLevel.Debug;
+        Log.MinimumLogLevel = ELogEventLevel.Debug;
 
-        settings.SongDataFetchType = EFetchType.Lazy;
+        settings.SongDataFetchType = EFetchType.OnDemand;
         settings.ShowSongIndexInSongSelect = true;
 
         string testSongFolder = ApplicationUtils.GetTemporaryCachePath($"{nameof(LoadSongsOnDemandTests)}");

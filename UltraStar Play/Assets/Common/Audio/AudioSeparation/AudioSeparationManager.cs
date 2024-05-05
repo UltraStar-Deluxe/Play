@@ -48,9 +48,9 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
-                string errorMessage = $"Vocals isolation failed: {ex.Message}";
-                Debug.LogError(errorMessage);
-                UiManager.CreateNotification(errorMessage);
+                Debug.LogError($"Vocals isolation failed: {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_audioSeparation_errorWithReason,
+                    "reason", ex.Message)));
             })
             // Subscribe to trigger the observable
             .Subscribe(evt => Debug.Log($"Successfully separated audio: {evt}"));
@@ -67,7 +67,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         // Create job to show in UI
         if (audioSeparationJob == null)
         {
-            audioSeparationJob = new Job($"Vocals isolation of '{Path.GetFileName(songMeta.Audio)}'");
+            audioSeparationJob = new Job(Translation.Get(R.Messages.job_audioSeparationWithName,
+                "name", Path.GetFileName(songMeta.Audio)));
             jobManager.AddJob(audioSeparationJob);
         }
         audioSeparationJob.SetStatus(EJobStatus.Running);
@@ -82,7 +83,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         CancellationTokenSource cancellationTokenSource = new();
         audioSeparationJob.OnCancel = () => cancellationTokenSource.Cancel();
 
-        // Set path to spleeter executable if needed
+        // Set path to Spleeter executable if needed
         string fallbackAudioSeparationCommand = PlatformUtils.IsWindows
             ? $"\"{ApplicationUtils.GetStreamingAssetsPath("SpleeterMsvcExe/Spleeter.exe").Replace("/", "\\")}\""
             : "";
@@ -132,7 +133,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     {
         if (audioSeparationProcessCount > 0)
         {
-            UiManager.CreateNotification("Already performing vocals isolation");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
             return Observable.Throw<AudioSeparationResult>(new IllegalStateException("Already performing vocals isolation"));
         }
 

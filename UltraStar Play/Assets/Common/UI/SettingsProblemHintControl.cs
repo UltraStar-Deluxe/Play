@@ -14,7 +14,7 @@ public class SettingsProblemHintControl
 
     private bool hasIssues;
 
-    public SettingsProblemHintControl(VisualElement visualElement, List<string> settingsProblems)
+    public SettingsProblemHintControl(VisualElement visualElement, List<Translation> settingsProblems)
     {
         this.tooltipControl = new(visualElement);
         this.visualElement = visualElement;
@@ -23,7 +23,7 @@ public class SettingsProblemHintControl
         SetProblems(settingsProblems);
     }
 
-    public static List<string> GetAllSettingsProblems(
+    public static List<Translation> GetAllSettingsProblems(
         Settings settings,
         ModManager modManager)
     {
@@ -34,20 +34,20 @@ public class SettingsProblemHintControl
             .ToList();
     }
 
-    public static List<string> GetModSettingsProblems(ModManager modManager)
+    public static List<Translation> GetModSettingsProblems(ModManager modManager)
     {
-        List<string> result = new();
+        List<Translation> result = new();
         if (!modManager.EnabledFailedToLoadModFolders.IsNullOrEmpty())
         {
-            result.Add("Some mods failed to load.");
+            result.Add(Translation.Get(R.Messages.settingsProblem_modFailedToLoad));
         }
 
         return result;
     }
 
-    public static List<string> GetSongLibrarySettingsProblems(Settings settings)
+    public static List<Translation> GetSongLibrarySettingsProblems(Settings settings)
     {
-        List<string> result = new();
+        List<Translation> result = new();
         if (settings.SongDirs.IsNullOrEmpty())
         {
             result.Add(Translation.Get(R.Messages.settingsProblem_noSongFolders));
@@ -85,9 +85,9 @@ public class SettingsProblemHintControl
         return result;
     }
 
-    public static List<string> GetRecordingSettingsProblems(Settings settings)
+    public static List<Translation> GetRecordingSettingsProblems(Settings settings)
     {
-        List<string> result = new();
+        List<Translation> result = new();
         if (settings.MicProfiles.IsNullOrEmpty()
             || !settings.MicProfiles
                 .AnyMatch(micProfile => micProfile.IsEnabled))
@@ -102,9 +102,9 @@ public class SettingsProblemHintControl
         return result;
     }
 
-    public static List<string> GetPlayerSettingsProblems(Settings settings)
+    public static List<Translation> GetPlayerSettingsProblems(Settings settings)
     {
-        List<string> result = new();
+        List<Translation> result = new();
         if (settings.PlayerProfiles.IsNullOrEmpty())
         {
             result.Add(Translation.Get(R.Messages.settingsProblem_noPlayerProfile));
@@ -172,7 +172,7 @@ public class SettingsProblemHintControl
         return potentialSubfolderInfo.FullName.StartsWith(potentialParentAbsolutePath);
     }
 
-    public void SetProblems(List<string> settingsProblems)
+    public void SetProblems(List<Translation> settingsProblems)
     {
         bool oldHasIssues = this.hasIssues;
         hasIssues = !settingsProblems.IsNullOrEmpty();
@@ -198,6 +198,6 @@ public class SettingsProblemHintControl
                 .setEaseLinear();
         }
 
-        tooltipControl.TooltipText = settingsProblems.JoinWith("\n\n");
+        tooltipControl.TooltipText = Translation.Of(settingsProblems.JoinWith("\n\n"));
     }
 }

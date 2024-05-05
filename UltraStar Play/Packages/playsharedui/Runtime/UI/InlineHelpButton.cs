@@ -14,10 +14,21 @@ public partial class InlineHelpButton : Button
 
     [UxmlAttribute]
     [Multiline]
-    public string HelpText
+    private string helpTextKey;
+    public string HelpTextKey
+    {
+        get => helpTextKey;
+        set
+        {
+            helpTextKey = value;
+            HelpText = Translation.Get(value);
+        }
+    }
+
+    public Translation HelpText
     {
         get => TooltipControl.TooltipText;
-        set => TooltipControl.TooltipText = value;
+        set => TooltipControl.TooltipText = Translation.Of(value);
     }
 
     [UxmlAttribute]
@@ -60,7 +71,7 @@ public partial class InlineHelpButton : Button
         };
         Add(MaterialIconElement);
 
-        TooltipControl = new TooltipControl(this, "", false);
+        TooltipControl = new TooltipControl(this, Translation.Empty, false);
 
         this.RegisterCallbackButtonTriggered(evt => TooltipControl.ShowTooltip(new Vector2(worldBound.center.x, worldBound.yMax)));
         this.RegisterCallback<BlurEvent>(evt => TooltipControl.CloseTooltip());

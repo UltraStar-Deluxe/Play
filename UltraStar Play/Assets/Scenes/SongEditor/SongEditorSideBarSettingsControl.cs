@@ -128,9 +128,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.speechRecognitionPhrasesTextField)]
     private TextField speechRecognitionPhrasesTextField;
 
-    [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmItemPicker)]
-    private ItemPicker pitchDetectionAlgorithmItemPicker;
-
     [Inject(UxmlName = R.UxmlNames.audioSeparationButton)]
     private Button audioSeparationButton;
 
@@ -231,7 +228,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.MusicVolumePercent = (int) newValue);
 
         drawNoteLayerPickerControl = new(drawNoteLayerPicker);
-        drawNoteLayerPickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(ObjectUtils.NullableToString(item, ""));
         drawNoteLayerPickerControl.Bind(
             () => settings.SongEditorSettings.DrawNoteLayer,
             newValue => settings.SongEditorSettings.DrawNoteLayer = newValue);
@@ -265,8 +261,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         List<MicProfile> enabledAndConnectedMicProfiles = micProfiles
             .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
             .ToList();
-        micDeviceItemPickerControl = new(micDeviceItemPicker, enabledAndConnectedMicProfiles);
-        micDeviceItemPickerControl.GetLabelTextFunction = micProfile => micProfile != null ? micProfile.GetDisplayNameWithChannel() : "";
+        micDeviceItemPickerControl = new(micDeviceItemPicker, enabledAndConnectedMicProfiles,
+            micProfile => micProfile != null ? Translation.Of(micProfile.GetDisplayNameWithChannel()) : Translation.Empty);
         if (settings.SongEditorSettings.MicProfile == null
             || !settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager))
         {
@@ -412,11 +408,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         splitSyllablesInSelectionButton.RegisterCallbackButtonTriggered(_ => SplitSyllablesInSelection());
 
         // Pitch detection
-        new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmItemPicker)
-            .Bind(() => settings.SongEditorSettings.PitchDetectionAlgorithm,
-                newValue => settings.SongEditorSettings.PitchDetectionAlgorithm = newValue);
-        new AutoFitLabelControl(pitchDetectionAlgorithmItemPicker.ItemLabel, 8, 15);
-
         pitchDetectionAudioItemPickerControl = new(pitchDetectionAudioPicker, speechAndPitchAnalysisSampleSources);
         pitchDetectionAudioItemPickerControl.Bind(
             () => settings.SongEditorSettings.PitchDetectionSamplesSource,
@@ -427,7 +418,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
                 && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
             {
-                UiManager.CreateNotification("Vocals and instrumental audio already exists");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingInstrumentalAudio));
                 return;
             }
             audioSeparationManager.ProcessSongMeta(songMeta, true);
@@ -547,11 +538,5 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private void Bind<T>(BaseField<T> baseField, Func<T> valueGetter, Action<T> valueSetter, bool observeValueGetter = true)
     {
         FieldBindingUtils.Bind(gameObject, baseField, valueGetter, valueSetter, observeValueGetter);
-    }
-
-    public enum ERecordNotesOrAudio
-    {
-        RecordNotes,
-        RecordAudio,
     }
 }

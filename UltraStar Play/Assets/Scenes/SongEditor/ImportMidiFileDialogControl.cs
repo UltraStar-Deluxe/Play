@@ -263,10 +263,11 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             MidiFileUtils.SetFirstDeltaTimeTo(previewMidiFile, 0, 0);
             midiManager.PlayMidiFile(previewMidiFile);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Debug.LogException(e);
-            UiManager.CreateNotification($"Preview failed: {e.Message}");
+            Debug.LogException(ex);
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", ex.Message));
             throw;
         }
     }
@@ -275,7 +276,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     {
         if (!FileUtils.Exists(MidiFilePath))
         {
-            UiManager.CreateNotification("File does not exist");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_fileNotFound));
             return;
         }
 
@@ -306,7 +307,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             voiceId,
             true,
             ESongEditorLayer.Import);
-        UiManager.CreateNotification("Loaded MIDI file successfully");
+        NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_midiImportDialog_success));
     }
 
     public void OpenDialog()
@@ -323,9 +324,9 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
     private void UpdateControls()
     {
-        string errorMessage = GetMidiFileErrorMessage();
+        Translation errorMessage = GetMidiFileErrorMessage();
         SetErrorMessage(errorMessage);
-        if (!errorMessage.IsNullOrEmpty())
+        if (!errorMessage.Value.IsNullOrEmpty())
         {
             return;
         }
@@ -337,7 +338,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         catch (Exception e)
         {
             Debug.LogException(e);
-            SetErrorMessage($"Import failed: {e.Message}");
+            SetErrorMessage(Translation.Get(R.Messages.common_errorWithReason, "reason", e.Message));
             return;
         }
 
@@ -358,7 +359,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         if (lyrics.IsNullOrEmpty())
         {
             midiLyricsTextField.value = "No lyrics found";
-            bestMatchnigTrackAndChannelLabel.text = "";
+            bestMatchnigTrackAndChannelLabel.SetTranslatedText(Translation.Empty);
         }
         else
         {
@@ -368,11 +369,11 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         importMidiLyricsToggle.value = !lyrics.IsNullOrEmpty();
     }
 
-    private void SetErrorMessage(string errorMessage)
+    private void SetErrorMessage(Translation errorMessage)
     {
-        bool hasError = !errorMessage.IsNullOrEmpty();
+        bool hasError = !errorMessage.Value.IsNullOrEmpty();
         midiFileIssueContainer.SetVisibleByDisplay(hasError);
-        midiFileIssueLabel.text = errorMessage;
+        midiFileIssueLabel.SetTranslatedText(errorMessage);
         importMidiFileDialogButton.SetEnabled(!hasError);
     }
 
@@ -390,35 +391,36 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         TrackAndChannel bestMatchingTrackAndChannel = MidiToSongMetaUtils.FindTrackAndChannelWithBestMatchingNotesForLyricsEvents(midiFile, lyricsEvents, trackAndChannels, midiEventToAbsoluteDeltaTimeInMillis);
         if (bestMatchingTrackAndChannel != null)
         {
-            bestMatchnigTrackAndChannelLabel.text = $"Best matching notes: track {bestMatchingTrackAndChannel}";
+            bestMatchnigTrackAndChannelLabel.SetTranslatedText(Translation.Get(R.Messages.songEditor_midiImportDialog_bestMatchingTrack,
+                "value", bestMatchingTrackAndChannel));
             midiTrackIndexPickerControl.SetSelection(bestMatchingTrackAndChannel);
         }
         else
         {
-            bestMatchnigTrackAndChannelLabel.text = $"";
+            bestMatchnigTrackAndChannelLabel.SetTranslatedText(Translation.Empty);
             midiTrackIndexPickerControl.SetSelection(trackAndChannels.FirstOrDefault());
         }
     }
 
-    private string GetMidiFileErrorMessage()
+    private Translation GetMidiFileErrorMessage()
     {
         if (MidiFilePath.IsNullOrEmpty())
         {
-            return "Enter path to MIDI or KAR file";
+            return Translation.Get(R.Messages.songEditor_midiImportDialog_error_missingPath);
         }
 
         if (!FileUtils.Exists(MidiFilePath))
         {
-            return "File does not exist";
+            return Translation.Get(R.Messages.songEditor_midiImportDialog_error_fileNotFound);
         }
 
         List<string> supportedFileExtensions = new() { ".mid", ".midi", ".kar" };
         string midiFileExtension = Path.GetExtension(MidiFilePath.ToLowerInvariant());
         if (!supportedFileExtensions.Contains(midiFileExtension))
         {
-            return "Unsupported file format";
+            return Translation.Get(R.Messages.songEditor_midiImportDialog_error_unsupportedFormat);
         }
 
-        return "";
+        return Translation.Empty;
     }
 }

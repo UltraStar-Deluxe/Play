@@ -9,9 +9,10 @@ using UnityEngine;
 public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenResolution>
 {
     public ScreenResolutionPickerControl(ItemPicker itemPicker, Settings settings)
-        : base(itemPicker, GetItems())
+        : base(itemPicker,
+            GetItems(),
+            item => Translation.Of($"{item.Width} x {item.Height} ({item.RefreshRate} Hz)"))
     {
-        GetLabelTextFunction = item => $"{item.Width} x {item.Height} ({item.RefreshRate} Hz)";
         if (Application.isEditor)
         {
             Selection.Value = Items[0];

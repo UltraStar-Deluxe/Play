@@ -107,7 +107,7 @@ public static class UltraStarSongParser
                 string errorMessage = $"Failed to handle header field '{item.Key}' with value '{item.Value}'";
                 Debug.LogException(ex);
                 Debug.LogError(errorMessage);
-                songIssues.Add(SongIssue.CreateWarning(songMeta, errorMessage));
+                songIssues.Add(SongIssue.CreateWarning(songMeta, Translation.Get("songIssue_headerField")));
             }
         }
 
@@ -144,8 +144,8 @@ public static class UltraStarSongParser
                     !headerFields.TryGetValue(mandatoryHeaderField, out string mandatoryHeaderFieldValue)
                     || mandatoryHeaderFieldValue.IsNullOrEmpty()))
             {
-                songIssues.Add(SongIssue.CreateError(null,
-                    $"Missing required header field. Specify {mandatoryHeaderFieldsWithAlternatives.JoinWith(" or ")}"));
+                songIssues.Add(SongIssue.CreateError(null, Translation.Get("songIssue_missingHeaderField",
+                    "value", mandatoryHeaderFieldsWithAlternatives.JoinWith(" or "))));
             }
         }
     }
@@ -223,7 +223,8 @@ public static class UltraStarSongParser
             {
                 if (headerFields.ContainsKey(key))
                 {
-                    songIssues.Add(SongIssue.CreateWarning(null, $"Cannot set '{key}' multiple times"));
+                    songIssues.Add(SongIssue.CreateWarning(null, Translation.Get("songIssue_headerField_duplicate",
+                        "key", key)));
                 }
                 else
                 {
@@ -243,7 +244,9 @@ public static class UltraStarSongParser
             else if (line.StartsWith('#'))
             {
                 // This could be a header fields with invalid syntax, e.g., using the wrong separator for key and value.
-                songIssues.Add(SongIssue.CreateWarning(null, $"Invalid formatting of header field on line {lineNumber}: '{line}'"));
+                songIssues.Add(SongIssue.CreateWarning(null, Translation.Get("songIssue_headerField_invalidFormat",
+                    "lineNumber", lineNumber,
+                    "line", line)));
             }
             else
             {

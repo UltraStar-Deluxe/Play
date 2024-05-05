@@ -6,10 +6,10 @@ public class TextFieldHintControl
     private readonly Label hintLabel;
     private readonly TextField textField;
 
-    public string Hint
+    public Translation Hint
     {
-        get => hintLabel.text;
-        set => hintLabel.text = value;
+        get => Translation.Of(hintLabel.text);
+        set => hintLabel.SetTranslatedText(value);
     }
 
     public TextFieldHintControl(TextField textField)

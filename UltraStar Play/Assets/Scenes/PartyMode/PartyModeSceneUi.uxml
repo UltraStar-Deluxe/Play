@@ -9,12 +9,12 @@
                         <MaterialIcon tabindex="-1" name="backIcon" icon="arrow_back" />
                     </ui:Button>
                     <ui:VisualElement name="titleAndDescription">
-                        <ui:Label text="Team &amp; Tournament" name="sceneTitle" class="titleText noBackgroundInHierarchy" />
+                        <ui:Label text="$partyModeScene_title" name="sceneTitle" class="titleText noBackgroundInHierarchy" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
-            <ui:Button text="Continue" display-tooltip-when-elided="true" name="continueButton" />
+            <ui:Button text="$action_continue" display-tooltip-when-elided="true" name="continueButton" />
         </ui:VisualElement>
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="flex-grow: 1;">
             <ui:Instance template="PartyModeSongSelectionRoundUi" name="partyModeSongSelectionConfigUi" />

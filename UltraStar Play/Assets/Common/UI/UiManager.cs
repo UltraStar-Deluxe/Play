@@ -12,9 +12,6 @@ using IBinding = UniInject.IBinding;
 
 public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 {
-    private const float NotificationFadeOutDelayInSeconds = 4;
-    private const float NotificationFadeOutDurationInSeconds = 1;
-
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
@@ -24,12 +21,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
 
     private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
-
-    [InjectedInInspector]
-    public VisualTreeAsset notificationOverlayUi;
-
-    [InjectedInInspector]
-    public VisualTreeAsset notificationUi;
 
     [InjectedInInspector]
     public VisualTreeAsset messageDialogUi;
@@ -91,30 +82,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
             .ForEach(contextMenuPopupControl => contextMenuPopupControl.Update());
     }
 
-    private Label DoCreateNotification(
-        string text)
-    {
-        VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
-        if (notificationOverlay == null)
-        {
-            notificationOverlay = notificationOverlayUi.CloneTree()
-                .Children()
-                .First();
-            uiDocument.rootVisualElement.Add(notificationOverlay);
-        }
-
-        TemplateContainer templateContainer = notificationUi.CloneTree();
-        VisualElement notification = templateContainer.Children().First();
-        Label notificationLabel = notification.Q<Label>("notificationLabel");
-        notificationLabel.text = text;
-        notificationOverlay.Add(notification);
-
-        // Fade out then remove
-        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, NotificationFadeOutDelayInSeconds, NotificationFadeOutDurationInSeconds));
-
-        return notificationLabel;
-    }
-
     public void ReloadPlayerProfileImages()
     {
         UpdatePlayerProfileImagePaths();
@@ -126,21 +93,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages(folders);
     }
 
-    public static void CreateNotification(string text)
-    {
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            UiManager uiManager = Instance;
-            if (uiManager == null)
-            {
-                return;
-            }
-
-            uiManager.DoCreateNotification(text);
-        });
-    }
-
-    public MessageDialogControl CreateDialogControl(string dialogTitle)
+    public MessageDialogControl CreateDialogControl(Translation dialogTitle)
     {
         VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(dialogVisualElement);
@@ -155,39 +108,41 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     }
 
     public MessageDialogControl CreateErrorInfoDialogControl(
-        string dialogTitle,
-        string dialogMessage,
-        string errorMessage,
-        string closeButtonText = null)
+        Translation dialogTitle,
+        Translation dialogMessage,
+        Translation errorMessage,
+        Translation closeButtonText = default)
     {
-        MessageDialogControl messageDialogControl = CreateInfoDialogControl(dialogTitle,dialogMessage, closeButtonText);
+        MessageDialogControl messageDialogControl = CreateInfoDialogControl(dialogTitle, dialogMessage, closeButtonText);
 
         // Add accordion item to show error message.
-        if (!errorMessage.IsNullOrEmpty())
+        if (errorMessage.Value.IsNullOrEmpty())
         {
-            AccordionItem accordionItem = new AccordionItem();
-            accordionItem.Title = "Details";
-            Label errorMessageLabel = new();
-            errorMessageLabel.text = errorMessage;
-            accordionItem.Add(errorMessageLabel);
-            accordionItem.HideAccordionContent();
-            messageDialogControl.AddVisualElement(accordionItem);
+            return messageDialogControl;
         }
+
+        AccordionItem accordionItem = new AccordionItem();
+        accordionItem.SetTranslatedTitle(Translation.Get(R.Messages.common_details));
+        Label errorMessageLabel = new();
+        errorMessageLabel.SetTranslatedText(errorMessage);
+        accordionItem.Add(errorMessageLabel);
+        accordionItem.HideAccordionContent();
+        messageDialogControl.AddVisualElement(accordionItem);
 
         return messageDialogControl;
     }
 
     public MessageDialogControl CreateInfoDialogControl(
-        string dialogTitle,
-        string dialogMessage,
-        string closeButtonText = null)
+        Translation dialogTitle,
+        Translation dialogMessage,
+        Translation closeButtonText = default)
     {
         MessageDialogControl messageDialogControl = CreateDialogControl(dialogTitle);
         messageDialogControl.Message = dialogMessage;
 
-        closeButtonText = !closeButtonText.IsNullOrEmpty()
+        closeButtonText = !closeButtonText.Value.IsNullOrEmpty()
             ? closeButtonText
-            : Translation.Get(R.Messages.close);
+            : Translation.Get(R.Messages.action_close);
         messageDialogControl.AddButton(closeButtonText, evt =>
         {
             messageDialogControl.CloseDialog();
@@ -196,11 +151,11 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     }
 
     public MessageDialogControl CreateConfirmationDialogControl(
-        string dialogTitle,
-        string dialogMessage,
-        string confirmButtonText,
+        Translation dialogTitle,
+        Translation dialogMessage,
+        Translation confirmButtonText,
         Action<EventBase> onConfirm,
-        string cancelButtonText = "",
+        Translation cancelButtonText = default,
         Action<EventBase> onCancel = null)
     {
         MessageDialogControl messageDialogControl = CreateDialogControl(dialogTitle);
@@ -211,9 +166,9 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
             onConfirm?.Invoke(evt);
         });
 
-        cancelButtonText = !cancelButtonText.IsNullOrEmpty()
+        cancelButtonText = !cancelButtonText.Value.IsNullOrEmpty()
             ? cancelButtonText
-            : Translation.Get(R.Messages.cancel);
+            : Translation.Get(R.Messages.action_cancel);
         messageDialogControl.AddButton(cancelButtonText, evt =>
         {
             messageDialogControl.CloseDialog();
@@ -223,7 +178,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     }
 
     public MessageDialogControl CreateHelpDialogControl(
-        string dialogTitle,
+        Translation dialogTitle,
         Dictionary<string, string> titleToContentMap)
     {
         VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();

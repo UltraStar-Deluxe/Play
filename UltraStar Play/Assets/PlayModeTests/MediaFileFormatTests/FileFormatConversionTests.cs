@@ -127,14 +127,15 @@ public class FileFormatConversionTests : AbstractMediaFileFormatTests
 
         bool isSuccessful = false;
         bool ignoreEqualFileExtension = true;
+        int maxRetry = 3;
         long conversionStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         SongMediaFileConversionManager.MinTargetFileSizeInBytes = 10 * 1024; // 10 KB
         SongMediaFileConversionManager.Instance.ConvertFileToSupportedFormat(tempSourceFilePath,
             $"test media '{Path.GetFileName(tempSourceFilePath)}'",
-            $"Convert '{Path.GetFileName(tempSourceFilePath)}' to supported format",
+            Translation.Of($"Convert '{Path.GetFileName(tempSourceFilePath)}' to supported format"),
             isAudio,
-            ignoreEqualFileExtension,
-            3,
+            true,
+            maxRetry,
             targetFilePath =>
             {
                 if (!File.Exists(targetFilePath))

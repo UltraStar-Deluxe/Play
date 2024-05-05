@@ -184,8 +184,8 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private void FillVideoImageContextMenu(ContextMenuPopupControl contextMenu)
     {
-        contextMenu.AddButton("Reset VideoGap", () => setVideoGapAction.ExecuteAndNotify(0));
-        contextMenu.AddButton("Change Video", () => OpenDialogToSetVideo());
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_resetVideoGap), () => setVideoGapAction.ExecuteAndNotify(0));
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_changeVideo), () => OpenDialogToSetVideo());
     }
 
     private void ShowVideoImage()
@@ -238,7 +238,8 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     {
         setVideoGapAction.Execute(GetNewVideoGap(dragEvent));
         videoAreaLabel.ShowByDisplay();
-        videoAreaLabel.text = $"VideoGap (ms): {songMeta.VideoGapInMillis}";
+        videoAreaLabel.SetTranslatedText(Translation.Get(R.Messages.songEditor_videoArea_videoGapWithValue,
+            "value", songMeta.VideoGapInMillis));
     }
 
     public void OnEndDrag(GeneralDragEvent dragEvent)

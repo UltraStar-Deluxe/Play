@@ -12,13 +12,19 @@ public static class VisualElementUtils
     // See https://forum.unity.com/threads/textfield-character-limit-text-will-be-truncated-because-it-exceeds-49152-vertices.1309179/#post-8281530
     public const int TextFieldCharacterLimit = 12000;
 
-    public static void MoveVisualElementFullyInsideScreen(VisualElement visualElement, PanelHelper panelHelper)
+    public static void MoveVisualElementFullyInsideScreen(
+        VisualElement visualElement,
+        PanelHelper panelHelper,
+        float marginLeft = 0,
+        float marginRight = 0,
+        float marginTop = 0,
+        float marginBottom = 0)
     {
         Vector2 screenSizeInPanelCoordinates = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
-        float overshootRight = visualElement.worldBound.xMax - screenSizeInPanelCoordinates.x;
-        float overshootLeft = visualElement.worldBound.xMin;
-        float overshootBottom = visualElement.worldBound.yMax - screenSizeInPanelCoordinates.y;
-        float overshootTop = visualElement.worldBound.yMin;
+        float overshootRight = (visualElement.worldBound.xMax + marginRight) - screenSizeInPanelCoordinates.x;
+        float overshootLeft = (visualElement.worldBound.xMin - marginLeft);
+        float overshootBottom = (visualElement.worldBound.yMax + marginBottom) - screenSizeInPanelCoordinates.y;
+        float overshootTop = (visualElement.worldBound.yMin - marginTop);
 
         Vector2 shift = Vector2.zero;
         if (overshootLeft < 0)

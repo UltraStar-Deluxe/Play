@@ -85,17 +85,6 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         });
 
         VoiceChooserControl = new EnumItemPickerControl<EExtendedVoiceId>(voiceChooser);
-        VoiceChooserControl.GetLabelTextFunction = item =>
-        {
-            if (item is EExtendedVoiceId.Merged)
-            {
-                return "Both";
-            }
-            else
-            {
-                return item.ToString();
-            }
-        };
 
         UpdateMicIcon();
     }
@@ -126,8 +115,8 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         micSelectionDialogControl = injector
             .WithRootVisualElement(dialog)
             .CreateAndInject<MicSelectionDialogControl>();
-        micSelectionDialogControl.Title = $"Select Microphone for {PlayerProfileName}";
-        micSelectionDialogControl.AddButton("OK", _ => micSelectionDialogControl.CloseDialog());
+        micSelectionDialogControl.Title = Translation.Of($"Select Microphone for {PlayerProfileName}");
+        micSelectionDialogControl.AddButton(Translation.Get(R.Messages.common_ok), _ => micSelectionDialogControl.CloseDialog());
         micSelectionDialogControl.ShowInfoLabel = false;
         micSelectionDialogControl.DialogClosedEventStream.Subscribe(_ => OnMicSelectionDialogClosed());
         micSelectionDialogControl.MicProfiles = micProfiles;

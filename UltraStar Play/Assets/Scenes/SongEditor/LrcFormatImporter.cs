@@ -6,20 +6,20 @@ using UnityEngine;
 
 public class LrcFormatImporter : INeedInjection
 {
-    public string GetLrcFormatErrorMessage(string lrcText)
+    public Translation GetLrcFormatErrorMessage(string lrcText)
     {
         if (lrcText.IsNullOrEmpty())
         {
-            return "";
+            return Translation.Empty;
         }
 
         IParseResult<Line> parseResult = Lyrics.Parse(lrcText);
         if (!parseResult.Exceptions.IsNullOrEmpty())
         {
             ParseException ex = parseResult.Exceptions.FirstOrDefault();
-            return ex.Message;
+            return Translation.Get(R.Messages.common_errorWithReason, "reason", ex.Message);
         }
-        return "";
+        return Translation.Empty;
     }
 
     public List<Note> ImportLrcFormat(string lrcText, SongMeta songMeta, Settings settings)

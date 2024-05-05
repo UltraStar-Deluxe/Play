@@ -125,23 +125,25 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         wasNoButtonOrTouchPressed = wasNoButtonOrTouchPressed || !InputUtils.AnyKeyboardOrMouseOrTouchPressed();
     }
 
-    public void AddSeparator()
+    public VisualElement AddSeparator()
     {
-        VisualElement contextMenuItemVisualElement = contextMenuPopupManager.contextMenuSeparatorUi.CloneTree().Children().First();
-        visualElement.Add(contextMenuItemVisualElement);
+        VisualElement separator = contextMenuPopupManager.contextMenuSeparatorUi.CloneTree().Children().First();
+        visualElement.Add(separator);
+        return separator;
     }
 
-    public void AddVisualElement(VisualElement newVisualElement)
+    public VisualElement AddVisualElement(VisualElement newVisualElement)
     {
         visualElement.Add(newVisualElement);
+        return newVisualElement;
     }
 
-    public void AddButton(string text, Action action)
+    public VisualElement AddButton(Translation text, Action action)
     {
-        AddButton(text, null, action);
+        return AddButton(text, null, action);
     }
 
-    public VisualElement AddButton(string text, string icon, Action action)
+    public VisualElement AddButton(Translation text, string icon, Action action)
     {
         VisualElement contextMenuItemVisualElement = contextMenuPopupManager.contextMenuItemUi.CloneTree().Children().First();
         ContextMenuItemControl contextMenuItemControl = new(text, icon, action);

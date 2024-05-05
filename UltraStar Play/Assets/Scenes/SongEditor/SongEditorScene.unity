@@ -664,7 +664,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfac381e8120d2d41b8da847760356a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: On the run
+  defaultSongName: Kryptonite
   defaultSongNamePasteBin: 'Code Monkey
 
     Summer Wine

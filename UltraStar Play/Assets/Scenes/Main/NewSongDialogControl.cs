@@ -10,6 +10,9 @@ using UnityEngine.UIElements;
 
 public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinishedListener
 {
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement visualElement;
+
     [Inject(UxmlName = R.UxmlNames.audioFileTextField)]
     private TextField audioFileTextField;
 
@@ -68,6 +71,8 @@ public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinish
         titleTextField.RegisterValueChangedCallback(evt => UpdateOkButtonEnabled());
 
         cancelButton.Focus();
+
+        TranslationManager.ApplyTranslations(visualElement);
     }
 
     private void OnAudioFileTextFieldChanged(string newValue)
@@ -120,7 +125,7 @@ public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinish
     {
         if (!IsInputValid())
         {
-            UiManager.CreateNotification("Please specify the artist and title");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_missingArtistOrTitle));
             return;
         }
 

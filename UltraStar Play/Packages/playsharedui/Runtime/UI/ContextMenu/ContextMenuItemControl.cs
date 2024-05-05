@@ -10,18 +10,18 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.contextMenuButton)]
     private Button button;
-    
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.contextMenuButtonIcon)]
     private MaterialIcon iconElement;
 
-    private readonly string text;
+    private readonly Translation text;
     private readonly string icon;
     private readonly Action action;
 
     private readonly Subject<bool> itemTriggeredEventStream = new();
     public IObservable<bool> ItemTriggeredEventStream => itemTriggeredEventStream;
 
-    public ContextMenuItemControl(string text, string icon, Action action)
+    public ContextMenuItemControl(Translation text, string icon, Action action)
     {
         this.text = text;
         this.icon = icon;
@@ -39,8 +39,8 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
             iconElement.ShowByDisplay();
             iconElement.Icon = icon;
         }
-        
-        label.text = text;
+
+        label.SetTranslatedText(text);
         button.RegisterCallbackButtonTriggered(_ =>
         {
             if (button.focusController.focusedElement == button)

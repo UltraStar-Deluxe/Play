@@ -350,6 +350,9 @@ ChipsCombo {
     background-color: rgb(60, 63, 65);
     border-color: rgb(50, 50, 50);
     border-width: 1px;
+    max-width: 792px; /* full screen width minus margin */
+    max-height: 592px; /* full screen height minus margin */
+    white-space: normal;
 }
 
 /**************************************************/

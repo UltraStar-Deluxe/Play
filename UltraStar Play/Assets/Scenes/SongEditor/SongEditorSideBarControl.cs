@@ -215,7 +215,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     {
         if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
         {
-            UiManager.CreateNotification("No vocals audio found. Split the audio first.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingVocalsAudio));
             return;
         }
 
@@ -257,10 +257,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         controlsAccordionItem.Add(inputLegendContainer);
         helpDialogControl.DialogRootVisualElement.Q<AccordionGroup>().Add(controlsAccordionItem);
 
-        helpDialogControl.AddButton(Translation.Get(R.Messages.viewMore),
+        helpDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
             _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToSongEditor)));
-        helpDialogControl.AddButton("Video Tutorials",
-            _ => Application.OpenURL(Translation.Get(R.Messages.uri_songEditorVideoTutorials)));
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(helpDialogControl.DialogRootVisualElement);
     }
@@ -339,8 +337,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         double issueStartPositionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, issue.StartBeat);
         int issueStartPositionInSeconds = (int)(issueStartPositionInMillis / 1000);
         visualElement.Q<Button>(R.UxmlNames.goToIssueButton).RegisterCallbackButtonTriggered(_ => GoToIssue(issue));
-        visualElement.Q<Label>(R.UxmlNames.issueMessageLabel).text = issue.Message;
-        visualElement.Q<Label>(R.UxmlNames.issuePositionLabel).text = $"({issueStartPositionInSeconds}s)";
+        visualElement.Q<Label>(R.UxmlNames.issueMessageLabel).SetTranslatedText(issue.Message);
+        visualElement.Q<Label>(R.UxmlNames.issuePositionLabel).SetTranslatedText(Translation.Of($"({issueStartPositionInSeconds}s)"));
 
         VisualElement issueImage = visualElement.Q<VisualElement>(R.UxmlNames.issueImage);
         if (issue.Severity == ESongIssueSeverity.Error)
@@ -383,7 +381,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
         List<InputActionInfo> inputActionInfos = new();
 
-        inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.usplay_back, Translation.Get(R.Messages.back)));
+        inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.usplay_back, Translation.Get(R.Messages.common_back)));
 
         if (inputManager.InputDeviceEnum == EInputDevice.KeyboardAndMouse)
         {

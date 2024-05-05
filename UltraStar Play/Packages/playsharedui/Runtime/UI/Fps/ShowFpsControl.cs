@@ -96,7 +96,7 @@ public class ShowFpsControl : MonoBehaviour, INeedInjection, IInjectionFinishedL
 
             if (fpsLabel != null)
             {
-                fpsLabel.text = "FPS: " + fps;
+                fpsLabel.SetTranslatedText(Translation.Get("common_fps", "value", fps));
             }
         }
     }

@@ -65,118 +65,112 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
         bpmTextField.AddToClassList("disabled");
         bpmTextField.value = songMeta.BeatsPerMinute.ToString("0.00", CultureInfo.InvariantCulture);
 
-        string enterBpmMessage = "Enter new BPM value.\n" +
-                         "For better accuracy, the BPM of the audio should at least be doubled.";
+        Translation enterBpmMessage = Translation.Get(R.Messages.songEditor_setBpmDialog_message);
         setBpmChangeNoteDurationButton.RegisterCallbackButtonTriggered(_ =>
-            songEditorSceneControl.CreateNumberInputDialog("Set BPM and change note duration", enterBpmMessage, newBpm => applyBpmDontAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
+            songEditorSceneControl.CreateNumberInputDialog(Translation.Get(R.Messages.songEditor_setBpmChangeNoteDurationDialog_title), enterBpmMessage, newBpm => applyBpmDontAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
         setBpmKeepNoteDurationButton.RegisterCallbackButtonTriggered(_ =>
-            songEditorSceneControl.CreateNumberInputDialog("Set BPM but keep note duration", enterBpmMessage, newBpm => applyBpmAndAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
+            songEditorSceneControl.CreateNumberInputDialog(Translation.Get(R.Messages.songEditor_setBpmKeepNoteDurationDialog_title), enterBpmMessage, newBpm => applyBpmAndAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
     }
 
     private void CreateSongPropertiesInputControls()
     {
         CreateSongPropertiesInputControl(ESongProperty.Artist,
-            Translation.Get(R.Messages.songProperty_artist),
             () => songMeta.Artist,
             null);
         CreateSongPropertiesInputControl(ESongProperty.Title,
-            Translation.Get(R.Messages.songProperty_title),
             () => songMeta.Title,
             null);
         CreateSongPropertiesInputControl(ESongProperty.Mp3,
-            "Audio",
             () => songMeta.Audio,
             null);
         CreateSongPropertiesInputControl(ESongProperty.Video,
-            "Video",
             () => songMeta.Video,
             newValue => songMeta.Video = newValue);
         CreateSongPropertiesInputControl(ESongProperty.Background,
-            "Background",
             () => songMeta.Background,
             newValue => songMeta.Background = newValue);
         CreateSongPropertiesInputControl(ESongProperty.Cover,
-            "Cover",
             () => songMeta.Cover,
             newValue => songMeta.Cover = newValue);
         CreateSongPropertiesInputControl(ESongProperty.Gap,
-            "Gap (ms)",
             PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.GapInMillis, true, "0"),
-            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.GapInMillis = newValue));
+            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.GapInMillis = newValue),
+            "ms");
         CreateSongPropertiesInputControl(ESongProperty.VideoGap,
-            "Video Gap (ms)",
             PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.VideoGapInMillis, true, "0"),
-            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.VideoGapInMillis = newValue));
+            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.VideoGapInMillis = newValue),
+            "ms");
         CreateSongPropertiesInputControl(ESongProperty.Start,
-            "Skip Intro (ms, #START)",
             PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.StartInMillis, true, "0"),
-            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.StartInMillis = (int)newValue));
+            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.StartInMillis = (int)newValue),
+            "ms");
         CreateSongPropertiesInputControl(ESongProperty.End,
-            "Skip Outro (ms, #END)",
             PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.EndInMillis, true, "0"),
-            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.EndInMillis = (int)newValue));
+            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.EndInMillis = (int)newValue),
+            "ms");
         CreateSongPropertiesInputControl(ESongProperty.PreviewStart,
-            "Preview Start (ms)",
             PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.PreviewStartInMillis, true, "0"),
-            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.PreviewStartInMillis = newValue));
+            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.PreviewStartInMillis = newValue),
+            "ms");
         CreateSongPropertiesInputControl(ESongProperty.PreviewEnd,
-            "Preview End (ms)",
             PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.PreviewEndInMillis, true, "0"),
-            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.PreviewEndInMillis = newValue));
+            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.PreviewEndInMillis = newValue),
+            "ms");
         CreateSongPropertiesInputControl(ESongProperty.MedleyStart,
-            "Medley Start (ms)",
             PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.MedleyStartInMillis, true, "0"),
-            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.MedleyStartInMillis = (int)newValue));
+            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.MedleyStartInMillis = (int)newValue),
+            "ms");
         CreateSongPropertiesInputControl(ESongProperty.MedleyEnd,
-            "Medley End (ms)",
             PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.MedleyEndInMillis, true, "0"),
-            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.MedleyEndInMillis = (int)newValue));
+            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.MedleyEndInMillis = (int)newValue),
+            "ms");
         CreateSongPropertiesInputControl(ESongProperty.Language,
-            Translation.Get(R.Messages.songProperty_language),
             () => songMeta.Language,
             (newValue) => songMeta.Language = newValue);
         CreateSongPropertiesInputControl(ESongProperty.Genre,
-            Translation.Get(R.Messages.songProperty_genre),
             () => songMeta.Genre,
             (newValue) => songMeta.Genre = newValue);
-        CreateSongPropertiesInputControl(ESongProperty.Tag,
-            "Tag",
+        CreateSongPropertiesInputControl(ESongProperty.Tags,
             () => songMeta.Tag,
             (newValue) => songMeta.Tag = newValue);
         CreateSongPropertiesInputControl(ESongProperty.Edition,
-            Translation.Get(R.Messages.songProperty_edition),
             () => songMeta.Edition,
             (newValue) => songMeta.Edition = newValue);
         CreateSongPropertiesInputControl(ESongProperty.Year,
-            Translation.Get(R.Messages.songProperty_year),
             PropertyUtils.CreateStringGetterFromUintGetter(() => songMeta.Year, true),
             PropertyUtils.CreateStringSetterFromUintSetter(newValue => songMeta.Year = newValue));
         CreateSongPropertiesInputControl(ESongProperty.VocalsAudio,
-            "Vocals Audio",
             () => songMeta.VocalsAudio,
             newValue => songMeta.VocalsAudio = newValue);
         CreateSongPropertiesInputControl(ESongProperty.InstrumentalAudio,
-            "Instrumental Audio",
             () => songMeta.InstrumentalAudio,
             newValue => songMeta.InstrumentalAudio = newValue);
 
         songMeta.AdditionalHeaderEntries.ForEach(entry =>
         {
             CreateSongPropertiesInputControl(ESongProperty.Other,
-                entry.Key,
                 () => songMeta.AdditionalHeaderEntries[entry.Key],
-                newValue => songMeta.SetAdditionalHeaderEntry(entry.Key, newValue));
+                newValue => songMeta.SetAdditionalHeaderEntry(entry.Key, newValue),
+                "",
+                Translation.Of(entry.Key));
         });
     }
 
-    private void CreateSongPropertiesInputControl(ESongProperty songProperty, string labelText, Func<string> valueGetter, Action<string> valueSetter)
+    private void CreateSongPropertiesInputControl(
+        ESongProperty songProperty,
+        Func<string> valueGetter,
+        Action<string> valueSetter,
+        string unitName = "",
+        Translation labelText = default)
     {
+        labelText = !labelText.Value.IsNullOrEmpty() ? labelText : Translation.Get(songProperty);
+
         VisualElement visualElement = songPropertySideBarEntryUi.CloneTree().Children().First();
         songPropertiesSideBarContainer.Add(visualElement);
 
         TextField textField = visualElement.Q<TextField>(R.UxmlNames.propertyTextField);
         textField.DisableParseEscapeSequences();
-        textField.label = labelText;
+        textField.SetTranslatedLabel(unitName.IsNullOrEmpty() ? labelText : Translation.Of($"{labelText} ({unitName})"));
         textField.isDelayed = true;
         textField.value = valueGetter();
         bool isReadOnly = valueSetter == null;

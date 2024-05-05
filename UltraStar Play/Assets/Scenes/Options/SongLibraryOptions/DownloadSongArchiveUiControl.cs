@@ -80,7 +80,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         urlTextField.DisableParseEscapeSequences();
         new TextFieldHintControl(urlTextField);
 
-        statusLabel.text = "Click the button to start the download";
+        statusLabel.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_archiveDownload_status_initial));
 
         urlChooserButton.RegisterCallbackButtonTriggered(_ => ShowUrlChooserDialog());
         deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(true));
@@ -88,6 +88,8 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         toggleStartAndCancelButton.RegisterCallbackButtonTriggered(_ => ToggleStartAndCancel());
         startIcon.ShowByDisplay();
         cancelIcon.HideByDisplay();
+
+        TranslationManager.ApplyTranslations(VisualElement);
     }
 
     private void ToggleStartAndCancel()
@@ -113,7 +115,6 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         if (downloadAndExtractSongArchiveControl != null
             && !downloadAndExtractSongArchiveControl.IsDone.Value)
         {
-            UiManager.CreateNotification("Download still in progress");
             return;
         }
 
@@ -167,7 +168,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
             return;
         }
 
-        urlChooserDialogControl = uiManager.CreateDialogControl("Archive URL");
+        urlChooserDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_songLibrary_urlChooserDialog_title));
         urlChooserDialogControl.DialogClosedEventStream.Subscribe(_ => urlChooserDialogControl = null);
 
         // Create a button in the dialog for every archive URL
@@ -175,7 +176,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         {
             Button songArchiveUrlButton = new();
             songArchiveUrlButton.AddToClassList("songArchiveUrlButton");
-            songArchiveUrlButton.text = songArchiveEntry.name;
+            songArchiveUrlButton.SetTranslatedText(Translation.Of(songArchiveEntry.name));
             songArchiveUrlButton.RegisterCallbackButtonTriggered(_ =>
             {
                 SelectSongArchiveUrl(songArchiveEntry.url);
@@ -198,21 +199,18 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
 
     private void SetFinishedStatus()
     {
-        statusLabel.text = "Finished";
+        statusLabel.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_archiveDownload_status_finished));
     }
 
     private void SetErrorStatus(string errorMessage)
     {
-        statusLabel.text = "Failed";
-        if (!errorMessage.IsNullOrEmpty())
-        {
-            statusLabel.text += $": {errorMessage}";
-        }
+        statusLabel.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_archiveDownload_status_error,
+            "reason", errorMessage));
     }
 
     private void SetCanceledStatus()
     {
-        statusLabel.text = "Canceled";
+        statusLabel.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_archiveDownload_status_canceled));
     }
 
     private void UpdateDownloadProgressText(FileDownloadControl.DownloadProgressEvent evt)
@@ -221,17 +219,17 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         if (unit is "B" or "KB" or "MB")
         {
             // No digits after comma needed
-            statusLabel.text = $"{size:0} {unit}";
+            statusLabel.SetTranslatedText(Translation.Of($"{size:0} {unit}"));
         }
         else
         {
-            statusLabel.text = $"{size:0.00} {unit}";
+            statusLabel.SetTranslatedText(Translation.Of($"{size:0.00} {unit}"));
         }
 
         if (evt.FinalDownloadSizeInBytes > 0)
         {
             // Also show download progress in percent
-            statusLabel.text += $" ({Math.Round(evt.DownloadProgressInPercent):0} %)";
+            statusLabel.SetTranslatedText(Translation.Of($" ({Math.Round(evt.DownloadProgressInPercent):0} %)"));
         }
     }
 
@@ -243,7 +241,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         }
         else
         {
-            statusLabel.text = $"{Math.Round(evt.ProgressInPercent):0} %";
+            statusLabel.SetTranslatedText(Translation.Of($"{Math.Round(evt.ProgressInPercent):0} %"));
         }
     }
 }

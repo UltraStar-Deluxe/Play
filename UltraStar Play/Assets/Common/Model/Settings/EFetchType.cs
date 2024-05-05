@@ -1,5 +1,12 @@
 ﻿public enum EFetchType
 {
-    Eager,
-    Lazy,
+    /**
+     * Eager loading of data
+     */
+    Upfront,
+
+    /**
+     * Lazy loading of data
+     */
+    OnDemand,
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using AhoCorasick;
 using NUnit.Framework;
 using ProTrans;
 using UnityEngine;
@@ -14,15 +15,138 @@ public class TranslationTests
     [SetUp]
     public void SetUp()
     {
-        TranslationConfig translationConfig = TranslationConfig.Singleton;
-        if (translationConfig.PropertiesFileProvider is not ResourcesFolderPropertiesFileProvider)
+        Translation.InitTranslationConfig();
+    }
+
+    [Test]
+    public void ShouldNotHaveUnusedTranslationKeys()
+    {
+        PropertiesFile defaultPropertiesFile = Translation.GetPropertiesFile(Translation.GetFallbackCultureInfo());
+        ShouldNotHaveUnusedTranslationKeys(defaultPropertiesFile.Dictionary.Keys.ToHashSet());
+    }
+
+    [Test]
+    public void ShouldFindUnusedTranslationKeys()
+    {
+        HashSet<string> translationKeys = new HashSet<string>() { "this_is_not_used" };
+        Assert.Throws<AssertionException>(
+            () => ShouldNotHaveUnusedTranslationKeys(translationKeys),
+            "Did not find unused translation");
+    }
+
+    private void ShouldNotHaveUnusedTranslationKeys(HashSet<string> translationKeys)
+    {
+
+        HashSet<string> ignoredFileNames = new()
         {
-            translationConfig.PropertiesFileProvider = new ResourcesFolderPropertiesFileProvider();
+            // Ignore file with generated constants for translation keys.
+            "RMessages.cs",
+            // Ignore this file itself
+            "TranslationTests.cs",
+        };
+
+        HashSet<string> unseenTranslationKeys = new();
+        HashSet<string> seenTranslationKeys = new();
+
+        // Ignore translations for companion app
+        // and ignore translations that are used dynamically via string concatenation.
+        List<string> ignoredTranslationKeyPrefixes = new List<string>() { "enum_", "companionApp_", "language_"};
+
+        // AhoCorasick search algorithm as recommended by https://stackoverflow.com/questions/46339057/c-sharp-fastest-string-search-in-all-files
+        Trie trie = new();
+        unseenTranslationKeys.AddRange(translationKeys
+            .Where(key => !ignoredTranslationKeyPrefixes.AnyMatch(prefix => key.StartsWith(prefix))));
+        unseenTranslationKeys.ForEach(key => trie.Add(key));
+        trie.Build();
+
+        // Search in Assets and Packages for .cs and .uxml files
+        List<string> sourceFolders = new List<string>() { Application.dataPath, $"{Application.dataPath}/../Packages" }
+            .Select(folder => new DirectoryInfo(folder).FullName)
+            .ToList();
+        List<string> files = FileScannerUtils.ScanForFiles(sourceFolders, new List<string>() { "*.cs", "*.uxml" });
+
+        foreach (string file in files)
+        {
+            if (ignoredFileNames.Contains(Path.GetFileName(file)))
+            {
+                continue;
+            }
+
+            string fileContent = File.ReadAllText(file);
+            foreach (string match in trie.Find(fileContent))
+            {
+                unseenTranslationKeys.Remove(match);
+                seenTranslationKeys.Add(match);
+            }
+
+            if (unseenTranslationKeys.IsNullOrEmpty())
+            {
+                break;
+            }
+        }
+
+        Debug.Log($"Used translation keys:\n    {seenTranslationKeys.OrderBy(it => it).JoinWith("\n    ")}");
+        if (!unseenTranslationKeys.IsNullOrEmpty())
+        {
+            Assert.Fail($"Unused translation keys:\n    {unseenTranslationKeys.OrderBy(it => it).JoinWith("\n    ")}");
         }
     }
 
     [Test]
-    [Ignore("Not all UXML files are translated yet")]
+    public void ShouldNotHaveDuplicateTranslationValues()
+    {
+        // TODO: Remove duplicate translation values where it makes sense
+        PropertiesFile defaultPropertiesFile = Translation.GetPropertiesFile(Translation.GetFallbackCultureInfo());
+        foreach (KeyValuePair<string,string> entry in defaultPropertiesFile.Dictionary)
+        {
+            List<KeyValuePair<string, string>> duplicateEntries = defaultPropertiesFile.Dictionary
+                .Where(otherEntry => otherEntry.Key != entry.Key && otherEntry.Value == entry.Value)
+                .ToList();
+            if (!duplicateEntries.IsNullOrEmpty())
+            {
+                Debug.LogWarning($"Duplicate translation values: {entry.Key} & {duplicateEntries.Select(it => it.Key).JoinWith(" & ")} = {entry.Value}");
+            }
+        }
+    }
+
+    [Test]
+    public void AllTranslationKeysArePresentInDefaultPropertiesFiles()
+    {
+        Dictionary<PropertiesFile, List<string>> propertiesFileToKeys = new();
+
+        PropertiesFile defaultPropertiesFile = Translation.GetPropertiesFile(Translation.GetFallbackCultureInfo());
+        Translation.GetTranslatedCultureInfos()
+            .ForEach(cultureInfo =>
+            {
+                PropertiesFile propertiesFile = Translation.GetPropertiesFile(cultureInfo);
+                if (propertiesFile == null)
+                {
+                    return;
+                }
+
+                List<string> keys = propertiesFile.Dictionary.Keys
+                    .Where(key => !defaultPropertiesFile.Dictionary.ContainsKey(key))
+                    .ToList();
+                if (!keys.IsNullOrEmpty())
+                {
+                    propertiesFileToKeys.Add(propertiesFile, keys);
+                }
+            });
+
+        if (!propertiesFileToKeys.IsNullOrEmpty())
+        {
+            Assert.Fail("Found keys not present in default properties files:\n"
+             + propertiesFileToKeys.Keys
+                 .Select(propertiesFile =>
+                 {
+                     List<string> keys = propertiesFileToKeys[propertiesFile];
+                     return $"{propertiesFile.CultureInfo}\n    {keys.JoinWith("\n    ")}";
+                 })
+                 .JoinWith("\n"));
+        }
+    }
+
+    [Test]
     public void UxmlFilesAreTranslated()
     {
         List<TranslatableAttribute> allMissingTranslations = GetAllTranslatableAttributes()
@@ -68,7 +192,7 @@ public class TranslationTests
         string translationKey = translationKeyWithPrefix.Substring(1);
 
         TranslationConfig.Singleton.MissingPlaceholderStrategy = MissingPlaceholderStrategy.Ignore;
-        return !Translation.TryGet(translationKey, null, out TranslationResult _);
+        return !Translation.TryGet(translationKey, null, out Translation _);
     }
 
     private List<TranslatableAttribute> GetAllTranslatableAttributes()
@@ -146,6 +270,11 @@ public class TranslationTests
         ignoredMissingTranslations = new();
 
         string[] lines = File.ReadAllLines("Assets/Editor/Tests/Translations/IgnoredMissingTranslations.csv");
+        if (lines.Length > 1)
+        {
+            Debug.LogWarning($"Ignoring missing translations:\n  {lines.JoinWith("\n  ")}");
+        }
+
         // Start at index 1 to skip header line
         for (int i = 1; i < lines.Length; i++)
         {
@@ -155,11 +284,6 @@ public class TranslationTests
             string elementName = values[1].Trim();
             string nameAttribute = values[2].Trim();
             ignoredMissingTranslations.Add(new TranslatableAttribute(fileName, elementName, nameAttribute));
-        }
-
-        if (!ignoredMissingTranslations.IsNullOrEmpty())
-        {
-            Debug.LogWarning($"Ignoring missing translations:\n  {lines.JoinWith("\n  ")}");
         }
     }
 
@@ -233,6 +357,12 @@ public class TranslationTests
             uxmlFile,
             translatableAttributes,
             xDocument.Descendants("ItemPicker"),
+            "label");
+
+        AddTranslatableAttributes(
+            uxmlFile,
+            translatableAttributes,
+            xDocument.Descendants("SongEditorSideBarGroup"),
             "label");
 
         AddTranslatableAttributes(

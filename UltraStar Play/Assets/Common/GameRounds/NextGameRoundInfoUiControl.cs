@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -42,7 +41,8 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
         List<SongMeta> songMetas = songQueueEntryDtos
             .Select(it => DtoConverter.FromDto(it.SongDto, songMetaManager))
             .ToList();
-        nextGameRoundSongInfoLabel.text = SongMetaUtils.GetMedleyName(songMetas);
+        nextGameRoundSongInfoLabel.SetTranslatedText(Translation.Get(R.Messages.songQueue_nextEntry,
+            "value", SongMetaUtils.GetMedleyName(songMetas)));
 
         nextGameRoundPlayerEntryList.RemoveTemplateContainers();
         SongQueueEntryDto songQueueEntryDto = songQueueEntryDtos.FirstOrDefault();
@@ -52,7 +52,7 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
             nextGameRoundPlayerEntryList.Add(playerEntryVisualElement);
 
             Label playerNameLabel = playerEntryVisualElement.Q<Label>(R.UxmlNames.nextGameRoundPlayerEntryLabel);
-            playerNameLabel.text = playerProfileName;
+            playerNameLabel.SetTranslatedText(Translation.Of(playerProfileName));
 
             VisualElement micVisualElement = playerEntryVisualElement.Q<VisualElement>(R.UxmlNames.nextGameRoundPlayerEntryMicImage);
             if (songQueueEntryDto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap.TryGetValue(playerProfileName, out MicProfileDto micProfileDto))
@@ -60,7 +60,6 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
                 micVisualElement.ShowByDisplay();
                 micVisualElement.style.color = new StyleColor(micProfileDto.Color);
                 micVisualElement.style.unityBackgroundImageTintColor = new StyleColor(micProfileDto.Color);
-                Debug.Log("Set mic color: " + micProfileDto.Color);
             }
             else
             {

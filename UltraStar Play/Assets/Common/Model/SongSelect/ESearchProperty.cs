@@ -4,7 +4,7 @@
     Title,
     Language,
     Genre,
-    Tag,
+    Tags,
     Edition,
     Year,
     Lyrics,

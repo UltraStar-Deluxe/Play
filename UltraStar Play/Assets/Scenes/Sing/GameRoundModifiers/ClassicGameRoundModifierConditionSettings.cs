@@ -20,7 +20,7 @@ public class ClassicGameRoundModifierConditionSettings
         MinMaxSlider timeRangeField = new();
         timeRangeField.lowLimit = 0;
         timeRangeField.highLimit = 100;
-        timeRangeField.label = "Time Range %";
+        timeRangeField.SetTranslatedLabel(Translation.Of(Translation.Get(R.Messages.gameRoundModifier_condition_timeRange) + " %"));
         FieldBindingUtils.Bind(timeRangeField,
             () => conditionRangePercent,
             newValue => conditionRangePercent = new Vector2Int((int)newValue.x, (int)newValue.y));
@@ -28,7 +28,7 @@ public class ClassicGameRoundModifierConditionSettings
         MinMaxSlider scoreRangeField = new();
         scoreRangeField.lowLimit = 0;
         scoreRangeField.highLimit = 100;
-        scoreRangeField.label = "Score Range %";
+        scoreRangeField.SetTranslatedLabel(Translation.Of(Translation.Get(R.Messages.gameRoundModifier_condition_scoreRange) + " %"));
         FieldBindingUtils.Bind(scoreRangeField,
             () => conditionRangePercent,
             newValue => conditionRangePercent = new Vector2Int((int)newValue.x, (int)newValue.y));
@@ -36,7 +36,7 @@ public class ClassicGameRoundModifierConditionSettings
         SliderInt playerAdvanceField = new();
         playerAdvanceField.lowValue = 0;
         playerAdvanceField.highValue = 100;
-        playerAdvanceField.label = "Player Advance %";
+        playerAdvanceField.SetTranslatedLabel(Translation.Of(Translation.Get(R.Messages.gameRoundModifier_condition_playerAdvance) + " %"));
         FieldBindingUtils.Bind(playerAdvanceField,
             () => conditionRangePercent.x,
             newValue => conditionRangePercent.x = newValue);
@@ -59,7 +59,7 @@ public class ClassicGameRoundModifierConditionSettings
         UpdateFields();
 
         ItemPicker conditionChooser = new();
-        conditionChooser.Label = "";
+        conditionChooser.SetTranslatedLabel(Translation.Empty);
         EnumItemPickerControl<EClassicGameRoundModifierCondition> conditionChooserControl = new(conditionChooser);
         conditionChooserControl.Bind(
             () => condition,

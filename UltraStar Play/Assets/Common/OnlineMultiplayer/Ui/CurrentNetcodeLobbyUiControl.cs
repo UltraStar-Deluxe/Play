@@ -47,7 +47,7 @@ namespace CommonOnlineMultiplayer
 
         public void OnInjectionFinished()
         {
-            connectedClientsListTitle.text = "Connected Players";
+            connectedClientsListTitle.SetTranslatedText(Translation.Get(R.Messages.onlineGame_lobby_list_title));
             connectedClientsListScrollView.Clear();
 
             disconnectOnlineGameButton.RegisterCallbackButtonTriggered(_ => lobbyManager.LeaveCurrentLobby());
@@ -66,12 +66,13 @@ namespace CommonOnlineMultiplayer
         {
             if (lobbyManager.CurrentLobby != null)
             {
-                connectedClientsListTitle.text = $"Members of \"{lobbyManager.CurrentLobby.Name}\"";
+                connectedClientsListTitle.SetTranslatedText(Translation.Get(R.Messages.onlineGame_lobby_title,
+                    "lobbyName", lobbyManager.CurrentLobby.Name));
                 UpdateLobbyMemberList();
             }
             else
             {
-                connectedClientsListTitle.text = "Not connected";
+                connectedClientsListTitle.SetTranslatedText(Translation.Get(R.Messages.onlineGame_lobby_list_title));
                 UpdateLobbyMemberList();
             }
         }

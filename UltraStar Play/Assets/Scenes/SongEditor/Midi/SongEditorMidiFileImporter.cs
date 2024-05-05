@@ -54,7 +54,7 @@ public class SongEditorMidiFileImporter : INeedInjection
         if (!File.Exists(midiFilePath))
         {
             Debug.Log($"File does not exist: {midiFilePath}");
-            UiManager.CreateNotification("File does not exist");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_fileNotFound));
             return;
         }
 
@@ -102,10 +102,11 @@ public class SongEditorMidiFileImporter : INeedInjection
 
             songMetaChangeEventStream.OnNext(new ImportedMidiFileEvent());
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Debug.LogException(e);
-            UiManager.CreateNotification($"Loading MIDI file failed: {e.Message}");
+            Debug.LogException(ex);
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", ex.Message));
         }
     }
 

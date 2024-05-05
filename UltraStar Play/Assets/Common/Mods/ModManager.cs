@@ -296,7 +296,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         if (targetModFolderInfo.Exists)
         {
             Debug.Log($"Directory already exists: '{targetModFolder}'");
-            UiManager.CreateNotification("A mod with this name already exists.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_nameConflict));
             return "";
         }
 
@@ -410,8 +410,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to load mods: {ex.Message}");
-            UiManager.CreateNotification($"Failed to load mods. Check log for details.\n" +
-                                         $"Try to disable mods and restart the app.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_failedToLoad));
         }
     }
 
@@ -709,7 +708,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                 catch (LoadModSettingsException ex)
                 {
                     Debug.LogException(ex);
-                    UiManager.CreateNotification($"Failed to load settings of mod '{GetModFolderName(ex.ModFolder)}'");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_settingsFailedToLoad,
+                     "name", GetModFolderName(ex.ModFolder)));
                 }
             }
         }

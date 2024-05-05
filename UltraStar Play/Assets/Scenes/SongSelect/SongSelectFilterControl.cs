@@ -163,7 +163,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             ESearchProperty.Year,
             ESearchProperty.Language,
             ESearchProperty.Genre,
-            ESearchProperty.Tag,
+            ESearchProperty.Tags,
             ESearchProperty.Edition,
         };
 
@@ -193,7 +193,8 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             return;
         }
 
-        Label propertyLabel = new(StringUtils.ToTitleCase(searchProperty.ToString()));
+        Label propertyLabel = new();
+        propertyLabel.SetTranslatedText(Translation.Get(searchProperty));
         propertyLabel.AddToClassList("searchFilterLabel");
         filterListContainer.Add(propertyLabel);
         foreach (string value in values)
@@ -229,7 +230,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
         return searchProperty
             is ESearchProperty.Language
             or ESearchProperty.Genre
-            or ESearchProperty.Tag
+            or ESearchProperty.Tags
             or ESearchProperty.Edition;
     }
 
@@ -289,7 +290,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
                 return songMeta.Language;
             case ESearchProperty.Edition:
                 return songMeta.Edition;
-            case ESearchProperty.Tag:
+            case ESearchProperty.Tags:
                 return songMeta.Tag;
             case ESearchProperty.Lyrics:
                 return SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1, true);

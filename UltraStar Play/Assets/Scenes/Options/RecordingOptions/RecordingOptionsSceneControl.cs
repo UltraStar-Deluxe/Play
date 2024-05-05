@@ -125,9 +125,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 
         new AutoFitLabelControl(devicePicker.ItemLabel, 10, 15);
 
-        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, micProfiles);
+        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, micProfiles,
+            item => item != null ? Translation.Of(item.GetDisplayNameWithChannel()) : Translation.Empty);
         devicePickerControl.AutoSmallFont = false;
-        devicePickerControl.GetLabelTextFunction = item => item != null ? item.GetDisplayNameWithChannel() : "";
         if (!TryReSelectLastMicProfile()
             && !devicePickerControl.Items.IsNullOrEmpty())
         {
@@ -144,15 +144,12 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 settings.LastMicProfileChannelIndexInRecordingOptionsScene = micProfile.ChannelIndex;
             });
 
-        amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationPicker, amplificationItems);
-        amplificationPickerControl.GetLabelTextFunction = item => item + " %";
-        noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionPicker, noiseSuppressionItems);
-        noiseSuppressionPickerControl.GetLabelTextFunction = item => item + " %";
+        amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationPicker, amplificationItems, item => Translation.Of(item + " %"));
+        noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionPicker, noiseSuppressionItems, item => Translation.Of(item + " %"));
         delayPickerControl = new NumberPickerControl(delayPicker);
         delayPickerControl.GetLabelTextFunction = item => item + " ms";
         colorPickerControl = new ColorPickerControl(colorPicker, themeManager.GetMicrophoneColors());
-        sampleRatePickerControl = new SampleRatePickerControl(sampleRatePicker);
-        sampleRatePickerControl.GetLabelTextFunction = _ => GetSampleRateLabel();
+        sampleRatePickerControl = new SampleRatePickerControl(sampleRatePicker, item => GetSampleRateLabel(item));
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(_ => DeleteSelectedRecordingDevice());
 
@@ -165,10 +162,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 .CreateAndInject<ContextMenuControl>();
             contextMenuControl.FillContextMenuAction = contextMenuPopupControl =>
             {
-                contextMenuPopupControl.AddButton("Random Color", () =>
-                {
-                    colorPickerControl.SelectItem(Colors.CreateRandomColor());
-                });
+                contextMenuPopupControl.AddButton(Translation.Get(R.Messages.options_recording_action_selectRandomColor),
+                    () => colorPickerControl.SelectItem(Colors.CreateRandomColor()));
             };
         }
 
@@ -252,8 +247,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 }
                 else
                 {
-                    UiManager.CreateNotification(
-                        Translation.Get(R.Messages.options_delay_calibrate_timeout));
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.options_delay_calibrate_timeout));
                 }
             });
 
@@ -349,23 +343,22 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         sampleRatePickerControl.UpdateLabelText();
     }
 
-    private string GetSampleRateLabel()
+    private Translation GetSampleRateLabel(int item)
     {
         if (SelectedMicProfile == null)
         {
-            return "";
+            return Translation.Empty;
         }
 
-        int item = sampleRatePickerControl.SelectedItem;
         if (item <= 0)
         {
             // When "auto" is selected, then also show the automatically used sample rate.
-            string sampleRateText = SelectedMicProfile.IsInputFromConnectedClient
+            string sampleRateSuffix = SelectedMicProfile.IsInputFromConnectedClient
                 ? ""
                 : $"\n({micPitchTracker.FinalSampleRate.Value} Hz)";
-            return Translation.Get(R.Messages.options_sampleRate_auto) + sampleRateText;
+            return Translation.Of(Translation.Get(R.Messages.options_sampleRate_auto) + sampleRateSuffix);
         }
-        return $"{item} Hz";
+        return Translation.Of($"{item} Hz");
     }
 
     private bool TryReSelectLastMicProfile()
@@ -464,7 +457,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         deleteButton.SetVisibleByDisplay(!isConnected);
 
         micVisualizer.SetMicProfile(micProfile);
-        noteLabel.text = Translation.Get(R.Messages.options_note, "value", "?");
+        noteLabel.SetTranslatedText(Translation.Get(R.Messages.options_note, "value", "?"));
 
         // playRecordedAudioInfoContainer.SetVisibleByDisplay(micProfile.IsInputFromConnectedClient);
 

@@ -48,9 +48,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
     [Inject(UxmlName = R.UxmlNames.designOptionsButton)]
     private ToggleButton designOptionsButton;
 
-    [Inject(UxmlName = R.UxmlNames.internetOptionsButton)]
-    private ToggleButton internetOptionsButton;
-
     [Inject(UxmlName = R.UxmlNames.appOptionsButton)]
     private ToggleButton appOptionsButton;
 
@@ -120,8 +117,8 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
     private SceneRecipe loadedSceneRecipe;
     private readonly List<GameObject> loadedGameObjects = new();
     private readonly Dictionary<EScene, ToggleButton> sceneToButtonMap = new();
-    private readonly Dictionary<EScene, string> sceneToShortNameMap = new();
-    private readonly Dictionary<EScene, string> sceneToLongNameMap = new();
+    private readonly Dictionary<EScene, Translation> sceneToShortNameMap = new();
+    private readonly Dictionary<EScene, Translation> sceneToLongNameMap = new();
 
     private AbstractOptionsSceneControl LoadedOptionsSceneControl => loadedGameObjects
         .Select(it => it.GetComponentInChildren<AbstractOptionsSceneControl>())
@@ -156,7 +153,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         openSteamWorkshopButton.RegisterCallbackButtonTriggered(_ => OpenSteamWorkshop());
 
         updateSteamWorkshopItemsButton.RegisterCallbackButtonTriggered(_ => UpdateSteamWorkshopItems());
-        new TooltipControl(updateSteamWorkshopItemsButton, "Update Steam Workshop items.");
+        new TooltipControl(updateSteamWorkshopItemsButton, Translation.Get(R.Messages.steamWorkshop_updateTooltip));
 
         helpButton.RegisterCallbackButtonTriggered(_ => ShowHelp());
         issuesButton.RegisterCallbackButtonTriggered(_ => ShowIssuesDialog());
@@ -253,7 +250,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         }
 
         // Set loaded scene title
-        loadedSceneTitle.text = sceneToLongNameMap[loadedSceneRecipe.scene];
+        loadedSceneTitle.SetTranslatedText(sceneToLongNameMap[loadedSceneRecipe.scene]);
 
         // Hide buttons in top row
         helpButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.HelpUri.IsNullOrEmpty());
@@ -261,8 +258,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         openSteamWorkshopButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty());
         updateSteamWorkshopItemsButton.SetVisibleByDisplay(openSteamWorkshopButton.IsVisibleByDisplay());
 
-        // Apply theme to loaded UI
+        // Apply theme and translations to loaded UI
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(loadedSceneVisualElement);
+        TranslationManager.ApplyTranslations(loadedSceneVisualElement);
 
         // Scroll with mouse drag
         MouseEventScrollControl.RegisterMouseScrollEvents();
@@ -318,19 +316,19 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
     public void UpdateTranslation()
     {
-        sceneTitle.text = Translation.Get(R.Messages.options);
+        sceneTitle.SetTranslatedText(Translation.Get(R.Messages.options));
 
         UpdateSceneToNameMap();
         sceneToButtonMap.ForEach(entry =>
         {
             Button button = entry.Value;
             Label label = button.Q<Label>(R.UxmlNames.label);
-            label.text = sceneToShortNameMap[entry.Key];
+            label.SetTranslatedText(sceneToShortNameMap[entry.Key]);
         });
 
         if (loadedSceneRecipe != null)
         {
-            loadedSceneTitle.text = sceneToLongNameMap[loadedSceneRecipe.scene];
+            loadedSceneTitle.SetTranslatedText(sceneToLongNameMap[loadedSceneRecipe.scene]);
         }
     }
 
@@ -344,7 +342,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         sceneToShortNameMap.Add(EScene.RecordingOptionsScene, Translation.Get(R.Messages.options_recording_button));
         sceneToShortNameMap.Add(EScene.PlayerProfileSetupScene, Translation.Get(R.Messages.options_playerProfiles_button));
         sceneToShortNameMap.Add(EScene.ThemeOptionsScene, Translation.Get(R.Messages.options_design_button));
-        sceneToShortNameMap.Add(EScene.NetworkOptionsScene, Translation.Get(R.Messages.options_internet_button));
         sceneToShortNameMap.Add(EScene.CompanionAppOptionsScene, Translation.Get(R.Messages.options_companionApp_button));
         sceneToShortNameMap.Add(EScene.WebcamOptionsSecene, Translation.Get(R.Messages.options_webcam_button));
         sceneToShortNameMap.Add(EScene.DevelopmentOptionsScene, Translation.Get(R.Messages.options_development_button));
@@ -358,7 +355,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         sceneToLongNameMap.Add(EScene.RecordingOptionsScene, Translation.Get(R.Messages.options_recording_title));
         sceneToLongNameMap.Add(EScene.PlayerProfileSetupScene, Translation.Get(R.Messages.options_playerProfiles_title));
         sceneToLongNameMap.Add(EScene.ThemeOptionsScene, Translation.Get(R.Messages.options_design_title));
-        sceneToLongNameMap.Add(EScene.NetworkOptionsScene, Translation.Get(R.Messages.options_internet_title));
         sceneToLongNameMap.Add(EScene.CompanionAppOptionsScene, Translation.Get(R.Messages.options_companionApp_title));
         sceneToLongNameMap.Add(EScene.WebcamOptionsSecene, Translation.Get(R.Messages.options_webcam_title));
         sceneToLongNameMap.Add(EScene.DevelopmentOptionsScene, Translation.Get(R.Messages.options_development_title));
@@ -374,7 +370,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         sceneToButtonMap.Add(EScene.RecordingOptionsScene, recordingOptionsButton);
         sceneToButtonMap.Add(EScene.PlayerProfileSetupScene, profileOptionsButton);
         sceneToButtonMap.Add(EScene.ThemeOptionsScene, designOptionsButton);
-        sceneToButtonMap.Add(EScene.NetworkOptionsScene, internetOptionsButton);
         sceneToButtonMap.Add(EScene.CompanionAppOptionsScene, appOptionsButton);
         sceneToButtonMap.Add(EScene.DevelopmentOptionsScene, developerOptionsButton);
         sceneToButtonMap.Add(EScene.WebcamOptionsSecene, webcamOptionsButton);

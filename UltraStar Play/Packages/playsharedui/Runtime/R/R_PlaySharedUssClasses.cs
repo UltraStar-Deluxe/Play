@@ -96,6 +96,7 @@ public static partial class R_PlayShared
         public const string marginBottomSmaller = "marginBottomSmaller";
         public const string materialIcon = "materialIcon";
         public const string mb_1 = "mb-1";
+        public const string mb_2 = "mb-2";
         public const string medleyWithNext = "medleyWithNext";
         public const string medleyWithPrevious = "medleyWithPrevious";
         public const string middleCenterText = "middleCenterText";
@@ -103,6 +104,7 @@ public static partial class R_PlayShared
         public const string ml_1 = "ml-1";
         public const string modalDialogContainer = "modalDialogContainer";
         public const string mr_1 = "mr-1";
+        public const string mt_2 = "mt-2";
         public const string nextLyrics = "nextLyrics";
         public const string noBackground = "noBackground";
         public const string noBackgroundInHierarchy = "noBackgroundInHierarchy";
@@ -128,6 +130,7 @@ public static partial class R_PlayShared
         public const string radial_progress_bar = "radial-progress-bar";
         public const string radial_progress_bar__label = "radial-progress-bar__label";
         public const string roundCorners = "roundCorners";
+        public const string rounded = "rounded";
         public const string scoreRow = "scoreRow";
         public const string scrollingNoteStreamSentenceSeparator = "scrollingNoteStreamSentenceSeparator";
         public const string searchFilterLabel = "searchFilterLabel";

@@ -1,16 +1,14 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Serilog.Events;
-using Unity.Netcode;
-using UnityEngine;
+using CommonOnlineMultiplayer;
 
 [Serializable]
 public class Settings : ISettings
 {
     // Graphics settings
     public ScreenResolution ScreenResolution { get; set; } = new ScreenResolution(1280, 720, 60);
-    public FullScreenMode FullScreenMode { get; set; } = FullScreenMode.Windowed;
+    public EFullScreenMode FullScreenMode { get; set; } = EFullScreenMode.Windowed;
     public int TargetFps { get; set; } = -1;
 
     // Audio settings
@@ -74,7 +72,7 @@ public class Settings : ISettings
     public bool SearchMidiFilesWithLyrics { get; set; }
     public string GeneratedFolderPath { get; set; } = "";
     public bool SaveVocalsAndInstrumentalAudioInFolderOfSong { get; set; }
-    public EFetchType SongDataFetchType { get; set; } = EFetchType.Eager;
+    public EFetchType SongDataFetchType { get; set; } = EFetchType.Upfront;
 
     /**
      * The UltraStar song format version that is used to save a song when otherwise none is specified or unknown.
@@ -127,7 +125,7 @@ public class Settings : ISettings
     public bool ShowFps { get; set; }
     public bool UseUniversalCharsetDetector { get; set; } = true;
     public bool WriteUltraStarTxtFileWithByteOrderMark { get; set; }
-    public LogEventLevel MinimumLogLevel { get; set; } = LogEventLevel.Information;
+    public ELogEventLevel MinimumLogLevel { get; set; } = ELogEventLevel.Information;
 
     /**
      * Require explicit user action to use custom event system
@@ -196,5 +194,5 @@ public class Settings : ISettings
     public EOnlineMultiplayerBackend EOnlineMultiplayerBackend { get; set; } = EOnlineMultiplayerBackend.Steam;
     public string UnityTransportIpAddress { get; set; } = "127.0.0.1";
     public ushort UnityTransportPort { get; set; } = 7777;
-    public NetworkDelivery BeatAnalyzedEventNetworkDelivery { get; set; } = NetworkDelivery.ReliableSequenced;
+    public ENetworkDelivery BeatAnalyzedEventNetworkDelivery { get; set; } = ENetworkDelivery.ReliableSequenced;
 }

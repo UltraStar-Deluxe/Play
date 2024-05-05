@@ -88,7 +88,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
     {
         ToggleButton button = new();
         button.AddToClassList("mb-2");
-        button.text = aboutTextEntry.Key;
+        button.SetTranslatedText(Translation.Of(aboutTextEntry.Key));
         button.RegisterCallbackButtonTriggered(_ =>
         {
             ShowAboutText(aboutTextEntry.Key, LoadAboutText(aboutTextEntry.Value));

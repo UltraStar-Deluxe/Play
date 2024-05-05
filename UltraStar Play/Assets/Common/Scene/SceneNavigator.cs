@@ -92,7 +92,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
             && (scene is EScene.PartyModeScene or EScene.SongEditorScene))
         {
             Debug.Log($"Cannot open {scene} when connected to online game");
-            UiManager.CreateNotification("Not (yet) available during online game");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_notAvailable));
             return;
         }
 

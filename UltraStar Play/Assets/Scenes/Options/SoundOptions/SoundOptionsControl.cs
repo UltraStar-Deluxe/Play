@@ -99,10 +99,10 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
         new TextFieldHintControl(soundfontPathTextField);
 
         testSoundfontButton.RegisterCallbackButtonTriggered(_ => TestSoundfont());
-        new TooltipControl(testSoundfontButton, "Test soundfont", false);
+        new TooltipControl(testSoundfontButton, Translation.Get(R.Messages.options_soundFont_test_tooltip), false);
 
         selectSoundfontButton.RegisterCallbackButtonTriggered(_ => OpenSoundfontDialog());
-        new TooltipControl(selectSoundfontButton, "Select soundfont", false);
+        new TooltipControl(selectSoundfontButton, Translation.Get(R.Messages.options_soundFont_select_tooltip), false);
     }
 
     private void OpenSoundfontDialog()

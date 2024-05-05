@@ -9,7 +9,7 @@
             <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
             <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
         </ui:ScrollView>
-        <ui:Button text="Leave Online Game" parse-escape-sequences="true" display-tooltip-when-elided="true" name="disconnectOnlineGameButton" />
+        <ui:Button text="$onlineGame_lobby_leave" parse-escape-sequences="true" display-tooltip-when-elided="true" name="disconnectOnlineGameButton" />
         <ui:VisualElement name="lobbyInfoContainer" style="flex-direction: row; flex-shrink: 0; justify-content: center; align-items: center;">
             <MaterialIcon icon="info_outline" name="infoIcon" class="smallFont" />
             <ui:Label tabindex="-1" text="Lobby is hidden with password: lobby-password" parse-escape-sequences="true" display-tooltip-when-elided="true" name="lobbyInfoLabel" class="mx-2 wordWrap smallerFont" />

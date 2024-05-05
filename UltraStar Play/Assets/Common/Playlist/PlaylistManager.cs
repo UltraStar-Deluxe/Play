@@ -218,15 +218,12 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             return EPlaylistNameIssue.Invalid;
         }
 
-        List<char> invalidCharacters = Path.GetInvalidPathChars()
+        HashSet<char> invalidCharacters = Path.GetInvalidPathChars()
             .Concat(new List<char> { '\\', '/' })
-            .ToList();
-        foreach (char invalidChar in invalidCharacters)
+            .ToHashSet();
+        if (invalidCharacters.AnyMatch(invalidChar => newName.Contains(invalidChar)))
         {
-            if (newName.Contains(invalidChar))
-            {
-                return EPlaylistNameIssue.Invalid;
-            }
+            return EPlaylistNameIssue.Invalid;
         }
 
         if (playlists
@@ -240,12 +237,12 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         return EPlaylistNameIssue.None;
     }
 
-    public bool TrySetPlaylistName(IPlaylist playlist, string newName, out string errorMessage)
+    public bool TrySetPlaylistName(IPlaylist playlist, string newName, out Translation errorMessage)
     {
         if (playlist == null
             || playlist.Name == newName)
         {
-            errorMessage = "";
+            errorMessage = Translation.Empty;
             return true;
         }
 
@@ -255,13 +252,13 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             || playlist.FilePath.IsNullOrEmpty()
             || ultraStarPlaylist == null)
         {
-            errorMessage = "Cannot rename this playlist";
+            errorMessage = Translation.Get(R.Messages.playlist_error_cannotRename);
             return false;
         }
 
         if (GetPlaylistNameIssue(playlist, newName) != EPlaylistNameIssue.None)
         {
-            errorMessage = "Invalid or duplicate playlist name";
+            errorMessage = Translation.Get(R.Messages.playlist_error_invalidName);
             return false;
         }
 
@@ -277,11 +274,11 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             ultraStarPlaylist.SetFileName(newName);
             ultraStarPlaylist.RemoveHeaderField("name");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Debug.LogException(e);
-            Debug.LogError($"Failed to rename playlist to '{newName}': {e.Message}");
-            errorMessage = $"Failed to rename playlist to '{newName}': " + e.Message;
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to rename playlist to '{newName}': {ex.Message}");
+            errorMessage = Translation.Get(R.Messages.common_errorWithReason, "reason", ex.Message);
             return false;
         }
 
@@ -294,18 +291,18 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
         playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, null));
 
-        errorMessage = "";
+        errorMessage = Translation.Empty;
         return true;
     }
 
-    public string TryRemovePlaylist(IPlaylist playlist)
+    public Translation TryRemovePlaylist(IPlaylist playlist)
     {
         if (playlist == null
             || playlist is UltraStarAllSongsPlaylist
             || playlist.Name == favoritesPlaylistName
             || playlist.FilePath.IsNullOrEmpty())
         {
-            return "Cannot remove this playlist";
+            return Translation.Get(R.Messages.playlist_error_cannotRemove);
         }
 
         string oldName = playlist.Name;
@@ -314,11 +311,11 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             Debug.Log($"Deleting playlist '{oldName}'");
             File.Delete(playlist.FilePath);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Debug.LogException(e);
-            Debug.LogError($"Failed to delete playlist '{oldName}': {e.Message}");
-            return $"Failed to delete playlist '{oldName}': " + e.Message;
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to delete playlist '{oldName}': {ex.Message}");
+            return Translation.Get(R.Messages.common_errorWithReason, "reason", ex.Message);
         }
 
         // Update settings
@@ -332,7 +329,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
         playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, null));
 
-        return "";
+        return Translation.Empty;
     }
 
     public UltraStarPlaylist CreateNewPlaylist(string initialName)

@@ -5663,7 +5663,6 @@ public static partial class R
         public const string _bottom_full = "-bottom-full";
         public const string bottom_px = "bottom-px";
         public const string _bottom_px = "-bottom-px";
-        public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string child_mb_1 = "child-mb-1";
         public const string child_mb_2 = "child-mb-2";
         public const string child_mb_3 = "child-mb-3";
@@ -9817,7 +9816,6 @@ public static partial class R
         public const string m_9 = "m-9";
         public const string m_96 = "m-96";
         public const string mainSceneButton = "mainSceneButton";
-        public const string marginBottomSmaller = "marginBottomSmaller";
         public const string m_auto = "m-auto";
         public const string max_h_0 = "max-h-0";
         public const string max_h_0dot5 = "max-h-0dot5";
@@ -13957,7 +13955,6 @@ public static partial class R
         public const string origin_top = "origin-top";
         public const string origin_top_left = "origin-top-left";
         public const string origin_top_right = "origin-top-right";
-        public const string outlineOnFocus = "outlineOnFocus";
         public const string overflow_hidden = "overflow-hidden";
         public const string overflow_scroll = "overflow-scroll";
         public const string overflow_visible = "overflow-visible";
@@ -18386,8 +18383,6 @@ public static partial class R
         public const string text_zinc_900 = "text-zinc-900";
         public const string timeBar = "timeBar";
         public const string tinyFont = "tinyFont";
-        public const string titleImage = "titleImage";
-        public const string titleSubText = "titleSubText";
         public const string titleText = "titleText";
         public const string toggleButton = "toggleButton";
         public const string tooltip = "tooltip";
