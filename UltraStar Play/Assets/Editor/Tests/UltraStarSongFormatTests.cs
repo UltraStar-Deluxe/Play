@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 public class UltraStarSongFormatTests
 {
@@ -100,6 +101,16 @@ public class UltraStarSongFormatTests
         Assert.NotNull(songMeta);
         Assert.AreEqual("English", songMeta.Language);
         Assert.AreEqual(2022, songMeta.Year);
+    }
+
+    [Test]
+    public void NegativeNoteValues()
+    {
+        LogAssert.ignoreFailingMessages = true;
+
+        SongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-NegativeNoteValues.txt", out List<SongIssue> songIssues, null, true);
+        Assert.NotNull(songMeta);
+        Assert.IsTrue(SongMetaUtils.GetAllNotes(songMeta).Count > 0);
     }
 
     [Test]

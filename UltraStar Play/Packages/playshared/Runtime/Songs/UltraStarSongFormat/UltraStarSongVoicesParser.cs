@@ -107,7 +107,7 @@ public class UltraStarSongVoicesParser
                 ParseNote(line, lineNumber);
                 break;
             default:
-                ThrowLineError(lineNumber, "Invalid instruction: " + line);
+                LogLineError(lineNumber, "Invalid instruction: " + line);
                 break;
         }
     }
@@ -117,7 +117,7 @@ public class UltraStarSongVoicesParser
         // Create sentence if needed.
         if (currentVoice == null)
         {
-            ThrowLineError(lineNumber, "Note encountered but no voice is active");
+            LogLineError(lineNumber, "Note encountered but no voice is active");
         }
         else if (currentSentence == null)
         {
@@ -133,7 +133,7 @@ public class UltraStarSongVoicesParser
         }
         catch (Exception e)
         {
-            ThrowLineError(lineNumber, e.Message, e);
+            LogLineError(lineNumber, e.Message, e);
         }
     }
 
@@ -156,7 +156,7 @@ public class UltraStarSongVoicesParser
         }
         catch (Exception e)
         {
-            ThrowLineError(lineNumber, e.Message, e);
+            LogLineError(lineNumber, e.Message, e);
         }
     }
 
@@ -190,7 +190,7 @@ public class UltraStarSongVoicesParser
     {
         if (voiceIdString.IsNullOrEmpty())
         {
-            ThrowLineError(lineNumber, "Voice id is null or empty, should be 'P1' or 'P2' for example");
+            LogLineError(lineNumber, "Voice id is null or empty, should be 'P1' or 'P2' for example");
         }
 
         // Normalize voice name.
@@ -200,7 +200,7 @@ public class UltraStarSongVoicesParser
 
         if (!Enum.TryParse(normalizedVoiceIdString, out EVoiceId voiceId))
         {
-            ThrowLineError(lineNumber, $"Failed to parse voice id '{voiceIdString}', should be 'P1' or 'P2' for example");
+            LogLineError(lineNumber, $"Failed to parse voice id '{voiceIdString}', should be 'P1' or 'P2' for example");
         }
 
         // Switch to or create new voice
@@ -293,17 +293,18 @@ public class UltraStarSongVoicesParser
         return res;
     }
 
-    private void ThrowLineError(uint lineNumber, string message, Exception innerException = null)
+    private void LogLineError(uint lineNumber, string message, Exception exception = null)
     {
-        throw new UltraStarSongParserException(
-            $"{message} (path: '{filePath}', line: {lineNumber}, encoding: {streamReader.CurrentEncoding})",
-            innerException);
+        if (exception != null)
+        {
+            Debug.LogException(exception);
+        }
+        Debug.LogWarning($"{message} (path: '{filePath}', line: {lineNumber}, encoding: {streamReader.CurrentEncoding})");
     }
 
     private void LogLineWarning(uint lineNumber, string message)
     {
-        Debug.LogWarning(
-            $"{message} (path: '{filePath}', line: {lineNumber}, encoding: {streamReader.CurrentEncoding})");
+        Debug.LogWarning($"{message} (path: '{filePath}', line: {lineNumber}, encoding: {streamReader.CurrentEncoding})");
     }
 
     private static int ConvertToInt32(string s)
