@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CommonOnlineMultiplayer;
 using PortAudioForUnity;
-using ProTrans;
 using Serilog.Events;
 using SimpleHttpServerForUnity;
 using UniInject;
@@ -16,7 +16,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator, IBinder
+public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjection, IBinder
 {
     [InjectedInInspector]
     public VisualTreeAsset uploadWorkshopItemDialogUi;
@@ -168,6 +168,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.uploadWorkshopItemButton)]
     private Button uploadWorkshopItemButton;
 
+    [Inject(UxmlName = R.UxmlNames.defaultUltraStarFormatVersionForSave)]
+    private ItemPicker defaultUltraStarFormatVersionForSave;
+
+    [Inject(UxmlName = R.UxmlNames.upgradeUltraStarFormatVersionForSave)]
+    private ItemPicker upgradeUltraStarFormatVersionForSave;
+
     private MessageDialogControl uploadWorkshopItemDialogControl;
 
     protected override void Start()
@@ -210,10 +216,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             });
         new TextFieldHintControl(generatedFolderPathTextField);
 
-        List<LogEventLevel> logEventLevels = EnumUtils.GetValuesAsList<LogEventLevel>()
+        List<ELogEventLevel> logEventLevels = EnumUtils.GetValuesAsList<ELogEventLevel>()
             .OrderBy(logEventLevel => (int)logEventLevel)
             .ToList();
-        new LabeledItemPickerControl<LogEventLevel>(minimumLogLevelPicker, logEventLevels)
+        new EnumItemPickerControl<ELogEventLevel>(minimumLogLevelPicker, logEventLevels)
             .Bind(() => settings.MinimumLogLevel,
                   newValue =>
                   {
@@ -276,7 +282,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         }
         else
         {
-            httpEndpointExampleLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerNotSupported);
+            httpEndpointExampleLabel.text = Translation.Get(R.Messages.options_httpServerNotSupported);
         }
 
         // View and copy log
@@ -284,7 +290,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
-            UiManager.CreateNotification("Copied log to clipboard");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
         });
 
         // Open persistent data path
@@ -345,6 +351,15 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.WriteUltraStarTxtFileWithByteOrderMark,
             newValue => settings.WriteUltraStarTxtFileWithByteOrderMark = newValue);
 
+        // UltraStar format versions
+        new EnumItemPickerControl<EKnownUltraStarSongFormatVersion>(defaultUltraStarFormatVersionForSave)
+            .Bind(() => settings.DefaultUltraStarSongFormatVersionForSave,
+                newValue => settings.DefaultUltraStarSongFormatVersionForSave = newValue);
+
+        new EnumItemPickerControl<EUpgradeUltraStarSongFormatVersion>(upgradeUltraStarFormatVersionForSave)
+            .Bind(() => settings.UpgradeUltraStarSongFormatVersionForSave,
+                newValue => settings.UpgradeUltraStarSongFormatVersionForSave = newValue);
+
         // Ffmpeg playback / conversion
         FieldBindingUtils.Bind(ffmpegConversionCommandsJsonPicker,
             () => JsonConverter.ToJson(settings.FileFormatToFfmpegConversionArguments, true),
@@ -365,9 +380,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
         // SongVideoPlayback
         new EnumItemPickerControl<ESongVideoPlayback>(songVideoPlaybackPicker)
-        {
-            GetLabelTextFunction = item => item.ToDisplayString()
-        }.Bind(() => settings.SongVideoPlayback,
+            .Bind(() => settings.SongVideoPlayback,
                 newValue => settings.SongVideoPlayback = newValue);
 
         // VLC
@@ -402,16 +415,17 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         portAudioDeviceInfoButton.RegisterCallbackButtonTriggered(_ => ShowPortAudioDeviceInfo());
 
         // PortAudio host API
-        new LabeledItemPickerControl<PortAudioHostApi>(portAudioHostApiPicker, GetAvailablePortAudioHostApis())
+        new EnumItemPickerControl<PortAudioHostApi>(portAudioHostApiPicker, GetAvailablePortAudioHostApis())
             .Bind(() => settings.PortAudioHostApi,
                 newValue => settings.PortAudioHostApi = newValue);
 
         // PortAudio output device
-        LabeledItemPickerControl<string> portAudioOutputDevicePickerControl = new LabeledItemPickerControl<string>(portAudioOutputDevicePicker, GetAvailablePortAudioOutputDeviceNames());
+        LabeledItemPickerControl<string> portAudioOutputDevicePickerControl = new(portAudioOutputDevicePicker,
+            GetAvailablePortAudioOutputDeviceNames(),
+            item => item.IsNullOrEmpty() ? Translation.Get(R.Messages.common_default) : Translation.Of(item));
         portAudioOutputDevicePickerControl.Bind(
             () => settings.PortAudioOutputDeviceName,
             newValue => settings.PortAudioOutputDeviceName = newValue);
-        portAudioOutputDevicePickerControl.GetLabelTextFunction = item => item.IsNullOrEmpty() ? "Default" : item;
 
         settings.ObserveEveryValueChanged(it => it.PortAudioHostApi)
             .Subscribe(newValue => portAudioOutputDevicePickerControl.Items = GetAvailablePortAudioOutputDeviceNames())
@@ -434,7 +448,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             newValue => settings.EnableVfx = newValue);
 
         // Online multiplayer
-        new EnumItemPickerControl<NetworkDelivery>(beatAnalyzedEventNetworkDeliveryPicker)
+        new EnumItemPickerControl<ENetworkDelivery>(beatAnalyzedEventNetworkDeliveryPicker)
             .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,
                 newValue => settings.BeatAnalyzedEventNetworkDelivery = newValue);
 
@@ -454,7 +468,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .WithRootVisualElement(visualElement)
             .CreateAndInject<UploadWorkshopItemUiControl>();
 
-        uploadWorkshopItemDialogControl = uiManager.CreateDialogControl("Upload New Steam Workshop Item");
+        uploadWorkshopItemDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.steamWorkshop_uploadDialog_title));
         uploadWorkshopItemDialogControl.AddVisualElement(visualElement);
         uploadWorkshopItemDialogControl.DialogClosedEventStream
             .Subscribe(evt =>
@@ -462,11 +476,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 uploadWorkshopItemUiControl.Dispose();
                 uploadWorkshopItemDialogControl = null;
             });
-        uploadWorkshopItemDialogControl.AddButton("Learn More",
-            _ => ApplicationUtils.OpenUrl(TranslationManager.GetTranslation(R.Messages.uri_howToSteamWorkshop)));
-        uploadWorkshopItemDialogControl.AddButton("Publish Workshop Item",
+        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
+            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToSteamWorkshop)));
+        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.steamWorkshop_action_publish),
             _ => uploadWorkshopItemUiControl.PublishWorkshopItem());
-        uploadWorkshopItemDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.cancel),
+        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.action_cancel),
             _ => uploadWorkshopItemDialogControl.CloseDialog());
     }
 
@@ -497,9 +511,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     private void ShowPortAudioDeviceInfo()
     {
-        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl("PortAudio host APIs and devices");
-        messageDialogControl.AddButton("Copy CSV", _ => CopyPortAudioDeviceListCsv());
-        messageDialogControl.AddButton("Close", _ => messageDialogControl.CloseDialog());
+        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_development_portAudioDialog_title));
+        messageDialogControl.AddButton(Translation.Get(R.Messages.options_development_action_copyCsv), _ => CopyPortAudioDeviceListCsv());
+        messageDialogControl.AddButton(Translation.Get(R.Messages.action_close), _ => messageDialogControl.CloseDialog());
 
         Label defaultHostApiLabel = new Label();
         defaultHostApiLabel.text = $"Default host API: {PortAudioConversionUtils.GetDefaultHostApi()}";
@@ -610,7 +624,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
         ClipboardUtils.CopyToClipboard(sb.ToString());
 
-        UiManager.CreateNotification("Copied to clipboard");
+        NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
     }
 
     private void UpdateLogEventLevel()
@@ -644,13 +658,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     private void RestartScene()
     {
         sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.DevelopmentOptionsScene));
-    }
-
-    public void UpdateTranslation()
-    {
-        showFpsToggle.label = TranslationManager.GetTranslation(R.Messages.options_showFps);
-        pitchDetectionAlgorithmPicker.Label = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
-        analyzeBeatsWithoutTargetNoteToggle.label = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
     }
 
     public List<IBinding> GetBindings()

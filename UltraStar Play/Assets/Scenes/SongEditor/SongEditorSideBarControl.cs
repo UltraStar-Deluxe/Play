@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -216,7 +215,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     {
         if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
         {
-            UiManager.CreateNotification("No vocals audio found. Split the audio first.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingVocalsAudio));
             return;
         }
 
@@ -232,21 +231,21 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
         Dictionary<string, string> titleToContentMap = new()
         {
-            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_audioSeparation_title),
-                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_audioSeparation) },
-            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_pitchDetection_title),
-                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_pitchDetection) },
-            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_lyricsDictation_title),
-                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_lyricsDictation) },
-            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_buttonTapping_title),
-                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_buttonTapping) },
-            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_editingLyrics_title),
-                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_editingLyrics) },
-            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_layers_title),
-                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_layers) },
+            { Translation.Get(R.Messages.songEditor_helpDialog_audioSeparation_title),
+                Translation.Get(R.Messages.songEditor_helpDialog_audioSeparation) },
+            { Translation.Get(R.Messages.songEditor_helpDialog_pitchDetection_title),
+                Translation.Get(R.Messages.songEditor_helpDialog_pitchDetection) },
+            { Translation.Get(R.Messages.songEditor_helpDialog_lyricsDictation_title),
+                Translation.Get(R.Messages.songEditor_helpDialog_lyricsDictation) },
+            { Translation.Get(R.Messages.songEditor_helpDialog_buttonTapping_title),
+                Translation.Get(R.Messages.songEditor_helpDialog_buttonTapping) },
+            { Translation.Get(R.Messages.songEditor_helpDialog_editingLyrics_title),
+                Translation.Get(R.Messages.songEditor_helpDialog_editingLyrics) },
+            { Translation.Get(R.Messages.songEditor_helpDialog_layers_title),
+                Translation.Get(R.Messages.songEditor_helpDialog_layers) },
         };
         helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_title),
+            Translation.Get(R.Messages.songEditor_helpDialog_title),
             titleToContentMap);
         helpDialogControl.DialogClosedEventStream.Subscribe(_ => helpDialogControl = null);
 
@@ -258,10 +257,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         controlsAccordionItem.Add(inputLegendContainer);
         helpDialogControl.DialogRootVisualElement.Q<AccordionGroup>().Add(controlsAccordionItem);
 
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToSongEditor)));
-        helpDialogControl.AddButton("Video Tutorials",
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_songEditorVideoTutorials)));
+        helpDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
+            _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToSongEditor)));
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(helpDialogControl.DialogRootVisualElement);
     }
@@ -340,8 +337,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         double issueStartPositionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, issue.StartBeat);
         int issueStartPositionInSeconds = (int)(issueStartPositionInMillis / 1000);
         visualElement.Q<Button>(R.UxmlNames.goToIssueButton).RegisterCallbackButtonTriggered(_ => GoToIssue(issue));
-        visualElement.Q<Label>(R.UxmlNames.issueMessageLabel).text = issue.Message;
-        visualElement.Q<Label>(R.UxmlNames.issuePositionLabel).text = $"({issueStartPositionInSeconds}s)";
+        visualElement.Q<Label>(R.UxmlNames.issueMessageLabel).SetTranslatedText(issue.Message);
+        visualElement.Q<Label>(R.UxmlNames.issuePositionLabel).SetTranslatedText(Translation.Of($"({issueStartPositionInSeconds}s)"));
 
         VisualElement issueImage = visualElement.Q<VisualElement>(R.UxmlNames.issueImage);
         if (issue.Severity == ESongIssueSeverity.Error)
@@ -384,7 +381,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
         List<InputActionInfo> inputActionInfos = new();
 
-        inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.usplay_back, TranslationManager.GetTranslation(R.Messages.back)));
+        inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.usplay_back, Translation.Get(R.Messages.common_back)));
 
         if (inputManager.InputDeviceEnum == EInputDevice.KeyboardAndMouse)
         {
@@ -420,8 +417,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             inputActionInfos.Add(new InputActionInfo("Zoom", "2 Finger Pinch Gesture"));
             inputActionInfos.Add(new InputActionInfo("Scroll", "2 Finger Drag"));
             inputActionInfos.Add(new InputActionInfo("Toggle Play Pause", "Double Tap"));
-            inputActionInfos.Add(new InputActionInfo(TranslationManager.GetTranslation(R.Messages.action_openContextMenu),
-                TranslationManager.GetTranslation(R.Messages.action_longPress)));
+            inputActionInfos.Add(new InputActionInfo(Translation.Get(R.Messages.action_openContextMenu),
+                Translation.Get(R.Messages.action_longPress)));
         }
 
         inputLegendContainer.Clear();

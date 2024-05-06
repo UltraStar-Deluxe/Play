@@ -8,10 +8,12 @@
         "UniRx",
         "Responsible",
         "com.achimmihca.uniinject",
+        "com.achimmihca.protrans",
         "playshared",
         "playsharedui",
         "Common",
-        "Scenes"
+        "Scenes",
+        "SongEditorScene"
     ],
     "includePlatforms": [
         "Editor"

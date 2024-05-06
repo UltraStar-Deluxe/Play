@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class CreateConstantsUxmlAndUssAssetPostprocessor : AssetPostprocessor
 {
-    private static readonly bool createConstansOnFileChange = true;
+    private static readonly bool createConstantsOnFileChange = false;
 
     private static void OnPostprocessAllAssets(
         string[] importedAssets,
@@ -17,7 +17,7 @@ public class CreateConstantsUxmlAndUssAssetPostprocessor : AssetPostprocessor
         string[] movedAssets,
         string[] movedFromAssetPaths)
     {
-        if (!createConstansOnFileChange)
+        if (!createConstantsOnFileChange)
         {
             return;
         }

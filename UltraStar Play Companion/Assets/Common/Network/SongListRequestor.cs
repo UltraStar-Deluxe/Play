@@ -23,7 +23,7 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
     {
         if (!mainGameHttpClient.IsConnected)
         {
-            FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_notConnected));
+            FireErrorMessageEvent(Translation.Get(R.Messages.companionApp_songList_error_notConnected));
             return;
         }
 
@@ -41,7 +41,7 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
                 && LoadedSongsDto.SongCount == 0)
             {
                 SuccessfullyLoadedAllSongs = false;
-                FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_noSongsFound));
+                FireErrorMessageEvent(Translation.Get(R.Messages.companionApp_songList_error_noSongsFound));
                 return;
             }
 
@@ -59,13 +59,13 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
         {
             Debug.LogException(e);
             SuccessfullyLoadedAllSongs = false;
-            FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_general));
+            FireErrorMessageEvent(Translation.Get(R.Messages.companionApp_songList_error_general));
         }
     }
 
     private void HandleSongListErrorResponse(Exception ex)
     {
-        FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_general));
+        FireErrorMessageEvent(Translation.Get(R.Messages.companionApp_songList_error_general));
     }
 
     private void FireErrorMessageEvent(string errorMessage)

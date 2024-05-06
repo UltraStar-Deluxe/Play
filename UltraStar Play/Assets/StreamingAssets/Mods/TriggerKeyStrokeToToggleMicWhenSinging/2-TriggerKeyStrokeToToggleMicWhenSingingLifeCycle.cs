@@ -73,7 +73,7 @@ public class TriggerKeyStrokeToToggleMicWhenSingingLifeCycle : IOnLoadMod, IOnDi
 
         if (modSettings.showNotificationOnTriggerKeyStroke)
         {
-            UiManager.CreateNotification($"Triggered shortcut '{ShortcutName}'");
+            NotificationManager.CreateNotification(Translation.Of($"Triggered shortcut '{ShortcutName}'"));
         }
     }
 

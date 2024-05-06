@@ -98,7 +98,7 @@ namespace SteamOnlineMultiplayer
                 {
                     Debug.LogException(ex);
                     Debug.LogError($"Failed to create lobby: {ex.Message}");
-                    UiManager.CreateNotification("Failed to create lobby");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_failedToCreateLobby));
                 })
                 .Select(lobby=>
                 {
@@ -110,11 +110,11 @@ namespace SteamOnlineMultiplayer
                 {
                     Debug.LogException(ex);
                     Debug.LogError($"Failed to start Unity Netcode host: {ex.Message}");
-                    UiManager.CreateNotification("Failed to start Unity Netcode host");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_failedToStartNetcodeHost));
                 })
                 .Subscribe(_ =>
                 {
-                    UiManager.CreateNotification("Successfully hosting online game");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_hostSuccess));
                 });
         }
 

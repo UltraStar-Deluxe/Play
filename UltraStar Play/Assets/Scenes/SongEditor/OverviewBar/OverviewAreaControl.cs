@@ -91,13 +91,13 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
 
     private void FillContextMenu(ContextMenuPopupControl popupControl)
     {
-        popupControl.AddButton("Show original music",
+        popupControl.AddButton(Translation.Get(R.Messages.songEditor_action_showOriginalAudio),
             () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.OriginalMusic);
-        popupControl.AddButton("Show vocals audio",
+        popupControl.AddButton(Translation.Get(R.Messages.songEditor_action_showVocalsAudio),
             () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.Vocals);
-        popupControl.AddButton("Show instrumental audio",
+        popupControl.AddButton(Translation.Get(R.Messages.songEditor_action_showInstrumentalAudio),
             () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.Instrumental);
-        popupControl.AddButton("Show playback audio (default)",
+        popupControl.AddButton(Translation.Get(R.Messages.songEditor_action_showPlaybackAudio),
             () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.SameAsPlayback);
     }
 

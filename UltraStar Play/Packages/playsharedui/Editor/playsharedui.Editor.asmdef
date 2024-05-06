@@ -1,0 +1,30 @@
+{
+    "name": "playsharedui.Editor",
+    "rootNamespace": "",
+    "references": [
+        "playshared",
+        "playshared.Editor",
+        "playsharedui",
+        "Unity.InputSystem",
+        "Serilog",
+        "Plugins",
+        "UniRx",
+        "com.achimmihca.uniinject",
+        "com.achimmihca.protrans",
+        "com.achimmihca.primeinputactions",
+        "com.achimmihca.simplehttpserverforunity",
+        "com.achimmihca.utfunknownunity",
+        "IngameDebugConsole.Runtime"
+    ],
+    "includePlatforms": [
+      "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

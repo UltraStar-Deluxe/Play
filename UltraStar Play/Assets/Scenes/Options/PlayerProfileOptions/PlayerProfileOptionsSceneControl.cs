@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CommonOnlineMultiplayer;
-using ProTrans;
 using SteamOnlineMultiplayer;
 using UniInject;
 using UniRx;
@@ -140,7 +139,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         playerProfileImagePickerControl.Bind(() => playerProfile.ImagePath,
                 newValue => playerProfile.ImagePath = newValue);
 
-        DifficultyPicker difficultyPicker = new DifficultyPicker(visualElement.Q<ItemPicker>(R.UxmlNames.difficultyPicker));
+        EnumItemPickerControl<EDifficulty> difficultyPicker = new(visualElement.Q<ItemPicker>(R.UxmlNames.difficultyPicker));
         difficultyPicker.Bind(() => playerProfile.Difficulty,
                 newValue => playerProfile.Difficulty = newValue);
 
@@ -199,30 +198,5 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
 
     public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=PlayerProfileImage";
 
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
-    {
-        string absolutePlayerProfileImagesFolder = PlayerProfileUtils.GetDefaultPlayerProfileImageFolderAbsolutePath();
-
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile_title),
-                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile) },
-            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages_title),
-                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages) },
-            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages_title),
-                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages,
-                    "path", ApplicationUtils.ReplacePathsWithDisplayString(absolutePlayerProfileImagesFolder)) },
-        };
-        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_title),
-            titleToContentMap);
-        helpDialogControl.AddButton("Images Folder",
-            _ =>
-            {
-                DirectoryUtils.CreateDirectory(absolutePlayerProfileImagesFolder);
-                ApplicationUtils.OpenDirectory(absolutePlayerProfileImagesFolder);
-            });
-        return helpDialogControl;
-    }
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToPlayerProfiles);
 }

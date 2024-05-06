@@ -23,38 +23,38 @@ public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinish
     [Inject]
     protected Injector injector;
 
-    public string Title
+    public Translation Title
     {
         get
         {
-            return dialogTitle.text;
+            return Translation.Of(dialogTitle.text);
         }
 
         set
         {
-            dialogTitle.text = value;
+            dialogTitle.SetTranslatedText(value);
         }
     }
 
-    public string Message
+    public Translation Message
     {
         get
         {
-            return dialogMessage.text;
+            return Translation.Of(dialogMessage.text);
         }
 
         set
         {
-            dialogMessage.text = value;
+            dialogMessage.SetTranslatedText(value);
         }
     }
 
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
-        
-        dialogTitle.text = "";
-        dialogMessage.text = "";
+
+        dialogTitle.SetTranslatedText(Translation.Empty);
+        dialogMessage.SetTranslatedText(Translation.Empty);
     }
 
     public void AddButton(Button button)
@@ -68,11 +68,11 @@ public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinish
             () => button.Focus()));
     }
 
-    public Button AddButton(string text, EventCallback<EventBase> callback)
+    public Button AddButton(Translation text, EventCallback<EventBase> callback)
     {
         Button button = new();
 
-        button.text = text;
+        button.SetTranslatedText(text);
         button.RegisterCallbackButtonTriggered(callback);
 
         AddButton(button);
@@ -84,7 +84,7 @@ public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinish
     {
         dialogMessageContainer.Add(visualElement);
     }
-    
+
     public void AddInformationMessage(string informationMessage)
     {
         VisualElement infoContainer = new();
@@ -92,17 +92,17 @@ public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinish
         infoContainer.AddToClassList("ml-auto");
         infoContainer.AddToClassList("mr-auto");
         infoContainer.AddToClassList("my-3");
-        
+
         FontIcon infoIcon = new MaterialIcon();
         infoIcon.Icon = "info_outline";
         infoIcon.style.fontSize = 14;
         infoIcon.AddToClassList("mr-1");
         infoContainer.Add(infoIcon);
-        
+
         Label infoLabel = new Label(informationMessage);
         infoLabel.AddToClassList("smallFont");
         infoContainer.Add(infoLabel);
-        
+
         AddVisualElement(infoContainer);
     }
 

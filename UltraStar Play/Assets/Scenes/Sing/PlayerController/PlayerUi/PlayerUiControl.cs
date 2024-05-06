@@ -120,7 +120,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .Inject(playerPitchIndicatorControl);
 
         // Show rating and score after each sentence
-        playerScoreLabel.text = "";
+        playerScoreLabel.SetTranslatedText(Translation.Empty);
 
         if (singSceneControl.IsIndividualScore)
         {
@@ -189,7 +189,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        playerNameLabel.text = playerProfile.Name;
+        playerNameLabel.SetTranslatedText(Translation.Of(playerProfile.Name));
         injector.WithRootVisualElement(playerImage)
             .Inject(playerProfileImageControl);
         if (micProfile != null
@@ -240,11 +240,12 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         nextPlayerNameLabel.ShowByDisplay();
-        string newText = $"Next: {nextPlayerProfile.Name}";
-        if (newText != nextPlayerNameLabel.text)
+        Translation newText = Translation.Get(R.Messages.songQueue_nextEntry,
+            "value", nextPlayerProfile.Name);
+        if (newText.Value != nextPlayerNameLabel.text)
         {
             nextPlayerNameLabel.style.color = new StyleColor(PlayerColor);
-            nextPlayerNameLabel.text = newText;
+            nextPlayerNameLabel.SetTranslatedText(newText);
             AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, nextPlayerNameLabel, setNextPlayerProfileAnimTimeInSeconds);
         }
     }
@@ -303,7 +304,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         VisualElement visualElement = sentenceRatingUi.CloneTree().Children().First();
         Label label = visualElement.Q<Label>();
-        label.text = sentenceRating.Text;
+        label.SetTranslatedText(sentenceRating.Translation);
         label.style.color = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
         // visualElement.style.unityBackgroundImageTintColor = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
         parentContainer.Add(visualElement);
@@ -342,7 +343,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             totalScoreAnimationId = LeanTween.value(singSceneControl.gameObject, lastDisplayedScore, score, 1f)
                 .setOnUpdate((float interpolatedScoreValue) =>
                 {
-                    playerScoreLabel.text = interpolatedScoreValue.ToString("0");
+                    playerScoreLabel.SetTranslatedText(Translation.Of(interpolatedScoreValue.ToString("0")));
                     float progressInPercent = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
                     playerScoreProgressBar.ProgressInPercent = progressInPercent;
                 })
@@ -350,7 +351,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
         else
         {
-            playerScoreLabel.text = score.ToString("0");
+            playerScoreLabel.SetTranslatedText(Translation.Of(score.ToString("0")));
             float progressInPercent = (float)(100.0 * score / PlayerScoreControl.maxScore);
             playerScoreProgressBar.ProgressInPercent = progressInPercent;
         }
@@ -479,7 +480,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         playerProfile = newCurrentPlayerProfile;
-        playerNameLabel.text = newCurrentPlayerProfile.Name;
+        playerNameLabel.SetTranslatedText(Translation.Of(newCurrentPlayerProfile.Name));
         playerProfileImageControl.PlayerProfile = newCurrentPlayerProfile;
 
         // Highlight the change with an animation

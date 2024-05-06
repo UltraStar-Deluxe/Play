@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Globalization;
 using ProTrans;
 using UniInject;
 using UnityEngine;
@@ -23,19 +23,19 @@ public class BuildInfoUiControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-        Dictionary<string, string> versionProperties = PropertiesFileParser.ParseText(versionPropertiesTextAsset.text);
+        PropertiesFile versionProperties = PropertiesFileParser.ParseText(versionPropertiesTextAsset.text, CultureInfo.InvariantCulture);
 
         // Show the release number (e.g. release date, or some version number)
         versionProperties.TryGetValue("release", out string release);
-        semanticVersionLabel.text = TranslationManager.GetTranslation("version", "value", release);
+        semanticVersionLabel.SetTranslatedText(Translation.Get("buildInfo_version", "value", release));
 
         // Show the commit hash of the build
         versionProperties.TryGetValue("commit_hash", out string commitHash);
-        commitHashLabel.text = TranslationManager.GetTranslation("commit", "value", commitHash);
+        commitHashLabel.SetTranslatedText(Translation.Get("buildInfo_commit", "value", commitHash));
 
         // Show the build time stamp
         versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
-        buildTimeStampLabel.text = TranslationManager.GetTranslation("buildTimeStamp", "value", buildTimeStamp);
+        buildTimeStampLabel.SetTranslatedText(Translation.Get("buildInfo_timeStamp", "value", buildTimeStamp));
 
         // Show the Unity version
         versionProperties.TryGetValue("unity_version", out string unityVersion);
@@ -45,6 +45,6 @@ public class BuildInfoUiControl : INeedInjection, IInjectionFinishedListener
             Debug.LogWarning("Unity version in VERSION.txt info file does not match the current Unity version. " +
                              $"VERSION.txt: '{unityVersion}', Application.unityVersion: '{Application.unityVersion}'");
         }
-        unityVersionLabel.text = $"Unity version: {Application.unityVersion}";
+        unityVersionLabel.SetTranslatedText(Translation.Get("buildInfo_unityVersion", "value", buildTimeStamp));
     }
 }

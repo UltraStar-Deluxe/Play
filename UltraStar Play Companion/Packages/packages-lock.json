@@ -15,11 +15,11 @@
       "hash": "3e338c7cbf22ac7df71d3949ee94855720899e59"
     },
     "com.achimmihca.protrans": {
-      "version": "https://github.com/achimmihca/ProTrans.git?path=ProTrans/Packages/com.achimmihca.ProTrans#v1.0.0",
+      "version": "https://github.com/achimmihca/ProTrans.git?path=ProTrans/Packages/com.achimmihca.ProTrans#b8d06cd11f1f1791e745dda6115ab2c4903dcd0d",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "9d50e260346432ca05b6508b09e21f530ba3bae0"
+      "hash": "b8d06cd11f1f1791e745dda6115ab2c4903dcd0d"
     },
     "com.achimmihca.uniinject": {
       "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#2aca140060bf59f18a496ade55db4ee88965ab8a",

@@ -1,4 +1,3 @@
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -7,7 +6,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
+public class EditPlaylistControl : MonoBehaviour, INeedInjection
 {
     [Inject(UxmlName = R.UxmlNames.editPlaylistButton)]
     private Button editPlaylistButton;
@@ -17,12 +16,9 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
 
     [Inject(UxmlName = R.UxmlNames.editPlaylistOverlay)]
     private VisualElement editPlaylistOverlay;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownOverlay)]
     private VisualElement searchPropertyDropdownOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.playlistChooserDropdownTitle)]
-    private Label playlistChooserDropdownTitle;
 
     [Inject(UxmlName = R.UxmlNames.submitEditPlaylistButton)]
     private Button submitEditPlaylistButton;
@@ -39,8 +35,11 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.playlistNameTextField)]
     private TextField playlistNameTextField;
 
-    [Inject(UxmlName = R.UxmlNames.editPlaylistDialogTitle)]
-    private Label editPlaylistDialogTitle;
+    [Inject(UxmlName = R.UxmlNames.validationWarningContainer)]
+    private VisualElement validationWarningContainer;
+
+    [Inject(UxmlName = R.UxmlNames.invalidValueLabel)]
+    private Label invalidValueLabel;
 
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
@@ -52,8 +51,6 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
     private UiManager uiManager;
 
     private IPlaylist currentPlaylist;
-
-    private string titleText;
 
     private void Start()
     {
@@ -78,11 +75,11 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         });
         confirmDeletePlaylistButton.RegisterCallbackButtonTriggered(_ =>
         {
-            string errorMessage = playlistManager.TryRemovePlaylist(currentPlaylist);
-            if (!errorMessage.IsNullOrEmpty())
+            Translation errorMessage = playlistManager.TryRemovePlaylist(currentPlaylist);
+            if (!errorMessage.Value.IsNullOrEmpty())
             {
                 Debug.LogError(errorMessage);
-                UiManager.CreateNotification(errorMessage);
+                NotificationManager.CreateNotification(errorMessage);
             }
             HideEditPlaylistDialog();
         });
@@ -101,16 +98,19 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         switch (playlistNameIssue)
         {
             case EPlaylistNameIssue.Invalid:
-                editPlaylistDialogTitle.text = "Invalid playlist name";
-                submitEditPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.cancel);
+                validationWarningContainer.ShowByDisplay();
+                invalidValueLabel.SetTranslatedText(Translation.Get(R.Messages.songSelectScene_editPlaylistDialog_error_invalidName));
+                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.action_cancel));
                 break;
             case EPlaylistNameIssue.Duplicate:
-                editPlaylistDialogTitle.text = "Duplicate playlist name";
-                submitEditPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.cancel);
+                validationWarningContainer.ShowByDisplay();
+                invalidValueLabel.SetTranslatedText(Translation.Get(R.Messages.songSelectScene_editPlaylistDialog_error_duplicateName));
+                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.action_cancel));
                 break;
             default:
-                editPlaylistDialogTitle.text = titleText;
-                submitEditPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
+                validationWarningContainer.HideByDisplay();
+                invalidValueLabel.SetTranslatedText(Translation.Empty);
+                submitEditPlaylistButton.SetTranslatedText(Translation.Get(R.Messages.action_continue));
                 break;
         }
     }
@@ -129,8 +129,8 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
             return;
         }
 
-        titleText = "Edit Playlist";
-        editPlaylistDialogTitle.text = titleText;
+        validationWarningContainer.HideByDisplay();
+        invalidValueLabel.SetTranslatedText(Translation.Empty);
         playlistNameTextField.value = currentPlaylist.Name;
         editPlaylistOverlay.ShowByDisplay();
         searchPropertyDropdownOverlay.HideByDisplay();
@@ -167,17 +167,12 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         }
 
         // Try to rename playlist
-        if (!playlistManager.TrySetPlaylistName(currentPlaylist, newPlaylistName, out string errorMessage))
+        if (!playlistManager.TrySetPlaylistName(currentPlaylist, newPlaylistName, out Translation errorMessage))
         {
             // Show error in UI
             Debug.LogError(errorMessage);
-            UiManager.CreateNotification(errorMessage);
+            NotificationManager.CreateNotification(errorMessage);
         }
         HideEditPlaylistDialog();
-    }
-
-    public void UpdateTranslation()
-    {
-        playlistChooserDropdownTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_playlistDropdownTitle);
     }
 }

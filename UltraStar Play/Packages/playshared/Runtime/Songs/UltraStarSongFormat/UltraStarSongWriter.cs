@@ -6,18 +6,23 @@ using System.Text;
 
 public static class UltraStarFormatWriter
 {
-    public static void WriteFile(string absolutePath, SongMeta songMeta, bool writeByteOrderMark = true)
+    public static void WriteFile(string absolutePath, SongMeta songMeta, UltraStarSongFormatVersion version, bool writeByteOrderMark = true)
     {
+        if (version.EnumValue is EUltraStarSongFormatVersion.Unknown)
+        {
+            throw new IllegalArgumentException("Must specify a known UltraStar format version");
+        }
+
         if (songMeta is not UltraStarSongMeta ultraStarSongMeta)
         {
             ultraStarSongMeta = new(songMeta);
         }
-        WriteFileWithUltraStarSongMeta(absolutePath, ultraStarSongMeta, writeByteOrderMark);
+        WriteFileWithUltraStarSongMeta(absolutePath, ultraStarSongMeta, version, writeByteOrderMark);
     }
 
-    private static void WriteFileWithUltraStarSongMeta(string absolutePath, UltraStarSongMeta songMeta, bool writeByteOrderMark)
+    private static void WriteFileWithUltraStarSongMeta(string absolutePath, UltraStarSongMeta songMeta, UltraStarSongFormatVersion version, bool writeByteOrderMark)
     {
-        string ultraStarFormat = ToUltraStarSongFormat(songMeta);
+        string ultraStarFormat = ToUltraStarSongFormat(songMeta, version);
         File.WriteAllText(absolutePath, ultraStarFormat, EncodingUtils.GetUtf8Encoding(writeByteOrderMark));
     }
 
@@ -30,10 +35,10 @@ public static class UltraStarFormatWriter
         return ToUltraStarSongFormat(ultraStarSongMeta);
     }
 
-    private static string ToUltraStarSongFormat(UltraStarSongMeta songMeta)
+    private static string ToUltraStarSongFormat(UltraStarSongMeta songMeta, UltraStarSongFormatVersion version)
     {
         StringBuilder sb = new();
-        AppendHeader(sb, songMeta);
+        AppendHeader(sb, songMeta, version);
         List<Voice> nonEmptyVoices = songMeta.Voices.Where(voice => IsNotEmpty(voice)).ToList();
         nonEmptyVoices.Sort(Voice.comparerById);
         foreach (Voice voice in nonEmptyVoices)
@@ -101,36 +106,56 @@ public static class UltraStarFormatWriter
         }
     }
 
-    private static void AppendHeader(StringBuilder sb, UltraStarSongMeta songMeta)
+    private static void AppendHeader(StringBuilder sb, UltraStarSongMeta songMeta, UltraStarSongFormatVersion version)
     {
+        AppendHeaderField(sb, "version", version.StringValue);
+
         AppendHeaderField(sb, "title", songMeta.Title);
         AppendHeaderField(sb, "artist", songMeta.Artist);
-        AppendHeaderField(sb, "mp3", songMeta.Audio);
-        AppendHeaderField(sb, "Vocals", songMeta.VocalsAudio);
-        AppendHeaderField(sb, "Instrumental", songMeta.InstrumentalAudio);
+
+        AppendHeaderField(sb, version.IsBefore(UltraStarSongFormatVersion.v110) ? "mp3" : "audio", songMeta.Audio);
+        AppendHeaderField(sb, "audiourl", songMeta.AudioUrl);
+
+        AppendHeaderField(sb, "vocals", songMeta.VocalsAudio);
+        AppendHeaderField(sb, "vocalsurl", songMeta.VocalsAudioUrl);
+
+        AppendHeaderField(sb, "instrumental", songMeta.InstrumentalAudio);
+        AppendHeaderField(sb, "instrumentalurl", songMeta.InstrumentalAudioUrl);
+
         AppendNumberHeaderField(sb, "bpm", songMeta.TxtFileBpm);
         AppendNumberHeaderField(sb, "gap", songMeta.GapInMillis);
 
         AppendHeaderField(sb, "cover", songMeta.Cover);
+        AppendHeaderField(sb, "coverurl", songMeta.CoverUrl);
+
         AppendHeaderField(sb, "background", songMeta.Background);
+        AppendHeaderField(sb, "backgroundurl", songMeta.BackgroundUrl);
 
         AppendHeaderField(sb, "video", songMeta.Video);
-        AppendNumberHeaderField(sb, "videogap", songMeta.TxtFileVideoGapInSeconds);
+        AppendHeaderField(sb, "videourl", songMeta.VideoUrl);
+        AppendNumberHeaderField(sb, "videogap", version.IsBefore(UltraStarSongFormatVersion.v200) ? songMeta.TxtFileVideoGapInSeconds : songMeta.VideoGapInMillis);
 
-        AppendHeaderField(sb, "website", songMeta.Website);
-
-        AppendHeaderField(sb, "genre", songMeta.Genre);
         AppendNumberHeaderField(sb, "year", songMeta.Year);
-
-        AppendHeaderField(sb, "language", songMeta.Language);
         AppendHeaderField(sb, "edition", songMeta.Edition);
+        AppendHeaderField(sb, "language", songMeta.Language);
+        AppendHeaderField(sb, "genre", songMeta.Genre);
+        AppendHeaderField(sb, "tags", songMeta.Tag);
 
-        AppendNumberHeaderField(sb, "start", songMeta.TxtFileStartInSeconds);
-        AppendNumberHeaderField(sb, "end", songMeta.TxtFileEndInMillis);
-        AppendNumberHeaderField(sb, "previewstart", songMeta.TxtFilePreviewStartInSeconds);
-        AppendNumberHeaderField(sb, "previewend", songMeta.TxtFilePreviewEndInSeconds);
-        AppendNumberHeaderField(sb, "medleystartbeat", (int)songMeta.TxtFileMedleyStartBeat);
-        AppendNumberHeaderField(sb, "medleyendbeat", (int)songMeta.TxtFileMedleyEndBeat);
+        AppendNumberHeaderField(sb, "start", version.IsBefore(UltraStarSongFormatVersion.v200) ? songMeta.TxtFileStartInSeconds : songMeta.StartInMillis);
+        AppendNumberHeaderField(sb, "end", songMeta.EndInMillis);
+        AppendNumberHeaderField(sb, "previewstart", version.IsBefore(UltraStarSongFormatVersion.v200) ? songMeta.TxtFilePreviewStartInSeconds : songMeta.PreviewStartInMillis);
+        AppendNumberHeaderField(sb, "previewend", version.IsBefore(UltraStarSongFormatVersion.v200) ? songMeta.TxtFilePreviewEndInSeconds : songMeta.PreviewEndInMillis);
+
+        if (version.IsBefore(UltraStarSongFormatVersion.v200))
+        {
+            AppendNumberHeaderField(sb, "medleystartbeat", songMeta.TxtFileMedleyStartBeat);
+            AppendNumberHeaderField(sb, "medleyendbeat", songMeta.TxtFileMedleyEndBeat);
+        }
+        else
+        {
+            AppendNumberHeaderField(sb, "medleystart", songMeta.MedleyStartInMillis);
+            AppendNumberHeaderField(sb, "medleyend", songMeta.MedleyEndInMillis);
+        }
 
         songMeta.AdditionalHeaderEntries.ForEach(entry =>
             AppendHeaderField(sb, entry.Key, entry.Value));

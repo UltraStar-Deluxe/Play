@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using PrimeInputActions;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -73,7 +71,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         modListEntryInactiveOverlay.ShowByDisplay();
-        modNameLabel.text = ModDisplayName;
+        modNameLabel.SetTranslatedText(Translation.Of(ModDisplayName));
 
         enabledToggle.value = IsModEnabled;
         enabledToggle.RegisterValueChangedCallback(evt =>
@@ -106,7 +104,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
     {
         if (!IsModEnabled)
         {
-            UiManager.CreateNotification("Cannot access settings of a disabled mod.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_settingsNotAvailable));
             return;
         }
 
@@ -118,7 +116,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         List<IModSettings> allModSettings = ModManager.GetModObjects<IModSettings>(ModFolder);
         if (allModSettings.IsNullOrEmpty())
         {
-            UiManager.CreateNotification("This mod has no settings.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_settingsEmpty));
             return;
         }
 
@@ -127,12 +125,13 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
             .ToList();
         if (allModSettingControls.IsNullOrEmpty())
         {
-            UiManager.CreateNotification("This mod has no settings.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_settingsEmpty));
             return;
         }
 
-        modSettingsDialogControl = uiManager.CreateDialogControl($"{ModDisplayName} Settings");
-        modSettingsDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.ok),
+        modSettingsDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_mod_settingsDialog_title,
+            "modName", ModDisplayName));
+        modSettingsDialogControl.AddButton(Translation.Get(R.Messages.action_close),
             _ => modSettingsDialogControl.CloseDialog());
         modSettingsDialogControl.DialogClosedEventStream.Subscribe(_ => modSettingsDialogControl = null);
 
@@ -157,8 +156,9 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        modInfoDialogControl = uiManager.CreateDialogControl($"{ModDisplayName}");
-        modInfoDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
+        modInfoDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_mod_infoDialog_title,
+            "modName", ModDisplayName));
+        modInfoDialogControl.AddButton(Translation.Get(R.Messages.action_close),
             _ => modInfoDialogControl.CloseDialog());
         modInfoDialogControl.DialogClosedEventStream.Subscribe(_ => modInfoDialogControl = null);
 
@@ -179,11 +179,15 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         Label authorsLabel = modInfoDialogVisualElement.Q<Label>(R.UxmlNames.modAuthorsLabel);
         VisualElement modDependenciesContainer = modInfoDialogVisualElement.Q<VisualElement>(R.UxmlNames.modDependenciesContainer);
 
-        SetTextOrHideLabel(descriptionLabel, "",modInfo.description);
-        SetTextOrHideLabel(versionLabel, "Version: " , modInfo.version);
-        SetTextOrHideLabel(websiteLabel, "Website: " , modInfo.website);
-        SetTextOrHideLabel(websiteLabel, "License: " , modInfo.license);
-        SetTextOrHideLabel(authorsLabel, "Authors: " , modInfo.authors);
+        SetTextAndVisibility(descriptionLabel, false, Translation.Of(modInfo.description));
+        SetTextAndVisibility(versionLabel, modInfo.version.IsNullOrEmpty(),
+            Translation.Get(R.Messages.options_mod_infoDialog_version, "value", modInfo.version));
+        SetTextAndVisibility(websiteLabel, modInfo.website.IsNullOrEmpty(),
+            Translation.Get(R.Messages.options_mod_infoDialog_website, "value", modInfo.website));
+        SetTextAndVisibility(websiteLabel, modInfo.license.IsNullOrEmpty(),
+            Translation.Get(R.Messages.options_mod_infoDialog_license, "value", modInfo.license));
+        SetTextAndVisibility(authorsLabel, modInfo.authors.IsNullOrEmpty(),
+            Translation.Get(R.Messages.options_mod_infoDialog_authors, "value", modInfo.authors.JoinWith(", ")));
 
         // TODO: Mod permissions like FileSystem, Networking, etc.
         modDependenciesContainer.Clear();
@@ -201,26 +205,17 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         // }
     }
 
-    private void SetTextOrHideLabel(Label label, string prefix, List<string> texts)
+    private void SetTextAndVisibility(Label label, bool hide, Translation text)
     {
-        if (texts.IsNullOrEmpty())
-        {
-            SetTextOrHideLabel(label, prefix, "");
-            return;
-        }
-        SetTextOrHideLabel(label, prefix, texts.ToCsv(", ", "", ""));
-    }
-
-    private void SetTextOrHideLabel(Label label, string prefix, string text)
-    {
-        if (text.IsNullOrEmpty())
+        if (hide)
         {
             label.HideByDisplay();
+            label.SetTranslatedText(Translation.Empty);
             return;
         }
 
         label.ShowByDisplay();
-        label.text = $"{prefix}{text}";
+        label.SetTranslatedText(text);
     }
 
     private void UpdateInactiveOverlay()

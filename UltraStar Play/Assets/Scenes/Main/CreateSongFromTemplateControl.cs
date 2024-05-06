@@ -149,15 +149,17 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
             ApplicationUtils.OpenDirectory(outputFolder);
         }
 
-        string message = $"Created new song from template in: \n{outputFolder}";
-        Debug.Log(message);
-        UiManager.CreateNotification(message);
+        Debug.Log($"Created new song from template in: {outputFolder}");
+        NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_createdNewSong,
+        "path", outputFolder));
 
         // Reload songs, now with the newly added song.
-        songMetaManager.TryLoadAndAddSongMetasFromFolder(outputFolder, out List<SongMeta> newSongMetas, out List<SongIssue> _);
-        SongMeta newSongMeta = newSongMetas.FirstOrDefault();
-        if (newSongMeta != null)
+        string txtFile = FileScannerUtils.ScanForFiles(new List<string> { outputFolder }, new List<string>() { "*.txt" })
+            .FirstOrDefault();
+        if (txtFile != null)
         {
+            SongMeta newSongMeta = new LazyLoadedFromFileSongMeta(txtFile);
+            songMetaManager.AddSongMeta(newSongMeta);
             OpenSongEditorScene(newSongMeta, audioFileExists);
         }
     }

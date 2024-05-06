@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using FullSerializer;
 using UnityEngine;
 
 [Serializable]
-public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
+public abstract class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
 {
-    private enum ELoadSongPhase
+    public enum ELoadSongPhase
     {
         Pending,
         Started,
@@ -17,8 +18,8 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
 
     public virtual Action DoLoadSong { get; set; }
 
-    public bool HasFailedToLoadSong => loadSongPhase is ELoadSongPhase.Failed;
-    private ELoadSongPhase loadSongPhase;
+    [fsIgnore]
+    public ELoadSongPhase LoadSongPhase { get; private set; }
 
     private bool hasSetFileInfo;
     public override FileInfo FileInfo
@@ -44,6 +45,21 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         {
             LoadSongIfNotDoneYetAndIsNotSetYet(hasSetFileEncoding);
             return base.FileEncoding;
+        }
+    }
+
+    private bool hasSetVersion;
+    public override UltraStarSongFormatVersion Version
+    {
+        get
+        {
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetVersion);
+            return base.Version;
+        }
+        set
+        {
+            hasSetVersion = true;
+            base.Version = value;
         }
     }
 
@@ -134,21 +150,6 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         {
             hasSetInstrumentalAudio = true;
             base.InstrumentalAudio = value;
-        }
-    }
-
-    private bool hasSetWebsite;
-    public override string Website
-    {
-        get
-        {
-            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetWebsite);
-            return base.Website;
-        }
-        set
-        {
-            hasSetWebsite = true;
-            base.Website = value;
         }
     }
 
@@ -420,24 +421,24 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
 
     public virtual void LoadSongIfNotDoneYet()
     {
-        if (loadSongPhase is not ELoadSongPhase.Pending)
+        if (LoadSongPhase is not ELoadSongPhase.Pending)
         {
             return;
         }
 
         try
         {
-            loadSongPhase = ELoadSongPhase.Started;
+            LoadSongPhase = ELoadSongPhase.Started;
             DoLoadSong?.Invoke();
         }
         catch (Exception ex)
         {
-            loadSongPhase = ELoadSongPhase.Failed;
+            LoadSongPhase = ELoadSongPhase.Failed;
             Debug.LogException(ex);
             Debug.LogError($"Failed load song '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
             return;
         }
 
-        loadSongPhase = ELoadSongPhase.FinishedSuccessfully;
+        LoadSongPhase = ELoadSongPhase.FinishedSuccessfully;
     }
 }

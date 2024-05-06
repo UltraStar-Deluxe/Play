@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -14,7 +13,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
 {
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
-    
+
     [Inject(UxmlName = R.UxmlNames.statusLabel)]
     private Label statusLabel;
 
@@ -26,19 +25,19 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
 
     [Inject(UxmlName = R.UxmlNames.startIcon)]
     private VisualElement startIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.cancelIcon)]
     private VisualElement cancelIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.urlChooserButton)]
     private Button urlChooserButton;
 
     [Inject(UxmlName = R.UxmlNames.deleteButton)]
     private Button deleteButton;
-    
+
     [Inject]
     private SettingsManager settingsManager;
-    
+
     [Inject]
     private SongMetaManager songMetaManager;
 
@@ -50,7 +49,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
 
     [Inject]
     private GameObject gameObject;
-    
+
     private MessageDialogControl urlChooserDialogControl;
 
     public string TargetFolder => downloadAndExtractSongArchiveControl != null
@@ -58,9 +57,9 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         : "";
 
     private DownloadAndExtractSongArchiveControl downloadAndExtractSongArchiveControl;
-    
+
     public ReactiveProperty<bool> IsDoneWithoutError { get; private set; } = new();
-    
+
     private List<SongArchiveEntry> songArchiveEntries = new();
     public List<SongArchiveEntry> SongArchiveEntries
     {
@@ -80,15 +79,17 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         urlTextField.value = "";
         urlTextField.DisableParseEscapeSequences();
         new TextFieldHintControl(urlTextField);
-        
-        statusLabel.text = "Click the button to start the download";
-        
+
+        statusLabel.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_archiveDownload_status_initial));
+
         urlChooserButton.RegisterCallbackButtonTriggered(_ => ShowUrlChooserDialog());
         deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(true));
-        
+
         toggleStartAndCancelButton.RegisterCallbackButtonTriggered(_ => ToggleStartAndCancel());
         startIcon.ShowByDisplay();
         cancelIcon.HideByDisplay();
+
+        TranslationManager.ApplyTranslations(VisualElement);
     }
 
     private void ToggleStartAndCancel()
@@ -110,17 +111,16 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         {
             return;
         }
-        
+
         if (downloadAndExtractSongArchiveControl != null
             && !downloadAndExtractSongArchiveControl.IsDone.Value)
         {
-            UiManager.CreateNotification("Download still in progress");
             return;
         }
-        
+
         startIcon.HideByDisplay();
         cancelIcon.ShowByDisplay();
-        
+
         downloadAndExtractSongArchiveControl = new(urlTextField.value.Trim(), gameObject.transform);
         downloadAndExtractSongArchiveControl.ErrorMessage.ObserveOnMainThread()
             .Subscribe(newValue =>
@@ -154,7 +154,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
             .Subscribe(evt => UpdateExtractArchiveProgressText(evt));
         downloadAndExtractSongArchiveControl.Start();
     }
-    
+
     public void CancelDownload()
     {
         downloadAndExtractSongArchiveControl?.Cancel();
@@ -168,8 +168,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
             return;
         }
 
-        string title = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_archiveUrlLabel);
-        urlChooserDialogControl = uiManager.CreateDialogControl(title);
+        urlChooserDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_songLibrary_urlChooserDialog_title));
         urlChooserDialogControl.DialogClosedEventStream.Subscribe(_ => urlChooserDialogControl = null);
 
         // Create a button in the dialog for every archive URL
@@ -177,7 +176,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         {
             Button songArchiveUrlButton = new();
             songArchiveUrlButton.AddToClassList("songArchiveUrlButton");
-            songArchiveUrlButton.text = songArchiveEntry.name;
+            songArchiveUrlButton.SetTranslatedText(Translation.Of(songArchiveEntry.name));
             songArchiveUrlButton.RegisterCallbackButtonTriggered(_ =>
             {
                 SelectSongArchiveUrl(songArchiveEntry.url);
@@ -200,40 +199,37 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
 
     private void SetFinishedStatus()
     {
-        statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_finished);
+        statusLabel.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_archiveDownload_status_finished));
     }
 
     private void SetErrorStatus(string errorMessage)
     {
-        statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_failed);    
-        if (!errorMessage.IsNullOrEmpty())
-        {
-            statusLabel.text += $": {errorMessage}";
-        }
+        statusLabel.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_archiveDownload_status_error,
+            "reason", errorMessage));
     }
 
     private void SetCanceledStatus()
     {
-        statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_canceled);
+        statusLabel.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_archiveDownload_status_canceled));
     }
-    
+
     private void UpdateDownloadProgressText(FileDownloadControl.DownloadProgressEvent evt)
     {
         ByteSizeUtils.TryGetHumanReadableByteSize((long)evt.DownloadedByteCount, out double size, out string unit);
         if (unit is "B" or "KB" or "MB")
         {
             // No digits after comma needed
-            statusLabel.text = $"{size:0} {unit}";
+            statusLabel.SetTranslatedText(Translation.Of($"{size:0} {unit}"));
         }
         else
         {
-            statusLabel.text = $"{size:0.00} {unit}";
+            statusLabel.SetTranslatedText(Translation.Of($"{size:0.00} {unit}"));
         }
 
         if (evt.FinalDownloadSizeInBytes > 0)
         {
             // Also show download progress in percent
-            statusLabel.text += $" ({Math.Round(evt.DownloadProgressInPercent):0} %)";
+            statusLabel.SetTranslatedText(Translation.Of($" ({Math.Round(evt.DownloadProgressInPercent):0} %)"));
         }
     }
 
@@ -245,7 +241,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         }
         else
         {
-            statusLabel.text = $"{Math.Round(evt.ProgressInPercent):0} %";
+            statusLabel.SetTranslatedText(Translation.Of($"{Math.Round(evt.ProgressInPercent):0} %"));
         }
     }
 }

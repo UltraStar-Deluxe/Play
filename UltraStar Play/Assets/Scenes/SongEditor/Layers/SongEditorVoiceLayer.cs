@@ -7,10 +7,8 @@ public class SongEditorVoiceLayer : AbstractSongEditorLayer
         this.VoiceId = voiceId;
     }
 
-    public override string GetDisplayName()
+    public override Translation GetDisplayName()
     {
-        return VoiceId
-            .ToString()
-            .Replace("P", "Player ");
+        return Translation.Get(VoiceId);
     }
 }

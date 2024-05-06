@@ -28,7 +28,7 @@ public class GameRoundModifierDialogEntryControl
         toggle = new();
         toggle.name = $"{modifier.GetId()}Toggle";
         toggle.AddToClassList("gameRoundModifierToggle");
-        toggle.label = modifier.DisplayName;
+        toggle.SetTranslatedLabel(Translation.Of(modifier.DisplayName));
         FieldBindingUtils.Bind(toggle,
             () => GameRoundSettings.modifiers.Contains(modifier),
             newValue =>

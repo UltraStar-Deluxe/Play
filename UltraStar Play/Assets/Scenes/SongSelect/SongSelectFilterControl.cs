@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Win32;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -90,14 +91,15 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
         }
         isInitialized = true;
 
-        if (SongMetaManager.IsSongScanFinished)
+        if (songMetaManager.IsSongScanFinished)
         {
             UpdateFilterList();
         }
         else
         {
             filterListContainer.Clear();
-            songMetaManager.SongScanFinishedEventStream.Subscribe(_ => UpdateFilterList());
+            songMetaManager.SongScanFinishedEventStream
+                .Subscribe(_ => UpdateFilterList());
         }
     }
 
@@ -149,7 +151,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     private bool SongMetaPassesFilter(SongMeta songMeta, SearchPropertyFilter searchPropertyFilter)
     {
         string songMetaValue = GetSongMetaSearchProperty(songMeta, searchPropertyFilter.searchProperty);
-        return songMetaValue.Equals(searchPropertyFilter.value, StringComparison.InvariantCultureIgnoreCase);
+        return StringUtils.ContainsIgnoreCaseAndDiacritics(songMetaValue, searchPropertyFilter.value);
     }
 
     private void UpdateFilterList()
@@ -159,9 +161,10 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
 
         List<ESearchProperty> searchProperties = new()
         {
+            ESearchProperty.Year,
             ESearchProperty.Language,
             ESearchProperty.Genre,
-            ESearchProperty.Year,
+            ESearchProperty.Tags,
             ESearchProperty.Edition,
         };
 
@@ -177,13 +180,22 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     private void FillFilterList(ESearchProperty searchProperty)
     {
         List<string> values = songMetaManager.GetSongMetas()
-            .Select(songMeta => StringUtils.ToTitleCase(GetSongMetaSearchProperty(songMeta, searchProperty).ToLowerInvariant()))
+            .Select(songMeta => GetSongMetaSearchProperty(songMeta, searchProperty).ToLowerInvariant())
+            .SelectMany(value => IsCommaSeparatedSearchProperty(searchProperty) ? value.Split(",") : new []{ value })
+            .Distinct(new StringEqualityComparerIgnoreCaseAndDiacritics())
+            .Select(value => StringUtils.ToTitleCase(value.Trim()))
             .Where(value => !value.IsNullOrEmpty() && value != "Undefined" && value != "None" && value != "Unknown" && value != "0")
-            .Distinct()
             .OrderBy(value => value)
             .ToList();
 
-        Label propertyLabel = new(StringUtils.ToTitleCase(searchProperty.ToString()));
+        if (values.IsNullOrEmpty())
+        {
+            // Cannot filter by this property
+            return;
+        }
+
+        Label propertyLabel = new();
+        propertyLabel.SetTranslatedText(Translation.Get(searchProperty));
         propertyLabel.AddToClassList("searchFilterLabel");
         filterListContainer.Add(propertyLabel);
         foreach (string value in values)
@@ -212,6 +224,15 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
         }
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(filterListContainer);
+    }
+
+    private bool IsCommaSeparatedSearchProperty(ESearchProperty searchProperty)
+    {
+        return searchProperty
+            is ESearchProperty.Language
+            or ESearchProperty.Genre
+            or ESearchProperty.Tags
+            or ESearchProperty.Edition;
     }
 
     private void DisableFilter(SearchPropertyFilter searchPropertyFilter)
@@ -270,6 +291,8 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
                 return songMeta.Language;
             case ESearchProperty.Edition:
                 return songMeta.Edition;
+            case ESearchProperty.Tags:
+                return songMeta.Tag;
             case ESearchProperty.Lyrics:
                 return SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1, true);
             default:

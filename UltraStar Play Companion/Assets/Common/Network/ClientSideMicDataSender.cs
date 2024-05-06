@@ -223,7 +223,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
     {
         PositionInSongData positionInSongData = new(positionInSongDto.PositionInSongInMillis, TimeUtils.GetUnixTimeMilliseconds());
         receivedPositionInSongTimes.PushBack(positionInSongData);
-        songMeta = new SongMeta
+        songMeta = new UltraStarSongMeta
         {
             BeatsPerMinute = positionInSongDto.BeatsPerMinute,
             GapInMillis = positionInSongDto.SongGap,

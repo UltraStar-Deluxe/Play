@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using ProTrans;
 using UniInject;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInjectionFinishedListener, ITranslator
+public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInjectionFinishedListener
 {
     [Inject(UxmlName = R.UxmlNames.dialogTitle)]
     private Label dialogTitle;
@@ -41,6 +40,8 @@ public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInj
         remoteVersionProperties.TryGetValue("release", out remoteRelease);
         remoteVersionProperties.TryGetValue("name", out releaseName);
         remoteVersionProperties.TryGetValue("website_link", out websiteLink);
+
+        TranslationManager.ApplyTranslations(dialogRootVisualElement);
     }
 
     public override void OnInjectionFinished()
@@ -83,9 +84,8 @@ public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInj
         string displayName = releaseName.IsNullOrEmpty()
             ? remoteRelease.NullToEmpty()
             : releaseName.NullToEmpty();
-        dialogMessage.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_message, "remoteRelease", displayName, "websiteLink", websiteLink.NullToEmpty());
-        dialogTitle.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_title);
-        ignoreThisVersionButton.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_ignoreThisVersion);
-        ignoreAllFutureVersionsButton.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_ignoreAllFutureVersions);
+        dialogMessage.SetTranslatedText(Translation.Get(R.Messages.mainScene_newVersionDialog_message,
+            "remoteRelease", displayName,
+             "websiteLink", websiteLink.NullToEmpty()));
     }
 }

@@ -88,7 +88,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
             return;
         }
 
-        contextMenu.AddButton("Edit lyrics", () => songEditorSceneControl.StartEditingSelectedNoteText());
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_editLyrics), () => songEditorSceneControl.StartEditingSelectedNoteText());
         FillContextMenuForAiTools(contextMenu, selectedNotes);
         FillContextMenuToMergeAndAddSpaceBetweenNotes(contextMenu, selectedNotes);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
@@ -105,9 +105,10 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         contextMenu.AddSeparator();
 
-        contextMenu.AddButton($"Speech recognition on {settings.SongEditorSettings.SpeechRecognitionSamplesSource} audio",
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_speechRecognitionOnAudio,
+                "audio", settings.SongEditorSettings.SpeechRecognitionSamplesSource),
             () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
-        contextMenu.AddButton($"Move to detected pitch",
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveToDetectedPitch),
             () => pitchDetectionAction.MoveNotesToDetectedPitchUsingPitchDetectionLayer(selectedNotes, true));
     }
 
@@ -117,14 +118,14 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         if (mergeNotesAction.CanExecute(selectedNotes))
         {
-            contextMenu.AddButton("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_mergeNotes), () => mergeNotesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
         }
     }
 
     private void FillContextMenuToDeleteNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
-        contextMenu.AddButton("Delete", () => deleteNotesAction.ExecuteAndNotify(selectedNotes));
+        contextMenu.AddButton(Translation.Get(R.Messages.action_delete), () => deleteNotesAction.ExecuteAndNotify(selectedNotes));
     }
 
     private void FillContextMenuToSetNoteType(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
@@ -132,27 +133,27 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         contextMenu.AddSeparator();
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.Golden))
         {
-            contextMenu.AddButton("Make golden",
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setNoteTypeGolden),
                 () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.Golden));
         }
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.Freestyle))
         {
-            contextMenu.AddButton("Make freestyle",
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setNoteTypeFreestyle),
                 () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.Freestyle));
         }
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.Rap))
         {
-            contextMenu.AddButton("Make rap",
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setNoteTypeRap),
                 () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.Rap));
         }
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.RapGolden))
         {
-            contextMenu.AddButton("Make rap-golden",
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setNoteTypeRapGolden),
                 () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.RapGolden));
         }
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.Normal))
         {
-            contextMenu.AddButton("Make normal",
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setNoteTypeNormal),
                 () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.Normal));
         }
     }
@@ -162,7 +163,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         if (mergeSentencesAction.CanExecute(selectedNotes))
         {
             contextMenu.AddSeparator();
-            contextMenu.AddButton("Merge sentences",
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_mergeSentences),
                 () => mergeSentencesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
         }
     }
@@ -174,7 +175,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         if (canMoveToVoice1)
         {
             contextMenu.AddSeparator();
-            contextMenu.AddButton("Assign to player 1",
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_assignToVoice, "name", "1"),
                 () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, EVoiceId.P1));
         }
         if (!canMoveToVoice1 && canMoveToVoice2)
@@ -183,25 +184,25 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
         if (canMoveToVoice2)
         {
-            contextMenu.AddButton("Assign to player 2",
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_assignToVoice, "name", "2"),
                 () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, EVoiceId.P2));
         }
 
         if (moveNoteToOwnSentenceAction.CanMoveToOwnSentence(selectedNotes))
         {
-            contextMenu.AddButton("Assign to own phrase", () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveNotesToOwnSentence), () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
         }
 
         bool canMoveToPreviousSentence = moveNoteToAdjacentSentenceAction.CanMoveToPreviousSentence(selectedNotes, noteControl.Note);
         bool canMoveToNextSentence = moveNoteToAdjacentSentenceAction.CanMoveToNextSentence(selectedNotes, noteControl.Note);
         if (canMoveToPreviousSentence)
         {
-            contextMenu.AddButton("Assign to previous phrase",
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveNotesToPreviousSentence),
                 () => moveNoteToAdjacentSentenceAction.MoveToPreviousSentenceAndNotify(selectedNotes));
         }
         if (canMoveToNextSentence)
         {
-            contextMenu.AddButton("Assign to next phrase",
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveNotesToNextSentence),
                 () => moveNoteToAdjacentSentenceAction.MoveToNextSentenceAndNotify(selectedNotes));
         }
     }

@@ -6,19 +6,20 @@
 public class PitchDetectionAlgorithmPickerControl : LabeledItemPickerControl<EPitchDetectionAlgorithm>
 {
     public PitchDetectionAlgorithmPickerControl(ItemPicker itemPicker)
-        : base(itemPicker, EnumUtils.GetValuesAsList<EPitchDetectionAlgorithm>())
-    {
-        GetLabelTextFunction = item =>
-        {
-            switch (item)
+        : base(itemPicker,
+            EnumUtils.GetValuesAsList<EPitchDetectionAlgorithm>(),
+            item =>
             {
-                case EPitchDetectionAlgorithm.Dywa:
-                    return "Dynamic Wavelet\n(default)";
-                case EPitchDetectionAlgorithm.Camd:
-                    return "Circular Average\nMagnitude Difference";
-                default:
-                    return item.ToString();
-            }
-        };
+                switch (item)
+                {
+                    case EPitchDetectionAlgorithm.Dywa:
+                        return Translation.Of("Dynamic Wavelet\n(default)");
+                    case EPitchDetectionAlgorithm.Camd:
+                        return Translation.Of("Circular Average\nMagnitude Difference");
+                    default:
+                        return Translation.Of(item.ToString());
+                }
+            })
+    {
     }
 }

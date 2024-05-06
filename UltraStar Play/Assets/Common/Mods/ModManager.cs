@@ -126,7 +126,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void CreateOrUpdateModFolderFileSystemWatchers()
     {
-        foreach (string modFolder in GetEnabledModFolders())
+        foreach (string modFolder in GetModFolders())
         {
             CreateOrUpdateModFolderFileSystemWatcher(modFolder);
         }
@@ -296,7 +296,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         if (targetModFolderInfo.Exists)
         {
             Debug.Log($"Directory already exists: '{targetModFolder}'");
-            UiManager.CreateNotification("A mod with this name already exists.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_nameConflict));
             return "";
         }
 
@@ -399,37 +399,34 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         });
     }
 
-    public void LoadAndInstantiateMods(bool onlyEnabledMods = true)
+    public void LoadAndInstantiateMods()
     {
         try
         {
-            LoadModsIntoAppDomain(onlyEnabledMods);
-            UpdateModObjects(onlyEnabledMods);
+            LoadModsIntoAppDomain();
+            UpdateModObjects();
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to load mods: {ex.Message}");
-            UiManager.CreateNotification($"Failed to load mods. Check log for details.\n" +
-                                         $"Try to disable mods and restart the app.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_failedToLoad));
         }
     }
 
-    private void LoadModsIntoAppDomain(bool onlyEnabledMods)
+    private void LoadModsIntoAppDomain()
     {
-        if (onlyEnabledMods
-            && settings.EnabledMods.IsNullOrEmpty())
+        if (settings.EnabledMods.IsNullOrEmpty())
         {
             return;
         }
 
         failedToLoadModFolders.Clear();
 
-        List<string> modFolders = GetEnabledModFolders();
+        List<string> modFolders = GetModFolders();
         foreach (string modFolder in modFolders)
         {
-            if (!onlyEnabledMods
-                || IsModEnabled(modFolder))
+            if (IsModEnabled(modFolder))
             {
                 string modFolderName = GetModFolderName(modFolder);
 
@@ -482,7 +479,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return IsModEnabled(mod.GetType());
     }
 
-    public List<string> GetEnabledModFolders()
+    public static List<string> GetModFolders()
     {
         List<string> modRootFolders = ModFolderUtils.GetModRootFolders();
 
@@ -628,12 +625,12 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private List<IMod> CreateModObjects(bool onlyEnabledMods)
+    private List<IMod> CreateModObjects()
     {
         Type parent = typeof(IMod);
         return ModTypes
             .Where(type => parent.IsAssignableFrom(type)
-                           && (!onlyEnabledMods || IsModEnabled(type))
+                           && IsModEnabled(type)
                            && IsModLoadedSuccessfully(type))
             .Select(type => (IMod)Activator.CreateInstance(type))
             .ToList();
@@ -644,7 +641,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return ReflectionUtils.GetTypeInAppDomain<IMod>(logExceptions);
     }
 
-    private void UpdateModObjects(bool onlyEnabledMods)
+    private void UpdateModObjects()
     {
         using DisposableStopwatch d = new($"Instantiate mod objects took <ms> ms");
 
@@ -652,7 +649,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         List<IMod> currentAndObsoleteModObjects;
         try
         {
-            currentAndObsoleteModObjects = CreateModObjects(onlyEnabledMods);
+            currentAndObsoleteModObjects = CreateModObjects();
         }
         catch (Exception ex)
         {
@@ -709,7 +706,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                 catch (LoadModSettingsException ex)
                 {
                     Debug.LogException(ex);
-                    UiManager.CreateNotification($"Failed to load settings of mod '{GetModFolderName(ex.ModFolder)}'");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.mod_error_settingsFailedToLoad,
+                     "name", GetModFolderName(ex.ModFolder)));
                 }
             }
         }

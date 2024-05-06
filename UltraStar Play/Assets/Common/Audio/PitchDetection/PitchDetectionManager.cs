@@ -71,7 +71,8 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         // Create job to show in UI
         if (pitchDetectionJob == null)
         {
-            pitchDetectionJob = new Job($"Pitch detection of '{Path.GetFileName(songMeta.Audio)}' (using vocals audio)");
+            pitchDetectionJob = new Job(Translation.Get(R.Messages.job_pitchDetectionWithName,
+                "name", Path.GetFileName(songMeta.Audio)));
             jobManager.AddJob(pitchDetectionJob);
         }
         pitchDetectionJob.SetStatus(EJobStatus.Running);
@@ -122,7 +123,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
     {
         if (basicPitchProcessCount > 0)
         {
-            UiManager.CreateNotification("Already performing pitch detection");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
             return Observable.Throw<BasicPitchDetectionResult>(new IllegalStateException("Already performing pitch detection"));
         }
 

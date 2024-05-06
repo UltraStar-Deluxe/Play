@@ -13,7 +13,10 @@
         "playshared",
         "playshared.Editor",
         "Plugins",
-        "Common"
+        "Common",
+        "Common.OnlineMultiplayer.Editor",
+        "Steam.OnlineMultiplayer.Editor",
+        "SongEditorScene"
     ],
     "includePlatforms": [
         "Editor"
@@ -22,7 +25,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        ""
+        "Flurl.dll",
+        "Flurl.Http.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

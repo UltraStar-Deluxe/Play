@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ProTrans;
-using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,7 +14,7 @@ public class SettingsProblemHintControl
 
     private bool hasIssues;
 
-    public SettingsProblemHintControl(VisualElement visualElement, List<string> settingsProblems)
+    public SettingsProblemHintControl(VisualElement visualElement, List<Translation> settingsProblems)
     {
         this.tooltipControl = new(visualElement);
         this.visualElement = visualElement;
@@ -25,7 +23,7 @@ public class SettingsProblemHintControl
         SetProblems(settingsProblems);
     }
 
-    public static List<string> GetAllSettingsProblems(
+    public static List<Translation> GetAllSettingsProblems(
         Settings settings,
         ModManager modManager)
     {
@@ -36,32 +34,32 @@ public class SettingsProblemHintControl
             .ToList();
     }
 
-    public static List<string> GetModSettingsProblems(ModManager modManager)
+    public static List<Translation> GetModSettingsProblems(ModManager modManager)
     {
-        List<string> result = new();
+        List<Translation> result = new();
         if (!modManager.EnabledFailedToLoadModFolders.IsNullOrEmpty())
         {
-            result.Add("Some mods failed to load.");
+            result.Add(Translation.Get(R.Messages.settingsProblem_modFailedToLoad));
         }
 
         return result;
     }
 
-    public static List<string> GetSongLibrarySettingsProblems(Settings settings)
+    public static List<Translation> GetSongLibrarySettingsProblems(Settings settings)
     {
-        List<string> result = new();
+        List<Translation> result = new();
         if (settings.SongDirs.IsNullOrEmpty())
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noSongFolders));
+            result.Add(Translation.Get(R.Messages.settingsProblem_noSongFolders));
         }
         else if (settings.SongDirs.AnyMatch(songDir => !Directory.Exists(songDir)))
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_songFolderDoesNotExist));
+            result.Add(Translation.Get(R.Messages.settingsProblem_songFolderDoesNotExist));
         }
 
         if (SongIssueManager.HasSongIssues)
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_thereAreSongIssues));
+            result.Add(Translation.Get(R.Messages.settingsProblem_thereAreSongIssues));
         }
 
         // Check song folders
@@ -73,47 +71,47 @@ public class SettingsProblemHintControl
                 && IsDuplicateFolder(songFolder, settings.SongDirs))
             {
                 hasDuplicateFolder = true;
-                result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_duplicateSongFolders));
+                result.Add(Translation.Get(R.Messages.settingsProblem_duplicateSongFolders));
             }
 
             if (!hasDuplicateSubfolder
                 && IsSubfolderOfAnyOtherFolder(songFolder, settings.SongDirs, out string _))
             {
                 hasDuplicateSubfolder = true;
-                result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_songFolderIsSubfolderOfOtherSongFolder));
+                result.Add(Translation.Get(R.Messages.settingsProblem_songFolderIsSubfolderOfOtherSongFolder));
             }
         }
 
         return result;
     }
 
-    public static List<string> GetRecordingSettingsProblems(Settings settings)
+    public static List<Translation> GetRecordingSettingsProblems(Settings settings)
     {
-        List<string> result = new();
+        List<Translation> result = new();
         if (settings.MicProfiles.IsNullOrEmpty()
             || !settings.MicProfiles
                 .AnyMatch(micProfile => micProfile.IsEnabled))
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noMicProfiles));
+            result.Add(Translation.Get(R.Messages.settingsProblem_noMicProfiles));
         }
         else if (settings.MicProfiles
                  .AllMatch(micProfile => !micProfile.IsEnabled || !micProfile.IsConnected(ServerSideConnectRequestManager.Instance)))
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noConnectedAndEnabledMicProfile));
+            result.Add(Translation.Get(R.Messages.settingsProblem_noConnectedAndEnabledMicProfile));
         }
         return result;
     }
 
-    public static List<string> GetPlayerSettingsProblems(Settings settings)
+    public static List<Translation> GetPlayerSettingsProblems(Settings settings)
     {
-        List<string> result = new();
+        List<Translation> result = new();
         if (settings.PlayerProfiles.IsNullOrEmpty())
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noPlayerProfile));
+            result.Add(Translation.Get(R.Messages.settingsProblem_noPlayerProfile));
         }
         else if (!settings.PlayerProfiles.AnyMatch(playerProfile => playerProfile.IsEnabled))
         {
-            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noEnabledPlayerProfile));
+            result.Add(Translation.Get(R.Messages.settingsProblem_noEnabledPlayerProfile));
         }
         return result;
     }
@@ -174,7 +172,7 @@ public class SettingsProblemHintControl
         return potentialSubfolderInfo.FullName.StartsWith(potentialParentAbsolutePath);
     }
 
-    public void SetProblems(List<string> settingsProblems)
+    public void SetProblems(List<Translation> settingsProblems)
     {
         bool oldHasIssues = this.hasIssues;
         hasIssues = !settingsProblems.IsNullOrEmpty();
@@ -200,6 +198,6 @@ public class SettingsProblemHintControl
                 .setEaseLinear();
         }
 
-        tooltipControl.TooltipText = settingsProblems.JoinWith("\n\n");
+        tooltipControl.TooltipText = Translation.Of(settingsProblems.JoinWith("\n\n"));
     }
 }

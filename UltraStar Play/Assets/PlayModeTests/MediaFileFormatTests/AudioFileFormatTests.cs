@@ -8,18 +8,16 @@ public class AudioFileFormatTests : AbstractMediaFileFormatTests
     /////////////////////////////////////////////////////////
 
     [UnityTest]
-    public IEnumerator Mp3Test()
+    public IEnumerator Mp3ConstantBitRateTest()
     {
-        yield return AudioFileTest("mp3-");
+        yield return AudioFileTest("mp3-ConstantBitRate-");
     }
 
-    // [UnityTest]
-    // public IEnumerator Mp3UnityReturnsWrongDurationTest()
-    // {
-    //     // A bug report for this issue has been opened.
-    //     // See https://github.com/achimmihca/UnityAudioClipMp3WrongDuration
-    //     return AudioFileTest("mp3-UnityReturnsWrongDuration-");
-    // }
+    [UnityTest]
+    public IEnumerator Mp3VariableBitRateTest()
+    {
+        return AudioFileTest("mp3-VariableBitRate-");
+    }
 
     [UnityTest]
     public IEnumerator OggTest()

@@ -57,7 +57,7 @@ public class SingSceneCountdownControl : INeedInjection, IInjectionFinishedListe
         float passedTimeInWholeSeconds = (float)Math.Truncate(passedTimeInSeconds);
         float passedTimeInSingleSecond = (float)(passedTimeInSeconds - passedTimeInWholeSeconds);
         int missingSeconds = (int)Math.Ceiling(targetTimeInSeconds - passedTimeInSeconds);
-        countdownLabel.text = missingSeconds.ToString();
+        countdownLabel.SetTranslatedText(Translation.Of(missingSeconds.ToString()));
 
         Vector2 scale = new(1 - passedTimeInSingleSecond, 1 - passedTimeInSingleSecond);
         countdownLabel.style.scale = new StyleScale(scale);

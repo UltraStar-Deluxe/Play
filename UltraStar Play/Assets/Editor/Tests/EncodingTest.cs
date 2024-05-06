@@ -109,8 +109,8 @@ public class EncodingTest
     [Test]
     public void TestInvalidExplicit()
     {
-        LogAssert.Expect(LogType.Exception, new Regex(@"ArgumentException: 'InvalidEncoding'.+"));
-        LogAssert.Expect(LogType.Error, new Regex(@"Failed to find encoding for explicitly specified encoding name 'InvalidEncoding'.+"));
+        LogAssert.Expect(LogType.Exception, new Regex(@".+'InvalidEncoding'.+"));
+        LogAssert.Expect(LogType.Error, new Regex(@".+'InvalidEncoding'.+"));
 
         TestFile("TestSong-invalid-explicit-encoding.txt",
             true,

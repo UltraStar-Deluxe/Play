@@ -98,8 +98,8 @@ public class SongIssueManager : AbstractSingletonBehaviour
     {
         ResetSongIssues();
 
-        songMetaManager.ScanFilesIfNotDoneYet();
-        if (SongMetaManager.IsSongScanFinished)
+        songMetaManager.ScanSongsIfNotDoneYet();
+        if (songMetaManager.IsSongScanFinished)
         {
             ScanSongIssues();
         }
@@ -139,7 +139,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
         IReadOnlyCollection<SongMeta> songMetas = songMetaManager.GetSongMetas();
         CancellationDisposable cancellationDisposable = new();
 
-        Job job = JobManager.CreateAndAddJob("Search issues in songs");
+        Job job = JobManager.CreateAndAddJob(Translation.Get(R.Messages.job_searchSongIssues));
         job.OnCancel = () => cancellationDisposable.Dispose();
         job.SetStatus(EJobStatus.Running);
 
@@ -259,15 +259,18 @@ public class SongIssueManager : AbstractSingletonBehaviour
         List<SongIssue> songIssues = new();
 
         // Check video exists and uses a supported format.
-        if (SongMetaUtils.GetWebsiteUri(songMeta).IsNullOrEmpty())
+        if (SongMetaUtils.GetWebViewUrl(songMeta).IsNullOrEmpty())
         {
             string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
             CheckResourceExists(songIssues, songMeta, videoUri,
-                () => $"Video resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(videoUri)}'",
+                () => Translation.Get(R.Messages.songIssue_media_notFound,
+                    "value", ApplicationUtils.ReplacePathsWithDisplayString(videoUri)),
                 ESongIssueSeverity.Warning);
 
             CheckVideoFormatIsSupported(songIssues, videoUri,
-                () => $"Unsupported video format '{GetUriOrExtensionWithoutDot(videoUri)}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
+                () => Translation.Get(R.Messages.songIssue_media_unsupported,
+                    "actual", GetUriOrExtensionWithoutDot(videoUri),
+                    "expected", unitySupportedVideoFileExtensionsAsCsv),
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
                 ESongIssueSeverity.Warning);
         }
@@ -283,7 +286,8 @@ public class SongIssueManager : AbstractSingletonBehaviour
                 && !ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(songMeta.Video))
                 && !WebViewUtils.CanHandleWebViewUrl(songMeta.Video))
             {
-                songIssues.Add(SongIssue.CreateWarning(songMeta, $"Video resource differs from audio resource. This is only supported for the formats {unitySupportedVideoFileExtensionsAsCsv}"));
+                songIssues.Add(SongIssue.CreateWarning(songMeta, Translation.Get(R.Messages.songIssue_media_videoDiffersFromAudio,
+                    "supportedFormats", unitySupportedVideoFileExtensionsAsCsv)));
 
                 // Do not attempt to load this video file, it will not work.
                 SongVideoPlayer.AddIgnoredVideoFile(songMeta.Video);
@@ -300,42 +304,55 @@ public class SongIssueManager : AbstractSingletonBehaviour
         // Check audio format.
         // Audio is mandatory. Without working audio file, the song cannot be played.
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-        if (SongMetaUtils.GetWebsiteUri(songMeta).IsNullOrEmpty())
+        if (SongMetaUtils.GetWebViewUrl(songMeta).IsNullOrEmpty())
         {
             // Must have local audio file in supported format because no website is specified.
             CheckResourceExists(songIssues, songMeta, audioUri,
-                () => $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetAudioUri(songMeta))}'",
-                ESongIssueSeverity.Error);
+                () => Translation.Get(R.Messages.songIssue_media_notFound,
+                    "value", ApplicationUtils.ReplacePathsWithDisplayString(audioUri)),
+                    ESongIssueSeverity.Error);
             CheckAudioOrVideoFormatIsSupported(songIssues, audioUri,
-                () => $"Unsupported audio format '{GetUriOrExtensionWithoutDot(audioUri)}'. Convert to one of {unitySupportedAudioFileExtensionsAsCsv}",
+                () => Translation.Get(R.Messages.songIssue_media_unsupported,
+                    "actual", GetUriOrExtensionWithoutDot(audioUri),
+                    "expected", unitySupportedAudioFileExtensionsAsCsv),
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Audio),
                 ESongIssueSeverity.Error);
         }
-        // Check WebView URI is supported when specified
-        else if (!WebViewUtils.CanHandleWebViewUrl(songMeta.Website))
+        // Check WebView URI is supported when needed
+        else if (!SongMetaUtils.ResourceExists(songMeta, songMeta.Audio))
         {
-            if (!SongMetaUtils.LocalAudioResourceExists(songMeta))
+            string webViewUrl = SongMetaUtils.GetWebViewUrl(songMeta);
+            if (!WebViewUtils.CanHandleWebViewUrl(webViewUrl))
             {
                 // Cannot use the local audio file and not the website. This song cannot be played.
-                songIssues.Add(SongIssue.CreateError(songMeta,
-                    $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetLocalAudioUri(songMeta))}' and website is not supported '{songMeta.Website}'. " +
-                          $"Add the local audio file or provide JavaScript code to integrate the website in the embedded browser."));
+                songIssues.Add(SongIssue.CreateError(songMeta, Translation.Get(R.Messages.songIssue_media_missingAudioAndUnsupportedWebsite,
+                    "audio", ApplicationUtils.ReplacePathsWithDisplayString(songMeta.Audio),
+                    "website", webViewUrl)));
             }
         }
 
         // Vocals audio and instrumental audio must use formats that are supported by Unity. Ffmpeg can only be used for the main audio.
-        CheckResourceExists(songIssues, songMeta, songMeta.VocalsAudio,
-            () => $"Vocals audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetVocalsAudioUri(songMeta))}'",
+        string vocalsAudioUri = SongMetaUtils.GetVocalsAudioUri(songMeta);
+        CheckResourceExists(songIssues, songMeta, vocalsAudioUri,
+            () => Translation.Get(R.Messages.songIssue_media_notFound,
+                "value", ApplicationUtils.ReplacePathsWithDisplayString(vocalsAudioUri)),
             ESongIssueSeverity.Warning);
         CheckIsUnitySupportedAudioFormat(songIssues, songMeta.VocalsAudio,
-            () => $"Unsupported audio format '{GetUriOrExtensionWithoutDot(songMeta.VocalsAudio)}' for vocals . Convert to one of {unitySupportedAudioFileExtensionsAsCsv}",
+            () => Translation.Get(R.Messages.songIssue_media_unsupported,
+                "actual", GetUriOrExtensionWithoutDot(vocalsAudioUri),
+                "expected", unitySupportedAudioFileExtensionsAsCsv),
             () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.VocalsAudio),
             ESongIssueSeverity.Warning);
-        CheckResourceExists(songIssues, songMeta, songMeta.InstrumentalAudio,
-            () => $"Instrumental audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetInstrumentalAudioUri(songMeta))}'",
+
+        string instrumentalAudioUri = SongMetaUtils.GetInstrumentalAudioUri(songMeta);
+        CheckResourceExists(songIssues, songMeta, instrumentalAudioUri,
+            () => Translation.Get(R.Messages.songIssue_media_notFound,
+                "value", ApplicationUtils.ReplacePathsWithDisplayString(instrumentalAudioUri)),
             ESongIssueSeverity.Warning);
         CheckIsUnitySupportedAudioFormat(songIssues, songMeta.InstrumentalAudio,
-            () => $"Unsupported audio format '{GetUriOrExtensionWithoutDot(songMeta.InstrumentalAudio)}' for instrumental. Convert to one of {unitySupportedAudioFileExtensionsAsCsv}",
+            () => Translation.Get(R.Messages.songIssue_media_unsupported,
+                "actual", GetUriOrExtensionWithoutDot(instrumentalAudioUri),
+                "expected", unitySupportedAudioFileExtensionsAsCsv),
             () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.InstrumentalAudio),
             ESongIssueSeverity.Warning);
 
@@ -351,7 +368,9 @@ public class SongIssueManager : AbstractSingletonBehaviour
         if (!songMeta.Audio.IsNullOrEmpty())
         {
             CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Audio,
-                codec => $"Unsupported video codec '{codec}' in '{songMeta.Audio}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
+                codec => Translation.Get(R.Messages.songIssue_media_unsupported,
+                    "actual", codec,
+                    "expected", unitySupportedVideoFileExtensionsAsCsv),
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
                 ESongIssueSeverity.Error);
         }
@@ -359,7 +378,9 @@ public class SongIssueManager : AbstractSingletonBehaviour
         if (!songMeta.Video.IsNullOrEmpty())
         {
             CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Video,
-                codec => $"Unsupported video codec '{codec}' in '{songMeta.Video}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
+                codec => Translation.Get(R.Messages.songIssue_media_unsupported,
+                    "actual", codec,
+                    "expected", unitySupportedVideoFileExtensionsAsCsv),
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
                 ESongIssueSeverity.Warning);
         }
@@ -369,7 +390,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
         List<SongIssue> songIssues,
         SongMeta songMeta,
         string pathOrUri,
-        Func<string, string> errorMessageGetter,
+        Func<string, Translation> errorMessageGetter,
         Func<SongIssueData> songIssueDataGetter,
         ESongIssueSeverity severity)
     {
@@ -420,7 +441,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
         List<SongIssue> songIssues,
         SongMeta songMeta,
         string pathOrUri,
-        Func<string> errorMessageGetter,
+        Func<Translation> errorMessageGetter,
         ESongIssueSeverity severity)
     {
         if (pathOrUri.IsNullOrEmpty())
@@ -437,7 +458,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
     private static void CheckIsUnitySupportedAudioFormat(
         List<SongIssue> songIssues,
         string pathOrUri,
-        Func<string> errorMessageGetter,
+        Func<Translation> errorMessageGetter,
         Func<SongIssueData> songIssueDataGetter,
         ESongIssueSeverity severity)
     {
@@ -455,7 +476,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
     private static void CheckVideoFormatIsSupported(
         List<SongIssue> songIssues,
         string pathOrUri,
-        Func<string> errorMessageGetter,
+        Func<Translation> errorMessageGetter,
         Func<SongIssueData> songIssueDataGetter,
         ESongIssueSeverity severity)
     {
@@ -476,7 +497,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
     private static void CheckAudioOrVideoFormatIsSupported(
         List<SongIssue> songIssues,
         string pathOrUri,
-        Func<string> errorMessageGetter,
+        Func<Translation> errorMessageGetter,
         Func<SongIssueData> songIssueDataGetter,
         ESongIssueSeverity severity)
     {

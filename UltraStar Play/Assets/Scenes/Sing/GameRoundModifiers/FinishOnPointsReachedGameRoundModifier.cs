@@ -32,7 +32,7 @@ public class FinishOnPointsReachedGameRoundModifier : GameRoundModifier
     public override VisualElement CreateConfigurationVisualElement()
     {
         IntegerField integerField = new IntegerField();
-        integerField.label = "Points";
+        integerField.SetTranslatedLabel(Translation.Get(R.Messages.gameRoundModifier_condition_score));
         FieldBindingUtils.Bind(integerField,
             () => PointsThreshold,
             newValue =>

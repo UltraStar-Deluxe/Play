@@ -33,9 +33,9 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     {
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(_ =>
         {
-            if (!CanPlayAudio(out string errorMessage))
+            if (!CanPlayAudio(out Translation errorMessage))
             {
-                UiManager.CreateNotification(errorMessage);
+                NotificationManager.CreateNotification(errorMessage);
                 return;
             }
             AudioSource.Play();
@@ -131,33 +131,35 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         AudioClip loadedAudioClip = AudioManager.LoadAudioClipFromUriImmediately(audioClipUri, false);
         if (loadedAudioClip == null)
         {
-            UiManager.CreateNotification($"Failed to load {audioClipUri}");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_failedToLoadWithName,
+                "name", audioClipUri));
             failedAudioClipPaths.Add(audioClipUri);
         }
 
         return loadedAudioClip;
     }
 
-    private bool CanPlayAudio(out string errorMessage)
+    private bool CanPlayAudio(out Translation errorMessage)
     {
         if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Recording
             && !micSampleRecorder.HasRecordedAudio)
         {
-            errorMessage = "Cannot play recorded audio. Use a microphone to record audio first.";
+            errorMessage = Translation.Get(R.Messages.songEditor_error_missingRecordedAudio);
             return false;
         }
         else if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Vocals)
         {
             if (songMeta.VocalsAudio.IsNullOrEmpty())
             {
-                errorMessage = "No vocals audio found. Split the audio first.";
+                errorMessage = Translation.Get(R.Messages.songEditor_error_missingVocalsAudio);
                 return false;
             }
 
             if (!WebRequestUtils.IsHttpOrHttpsUri(songMeta.VocalsAudio)
                 && !File.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
             {
-                errorMessage = $"File does not exist: {songMeta.VocalsAudio}";
+                errorMessage = Translation.Get(R.Messages.common_error_fileNotFoundWithName,
+                    "name", songMeta.VocalsAudio);
                 return false;
             }
         }
@@ -165,19 +167,20 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         {
             if (songMeta.InstrumentalAudio.IsNullOrEmpty())
             {
-                errorMessage = "No instrumental audio found. Split the audio first.";
+                errorMessage = Translation.Get(R.Messages.songEditor_error_missingInstrumentalAudio);
                 return false;
             }
 
             if (!WebRequestUtils.IsHttpOrHttpsUri(songMeta.InstrumentalAudio)
                 && !File.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.InstrumentalAudio)))
             {
-                errorMessage = $"File does not exist: {songMeta.VocalsAudio}";
+                errorMessage = Translation.Get(R.Messages.common_error_fileNotFoundWithName,
+                    "name", songMeta.VocalsAudio);
                 return false;
             }
         }
 
-        errorMessage = "";
+        errorMessage = Translation.Empty;
         return true;
     }
 }

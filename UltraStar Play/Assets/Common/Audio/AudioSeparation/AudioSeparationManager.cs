@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -46,6 +45,13 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         Job audioSeparationJob = null)
     {
         ProcessSongMetaAsObservable(songMeta, saveSong, audioSeparationJob)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Vocals isolation failed: {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_audioSeparation_errorWithReason,
+                    "reason", ex.Message)));
+            })
             // Subscribe to trigger the observable
             .Subscribe(evt => Debug.Log($"Successfully separated audio: {evt}"));
     }
@@ -56,20 +62,13 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         Job audioSeparationJob = null)
     {
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-        string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
-        if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
-        {
-            UiManager.CreateNotification($"Vocals isolation not supported for this audio file.\n" +
-                                         $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.ToCsv(",", "", "")}");
-            return Observable.Empty<AudioSeparationResult>();
-        }
-
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
 
         // Create job to show in UI
         if (audioSeparationJob == null)
         {
-            audioSeparationJob = new Job($"Vocals isolation of '{Path.GetFileName(songMeta.Audio)}'");
+            audioSeparationJob = new Job(Translation.Get(R.Messages.job_audioSeparationWithName,
+                "name", Path.GetFileName(songMeta.Audio)));
             jobManager.AddJob(audioSeparationJob);
         }
         audioSeparationJob.SetStatus(EJobStatus.Running);
@@ -84,35 +83,45 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         CancellationTokenSource cancellationTokenSource = new();
         audioSeparationJob.OnCancel = () => cancellationTokenSource.Cancel();
 
-        // Set path to spleeter executable if needed
+        // Set path to Spleeter executable if needed
         string fallbackAudioSeparationCommand = PlatformUtils.IsWindows
             ? $"\"{ApplicationUtils.GetStreamingAssetsPath("SpleeterMsvcExe/Spleeter.exe").Replace("/", "\\")}\""
             : "";
 
-        return DoProcessSongMetaAsObservable(
-                songMeta,
-                generatedSongFolderAbsolutePath,
-                cancellationTokenSource.Token,
-                fallbackAudioSeparationCommand,
-                saveSong)
-            // Execute on Background thread
+        return Observable.Create<bool>(o =>
+                {
+                    string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
+                    if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
+                    {
+                        o.OnError(new Exception(
+                            $"Vocals isolation not supported for this audio file.\n" +
+                            $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.ToCsv(",", "", "")}"));
+                    }
+                    o.OnNext(true);
+                    o.OnCompleted();
+                    return Disposable.Empty;
+                })
+            .ContinueWith(DoProcessSongMetaAsObservable(
+                        songMeta,
+                        generatedSongFolderAbsolutePath,
+                        cancellationTokenSource.Token,
+                        fallbackAudioSeparationCommand,
+                        saveSong))
             .SubscribeOn(Scheduler.ThreadPool)
-            // Notify on Main thread
             .ObserveOnMainThread()
-            // Handle Exceptions
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Vocals isolation failed: {ex.Message}");
-                audioSeparationJob.SetResult(EJobResult.Error);
-                throw ex;
-            })
             .Select(audioSeparationResult =>
             {
                 audioSeparationJob.SetResult(EJobResult.Ok);
 
                 audioSeparationFinishedEventStream.OnNext(new AudioSeparationFinishedEvent(songMeta));
                 return audioSeparationResult;
+            })
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Vocals isolation failed: {ex.Message}");
+                audioSeparationJob.SetResult(EJobResult.Error);
+                throw ex;
             });
     }
 
@@ -124,7 +133,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     {
         if (audioSeparationProcessCount > 0)
         {
-            UiManager.CreateNotification("Already performing vocals isolation");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
             return Observable.Throw<AudioSeparationResult>(new IllegalStateException("Already performing vocals isolation"));
         }
 

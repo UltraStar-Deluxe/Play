@@ -69,9 +69,9 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
         SearchResultEventStream.Subscribe(evt =>
         {
             lastSearchResult = evt;
-            searchResultLabel.text = evt.SearchText.IsNullOrEmpty()
-                ? ""
-                : $"{evt.MatchingNotes.Count} matches";
+            searchResultLabel.SetTranslatedText(evt.SearchText.IsNullOrEmpty()
+                ? Translation.Empty
+                : Translation.Get(R.Messages.songEditor_search_matchCount, "value", evt.MatchingNotes.Count));
         });
 
         VisualElementUtils.RegisterDirectClickCallback(searchOverlay, () => HideSearchOverlay());
@@ -156,7 +156,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
             int indexOfNote = matchingNotes.IndexOf(note);
             if (indexOfNote >= 0)
             {
-                searchResultLabel.text = $"{indexOfNote + 1} / {matchingNotes.Count}";
+                searchResultLabel.SetTranslatedText(Translation.Of($"{indexOfNote + 1} / {matchingNotes.Count}"));
             }
         }
     }
@@ -207,7 +207,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
             catch (Exception e)
             {
                 Debug.LogException(e);
-                searchResultLabel.text = "Invalid search syntax";
+                searchResultLabel.SetTranslatedText(Translation.Get(R.Messages.songEditor_search_invalidSyntax));
             }
         });
 

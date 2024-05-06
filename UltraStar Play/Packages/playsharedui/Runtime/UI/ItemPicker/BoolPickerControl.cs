@@ -1,21 +1,14 @@
 ﻿using System.Collections.Generic;
-using ProTrans;
 
 public class BoolPickerControl : LabeledItemPickerControl<bool>
 {
     public BoolPickerControl(ItemPicker itemPicker)
-        : base(itemPicker, new List<bool> { false, true })
+        : base(itemPicker,
+            new List<bool> { false, true },
+            item => item
+                ? Translation.Get("yes")
+                : Translation.Get("no"))
     {
-        GetLabelTextFunction = item =>
-        {
-            if (item)
-            {
-                return TranslationManager.GetTranslation("yes");
-            }
-            else
-            {
-                return TranslationManager.GetTranslation("no");
-            }
-        };
+
     }
 }

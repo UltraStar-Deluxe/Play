@@ -11,7 +11,7 @@ public class ColorPickerControl : PicturedItemPickerControl<Color32>
 
     public override void UpdateImageElement(Color32 item)
     {
-        ItemPicker.ItemLabel.text = "";
+        ItemPicker.ItemLabel.SetTranslatedText(Translation.Empty);
         ItemPicker.ItemLabel.style.backgroundColor = new StyleColor(item);
     }
 

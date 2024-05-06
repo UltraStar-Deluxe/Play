@@ -59,13 +59,13 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     private Label sceneTitle;
 
     private PartyModeSettings PartyModeSettings => sceneData.PartyModeSettings;
-    
+
     private readonly PartyModeTeamConfigControl teamConfigControl = new();
     private readonly PartyModeSongSelectionConfigControl songSelectionConfigControl = new();
 
     public void OnInjectionFinished()
     {
-        songMetaManager.ScanFilesIfNotDoneYet();
+        songMetaManager.ScanSongsIfNotDoneYet();
 
         InitPartyModeSettings();
 
@@ -115,26 +115,26 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private void OnContinue()
     {
-        string errorMessage;
-        
+        Translation errorMessage;
+
         errorMessage = GetSongSelectionConfigErrorMessage();
-        if (!errorMessage.IsNullOrEmpty())
+        if (!errorMessage.Value.IsNullOrEmpty())
         {
-            UiManager.CreateNotification(errorMessage);
+            NotificationManager.CreateNotification(errorMessage);
             return;
         }
-        
+
         errorMessage = GetTeamsConfigErrorMessage();
-        if (!errorMessage.IsNullOrEmpty())
+        if (!errorMessage.Value.IsNullOrEmpty())
         {
-            UiManager.CreateNotification(errorMessage);
+            NotificationManager.CreateNotification(errorMessage);
             return;
         }
 
         errorMessage = GetRoundsConfigErrorMessage();
-        if (!errorMessage.IsNullOrEmpty())
+        if (!errorMessage.Value.IsNullOrEmpty())
         {
-            UiManager.CreateNotification(errorMessage);
+            NotificationManager.CreateNotification(errorMessage);
             return;
         }
 
@@ -145,7 +145,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     {
         // Select all enabled player profiles for singing
         settings.PlayerProfiles.ForEach(playerProfile => playerProfile.IsSelected = playerProfile.IsEnabled);
-        
+
         // Reset scene data
         sceneData.teamToIsKnockedOutMap.Clear();
         sceneData.freeForAllPlayerToTeam.Clear();
@@ -159,38 +159,38 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 
-    private string GetSongSelectionConfigErrorMessage()
+    private Translation GetSongSelectionConfigErrorMessage()
     {
         if (PartyModeSettings.SongSelectionSettings.SongPoolPlaylist == null
             || PartyModeSettings.SongSelectionSettings.SongPoolPlaylist.IsEmpty)
         {
-            return "Selected playlist is empty";
+            return Translation.Get(R.Messages.partyMode_error_emptyPlaylist);
         }
 
-        return "";
+        return Translation.Empty;
     }
 
-    private string GetTeamsConfigErrorMessage()
+    private Translation GetTeamsConfigErrorMessage()
     {
         if (PartyModeSettings.TeamSettings.Teams.Count < 1)
         {
-            return "Must use at least one teams";
+            return Translation.Get(R.Messages.partyMode_error_tooFewTeams);
         }
 
         if (PartyModeSettings.TeamSettings.Teams
             .AnyMatch(team => team.playerProfiles.IsNullOrEmpty() && team.guestPlayerProfiles.IsNullOrEmpty()))
         {
-            return "Each team must have at least one player";
+            return Translation.Get(R.Messages.partyMode_error_tooFewPlayers);
         }
 
-        return "";
+        return Translation.Empty;
     }
 
-    private string GetRoundsConfigErrorMessage()
+    private Translation GetRoundsConfigErrorMessage()
     {
         if (PartyModeSettings.RoundCount <= 0)
         {
-            return "Must play at least one round";
+            return Translation.Get(R.Messages.partyMode_error_tooFewRounds);
         }
 
         if (PartyModeSettings.TeamSettings.IsKnockOutTournament)
@@ -203,7 +203,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
                     .Sum();
                 if (PartyModeSettings.RoundCount >= playerCount)
                 {
-                    return "Too many rounds for knock-out tournament";
+                    return Translation.Get(R.Messages.partyMode_error_tooManyRoundsForKo);
                 }
             }
             else
@@ -212,12 +212,12 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
                 int teamCount = PartyModeSettings.TeamSettings.Teams.Count;
                 if (PartyModeSettings.RoundCount >= teamCount)
                 {
-                    return "Too many rounds for knock-out tournament";
+                    return Translation.Get(R.Messages.partyMode_error_tooManyRoundsForKo);
                 }
             }
         }
 
-        return "";
+        return Translation.Empty;
     }
 
     private void AddPlayerProfilesToTeams(bool guests)

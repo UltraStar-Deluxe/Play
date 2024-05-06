@@ -1,40 +1,30 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using UniRx;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
 public class SongMetaManager : AbstractSingletonBehaviour
 {
     private const int LazyLoadingSongRecommendationThresholdCount = 500;
-    private static readonly object scanLock = new();
-
-    // The collection of songs is static to be persisted across scenes.
-    // The collection is filled with song datas from a background thread, thus a thread-safe collection is used.
-    private static ConcurrentBag<SongMeta> allSongMetas = new();
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        ResetSongMetas();
-    }
 
     public static SongMetaManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongMetaManager>();
 
-    // Static to be persisted across scenes.
-    private static bool isSongScanStarted;
-    private static bool isSongScanFinished;
-    public static bool IsSongScanFinished => isSongScanFinished;
+    private ConcurrentBag<SongMeta> allSongMetas = new();
 
-    private static int targetSongCount;
-    public static int LoadedSongsCount => allSongMetas.Count;
-    public static double LoadedSongsPercent
+    // Static to be persisted across scenes.
+    private bool isSongScanStarted;
+    private bool isSongScanFinished;
+    public bool IsSongScanFinished => isSongScanFinished;
+
+    private int targetSongCount;
+    public int LoadedSongsCount => allSongMetas.Count;
+    public double LoadedSongsPercent
     {
         get
         {
@@ -53,47 +43,35 @@ public class SongMetaManager : AbstractSingletonBehaviour
     }
 
     private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new();
-    public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
+    public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream
+        .ObserveOnMainThread();
 
     private readonly Subject<SongMeta> addedSongMetaEventStream = new();
-    public IObservable<SongMeta> AddedSongMetaEventStream => addedSongMetaEventStream;
+    public IObservable<SongMeta> AddedSongMetaEventStream => addedSongMetaEventStream
+        .ObserveOnMainThread();
 
     [InjectedInAwake]
     private Settings settings;
 
     private List<string> EnabledSongFolders => SettingsUtils.GetEnabledSongFolders(settings);
 
-    private static CancellationTokenSource songScanCancellationTokenSource;
-
-    private static void ResetSongMetas()
-    {
-        lock (scanLock)
-        {
-            targetSongCount = 0;
-            allSongMetas = new ConcurrentBag<SongMeta>();
-            isSongScanStarted = false;
-            isSongScanFinished = false;
-        }
-    }
+    private CancellationTokenSource songScanCancellationTokenSource;
 
     protected override object GetInstance()
     {
         return Instance;
     }
 
-    public void ReloadSongMetas()
+    public void RescanSongs()
     {
-        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
-        ThreadPool.QueueUserWorkItem(_ =>
-        {
-            CancelSongScanIfRunning();
+        CancelSongScan();
 
-            lock (scanLock)
-            {
-                ResetSongMetas();
-                DoScanFilesIfNotDoneYet(generatedSongFolderAbsolutePath);
-            }
-        });
+        targetSongCount = 0;
+        allSongMetas = new ConcurrentBag<SongMeta>();
+        isSongScanStarted = false;
+        isSongScanFinished = false;
+
+        ScanSongsIfNotDoneYet();
     }
 
     protected override void AwakeSingleton()
@@ -135,228 +113,114 @@ public class SongMetaManager : AbstractSingletonBehaviour
         return allSongMetas;
     }
 
-    public void ScanFilesIfNotDoneYet()
+    public void ScanSongsIfNotDoneYet()
     {
-        DoScanFilesIfNotDoneYet(SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings));
-    }
-
-    private void DoScanFilesIfNotDoneYet(string generatedSongFolderAbsolutePath)
-    {
-        // First check. If the songs have been scanned already,
-        // then this will quickly return and allows multiple threads access.
-        if (!isSongScanStarted)
+        if (isSongScanStarted
+            || this != Instance)
         {
-            // The songs have not been scanned. Only one thread must perform the scan action.
-            lock (scanLock)
-            {
-                // From here on, reading and writing the isInitialized flag can be considered atomic.
-                // Second check. If multiple threads attempted to scan for songs (they passed the first check),
-                // then only the first of these threads will start the scan.
-                if (!isSongScanStarted)
-                {
-                    isSongScanStarted = true;
-                    isSongScanFinished = false;
-                    songScanCancellationTokenSource?.Cancel();
-                    songScanCancellationTokenSource = new();
-                    ScanFilesAsynchronously(generatedSongFolderAbsolutePath, songScanCancellationTokenSource.Token);
-                }
-            }
+            return;
         }
-    }
-
-    private void ScanFilesAsynchronously(string generatedSongFolderAbsolutePath, CancellationToken cancellationToken)
-    {
-        Debug.Log("Starting song scan");
 
         // Update supported file formats when ffmpeg is (not) used.
         ApplicationUtils.UseFfmpegToPlayMediaFiles = settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never;
         ApplicationUtils.UseVlcToPlayMediaFiles = settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never;
 
-        // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
-        // Thus, use the static instance.
-        InitFolderIfNotDoneYet(generatedSongFolderAbsolutePath);
+        isSongScanStarted = true;
+        isSongScanFinished = false;
+        songScanCancellationTokenSource?.Cancel();
+        songScanCancellationTokenSource = new();
+        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
+        Task.Run(async () => await ScanSongsAsync(generatedSongFolderAbsolutePath, songScanCancellationTokenSource.Token));
+    }
 
-        if (cancellationToken.IsCancellationRequested)
+    private async Task ScanSongsAsync(string generatedSongFolderAbsolutePath, CancellationToken cancellationToken)
+    {
+        Debug.Log($"Started song scan on thread {Thread.CurrentThread.ManagedThreadId}");
+        using DisposableStopwatch d = new($"Finished song-scan-thread after <ms> ms. Found {allSongMetas.Count} songs.");
+
+        try
         {
-            return;
+            DirectoryUtils.CreateDirectory(generatedSongFolderAbsolutePath);
+
+            // Find all txt and audio files in configured song folders and the generated song folder
+            List<string> allSongFolders = EnabledSongFolders
+                .Union(new List<string> { generatedSongFolderAbsolutePath })
+                .ToList();
+
+            await Task.WhenAll(allSongFolders
+                .Select(songFolder => ScanFolderAsync(songFolder, cancellationToken)));
         }
-
-        // Load the txt files in a background thread
-        ThreadPool.QueueUserWorkItem(poolHandle =>
+        catch (Exception ex)
         {
-            Stopwatch stopwatch = new();
-            stopwatch.Start();
-
-            Debug.Log("Started song-scan-thread.");
-
-            lock (scanLock)
-            {
-                // Find all txt and audio files in configured song folders and the generated song folder
-                List<string> allSongFolders = EnabledSongFolders
-                    .Union(new List<string> { generatedSongFolderAbsolutePath })
-                    .ToList();
-                List<string> txtFiles = FileScannerUtils.ScanForFiles(allSongFolders, new List<string> { "*.txt" });
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return;
-                }
-                targetSongCount += txtFiles.Count;
-
-                // Show notification to the user when switching to lazy loading of songs is recommended.
-                if (targetSongCount > LazyLoadingSongRecommendationThresholdCount
-                    && settings.SongDataFetchType is EFetchType.Eager)
-                {
-                    UiManager.CreateNotification($"Configure on-demand loading\nof songs for faster setup.");
-                }
-
-                if (!cancellationToken.IsCancellationRequested)
-                {
-                    LoadAndAddSongMetasFromTxtFiles(txtFiles, cancellationToken);
-                }
-
-                // Only search for audio and midi files in configured song folders, not in the generated song folder
-                if (settings.SearchMidiFilesWithLyrics)
-                {
-                    List<string> midiFiles = FileScannerUtils.ScanForFiles(EnabledSongFolders, GetMidiFileExtensionPatterns());
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
-                    if (!cancellationToken.IsCancellationRequested)
-                    {
-                        // Generate song meta for audio files that do not have a corresponding SongMeta.
-                        GenerateSongMetasForAudioFiles(generatedSongFolderAbsolutePath, midiFiles, allSongMetas.ToList());
-                    }
-                }
-
-                isSongScanFinished = true;
-            }
-
-            stopwatch.Stop();
-            Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms. Loaded {allSongMetas.Count} songs.");
-
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to scan songs: {ex.Message}");
+        }
+        finally
+        {
+            isSongScanFinished = true;
             songScanFinishedEventStream.OnNext(new SongScanFinishedEvent(allSongMetas.Count));
-        });
+        }
     }
 
-    private void GenerateSongMetasForAudioFiles(
-        string generatedSongFolderAbsolutePath,
-        List<string> audioFiles,
-        List<SongMeta> existingSongMetas)
+    private async Task ScanFolderAsync(string folder, CancellationToken cancellationToken)
     {
-        if (audioFiles.IsNullOrEmpty())
+        Debug.Log($"Scan songs in folder '{folder}' on thread {Thread.CurrentThread.ManagedThreadId}");
+
+        await Task.WhenAll(
+            ScanTxtFilesAsync(folder, cancellationToken),
+            ScanMidiFilesAsync(folder, cancellationToken));
+    }
+
+    private async Task ScanTxtFilesAsync(string folder, CancellationToken cancellationToken)
+    {
+        List<string> txtFiles = FileScannerUtils.ScanForFiles(new List<string> { folder }, new List<string> { "*.txt" });
+        cancellationToken.ThrowIfCancellationRequested();
+
+        targetSongCount += txtFiles.Count;
+        // Show notification to the user when switching to lazy loading of songs is recommended.
+        if (targetSongCount > LazyLoadingSongRecommendationThresholdCount
+            && settings.SongDataFetchType is EFetchType.Upfront)
+        {
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_configureOnDemandSongLoading));
+        }
+
+        await LoadTxtFilesAsync(txtFiles, cancellationToken);
+    }
+
+    private async Task ScanMidiFilesAsync(string folder, CancellationToken cancellationToken)
+    {
+        if (!settings.SearchMidiFilesWithLyrics)
         {
             return;
         }
 
-        // Exclude audio files that are used in UltraStar txt files
-        List<string> existingSongMetaAudioFiles = existingSongMetas
-            .SelectMany(songMeta => GetAbsoluteAudioFilePaths(songMeta))
-            .ToList();
-
-        // Exclude audio files that are stored next to an UltraStar txt file
-        HashSet<string> existingSongMetaFolders = existingSongMetas
-            .Select(songMeta =>
-            {
-                string directoryPath = SongMetaUtils.GetDirectoryPath(songMeta);
-                if (directoryPath.IsNullOrEmpty())
-                {
-                    return "";
-                }
-                return new DirectoryInfo(directoryPath).FullName;
-            })
-            .ToHashSet();
-
-        List<string> audioFilesWithoutSongMeta = audioFiles
-            .Where(audioFile =>
-            {
-                bool isGeneratedAudioFile = ApplicationUtils.IsGeneratedAudioFile(audioFile);
-                bool isNextToExistingSongMeta = existingSongMetaFolders.Contains(new FileInfo(audioFile).Directory.FullName);
-                return !isGeneratedAudioFile && !isNextToExistingSongMeta;
-            })
-            .Select(audioFile => PathUtils.NormalizePath(Path.GetFullPath(audioFile)))
-            .Except(existingSongMetaAudioFiles)
-            .ToList();
-
-        Debug.Log($"Found {audioFilesWithoutSongMeta.Count} audio files without corresponding SongMeta");
-
-        List<SongMeta> generatedSongMetas = audioFilesWithoutSongMeta
-            .Select(audioFile => GenerateSongMetaForAudioFile(generatedSongFolderAbsolutePath, audioFile))
-            .Where(generatedSongMeta => generatedSongMeta != null)
-            .ToList();
-
-        generatedSongMetas.ForEach(songMeta => AddSongMeta(songMeta));
+        List<string> midiFiles = FileScannerUtils.ScanForFiles(new List<string> { folder }, GetMidiFileExtensionPatterns());
+        await LoadMidiFilesAsync(midiFiles, cancellationToken);
     }
 
-    private List<string> GetAbsoluteAudioFilePaths(SongMeta songMeta)
+    private async Task LoadMidiFileAsync(string midiFile, CancellationToken cancellationToken)
     {
-        List<string> result = new List<string>();
+        Log.Verbose(() => $"Load '{Path.GetFileName(midiFile)}' on thread {Thread.CurrentThread.ManagedThreadId}");
+        cancellationToken.ThrowIfCancellationRequested();
 
-        void TryAddAudioFilePath(string audioFilePath)
-        {
-            if (SongMetaUtils.ResourceExists(songMeta, audioFilePath))
-            {
-                string absoluteFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, audioFilePath);
-                result.Add(PathUtils.NormalizePath(absoluteFilePath));
-            }
-        }
-
-        TryAddAudioFilePath(songMeta.Audio);
-        TryAddAudioFilePath(songMeta.VocalsAudio);
-        TryAddAudioFilePath(songMeta.InstrumentalAudio);
-
-        return result
-            .Distinct()
-            .ToList();
-    }
-
-    private SongMeta GenerateSongMetaForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
-    {
-        if (!AudioFileMetaTagUtils.TryGetArtist(audioFile, out string artist))
+        if (!AudioFileMetaTagUtils.TryGetArtist(midiFile, out string artist))
         {
             artist = "";
         }
-        if (!AudioFileMetaTagUtils.TryGetTitle(audioFile, out string title))
+        if (!AudioFileMetaTagUtils.TryGetTitle(midiFile, out string title))
         {
-            title = Path.GetFileNameWithoutExtension(audioFile);
+            title = Path.GetFileNameWithoutExtension(midiFile);
         }
 
-        // TODO: use https://github.com/WestHillApps/UniBpmAnalyzer to analyze bpm
-        // TODO: use https://github.com/Zeugma440/atldotnet to read meta tags.
         float txtFileBpm = 300;
-
         Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
-
-        SongMeta songMeta;
-
-        string fileExtension = Path.GetExtension(new Uri(audioFile).LocalPath);
-        if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
-        {
-            // Load lyrics and notes from MIDI file
-            songMeta = new MidiFileSongMeta(
-                artist,
-                title,
-                txtFileBpm,
-                audioFile,
-                voiceIdToDisplayName);
-        }
-        else
-        {
-            songMeta = new UltraStarSongMeta(
-                artist,
-                title,
-                txtFileBpm,
-                audioFile,
-                voiceIdToDisplayName);
-        }
-
-        string absoluteSongMetaFilePath = GetAbsoluteGeneratedSongMetaFilePathForAudioFile(generatedSongFolderAbsolutePath, audioFile);
-        songMeta.SetFileInfo(absoluteSongMetaFilePath);
-
-
-        Debug.Log("Generated SongMeta: " + songMeta);
-        return songMeta;
+        MidiFileSongMeta songMeta = new MidiFileSongMeta(
+            artist,
+            title,
+            txtFileBpm,
+            midiFile,
+            voiceIdToDisplayName);
+        AddSongMeta(songMeta);
     }
 
     public static string GetAbsoluteGeneratedSongMetaFilePathForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
@@ -371,48 +235,27 @@ public class SongMetaManager : AbstractSingletonBehaviour
             .ToList();
     }
 
-    private void InitFolderIfNotDoneYet(string path)
+    private async Task LoadTxtFilesAsync(List<string> txtFiles, CancellationToken cancellationToken)
     {
-        if (!Directory.Exists(path))
-        {
-            Debug.Log("Creating folder: " + path);
-            Directory.CreateDirectory(path);
-        }
+        Log.Verbose(() => $"Load {txtFiles.Count} txt files on thread {Thread.CurrentThread.ManagedThreadId}");
+        cancellationToken.ThrowIfCancellationRequested();
+
+        await Task.WhenAll(txtFiles
+            .Select(txtFile => LoadTxtFileAsync(txtFile, cancellationToken)));
     }
 
-    private void LoadAndAddSongMetasFromTxtFiles(List<string> txtFiles, CancellationToken cancellationToken)
+    private async Task LoadMidiFilesAsync(List<string> midiFiles, CancellationToken cancellationToken)
     {
-        foreach (string path in txtFiles)
-        {
-            if (TryLoadSongMetaFromFile(path, out SongMeta newSongMeta, out List<SongIssue> newSongIssues))
-            {
-                AddSongMeta(newSongMeta);
-            }
+        Log.Verbose(() => $"Load {midiFiles.Count} MIDI files on thread {Thread.CurrentThread.ManagedThreadId}");
+        cancellationToken.ThrowIfCancellationRequested();
 
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-        }
-    }
-
-    private void LoadSongMetasFromTxtFiles(List<string> txtFiles, out List<SongMeta> songMetas, out List<SongIssue> songIssues)
-    {
-        songMetas = new();
-        songIssues = new();
-        foreach (string path in txtFiles)
-        {
-            if (TryLoadSongMetaFromFile(path, out SongMeta newSongMeta, out List<SongIssue> newSongIssues))
-            {
-                songMetas.Add(newSongMeta);
-            }
-            songIssues.AddRange(newSongIssues);
-        }
+        await Task.WhenAll(midiFiles
+            .Select(midiFile => LoadMidiFileAsync(midiFile, cancellationToken)));
     }
 
     public void WaitUntilSongScanFinished()
     {
-        ScanFilesIfNotDoneYet();
+        ScanSongsIfNotDoneYet();
         float startTimeInSeconds = Time.time;
         float timeoutInSeconds = 2;
         while ((startTimeInSeconds + timeoutInSeconds) > Time.time)
@@ -426,61 +269,39 @@ public class SongMetaManager : AbstractSingletonBehaviour
         Debug.LogError("Song scan did not finish - timeout reached.");
     }
 
-    public bool TryLoadAndAddSongMetasFromFolder(string songFolder, out List<SongMeta> songMetas, out List<SongIssue> songIssues)
+    private async Task LoadTxtFileAsync(string txtFile, CancellationToken cancellationToken)
     {
-        songMetas = new List<SongMeta>();
-        songIssues = new List<SongIssue>();
-        if (!Directory.Exists(songFolder))
-        {
-            return false;
-        }
+        Log.Verbose(() => $"Load '{Path.GetFileName(txtFile)}' on thread {Thread.CurrentThread.ManagedThreadId}");
+        cancellationToken.ThrowIfCancellationRequested();
 
-        FileScanner txtScanner = new("*.txt", true, true);
-        List<string> txtFiles = txtScanner.GetFiles(songFolder, true);
-
-        LoadSongMetasFromTxtFiles(txtFiles, out List<SongMeta> newSongMetas, out List<SongIssue> newSongIssues);
-        AddSongMetas(newSongMetas);
-
-        songMetas.AddRange(newSongMetas);
-        newSongIssues.AddRange(newSongIssues);
-
-        return true;
-    }
-
-    private bool TryLoadSongMetaFromFile(string path, out SongMeta songMeta, out List<SongIssue> songIssues)
-    {
-        string fileName = Path.GetFileName(path);
+        string fileName = Path.GetFileName(txtFile);
         List<string> ignoredFileNames = new() { "license.txt" };
         if (ignoredFileNames.AnyMatch(ignoredFileName => string.Equals(fileName, ignoredFileName)))
         {
-            songMeta = null;
-            songIssues = new List<SongIssue>();
-            return false;
+            return;
         }
 
-        songIssues = new List<SongIssue>();
         try
         {
-            LazyLoadedFromFileSongMeta newSongMeta = new LazyLoadedFromFileSongMeta(path);
-            if (settings.SongDataFetchType is EFetchType.Eager)
+            LazyLoadedFromFileSongMeta songMeta = new LazyLoadedFromFileSongMeta(txtFile);
+            if (settings.SongDataFetchType is EFetchType.Upfront)
             {
-                newSongMeta.LoadSongIfNotDoneYet();
+                songMeta.LoadSongIfNotDoneYet();
             }
-            songMeta = newSongMeta;
-            return true;
+
+            AddSongMeta(songMeta);
         }
         catch (UltraStarSongParserException e)
         {
-            Debug.LogError($"{nameof(UltraStarSongParserException)}: " + path + "\n" + e.Message);
+            Debug.LogError($"{nameof(UltraStarSongParserException)}: " + txtFile + "\n" + e.Message);
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.LogError($"Failed to load {path}");
+            Debug.LogError($"Failed to load {txtFile}");
         }
 
-        songMeta = null;
-        return false;
+        return;
     }
 
     public void SaveSong(SongMeta songMeta, bool isAutoSave)
@@ -497,8 +318,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
         try
         {
             // Write the song data structure to the file.
-            Debug.Log($"Saving song {songFilePath}");
-            UltraStarFormatWriter.WriteFile(songFilePath, songMeta, settings.WriteUltraStarTxtFileWithByteOrderMark);
+            UltraStarSongFormatVersion version = SettingsUtils.GetUltraStarSongFormatVersionForSave(settings, songMeta.Version);
+            Debug.Log($"Saving song {songFilePath} using UltraStar format version {version.StringValue}");
+            UltraStarFormatWriter.WriteFile(songFilePath, songMeta, version, settings.WriteUltraStarTxtFileWithByteOrderMark);
 
             // Update creation and modification time
             songMeta.FileInfo?.Refresh();
@@ -506,13 +328,14 @@ public class SongMetaManager : AbstractSingletonBehaviour
         catch (Exception e)
         {
             Debug.LogException(e);
-            UiManager.CreateNotification("Saving the file failed:\n" + e.Message);
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_save,
+                "reason", e.Message));
             return;
         }
 
         if (!isAutoSave)
         {
-            UiManager.CreateNotification("Saved file");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_saveSuccess));
         }
     }
 
@@ -574,16 +397,16 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     protected override void OnDestroySingleton()
     {
-        CancelSongScanIfRunning();
+        CancelSongScan();
     }
 
-    private void CancelSongScanIfRunning()
+    private void CancelSongScan()
     {
         if (isSongScanStarted
             && !isSongScanFinished
             && songScanCancellationTokenSource != null)
         {
-            Debug.Log($"Cancelling song-scan-thread.");
+            Debug.Log($"Cancelling song scan");
             songScanCancellationTokenSource.Cancel();
         }
     }

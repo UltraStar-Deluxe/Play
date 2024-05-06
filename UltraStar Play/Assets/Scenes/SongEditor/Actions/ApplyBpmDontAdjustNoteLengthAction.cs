@@ -23,7 +23,8 @@ public class ApplyBpmDontAdjustNoteLengthAction : INeedInjection
 
         if (newBpm <= 60)
         {
-            UiManager.CreateNotification("New BPM is set much too low.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", "value too low"));
             return;
         }
 

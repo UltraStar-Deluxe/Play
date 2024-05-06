@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using ProTrans;
 using UniInject;
 using UniRx;
-using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
@@ -55,8 +53,8 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
                 connectedClientList.Add(CreateClientEntry(clientHandler));
             });
 
-        connectedClientCountLabel.text = TranslationManager.GetTranslation(R.Messages.options_connectedClientCount,
-            "count", serverSideConnectRequestManager.ConnectedClientCount);
+        connectedClientCountLabel.SetTranslatedText(Translation.Get(R.Messages.options_connectedClientCount,
+            "count", serverSideConnectRequestManager.ConnectedClientCount));
 
         bool noConnectedClients = serverSideConnectRequestManager.ConnectedClientCount <= 0;
         noConnectedClientsContainer.SetVisibleByDisplay(noConnectedClients);
@@ -79,21 +77,5 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
         return visualElement;
     }
 
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
-    {
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_features_title),
-                TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_features) },
-            { TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_install_title),
-                TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_install) },
-        };
-        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_title),
-            titleToContentMap);
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToCompanionApp)));
-        return helpDialogControl;
-    }
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToCompanionApp);
 }

@@ -5,64 +5,64 @@
             <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton">
                 <MaterialIcon name="playIcon" icon="play_arrow" />
                 <MaterialIcon name="pauseIcon" icon="pause" />
-                <ui:Label text="Play / Pause" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_togglePlayback" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleRecordingButton">
                 <MaterialIcon name="icon" icon="mic" />
-                <ui:Label text="Record" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_record" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="audioSeparationButton">
                 <MaterialIcon name="icon" icon="call_split" />
-                <ui:Label text="Split Audio" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_splitAudio" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="pitchDetectionUsingBasicPitchButton">
                 <MaterialIcon name="icon" icon="timeline" />
-                <ui:Label text="Analyze Pitch" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_analyzePitch" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleIssuesButton">
                 <MaterialIcon name="icon" icon="warning" class="rounded" />
-                <ui:Label text="Issues" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_issues" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleSongPropertiesButton">
                 <MaterialIcon name="icon" icon="queue_music" class="rounded" />
-                <ui:Label text="Properties" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_songProperties" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleLayersButton">
                 <MaterialIcon name="icon" icon="layers" class="rounded" />
-                <ui:Label text="Layers" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_layers" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleSettingsButton">
                 <MaterialIcon name="icon" icon="settings" class="rounded" />
-                <ui:Label text="Settings" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_settings" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleHelpButton">
                 <MaterialIcon name="icon" icon="help_outline" class="rounded" />
-                <ui:Label text="Help" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_help" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="openSongFolderButton">
                 <MaterialIcon name="icon" icon="folder" class="rounded" />
-                <ui:Label text="Folder" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_folder" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="undoButton">
                 <MaterialIcon name="icon" icon="undo" class="rounded" />
-                <ui:Label text="Undo" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_undo" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="redoButton">
                 <MaterialIcon name="icon" icon="redo" class="rounded" />
-                <ui:Label text="Redo" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_redo" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="saveButton">
                 <MaterialIcon name="icon" icon="save" class="rounded" />
-                <ui:Label text="Save" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_save" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="exitSceneButton">
                 <MaterialIcon name="icon" icon="arrow_back" class="rounded" />
-                <ui:Label text="Back" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_back" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleSideBarSizeButton">
                 <MaterialIcon name="wideIcon" icon="unfold_less" class="rounded invertedVisibility" style="rotate: 90deg;" />
                 <MaterialIcon name="smallIcon" icon="unfold_more" class="rounded" style="rotate: 90deg;" />
-                <ui:Label text="Shrink" display-tooltip-when-elided="true" name="label" />
+                <ui:Label text="$songEditor_sideBar_shrink" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
         </ui:ScrollView>
     </ui:VisualElement>

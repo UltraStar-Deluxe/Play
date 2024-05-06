@@ -7,7 +7,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class SongListControl : INeedInjection, IInjectionFinishedListener, ITranslator, IDisposable
+public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
     private IComparer<SongDto> songDtoComparer = new SongListSongDtoComparer();
 
@@ -278,12 +278,12 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
     public void UpdateTranslation()
     {
         // Search text field hint
-        string searchPropertiesText = new List<string>
+        string searchPropertiesCsv = new List<Translation>
         {
-            TranslationManager.GetTranslation(R.Messages.songProperty_artist),
-            TranslationManager.GetTranslation(R.Messages.songProperty_title),
+            Translation.Get(R.Messages.enum_SongProperty_Artist),
+            Translation.Get(R.Messages.enum_SongProperty_Title),
         }.ToCsv(", ", "", "");
-        songSearchHint.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchTextFieldHint, "properties", searchPropertiesText);
+        songSearchHint.SetTranslatedText(Translation.Of($"Search in {searchPropertiesCsv}"));
     }
 
     public void Show()

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
-using ProTrans;
 using SteamOnlineMultiplayer;
 using UniInject;
 using UniRx;
@@ -13,7 +12,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, ITranslator, IBinder
+public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IBinder
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -207,12 +206,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             .Subscribe(_ => OnBack());
     }
 
-    public void UpdateTranslation()
-    {
-        startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
-        partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
-    }
-
     public void CloseQuitGameDialog()
     {
         if (quitGameDialogControl == null)
@@ -232,12 +225,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             return;
         }
 
-        quitGameDialogControl = uiManager.CreateDialogControl(TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title));
+        quitGameDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_quitDialog_title));
         quitGameDialogControl.DialogClosedEventStream.Subscribe(_ => quitGameDialogControl = null);
-        quitGameDialogControl.Message = $"\n{TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message)}\n";
+        quitGameDialogControl.Message = Translation.Get(R.Messages.mainScene_quitDialog_message);
 
-        quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ => CloseQuitGameDialog());
-        quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ => ApplicationUtils.QuitOrStopPlayMode());
+        quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_quit), _ => CloseQuitGameDialog());
+        quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_cancel), _ => ApplicationUtils.QuitOrStopPlayMode());
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(quitGameDialogControl.DialogRootVisualElement);
     }

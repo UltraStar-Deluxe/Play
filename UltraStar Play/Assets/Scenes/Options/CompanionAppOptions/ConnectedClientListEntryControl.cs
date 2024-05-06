@@ -6,22 +6,22 @@ public class ConnectedClientListEntryControl : INeedInjection, IInjectionFinishe
 {
     [Inject]
     private IConnectedClientHandler clientHandler;
-    
+
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
-    
+
     [Inject(UxmlName = R.UxmlNames.clientNameLabel)]
     private Label clientNameLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.permissionsContainer)]
     private VisualElement permissionsContainer;
-    
+
     public void OnInjectionFinished()
     {
-        clientNameLabel.text = clientHandler.ClientName;
+        clientNameLabel.SetTranslatedText(Translation.Of(clientHandler.ClientName));
         UpdatePermissions();
     }
 
@@ -58,7 +58,7 @@ public class ConnectedClientListEntryControl : INeedInjection, IInjectionFinishe
                     Permissions = permissions,
                 });
             });
-            
+
             permissionsContainer.Add(permissionToggle);
         });
     }

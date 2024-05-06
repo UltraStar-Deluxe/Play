@@ -58,17 +58,16 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         if (lastProcessSongJob != null
             && lastProcessSongJob.Result.Value == EJobResult.Pending)
         {
-            string errorMessage = "Already processing a song.\nWait until the running tasks have finished.";
-            Debug.LogError(errorMessage);
-            UiManager.CreateNotification(errorMessage);
+            Debug.LogError("Already processing a song");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
             return Observable.Empty<SongMeta>();
         }
         Debug.Log($"Creating sing-along data song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
 
-        Job processSongJob = new($"Create sing-along version of '{Path.GetFileName(songMeta.Audio)}'");
-        Job audioSeparationJob = new("Vocals isolation", processSongJob);
-        Job speechRecognitionJob = new("Speech recognition", processSongJob);
-        Job pitchDetectionJob = new("Pitch detection", processSongJob);
+        Job processSongJob = new(Translation.Get(R.Messages.job_createSingAlongDataWithName, "name", Path.GetFileName(songMeta.Audio)));
+        Job audioSeparationJob = new(Translation.Get(R.Messages.job_audioSeparation), processSongJob);
+        Job speechRecognitionJob = new(Translation.Get(R.Messages.job_speechRecognition), processSongJob);
+        Job pitchDetectionJob = new(Translation.Get(R.Messages.job_pitchDetection), processSongJob);
 
         lastProcessSongJob = processSongJob;
 
@@ -94,9 +93,9 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
-                string errorMessage = $"Failed to create sing-along data.\n{ex.Message}";
-                Debug.Log(errorMessage);
-                UiManager.CreateNotification(errorMessage);
+                Debug.Log($"Failed to create sing-along data: {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
 
                 audioSeparationJob.SetResult(EJobResult.Error);
                 speechRecognitionJob.SetResult(EJobResult.Error);
@@ -134,7 +133,8 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 Debug.LogError($"Create sing-along song failed: {ex.Message}");
                 speechRecognitionJob.SetResult(EJobResult.Error);
                 pitchDetectionJob.SetResult(EJobResult.Error);
-                UiManager.CreateNotification(ex.Message);
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
             })
             .SelectMany(localCreatedNotes =>
             {
@@ -161,18 +161,17 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             {
                 pitchDetectionJob.SetResult(EJobResult.Error);
                 Debug.LogException(ex);
-                string localErrorMessage = $"Pitch detection failed.";
-                Debug.LogError(localErrorMessage);
-                UiManager.CreateNotification(localErrorMessage);
+                Debug.LogError($"Pitch detection failed: {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
             })
             .Select(loadedPitchDetectionNotes =>
             {
                 if (loadedPitchDetectionNotes.IsNullOrEmpty())
                 {
                     pitchDetectionJob.SetResult(EJobResult.Error);
-                    string localErrorMessage = "Failed to load pitch detection result.";
-                    Debug.LogError(localErrorMessage);
-                    UiManager.CreateNotification(localErrorMessage);
+                    Debug.LogError($"Failed to load pitch detection result");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
                     return null;
                 }
 
@@ -187,9 +186,9 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 catch (Exception ex)
                 {
                     Debug.LogException(ex);
-                    string localErrorMessage = "Failed to move notes to detected pitch";
-                    Debug.LogError(localErrorMessage);
-                    UiManager.CreateNotification(localErrorMessage);
+                    Debug.LogError("Failed to move notes to detected pitch");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                        "reason", ex.Message));
                 }
 
                 try
@@ -205,9 +204,9 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 catch (Exception ex)
                 {
                     Debug.LogException(ex);
-                    string localErrorMessage = "Failed to save song with sing-along data";
-                    Debug.LogError(localErrorMessage);
-                    UiManager.CreateNotification(localErrorMessage);
+                    Debug.LogError("Failed to save song with sing-along data");
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                        "reason", ex.Message));
                 }
 
                 return songMeta;

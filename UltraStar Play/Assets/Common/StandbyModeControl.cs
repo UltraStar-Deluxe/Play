@@ -106,7 +106,11 @@ public class StandbyModeControl : AbstractSingletonBehaviour, INeedInjection
         // Reset resolution
         if (!Application.isEditor)
         {
-            Screen.SetResolution(settings.ScreenResolution.Width, settings.ScreenResolution.Height, settings.FullScreenMode, settings.ScreenResolution.RefreshRate);
+            Screen.SetResolution(
+                settings.ScreenResolution.Width,
+                settings.ScreenResolution.Height,
+                settings.FullScreenMode.ToUnityFullScreenMode(),
+                settings.ScreenResolution.RefreshRate);
         }
 
         // Reset audio

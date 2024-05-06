@@ -16,7 +16,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 
     [InjectedInInspector]
     public TextAsset defaultSoundfontAsset;
-    
+
     // "volume" for the midi events.
     [Range(0, 127)]
     private int midiVelocity;
@@ -41,7 +41,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 
     private AudioClip midiAudioClip;
     private bool ignoreInitialOnAudioClipSetPositionCallback;
-    
+
     private MidiSamplesGenerator onAudioFilterReadMidiSamplesGenerator;
     private MidiSamplesGenerator audioClipMidiSamplesGenerator;
 
@@ -88,7 +88,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             StopAllMidiNotes();
             DestroyMidiAudioClip();
         });
-        
+
         // Deactivate until the MidiManager has been initialized.
         // This is to prevent OnAudioFilterRead to create weird noise (probably a Unity bug).
         gameObject.SetActive(false);
@@ -106,11 +106,11 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         InitPatchBank();
         onAudioFilterReadMidiSamplesGenerator = CreateOrUpdateMidiSamplesGenerator(audioClipMidiSamplesGenerator);
         audioClipMidiSamplesGenerator = CreateOrUpdateMidiSamplesGenerator(audioClipMidiSamplesGenerator);
-        
+
         isInitialized = true;
         gameObject.SetActive(true);
     }
-    
+
     private void InitAudioSourceIfNotDoneYet()
     {
         if (isAudioSourceInitialized)
@@ -118,11 +118,11 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         isAudioSourceInitialized = true;
-        
+
         audioSource.enabled = true;
         audioSource.Play();
     }
-    
+
     private void InitPatchBank()
     {
         if (FileUtils.Exists(settings.SoundfontPath))
@@ -133,11 +133,11 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         {
             if (!settings.SoundfontPath.IsNullOrEmpty())
             {
-                string message = $"Soundfont file does not exist: {settings.SoundfontPath}";
-                UiManager.CreateNotification(message);
-                Debug.LogWarning(message);
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_fileNotFoundWithName,
+                    "name", Path.GetFileName(settings.SoundfontPath)));
+                Debug.LogWarning($"Soundfont file does not exist: {settings.SoundfontPath}");
             }
-            
+
             patchBank = new PatchBank(new TextAssetSoundfontResource(defaultSoundfontAsset));
         }
     }
@@ -163,7 +163,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         Debug.Log("MidiManager - unloading soundfont because soundfont path changed");
-        
+
         // Unload everything
         audioSource.Stop();
         onAudioFilterReadMidiSamplesGenerator?.UnloadMidi();
@@ -172,7 +172,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         audioClipMidiSamplesGenerator?.UnloadBank();
         isInitialized = false;
     }
-    
+
     public void PlayMidiFile(MidiFile midiFile)
     {
         InitIfNotDoneYet();
@@ -183,9 +183,9 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             onAudioFilterReadMidiSamplesGenerator.UnloadMidi();
         }
         IsPlayingMidiFile = false;
-        
+
         StopAllMidiNotes();
-        
+
         onAudioFilterReadMidiSamplesGenerator.LoadMidi(midiFile);
         IsPlayingMidiFile = true;
     }
@@ -196,16 +196,16 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         onAudioFilterReadMidiSamplesGenerator.Stop();
         IsPlayingMidiFile = false;
     }
-    
+
     public void PlayMidiNote(int midiNote)
     {
         InitIfNotDoneYet();
         InitAudioSourceIfNotDoneYet();
-        
+
         isPlayingMidiNote = true;
         onAudioFilterReadMidiSamplesGenerator.NoteOn(0, midiNote, midiVelocity);
     }
@@ -216,7 +216,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         InitIfNotDoneYet();
         onAudioFilterReadMidiSamplesGenerator.NoteOff(0, midiNote);
         isPlayingMidiNote = false;
@@ -238,17 +238,17 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     // See http://unity3d.com/support/documentation/ScriptReference/MonoBehaviour.OnAudioFilterRead.html for reference code
     //	If OnAudioFilterRead is implemented, Unity will insert a custom filter into the audio DSP chain.
     //
-    //	The filter is inserted in the same order as the MonoBehaviour script is shown in the inspector. 	
-    //	OnAudioFilterRead is called everytime a chunk of audio is routed thru the filter (this happens frequently, every ~20ms depending on the samplerate and platform). 
-    //	The audio data is an array of floats ranging from [-1.0f;1.0f] and contains audio from the previous filter in the chain or the AudioClip on the AudioSource. 
-    //	If this is the first filter in the chain and a clip isn't attached to the audio source this filter will be 'played'. 
+    //	The filter is inserted in the same order as the MonoBehaviour script is shown in the inspector.
+    //	OnAudioFilterRead is called everytime a chunk of audio is routed thru the filter (this happens frequently, every ~20ms depending on the samplerate and platform).
+    //	The audio data is an array of floats ranging from [-1.0f;1.0f] and contains audio from the previous filter in the chain or the AudioClip on the AudioSource.
+    //	If this is the first filter in the chain and a clip isn't attached to the audio source this filter will be 'played'.
     //	That way you can use the filter as the audio clip, procedurally generating audio.
     //
-    //	If OnAudioFilterRead is implemented a VU meter will show up in the inspector showing the outgoing samples level. 
-    //	The process time of the filter is also measured and the spent milliseconds will show up next to the VU Meter 
-    //	(it turns red if the filter is taking up too much time, so the mixer will starv audio data). 
-    //	Also note, that OnAudioFilterRead is called on a different thread from the main thread (namely the audio thread) 
-    //	so calling into many Unity functions from this function is not allowed ( a warning will show up ). 	
+    //	If OnAudioFilterRead is implemented a VU meter will show up in the inspector showing the outgoing samples level.
+    //	The process time of the filter is also measured and the spent milliseconds will show up next to the VU Meter
+    //	(it turns red if the filter is taking up too much time, so the mixer will starv audio data).
+    //	Also note, that OnAudioFilterRead is called on a different thread from the main thread (namely the audio thread)
+    //	so calling into many Unity functions from this function is not allowed ( a warning will show up ).
     private void OnAudioFilterRead(float[] data, int outputChannelCount)
     {
         if (!isInitialized
@@ -268,7 +268,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     public AudioClip CreateAudioClip(string midiFilePath)
     {
         DestroyMidiAudioClip();
-        
+
         if (!FileUtils.Exists(midiFilePath))
         {
             Debug.LogError($"MIDI file does not exist: {midiFilePath}");
@@ -288,7 +288,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 
             // Ignore the initial SetPosition callback.
             ignoreInitialOnAudioClipSetPositionCallback = true;
-            
+
             midiAudioClip = AudioClip.Create($"MIDI file '{Path.GetFileName(midiFilePath)}'",
                 audioClipLengthInSamples,
                 MidiSamplesGenerator.MidiSynthesizerChannelCount,
@@ -310,7 +310,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             midiAudioClip = null;
         }
     }
-    
+
     private void OnAudioClipRead(float[] data)
     {
         audioClipMidiSamplesGenerator.FillOutputBuffer(data, MidiSamplesGenerator.MidiSynthesizerChannelCount);
@@ -324,7 +324,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             ignoreInitialOnAudioClipSetPositionCallback = false;
             return;
         }
-        
+
         audioClipMidiSamplesGenerator.SeekSampleTime(positionInSamples);
     }
 }

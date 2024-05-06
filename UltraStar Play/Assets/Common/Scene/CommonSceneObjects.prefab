@@ -230,10 +230,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 158966a929f7d5c4d9079f5b306ff7cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  notificationOverlayUi: {fileID: 9197481963319205126, guid: 1b9e64f2bf87a1743adc6aced20186f0,
-    type: 3}
-  notificationUi: {fileID: 9197481963319205126, guid: 621e11db1bf96254eb113e663e4bcc59,
-    type: 3}
   messageDialogUi: {fileID: 9197481963319205126, guid: 9dd0037eeddfcb64ab006c7c01edb4e7,
     type: 3}
   micWithNameUi: {fileID: 9197481963319205126, guid: 633a1b5f196ee2f45beba597ffda0b45,
@@ -951,6 +947,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4190377001124415443}
   - {fileID: 5257901910265333630}
   - {fileID: 2392547021998789281}
   - {fileID: 6171799238151469095}
@@ -977,6 +974,7 @@ Transform:
   - {fileID: 8568522364055573128}
   - {fileID: 1726528158099047256}
   - {fileID: 2247980495390972918}
+  - {fileID: 136179686410441847}
   - {fileID: 6981507401744584904}
   - {fileID: 6858925117782900906}
   - {fileID: 3016431984148765601}
@@ -997,7 +995,6 @@ Transform:
   - {fileID: 8635082549009352342}
   - {fileID: 3601633907700374255}
   - {fileID: 6394043851129589506}
-  - {fileID: 4539458775672432122}
   - {fileID: 392402727400235556}
   - {fileID: 6948374851428345165}
   - {fileID: 6169907629867958379}
@@ -1010,6 +1007,7 @@ Transform:
   - {fileID: 8951246057956905287}
   - {fileID: 1535503042610526989}
   - {fileID: 2311127367653777862}
+  - {fileID: 7657069212502855339}
   m_Father: {fileID: 8069444317427349030}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8128606580828000032
@@ -1143,7 +1141,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8069444317427349030}
+  m_Father: {fileID: 5483831765678408185}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &9022508001146490944
 MonoBehaviour:
@@ -1157,15 +1155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 713e7f6d00e1ea64bbf2732f88763a68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  propertiesFolderRelativeToResourcesFolder: Translations
-  propertiesFileName: messages
-  logInfoInEditMode: 0
-  logInfoInPlayMode: 1
-  generatedConstantsFolder: Assets/Common/R
   generateConstantsOnResourceChange: 1
-  useFallbackIfNotInCurrentLanguage: 1
-  currentLanguage: 10
-  defaultPropertiesFileLanguage: 10
 --- !u!1 &1125044229191517596
 GameObject:
   m_ObjectHideFlags: 0
@@ -1247,7 +1237,6 @@ Transform:
   - {fileID: 3684749312725033491}
   - {fileID: 7070348881094510559}
   - {fileID: 8815353626146034715}
-  - {fileID: 4190377001124415443}
   - {fileID: 5483831765678408185}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1861,6 +1850,50 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0bae7fcc69b14717b495bbdb430f7705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &2156618845726487336
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7657069212502855339}
+  - component: {fileID: 830075656448988466}
+  m_Layer: 0
+  m_Name: CloseTooltipViaBackInputActionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7657069212502855339
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2156618845726487336}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5483831765678408185}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &830075656448988466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2156618845726487336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b922e4406a8d41209c77f8e93e65b300, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &2176175115326065358
@@ -7410,6 +7443,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ed9bde74d3e2384aaa1ab1fca56c995, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &3971341128776210809
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 136179686410441847}
+  - component: {fileID: 5816708759272577806}
+  m_Layer: 0
+  m_Name: NotificationManager
+  m_TagString: UiManager
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &136179686410441847
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3971341128776210809}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5483831765678408185}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5816708759272577806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3971341128776210809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eb0ff96328741769cd527b914c5b663, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  notificationUi: {fileID: 9197481963319205126, guid: 621e11db1bf96254eb113e663e4bcc59,
+    type: 3}
+  notificationOverlayUi: {fileID: 9197481963319205126, guid: 1b9e64f2bf87a1743adc6aced20186f0,
+    type: 3}
 --- !u!1 &4041919321286605065
 GameObject:
   m_ObjectHideFlags: 0
@@ -7966,50 +8047,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 28d76e8023e4f5f4a8ac8bad1ab7cf5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &5077495643793114996
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4539458775672432122}
-  - component: {fileID: 4980946144356743718}
-  m_Layer: 0
-  m_Name: ApplyTranslationsOnSceneChangeControl
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4539458775672432122
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5077495643793114996}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 116.26877, y: -87.73337, z: -263.9158}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5483831765678408185}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4980946144356743718
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5077495643793114996}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e3eb005d367f354988932948bc73960, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &5278263641372032629
@@ -10634,7 +10671,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11414302, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_Value
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11452418, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: toggleKey

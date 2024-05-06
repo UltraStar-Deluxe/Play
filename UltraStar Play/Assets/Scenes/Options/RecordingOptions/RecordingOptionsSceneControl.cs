@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortAudioForUnity;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -12,7 +10,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITranslator, IBinder
+public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 {
     private static readonly List<int> amplificationItems = new() { 0, 3, 6, 9, 12, 15, 18 };
     private static readonly List<int> noiseSuppressionItems= new() { 0, 1, 3, 5, 10, 15, 20, 25, 30 };
@@ -127,9 +125,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
         new AutoFitLabelControl(devicePicker.ItemLabel, 10, 15);
 
-        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, micProfiles);
+        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, micProfiles,
+            item => item != null ? Translation.Of(item.GetDisplayNameWithChannel()) : Translation.Empty);
         devicePickerControl.AutoSmallFont = false;
-        devicePickerControl.GetLabelTextFunction = item => item != null ? item.GetDisplayNameWithChannel() : "";
         if (!TryReSelectLastMicProfile()
             && !devicePickerControl.Items.IsNullOrEmpty())
         {
@@ -146,15 +144,12 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
                 settings.LastMicProfileChannelIndexInRecordingOptionsScene = micProfile.ChannelIndex;
             });
 
-        amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationPicker, amplificationItems);
-        amplificationPickerControl.GetLabelTextFunction = item => item + " %";
-        noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionPicker, noiseSuppressionItems);
-        noiseSuppressionPickerControl.GetLabelTextFunction = item => item + " %";
+        amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationPicker, amplificationItems, item => Translation.Of(item + " %"));
+        noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionPicker, noiseSuppressionItems, item => Translation.Of(item + " %"));
         delayPickerControl = new NumberPickerControl(delayPicker);
         delayPickerControl.GetLabelTextFunction = item => item + " ms";
         colorPickerControl = new ColorPickerControl(colorPicker, themeManager.GetMicrophoneColors());
-        sampleRatePickerControl = new SampleRatePickerControl(sampleRatePicker);
-        sampleRatePickerControl.GetLabelTextFunction = _ => GetSampleRateLabel();
+        sampleRatePickerControl = new SampleRatePickerControl(sampleRatePicker, item => GetSampleRateLabel(item));
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(_ => DeleteSelectedRecordingDevice());
 
@@ -167,10 +162,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
                 .CreateAndInject<ContextMenuControl>();
             contextMenuControl.FillContextMenuAction = contextMenuPopupControl =>
             {
-                contextMenuPopupControl.AddButton("Random Color", () =>
-                {
-                    colorPickerControl.SelectItem(Colors.CreateRandomColor());
-                });
+                contextMenuPopupControl.AddButton(Translation.Get(R.Messages.options_recording_action_selectRandomColor),
+                    () => colorPickerControl.SelectItem(Colors.CreateRandomColor()));
             };
         }
 
@@ -254,8 +247,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
                 }
                 else
                 {
-                    UiManager.CreateNotification(
-                        TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout));
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.options_delay_calibrate_timeout));
                 }
             });
 
@@ -351,23 +343,22 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         sampleRatePickerControl.UpdateLabelText();
     }
 
-    private string GetSampleRateLabel()
+    private Translation GetSampleRateLabel(int item)
     {
         if (SelectedMicProfile == null)
         {
-            return "";
+            return Translation.Empty;
         }
 
-        int item = sampleRatePickerControl.SelectedItem;
         if (item <= 0)
         {
             // When "auto" is selected, then also show the automatically used sample rate.
-            string sampleRateText = SelectedMicProfile.IsInputFromConnectedClient
+            string sampleRateSuffix = SelectedMicProfile.IsInputFromConnectedClient
                 ? ""
                 : $"\n({micPitchTracker.FinalSampleRate.Value} Hz)";
-            return TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto) + sampleRateText;
+            return Translation.Of(Translation.Get(R.Messages.options_sampleRate_auto) + sampleRateSuffix);
         }
-        return $"{item} Hz";
+        return Translation.Of($"{item} Hz");
     }
 
     private bool TryReSelectLastMicProfile()
@@ -466,7 +457,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         deleteButton.SetVisibleByDisplay(!isConnected);
 
         micVisualizer.SetMicProfile(micProfile);
-        noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
+        noteLabel.SetTranslatedText(Translation.Get(R.Messages.options_note, "value", "?"));
 
         // playRecordedAudioInfoContainer.SetVisibleByDisplay(micProfile.IsInputFromConnectedClient);
 
@@ -496,19 +487,6 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         }
     }
 
-    public void UpdateTranslation()
-    {
-        deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
-        colorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_color);
-        delayPicker.Label = TranslationManager.GetTranslation(R.Messages.options_delay);
-        amplificationPicker.Label = TranslationManager.GetTranslation(R.Messages.options_amplification);
-        noiseSuppressionPicker.Label = TranslationManager.GetTranslation(R.Messages.options_noiseSuppression);
-        sampleRatePicker.Label = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
-        noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
-        calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate);
-        notConnectedLabel.text = TranslationManager.GetTranslation(R.Messages.options_deviceNotConnected);
-    }
-
     private List<MicProfile> CreateAndPersistMicProfiles()
     {
         return MicProfileUtils.CreateAndPersistMicProfiles(
@@ -525,29 +503,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         }
     }
 
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
-    {
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelay_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelay) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelayCalibration_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelayCalibration) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_amplification_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_amplification) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_noiseSuppression_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_noiseSuppression) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate) },
-        };
-        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_title),
-            titleToContentMap);
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToConfigureMicsAndSpeaker)));
-        return helpDialogControl;
-    }
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToConfigureMicsAndSpeaker);
 
     private void InitPitchDetectionFromConnectionClient()
     {

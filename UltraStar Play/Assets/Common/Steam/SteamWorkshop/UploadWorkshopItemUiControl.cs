@@ -75,7 +75,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         workshopItemFolderTextField.RegisterValueChangedCallback(evt => OnContentFolderChanged(evt.newValue));
         new TextFieldHintControl(workshopItemFolderTextField);
         new TextFieldHintControl(workshopItemImageTextField);
-        statusLabel.text = "";
+        statusLabel.SetTranslatedText(Translation.Empty);
     }
 
     public void PublishWorkshopItem()
@@ -95,13 +95,13 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
             title);
         if (!errorMessage.IsNullOrEmpty())
         {
-            string fullErrorMessage = $"Upload failed. {errorMessage}";
-            Debug.LogError(fullErrorMessage);
-            statusLabel.text = fullErrorMessage;
+            Debug.LogError($"Upload failed. {errorMessage}");
+            statusLabel.SetTranslatedText(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_error,
+                "reason", errorMessage));
             return;
         }
 
-        statusLabel.text = "Uploading...";
+        statusLabel.SetTranslatedText(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_uploading));
         ObservableUtils.RunOnNewTaskAsObservable<ulong>(async () =>
             {
                 PublishResult publishResult = await steamWorkshopManager.PublishWorkshopItemAsync(
@@ -115,13 +115,15 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
                 if (!publishResult.Success)
                 {
-                    throw new SteamException($"Publish result is {publishResult.Result.ToString()}");
+                    Debug.LogError($"Steam Workshop publish result is {publishResult.Result.ToString()}");
+                    throw new SteamException(Translation.Get(R.Messages.steamWorkshop_uploadDialog_exception_notSuccessful,
+                        "publishResult", publishResult.Result.ToString()));
                 }
                 Debug.Log($"Successfully uploaded Steam Workshop Item. Result: {publishResult.Result}, FileId: {publishResult.FileId}");
 
                 ApplicationUtils.OpenUrl($"https://steamcommunity.com/sharedfiles/filedetails/?id={publishResult.FileId}");
 
-                ShowMessage("Upload successful. Downloading...");
+                ShowMessage(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_downloading));
 
                 await steamWorkshopManager.SubscribeAndDownloadWorkshopItemAsync(publishResult.FileId);
                 return publishResult.FileId;
@@ -131,11 +133,12 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to upload Steam Workshop item: {ex.Message}");
-                ShowMessage($"Upload failed: {ex.Message}");
+                ShowMessage(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_error,
+                    "reason", ex.Message));
             })
             .Subscribe(newlyPublishedFileId =>
             {
-                ShowMessage("Download successful. All done.");
+                ShowMessage(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_success));
 
                 // Update dropdown and select newly created Workshop Item
                 UpdateWorkshopItemChooserEntries();
@@ -152,31 +155,33 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     private void OnContentFolderChanged(string newContentFolder)
     {
-        string errorMessage = GetContentFolderErrorMessage(newContentFolder);
-        if (errorMessage.IsNullOrEmpty())
+        Translation errorMessage = GetContentFolderErrorMessage(newContentFolder);
+        if (errorMessage.Value.IsNullOrEmpty())
         {
             string expectedSubfoldersCsv = GetExistingContentFolderSubfolders(newContentFolder).ToCsv(", ", "", "");
-            statusLabel.text = $"Found subfolders {expectedSubfoldersCsv}";
+            statusLabel.SetTranslatedText(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_contentFolders,
+                "names", expectedSubfoldersCsv));
             FillTextFieldWithDefaultsFromFolder(newContentFolder);
         }
         else
         {
-            statusLabel.text = errorMessage;
+            statusLabel.SetTranslatedText(errorMessage);
         }
     }
 
-    private string GetContentFolderErrorMessage(string folder)
+    private Translation GetContentFolderErrorMessage(string folder)
     {
         if (!DirectoryUtils.Exists(folder))
         {
-            return "Folder does not exist.";
+            return Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_contentFolderDoesNotExist);
         }
 
         if (GetExistingContentFolderSubfolders(folder).IsNullOrEmpty())
         {
-            return $"Found none of the expected subfolders {expectedContentFolderSubfolders.ToCsv(", ", "", "")}";
+            return Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_contentFoldersNotFound,
+                "names", expectedContentFolderSubfolders.JoinWith(", "));
         }
-        return "";
+        return default;
     }
 
     private List<string> GetExistingContentFolderSubfolders(string contentFolder)
@@ -309,9 +314,9 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         ThreadUtils.RunOnMainThread(() => uploadProgressBar.value = progressZeroToHundred);
     }
 
-    private void ShowMessage(string message)
+    private void ShowMessage(Translation message)
     {
-        ThreadUtils.RunOnMainThread(() => statusLabel.text = message);
+        ThreadUtils.RunOnMainThread(() => statusLabel.SetTranslatedText(message));
     }
 
     private void OpenWorkshopItemFolder()

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using LiteNetLib;
 using ProTrans;
@@ -12,7 +14,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInjectionFinishedListener, IBinder
+public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IBinder
 {
     private const int ConnectRequestCountShowTroubleshootingHintThreshold = 3;
 
@@ -97,7 +99,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private ItemPicker recordingDevicePicker;
 
     [Inject(UxmlName = R.UxmlNames.languagePicker)]
-    private ItemPicker languagePicker;
+    private DropdownField languagePicker;
 
     [Inject(UxmlName = R.UxmlNames.devModePicker)]
     private ItemPicker devModePicker;
@@ -160,7 +162,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private Button copyLogButton;
 
     private LabeledItemPickerControl<string> recordingDevicePickerControl;
-    private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
     private BoolPickerControl devModePickerControl;
 
     private float frameCountTime;
@@ -239,6 +240,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
         InitTabGroup();
         InitMenu();
+
+        UpdateTranslation();
     }
 
     private void Start()
@@ -275,21 +278,15 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         // Recording device
         List<string> deviceNames = Microphone.devices.ToList();
         deviceNames.Sort();
-        recordingDevicePickerControl = new(recordingDevicePicker, deviceNames);
+        recordingDevicePickerControl = new(recordingDevicePicker, deviceNames,
+            item => Translation.Of(item));
         recordingDevicePickerControl.AutoSmallFont = false;
         recordingDevicePickerControl.SelectItem(settings.MicProfile.Name);
         recordingDevicePickerControl.Selection.Subscribe(newValue => settings.SetMicProfileName(newValue));
 
         // Language
-        languagePickerControl = new LabeledItemPickerControl<SystemLanguage>(languagePicker, translationManager.GetTranslatedLanguages());
-        languagePickerControl.SelectItem(settings.Language);
-        languagePickerControl.Selection.Subscribe(newValue => settings.Language = newValue);
-        settings.ObserveEveryValueChanged(it => it.Language)
-            .Subscribe(newValue =>
-            {
-                translationManager.currentLanguage = newValue;
-                translationManager.ReloadTranslationsAndUpdateScene();
-            });
+        LanguageChooserControl languageChooserControl = new LanguageChooserControl(languagePicker);
+        languageChooserControl.Selection.Subscribe(newValue => OnLanguageChanged(newValue));
 
         // Dev Mode
         devModePickerControl = new BoolPickerControl(devModePicker);
@@ -300,7 +297,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             .Subscribe(newValue => OnDevModeEnabledChanged(newValue));
 
         // Minimum log level
-        new EnumItemPickerControl<LogEventLevel>(minimumLogLevelPicker).Bind(
+        new EnumItemPickerControl<ELogEventLevel>(minimumLogLevelPicker).Bind(
             () => settings.MinimumLogLevel,
             newValue =>
             {
@@ -309,8 +306,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             });
 
         // Target FPS
-        LabeledItemPickerControl<int> targetFpsPickerControl = new(targetFpsPicker, new List<int> { -1, 5, 10, 15, 20, 30, 60, 90, 120 });
-        targetFpsPickerControl.GetLabelTextFunction = item => item > 0 ? $"{item}" : "Auto";
+        LabeledItemPickerControl<int> targetFpsPickerControl = new(targetFpsPicker, new List<int> { -1, 5, 10, 15, 20, 30, 60, 90, 120 },
+            item => item > 0 ? Translation.Of(item.ToString()) : Translation.Of("Auto"));
         targetFpsPickerControl.Bind(
             () => settings.TargetFps,
             newValue => settings.TargetFps = newValue);
@@ -344,6 +341,30 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         });
     }
 
+    private void OnLanguageChanged(CultureInfo newValue)
+    {
+        if (Equals(newValue, TranslationConfig.Singleton.CurrentCultureInfo))
+        {
+            return;
+        }
+        SetCurrentLanguage(newValue);
+        UpdateTranslation();
+    }
+
+    private void SetCurrentLanguage(CultureInfo cultureInfo)
+    {
+        try
+        {
+            TranslationConfig.Singleton.CurrentCultureInfo = cultureInfo;
+            settings.CultureInfoName = cultureInfo.ToString();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to set current CultureInfo to '{cultureInfo}': {ex.Message}");
+        }
+    }
+
     private void OnDevModeEnabledChanged(bool isEnabled)
     {
         recordingDeviceInfo.SetVisibleByDisplay(isEnabled);
@@ -362,18 +383,17 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     public void UpdateTranslation()
     {
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.companionApp_title);
-        connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.companionApp_connecting);
-        recordingDevicePicker.Label = TranslationManager.GetTranslation(R.Messages.options_recording_title);
-        languagePicker.Label = TranslationManager.GetTranslation(R.Messages.language);
-        devModePicker.Label = TranslationManager.GetTranslation(R.Messages.devMode);
-        visualizeAudioToggle.label = TranslationManager.GetTranslation(R.Messages.companionApp_visualizeMicInput);
-        closeMenuButton.text = TranslationManager.GetTranslation(R.Messages.back);
+        sceneTitle.text = Translation.Get(R.Messages.companionApp_title);
+        connectionStatusText.text = Translation.Get(R.Messages.companionApp_connecting);
+        recordingDevicePicker.Label = Translation.Get(R.Messages.options_recording_title);
+        languagePicker.label = Translation.Get(R.Messages.language);
+        devModePicker.Label = Translation.Get(R.Messages.companionApp_devMode);
+        visualizeAudioToggle.label = Translation.Get(R.Messages.companionApp_visualizeMicInput);
+        closeMenuButton.text = Translation.Get(R.Messages.common_back);
 
         recordingDevicePickerControl.UpdateLabelText();
-        languagePickerControl.UpdateLabelText();
-        TranslationManager.GetTranslation("yes");
         devModePickerControl.UpdateLabelText();
+        songListControl.UpdateTranslation();
     }
 
     private void Update()
@@ -464,7 +484,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         if (connectEvent.IsSuccess)
         {
             connectionInfoLabel.text = $"Connected to {connectEvent.ServerIpEndPoint.Address}:{connectEvent.ServerIpEndPoint.Port}";
-            connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.companionApp_connectedTo, "remote" , connectEvent.ServerIpEndPoint.Address);
+            connectionStatusText.text = Translation.Get(R.Messages.companionApp_connectedTo, "remote" , connectEvent.ServerIpEndPoint.Address);
 
             onlyVisibleWhenConnected.ForEach(it => it.ShowByDisplay());
             onlyVisibleWhenNotConnected.ForEach(it => it.HideByDisplay());
@@ -479,8 +499,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         {
             connectionInfoLabel.text = "Not connected";
             connectionStatusText.text = connectEvent.ConnectRequestCount > 0
-                ? TranslationManager.GetTranslation(R.Messages.companionApp_connectingWithFailedAttempts, "count", connectEvent.ConnectRequestCount)
-                : TranslationManager.GetTranslation(R.Messages.companionApp_connecting);
+                ? Translation.Get(R.Messages.companionApp_connectingWithFailedAttempts, "count", connectEvent.ConnectRequestCount)
+                : Translation.Get(R.Messages.companionApp_connecting);
 
             onlyVisibleWhenConnected.ForEach(it => it.HideByDisplay());
             onlyVisibleWhenNotConnected.ForEach(it => it.ShowByDisplay());
@@ -489,7 +509,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             SetThroubleshootingTextAndVisibility(
                 connectEvent.ErrorMessage.IsNullOrEmpty()
                 && connectEvent.ConnectRequestCount > ConnectRequestCountShowTroubleshootingHintThreshold
-                    ? TranslationManager.GetTranslation(R.Messages.companionApp_troubleShootingHints)
+                    ? Translation.Get(R.Messages.companionApp_troubleShootingHints)
                     : "");
         }
     }

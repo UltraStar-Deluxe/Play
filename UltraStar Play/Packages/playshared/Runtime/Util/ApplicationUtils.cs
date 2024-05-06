@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using PortAudioForUnity;
-using ProTrans;
 using UnityEditor;
 using UnityEngine;
 
@@ -302,14 +299,8 @@ public static class ApplicationUtils
     {
         if (PlatformUtils.IsAndroid)
         {
-            string internalStorageTranslation = "Internal Storage";
-            string sdCardStorageTranslation = "SD Card";
-            if (ThreadUtils.IsMainThread())
-            {
-                // The ProTrans TranslationManager only works on the main thread.
-                internalStorageTranslation = TranslationManager.GetTranslation("androidInternalStorage");
-                sdCardStorageTranslation = TranslationManager.GetTranslation("androidSdCardStorage");
-            }
+            string internalStorageTranslation = Translation.Get("androidInternalStorage");
+            string sdCardStorageTranslation = Translation.Get("androidSdCardStorage");
 
             string internalStorageRoot = AndroidUtils.GetStorageRootPath(false);
             string sdCardStorageRoot = AndroidUtils.GetStorageRootPath(true);

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using NHyphenator;
@@ -9,6 +11,18 @@ public static class SettingsUtils
 {
     private const string DefaultSpeechRecognitionModelPathInStreamingAssets = "SpeechRecognitionModels/WhisperModels/ggml-tiny.bin";
     private const string DefaultSpeechRecognitionLanguage = "auto";
+
+    public static CultureInfo GetCultureInfo(ISettings settings)
+    {
+        try
+        {
+            return new CultureInfo(settings.CultureInfoName);
+        }
+        catch (Exception ex)
+        {
+            return new CultureInfo("en");
+        };
+    }
 
     public static void SimplifySettings(Settings settings)
     {
@@ -191,5 +205,48 @@ public static class SettingsUtils
             return DefaultSpeechRecognitionLanguage;
         }
         return language;
+    }
+
+    public static UltraStarSongFormatVersion GetUltraStarSongFormatVersionForSave(Settings settings, UltraStarSongFormatVersion currentVersion)
+    {
+        if (currentVersion.EnumValue is EUltraStarSongFormatVersion.Unknown)
+        {
+            return GetDefaultUltraStarSongFormatVersionForSave(settings.DefaultUltraStarSongFormatVersionForSave);
+        }
+
+        UltraStarSongFormatVersion upgradeVersion = GetUpgradeUltraStarSongFormatVersionForSave(settings.UpgradeUltraStarSongFormatVersionForSave);
+        if (settings.UpgradeUltraStarSongFormatVersionForSave is not EUpgradeUltraStarSongFormatVersion.None
+            && (int)currentVersion.EnumValue < (int)upgradeVersion.EnumValue)
+        {
+            return upgradeVersion;
+        }
+
+        return currentVersion;
+    }
+
+    private static UltraStarSongFormatVersion GetDefaultUltraStarSongFormatVersionForSave(EKnownUltraStarSongFormatVersion defaultVersion)
+    {
+        switch (defaultVersion)
+        {
+            case EKnownUltraStarSongFormatVersion.V100: return UltraStarSongFormatVersion.v100;
+            case EKnownUltraStarSongFormatVersion.V110: return UltraStarSongFormatVersion.v110;
+            case EKnownUltraStarSongFormatVersion.V120: return UltraStarSongFormatVersion.v120;
+            case EKnownUltraStarSongFormatVersion.V200: return UltraStarSongFormatVersion.v200;
+            default:
+                throw new IllegalArgumentException($"No mapping from default version for save {defaultVersion} to actual UltraStar format version");
+        }
+    }
+
+    private static UltraStarSongFormatVersion GetUpgradeUltraStarSongFormatVersionForSave(EUpgradeUltraStarSongFormatVersion upgradeVersion)
+    {
+        switch (upgradeVersion)
+        {
+            case EUpgradeUltraStarSongFormatVersion.None: return UltraStarSongFormatVersion.unknown;
+            case EUpgradeUltraStarSongFormatVersion.V110: return UltraStarSongFormatVersion.v110;
+            case EUpgradeUltraStarSongFormatVersion.V120: return UltraStarSongFormatVersion.v120;
+            case EUpgradeUltraStarSongFormatVersion.V200: return UltraStarSongFormatVersion.v200;
+            default:
+                throw new IllegalArgumentException($"No mapping from upgrade version for save {upgradeVersion} to actual UltraStar format version");
+        }
     }
 }

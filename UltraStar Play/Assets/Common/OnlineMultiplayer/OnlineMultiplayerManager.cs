@@ -154,7 +154,7 @@ namespace CommonOnlineMultiplayer
         private void OnNetcodeLocalClientStopped(bool wasHostMode)
         {
             Debug.Log($"OnNetcodeLocalClientStopped(wasHostMode: {wasHostMode})");
-            UiManager.CreateNotification("Disconnected from online game");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_disconnected));
 
             if (LobbyManager.CurrentLobby != null)
             {

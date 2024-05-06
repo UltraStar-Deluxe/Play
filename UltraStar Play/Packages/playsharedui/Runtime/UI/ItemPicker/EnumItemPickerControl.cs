@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-public class EnumItemPickerControl<T> : LabeledItemPickerControl<T>
+public class EnumItemPickerControl<T> : LabeledItemPickerControl<T> where T : Enum
 {
     public EnumItemPickerControl(ItemPicker itemPicker)
         : this(itemPicker, EnumUtils.GetValuesAsList<T>())
@@ -8,8 +9,7 @@ public class EnumItemPickerControl<T> : LabeledItemPickerControl<T>
     }
 
     public EnumItemPickerControl(ItemPicker itemPicker, List<T> items)
-        : base(itemPicker, items)
+        : base(itemPicker, items, item => Translation.Get(item))
     {
-        GetLabelTextFunction = item => StringUtils.ToTitleCase(item.ToString());
     }
 }

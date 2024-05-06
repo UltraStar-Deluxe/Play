@@ -405,7 +405,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
     }
 
-    public void CreateNumberInputDialog(string title, string message, Action<float> useNumberCallback)
+    public void CreateNumberInputDialog(Translation title, Translation message, Action<float> useNumberCallback)
     {
         void UseValueCallback(string text)
         {
@@ -425,42 +425,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             .CreateAndInject<TextInputDialogControl>();
         dialogControl.Title = title;
         dialogControl.Message = message;
-
-        dialogControl.SubmitValueEventStream
-            .Subscribe(newValue => UseValueCallback(newValue));
-
-        openDialogControls.Add(dialogControl);
-        dialogControl.DialogClosedEventStream
-            .Subscribe(_ => openDialogControls.Remove(dialogControl));
-    }
-
-    public void CreatePathInputDialog(
-        string title,
-        string message,
-        string initialValue,
-        Action<string> usePathCallback)
-    {
-        void UseValueCallback(string path)
-        {
-            path = path.Trim();
-            if (!File.Exists(path))
-            {
-                Debug.Log($"File does not exist: {path}");
-                UiManager.CreateNotification($"File does not exist");
-            }
-            usePathCallback(path);
-        }
-
-        VisualElement visualElement = valueInputDialogUi.CloneTree();
-        visualElement.AddToClassList("overlay");
-        uiDocument.rootVisualElement.Add(visualElement);
-
-        PathInputDialogControl dialogControl = injector
-            .WithRootVisualElement(visualElement)
-            .CreateAndInject<PathInputDialogControl>();
-        dialogControl.Title = title;
-        dialogControl.Message = message;
-        dialogControl.InitialValue = initialValue;
 
         dialogControl.SubmitValueEventStream
             .Subscribe(newValue => UseValueCallback(newValue));

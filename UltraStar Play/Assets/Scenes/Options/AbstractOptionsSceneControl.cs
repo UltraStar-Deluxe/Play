@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using PrimeInputActions;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -14,9 +13,6 @@ public abstract class AbstractOptionsSceneControl : MonoBehaviour, INeedInjectio
 {
     [Inject]
     protected SceneNavigator sceneNavigator;
-
-    [Inject]
-    protected TranslationManager translationManager;
 
     [Inject]
     protected Settings settings;
@@ -56,7 +52,7 @@ public abstract class AbstractOptionsSceneControl : MonoBehaviour, INeedInjectio
 
     public void HighlightHelpIcon()
     {
-        if (!HasHelpDialog
+        if (HelpUri.IsNullOrEmpty()
             || helpIcon == null)
         {
             return;
@@ -65,11 +61,7 @@ public abstract class AbstractOptionsSceneControl : MonoBehaviour, INeedInjectio
         AnimationUtils.HighlightIconWithBounce(gameObject, helpIcon);
     }
 
-    public virtual bool HasHelpDialog => false;
-    public virtual MessageDialogControl CreateHelpDialogControl()
-    {
-        return null;
-    }
+    public virtual string HelpUri => "";
 
     public virtual bool HasIssuesDialog => false;
     public virtual MessageDialogControl CreateIssuesDialogControl()

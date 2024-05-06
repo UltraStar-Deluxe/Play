@@ -16,7 +16,7 @@ public class SongIssue
     public SongIssueData SongIssueData { get; private set; }
     public SongMeta SongMeta => SongIssueData?.SongMeta;
     public ESongIssueSeverity Severity { get; private set; }
-    public string Message { get; private set; }
+    public Translation Message { get; private set; }
     public int StartBeat { get; private set; }
     public int EndBeat { get; private set; }
 
@@ -27,7 +27,7 @@ public class SongIssue
     public SongIssue(
         ESongIssueSeverity severity,
         SongIssueData songIssueData,
-        string message,
+        Translation message,
         int startBeat,
         int endBeat)
     {
@@ -41,7 +41,7 @@ public class SongIssue
 
     public static SongIssue CreateWarning(
         SongMeta songMeta,
-        string message,
+        Translation message,
         int startBeat = -1,
         int endBeat = -1)
     {
@@ -51,7 +51,7 @@ public class SongIssue
 
     public static SongIssue CreateError(
         SongMeta songMeta,
-        string message,
+        Translation message,
         int startBeat = -1,
         int endBeat = -1)
     {

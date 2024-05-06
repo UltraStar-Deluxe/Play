@@ -52,7 +52,7 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
         settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInPx)
             .Subscribe(_ => UpdateLines())
             .AddTo(gameObject);
-        
+
         settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.PitchLabelFormat)
             .Subscribe(_ => UpdateLabelTexts())
             .AddTo(gameObject);
@@ -64,7 +64,7 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
         {
             return;
         }
-        
+
         labels.ForEach(label =>
         {
             if (label == null)
@@ -72,7 +72,7 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
                 return;
             }
             int midiNote = (int)label.userData;
-            label.text = GetLabelText(midiNote);
+            label.SetTranslatedText(GetLabelText(midiNote));
         });
     }
 
@@ -159,7 +159,7 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
         label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);
         label.style.left = 0;
 
-        label.text = GetLabelText(midiNote);
+        label.SetTranslatedText(GetLabelText(midiNote));
         label.userData = midiNote;
 
         UpdateMidiNoteLabelPosition(label, midiNote);
@@ -169,14 +169,14 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
         return label;
     }
 
-    private string GetLabelText(int midiNote)
+    private Translation GetLabelText(int midiNote)
     {
         switch (settings.SongEditorSettings.PitchLabelFormat)
         {
             case ESongEditorPitchLabelFormat.Notes:
-                return MidiUtils.GetAbsoluteName(midiNote);
+                return Translation.Of(MidiUtils.GetAbsoluteName(midiNote));
             default:
-                return "";
+                return Translation.Empty;
         }
     }
 

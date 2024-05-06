@@ -2,8 +2,7 @@
     <ui:Template name="NextRoundInfoPlayerEntryUi" src="project://database/Assets/Common/GameRounds/NextGameRoundInfoPlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=1c1764560ee144247ab75c166154b2a3&amp;type=3#NextGameRoundInfoPlayerEntryUi" />
     <ui:VisualElement name="nextGameRoundInfoUiRoot" style="background-color: rgba(0, 0, 0, 0);">
         <ui:VisualElement name="nextGameRoundSongInfoContainer" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
-            <ui:Label tabindex="-1" text="Next: " display-tooltip-when-elided="true" name="nextLabel" class="smallFont" />
-            <ui:Label tabindex="-1" text="Some Artist - Some Title" display-tooltip-when-elided="true" name="nextGameRoundSongInfoLabel" class="smallFont" />
+            <ui:Label tabindex="-1" text="Next: Some Artist - Some Title" display-tooltip-when-elided="true" name="nextGameRoundSongInfoLabel" class="smallFont" />
         </ui:VisualElement>
         <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: flex-start;">
             <ui:VisualElement name="nextGameRoundPlayerEntryList" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center; flex-wrap: wrap;">

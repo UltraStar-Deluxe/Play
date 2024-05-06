@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Tar;
 using ICSharpCode.SharpZipLib.Zip;
@@ -20,16 +21,16 @@ public class ExtractArchiveControl : MonoBehaviour
 
     private long totalZipEntryCount;
     private long extractedZipEntryCount;
-    
+
     private long totalTarFileSizeInBytes;
     private long extractedTarFileEntrySizeInBytes;
-    
+
     private readonly Subject<ExtractArchiveProgressEvent> progressEventStream = new();
     public IObservable<ExtractArchiveProgressEvent> ProgressEventStream => progressEventStream;
-    
+
     private readonly Subject<bool> beforeDestroyEventStream = new();
     public IObservable<bool> BeforeDestroyEventStream => beforeDestroyEventStream;
-    
+
     private bool isExtractArchiveStarted;
 
     public static ExtractArchiveControl Create(string archivePath, string targetFolder, Transform parent)
@@ -60,10 +61,10 @@ public class ExtractArchiveControl : MonoBehaviour
         }
 
         isExtractArchiveStarted = true;
-        ThreadPool.QueueUserWorkItem(_ => ExtractArchive());
+        Task.Run(async () => await ExtractArchiveAsync());
     }
 
-    private void ExtractArchive()
+    private async Task ExtractArchiveAsync()
     {
         try
         {
@@ -94,7 +95,7 @@ public class ExtractArchiveControl : MonoBehaviour
             ErrorMessage.Value = e.Message;
         }
     }
-    
+
     private void ExtractZipArchive()
     {
         using Stream archiveStream = File.OpenRead(ArchivePath);
@@ -108,7 +109,7 @@ public class ExtractArchiveControl : MonoBehaviour
             {
                 throw new Exception("Object destroyed");
             }
-            
+
             ExtractZipEntry(zipFile, entry, TargetFolder);
         }
     }
@@ -130,7 +131,7 @@ public class ExtractArchiveControl : MonoBehaviour
         using Stream zipEntryStream = zipFile.GetInputStream(zipEntry);
         using FileStream targetFileStream = File.Create(targetFilePath);
         StreamUtils.Copy(zipEntryStream, targetFileStream, buffer);
-        
+
         extractedZipEntryCount++;
         if (ErrorMessage.Value.IsNullOrEmpty())
         {
@@ -169,7 +170,7 @@ public class ExtractArchiveControl : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
+
     private void OnDestroy()
     {
         beforeDestroyEventStream.OnNext(true);
@@ -181,7 +182,7 @@ public class ExtractArchiveControl : MonoBehaviour
 
         public ExtractArchiveProgressEvent(long extractedSize, long totalSize)
         {
-            ProgressInPercent = totalSize > 0 
+            ProgressInPercent = totalSize > 0
                 ? 100.0 * (double)extractedSize / totalSize
                 : 0.0;
         }
@@ -189,6 +190,6 @@ public class ExtractArchiveControl : MonoBehaviour
 
     public void Cancel()
     {
-        Destroy(gameObject);   
+        Destroy(gameObject);
     }
 }

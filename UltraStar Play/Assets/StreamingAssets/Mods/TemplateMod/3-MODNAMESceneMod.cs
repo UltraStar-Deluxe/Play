@@ -23,7 +23,7 @@ public class MODNAMESceneMod : ISceneMod
         // You can do anything here, for example ...
 
         // ... show a message
-        UiManager.CreateNotification($"Welcome to {sceneEnteredContext.Scene}!");
+        NotificationManager.CreateNotification(Translation.Of($"Welcome to {sceneEnteredContext.Scene}!"));
 
         // ... change UI elements
         // uiDocument.rootVisualElement.Query<VisualElement>().ForEach(element =>

@@ -27,7 +27,7 @@ public class HyphenationPatternsProvider : IHyphenatePatternsLoader
 
     public static IHyphenatePatternsLoader CreateHyphenationPatternsLoader(string language)
     {
-        string twoLetterCountryCode = GetTwoLetterCountryCode(language);
+        string twoLetterCountryCode = LocaleInfoUtils.GetTwoLetterCountryCode(language);
         if (twoLetterCountryCode.IsNullOrEmpty())
         {
             return null;
@@ -70,22 +70,5 @@ public class HyphenationPatternsProvider : IHyphenatePatternsLoader
         }
         string fileNameWithoutTxt = fileName.Replace(".txt", "");
         return $"HyphenationPatterns/txt/{fileNameWithoutTxt}";
-    }
-
-    private static string GetTwoLetterCountryCode(string language)
-    {
-        // handshake_country_language_locale_codes.json from https://gist.github.com/justincoh/80f97efdd21b516e3274973a003a1b08
-        TextAsset countryCodeEntriesJsonTextAsset = Resources.Load<TextAsset>("handshake_country_language_locale_codes.json");
-        List<Dictionary<string, string>> countryCodeEntries = JsonConverter.FromJson<List<Dictionary<string, string>>>(countryCodeEntriesJsonTextAsset.text);
-        Dictionary<string,string> matchingEntry = countryCodeEntries.FirstOrDefault(countryCodeEntry =>
-            string.Equals(countryCodeEntry["Language"], language, StringComparison.InvariantCultureIgnoreCase)
-            || string.Equals(countryCodeEntry["ISO639-2 Lang"], language, StringComparison.InvariantCultureIgnoreCase));
-        if (matchingEntry == null)
-        {
-            return "";
-        }
-
-        string twoLetterCountryCode = matchingEntry["ISO639-2 Lang"];
-        return twoLetterCountryCode;
     }
 }

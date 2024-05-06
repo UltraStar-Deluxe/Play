@@ -3,7 +3,6 @@ using ArchUnitNET.Domain.Extensions;
 using ArchUnitNET.Fluent.Predicates;
 using ArchUnitNET.NUnit;
 using NUnit.Framework;
-using UnityEngine;
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
 
 public class ArchUnitTests

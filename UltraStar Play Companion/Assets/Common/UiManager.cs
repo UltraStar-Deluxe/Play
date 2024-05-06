@@ -19,30 +19,28 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
      [InjectedInInspector]
     public VisualTreeAsset messageDialogUi;
-    
+
     [InjectedInInspector]
     public VisualTreeAsset micWithNameUi;
-    
+
     [InjectedInInspector]
     public VisualTreeAsset songListEntryUi;
-    
+
     [InjectedInInspector]
     public VisualTreeAsset songQueueEntryUi;
-    
+
     [InjectedInInspector]
     public VisualTreeAsset songQueuePlayerEntryUi;
-    
+
     [Inject]
     private UIDocument uiDocument;
-    
+
     protected override object GetInstance()
     {
         return Instance;
     }
 
-    private Label DoCreateNotification(
-        string text,
-        params string[] additionalTextClasses)
+    private Label DoCreateNotification(string text)
     {
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
@@ -67,7 +65,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         string text,
         params string[] additionalTextClasses)
     {
-        return Instance.DoCreateNotification(text, additionalTextClasses);
+        return Instance.DoCreateNotification(text);
     }
 
     public List<IBinding> GetBindings()

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
-using ProTrans;
 using UniInject;
 using UniInject.Extensions;
 using UniRx;
@@ -13,7 +12,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
+public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinder
 {
     private const EScene DefaultOptionsScene = EScene.OptionsGameScene;
 
@@ -48,9 +47,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     [Inject(UxmlName = R.UxmlNames.designOptionsButton)]
     private ToggleButton designOptionsButton;
-
-    [Inject(UxmlName = R.UxmlNames.internetOptionsButton)]
-    private ToggleButton internetOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.appOptionsButton)]
     private ToggleButton appOptionsButton;
@@ -101,9 +97,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     private SceneNavigator sceneNavigator;
 
     [Inject]
-    private TranslationManager translationManager;
-
-    [Inject]
     private Settings settings;
 
     [Inject]
@@ -124,14 +117,13 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     private SceneRecipe loadedSceneRecipe;
     private readonly List<GameObject> loadedGameObjects = new();
     private readonly Dictionary<EScene, ToggleButton> sceneToButtonMap = new();
-    private readonly Dictionary<EScene, string> sceneToShortNameMap = new();
-    private readonly Dictionary<EScene, string> sceneToLongNameMap = new();
+    private readonly Dictionary<EScene, Translation> sceneToShortNameMap = new();
+    private readonly Dictionary<EScene, Translation> sceneToLongNameMap = new();
 
     private AbstractOptionsSceneControl LoadedOptionsSceneControl => loadedGameObjects
         .Select(it => it.GetComponentInChildren<AbstractOptionsSceneControl>())
         .FirstOrDefault();
 
-    private MessageDialogControl helpDialogControl;
     private MessageDialogControl issuesDialogControl;
 
     private void Start()
@@ -161,7 +153,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         openSteamWorkshopButton.RegisterCallbackButtonTriggered(_ => OpenSteamWorkshop());
 
         updateSteamWorkshopItemsButton.RegisterCallbackButtonTriggered(_ => UpdateSteamWorkshopItems());
-        new TooltipControl(updateSteamWorkshopItemsButton, "Update Steam Workshop items.");
+        new TooltipControl(updateSteamWorkshopItemsButton, Translation.Get(R.Messages.steamWorkshop_updateTooltip));
 
         helpButton.RegisterCallbackButtonTriggered(_ => ShowHelp());
         issuesButton.RegisterCallbackButtonTriggered(_ => ShowIssuesDialog());
@@ -255,29 +247,28 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
             loadedSceneInjector
                 .WithRootVisualElement(loadedSceneVisualElement)
                 .InjectAllComponentsInChildren(loadedGameObject, true);
-
-            // Update translations
-            loadedGameObject.GetComponentsInChildren<ITranslator>()
-                .ForEach(it => it.UpdateTranslation());
         }
 
         // Set loaded scene title
-        loadedSceneTitle.text = sceneToLongNameMap[loadedSceneRecipe.scene];
+        loadedSceneTitle.SetTranslatedText(sceneToLongNameMap[loadedSceneRecipe.scene]);
 
         // Hide buttons in top row
-        helpButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasHelpDialog);
+        helpButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.HelpUri.IsNullOrEmpty());
         issuesButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasIssuesDialog);
         openSteamWorkshopButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty());
         updateSteamWorkshopItemsButton.SetVisibleByDisplay(openSteamWorkshopButton.IsVisibleByDisplay());
 
-        // Apply theme to loaded UI
+        // Apply theme and translations to loaded UI
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(loadedSceneVisualElement);
+        TranslationManager.ApplyTranslations(loadedSceneVisualElement);
 
         // Scroll with mouse drag
         MouseEventScrollControl.RegisterMouseScrollEvents();
 
         // Define usable scroll wheel increments for ScrollView.
         ScrollViewScrollWheelSpeedControl.UpdateScrollWheelSpeedOfAllScrollViews(loadedSceneVisualElement);
+
+        UpdateTranslation();
     }
 
     private void UnloadLastOptionsScene()
@@ -325,51 +316,49 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     public void UpdateTranslation()
     {
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options);
+        sceneTitle.SetTranslatedText(Translation.Get(R.Messages.options));
 
         UpdateSceneToNameMap();
         sceneToButtonMap.ForEach(entry =>
         {
             Button button = entry.Value;
             Label label = button.Q<Label>(R.UxmlNames.label);
-            label.text = sceneToShortNameMap[entry.Key];
+            label.SetTranslatedText(sceneToShortNameMap[entry.Key]);
         });
 
         if (loadedSceneRecipe != null)
         {
-            loadedSceneTitle.text = sceneToLongNameMap[loadedSceneRecipe.scene];
+            loadedSceneTitle.SetTranslatedText(sceneToLongNameMap[loadedSceneRecipe.scene]);
         }
     }
 
     private void UpdateSceneToNameMap()
     {
         sceneToShortNameMap.Clear();
-        sceneToShortNameMap.Add(EScene.OptionsGameScene, TranslationManager.GetTranslation(R.Messages.options_game_button));
-        sceneToShortNameMap.Add(EScene.SongLibraryOptionsScene, TranslationManager.GetTranslation(R.Messages.options_songLibrary_button));
-        sceneToShortNameMap.Add(EScene.OptionsSoundScene, TranslationManager.GetTranslation(R.Messages.options_sound_button));
-        sceneToShortNameMap.Add(EScene.OptionsGraphicsScene, TranslationManager.GetTranslation(R.Messages.options_graphics_button));
-        sceneToShortNameMap.Add(EScene.RecordingOptionsScene, TranslationManager.GetTranslation(R.Messages.options_recording_button));
-        sceneToShortNameMap.Add(EScene.PlayerProfileSetupScene, TranslationManager.GetTranslation(R.Messages.options_playerProfiles_button));
-        sceneToShortNameMap.Add(EScene.ThemeOptionsScene, TranslationManager.GetTranslation(R.Messages.options_design_button));
-        sceneToShortNameMap.Add(EScene.NetworkOptionsScene, TranslationManager.GetTranslation(R.Messages.options_internet_button));
-        sceneToShortNameMap.Add(EScene.CompanionAppOptionsScene, TranslationManager.GetTranslation(R.Messages.options_companionApp_button));
-        sceneToShortNameMap.Add(EScene.WebcamOptionsSecene, TranslationManager.GetTranslation(R.Messages.options_webcam_button));
-        sceneToShortNameMap.Add(EScene.DevelopmentOptionsScene, TranslationManager.GetTranslation(R.Messages.options_development_button));
-        sceneToShortNameMap.Add(EScene.ModOptionsScene, TranslationManager.GetTranslation(R.Messages.options_mod_button));
+        sceneToShortNameMap.Add(EScene.OptionsGameScene, Translation.Get(R.Messages.options_game_button));
+        sceneToShortNameMap.Add(EScene.SongLibraryOptionsScene, Translation.Get(R.Messages.options_songLibrary_button));
+        sceneToShortNameMap.Add(EScene.OptionsSoundScene, Translation.Get(R.Messages.options_sound_button));
+        sceneToShortNameMap.Add(EScene.OptionsGraphicsScene, Translation.Get(R.Messages.options_graphics_button));
+        sceneToShortNameMap.Add(EScene.RecordingOptionsScene, Translation.Get(R.Messages.options_recording_button));
+        sceneToShortNameMap.Add(EScene.PlayerProfileSetupScene, Translation.Get(R.Messages.options_playerProfiles_button));
+        sceneToShortNameMap.Add(EScene.ThemeOptionsScene, Translation.Get(R.Messages.options_design_button));
+        sceneToShortNameMap.Add(EScene.CompanionAppOptionsScene, Translation.Get(R.Messages.options_companionApp_button));
+        sceneToShortNameMap.Add(EScene.WebcamOptionsSecene, Translation.Get(R.Messages.options_webcam_button));
+        sceneToShortNameMap.Add(EScene.DevelopmentOptionsScene, Translation.Get(R.Messages.options_development_button));
+        sceneToShortNameMap.Add(EScene.ModOptionsScene, Translation.Get(R.Messages.options_mod_button));
 
         sceneToLongNameMap.Clear();
-        sceneToLongNameMap.Add(EScene.OptionsGameScene, TranslationManager.GetTranslation(R.Messages.options_game_title));
-        sceneToLongNameMap.Add(EScene.SongLibraryOptionsScene, TranslationManager.GetTranslation(R.Messages.options_songLibrary_title));
-        sceneToLongNameMap.Add(EScene.OptionsSoundScene, TranslationManager.GetTranslation(R.Messages.options_sound_title));
-        sceneToLongNameMap.Add(EScene.OptionsGraphicsScene, TranslationManager.GetTranslation(R.Messages.options_graphics_title));
-        sceneToLongNameMap.Add(EScene.RecordingOptionsScene, TranslationManager.GetTranslation(R.Messages.options_recording_title));
-        sceneToLongNameMap.Add(EScene.PlayerProfileSetupScene, TranslationManager.GetTranslation(R.Messages.options_playerProfiles_title));
-        sceneToLongNameMap.Add(EScene.ThemeOptionsScene, TranslationManager.GetTranslation(R.Messages.options_design_title));
-        sceneToLongNameMap.Add(EScene.NetworkOptionsScene, TranslationManager.GetTranslation(R.Messages.options_internet_title));
-        sceneToLongNameMap.Add(EScene.CompanionAppOptionsScene, TranslationManager.GetTranslation(R.Messages.options_companionApp_title));
-        sceneToLongNameMap.Add(EScene.WebcamOptionsSecene, TranslationManager.GetTranslation(R.Messages.options_webcam_title));
-        sceneToLongNameMap.Add(EScene.DevelopmentOptionsScene, TranslationManager.GetTranslation(R.Messages.options_development_title));
-        sceneToLongNameMap.Add(EScene.ModOptionsScene, TranslationManager.GetTranslation(R.Messages.options_mod_title));
+        sceneToLongNameMap.Add(EScene.OptionsGameScene, Translation.Get(R.Messages.options_game_title));
+        sceneToLongNameMap.Add(EScene.SongLibraryOptionsScene, Translation.Get(R.Messages.options_songLibrary_title));
+        sceneToLongNameMap.Add(EScene.OptionsSoundScene, Translation.Get(R.Messages.options_sound_title));
+        sceneToLongNameMap.Add(EScene.OptionsGraphicsScene, Translation.Get(R.Messages.options_graphics_title));
+        sceneToLongNameMap.Add(EScene.RecordingOptionsScene, Translation.Get(R.Messages.options_recording_title));
+        sceneToLongNameMap.Add(EScene.PlayerProfileSetupScene, Translation.Get(R.Messages.options_playerProfiles_title));
+        sceneToLongNameMap.Add(EScene.ThemeOptionsScene, Translation.Get(R.Messages.options_design_title));
+        sceneToLongNameMap.Add(EScene.CompanionAppOptionsScene, Translation.Get(R.Messages.options_companionApp_title));
+        sceneToLongNameMap.Add(EScene.WebcamOptionsSecene, Translation.Get(R.Messages.options_webcam_title));
+        sceneToLongNameMap.Add(EScene.DevelopmentOptionsScene, Translation.Get(R.Messages.options_development_title));
+        sceneToLongNameMap.Add(EScene.ModOptionsScene, Translation.Get(R.Messages.options_mod_title));
     }
 
     private void UpdateSceneToButtonMap()
@@ -381,7 +370,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         sceneToButtonMap.Add(EScene.RecordingOptionsScene, recordingOptionsButton);
         sceneToButtonMap.Add(EScene.PlayerProfileSetupScene, profileOptionsButton);
         sceneToButtonMap.Add(EScene.ThemeOptionsScene, designOptionsButton);
-        sceneToButtonMap.Add(EScene.NetworkOptionsScene, internetOptionsButton);
         sceneToButtonMap.Add(EScene.CompanionAppOptionsScene, appOptionsButton);
         sceneToButtonMap.Add(EScene.DevelopmentOptionsScene, developerOptionsButton);
         sceneToButtonMap.Add(EScene.WebcamOptionsSecene, webcamOptionsButton);
@@ -399,40 +387,29 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     public void ShowHelp()
     {
-        if (helpDialogControl != null)
+        if (LoadedOptionsSceneControl.HelpUri.IsNullOrEmpty())
         {
             return;
         }
 
-        if (LoadedOptionsSceneControl.HasHelpDialog)
-        {
-            helpDialogControl = LoadedOptionsSceneControl.CreateHelpDialogControl();
-            helpDialogControl.DialogClosedEventStream.Subscribe(_ =>
-            {
-                helpDialogControl = null;
-                helpButton.Focus();
-            });
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(helpDialogControl.DialogRootVisualElement);
-        }
+        ApplicationUtils.OpenUrl(LoadedOptionsSceneControl.HelpUri);
     }
 
     public void ShowIssuesDialog()
     {
-        if (issuesDialogControl != null)
+        if (issuesDialogControl != null
+            || !LoadedOptionsSceneControl.HasIssuesDialog)
         {
             return;
         }
 
-        if (LoadedOptionsSceneControl.HasHelpDialog)
+        issuesDialogControl = LoadedOptionsSceneControl.CreateIssuesDialogControl();
+        issuesDialogControl.DialogClosedEventStream.Subscribe(_ =>
         {
-            issuesDialogControl = LoadedOptionsSceneControl.CreateIssuesDialogControl();
-            issuesDialogControl.DialogClosedEventStream.Subscribe(_ =>
-            {
-                issuesDialogControl = null;
-                issuesButton.Focus();
-            });
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(issuesDialogControl.DialogRootVisualElement);
-        }
+            issuesDialogControl = null;
+            issuesButton.Focus();
+        });
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(issuesDialogControl.DialogRootVisualElement);
     }
 
     private void OnDestroy()

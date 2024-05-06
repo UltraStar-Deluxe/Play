@@ -4,9 +4,6 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-#if UNITY_EDITOR
-    using UnityEditor;
-#endif
 
 public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 {
@@ -61,49 +58,6 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
             Debug.Log("Toggle UI visibility");
             uiDocument.rootVisualElement.SetVisibleByDisplay(!uiDocument.rootVisualElement.IsVisibleByDisplay());
         }
-
-#if UNITY_EDITOR
-        UpdateEditorOnlyGlobalShortcuts();
-#endif
-    }
-
-#if UNITY_EDITOR
-    private void UpdateEditorOnlyGlobalShortcuts()
-    {
-        if (!Application.isEditor
-            || Keyboard.current == null)
-        {
-            return;
-        }
-
-        if (InputUtils.IsKeyboardAltPressed()
-            && Keyboard.current.rKey.wasReleasedThisFrame)
-        {
-            RefreshAssetDatabase();
-            ReloadCurrentScene();
-        }
-
-        if (InputUtils.IsKeyboardControlPressed()
-            && Keyboard.current.rKey.wasReleasedThisFrame)
-        {
-            // Refresh assets even at runtime
-            RefreshAssetDatabase();
-        }
-    }
-#endif
-
-    private void RefreshAssetDatabase()
-    {
-#if UNITY_EDITOR
-        AssetDatabase.Refresh();
-#endif
-    }
-
-    private void ReloadCurrentScene()
-    {
-        EScene currentScene = sceneRecipeManager.GetCurrentScene();
-        Debug.Log($"Reloading scene: {currentScene}");
-        sceneNavigator.LoadScene(currentScene);
     }
 
     private void ToggleMuteAudio()
@@ -111,11 +65,11 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
         volumeControl.ToggleMuteAudio();
         if (volumeControl.IsMuted)
         {
-            UiManager.CreateNotification("Mute");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_mute));
         }
         else
         {
-            UiManager.CreateNotification("Unmute");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_unmute));
         }
     }
 
@@ -127,7 +81,7 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2,
             () =>
             {
-                settings.FullScreenMode = Screen.fullScreenMode;
+                settings.FullScreenMode = Screen.fullScreenMode.ToCustomFullScreenMode();
                 Debug.Log("New full-screen mode " + settings.FullScreenMode);
             }));
     }

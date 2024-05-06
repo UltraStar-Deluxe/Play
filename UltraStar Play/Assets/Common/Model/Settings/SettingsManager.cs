@@ -1,4 +1,5 @@
 ﻿using System;
+using ProTrans;
 using UnityEngine;
 
 public class SettingsManager : AbstractSingletonBehaviour
@@ -93,6 +94,9 @@ public class SettingsManager : AbstractSingletonBehaviour
         // Update log level
         Debug.Log($"Using loaded log level: {settings.MinimumLogLevel}");
         Log.MinimumLogLevel = settings.MinimumLogLevel;
+
+        Debug.Log($"Using loaded CultureInfo: {settings.CultureInfoName}");
+        TranslationConfig.Singleton.CurrentCultureInfo = SettingsUtils.GetCultureInfo(settings);
     }
 
     private static void OverwriteSettingsWithCommandLineArguments(Settings settings)

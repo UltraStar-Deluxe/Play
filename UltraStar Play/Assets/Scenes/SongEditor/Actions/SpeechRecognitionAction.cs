@@ -55,7 +55,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int minBeat = SongMetaUtils.MinBeat(selectedNotes);
         int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
         double lengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta) * lengthInBeats;
-        Job speechRecognitionJob = new("Speech recognition");
+        Job speechRecognitionJob = new(Translation.Get(R.Messages.job_speechRecognition));
         jobManager.AddJob(speechRecognitionJob);
         speechRecognitionJob.EstimatedTotalDurationInMillis =
             SpeechRecognitionUtils.GetEstimatedSpeechRecognitionDurationInMillis(lengthInMillis);
@@ -172,7 +172,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Create notes from speech recognition failed: {ex.Message}");
-                UiManager.CreateNotification(ex.Message);
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason, "reason", ex.Message));
             })
             .Select(createdNotes =>
             {
@@ -254,7 +254,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 monoAudioSamples.Length - 1,
                 audioClip.frequency,
                 speechRecognitionParameters,
-                JobManager.CreateAndAddJob("Speech Recognition"),
+                JobManager.CreateAndAddJob(Translation.Get(R.Messages.job_speechRecognition)),
                 continuous,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,

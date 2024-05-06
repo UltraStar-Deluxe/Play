@@ -5,29 +5,18 @@ using UniRx;
 public class LabeledItemPickerControl<T> : ListedItemPickerControl<T>
 {
     private readonly string smallFontUssClass = "smallFont";
-
-    private Func<T, string> getLabelTextFunction = item => item != null ? item.ToString() : "";
-
-    public Func<T, string> GetLabelTextFunction
-    {
-        get
-        {
-            return getLabelTextFunction;
-        }
-        set
-        {
-            getLabelTextFunction = value;
-            UpdateLabelText(SelectedItem);
-        }
-    }
+    private readonly Func<T, Translation> getLabelTextFunction;
 
     public bool AutoSmallFont { get; set; } = true;
-    
-    public LabeledItemPickerControl(ItemPicker itemPicker, List<T> items)
+
+    public LabeledItemPickerControl(ItemPicker itemPicker, List<T> items,
+         Func<T, Translation> getLabelTextFunction)
         : base(itemPicker)
     {
+        this.getLabelTextFunction = getLabelTextFunction;
         Selection.Subscribe(UpdateLabelText);
         Items = items;
+        UpdateLabelText(SelectedItem);
     }
 
     public void UpdateLabelText()
@@ -37,7 +26,7 @@ public class LabeledItemPickerControl<T> : ListedItemPickerControl<T>
 
     private void UpdateLabelText(T item)
     {
-        ItemPicker.ItemLabel.text = GetLabelTextFunction(item);
+        ItemPicker.ItemLabel.SetTranslatedText(getLabelTextFunction(item));
 
         if (AutoSmallFont)
         {

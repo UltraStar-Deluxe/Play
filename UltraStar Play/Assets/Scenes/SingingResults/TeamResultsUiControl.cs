@@ -23,7 +23,7 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.thirdTeamUi)]
     private VisualElement thirdTeamUi;
-    
+
     [Inject(UxmlName = R.UxmlNames.otherTeamsScrollView)]
     private ScrollView otherTeamsScrollView;
 
@@ -31,7 +31,7 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
     private VisualElement firstPlaceTrophyImage;
 
     private bool isVfxInitialized;
-    
+
     public void OnInjectionFinished()
     {
         HideByDisplay();
@@ -55,7 +55,7 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
         firstTeamUi.HideByDisplay();
         secondTeamUi.HideByDisplay();
         thirdTeamUi.HideByDisplay();
-        
+
         List<PartyModeTeamSettings> otherTeams = PartyModeUtils.GetAllTeams(singingResultsSceneControl.PartyModeSceneData);
         otherTeams.Sort((a,b) =>
         {
@@ -100,7 +100,7 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
         // Add other teams to scroll view
         otherTeamsScrollView.Clear();
         otherTeamsScrollView.SetVisibleByDisplay(!otherTeams.IsNullOrEmpty());
-        
+
         otherTeams.ForEach(team =>
         {
             VisualElement teamUi = teamResultUi.CloneTreeAndGetFirstChild();
@@ -108,7 +108,7 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
             otherTeamsScrollView.Add(teamUi);
             FillTeamResultUi(-1, teamUi, new List<PartyModeTeamSettings> { team });
         });
-        
+
         firstTeamUi.RegisterHasGeometryCallbackOneShot(_ => InitVfx());
     }
 
@@ -131,10 +131,10 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
                                       && teams.AllMatch(team => PartyModeUtils.IsKnockedOut(singingResultsSceneControl.PartyModeSceneData, team));
         knockOutOverlay.SetVisibleByDisplay(knockOutOverlayVisible);
 
-        teamNameLabel.text = teams.Select(team => team.name).JoinWith(" & ");
+        teamNameLabel.SetTranslatedText(Translation.Of(teams.Select(team => team.name).JoinWith(" & ")));
 
         int score = PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSceneData, teams.FirstOrDefault());
-        teamScoreLabel.text = score.ToString();
+        teamScoreLabel.SetTranslatedText(Translation.Of(score.ToString()));
 
         // labelContainer.style.backgroundColor = GetPlaceColor(place);
         labelContainer.style.unityBackgroundImageTintColor = GetPlaceColor(place);
@@ -158,7 +158,7 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
             return;
         }
         isVfxInitialized = true;
-        
+
         // Create particle effect for first place
         VfxManager.CreateParticleEffect(new ParticleEffectConfig()
         {

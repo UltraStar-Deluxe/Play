@@ -108,6 +108,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         partyModeSettings.TeamSettings.Teams.ForEach(team => CreateTeamUi(team));
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(teamList);
+        TranslationManager.ApplyTranslations(teamList);
     }
 
     private void CreateTeamUi(PartyModeTeamSettings team)
@@ -198,7 +199,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         }
         else
         {
-            playerNameLabel.text = playerProfile.Name;
+            playerNameLabel.SetTranslatedText(Translation.Of(playerProfile.Name));
         }
 
         // Move player to other team
