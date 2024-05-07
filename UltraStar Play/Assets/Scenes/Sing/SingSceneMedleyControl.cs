@@ -104,7 +104,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
 
     private void DoStartCurrentMedleySong()
     {
-        Debug.Log($"Starting current medley song '{SongMetaUtils.GetArtistDashTitle(singSceneControl.SongMeta)}'");
+        Debug.Log($"Starting current medley song '{singSceneControl.SongMeta.GetArtistDashTitle()}'");
         singSceneControl.SkipToPositionInSong(CalculateMedleyStartWithCountdownInMillis());
         countdownControl.StartCountdown(CountDownTimeInSeconds);
         audioFadeInControl.StartAudioFadeIn(CountDownTimeInSeconds);

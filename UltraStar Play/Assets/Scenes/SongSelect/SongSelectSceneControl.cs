@@ -408,7 +408,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                     uiManager.CreateConfirmationDialogControl(
                         Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_title),
                         Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_message,
-                            "suggestionName", SongMetaUtils.GetArtistDashTitle(songMeta),
+                            "suggestionName", songMeta.GetArtistDashTitle(),
                             "suggestorName", lobbyMember.DisplayName),
                         Translation.Get(R.Messages.common_yes),
                         _ => songRouletteControl.SelectEntryBySongMeta(songMeta),
@@ -1274,7 +1274,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         uiManager.CreateConfirmationDialogControl(
             Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_title),
             Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_message,
-                "suggestionName", SongMetaUtils.GetArtistDashTitle(songMeta)),
+                "suggestionName", songMeta.GetArtistDashTitle()),
             Translation.Get(R.Messages.common_yes),
             _ => SendSuggestSongMessageForOnlineMultiplayer(songMeta),
             Translation.Get(R.Messages.common_no));
@@ -1287,7 +1287,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             FastBufferWriterUtils.WriteJsonValuePacked(new SuggestSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
             NetworkManager.ServerClientId);
         NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_suggestedSongToHost,
-            "name", SongMetaUtils.GetArtistDashTitle(songMeta)));
+            "name", songMeta.GetArtistDashTitle()));
     }
 
     private void OpenAskToAssignMicsDialog(List<PlayerProfile> playerProfilesWithoutMics, Action onIgnoreAndStart)
@@ -1401,7 +1401,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.Log($"Failed to add search result entry '{SongMetaUtils.GetArtistDashTitle(searchResultEntry.SongMeta)}'");
+            Debug.Log($"Failed to add search result entry '{searchResultEntry.SongMeta.GetArtistDashTitle()}'");
         }
     }
 

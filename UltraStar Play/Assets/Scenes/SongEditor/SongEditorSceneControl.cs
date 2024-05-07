@@ -186,7 +186,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         createSingAlongSongControl.CreateSingAlongSongAsObservable(SongMeta, true)
             .Subscribe(evt =>
             {
-                Debug.Log($"Created sing-along data for song '{SongMetaUtils.GetArtistDashTitle(SongMeta)}'");
+                Debug.Log($"Created sing-along data for song '{SongMeta.GetArtistDashTitle()}'");
                 editorNoteDisplayer.ClearNoteControls();
                 songMetaChangeEventStream.OnNext(new NotesChangedEvent());
             });

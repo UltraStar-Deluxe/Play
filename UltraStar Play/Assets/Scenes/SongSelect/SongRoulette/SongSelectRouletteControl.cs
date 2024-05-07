@@ -401,7 +401,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
         if (entry is SongSelectSongEntry songEntry)
         {
-            item.Name = SongMetaUtils.GetArtistDashTitle(songEntry.SongMeta);
+            item.Name = songEntry.SongMeta.GetArtistDashTitle();
         }
         else if (entry is SongSelectFolderEntry folderEntry)
         {

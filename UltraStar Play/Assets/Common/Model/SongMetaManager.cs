@@ -99,7 +99,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.LogError($"Failed to notify about added song: '{SongMetaUtils.GetArtistDashTitle(songMeta)}': {ex.Message}");
+            Debug.LogError($"Failed to notify about added song: '{songMeta.GetArtistDashTitle()}': {ex.Message}");
         }
     }
 

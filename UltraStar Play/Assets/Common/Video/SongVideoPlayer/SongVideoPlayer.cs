@@ -832,13 +832,13 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Failed to load video of '{SongMetaUtils.GetArtistDashTitle(songMeta)}': {ex.Message}");
+                Debug.LogError($"Failed to load video of '{songMeta.GetArtistDashTitle()}': {ex.Message}");
                 ShowBackgroundImage(songMeta);
             })
             // Subscribe to trigger observable
             .Subscribe(evt =>
             {
-                Debug.Log($"Successfully loaded video of song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+                Debug.Log($"Successfully loaded video of song '{songMeta.GetArtistDashTitle()}'");
 
                 if (loadedSongMeta.VideoGapInMillis > 0)
                 {

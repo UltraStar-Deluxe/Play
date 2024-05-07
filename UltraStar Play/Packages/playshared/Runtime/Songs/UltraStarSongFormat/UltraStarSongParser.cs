@@ -56,7 +56,7 @@ public static class UltraStarSongParser
         if (logIssues)
         {
             // Log issues
-            songIssues.ForEach(songIssue => Debug.LogWarning($"{songIssue.Message} in song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'"));
+            songIssues.ForEach(songIssue => Debug.LogWarning($"{songIssue.Message} in song '{songMeta.GetArtistDashTitle()}'"));
         }
 
         // Lazy load voices

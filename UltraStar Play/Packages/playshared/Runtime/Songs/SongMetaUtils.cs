@@ -517,7 +517,7 @@ public static class SongMetaUtils
 
         if (songMetas.Count == 1)
         {
-            return GetArtistDashTitle(songMetas[0]);
+            songMetas[0].GetArtistDashTitle();
         }
 
         return songMetas
@@ -782,7 +782,7 @@ public static class SongMetaUtils
 
     public static Color32 CreateColorForSongMeta(SongMeta songMeta)
     {
-        return ColorGenerationUtils.FromString(GetArtistDashTitle(songMeta));
+        return ColorGenerationUtils.FromString(songMeta.GetArtistDashTitle());
     }
 
     public static string ComputeScoreRelevantSongHash(SongMeta songMeta)

@@ -18,6 +18,6 @@
 
     public override string ToString()
     {
-        return $"{nameof(FormatNotSupportedSongIssueData)}({MediaType}, {SongMetaUtils.GetArtistDashTitle(SongMeta)})";
+        return $"{nameof(FormatNotSupportedSongIssueData)}({MediaType}, {SongMeta.GetArtistDashTitle()})";
     }
 }

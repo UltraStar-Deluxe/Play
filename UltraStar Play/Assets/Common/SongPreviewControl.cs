@@ -232,7 +232,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Audio could not be loaded: '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+                Debug.LogError($"Audio could not be loaded: '{songMeta.GetArtistDashTitle()}'");
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                     "reason", ex.Message));
                 songAudioPlayer.PauseAudio();

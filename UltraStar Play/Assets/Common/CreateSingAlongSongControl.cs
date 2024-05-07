@@ -45,7 +45,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
     {
         CreateSingAlongSongAsObservable(songMeta, saveSongFile)
             // Subscribe to trigger observable
-            .Subscribe(_ => Debug.Log($"Created sing-along data for song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'"));
+            .Subscribe(_ => Debug.Log($"Created sing-along data for song '{songMeta.GetArtistDashTitle()}'"));
     }
 
     public IObservable<SongMeta> CreateSingAlongSongAsObservable(SongMeta songMeta, bool saveSongFile)
@@ -62,7 +62,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
             return Observable.Empty<SongMeta>();
         }
-        Debug.Log($"Creating sing-along data song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+        Debug.Log($"Creating sing-along data song '{songMeta.GetArtistDashTitle()}'");
 
         Job processSongJob = new(Translation.Get(R.Messages.job_createSingAlongDataWithName, "name", Path.GetFileName(songMeta.Audio)));
         Job audioSeparationJob = new(Translation.Get(R.Messages.job_audioSeparation), processSongJob);

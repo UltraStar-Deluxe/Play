@@ -9,6 +9,6 @@
 
     public override string ToString()
     {
-        return $"{nameof(SongIssueData)}({SongMetaUtils.GetArtistDashTitle(SongMeta)})";
+        return $"{nameof(SongIssueData)}({SongMeta.GetArtistDashTitle()})";
     }
 }

@@ -194,7 +194,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
                 return result;
             }
 
-            IDisposable d = new DisposableStopwatch($"Searching issues of song '{SongMetaUtils.GetArtistDashTitle(songMeta)}' took <ms> ms");
+            IDisposable d = new DisposableStopwatch($"Searching issues of song '{songMeta.GetArtistDashTitle()}' took <ms> ms");
 
             // Search issues in song txt file
             try
@@ -205,7 +205,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Failed to search issues in file '{songMeta.FileInfo}' of song '{SongMetaUtils.GetArtistDashTitle(songMeta)}': {ex.Message}");
+                Debug.LogError($"Failed to search issues in file '{songMeta.FileInfo}' of song '{songMeta.GetArtistDashTitle()}': {ex.Message}");
             }
 
             // Search issues in used audio, video, image files
@@ -221,7 +221,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Failed to search supported media format issues of song '{SongMetaUtils.GetArtistDashTitle(songMeta)}': {ex.Message}");
+                Debug.LogError($"Failed to search supported media format issues of song '{songMeta.GetArtistDashTitle()}': {ex.Message}");
             }
 
             // TODO: Search issues via SongMetaAnalyzer that is used to show additional errors/warnings in the song editor (e.g. overlapping notes).

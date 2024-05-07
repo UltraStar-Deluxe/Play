@@ -444,7 +444,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 startPositionInMillis,
                 streamAudio)
             // Subscribe to trigger observable
-            .Subscribe(evt => Debug.Log($"Successfully loaded audio of song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'"));
+            .Subscribe(evt => Debug.Log($"Successfully loaded audio of song '{songMeta.GetArtistDashTitle()}'"));
     }
 
     public IObservable<SongAudioLoadedEvent> LoadAndPlaySongAudioAsObservable(

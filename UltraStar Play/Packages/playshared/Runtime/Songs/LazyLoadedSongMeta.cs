@@ -435,7 +435,7 @@ public abstract class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         {
             LoadSongPhase = ELoadSongPhase.Failed;
             Debug.LogException(ex);
-            Debug.LogError($"Failed load song '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
+            Debug.LogError($"Failed load song '{this.GetArtistDashTitle()}': {ex.Message}");
             return;
         }
 
