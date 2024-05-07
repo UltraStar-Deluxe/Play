@@ -24,7 +24,7 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
     }
 
     [UnityTest]
-    public IEnumerator CreateSingAlongDataTest()
+    public IEnumerator ShouldCreateSingAlongData()
     {
         LogAssert.ignoreFailingMessages = true;
 

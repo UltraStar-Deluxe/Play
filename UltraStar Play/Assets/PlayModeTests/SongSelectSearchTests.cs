@@ -14,7 +14,7 @@ public class SongSelectSearchTests : AbstractPlayModeTest
     protected override string TestSceneName => EScene.SongSelectScene.ToString();
 
     [UnityTest]
-    public IEnumerator SongSearchIgnoresAccentsTest() => ExpectAnySongSelectEntry()
+    public IEnumerator SongSearchShouldIgnoreAccents() => ExpectAnySongSelectEntry()
         .ContinueWith(_ => SetSearchText("eLLo"))
         .ContinueWith(ExpectSongSelectEntryWithArtistName("HèllóArtist"))
         .ToYieldInstruction(this.Executor);

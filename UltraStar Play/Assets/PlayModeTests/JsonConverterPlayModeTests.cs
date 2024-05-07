@@ -10,7 +10,7 @@ public class JsonConverterPlayModeTests : AbstractPlayModeTest
 {
     // TODO: Refactor common code of these tests
     [UnityTest]
-    public IEnumerator UnityNetcodeClientIdTest()
+    public IEnumerator UnityNetcodeClientIdRoundtripKeepsValue()
     {
         LogAssert.ignoreFailingMessages = true;
 
@@ -31,7 +31,7 @@ public class JsonConverterPlayModeTests : AbstractPlayModeTest
     }
 
     [UnityTest]
-    public IEnumerator SteamIdTest()
+    public IEnumerator SteamIdRoundtripKeepsValue()
     {
         LogAssert.ignoreFailingMessages = true;
 

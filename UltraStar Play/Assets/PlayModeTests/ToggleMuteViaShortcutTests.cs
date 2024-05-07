@@ -10,7 +10,7 @@ public class ToggleMuteViaShortcutTests : AbstractPlayModeTest
     protected override string TestSceneName => EScene.MainScene.ToString();
 
     [UnityTest]
-    public IEnumerator ToggleMuteViaShortcutTest() => ExpectNotMutedAndNonZeroVolume()
+    public IEnumerator ToggleMuteShouldAffectVolume() => ExpectNotMutedAndNonZeroVolume()
         .ContinueWith(_ => PressAndReleaseF10Key())
         .ContinueWith(_ => ExpectMutedAndZeroVolume())
         .ToYieldInstruction(Executor);
