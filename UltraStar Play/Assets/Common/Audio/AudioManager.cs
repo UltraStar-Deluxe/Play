@@ -1,46 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
-// Handles loading and caching of AudioClips.
-// Use this over AudioUtils because AudioUtils does not cache AudioClips.
+/**
+ * Handles loading and caching of AudioClips.
+ */
 public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        ClearCache();
-    }
-
-    private const string MusicAudioMixerName = "Music";
-    private const string SfxAudioMixerName = "Sfx";
-    private const string VolumeParameterName = "Volume";
-
-    private static readonly int criticalCacheSize = 10;
-    private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
-
     public static AudioManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioManager>();
 
-    private static Dictionary<AudioClip, int> audioClipToLastPlayedFrameCount = new();
-
-    [InjectedInInspector]
-    public AudioMixer mainAudioMixer;
-
-    [InjectedInInspector]
-    public AudioClip defaultButtonSound;
-
-    [InjectedInInspector]
-    public AudioClip songSelectSound;
-
-    [InjectedInInspector]
-    public AudioClip singingResultsRatingPopupSound;
+    private const int CriticalCacheSize = 10;
+    private readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
 
     [Inject]
     private Settings settings;
@@ -50,159 +25,21 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         return Instance;
     }
 
-    protected override void StartSingleton()
-    {
-        settings.ObserveEveryValueChanged(it => it.SfxVolumePercent)
-            .Subscribe(newValue => SetVolume(SfxAudioMixerName, newValue / 100f))
-            .AddTo(gameObject);
-    }
-
-    public static void PlaySoundEffect(AudioClip clip, float volume = 1)
-    {
-        if (clip == null)
-        {
-            return;
-        }
-
-        if (audioClipToLastPlayedFrameCount.TryGetValue(clip, out int lastPlayedFrameCount)
-            && lastPlayedFrameCount == Time.frameCount)
-        {
-            return;
-        }
-        audioClipToLastPlayedFrameCount[clip] = Time.frameCount;
-
-        AudioManager audioManager = Instance;
-        if (audioManager == null
-            || audioManager.settings.SfxVolumePercent <= 0
-            || volume <= 0)
-        {
-            return;
-        }
-
-        GameObject sfxInstance = new GameObject($"Sfx '{clip.name}'");
-
-        AudioSource source = sfxInstance.AddComponent<AudioSource>();
-        source.clip = clip;
-        source.volume = volume;
-        source.Play();
-
-        // set the mixer group (e.g. music, sfx, etc.)
-        source.outputAudioMixerGroup = GetAudioMixerGroup(SfxAudioMixerName);
-
-        // destroy after clip length
-        Destroy(sfxInstance, clip.length);
-    }
-
-    public static AudioMixerGroup GetAudioMixerGroup(string groupName)
-    {
-        AudioManager audioManager = Instance;
-
-        if (audioManager == null)
-            return null;
-
-        if (audioManager.mainAudioMixer == null)
-            return null;
-
-        AudioMixerGroup[] groups = audioManager.mainAudioMixer.FindMatchingGroups(groupName);
-
-        foreach (AudioMixerGroup match in groups)
-        {
-            if (match.ToString() == groupName)
-                return match;
-        }
-        return null;
-
-    }
-    // convert linear value between 0 and 1 to decibels
-    public static float GetDecibelValue(float linearValue)
-    {
-        // commonly used for linear to decibel conversion
-        float conversionFactor = 20f;
-
-        float decibelValue = (linearValue != 0) ? conversionFactor * Mathf.Log10(linearValue) : -144f;
-        return decibelValue;
-    }
-
-    // convert decibel value to a range between 0 and 1
-    public static float GetLinearValue(float decibelValue)
-    {
-        float conversionFactor = 20f;
-
-        return Mathf.Pow(10f, decibelValue / conversionFactor);
-
-    }
-
-    // converts linear value between 0 and 1 into decibels and sets AudioMixer level
-    public static void SetVolume(string groupName, float linearValue)
-    {
-        AudioManager audioManager = Instance;
-        if (audioManager == null)
-            return;
-
-        float decibelValue = GetDecibelValue(linearValue);
-        if (audioManager.mainAudioMixer != null)
-        {
-            audioManager.mainAudioMixer.SetFloat(groupName + VolumeParameterName, decibelValue);
-        }
-    }
-
-    // returns a value between 0 and 1 based on the AudioMixer's decibel value
-    public static float GetVolume(string groupName)
-    {
-        AudioManager audioManager = Instance;
-        if (audioManager == null)
-            return 0f;
-
-        float decibelValue = 0f;
-        if (audioManager.mainAudioMixer != null)
-        {
-            audioManager.mainAudioMixer.GetFloat(groupName, out decibelValue);
-        }
-        return GetLinearValue(decibelValue);
-    }
-
-    public static void PlayButtonSound()
-    {
-        AudioManager audioManager = Instance;
-        if (audioManager == null)
-            return;
-
-        PlaySoundEffect(audioManager.defaultButtonSound, 0.5f);
-    }
-
-    public static void PlaySongSelectSound()
-    {
-        AudioManager audioManager = Instance;
-        if (audioManager == null)
-            return;
-
-        PlaySoundEffect(audioManager.songSelectSound, 0.3f);
-    }
-
-    public static void PlaySingingResultsRatingPopupSound()
-    {
-        AudioManager audioManager = Instance;
-        if (audioManager == null)
-            return;
-
-        PlaySoundEffect(audioManager.singingResultsRatingPopupSound, 0.5f);
-    }
-
     public static AudioClip LoadAudioClipFromUriImmediately(string uri, bool streamAudio = true)
     {
         AudioClip result = null;
         // Load with busy waiting
-        LoadAudioClipFromUri(uri, streamAudio, true)
+        Instance.LoadAudioClipFromUri(uri, streamAudio, true)
             .Subscribe(audioClip => result = audioClip);
         return result;
     }
 
     public static IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio = true)
     {
-        return LoadAudioClipFromUri(uri, streamAudio, false);
+        return Instance.LoadAudioClipFromUri(uri, streamAudio, false);
     }
 
-    private static IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio, bool busyWaiting)
+    private IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio, bool busyWaiting)
     {
         if (uri.IsNullOrEmpty())
         {
@@ -263,7 +100,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         });
     }
 
-    public static void ClearCache()
+    public void ClearCache()
     {
         foreach (CachedAudioClip cachedAudioClip in new List<CachedAudioClip>(audioClipCache.Values))
         {
@@ -272,9 +109,9 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         audioClipCache.Clear();
     }
 
-    private static void AddAudioClipToCache(string path, AudioClip audioClip, bool streamAudio)
+    private void AddAudioClipToCache(string path, AudioClip audioClip, bool streamAudio)
     {
-        if (audioClipCache.Count >= criticalCacheSize)
+        if (audioClipCache.Count >= CriticalCacheSize)
         {
             RemoveOldestAudioClipsFromCache();
         }
@@ -284,7 +121,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         audioClipCache[path] = cachedAudioClip;
     }
 
-    private static void RemoveOldestAudioClipsFromCache()
+    private void RemoveOldestAudioClipsFromCache()
     {
         CachedAudioClip oldest = null;
         foreach (CachedAudioClip cachedAudioClip in audioClipCache.Values)
@@ -301,7 +138,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private static void RemoveCachedAudioClip(CachedAudioClip cachedAudioClip)
+    private void RemoveCachedAudioClip(CachedAudioClip cachedAudioClip)
     {
         audioClipCache.Remove(cachedAudioClip.Path);
 
@@ -313,41 +150,6 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         if (cachedAudioClip.FullAudioClip != null)
         {
             cachedAudioClip.FullAudioClip.UnloadAudioData();
-        }
-    }
-
-    private class LoadingAudioClip
-    {
-        public string Path { get; private set; }
-        public DownloadHandlerAudioClip DownloadHandler { get; private set; }
-        public List<Action<AudioClip>> Callbacks { get; private set; } = new();
-        public long ElapsedMilliseconds
-        {
-            get
-            {
-                return stopwatch.ElapsedMilliseconds;
-            }
-        }
-
-        private readonly Stopwatch stopwatch;
-
-        public LoadingAudioClip(string path, DownloadHandlerAudioClip downloadHandler, Action<AudioClip> callback)
-        {
-            this.Path = path;
-            this.DownloadHandler = downloadHandler;
-            this.Callbacks.Add(callback);
-
-            stopwatch = new Stopwatch();
-            stopwatch.Start();
-        }
-
-        public void DisposeAndNotifyCallbacks(AudioClip audioClip)
-        {
-            DownloadHandler.Dispose();
-            foreach (Action<AudioClip> callback in Callbacks)
-            {
-                callback(audioClip);
-            }
         }
     }
 
@@ -371,12 +173,5 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
                 FullAudioClip = audioClip;
             }
         }
-    }
-
-    private class AudioClipRequestData
-    {
-        public string uri;
-        public Action<AudioClip> onSuccess;
-        public Action onFailure;
     }
 }

@@ -180,7 +180,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
 
     private void PlaySingingResultsRatingPopupSound()
     {
-        AudioManager.PlaySingingResultsRatingPopupSound();
+        SfxManager.PlaySingingResultsRatingPopupSound();
     }
 
     private void ResetScoreRowLabelTexts()

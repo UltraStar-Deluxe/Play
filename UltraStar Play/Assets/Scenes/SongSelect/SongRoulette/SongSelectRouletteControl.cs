@@ -238,7 +238,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         }
 
         lastPlaySongSelectSoundEffectTimeInSeconds = Time.time;
-        AudioManager.PlaySongSelectSound();
+        SfxManager.PlaySongSelectSound();
     }
 
     private void Update()

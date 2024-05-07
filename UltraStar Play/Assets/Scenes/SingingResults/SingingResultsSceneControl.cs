@@ -208,7 +208,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         });
         if (shouldPlayApplause)
         {
-            AudioManager.PlaySoundEffect(singingResultsApplauseAudioClip, 0.8f);
+            SfxManager.PlaySoundEffect(singingResultsApplauseAudioClip, 0.8f);
         }
 
         // TODO: Good score bar sound effect?
@@ -264,7 +264,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             return;
         }
 
-        AudioManager.PlaySoundEffect(teamResultsApplauseAudioClip, 0.8f);
+        SfxManager.PlaySoundEffect(teamResultsApplauseAudioClip, 0.8f);
 
         // Create particle effect
         if (!initializedTeamResultsParticleEffects)
