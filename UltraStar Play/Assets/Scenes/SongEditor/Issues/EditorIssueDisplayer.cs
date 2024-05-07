@@ -44,7 +44,7 @@ public class EditorIssueDisplayer : MonoBehaviour, INeedInjection, IInjectionFin
         if (lastViewportEvent == null
             || lastViewportEvent.X != viewportEvent.X
             || lastViewportEvent.Width != viewportEvent.Width
-            || !songMeta.BeatsPerMinute.NearlyEquals(lastSongMetaBpm, 0.01f))
+            || !songMeta.BeatsPerMinute.Equals(lastSongMetaBpm, 0.01f))
         {
             lastSongMetaBpm = songMeta.BeatsPerMinute;
             DrawIssues(lastIssues);
