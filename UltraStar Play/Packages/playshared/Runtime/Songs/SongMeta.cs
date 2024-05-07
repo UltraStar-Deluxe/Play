@@ -280,7 +280,7 @@ public abstract class SongMeta
 
     public override string ToString()
     {
-        return $"{nameof(SongMeta)}(artist: '{Artist}', title: '{Title}', file: '{FileInfo}')";
+        return $"{Artist} - '{Title}'";
     }
 
     public virtual void CopyValues(SongMeta other)
