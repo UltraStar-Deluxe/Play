@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
-public class SongDataStructureVoicesTests
+public class SongDataStructureVoicesTest
 {
-    public class EditHierarchyTests
+    public class EditHierarchyTest
     {
         [Test]
         public void SentenceMinAndMaxBeatIsSetWhenCreated()
@@ -167,7 +167,7 @@ public class SongDataStructureVoicesTests
         }
     }
 
-    public class EditSentenceTests
+    public class EditSentenceTest
     {
         private Sentence sentence;
 
@@ -178,7 +178,7 @@ public class SongDataStructureVoicesTests
         }
 
         [Test]
-        public void InitiallyEmptyTest()
+        public void InitiallyEmpty()
         {
             Assert.AreEqual(0, sentence.Notes.Count);
             Assert.AreEqual(0, sentence.LinebreakBeat);
@@ -191,14 +191,14 @@ public class SongDataStructureVoicesTests
         }
 
         [Test]
-        public void SetLinebreakBeatTest()
+        public void SetLinebreakBeat()
         {
             sentence.SetLinebreakBeat(2);
             Assert.AreEqual(2, sentence.LinebreakBeat);
         }
 
         [Test]
-        public void AddNoteTest()
+        public void AddNote()
         {
             Note testNote = new(ENoteType.Normal, 0, 2, 0, "");
             sentence.AddNote(testNote);
@@ -208,7 +208,7 @@ public class SongDataStructureVoicesTests
         }
     }
 
-    public class EditVoicesTests
+    public class EditVoicesTest
     {
         private Voice voice;
 
@@ -219,13 +219,13 @@ public class SongDataStructureVoicesTests
         }
 
         [Test]
-        public void InitiallyEmptyTest()
+        public void InitiallyEmpty()
         {
             Assert.AreEqual(0, voice.Sentences.Count);
         }
 
         [Test]
-        public void AddSentenceWithNoteTest()
+        public void AddSentenceWithNote()
         {
             Note testNote = new(ENoteType.Normal, 0, 2, 0, "");
             Sentence ms = new();

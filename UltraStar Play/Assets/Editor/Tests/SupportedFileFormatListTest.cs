@@ -2,10 +2,10 @@
 using System.Linq;
 using NUnit.Framework;
 
-public class SupportedFileFormatTest
+public class SupportedFileFormatListTest
 {
     [Test]
-    public void FfmpegSupportedAudioFormatsTest()
+    public void ShouldListSupportedAudioFormats()
     {
         List<string> expectedAudioFormats = new List<string>()
         {
@@ -26,7 +26,7 @@ public class SupportedFileFormatTest
     }
 
     [Test]
-    public void FfmpegSupportedVideoFormatsTest()
+    public void ShouldListSupportedVideoFormats()
     {
         List<string> expectedVideoFormats = new List<string>()
         {

@@ -5,7 +5,7 @@ using ArchUnitNET.NUnit;
 using NUnit.Framework;
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
 
-public class ArchUnitTests
+public class ArchUnitTest
 {
     [Test]
     public void CommonOnlineMultiplayerDoesNotReferenceSpecificOnlineMultiplayer()

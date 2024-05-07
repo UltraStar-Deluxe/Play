@@ -8,7 +8,7 @@ using NUnit.Framework;
 using ProTrans;
 using UnityEngine;
 
-public class TranslationTests
+public class TranslationTest
 {
     private List<TranslatableAttribute> ignoredMissingTranslations;
 
@@ -42,7 +42,7 @@ public class TranslationTests
             // Ignore file with generated constants for translation keys.
             "RMessages.cs",
             // Ignore this file itself
-            "TranslationTests.cs",
+            "TranslationTest.cs",
         };
 
         HashSet<string> unseenTranslationKeys = new();

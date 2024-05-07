@@ -6,12 +6,12 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-public class UltraStarSongFormatTests
+public class UltraStarSongFormatTest
 {
     private static readonly string folderPath = Application.dataPath + "/Editor/Tests/TestSongs/";
 
     [Test]
-    public void MissingTagNameTest()
+    public void ShouldHandleMissingTagName()
     {
         Translation.InitTranslationConfig();
         SongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-MissingTagName.txt", out List<SongIssue> songIssues, null, true);
@@ -20,7 +20,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void MissingTagValueTest()
+    public void ShouldHandleMissingTagValue()
     {
         SongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-MissingTagValue.txt", out List<SongIssue> songIssues, null, true);
         Assert.NotNull(songMeta);
@@ -29,7 +29,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void V100DeprecatedFields()
+    public void ShouldHandleV100DeprecatedFields()
     {
         UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-v1.0.0.txt", out List<SongIssue> songIssues, null, true);
         Assert.NotNull(songMeta);
@@ -40,7 +40,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void V100LoadInconsistentTimeUnits()
+    public void ShouldHandleV100InconsistentTimeUnits()
     {
         UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-v1.0.0.txt", out List<SongIssue> songIssues, null, true);
         Assert.NotNull(songMeta);
@@ -60,7 +60,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void V200LoadConsistentMillisecondsTimeUnit()
+    public void ShouldHandleV200ConsistentMillisecondsTimeUnit()
     {
         UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-v2.0.0.txt", out List<SongIssue> songIssues, null, true);
         Assert.NotNull(songMeta);
@@ -95,7 +95,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void SpaceAroundTagNameAndValueTest()
+    public void ShouldIgnoreSpaceAroundTagNameAndValue()
     {
         SongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-SpaceAroundTagNameAndValue.txt", out List<SongIssue> songIssues, null, true);
         Assert.NotNull(songMeta);
@@ -104,7 +104,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void NegativeNoteValues()
+    public void ShouldIgnoreNegativeNoteValues()
     {
         LogAssert.ignoreFailingMessages = true;
 
@@ -114,7 +114,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void SpaceAroundNumberTest()
+    public void ShouldIgnoreSpaceAroundNumber()
     {
         UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-SpaceAroundNumber.txt", out List<SongIssue> songIssues, null, true);
         Assert.NotNull(songMeta);
@@ -124,7 +124,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void CopyValuesFromUltraStarSongMetaToUltraStarSongMetaTest()
+    public void CopyValuesFromUltraStarSongMetaToUltraStarSongMetaShouldNotChangeFields()
     {
         string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
         UltraStarSongMeta originalSongMeta = UltraStarSongParser.ParseFile(originalFilePath, out List<SongIssue> _);
@@ -135,7 +135,7 @@ public class UltraStarSongFormatTests
     }
 
     [Test]
-    public void CopyValuesFromSongMetaToUltraStarSongMetaTest()
+    public void CopyValuesFromSongMetaToUltraStarSongMetaShouldNotChangeFields()
     {
         string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
         SongMeta originalSongMeta = UltraStarSongParser.ParseFile(originalFilePath, out List<SongIssue> _);
@@ -151,9 +151,9 @@ public class UltraStarSongFormatTests
     [TestCase("1.1.0")]
     [TestCase("1.2.0")]
     [TestCase("2.0.0")]
-    public void LoadAndSaveSongDoesNotChangeFieldsOfUltraStarSongMeta(string formatVersion)
+    public void LoadAndSaveSongShouldNotChangeFieldsOfUltraStarSongMeta(string formatVersion)
     {
-        LoadAndSaveSongDoesNotChangeFieldsOfSongMeta(
+        LoadAndSaveSongShouldNotChangeFieldsOfSongMeta(
             formatVersion,
             path => UltraStarSongParser.ParseFile(path, out List<SongIssue> _));
     }
@@ -163,14 +163,14 @@ public class UltraStarSongFormatTests
     [TestCase("1.1.0")]
     [TestCase("1.2.0")]
     [TestCase("2.0.0")]
-    public void LoadAndSaveSongDoesNotChangeFieldsOfLazyLoadedFromFileSongMeta(string formatVersion)
+    public void LoadAndSaveSongShouldNotChangeFieldsOfLazyLoadedFromFileSongMeta(string formatVersion)
     {
-        LoadAndSaveSongDoesNotChangeFieldsOfSongMeta(
+        LoadAndSaveSongShouldNotChangeFieldsOfSongMeta(
             formatVersion,
             path => new LazyLoadedFromFileSongMeta(path));
     }
 
-    private static void LoadAndSaveSongDoesNotChangeFieldsOfSongMeta(string formatVersion, Func<string, SongMeta> loadSongMeta)
+    private static void LoadAndSaveSongShouldNotChangeFieldsOfSongMeta(string formatVersion, Func<string, SongMeta> loadSongMeta)
     {
         // Load file content with modified formatVersion
         string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-public class ListExtensionTests
+public class ListExtensionTest
 {
     [Test]
-    public void GetElementBeforeTest()
+    public void ShouldReturnElementBefore()
     {
         List<string> list = new() { "a", "b", "c", "d" };
         string result1 = list.GetElementBefore("c", false);
@@ -18,7 +18,7 @@ public class ListExtensionTests
     }
 
     [Test]
-    public void GetElementAfterTest()
+    public void ShouldReturnElementAfter()
     {
         List<string> list = new() { "a", "b", "c", "d" };
         string result1 = list.GetElementAfter("c", false);
@@ -32,7 +32,7 @@ public class ListExtensionTests
     }
 
     [Test]
-    public void GetElementsBeforeTest()
+    public void ShouldReturnElementsBefore()
     {
         List<string> list = new() { "a", "b", "c", "d" };
         List<string> result1 = list.GetElementsBefore("c", false);

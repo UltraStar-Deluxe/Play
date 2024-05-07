@@ -2,10 +2,10 @@
 using System.IO;
 using NUnit.Framework;
 
-public class DirectoryUtilsTests
+public class DirectoryUtilsTest
 {
     [Test]
-    public void GetParentDirectoriesTest()
+    public void ShouldReturnParentDirectories()
     {
         string path = "C:/FirstFolder/SecondFolder/ThirdFolder";
         List<DirectoryInfo> parentDirectoriesAndLastSegment = DirectoryUtils.GetParentDirectories(new DirectoryInfo(path), true);

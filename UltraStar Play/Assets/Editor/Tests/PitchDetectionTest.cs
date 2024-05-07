@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 
-public class PitchDetectionTests
+public class PitchDetectionTest
 {
     [Test]
-    public void TestCamdPitchDetection()
+    public void CamdShouldDetectPitch()
     {
-        TestPitchDetection(sampleRateHz => new CamdAudioSamplesAnalyzer(sampleRateHz, 2048));
+        ShouldDetectPitch(sampleRateHz => new CamdAudioSamplesAnalyzer(sampleRateHz, 2048));
     }
 
     [Test]
-    public void TestDywaPitchDetection()
+    public void DywaShouldDetectPitch()
     {
-        TestPitchDetection(sampleRateHz => new DywaAudioSamplesAnalyzer(sampleRateHz, 2048));
+        ShouldDetectPitch(sampleRateHz => new DywaAudioSamplesAnalyzer(sampleRateHz, 2048));
     }
 
-    private void TestPitchDetection(Func<int, IAudioSamplesAnalyzer> audioSamplesAnalyzerProvider)
+    private void ShouldDetectPitch(Func<int, IAudioSamplesAnalyzer> audioSamplesAnalyzerProvider)
     {
         MicProfile micProfile = CreateDummyMicProfile();
 

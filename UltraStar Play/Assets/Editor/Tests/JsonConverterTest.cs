@@ -3,10 +3,10 @@ using NUnit.Framework;
 using UniRx;
 using UnityEngine;
 
-public class JsonConverterTests
+public class JsonConverterTest
 {
     [Test]
-    public void DeserializeEnumDefaultValueAsFallbackTest()
+    public void DeserializeEnumDefaultValueAsFallback()
     {
         ESide2D originalEnum = RandomUtils.RandomOf(EnumUtils.GetValuesAsList<ESide2D>());
         EnumTypeHolder original = new EnumTypeHolder()
@@ -26,7 +26,7 @@ public class JsonConverterTests
     }
 
     [Test]
-    public void FillReactivePropertyReferenceTest()
+    public void FillReactivePropertyReference()
     {
         ReactivePropertyUserTypeHolder original = CreateReactivePropertyUserTypeHolder();
 

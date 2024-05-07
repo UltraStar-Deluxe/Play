@@ -10,7 +10,7 @@ public class EncodingTest
     private static readonly string folderPath = Application.dataPath + "/Editor/Tests/TestSongs/";
 
     [Test]
-    public void GetEncodingTest()
+    public void ShouldReturnCorrectEncoding()
     {
         Assert.AreEqual(EncodingUtils.GetEncoding("utf8"), Encoding.UTF8);
         Assert.AreEqual(EncodingUtils.GetEncoding("utf-8"), Encoding.UTF8);
@@ -25,46 +25,46 @@ public class EncodingTest
     }
 
     [Test]
-    public void TestUtf8Bom()
+    public void Utf8Bom()
     {
-        TestFile("TestSong-UTF8-BOM.txt", true);
-        TestFile("TestSong-UTF8-BOM.txt", false);
+        ShouldDetectCorrectEncoding("TestSong-UTF8-BOM.txt", true);
+        ShouldDetectCorrectEncoding("TestSong-UTF8-BOM.txt", false);
     }
 
     [Test]
-    public void TestUtf8NoBom()
+    public void Utf8NoBom()
     {
-        TestFile("TestSong-UTF8-NoBOM.txt", true);
-        TestFile("TestSong-UTF8-NoBOM.txt", false);
+        ShouldDetectCorrectEncoding("TestSong-UTF8-NoBOM.txt", true);
+        ShouldDetectCorrectEncoding("TestSong-UTF8-NoBOM.txt", false);
     }
 
     [Test]
-    public void TestUtf16BeBom()
+    public void Utf16BeBom()
     {
-        TestFile("TestSong-UTF16-BE-BOM.txt", true);
-        TestFile("TestSong-UTF16-BE-BOM.txt", false);
+        ShouldDetectCorrectEncoding("TestSong-UTF16-BE-BOM.txt", true);
+        ShouldDetectCorrectEncoding("TestSong-UTF16-BE-BOM.txt", false);
     }
 
     [Test]
-    public void TestUtf16LeBom()
+    public void Utf16LeBom()
     {
-        TestFile("TestSong-UTF16-LE-BOM.txt", true);
-        TestFile("TestSong-UTF16-LE-BOM.txt", false);
+        ShouldDetectCorrectEncoding("TestSong-UTF16-LE-BOM.txt", true);
+        ShouldDetectCorrectEncoding("TestSong-UTF16-LE-BOM.txt", false);
     }
 
     [Test]
-    public void TestWindows1252()
+    public void Windows1252()
     {
         // The file contains special characters and was saved in a non-Unicode encoding.
-        // Thus, the test should fail with an exception when only detecting Unicode encodings.
-        Assert.Catch(delegate { TestFile("TestSong-Windows1252.txt",
+        // Thus, the  should fail with an exception when only detecting Unicode encodings.
+        Assert.Catch(delegate { ShouldDetectCorrectEncoding("TestSong-Windows1252.txt",
             false,
             "Käse und Gemüse",
             "Tränenüberströmt nach Fußmassage",
             new List<string> { "Süße", "Löwenbabys" }); });
 
         // It should work with the universal charset detector.
-        TestFile("TestSong-Windows1252.txt",
+        ShouldDetectCorrectEncoding("TestSong-Windows1252.txt",
             true,
             "Käse und Gemüse",
             "Tränenüberströmt nach Fußmassage",
@@ -72,9 +72,9 @@ public class EncodingTest
     }
 
     [Test]
-    public void TestIso8859_1()
+    public void Iso8859_1()
     {
-        TestFile("TestSong-ISO-8859-1.txt",
+        ShouldDetectCorrectEncoding("TestSong-ISO-8859-1.txt",
             true,
             "Käse und Gemüse",
             "Tränenüberströmt nach Fußmassage",
@@ -82,43 +82,43 @@ public class EncodingTest
     }
 
     [Test]
-    public void TestCp865()
+    public void Cp865()
     {
         // This encoding fails even with Universal Charset Detector
-        Assert.Catch(delegate { TestFile("TestSong-cp865.txt",
+        Assert.Catch(delegate { ShouldDetectCorrectEncoding("TestSong-cp865.txt",
                 true,
                 "å være midt i smørøyet",
                 "det finnes ikke dårlig vær, bare dårlige klær"); });
 
         // It works when explicitly specifying the encoding in the txt file because the song parsing will consider this header field.
-        TestFile("TestSong-cp865-explicit-encoding.txt",
+        ShouldDetectCorrectEncoding("TestSong-cp865-explicit-encoding.txt",
             true,
             "å være midt i smørøyet",
             "det finnes ikke dårlig vær, bare dårlige klær");
     }
 
     [Test]
-    public void TestKoi8_r()
+    public void Koi8_r()
     {
-        TestFile("TestSong-koi8-r.txt",
+        ShouldDetectCorrectEncoding("TestSong-koi8-r.txt",
             true,
             "Кириллица is Cyrillic",
             "SongTitle");
     }
 
     [Test]
-    public void TestInvalidExplicit()
+    public void InvalidExplicitEncodingShouldThrowError()
     {
         LogAssert.Expect(LogType.Exception, new Regex(@".+'InvalidEncoding'.+"));
         LogAssert.Expect(LogType.Error, new Regex(@".+'InvalidEncoding'.+"));
 
-        TestFile("TestSong-invalid-explicit-encoding.txt",
+        ShouldDetectCorrectEncoding("TestSong-invalid-explicit-encoding.txt",
             true,
             "SongArtist",
             "SongTitle");
     }
 
-    private void TestFile(
+    private void ShouldDetectCorrectEncoding(
         string fileName,
         bool useUniversalCharsetDetector = true,
         string songArtist = "TestArtist",

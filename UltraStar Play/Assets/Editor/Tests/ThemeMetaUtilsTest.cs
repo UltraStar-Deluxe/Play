@@ -11,7 +11,7 @@ public class ThemeMetaUtilsTest
     private readonly string cyclicThemeName = "cyclic_theme";
 
     [Test]
-    public void ResolveThemeTest()
+    public void ShouldResolveTheme()
     {
         List<ThemeMeta> themeMetas = GetThemeMetas()
             .Where(themeMeta => themeMeta.FileNameWithoutExtension != cyclicThemeName)
@@ -78,7 +78,7 @@ public class ThemeMetaUtilsTest
     }
 
     [Test]
-    public void CannotResolveCyclicParentThemeTest()
+    public void CannotResolveCyclicParentTheme()
     {
         LogAssert.Expect(LogType.Exception, new Regex(".*CyclicThemeReferenceException.*"));
         LogAssert.Expect(LogType.Error, new Regex(".*Failed to resolve parent themes.*"));

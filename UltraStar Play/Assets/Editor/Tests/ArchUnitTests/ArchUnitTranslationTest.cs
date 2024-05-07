@@ -15,7 +15,7 @@ using static ArchUnitNET.Fluent.ArchRuleDefinition;
 using Assembly = System.Reflection.Assembly;
 using Type = System.Type;
 
-public class ArchUnitTranslationTests
+public class ArchUnitTranslationTest
 {
     private static List<TranslatableAssignment> ignoredUntranslatedAssignments = new();
     private static HashSet<string> ignoredUntranslatedEnums = new();

@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-public class SettingsUtilsTests
+public class SettingsUtilsTest
 {
     [Test]
     // Should return default if unknown
@@ -12,7 +12,7 @@ public class SettingsUtilsTests
     // Should not downgrade
     [TestCase(EKnownUltraStarSongFormatVersion.V120, EUpgradeUltraStarSongFormatVersion.V120, "2.0.0", "2.0.0")]
     [TestCase(EKnownUltraStarSongFormatVersion.V110, EUpgradeUltraStarSongFormatVersion.None, "1.0.0", "1.0.0")]
-    public void GetUltraStarSongFormatVersionForSaveTest(
+    public void ShouldReturnUltraStarSongFormatVersionForSave(
         EKnownUltraStarSongFormatVersion defaultVersion,
         EUpgradeUltraStarSongFormatVersion upgradeVersion,
         string currentVersion,

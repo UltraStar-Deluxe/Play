@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
 
-public class LocaleInfoUtilsTests
+public class LocaleInfoUtilsTest
 {
     [Test]
-    public void GetTwoLetterCountryCodeTest()
+    public void ShouldReturnTwoLetterCountryCode()
     {
         Assert.AreEqual("en", LocaleInfoUtils.GetTwoLetterCountryCode("english"));
         Assert.AreEqual("en", LocaleInfoUtils.GetTwoLetterCountryCode("ENGLISH"));
