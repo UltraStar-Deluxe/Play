@@ -41,31 +41,26 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
         }
     }
 
-    protected IEnumerator AudioFileTest(string filePrefix)
+    protected IEnumerator ShouldLoadAudioFile(string txtFileName)
     {
-        yield return FileTest(filePrefix, audioFileFormatTestFolderPath, localFileTargetDurationInMillis, localFileMaxWaitTimeInMillis);
+        yield return ShouldLoadFile(txtFileName, audioFileFormatTestFolderPath, localFileTargetDurationInMillis, localFileMaxWaitTimeInMillis);
     }
 
-    protected IEnumerator VideoFileTest(string filePrefix)
+    protected IEnumerator ShouldLoadVideoFile(string txtFileName)
     {
-        yield return FileTest(filePrefix, videoFileFormatTestFolderPath, localFileTargetDurationInMillis, localFileMaxWaitTimeInMillis);
+        yield return ShouldLoadFile(txtFileName, videoFileFormatTestFolderPath, localFileTargetDurationInMillis, localFileMaxWaitTimeInMillis);
     }
 
     protected IEnumerator WebViewFileTest(string filePrefix, double targetDurationInMillis)
     {
-        yield return FileTest(filePrefix, webViewFileFormatTestFolderPath, targetDurationInMillis, webViewMaxWaitTimeInMillis);
+        yield return ShouldLoadFile(filePrefix, webViewFileFormatTestFolderPath, targetDurationInMillis, webViewMaxWaitTimeInMillis);
     }
 
-    private IEnumerator FileTest(string filePrefix, string folderPath, double targetDurationInMillis, long maxWaitTimeInMillis)
+    private IEnumerator ShouldLoadFile(string txtFileName, string folderPath, double targetDurationInMillis, long maxWaitTimeInMillis)
     {
         LogAssert.ignoreFailingMessages = true;
 
-        string songFilePath = GetSongMetaFilePath(filePrefix, folderPath);
-        yield return SongAudioPlayerCanLoadFileTest(songFilePath, targetDurationInMillis, maxWaitTimeInMillis);
-    }
-
-    private IEnumerator SongAudioPlayerCanLoadFileTest(string songFilePath, double targetDurationInMillis, long maxWaitTimeInMillis)
-    {
+        string songFilePath = GetSongMetaFilePath(txtFileName, folderPath);
         long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         bool hasFailed = false;
 
@@ -110,9 +105,9 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
         }
     }
 
-    protected string GetSongMetaFilePath(string filePrefix, string folderPath)
+    protected string GetSongMetaFilePath(string fileName, string folderPath)
     {
-        return $"{folderPath}/{filePrefix}TestSong.txt";
+        return $"{folderPath}/{fileName}";
     }
 
     protected SongMeta LoadSongMeta(string songFilePath)

@@ -1,66 +1,38 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine.TestTools;
 
 public class AudioFileFormatTests : AbstractMediaFileFormatTests
 {
-    /////////////////////////////////////////////////////////
-    // Audio formats supported by Unity at runtime
-    /////////////////////////////////////////////////////////
+    private static readonly List<TestCaseData> fileNamesWithAudioSupportedByUnity = new List<TestCaseData>()
+    {
+        new TestCaseData("mp3-ConstantBitRate-TestSong.txt").Returns(null),
+        new TestCaseData("mp3-VariableBitRate-TestSong.txt").Returns(null),
+        new TestCaseData("ogg-TestSong.txt").Returns(null),
+        new TestCaseData("wav-TestSong.txt").Returns(null),
+    };
+
+    private static readonly List<TestCaseData> fileNamesWithAudioSupportedByThirdPartyLib = new List<TestCaseData>()
+    {
+        new TestCaseData("aac-TestSong.txt").Returns(null),
+        new TestCaseData("aiff-TestSong.txt").Returns(null),
+        new TestCaseData("flac-TestSong.txt").Returns(null),
+        new TestCaseData("m4a-TestSong.txt").Returns(null),
+        new TestCaseData("wma-TestSong.txt").Returns(null),
+    };
 
     [UnityTest]
-    public IEnumerator Mp3ConstantBitRateTest()
+    [TestCaseSource(nameof(fileNamesWithAudioSupportedByUnity))]
+    public IEnumerator ShouldLoadUnitySupportedAudio(string txtFileName)
     {
-        yield return AudioFileTest("mp3-ConstantBitRate-");
+        yield return ShouldLoadAudioFile(txtFileName);
     }
 
     [UnityTest]
-    public IEnumerator Mp3VariableBitRateTest()
+    [TestCaseSource(nameof(fileNamesWithAudioSupportedByThirdPartyLib))]
+    public IEnumerator ShouldLoadThirdPartyLibSupportedAudio(string txtFileName)
     {
-        return AudioFileTest("mp3-VariableBitRate-");
-    }
-
-    [UnityTest]
-    public IEnumerator OggTest()
-    {
-        yield return AudioFileTest("ogg-");
-    }
-
-    [UnityTest]
-    public IEnumerator WavTest()
-    {
-        yield return AudioFileTest("wav-");
-    }
-
-    /////////////////////////////////////////////////////////
-    // common audio formats supported by ffmpeg
-    /////////////////////////////////////////////////////////
-    [UnityTest]
-    public IEnumerator AacTest()
-    {
-        yield return AudioFileTest("aac-");
-    }
-
-    [UnityTest]
-    public IEnumerator AiffTest()
-    {
-        yield return AudioFileTest("aiff-");
-    }
-
-    [UnityTest]
-    public IEnumerator FlacTest()
-    {
-        yield return AudioFileTest("flac-");
-    }
-
-    [UnityTest]
-    public IEnumerator M4aTest()
-    {
-        yield return AudioFileTest("m4a-");
-    }
-
-    [UnityTest]
-    public IEnumerator WmaTest()
-    {
-        yield return AudioFileTest("wma-");
+        yield return ShouldLoadAudioFile(txtFileName);
     }
 }
