@@ -93,7 +93,7 @@ namespace CommonOnlineMultiplayer
                 return;
             }
 
-            Log.Verbose(() => $"Sending message {messageName} to Netcode clients {targetNetcodeClientIds.ToCsv()}");
+            Log.Verbose(() => $"Sending message {messageName} to Netcode clients {targetNetcodeClientIds.JoinWith(", ")}");
 
             if (NetworkManager.IsServer)
             {

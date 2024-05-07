@@ -158,7 +158,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         Translation errorMessage = GetContentFolderErrorMessage(newContentFolder);
         if (errorMessage.Value.IsNullOrEmpty())
         {
-            string expectedSubfoldersCsv = GetExistingContentFolderSubfolders(newContentFolder).ToCsv(", ", "", "");
+            string expectedSubfoldersCsv = GetExistingContentFolderSubfolders(newContentFolder).JoinWith(", ");
             statusLabel.SetTranslatedText(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_contentFolders,
                 "names", expectedSubfoldersCsv));
             FillTextFieldWithDefaultsFromFolder(newContentFolder);

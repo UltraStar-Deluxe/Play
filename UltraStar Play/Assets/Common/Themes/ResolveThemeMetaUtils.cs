@@ -44,7 +44,7 @@ public static class ResolveThemeMetaUtils
         if (seenParentNames.Contains(themeJson.parentTheme))
         {
             throw new CyclicThemeReferenceException(
-                $"There is a loop in the theme hierarchy involving parent themes '{seenParentNames.ToCsv(", ", "", "")}'.");
+                $"There is a loop in the theme hierarchy involving parent themes '{seenParentNames.JoinWith(", ")}'.");
         }
         seenParentNames.Add(themeName);
 
@@ -57,7 +57,7 @@ public static class ResolveThemeMetaUtils
             {
                 throw new ParentThemeNotFoundException(
                     $"Theme not found with name '{themeJson.parentTheme}'. " +
-                    $"Available themes: {allThemeMetas.Select(availableThemeMeta => availableThemeMeta.FileNameWithoutExtension).ToCsv(", ", "", "")}");
+                    $"Available themes: {allThemeMetas.Select(availableThemeMeta => availableThemeMeta.FileNameWithoutExtension).JoinWith(", ")}");
             }
 
             ResolveThemeJsonRecursively(allThemeMetas, parentThemeMeta, seenParentNames, resolvedThemes);

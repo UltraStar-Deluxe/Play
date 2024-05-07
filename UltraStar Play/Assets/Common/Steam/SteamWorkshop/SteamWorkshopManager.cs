@@ -185,7 +185,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
                   $"Content folder: '{contentFolderPath}', " +
                   $"Preview Image: '{previewImagePath}', " +
                   $"Description: '{description}', " +
-                  $"Tags: '{tags.ToCsv(", ", "", "")}'");
+                  $"Tags: '{tags.JoinWith(", ")}'");
 
         Editor ugcEditor = isNewWorkshopItem
             ? Editor.NewCommunityFile.WithPublicVisibility()

@@ -125,7 +125,7 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
 
         if (!songIssues.IsNullOrEmpty())
         {
-            string songIssuesCsv = songIssues.Select(songIssue => songIssue.Message).ToCsv("\n    - ", "", "");
+            string songIssuesCsv = songIssues.Select(songIssue => songIssue.Message).JoinWith("\n    - ");
             Assert.Fail($"Issues found with song at path '{songFilePath}':\n    - {songIssuesCsv}");
         }
 

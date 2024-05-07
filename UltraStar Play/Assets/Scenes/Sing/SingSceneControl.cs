@@ -234,7 +234,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private void Start()
     {
-        string playerProfilesCsv = sceneData.SingScenePlayerData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
+        string playerProfilesCsv = sceneData.SingScenePlayerData.SelectedPlayerProfiles.Select(it => it.Name).JoinWith(", ");
         Debug.Log($"{playerProfilesCsv} start (or continue) singing of {SongMeta.Title} at {sceneData.PositionInSongInMillis} ms.");
 
         startTimeInSeconds = Time.time;
@@ -1516,7 +1516,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         if (voice == null)
         {
             Voice fallbackVoice = SongMeta.Voices.FirstOrDefault();
-            string voiceIdCsv = SongMeta.Voices.Select(it => it.Id).ToCsv();
+            string voiceIdCsv = SongMeta.Voices.Select(it => it.Id).JoinWith(", ");
             Debug.LogError($"The song data does not contain a voice with id {voiceId}."
                            + $" Available voice ids: {voiceIdCsv}. Using voice {fallbackVoice?.Id} instead.");
             return fallbackVoice;

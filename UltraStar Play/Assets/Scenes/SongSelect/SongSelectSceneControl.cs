@@ -1297,7 +1297,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         askToAssignMicsDialog = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_missingMicDialog_title));
         string playerNamesCsv = playerProfilesWithoutMics
             .Select(it => it.Name)
-            .ToCsv(", ", "", "");
+            .JoinWith(", ");
         askToAssignMicsDialog.Message = Translation.Get(R.Messages.songSelectScene_missingMicDialog_message,
             "playerNames", playerNamesCsv);
         askToAssignMicsDialog.AddButton(Translation.Get(R.Messages.songSelectScene_missingMicDialog_ignoreAndStart), _ =>

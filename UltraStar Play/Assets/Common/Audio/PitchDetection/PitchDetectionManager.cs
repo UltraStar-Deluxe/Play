@@ -63,7 +63,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         {
             return Observable.Throw<BasicPitchDetectionResult>(
                 new Exception($"Pitch Detection using Basic Pitch not supported for this audio file.\n" +
-                              $"Requires one of {ApplicationUtils.supportedBasicPitchDetectionAudioFiles.ToCsv(",", "", "")}"));
+                              $"Requires one of {ApplicationUtils.supportedBasicPitchDetectionAudioFiles.JoinWith(", ")}"));
         }
 
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
@@ -223,7 +223,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         }
         else
         {
-            Debug.LogError($"MIDI file of Basic Pitch not found. Written files: {basicPitchResult.WrittenFiles.ToCsv()}");
+            Debug.LogError($"MIDI file of Basic Pitch not found. Written files: {basicPitchResult.WrittenFiles.JoinWith(", ")}");
             midiFilePath = "";
             return false;
         }

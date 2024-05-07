@@ -211,7 +211,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
         if (!ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))
         {
-            return Observable.Throw<AudioClip>(new IllegalArgumentException($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.ToCsv(", ", "", "")}"));
+            return Observable.Throw<AudioClip>(new IllegalArgumentException($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.JoinWith(", ")}"));
         }
 
         if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)

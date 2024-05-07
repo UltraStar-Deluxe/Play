@@ -160,7 +160,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
         if (!changedCsFiles.IsNullOrEmpty())
         {
-            Debug.Log($"Reloading mods because of changed files: {changedCsFiles.ToCsv()}");
+            Debug.Log($"Reloading mods because of changed files: {changedCsFiles.JoinWith(", ")}");
             changedCsFiles.Clear();
             ReloadMods();
         }
@@ -225,7 +225,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             {
                 string text = AppDomain.CurrentDomain.GetAssemblies()
                     .Select(assembly => assembly.GetName().Name)
-                    .ToCsv();
+                    .JoinWith(", ");
                 ClipboardUtils.CopyToClipboard(text);
                 Debug.Log($"Copy and log assemblies in app domain: {text}");
             });
@@ -233,7 +233,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         DebugLogConsole.AddCommand("mod.assemblies.exposed", "Copy and log all assemblies in current app domain that are exposed to mods by default",
             () =>
             {
-                string text = defaultExposedAssemblyNames.ToCsv();
+                string text = defaultExposedAssemblyNames.JoinWith(", ");
                 ClipboardUtils.CopyToClipboard(text);
                 Debug.Log($"Assemblies exposed to mods by default: {text}");
             });
@@ -251,7 +251,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             () =>
             {
                 List<Type> modTypes = GetModInterfaces();
-                string text = modTypes.Select(type => type.Name).ToCsv(", ", "", "");
+                string text = modTypes.Select(type => type.Name).JoinWith(", ");
                 ClipboardUtils.CopyToClipboard(text);
                 Debug.Log($"Mod interfaces: {text}");
             });
@@ -370,7 +370,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnEnableMods(List<string> newlyEnabledModNames)
     {
-        Debug.Log($"Reloading mods because of newly enabled mod: {newlyEnabledModNames.ToCsv()}");
+        Debug.Log($"Reloading mods because of newly enabled mod: {newlyEnabledModNames.JoinWith(", ")}");
         CreateOrUpdateModFolderFileSystemWatchers();
         LoadAndInstantiateMods();
     }
@@ -874,7 +874,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
             if (!remainingTypeNames.IsNullOrEmpty())
             {
-                throw new LoadModException($"Required types not found in app domain: {remainingTypeNames.ToCsv(", ", "", "")}");
+                throw new LoadModException($"Required types not found in app domain: {remainingTypeNames.JoinWith(", ")}");
             }
             else
             {

@@ -34,11 +34,6 @@ public static class CollectionExtensions
         return prefix + string.Join(separator, enumerable) + suffix;
     }
 
-    public static string ToCsv<T>(this IEnumerable<T> enumerable, string separator = ",", string prefix = "[", string suffix = "]")
-    {
-        return enumerable.JoinWith(separator, prefix, suffix);
-    }
-
     public static void AddIfNotContains<T>(this ICollection<T> collection, T item)
     {
         if (!collection.Contains(item))

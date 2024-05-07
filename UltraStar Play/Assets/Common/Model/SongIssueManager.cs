@@ -22,8 +22,8 @@ public class SongIssueManager : AbstractSingletonBehaviour
 
     public static SongIssueManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongIssueManager>();
 
-    private static readonly string unitySupportedVideoFileExtensionsAsCsv = ApplicationUtils.unitySupportedVideoFiles.ToCsv(",", "", "");
-    private static readonly string unitySupportedAudioFileExtensionsAsCsv = ApplicationUtils.unitySupportedAudioFiles.ToCsv(",", "", "");
+    private static readonly string unitySupportedVideoFileExtensionsAsCsv = ApplicationUtils.unitySupportedVideoFiles.JoinWith(", ");
+    private static readonly string unitySupportedAudioFileExtensionsAsCsv = ApplicationUtils.unitySupportedAudioFiles.JoinWith(", ");
 
     private static IDisposable songIssueScanDisposable;
     public static bool IsSongIssueScanStarted => songIssueScanDisposable != null;

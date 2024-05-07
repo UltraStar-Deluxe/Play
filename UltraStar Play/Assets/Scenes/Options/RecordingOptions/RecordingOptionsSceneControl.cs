@@ -300,7 +300,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         List<MicProfile> micProfiles = CreateAndPersistMicProfiles();
         MicProfile lastMicProfile = SelectedMicProfile;
         devicePickerControl.Items = micProfiles;
-        Debug.Log($"MicProfiles: {devicePickerControl.Items.ToCsv()}");
+        Debug.Log($"MicProfiles: {devicePickerControl.Items.JoinWith(", ")}");
         if (devicePickerControl.Items.Count > 0)
         {
             MicProfile nextSelectedMicProfile = devicePickerControl.Items[0];

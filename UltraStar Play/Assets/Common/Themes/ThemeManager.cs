@@ -707,7 +707,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         if (defaultThemeMeta == null)
         {
-            string availableThemeMetasCsv = GetThemeMetas().Select(themeMeta => themeMeta.FileNameWithoutExtension).ToCsv();
+            string availableThemeMetasCsv = GetThemeMetas().Select(themeMeta => themeMeta.FileNameWithoutExtension).JoinWith(", ");
             Debug.LogError($"Default theme '{DefaultThemeName}' not found. Available themes: {availableThemeMetasCsv}");
         }
 
@@ -737,7 +737,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         ResolveThemeMetaUtils.ResolveThemes(themeMetas);
 
-        string themeNamesCsv = themeMetas.Select(themeMeta => themeMeta.FileNameWithoutExtension).ToCsv();
+        string themeNamesCsv = themeMetas.Select(themeMeta => themeMeta.FileNameWithoutExtension).JoinWith(", ");
         Debug.Log($"Found {themeMetas.Count} themes: {themeNamesCsv}");
 
         return themeMetas;
