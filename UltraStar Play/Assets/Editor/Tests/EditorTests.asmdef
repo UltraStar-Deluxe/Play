@@ -1,5 +1,5 @@
 {
-    "name": "USPlayEditorTests",
+    "name": "EditorTests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
