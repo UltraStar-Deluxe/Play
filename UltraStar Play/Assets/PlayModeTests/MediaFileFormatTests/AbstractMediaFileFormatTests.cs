@@ -105,9 +105,9 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
         }
     }
 
-    protected string GetSongMetaFilePath(string fileName, string folderPath)
+    protected string GetSongMetaFilePath(string txtFileName, string folderPath)
     {
-        return $"{folderPath}/{fileName}";
+        return $"{folderPath}/{txtFileName}";
     }
 
     protected SongMeta LoadSongMeta(string songFilePath)
