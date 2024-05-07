@@ -38,7 +38,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     public IWebView WebView => webView; // Public getter to allow modding
 
     private bool IsWebViewInitialized => webView != null;
-    private readonly Subject<bool> webViewInitializedEventStream = new();
+    private readonly Subject<VoidEvent> webViewInitializedEventStream = new();
 
     private bool isPlaying;
     public bool IsPlaying
@@ -310,7 +310,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
         webView.LoadHtml(defaultWebViewHtml.text);
 
-        webViewInitializedEventStream.OnNext(true);
+        webViewInitializedEventStream.OnNext(VoidEvent.instance);
     }
 
     private void OnWebViewLoadProgressChanged(object sender, ProgressChangedEventArgs e)

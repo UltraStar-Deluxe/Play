@@ -108,8 +108,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private bool isPopupMenuOpen;
     private float popupMenuClosedTimeInSeconds;
 
-    private readonly Subject<bool> clickOnSongImageEventStream = new();
-    public IObservable<bool> ClickOnSongImageEventStream => clickOnSongImageEventStream;
+    private readonly Subject<VoidEvent> clickOnSongImageEventStream = new();
+    public IObservable<VoidEvent> ClickOnSongImageEventStream => clickOnSongImageEventStream;
 
     private bool isInitialized;
 
@@ -185,7 +185,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         if (evt.button == 0
             && Vector2.Distance(pointerDownMousePosition ,evt.position) < MaxClickDistanceThresholdInPx)
         {
-            clickOnSongImageEventStream.OnNext(true);
+            clickOnSongImageEventStream.OnNext(VoidEvent.instance);
         }
     }
 

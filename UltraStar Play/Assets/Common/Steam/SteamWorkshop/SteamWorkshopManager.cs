@@ -15,8 +15,8 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
     public static SteamWorkshopManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamWorkshopManager>();
 
     private readonly UseSteamWorkshopItemsControl useSteamWorkshopItemsControl = new();
-    private readonly Subject<bool> finishDownloadWorkshopItemsEventStream = new();
-    public IObservable<bool> FinishDownloadWorkshopItemsEventStream => finishDownloadWorkshopItemsEventStream
+    private readonly Subject<VoidEvent> finishDownloadWorkshopItemsEventStream = new();
+    public IObservable<VoidEvent> FinishDownloadWorkshopItemsEventStream => finishDownloadWorkshopItemsEventStream
         .ObserveOnMainThread();
 
     [Inject]
@@ -67,7 +67,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
     {
         try
         {
-            finishDownloadWorkshopItemsEventStream.OnNext(true);
+            finishDownloadWorkshopItemsEventStream.OnNext(VoidEvent.instance);
         }
         catch (Exception ex)
         {

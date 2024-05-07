@@ -22,8 +22,8 @@ public abstract class AbstractDialogControl : IDialogControl, INeedInjection, II
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement DialogRootVisualElement { get; protected set; }
 
-    private readonly Subject<bool> dialogClosedEventStream = new();
-    public IObservable<bool> DialogClosedEventStream => dialogClosedEventStream;
+    private readonly Subject<VoidEvent> dialogClosedEventStream = new();
+    public IObservable<VoidEvent> DialogClosedEventStream => dialogClosedEventStream;
 
     protected readonly List<IDisposable> disposables = new();
 
@@ -41,7 +41,7 @@ public abstract class AbstractDialogControl : IDialogControl, INeedInjection, II
     public virtual void CloseDialog()
     {
         DialogRootVisualElement.RemoveFromHierarchy();
-        dialogClosedEventStream.OnNext(true);
+        dialogClosedEventStream.OnNext(VoidEvent.instance);
         disposables.ForEach(it => it.Dispose());
     }
 }

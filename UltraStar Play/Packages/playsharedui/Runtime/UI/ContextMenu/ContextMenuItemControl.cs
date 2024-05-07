@@ -18,8 +18,8 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
     private readonly string icon;
     private readonly Action action;
 
-    private readonly Subject<bool> itemTriggeredEventStream = new();
-    public IObservable<bool> ItemTriggeredEventStream => itemTriggeredEventStream;
+    private readonly Subject<VoidEvent> itemTriggeredEventStream = new();
+    public IObservable<VoidEvent> ItemTriggeredEventStream => itemTriggeredEventStream;
 
     public ContextMenuItemControl(Translation text, string icon, Action action)
     {
@@ -50,7 +50,7 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
             }
 
             action();
-            itemTriggeredEventStream.OnNext(true);
+            itemTriggeredEventStream.OnNext(VoidEvent.instance);
         });
     }
 }

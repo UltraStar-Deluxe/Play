@@ -69,8 +69,8 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
     private int recordingIndex;
     private int recordingStartIndex;
 
-    private readonly Subject<bool> recordedSamplesChangedEventStream = new Subject<bool>();
-    public IObservable<bool> RecordedSamplesChangedEventStream => recordedSamplesChangedEventStream;
+    private readonly Subject<VoidEvent> recordedSamplesChangedEventStream = new();
+    public IObservable<VoidEvent> RecordedSamplesChangedEventStream => recordedSamplesChangedEventStream;
 
     private bool areLastNonAnalyzedSamplesAboveThreshold;
     private int analyzeStartIndex;
@@ -194,7 +194,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         Array.Clear(RecordingBuffer, 0, RecordingBuffer.Length);
         recordingIndex = 0;
         recordingStartIndex = 0;
-        recordedSamplesChangedEventStream.OnNext(true);
+        recordedSamplesChangedEventStream.OnNext(VoidEvent.instance);
     }
 
     private void DoSpeechRecognitionForNewlyRecordedSamples()
@@ -297,7 +297,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         recordingIndex += recordingEvent.NewSampleCount;
 
         HasRecordedAudio = true;
-        recordedSamplesChangedEventStream.OnNext(true);
+        recordedSamplesChangedEventStream.OnNext(VoidEvent.instance);
     }
 
     private int GetMicDelayInSamples()

@@ -71,8 +71,8 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
-    private readonly Subject<bool> deleteEventStream = new();
-    public IObservable<bool> DeleteEventStream => deleteEventStream;
+    private readonly Subject<VoidEvent> deleteEventStream = new();
+    public IObservable<VoidEvent> DeleteEventStream => deleteEventStream;
 
     public void OnInjectionFinished()
     {
@@ -83,7 +83,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         statusLabel.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_archiveDownload_status_initial));
 
         urlChooserButton.RegisterCallbackButtonTriggered(_ => ShowUrlChooserDialog());
-        deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(true));
+        deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(VoidEvent.instance));
 
         toggleStartAndCancelButton.RegisterCallbackButtonTriggered(_ => ToggleStartAndCancel());
         startIcon.ShowByDisplay();

@@ -36,8 +36,8 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     public bool IsAnyFilterActive => !nonPersistentSettings.ActiveSearchPropertyFilters.IsNullOrEmpty()
         || nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value;
 
-    private readonly Subject<bool> filtersChangedEventStream = new();
-    public IObservable<bool> FiltersChangedEventStream => filtersChangedEventStream;
+    private readonly Subject<VoidEvent> filtersChangedEventStream = new();
+    public IObservable<VoidEvent> FiltersChangedEventStream => filtersChangedEventStream;
 
     private List<Toggle> filterToggles = new();
 
@@ -48,7 +48,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             newValue =>
             {
                 nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value = newValue;
-                filtersChangedEventStream.OnNext(true);
+                filtersChangedEventStream.OnNext(VoidEvent.instance);
             });
 
         filtersAccordionItem.AfterContentVisibleChangedEventStream.Subscribe(_ => InitFilters());
@@ -174,7 +174,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(filterListContainer);
 
-        filtersChangedEventStream.OnNext(true);
+        filtersChangedEventStream.OnNext(VoidEvent.instance);
     }
 
     private void FillFilterList(ESearchProperty searchProperty)
@@ -272,7 +272,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
         {
             DisableFilter(searchPropertyFilter);
         }
-        filtersChangedEventStream.OnNext(true);
+        filtersChangedEventStream.OnNext(VoidEvent.instance);
     }
 
     private static string GetSongMetaSearchProperty(SongMeta songMeta, ESearchProperty searchProperty)
@@ -306,6 +306,6 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
         ActiveFilters.ToList()
             .SelectMany(entry => entry.Value.ToList())
             .ForEach(activeFilter => DisableFilter(activeFilter));
-        filtersChangedEventStream.OnNext(true);
+        filtersChangedEventStream.OnNext(VoidEvent.instance);
     }
 }
