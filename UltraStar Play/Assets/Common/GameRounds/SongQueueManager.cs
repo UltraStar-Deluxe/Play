@@ -10,18 +10,12 @@ using UnityEngine;
 
 public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void StaticInit()
-    {
-        songQueueEntryDtos.Clear();
-    }
-
     public static SongQueueManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongQueueManager>();
 
-    public static int SongQueueLength => songQueueEntryDtos.Count;
-    private static readonly List<SongQueueEntryDto> songQueueEntryDtos = new();
+    private readonly List<SongQueueEntryDto> songQueueEntryDtos = new();
 
-    public bool IsSongQueueEmpty => GetSongQueueEntries().IsNullOrEmpty();
+    public int SongQueueLength => songQueueEntryDtos.Count;
+    public bool IsSongQueueEmpty => songQueueEntryDtos.IsNullOrEmpty();
 
     private readonly Subject<SongQueueChangedEvent> songQueueChangedEventStream = new();
     public IObservable<SongQueueChangedEvent> SongQueueChangedEventStream => songQueueChangedEventStream;

@@ -14,14 +14,8 @@ using UnityEngine;
 
 public class PitchDetectionManager : MonoBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        lockObject = new();
-        basicPitchProcessCount = 0;
-    }
-    private static object lockObject = new();
-    private static int basicPitchProcessCount;
+    private readonly object lockObject = new();
+    private int basicPitchProcessCount;
 
     public static PitchDetectionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PitchDetectionManager>();
 

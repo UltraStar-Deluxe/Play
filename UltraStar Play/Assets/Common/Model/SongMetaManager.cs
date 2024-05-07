@@ -17,7 +17,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private ConcurrentBag<SongMeta> allSongMetas = new();
 
-    // Static to be persisted across scenes.
     private bool isSongScanStarted;
     private bool isSongScanFinished;
     public bool IsSongScanFinished => isSongScanFinished;

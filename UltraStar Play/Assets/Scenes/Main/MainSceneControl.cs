@@ -111,6 +111,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     [Inject]
     private ModManager modManager;
 
+    [Inject]
+    private SongIssueManager songIssueManager;
+
     private MessageDialogControl quitGameDialogControl;
     private NewSongDialogControl newSongDialogControl;
     private OnlineMultiplayerConnectionDialogControl onlineMultiplayerConnectionDialogControl;
@@ -161,7 +164,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
         settingsProblemHintControl = new SettingsProblemHintControl(
             settingsProblemHintIcon,
-            SettingsProblemHintControl.GetAllSettingsProblems(settings, modManager));
+            SettingsProblemHintControl.GetAllSettingsProblems(settings, modManager, songIssueManager));
 
         micSampleRecorderManager.ConnectedMicDevicesChangesStream
             .Subscribe(_ => UpdateSettingsProblemHint())
@@ -187,7 +190,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     private void UpdateSettingsProblemHint()
     {
-        settingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetAllSettingsProblems(settings, modManager));
+        settingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetAllSettingsProblems(settings, modManager, songIssueManager));
     }
 
     private void OpenSongSelectScene()

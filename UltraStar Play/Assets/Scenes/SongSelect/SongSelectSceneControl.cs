@@ -513,10 +513,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.UpdateSongQueue");
 
-        string newSongQueueLengthAsString = SongQueueManager.SongQueueLength.ToString();
+        string newSongQueueLengthAsString = songQueueManager.SongQueueLength.ToString();
         if (songQueueLengthLabel.text != newSongQueueLengthAsString)
         {
-            songQueueLengthContainer.SetVisibleByDisplay(SongQueueManager.SongQueueLength > 0);
+            songQueueLengthContainer.SetVisibleByDisplay(songQueueManager.SongQueueLength > 0);
             songQueueLengthLabel.SetTranslatedText(Translation.Of(newSongQueueLengthAsString));
             LeanTween.value(gameObject, Vector3.one * 1.5f, Vector3.one, 1.5f)
                 .setEaseOutBounce()

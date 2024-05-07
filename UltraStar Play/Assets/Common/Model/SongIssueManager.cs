@@ -11,23 +11,17 @@ using UnityEngine;
 
 public class SongIssueManager : AbstractSingletonBehaviour
 {
-    private static ConcurrentBag<SongIssue> allSongIssues = new();
-    public static bool HasSongIssues => allSongIssues.Count > 0;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        ResetSongIssues();
-    }
+    private ConcurrentBag<SongIssue> allSongIssues = new();
+    public bool HasSongIssues => allSongIssues.Count > 0;
 
     public static SongIssueManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongIssueManager>();
 
-    private static readonly string unitySupportedVideoFileExtensionsAsCsv = ApplicationUtils.unitySupportedVideoFiles.JoinWith(", ");
-    private static readonly string unitySupportedAudioFileExtensionsAsCsv = ApplicationUtils.unitySupportedAudioFiles.JoinWith(", ");
+    private static string UnitySupportedVideoFileExtensionsCsv => ApplicationUtils.unitySupportedVideoFiles.JoinWith(", ");
+    private static string UnitySupportedAudioFileExtensionsCsv => ApplicationUtils.unitySupportedAudioFiles.JoinWith(", ");
 
-    private static IDisposable songIssueScanDisposable;
-    public static bool IsSongIssueScanStarted => songIssueScanDisposable != null;
-    public static bool IsSongIssueScanFinished { get; private set; }
+    private IDisposable songIssueScanDisposable;
+    public bool IsSongIssueScanStarted => songIssueScanDisposable != null;
+    public bool IsSongIssueScanFinished { get; private set; }
 
     private readonly Subject<SongIssueScanFinishedEvent> songIssueScanFinishedEventStream = new();
     public IObservable<SongIssueScanFinishedEvent> SongIssueScanFinishedEventStream => songIssueScanFinishedEventStream
@@ -70,7 +64,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             .AddTo(gameObject);
     }
 
-    private static void ResetSongIssues()
+    private void ResetSongIssues()
     {
         // Stop old song scan
         songIssueScanDisposable?.Dispose();
@@ -110,19 +104,19 @@ public class SongIssueManager : AbstractSingletonBehaviour
         }
     }
 
-    public static IReadOnlyList<SongIssue> GetSongIssues()
+    public IReadOnlyList<SongIssue> GetSongIssues()
     {
         return allSongIssues.ToList();
     }
 
-    public static IReadOnlyList<SongIssue> GetSongErrors()
+    public IReadOnlyList<SongIssue> GetSongErrors()
     {
         return allSongIssues
             .Where(it => it.Severity is ESongIssueSeverity.Error)
             .ToList();
     }
 
-    public static IReadOnlyList<SongIssue> GetSongWarnings()
+    public IReadOnlyList<SongIssue> GetSongWarnings()
     {
         return allSongIssues
             .Where(it => it.Severity is ESongIssueSeverity.Warning)
@@ -270,7 +264,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             CheckVideoFormatIsSupported(songIssues, videoUri,
                 () => Translation.Get(R.Messages.songIssue_media_unsupported,
                     "actual", GetUriOrExtensionWithoutDot(videoUri),
-                    "expected", unitySupportedVideoFileExtensionsAsCsv),
+                    "expected", UnitySupportedVideoFileExtensionsCsv),
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
                 ESongIssueSeverity.Warning);
         }
@@ -287,7 +281,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
                 && !WebViewUtils.CanHandleWebViewUrl(songMeta.Video))
             {
                 songIssues.Add(SongIssue.CreateWarning(songMeta, Translation.Get(R.Messages.songIssue_media_videoDiffersFromAudio,
-                    "supportedFormats", unitySupportedVideoFileExtensionsAsCsv)));
+                    "supportedFormats", UnitySupportedVideoFileExtensionsCsv)));
 
                 // Do not attempt to load this video file, it will not work.
                 SongVideoPlayer.AddIgnoredVideoFile(songMeta.Video);
@@ -314,7 +308,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             CheckAudioOrVideoFormatIsSupported(songIssues, audioUri,
                 () => Translation.Get(R.Messages.songIssue_media_unsupported,
                     "actual", GetUriOrExtensionWithoutDot(audioUri),
-                    "expected", unitySupportedAudioFileExtensionsAsCsv),
+                    "expected", UnitySupportedAudioFileExtensionsCsv),
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Audio),
                 ESongIssueSeverity.Error);
         }
@@ -340,7 +334,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
         CheckIsUnitySupportedAudioFormat(songIssues, songMeta.VocalsAudio,
             () => Translation.Get(R.Messages.songIssue_media_unsupported,
                 "actual", GetUriOrExtensionWithoutDot(vocalsAudioUri),
-                "expected", unitySupportedAudioFileExtensionsAsCsv),
+                "expected", UnitySupportedAudioFileExtensionsCsv),
             () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.VocalsAudio),
             ESongIssueSeverity.Warning);
 
@@ -352,7 +346,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
         CheckIsUnitySupportedAudioFormat(songIssues, songMeta.InstrumentalAudio,
             () => Translation.Get(R.Messages.songIssue_media_unsupported,
                 "actual", GetUriOrExtensionWithoutDot(instrumentalAudioUri),
-                "expected", unitySupportedAudioFileExtensionsAsCsv),
+                "expected", UnitySupportedAudioFileExtensionsCsv),
             () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.InstrumentalAudio),
             ESongIssueSeverity.Warning);
 
@@ -370,7 +364,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Audio,
                 codec => Translation.Get(R.Messages.songIssue_media_unsupported,
                     "actual", codec,
-                    "expected", unitySupportedVideoFileExtensionsAsCsv),
+                    "expected", UnitySupportedVideoFileExtensionsCsv),
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
                 ESongIssueSeverity.Error);
         }
@@ -380,7 +374,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Video,
                 codec => Translation.Get(R.Messages.songIssue_media_unsupported,
                     "actual", codec,
-                    "expected", unitySupportedVideoFileExtensionsAsCsv),
+                    "expected", UnitySupportedVideoFileExtensionsCsv),
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
                 ESongIssueSeverity.Warning);
         }

@@ -207,11 +207,11 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         // Update icon style
         issuesIcon.RemoveFromClassList(R.UssClasses.warningFontColor);
         issuesIcon.RemoveFromClassList(R.UssClasses.errorFontColor);
-        if (SongIssueManager.GetSongErrors().Count > 0)
+        if (songIssueManager.GetSongErrors().Count > 0)
         {
             issuesIcon.AddToClassList(R.UssClasses.errorFontColor);
         }
-        else if (SongIssueManager.GetSongWarnings().Count > 0)
+        else if (songIssueManager.GetSongWarnings().Count > 0)
         {
             issuesIcon.AddToClassList(R.UssClasses.warningFontColor);
         }
@@ -238,14 +238,14 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .CreateAndInject<MessageDialogControl>();
         issuesDialogControl.Title = Translation.Get(R.Messages.options_songLibrary_songIssueDialog_title);
 
-        if (SongIssueManager.IsSongIssueScanFinished)
+        if (songIssueManager.IsSongIssueScanFinished)
         {
             FillIssuesDialog(issuesDialogControl);
         }
         else
         {
             // Start song issue scan if needed
-            if (!SongIssueManager.IsSongIssueScanStarted)
+            if (!songIssueManager.IsSongIssueScanStarted)
             {
                 songIssueManager.ReloadSongIssues();
             }
@@ -277,17 +277,17 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         AccordionItem errorsAccordionItem = new(Translation.Get(R.Messages.options_songLibrary_songIssueDialog_errors));
         accordionGroup.Add(errorsAccordionItem);
-        FillWithSongIssues(errorsAccordionItem, SongIssueManager.GetSongErrors(), out List<QuickFixAction> errorQuickFixActions);
+        FillWithSongIssues(errorsAccordionItem, songIssueManager.GetSongErrors(), out List<QuickFixAction> errorQuickFixActions);
 
         AccordionItem warningsAccordionItem = new(Translation.Get(R.Messages.options_songLibrary_songIssueDialog_warnings));
         accordionGroup.Add(warningsAccordionItem);
-        FillWithSongIssues(warningsAccordionItem, SongIssueManager.GetSongWarnings(), out List<QuickFixAction> warningQuickFixActions);
+        FillWithSongIssues(warningsAccordionItem, songIssueManager.GetSongWarnings(), out List<QuickFixAction> warningQuickFixActions);
 
-        if (!SongIssueManager.GetSongErrors().IsNullOrEmpty())
+        if (!songIssueManager.GetSongErrors().IsNullOrEmpty())
         {
             errorsAccordionItem.ShowAccordionContent();
         }
-        else if (!SongIssueManager.GetSongWarnings().IsNullOrEmpty())
+        else if (!songIssueManager.GetSongWarnings().IsNullOrEmpty())
         {
             warningsAccordionItem.ShowAccordionContent();
         }

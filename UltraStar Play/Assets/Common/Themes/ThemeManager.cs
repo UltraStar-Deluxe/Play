@@ -942,11 +942,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         if (visualElement is Button button)
         {
-            button.RegisterCallbackButtonTriggered(_ => AudioManager.PlayButtonSound());
+            button.RegisterCallbackButtonTriggered(_ => SfxManager.PlayButtonSound());
         }
         else if (visualElement is Toggle toggle)
         {
-            toggle.RegisterValueChangedCallback(_ => AudioManager.PlayButtonSound());
+            toggle.RegisterValueChangedCallback(_ => SfxManager.PlayButtonSound());
         }
     }
 

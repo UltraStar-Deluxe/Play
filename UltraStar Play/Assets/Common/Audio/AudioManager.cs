@@ -17,12 +17,14 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
     private const int CriticalCacheSize = 10;
     private readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
 
-    [Inject]
-    private Settings settings;
-
     protected override object GetInstance()
     {
         return Instance;
+    }
+
+    protected override void OnDestroySingleton()
+    {
+        ClearCache();
     }
 
     public static AudioClip LoadAudioClipFromUriImmediately(string uri, bool streamAudio = true)
@@ -100,7 +102,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         });
     }
 
-    public void ClearCache()
+    private void ClearCache()
     {
         foreach (CachedAudioClip cachedAudioClip in new List<CachedAudioClip>(audioClipCache.Values))
         {

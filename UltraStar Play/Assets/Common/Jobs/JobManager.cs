@@ -11,14 +11,7 @@ using UnityEngine.UIElements;
 
 public class JobManager : AbstractSingletonBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void InitOnLoad()
-    {
-        jobsWithoutParent = new();
-    }
-
-    // Static field to be persisted across scenes
-    private static List<Job> jobsWithoutParent = new();
+    private readonly List<Job> jobsWithoutParent = new();
 
     public static JobManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<JobManager>();
 
