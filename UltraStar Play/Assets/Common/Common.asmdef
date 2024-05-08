@@ -45,7 +45,8 @@
         "Mono.CSharp.dll",
         "Mono.Data.Sqlite.dll",
         "ICSharpCode.SharpZipLib.dll",
-        "WindowsInput.dll"
+        "WindowsInput.dll",
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

@@ -199,6 +199,13 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.2.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
     "com.unity.render-pipelines.core": {
       "version": "16.0.5",
       "depth": 1,
@@ -363,6 +370,13 @@
       "source": "git",
       "dependencies": {},
       "hash": "2ee62e21eded65257454d14d545f5db7484743b0"
+    },
+    "jillejr.newtonsoft.json-for-unity.converters": {
+      "version": "https://github.com/applejag/Newtonsoft.Json-for-Unity.Converters.git#1.6.3",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "464cdbbabb67661751cb73fd39c4e99e5b5eedb0"
     },
     "nuget.castle-core": {
       "version": "2.0.0",

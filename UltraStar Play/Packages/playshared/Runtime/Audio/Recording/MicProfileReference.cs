@@ -1,21 +1,25 @@
 ﻿using System;
-using FullSerializer;
+using Newtonsoft.Json;
 
 public class MicProfileReference : IEquatable<MicProfileReference>
 {
-    [fsProperty]
+    [JsonIgnore]
     private readonly string name;
     public string Name => name;
 
-    [fsProperty]
+    [JsonIgnore]
     private readonly int channelIndex;
     public int ChannelIndex => channelIndex;
 
-    [fsProperty]
+    [JsonIgnore]
     private readonly string connectedClientId;
     public string ConnectedClientId => connectedClientId;
 
     public bool IsInputFromConnectedClient => !ConnectedClientId.IsNullOrEmpty();
+
+    public MicProfileReference()
+    {
+    }
 
     public MicProfileReference(string name, int channelIndex, string connectedClientId)
     {

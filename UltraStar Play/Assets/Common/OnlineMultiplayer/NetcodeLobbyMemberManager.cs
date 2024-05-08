@@ -83,7 +83,7 @@ namespace CommonOnlineMultiplayer
             LobbyConnectionRequestDto requestDto;
             try
             {
-                requestDto = JsonConverter.FromJson<LobbyConnectionRequestDto>(payload, false);
+                requestDto = JsonConverter.FromJson<LobbyConnectionRequestDto>(payload);
                 if (!IsConnectionRequestDataValid(requestDto, out string errorMessage))
                 {
                     Debug.Log($"DenyRequest because connection data is invalid: {errorMessage}");

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FullSerializer;
+using Newtonsoft.Json;
 
 /**
  * Data structure for song scores and other statistics.
@@ -21,6 +21,6 @@ public class Statistics
     // Indicates whether the Statistics have non-persisted changes.
     // The flag is checked by the StatsManager, e.g., on scene change.
     // The flag is reset by the StatsManger on save.
-    [fsIgnore]
+    [JsonIgnore]
     public bool IsDirty { get; set; }
 }

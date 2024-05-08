@@ -758,7 +758,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             {
                 Debug.Log($"Reading mod settings of type {modSettings.GetType()} from file '{modSettingsPath}'");
                 string json = File.ReadAllText(modSettingsPath);
-                JsonConverter.FillFromJsonCopy(json, modSettings, false);
+                JsonConverter.FillFromJsonCopy(json, modSettings);
 
                 if (modSettings is IOnAfterLoadModSettings afterLoadModSettings)
                 {

@@ -4,8 +4,8 @@ using NUnit.Framework;
 using Steamworks;
 using UnityEngine.TestTools;
 
-// Some custom converters are registered in RuntimeInitializeLoadType.SubsystemRegistration,
-// which is not executed in Edit mode tests
+// Tests some custom converters that are registered in RuntimeInitializeLoadType.SubsystemRegistration,
+// and thus not registered during Play Mode test.
 public class JsonConverterPlayModeTests : AbstractPlayModeTest
 {
     // TODO: Refactor common code of these tests
