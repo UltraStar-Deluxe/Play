@@ -59,13 +59,13 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private PanelHelper panelHelper;
-    
+
     [Inject]
     private Injector injector;
 
     [Inject]
     private AchievementEventStream achievementEventStream;
-    
+
     private int categoryIndex;
     private List<CreditsCategoryEntry> creditsCategoryEntries;
     private List<CreditsEntry> remainingCreditsEntries;
@@ -82,7 +82,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     private Vector2 lastCreatedEntryControlPosition;
 
     private bool wasSkipButtonClicked;
-    
+
     public void Start()
     {
         // Init UI
@@ -154,7 +154,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
             else
             {
                 StartFadeOut();
-                
+
                 // Trigger achievement for watching the credits without skipping
                 if (!wasSkipButtonClicked)
                 {
@@ -185,7 +185,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
                     ? ($"<i>{category.Name}</i>" + "\n" + categoryContent)
                     : categoryContent;
             }).JoinWith("\n\n");
-        
+
         // Extra line breaks for continued scroll range
         creditsSummaryLabel.text = creditsSummaryText + "\n\n\n\n\n\n\n\n";
     }

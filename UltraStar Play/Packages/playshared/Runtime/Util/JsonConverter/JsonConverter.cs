@@ -4,7 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
 using Newtonsoft.Json.UnityConverters.Math;
-u
+
 /**
  * Implements serialization / deserialization of JSON using the serialization lib Newtonsoft.Json (aka. Json.NET).
  */
