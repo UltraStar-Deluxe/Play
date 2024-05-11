@@ -232,8 +232,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         quitGameDialogControl.DialogClosedEventStream.Subscribe(_ => quitGameDialogControl = null);
         quitGameDialogControl.Message = Translation.Get(R.Messages.mainScene_quitDialog_message);
 
-        quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_quit), _ => CloseQuitGameDialog());
-        quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_cancel), _ => ApplicationUtils.QuitOrStopPlayMode());
+        quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_quit), _ => ApplicationUtils.QuitOrStopPlayMode());
+        quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_cancel), _ => CloseQuitGameDialog());
     }
 
     public void OpenNewSongDialog()
