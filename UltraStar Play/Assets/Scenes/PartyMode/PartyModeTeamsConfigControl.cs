@@ -106,8 +106,6 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         playerToVisualElement.Clear();
 
         partyModeSettings.TeamSettings.Teams.ForEach(team => CreateTeamUi(team));
-
-        TranslationManager.ApplyTranslations(teamList);
     }
 
     private void CreateTeamUi(PartyModeTeamSettings team)
