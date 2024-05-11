@@ -134,7 +134,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         VisualElement root = contextMenuPopupControl.VisualElement;
         ThemeJson themeJson = GetCurrentTheme()?.ThemeJson;
-        if (themeJson == null)
+        if (themeJson == null
+            || root == null)
         {
             return;
         }
@@ -1069,7 +1070,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         List<string> ignoredUxmlNamesAndUssClasses = new ()
         {
-            "hiddenContinueButton"
+            "hiddenContinueButton",
+            "contextMenuButton",
         };
 
         foreach (string excludedNameOrClass in ignoredUxmlNamesAndUssClasses)
