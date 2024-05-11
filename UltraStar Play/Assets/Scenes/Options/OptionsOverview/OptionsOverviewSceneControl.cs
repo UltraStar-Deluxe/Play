@@ -261,8 +261,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         openSteamWorkshopButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty());
         updateSteamWorkshopItemsButton.SetVisibleByDisplay(openSteamWorkshopButton.IsVisibleByDisplay());
 
-        // Apply theme and translations to loaded UI
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(loadedSceneVisualElement);
+        // Translations to loaded UI
         TranslationManager.ApplyTranslations(loadedSceneVisualElement);
 
         // Scroll with mouse drag
@@ -412,7 +411,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
             issuesDialogControl = null;
             issuesButton.Focus();
         });
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(issuesDialogControl.DialogRootVisualElement);
     }
 
     private void OnDestroy()

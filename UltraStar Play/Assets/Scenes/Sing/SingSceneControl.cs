@@ -638,8 +638,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
         dialogControl.Message = Translation.Get(R.Messages.singScene_missingMicrophones_message,
             "playerNames", playerNameCsv);
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);
     }
 
     public void OnDestroy()

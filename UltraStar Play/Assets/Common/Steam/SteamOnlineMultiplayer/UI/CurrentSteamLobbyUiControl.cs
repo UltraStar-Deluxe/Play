@@ -125,8 +125,6 @@ namespace SteamOnlineMultiplayer
             {
                 CreateConnectedClientEntryControl(memberData);
             }
-
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(connectedClientsListScrollView);
         }
 
         private void CreateConnectedClientEntryControl(SteamLobbyMember steamLobbyMember)

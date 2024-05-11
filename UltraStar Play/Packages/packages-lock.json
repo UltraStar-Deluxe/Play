@@ -63,6 +63,15 @@
       "dependencies": {},
       "hash": "abb643e689195bb4f1fb57ec013da680b141007d"
     },
+    "com.bsigame.visualelementevents": {
+      "version": "https://github.com/BSimonSweet/Unity-VisualElementEvents.git#cc25fdb9a6927632773e8f77e4587a3628ec1722",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.mono-cecil": "1.10.2"
+      },
+      "hash": "cc25fdb9a6927632773e8f77e4587a3628ec1722"
+    },
     "com.community.netcode.transport.facepunch": {
       "version": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.facepunch",
       "depth": 0,

@@ -524,7 +524,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
         songQueueUiControl.SetSongQueueEntryDtos(songQueueManager.GetSongQueueEntries());
         startSongQueueButton.SetEnabled(!songQueueManager.IsSongQueueEmpty);
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(songQueueOverlay);
     }
 
     private void UpdateModifiersActiveIcon()
@@ -759,8 +758,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         AccordionItem attributionAccordionItem = new(Translation.Get(R.Messages.action_showAttribution));
         attributionAccordionItem.Add(AttributionUtils.CreateAttributionVisualElement(songMeta));
         lyricsDialogControl.AddVisualElement(attributionAccordionItem);
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(lyricsDialogControl.DialogRootVisualElement);
     }
 
     public void InitSongMetas()

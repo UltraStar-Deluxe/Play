@@ -221,7 +221,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     private VisualElement OnMakeItem()
     {
         VisualElement songEntryVisualElement = songEntryUi.CloneTree().Children().FirstOrDefault();
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(songEntryVisualElement);
         return songEntryVisualElement;
     }
 

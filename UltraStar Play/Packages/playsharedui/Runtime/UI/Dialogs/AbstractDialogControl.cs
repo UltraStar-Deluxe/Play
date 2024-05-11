@@ -10,14 +10,10 @@ public abstract class AbstractDialogControl : IDialogControl, INeedInjection, II
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
-        dialogInjectionFinishedEventStream = new();
         instantiatedDialogCount = 0;
     }
 
     protected static int instantiatedDialogCount;
-
-    private static Subject<AbstractDialogControl> dialogInjectionFinishedEventStream = new();
-    public static IObservable<AbstractDialogControl> DialogInjectionFinishedEventStream => dialogInjectionFinishedEventStream;
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement DialogRootVisualElement { get; protected set; }
@@ -30,12 +26,10 @@ public abstract class AbstractDialogControl : IDialogControl, INeedInjection, II
     protected AbstractDialogControl()
     {
         instantiatedDialogCount++;
-        dialogInjectionFinishedEventStream.OnNext(this);
     }
 
     public virtual void OnInjectionFinished()
     {
-        dialogInjectionFinishedEventStream.OnNext(this);
     }
 
     public virtual void CloseDialog()

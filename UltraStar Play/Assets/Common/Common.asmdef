@@ -14,6 +14,7 @@
         "Plugins",
         "UniRx",
         "IngameDebugConsole.Runtime",
+        "com.bsigame.VisualElementEvents",
         "com.achimmihca.uniinject",
         "com.achimmihca.protrans",
         "com.achimmihca.primeinputactions",

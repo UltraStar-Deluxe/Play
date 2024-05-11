@@ -222,8 +222,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         {
             AnimationUtils.HighlightIconWithBounce(gameObject, issuesIcon);
         }
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(issuesIcon);
     }
 
     public override string HelpUri => Translation.Get(R.Messages.uri_howToAddAndCreateSongs);
@@ -380,8 +378,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         quickFixAllDialog.AddButton(Translation.Get(R.Messages.action_cancel),
             _ => quickFixAllDialog.CloseDialog());
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(quickFixAllDialog.DialogRootVisualElement);
     }
 
     private void FillWithSongIssues(AccordionItem accordionItem, IReadOnlyList<SongIssue> songIssues, out List<QuickFixAction> quickFixActions)
@@ -562,8 +558,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         {
             songFolderList.Add(downloadSongArchiveUiControl.VisualElement);
         });
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(songFolderList);
     }
 
     private void CreateSongFolderEntryControl(string path, int indexInList)
@@ -636,8 +630,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             deleteSongFolderDialog.CloseDialog();
             DoDeleteSongFolder(indexInList);
         });
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(deleteSongFolderDialog.DialogRootVisualElement);
     }
 
     private void DoDeleteSongFolder(int indexInList)

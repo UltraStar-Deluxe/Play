@@ -62,8 +62,6 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
         {
             HighlightHelpIcon();
         }
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(connectedClientList);
     }
 
     private VisualElement CreateClientEntry(IConnectedClientHandler clientHandler)

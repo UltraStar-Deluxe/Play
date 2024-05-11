@@ -49,8 +49,6 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             TextField nameTextField = playerProfileList[playerProfileList.childCount - 1].Q<TextField>("nameTextField");
             nameTextField.DisableParseEscapeSequences();
             nameTextField.Focus();
-
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
         });
     }
 
@@ -83,8 +81,6 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         settings.PlayerProfiles
             .Union(nonPersistentSettings.LobbyMemberPlayerProfiles)
             .ForEach(playerProfile => CreatePlayerProfileEntry(playerProfile));
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
     }
 
     private void UpdatePlayerProfileInactiveOverlay(PlayerProfile playerProfile, VisualElement playerProfileInactiveOverlay)

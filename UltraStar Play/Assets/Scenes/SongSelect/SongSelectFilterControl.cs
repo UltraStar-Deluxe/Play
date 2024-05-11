@@ -172,8 +172,6 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
 
         filtersAccordionItem.UpdateTargetHeight();
 
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(filterListContainer);
-
         filtersChangedEventStream.OnNext(VoidEvent.instance);
     }
 
@@ -222,8 +220,6 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
 
             filterToggles.Add(filterToggle);
         }
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(filterListContainer);
     }
 
     private bool IsCommaSeparatedSearchProperty(ESearchProperty searchProperty)

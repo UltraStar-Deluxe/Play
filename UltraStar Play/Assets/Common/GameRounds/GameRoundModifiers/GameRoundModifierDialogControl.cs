@@ -68,8 +68,6 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
         {
             CreateGameRoundModifierControl(gameRoundModifier);
         }
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(modifierContainer);
     }
 
     private void CreateGameRoundModifierControl(IGameRoundModifier modifier)

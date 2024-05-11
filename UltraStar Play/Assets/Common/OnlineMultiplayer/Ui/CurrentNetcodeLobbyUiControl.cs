@@ -91,8 +91,6 @@ namespace CommonOnlineMultiplayer
             {
                 CreateConnectedClientEntryControl(lobbyMember);
             }
-
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(connectedClientsListScrollView);
         }
 
         private void CreateConnectedClientEntryControl(LobbyMember lobbyMember)

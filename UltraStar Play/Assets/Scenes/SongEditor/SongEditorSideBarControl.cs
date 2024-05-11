@@ -259,8 +259,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
         helpDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
             _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToSongEditor)));
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(helpDialogControl.DialogRootVisualElement);
     }
 
     private void DoSpeechRecognition()
