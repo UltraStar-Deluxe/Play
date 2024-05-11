@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -9,8 +10,6 @@ public class UnityVideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
 {
     [InjectedInInspector]
     public VideoPlayer videoPlayer;
-
-    public override EVideoSupportProvider VideoSupportProvider => EVideoSupportProvider.UnityVideoPlayer;
 
     private readonly List<string> videoPlayerErrorMessages = new List<string>();
 
@@ -27,6 +26,14 @@ public class UnityVideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
     private void OnDestroy()
     {
         RenderTextureUtils.Clear(videoPlayer.targetTexture);
+    }
+
+    public override bool IsSupported(string videoUri, SongMeta songMeta)
+    {
+        return !WebViewUtils.CanHandleWebViewUrl(videoUri)
+            && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
+            && settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
+            && ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(videoUri));
     }
 
     public override IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri)
@@ -87,7 +94,7 @@ public class UnityVideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
 
     public override void SetTargetTexture(RenderTexture renderTexture)
     {
-        throw new VideoSupportProviderException("Cannot set RenderTexture because this object uses its own VideoPlayer component");
+        // Ignore
     }
 
     public override void SetBackgroundScaleMode(ESongBackgroundScaleMode mode)

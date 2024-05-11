@@ -5,14 +5,13 @@ using UnityEngine;
 
 public class FfmpegVideoSupportProvider : AbstractVideoSupportProvider
 {
-    public override EVideoSupportProvider VideoSupportProvider => EVideoSupportProvider.Ffmpeg;
-
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    protected void OnDestroy()
+    public override bool IsSupported(string videoUri, SongMeta songMeta)
     {
-        ResetFfmpegRenderTexture();
+        return !WebRequestUtils.IsHttpOrHttpsUri(videoUri)
+               && settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never;
     }
 
     public override IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri)

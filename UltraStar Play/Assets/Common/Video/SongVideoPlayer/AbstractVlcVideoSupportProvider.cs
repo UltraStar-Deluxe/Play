@@ -5,8 +5,6 @@ using UnityEngine;
 
 public abstract class AbstractVlcVideoSupportProvider : AbstractVideoSupportProvider, INeedInjection
 {
-    public override EVideoSupportProvider VideoSupportProvider => EVideoSupportProvider.Vlc;
-
     protected MediaPlayer mediaPlayer;
     protected Texture2D vlcTexture;
     protected RenderTexture targetTexture;
@@ -24,6 +22,12 @@ public abstract class AbstractVlcVideoSupportProvider : AbstractVideoSupportProv
     protected virtual void OnDestroy()
     {
         Destroy(vlcTexture);
+    }
+
+    public override bool IsSupported(string videoUri, SongMeta songMeta)
+    {
+        return !WebRequestUtils.IsHttpOrHttpsUri(videoUri)
+               && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never;
     }
 
     public override void SetTargetTexture(RenderTexture renderTexture)

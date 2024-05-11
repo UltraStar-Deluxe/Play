@@ -296,11 +296,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   songAudioPlayer: {fileID: 0}
-  unityVideoPlayerVideoSupportProvider: {fileID: 6784448477990193728}
-  vlcVideoSupportProvider: {fileID: 3051572588235740523}
-  songAudioPlayerVlcVideoSupportProvider: {fileID: 8363590573911095317}
-  ffmpegVideoSupportProvider: {fileID: 3486777015339389307}
-  webViewVideoSupportProvider: {fileID: 3168561779329018817}
+  videoPlayer: {fileID: 7416615285511047229}
   forceSyncOnForwardJumpInTheSong: 0
 --- !u!1 &9198272023589213903
 GameObject:

@@ -3,7 +3,11 @@ using UnityEngine;
 
 public abstract class AbstractVideoSupportProvider : MonoBehaviour, INeedInjection, IVideoSupportProvider
 {
+    [Inject]
+    protected Settings settings;
+
     public abstract IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri);
+    public abstract bool IsSupported(string videoUri, SongMeta songMeta);
     public abstract void UnloadVideo();
     public abstract void PlayVideo();
     public abstract void PauseVideo();
@@ -14,7 +18,6 @@ public abstract class AbstractVideoSupportProvider : MonoBehaviour, INeedInjecti
     public abstract float PlaybackSpeed { get; set; }
     public abstract double PositionInVideoInMillis { get; set; }
     public abstract double DurationInMillis { get; }
-    public abstract EVideoSupportProvider VideoSupportProvider { get; }
 
     public virtual void SetBackgroundScaleMode(ESongBackgroundScaleMode mode)
     {

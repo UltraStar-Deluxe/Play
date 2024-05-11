@@ -7,7 +7,12 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    public override EVideoSupportProvider VideoSupportProvider => EVideoSupportProvider.SongAudioPlayerVlc;
+    public override bool IsSupported(string videoUri, SongMeta songMeta)
+    {
+        return base.IsSupported(videoUri, songMeta)
+            && songMeta.Audio == songMeta.Video
+            && songAudioPlayer.VlcMediaPlayer != null;
+    }
 
     public override IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri)
     {

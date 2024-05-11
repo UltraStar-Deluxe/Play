@@ -3,23 +3,14 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class WebViewVideoSupportProvider : AbstractVideoSupportProvider, IInjectionFinishedListener
+public class WebViewVideoSupportProvider : AbstractVideoSupportProvider
 {
     [Inject]
     private WebViewManager webViewManager;
 
-    public override EVideoSupportProvider VideoSupportProvider => EVideoSupportProvider.WebView;
-
-    private RenderTexture originalWebViewCameraRenderTexture;
-
-    public void OnInjectionFinished()
+    public override bool IsSupported(string videoUri, SongMeta songMeta)
     {
-        originalWebViewCameraRenderTexture = webViewManager.webViewCamera.targetTexture;
-    }
-
-    public void OnDestroy()
-    {
-        ResetWebViewRenderTexture();
+        return WebViewUtils.CanHandleWebViewUrl(videoUri);
     }
 
     public override IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri)
@@ -103,24 +94,11 @@ public class WebViewVideoSupportProvider : AbstractVideoSupportProvider, IInject
 
     private void ResetWebViewRenderTexture()
     {
-        if (originalWebViewCameraRenderTexture == null)
-        {
-            return;
-        }
-
-        if (webViewManager.webViewCamera.targetTexture != originalWebViewCameraRenderTexture)
-        {
-            webViewManager.webViewCamera.targetTexture = originalWebViewCameraRenderTexture;
-        }
+        webViewManager.ResetWebViewRenderTexture();
     }
 
     private void SetWebViewRenderTextureToVideoRenderTexture(RenderTexture renderTexture)
     {
-        if (originalWebViewCameraRenderTexture == null)
-        {
-            return;
-        }
-
         webViewManager.SetWebViewRenderTexture(renderTexture);
     }
 }

@@ -8258,6 +8258,8 @@ MonoBehaviour:
   webViewCanvas: {fileID: 519528370131799763}
   webViewCamera: {fileID: 2364365025742481650}
   defaultWebViewHtml: {fileID: 4900000, guid: e3afca435ff14476bad0b2ad71017bc3, type: 3}
+  defaultRenderTexture: {fileID: 8400000, guid: b7abf32de3eac1648b13bbe27ad196a8,
+    type: 2}
   volumeInPercent: 0
   isContentLoaded: 0
 --- !u!1 &5675655531140774825
@@ -10761,7 +10763,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11414302, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_Value
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11452418, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: toggleKey

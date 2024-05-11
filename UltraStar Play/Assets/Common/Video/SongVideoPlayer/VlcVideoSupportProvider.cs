@@ -4,8 +4,6 @@ using UniRx;
 
 public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 {
-    public override EVideoSupportProvider VideoSupportProvider => EVideoSupportProvider.Vlc;
-
     private VlcManager vlcManager;
     private MediaPlayer vlcMediaPlayer;
 
@@ -13,6 +11,12 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     {
         base.OnDestroy();
         DestroyVlcMediaPlayer();
+    }
+
+    public override bool IsSupported(string videoUri, SongMeta songMeta)
+    {
+        return base.IsSupported(videoUri, songMeta)
+               && songMeta.Audio != songMeta.Video;
     }
 
     public override IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri)

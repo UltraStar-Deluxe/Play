@@ -22,6 +22,9 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     [InjectedInInspector]
     public TextAsset defaultWebViewHtml;
 
+    [InjectedInInspector]
+    public RenderTexture defaultRenderTexture;
+
     [Inject]
     private UIDocument uiDocument;
 
@@ -630,5 +633,10 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             webViewCamera.targetTexture = targetTexture;
             UpdateWebViewCameraActive();
         }
+    }
+
+    public void ResetWebViewRenderTexture()
+    {
+        SetWebViewRenderTexture(defaultRenderTexture);
     }
 }

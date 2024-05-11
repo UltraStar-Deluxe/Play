@@ -4,6 +4,7 @@ using UnityEngine;
 public interface IVideoSupportProvider
 {
     public IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri);
+    public bool IsSupported(string videoUri, SongMeta songMeta);
     public void UnloadVideo();
     public void PlayVideo();
     public void PauseVideo();
@@ -15,5 +16,4 @@ public interface IVideoSupportProvider
     public float PlaybackSpeed { get; set; }
     public double PositionInVideoInMillis { get; set; }
     public double DurationInMillis { get; }
-    public EVideoSupportProvider VideoSupportProvider { get; }
 }
