@@ -56,7 +56,7 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
             });
 
         Permissions.Subscribe(newPermissions =>
-            Debug.Log($"Permissions changed: {newPermissions.ToCsv()}"));
+            Debug.Log($"Permissions changed: {newPermissions.JoinWith(", ")}"));
     }
 
     public string GetUri(string path)

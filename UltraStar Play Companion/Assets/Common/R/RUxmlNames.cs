@@ -23,7 +23,7 @@ public static partial class R
         public const string connectionViewContainer = "connectionViewContainer";
         public const string content = "content";
         public const string copyLogButton = "copyLogButton";
-        public const string devModePicker = "devModePicker";
+        public const string devModeToggle = "devModeToggle";
         public const string dialogContainer = "dialogContainer";
         public const string enqueueAsMedleyIcons = "enqueueAsMedleyIcons";
         public const string enqueueButton = "enqueueButton";
@@ -50,7 +50,7 @@ public static partial class R
         public const string keyboardIcon = "keyboardIcon";
         public const string keyboardSimulationContainer = "keyboardSimulationContainer";
         public const string labelContainer = "labelContainer";
-        public const string languagePicker = "languagePicker";
+        public const string languageChooser = "languageChooser";
         public const string logo = "logo";
         public const string lyricsAccordionItem = "lyricsAccordionItem";
         public const string lyricsLabel = "lyricsLabel";
@@ -67,7 +67,7 @@ public static partial class R
         public const string MicrophoneUi = "MicrophoneUi";
         public const string microphoneUiRoot = "microphoneUiRoot";
         public const string micViewContainer = "micViewContainer";
-        public const string minimumLogLevelPicker = "minimumLogLevelPicker";
+        public const string minimumLogLevelChooser = "minimumLogLevelChooser";
         public const string modifierChipsCombo = "modifierChipsCombo";
         public const string modifierChipsComboContainer = "modifierChipsComboContainer";
         public const string modifierDialogOverlay = "modifierDialogOverlay";
@@ -86,7 +86,7 @@ public static partial class R
         public const string PlayerSelectPlayerEntryUi = "PlayerSelectPlayerEntryUi";
         public const string recordingDeviceColorIndicator = "recordingDeviceColorIndicator";
         public const string recordingDeviceInfo = "recordingDeviceInfo";
-        public const string recordingDevicePicker = "recordingDevicePicker";
+        public const string recordingDeviceChooser = "recordingDeviceChooser";
         public const string row = "row";
         public const string sceneTitle = "sceneTitle";
         public const string scrollWheelArea = "scrollWheelArea";
@@ -155,7 +155,7 @@ public static partial class R
         public const string spacer = "spacer";
         public const string tabContentContainer = "tabContentContainer";
         public const string tabGroup = "tabGroup";
-        public const string targetFpsPicker = "targetFpsPicker";
+        public const string targetFpsChooser = "targetFpsChooser";
         public const string teamLabel = "teamLabel";
         public const string titleAndDescription = "titleAndDescription";
         public const string titleContainer = "titleContainer";

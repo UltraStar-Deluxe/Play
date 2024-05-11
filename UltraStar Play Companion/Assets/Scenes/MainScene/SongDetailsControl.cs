@@ -268,7 +268,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailablePlayers,
             response =>
             {
-                ListDto<string> listDto = JsonConverter.FromJson<ListDto<string>>(response, false);
+                ListDto<string> listDto = JsonConverter.FromJson<ListDto<string>>(response);
                 if (listDto == null
                     || listDto.Items == null)
                 {
@@ -290,7 +290,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailableMicrophones,
             response =>
             {
-                ListDto<MicProfile> listDto = JsonConverter.FromJson<ListDto<MicProfile>>(response, false);
+                ListDto<MicProfile> listDto = JsonConverter.FromJson<ListDto<MicProfile>>(response);
                 if (listDto == null
                     || listDto.Items == null)
                 {
@@ -463,7 +463,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         mainGameHttpClient.GetRequest(HttpApiEndpointPaths.SongImage.ReplaceOrThrow("{songId}", songDto.Hash),
             response =>
             {
-                ImageDto imageDto = JsonConverter.FromJson<ImageDto>(response, false);
+                ImageDto imageDto = JsonConverter.FromJson<ImageDto>(response);
                 if (imageDto == null
                     || imageDto.JpgBytesBase64.IsNullOrEmpty())
                 {
@@ -492,7 +492,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         mainGameHttpClient.GetRequest(HttpApiEndpointPaths.Song.ReplaceOrThrow("{songId}", songDto.Hash),
             response =>
             {
-                SongDetailsDto songDetailsDto = JsonConverter.FromJson<SongDetailsDto>(response, false);
+                SongDetailsDto songDetailsDto = JsonConverter.FromJson<SongDetailsDto>(response);
                 if (songDetailsDto == null
                     || songDetailsDto.SongId.IsNullOrEmpty())
                 {

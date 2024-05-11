@@ -11,7 +11,7 @@
             </ui:VisualElement>
             <ui:Toggle name="selectedToggle" />
         </ui:VisualElement>
-        <ItemPicker name="voiceChooser" no-previous-button="true" wrap-around="true" class="smallControl smallFont mt-1" style="width: 100%;" />
+        <Chooser name="voiceChooser" no-previous-button="true" wrap-around="true" class="smallControl smallFont mt-1" style="width: 100%;" />
         <ui:VisualElement name="horizontalSeparatorLine" class="horizontalSeparatorLine mx-5" style="width: auto;" />
     </ui:VisualElement>
 </ui:UXML>
