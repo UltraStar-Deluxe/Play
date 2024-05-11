@@ -176,7 +176,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (isDropdownMenuOpened)
         {
             isDropdownMenuOpened = false;
-            ApplyStyles(uiDocument.rootVisualElement.focusController.focusedElement as VisualElement);
+            VisualElement dropdownParent = uiDocument.rootVisualElement.focusController.focusedElement as VisualElement;
+            if (dropdownParent == null)
+            {
+                return;
+            }
+
+            alreadyProcessedVisualElements.Remove(dropdownParent);
+            ApplyStyles(dropdownParent);
         }
     }
 
@@ -741,13 +748,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return themeMetas;
     }
 
-    private void ApplyStyles(VisualElement root)
+    private void ApplyStyles(VisualElement root = null)
     {
+        root ??= uiDocument.rootVisualElement;
         if (!applyThemeSpecificStyles
             // Settings can be null when running a specific scene in the Unity editor
             // and injection did not finish yet.
             || settings == null
-            || root == null
             || alreadyProcessedVisualElements.Contains(root))
         {
             return;
