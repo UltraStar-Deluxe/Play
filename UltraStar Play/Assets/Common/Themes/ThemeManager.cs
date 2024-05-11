@@ -762,7 +762,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
         alreadyProcessedVisualElements.Add(root);
 
-        using DisposableStopwatch d = new($"Apply styles to '{root.name}' in frame {Time.frameCount}");
+        // using DisposableStopwatch d = new($"Apply styles to '{root.name}' in frame {Time.frameCount}");
 
         if (!settings.EnableDynamicThemes)
         {

@@ -42,7 +42,7 @@ public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, IS
 
         root ??= translationManager.uiDocument.rootVisualElement;
 
-        using DisposableStopwatch d = new($"Apply translations to '{root.name}' in frame {Time.frameCount}");
+        // using DisposableStopwatch d = new($"Apply translations to '{root.name}' in frame {Time.frameCount}");
 
         root.Query<Label>().ForEach(label => ApplyTranslation(
             () => label.text,
