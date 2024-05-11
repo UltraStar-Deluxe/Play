@@ -14,6 +14,7 @@
     "jillejr.newtonsoft.json-for-unity.converters": "https://github.com/applejag/Newtonsoft.Json-for-Unity.Converters.git#1.6.3",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
+    "com.unity.dt.app-ui": "1.1.0",
     "com.unity.ai.navigation": "2.0.0",
     "com.unity.collab-proxy": "2.2.0",
     "com.unity.ext.nunit": "2.0.5",
