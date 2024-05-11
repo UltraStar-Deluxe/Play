@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -35,8 +36,9 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
 
     private void InitWebcamChooser()
     {
-        deviceChooserControl = new LabeledChooserControl<WebCamDevice>(deviceChooser, webCamManager.GetWebCamDevices(),
-            device => deviceChooserControl.Items.Count <= 0
+        List<WebCamDevice> webCamDevices = webCamManager.GetWebCamDevices();
+        deviceChooserControl = new LabeledChooserControl<WebCamDevice>(deviceChooser, webCamDevices,
+            device => webCamDevices.Count <= 0
                 ? Translation.Get(R.Messages.options_webcam_noWebcamsAvailable)
                 : Translation.Of(device.name));
         if (!TryReSelectLastWebcam() && deviceChooserControl.Items.Count > 0)
