@@ -5,4 +5,5 @@
     WebView,
     Ffmpeg,
     Vlc,
+    SongAudioPlayerVlc,
 }
