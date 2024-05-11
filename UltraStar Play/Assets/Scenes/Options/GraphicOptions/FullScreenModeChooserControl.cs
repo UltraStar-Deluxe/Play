@@ -4,10 +4,10 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class FullScreenModePickerControl : EnumItemPickerControl<EFullScreenMode>
+public class FullScreenModeChooserControl : EnumChooserControl<EFullScreenMode>
 {
-    public FullScreenModePickerControl(ItemPicker itemPicker, Settings settings, GameObject gameObject)
-        : base(itemPicker, EnumUtils.GetValuesAsList<EFullScreenMode>())
+    public FullScreenModeChooserControl(Chooser chooser, Settings settings, GameObject gameObject)
+        : base(chooser, EnumUtils.GetValuesAsList<EFullScreenMode>())
     {
         if (Application.isEditor)
         {

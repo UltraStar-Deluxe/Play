@@ -1,21 +1,21 @@
 ﻿using System;
 using UniRx;
 
-public abstract class AbstractItemPickerControl<T>
+public abstract class AbstractChooserControl<T>
 {
-    public ItemPicker ItemPicker { get; private set; }
+    public Chooser Chooser { get; private set; }
 
-    protected AbstractItemPickerControl(ItemPicker itemPicker)
+    protected AbstractChooserControl(Chooser chooser)
     {
-        itemPicker.InitControl(this);
-        this.ItemPicker = itemPicker;
-        if (itemPicker.PreviousItemButton != null)
+        chooser.InitControl(this);
+        this.Chooser = chooser;
+        if (chooser.PreviousItemButton != null)
         {
-            itemPicker.PreviousItemButton.RegisterCallbackButtonTriggered(_ => SelectPreviousItem());
+            chooser.PreviousItemButton.RegisterCallbackButtonTriggered(_ => SelectPreviousItem());
         }
-        if (itemPicker.NextItemButton != null)
+        if (chooser.NextItemButton != null)
         {
-            itemPicker.NextItemButton.RegisterCallbackButtonTriggered(_ => SelectNextItem());
+            chooser.NextItemButton.RegisterCallbackButtonTriggered(_ => SelectNextItem());
         }
     }
 

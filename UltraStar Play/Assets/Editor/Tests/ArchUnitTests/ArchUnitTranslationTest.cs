@@ -24,8 +24,8 @@ public class ArchUnitTranslationTest
     {
         "TextElement",
         "BaseField`1",
-        "EnumFieldItemPicker",
-        "ItemPicker",
+        "EnumFieldChooser",
+        "Chooser",
         "AccordionItem",
         "SongEditorSideBarGroup",
     };
@@ -149,7 +149,7 @@ public class ArchUnitTranslationTest
             typeof(UntranslatedButtonTextSetterExample),
             typeof(UntranslatedLabelTextSetterExample),
             typeof(UntranslatedTextFieldLabelSetterExample),
-            typeof(UntranslatedItemPickerLabelSetterExample),
+            typeof(UntranslatedChooserLabelSetterExample),
             typeof(UntranslatedAccordionItemTitleSetterExample),
             typeof(UntranslatedSongEditorSideBarGroupLabelSetterExample),
         };
@@ -292,11 +292,11 @@ public class ArchUnitTranslationTest
         }
     }
 
-    private struct UntranslatedItemPickerLabelSetterExample
+    private struct UntranslatedChooserLabelSetterExample
     {
         private static void Init()
         {
-            new ItemPicker().Label = "untranslated text";
+            new Chooser().Label = "untranslated text";
         }
     }
 

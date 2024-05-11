@@ -820,10 +820,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             RegisterDefaultButtonSfxCallback(button);
         });
 
-        // ItemPickers
+        // Choosers
         if (defaultControlStyleConfig != null)
         {
-            root.Query(null, "itemPickerControlsRow").ForEach(controlsRow =>
+            root.Query(null, "chooserControlsRow").ForEach(controlsRow =>
             {
                 defaultControlStyleConfig.backgroundColor.IfNotDefault(backgroundColor =>
                 {

@@ -44,11 +44,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.speechRecognitionPromptTextField)]
     private TextField speechRecognitionPromptTextField;
 
-    [Inject(UxmlName = R.UxmlNames.micDeviceItemPicker)]
-    private ItemPicker micDeviceItemPicker;
+    [Inject(UxmlName = R.UxmlNames.micDeviceChooser)]
+    private Chooser micDeviceChooser;
 
-    [Inject(UxmlName = R.UxmlNames.drawNoteLayerPicker)]
-    private ItemPicker drawNoteLayerPicker;
+    [Inject(UxmlName = R.UxmlNames.drawNoteLayerChooser)]
+    private Chooser drawNoteLayerChooser;
 
     [Inject(UxmlName = R.UxmlNames.micDelayTextField)]
     private TextField micDelayTextField;
@@ -131,20 +131,20 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.audioSeparationButton)]
     private Button audioSeparationButton;
 
-    [Inject(UxmlName = R.UxmlNames.playbackAudioPicker)]
-    private ItemPicker playbackAudioPicker;
+    [Inject(UxmlName = R.UxmlNames.playbackAudioChooser)]
+    private Chooser playbackAudioChooser;
 
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionAudioPicker)]
-    private ItemPicker speechRecognitionAudioPicker;
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionAudioChooser)]
+    private Chooser speechRecognitionAudioChooser;
 
-    [Inject(UxmlName = R.UxmlNames.pitchDetectionAudioPicker)]
-    private ItemPicker pitchDetectionAudioPicker;
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionAudioChooser)]
+    private Chooser pitchDetectionAudioChooser;
 
-    [Inject(UxmlName = R.UxmlNames.timeLabelFormatPicker)]
-    private ItemPicker timeLabelFormatPicker;
+    [Inject(UxmlName = R.UxmlNames.timeLabelFormatChooser)]
+    private Chooser timeLabelFormatChooser;
 
-    [Inject(UxmlName = R.UxmlNames.pitchLabelFormatPicker)]
-    private ItemPicker pitchLabelFormatPicker;
+    [Inject(UxmlName = R.UxmlNames.pitchLabelFormatChooser)]
+    private Chooser pitchLabelFormatChooser;
 
     [Inject(UxmlName = R.UxmlNames.settingsSideBarContainer)]
     private VisualElement settingsSideBarContainer;
@@ -194,11 +194,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
-    private LabeledItemPickerControl<MicProfile> micDeviceItemPickerControl;
-    private EnumItemPickerControl<ESongEditorSamplesSource> playbackAudioItemPickerControl;
-    private EnumItemPickerControl<ESongEditorSamplesSource> speechRecognitionAudioItemPickerControl;
-    private EnumItemPickerControl<ESongEditorSamplesSource> pitchDetectionAudioItemPickerControl;
-    private EnumItemPickerControl<ESongEditorDrawNoteLayer> drawNoteLayerPickerControl;
+    private LabeledChooserControl<MicProfile> micDeviceChooserControl;
+    private EnumChooserControl<ESongEditorSamplesSource> playbackAudioChooserControl;
+    private EnumChooserControl<ESongEditorSamplesSource> speechRecognitionAudioChooserControl;
+    private EnumChooserControl<ESongEditorSamplesSource> pitchDetectionAudioChooserControl;
+    private EnumChooserControl<ESongEditorDrawNoteLayer> drawNoteLayerChooserControl;
 
     private readonly ImportMidiFileDialogControl importMidiFileDialogControl = new();
 
@@ -227,8 +227,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.MusicVolumePercent,
             newValue => settings.SongEditorSettings.MusicVolumePercent = (int) newValue);
 
-        drawNoteLayerPickerControl = new(drawNoteLayerPicker);
-        drawNoteLayerPickerControl.Bind(
+        drawNoteLayerChooserControl = new(drawNoteLayerChooser);
+        drawNoteLayerChooserControl.Bind(
             () => settings.SongEditorSettings.DrawNoteLayer,
             newValue => settings.SongEditorSettings.DrawNoteLayer = newValue);
 
@@ -251,8 +251,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             musicPlaybackSpeedSlider.value = 1;
         });
 
-        playbackAudioItemPickerControl = new(playbackAudioPicker);
-        playbackAudioItemPickerControl.Bind(
+        playbackAudioChooserControl = new(playbackAudioChooser);
+        playbackAudioChooserControl.Bind(
             () => settings.SongEditorSettings.PlaybackSamplesSource,
             newValue => settings.SongEditorSettings.PlaybackSamplesSource = newValue);
 
@@ -261,17 +261,17 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         List<MicProfile> enabledAndConnectedMicProfiles = micProfiles
             .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
             .ToList();
-        micDeviceItemPickerControl = new(micDeviceItemPicker, enabledAndConnectedMicProfiles,
+        micDeviceChooserControl = new(micDeviceChooser, enabledAndConnectedMicProfiles,
             micProfile => micProfile != null ? Translation.Of(micProfile.GetDisplayNameWithChannel()) : Translation.Empty);
         if (settings.SongEditorSettings.MicProfile == null
             || !settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager))
         {
             settings.SongEditorSettings.MicProfile = enabledAndConnectedMicProfiles.FirstOrDefault();
         }
-        micDeviceItemPickerControl.Bind(
+        micDeviceChooserControl.Bind(
             () => settings.SongEditorSettings.MicProfile,
             newValue => settings.SongEditorSettings.MicProfile = newValue);
-        new AutoFitLabelControl(micDeviceItemPickerControl.ItemPicker.ItemLabel, 8, 15);
+        new AutoFitLabelControl(micDeviceChooserControl.Chooser.ItemLabel, 8, 15);
 
         micRecordingPitchTextField.DisableParseEscapeSequences();
         Bind(micRecordingPitchTextField,
@@ -396,8 +396,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             ESongEditorSamplesSource.Recording,
         };
 
-        speechRecognitionAudioItemPickerControl = new(speechRecognitionAudioPicker, speechAndPitchAnalysisSampleSources);
-        speechRecognitionAudioItemPickerControl.Bind(
+        speechRecognitionAudioChooserControl = new(speechRecognitionAudioChooser, speechAndPitchAnalysisSampleSources);
+        speechRecognitionAudioChooserControl.Bind(
             () => settings.SongEditorSettings.SpeechRecognitionSamplesSource,
             newValue => settings.SongEditorSettings.SpeechRecognitionSamplesSource = newValue);
 
@@ -408,8 +408,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         splitSyllablesInSelectionButton.RegisterCallbackButtonTriggered(_ => SplitSyllablesInSelection());
 
         // Pitch detection
-        pitchDetectionAudioItemPickerControl = new(pitchDetectionAudioPicker, speechAndPitchAnalysisSampleSources);
-        pitchDetectionAudioItemPickerControl.Bind(
+        pitchDetectionAudioChooserControl = new(pitchDetectionAudioChooser, speechAndPitchAnalysisSampleSources);
+        pitchDetectionAudioChooserControl.Bind(
             () => settings.SongEditorSettings.PitchDetectionSamplesSource,
             newValue => settings.SongEditorSettings.PitchDetectionSamplesSource = newValue);
 
@@ -478,11 +478,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => PropertyUtils.TrySetFloatFromString(newValue, newFloatValue => settings.SongEditorSettings.SentenceLineSizeInPx = newFloatValue));
 
         // Labels
-        new EnumItemPickerControl<ESongEditorTimeLabelFormat>(timeLabelFormatPicker)
+        new EnumChooserControl<ESongEditorTimeLabelFormat>(timeLabelFormatChooser)
             .Bind(() => settings.SongEditorSettings.TimeLabelFormat,
                 newValue => settings.SongEditorSettings.TimeLabelFormat = newValue);
 
-        new EnumItemPickerControl<ESongEditorPitchLabelFormat>(pitchLabelFormatPicker)
+        new EnumChooserControl<ESongEditorPitchLabelFormat>(pitchLabelFormatChooser)
             .Bind(() => settings.SongEditorSettings.PitchLabelFormat,
                 newValue => settings.SongEditorSettings.PitchLabelFormat = newValue);
     }

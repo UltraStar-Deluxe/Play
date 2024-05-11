@@ -24,23 +24,23 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.showFpsToggle)]
     private Toggle showFpsToggle;
 
-    [Inject(UxmlName = R.UxmlNames.systemAudioBackendDelayPicker)]
-    private ItemPicker systemAudioBackendDelayPicker;
+    [Inject(UxmlName = R.UxmlNames.systemAudioBackendDelayChooser)]
+    private Chooser systemAudioBackendDelayChooser;
 
-    [Inject(UxmlName = R.UxmlNames.portAudioOutputDevicePicker)]
-    private ItemPicker portAudioOutputDevicePicker;
+    [Inject(UxmlName = R.UxmlNames.portAudioOutputDeviceChooser)]
+    private Chooser portAudioOutputDeviceChooser;
 
-    [Inject(UxmlName = R.UxmlNames.portAudioHostApiPicker)]
-    private ItemPicker portAudioHostApiPicker;
+    [Inject(UxmlName = R.UxmlNames.portAudioHostApiChooser)]
+    private Chooser portAudioHostApiChooser;
 
     [Inject(UxmlName = R.UxmlNames.portAudioDeviceInfoButton)]
     private Button portAudioDeviceInfoButton;
 
-    [Inject(UxmlName = R.UxmlNames.maxConcurrentSongMediaConversionsPicker)]
-    private ItemPicker maxConcurrentSongMediaConversionsPicker;
+    [Inject(UxmlName = R.UxmlNames.maxConcurrentSongMediaConversionsChooser)]
+    private Chooser maxConcurrentSongMediaConversionsChooser;
 
-    [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmPicker)]
-    private ItemPicker pitchDetectionAlgorithmPicker;
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmChooser)]
+    private Chooser pitchDetectionAlgorithmChooser;
 
     [Inject(UxmlName = R.UxmlNames.saveVocalsAndInstrumentalAudioInFolderOfSongToggle)]
     private Toggle saveVocalsAndInstrumentalAudioInFolderOfSongToggle;
@@ -123,26 +123,26 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.httpServerPortTextField)]
     private IntegerField httpServerPortTextField;
 
-    [Inject(UxmlName = R.UxmlNames.minimumLogLevelPicker)]
-    private ItemPicker minimumLogLevelPicker;
+    [Inject(UxmlName = R.UxmlNames.minimumLogLevelChooser)]
+    private Chooser minimumLogLevelChooser;
 
     [Inject(UxmlName = R.UxmlNames.generatedFolderPathTextField)]
     private TextField generatedFolderPathTextField;
 
-    [Inject(UxmlName = R.UxmlNames.ffmpegConversionCommandsJsonPicker)]
-    private TextField ffmpegConversionCommandsJsonPicker;
+    [Inject(UxmlName = R.UxmlNames.ffmpegConversionCommandsJsonChooser)]
+    private TextField ffmpegConversionCommandsJsonChooser;
 
-    [Inject(UxmlName = R.UxmlNames.songVideoPlaybackPicker)]
-    private ItemPicker songVideoPlaybackPicker;
+    [Inject(UxmlName = R.UxmlNames.songVideoPlaybackChooser)]
+    private Chooser songVideoPlaybackChooser;
 
-    [Inject(UxmlName = R.UxmlNames.useFfmpegToPlayMediaFilesPicker)]
-    private ItemPicker useFfmpegToPlayMediaFilesPicker;
+    [Inject(UxmlName = R.UxmlNames.useFfmpegToPlayMediaFilesChooser)]
+    private Chooser useFfmpegToPlayMediaFilesChooser;
 
     [Inject(UxmlName = R.UxmlNames.logFfmpegOutputToggle)]
     private Toggle logFfmpegOutputToggle;
 
-    [Inject(UxmlName = R.UxmlNames.useVlcToPlayMediaFilesPicker)]
-    private ItemPicker useVlcToPlayMediaFilesPicker;
+    [Inject(UxmlName = R.UxmlNames.useVlcToPlayMediaFilesChooser)]
+    private Chooser useVlcToPlayMediaFilesChooser;
 
     [Inject(UxmlName = R.UxmlNames.logVlcOutputToggle)]
     private Toggle logVlcOutputToggle;
@@ -159,8 +159,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.writeUltraStarTxtFileWithByteOrderMarkToggle)]
     private Toggle writeUltraStarTxtFileWithByteOrderMarkToggle;
 
-    [Inject(UxmlName = R.UxmlNames.beatAnalyzedEventNetworkDeliveryPicker)]
-    private ItemPicker beatAnalyzedEventNetworkDeliveryPicker;
+    [Inject(UxmlName = R.UxmlNames.beatAnalyzedEventNetworkDeliveryChooser)]
+    private Chooser beatAnalyzedEventNetworkDeliveryChooser;
 
     [Inject(UxmlClass = "accordionItem")]
     private List<AccordionItem> accordionItems;
@@ -169,10 +169,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     private Button uploadWorkshopItemButton;
 
     [Inject(UxmlName = R.UxmlNames.defaultUltraStarFormatVersionForSave)]
-    private ItemPicker defaultUltraStarFormatVersionForSave;
+    private Chooser defaultUltraStarFormatVersionForSave;
 
     [Inject(UxmlName = R.UxmlNames.upgradeUltraStarFormatVersionForSave)]
-    private ItemPicker upgradeUltraStarFormatVersionForSave;
+    private Chooser upgradeUltraStarFormatVersionForSave;
 
     private MessageDialogControl uploadWorkshopItemDialogControl;
 
@@ -219,7 +219,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         List<ELogEventLevel> logEventLevels = EnumUtils.GetValuesAsList<ELogEventLevel>()
             .OrderBy(logEventLevel => (int)logEventLevel)
             .ToList();
-        new EnumItemPickerControl<ELogEventLevel>(minimumLogLevelPicker, logEventLevels)
+        new EnumChooserControl<ELogEventLevel>(minimumLogLevelChooser, logEventLevels)
             .Bind(() => settings.MinimumLogLevel,
                   newValue =>
                   {
@@ -227,7 +227,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                       UpdateLogEventLevel();
                   });
 
-        new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmPicker)
+        new PitchDetectionAlgorithmChooserControl(pitchDetectionAlgorithmChooser)
             .Bind(() => settings.PitchDetectionAlgorithm,
                 newValue => settings.PitchDetectionAlgorithm = newValue);
 
@@ -352,16 +352,16 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             newValue => settings.WriteUltraStarTxtFileWithByteOrderMark = newValue);
 
         // UltraStar format versions
-        new EnumItemPickerControl<EKnownUltraStarSongFormatVersion>(defaultUltraStarFormatVersionForSave)
+        new EnumChooserControl<EKnownUltraStarSongFormatVersion>(defaultUltraStarFormatVersionForSave)
             .Bind(() => settings.DefaultUltraStarSongFormatVersionForSave,
                 newValue => settings.DefaultUltraStarSongFormatVersionForSave = newValue);
 
-        new EnumItemPickerControl<EUpgradeUltraStarSongFormatVersion>(upgradeUltraStarFormatVersionForSave)
+        new EnumChooserControl<EUpgradeUltraStarSongFormatVersion>(upgradeUltraStarFormatVersionForSave)
             .Bind(() => settings.UpgradeUltraStarSongFormatVersionForSave,
                 newValue => settings.UpgradeUltraStarSongFormatVersionForSave = newValue);
 
         // Ffmpeg playback / conversion
-        FieldBindingUtils.Bind(ffmpegConversionCommandsJsonPicker,
+        FieldBindingUtils.Bind(ffmpegConversionCommandsJsonChooser,
             () => JsonConverter.ToJson(settings.FileFormatToFfmpegConversionArguments, true),
             newValueAsString =>
             {
@@ -379,12 +379,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             });
 
         // SongVideoPlayback
-        new EnumItemPickerControl<ESongVideoPlayback>(songVideoPlaybackPicker)
+        new EnumChooserControl<ESongVideoPlayback>(songVideoPlaybackChooser)
             .Bind(() => settings.SongVideoPlayback,
                 newValue => settings.SongVideoPlayback = newValue);
 
         // VLC
-        new EnumItemPickerControl<EThirdPartyLibraryUsage>(useVlcToPlayMediaFilesPicker)
+        new EnumChooserControl<EThirdPartyLibraryUsage>(useVlcToPlayMediaFilesChooser)
             .Bind(() => settings.VlcToPlayMediaFilesUsage,
                 newValue => settings.VlcToPlayMediaFilesUsage = newValue);
 
@@ -394,7 +394,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
 
         // ffmpeg
-        new EnumItemPickerControl<EThirdPartyLibraryUsage>(useFfmpegToPlayMediaFilesPicker)
+        new EnumChooserControl<EThirdPartyLibraryUsage>(useFfmpegToPlayMediaFilesChooser)
             .Bind(() => settings.FfmpegToPlayMediaFilesUsage,
                 newValue => settings.FfmpegToPlayMediaFilesUsage = newValue);
 
@@ -407,7 +407,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.CheckCodecIsSupported,
             newValue => settings.CheckCodecIsSupported = newValue);
 
-        new NumberPickerControl(maxConcurrentSongMediaConversionsPicker, settings.MaxConcurrentSongMediaConversions).Bind(
+        new NumberChooserControl(maxConcurrentSongMediaConversionsChooser, settings.MaxConcurrentSongMediaConversions).Bind(
             () => settings.MaxConcurrentSongMediaConversions,
             newValue => settings.MaxConcurrentSongMediaConversions = (int)Math.Max(newValue, 0));
 
@@ -415,25 +415,25 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         portAudioDeviceInfoButton.RegisterCallbackButtonTriggered(_ => ShowPortAudioDeviceInfo());
 
         // PortAudio host API
-        new EnumItemPickerControl<PortAudioHostApi>(portAudioHostApiPicker, GetAvailablePortAudioHostApis())
+        new EnumChooserControl<PortAudioHostApi>(portAudioHostApiChooser, GetAvailablePortAudioHostApis())
             .Bind(() => settings.PortAudioHostApi,
                 newValue => settings.PortAudioHostApi = newValue);
 
         // PortAudio output device
-        LabeledItemPickerControl<string> portAudioOutputDevicePickerControl = new(portAudioOutputDevicePicker,
+        LabeledChooserControl<string> portAudioOutputDeviceChooserControl = new(portAudioOutputDeviceChooser,
             GetAvailablePortAudioOutputDeviceNames(),
             item => item.IsNullOrEmpty() ? Translation.Get(R.Messages.common_default) : Translation.Of(item));
-        portAudioOutputDevicePickerControl.Bind(
+        portAudioOutputDeviceChooserControl.Bind(
             () => settings.PortAudioOutputDeviceName,
             newValue => settings.PortAudioOutputDeviceName = newValue);
 
         settings.ObserveEveryValueChanged(it => it.PortAudioHostApi)
-            .Subscribe(newValue => portAudioOutputDevicePickerControl.Items = GetAvailablePortAudioOutputDeviceNames())
+            .Subscribe(newValue => portAudioOutputDeviceChooserControl.Items = GetAvailablePortAudioOutputDeviceNames())
             .AddTo(gameObject);
 
         // System audio backend delay
-        UnitNumberPickerControl systemAudioBackendDelayPickerControl = new(systemAudioBackendDelayPicker, "ms");
-        systemAudioBackendDelayPickerControl.Bind(
+        UnitNumberChooserControl systemAudioBackendDelayChooserControl = new(systemAudioBackendDelayChooser, "ms");
+        systemAudioBackendDelayChooserControl.Bind(
             () => settings.SystemAudioBackendDelayInMillis,
             newValue => settings.SystemAudioBackendDelayInMillis = (int)newValue);
 
@@ -448,7 +448,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             newValue => settings.EnableVfx = newValue);
 
         // Online multiplayer
-        new EnumItemPickerControl<ENetworkDelivery>(beatAnalyzedEventNetworkDeliveryPicker)
+        new EnumChooserControl<ENetworkDelivery>(beatAnalyzedEventNetworkDeliveryChooser)
             .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,
                 newValue => settings.BeatAnalyzedEventNetworkDelivery = newValue);
 

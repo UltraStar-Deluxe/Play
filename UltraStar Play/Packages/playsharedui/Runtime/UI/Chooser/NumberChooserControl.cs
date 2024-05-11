@@ -3,7 +3,7 @@ using System.Globalization;
 using UniRx;
 using UnityEngine.InputSystem;
 
-public class NumberPickerControl : ComputedItemPickerControl<double>
+public class NumberChooserControl : ComputedChooserControl<double>
 {
     private Func<double, string> getLabelTextFunction = item => item.ToString(CultureInfo.InvariantCulture);
     public Func<double, string> GetLabelTextFunction
@@ -19,15 +19,15 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
         }
     }
 
-    public bool WrapAround => ItemPicker.WrapAround
-                              || ItemPicker.NoPreviousButton
-                              || ItemPicker.NoNextButton;
-    public double MinValue => ItemPicker.MinValue;
-    public double MaxValue => ItemPicker.MaxValue;
-    public double StepValue => ItemPicker.StepValue;
+    public bool WrapAround => Chooser.WrapAround
+                              || Chooser.NoPreviousButton
+                              || Chooser.NoNextButton;
+    public double MinValue => Chooser.MinValue;
+    public double MaxValue => Chooser.MaxValue;
+    public double StepValue => Chooser.StepValue;
 
-    public NumberPickerControl(ItemPicker itemPicker, double initialValue=0)
-        : base(itemPicker, initialValue)
+    public NumberChooserControl(Chooser chooser, double initialValue=0)
+        : base(chooser, initialValue)
     {
         Selection.Subscribe(newValue => UpdateLabelText(newValue));
     }
@@ -95,6 +95,6 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
 
     private void UpdateLabelText(double newValue)
     {
-        ItemPicker.ItemLabel.text = GetLabelTextFunction(newValue);
+        Chooser.ItemLabel.text = GetLabelTextFunction(newValue);
     }
 }

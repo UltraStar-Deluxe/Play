@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
+public abstract class ListedChooserControl<T> : AbstractChooserControl<T>
 {
-    public bool WrapAround => ItemPicker.WrapAround
-        || ItemPicker.NoPreviousButton
-        || ItemPicker.NoNextButton;
+    public bool WrapAround => Chooser.WrapAround
+        || Chooser.NoPreviousButton
+        || Chooser.NoNextButton;
 
-    protected ListedItemPickerControl(ItemPicker itemPicker)
-        : base(itemPicker)
+    protected ListedChooserControl(Chooser chooser)
+        : base(chooser)
     {
     }
 

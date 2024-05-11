@@ -7,9 +7,9 @@ public static class TranslationExtensions
         baseField.label = text;
     }
 
-    public static void SetTranslatedLabel(this ItemPicker itemPicker, Translation text)
+    public static void SetTranslatedLabel(this Chooser chooser, Translation text)
     {
-        itemPicker.Label = text;
+        chooser.Label = text;
     }
 
     public static void SetTranslatedTitle(this AccordionItem accordionItem, Translation text)

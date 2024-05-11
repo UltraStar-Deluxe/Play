@@ -158,7 +158,7 @@ VisualElement
     font-size: var(--font-size);
 }
 
-ItemPicker.controlLabel40Percent .itemPickerLabel {
+Chooser.controlLabel40Percent .chooserLabel {
     width: 40%;
 }
 
@@ -232,7 +232,7 @@ ToggleButton.smallerFont {
     font-size: var(--font-size-xs);
 }
 
-ItemPicker.smallFont Label {
+Chooser.smallFont Label {
     font-size: var(--font-size-s);
 }
 
@@ -378,7 +378,7 @@ Toggle.smallControl {
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 
-.noBackgroundInHierarchy #itemPickerLabel {
+.noBackgroundInHierarchy #chooserLabel {
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 

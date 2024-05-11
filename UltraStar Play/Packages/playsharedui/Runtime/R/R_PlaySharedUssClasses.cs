@@ -27,6 +27,13 @@ public static partial class R_PlayShared
         public const string chipsComboListSeparator = "chipsComboListSeparator";
         public const string chipsComponentContainer = "chipsComponentContainer";
         public const string chipsDialogToggle = "chipsDialogToggle";
+        public const string chooserButton = "chooserButton";
+        public const string chooserControlsRow = "chooserControlsRow";
+        public const string chooserItemImage = "chooserItemImage";
+        public const string chooserItemLabel = "chooserItemLabel";
+        public const string chooserLabel = "chooserLabel";
+        public const string chooserNextItemButton = "chooserNextItemButton";
+        public const string chooserPreviousItemButton = "chooserPreviousItemButton";
         public const string circle = "circle";
         public const string circleButton = "circleButton";
         public const string comboBoxButton = "comboBoxButton";
@@ -80,13 +87,6 @@ public static partial class R_PlayShared
         public const string inputLegendBar = "inputLegendBar";
         public const string inputLegendLabel = "inputLegendLabel";
         public const string intermediateTeamResults = "intermediateTeamResults";
-        public const string itemPickerButton = "itemPickerButton";
-        public const string itemPickerControlsRow = "itemPickerControlsRow";
-        public const string itemPickerItemImage = "itemPickerItemImage";
-        public const string itemPickerItemLabel = "itemPickerItemLabel";
-        public const string itemPickerLabel = "itemPickerLabel";
-        public const string itemPickerNextItemButton = "itemPickerNextItemButton";
-        public const string itemPickerPreviousItemButton = "itemPickerPreviousItemButton";
         public const string largeControlMinWidth = "largeControlMinWidth";
         public const string largeFont = "largeFont";
         public const string largerFont = "largerFont";
@@ -111,7 +111,7 @@ public static partial class R_PlayShared
         public const string noSearchResults = "noSearchResults";
         public const string noTextShadow = "noTextShadow";
         public const string onlineMultiplayerHost = "onlineMultiplayerHost";
-        public const string optionsLabelAndItemPicker = "optionsLabelAndItemPicker";
+        public const string optionsLabelAndChooser = "optionsLabelAndChooser";
         public const string optionsOverviewButton = "optionsOverviewButton";
         public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";
         public const string optionsSceneTitleAndImageContainer = "optionsSceneTitleAndImageContainer";

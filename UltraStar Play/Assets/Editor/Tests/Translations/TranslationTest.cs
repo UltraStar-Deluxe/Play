@@ -356,7 +356,7 @@ public class TranslationTest
         AddTranslatableAttributes(
             uxmlFile,
             translatableAttributes,
-            xDocument.Descendants("ItemPicker"),
+            xDocument.Descendants("Chooser"),
             "label");
 
         AddTranslatableAttributes(

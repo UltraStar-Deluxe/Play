@@ -20,29 +20,29 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
     [Inject]
     private PlaylistManager playlistManager;
 
-    [Inject(UxmlName = R.UxmlNames.songSelectionItemPicker)]
-    private ItemPicker songSelectionItemPicker;
+    [Inject(UxmlName = R.UxmlNames.songSelectionChooser)]
+    private Chooser songSelectionChooser;
 
-    [Inject(UxmlName = R.UxmlNames.songSelectionPlaylistItemPicker)]
-    private ItemPicker songSelectionPlaylistItemPicker;
+    [Inject(UxmlName = R.UxmlNames.songSelectionPlaylistChooser)]
+    private Chooser songSelectionPlaylistChooser;
 
-    [Inject(UxmlName = R.UxmlNames.songSelectionJokerCountItemPicker)]
-    private ItemPicker songSelectionJokerCountItemPicker;
+    [Inject(UxmlName = R.UxmlNames.songSelectionJokerCountChooser)]
+    private Chooser songSelectionJokerCountChooser;
 
-    [Inject(UxmlName = R.UxmlNames.roundCountItemPicker)]
-    private ItemPicker roundCountItemPicker;
+    [Inject(UxmlName = R.UxmlNames.roundCountChooser)]
+    private Chooser roundCountChooser;
 
     public void OnInjectionFinished()
     {
         // Round count
-        NumberPickerControl roundCountItemPickerControl = new(roundCountItemPicker, 4);
-        roundCountItemPickerControl.Bind(
+        NumberChooserControl roundCountChooserControl = new(roundCountChooser, 4);
+        roundCountChooserControl.Bind(
             () => partyModeSettings.RoundCount,
             newValue => partyModeSettings.RoundCount = (int)newValue);
 
         // Selection mode (random or manual)
-        EnumItemPickerControl<EPartyModeSongSelectionMode> songSelectionItemPickerControl = new(songSelectionItemPicker);
-        songSelectionItemPickerControl.Bind(
+        EnumChooserControl<EPartyModeSongSelectionMode> songSelectionChooserControl = new(songSelectionChooser);
+        songSelectionChooserControl.Bind(
             () => partyModeSettings.SongSelectionSettings.SongSelectionMode,
             newValue =>
             {
@@ -52,17 +52,17 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
 
         // Playlist
         List<IPlaylist> playlists = playlistManager.GetPlaylists(true, true);
-        LabeledItemPickerControl<IPlaylist> playlistItemPickerControl = new(songSelectionPlaylistItemPicker, playlists,
+        LabeledChooserControl<IPlaylist> playlistChooserControl = new(songSelectionPlaylistChooser, playlists,
             newValue => Translation.Of(playlistManager.GetPlaylistName(newValue)));
-        playlistItemPickerControl.Bind(
+        playlistChooserControl.Bind(
             () => partyModeSettings.SongSelectionSettings.SongPoolPlaylist,
             newValue => partyModeSettings.SongSelectionSettings.SongPoolPlaylist = newValue);
 
         // Joker count
-        LabeledItemPickerControl<int> jokerCountItemPickerControl =
-            new(songSelectionJokerCountItemPicker, new List<int> { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+        LabeledChooserControl<int> jokerCountChooserControl =
+            new(songSelectionJokerCountChooser, new List<int> { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
                 newValue => newValue >= 0 ? Translation.Of(newValue.ToString()) : Translation.Get(R.Messages.partyModeScene_jokerCount_unlimited));
-        jokerCountItemPickerControl.Bind(
+        jokerCountChooserControl.Bind(
             () => partyModeSettings.SongSelectionSettings.JokerCount,
             newValue => partyModeSettings.SongSelectionSettings.JokerCount = newValue);
 
@@ -74,7 +74,7 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
 
     private void UpdateControlsVisibility()
     {
-        songSelectionJokerCountItemPicker.SetVisibleByDisplay(partyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random);
-        songSelectionPlaylistItemPicker.SetVisibleByDisplay(partyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random);
+        songSelectionJokerCountChooser.SetVisibleByDisplay(partyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random);
+        songSelectionPlaylistChooser.SetVisibleByDisplay(partyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random);
     }
 }

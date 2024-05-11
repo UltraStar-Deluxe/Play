@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 
-public class TargetFpsItemPickerControl : LabeledItemPickerControl<int>
+public class TargetFpsChooserControl : LabeledChooserControl<int>
 {
-    public TargetFpsItemPickerControl(ItemPicker itemPicker)
-        : base(itemPicker,
+    public TargetFpsChooserControl(Chooser chooser)
+        : base(chooser,
             new List<int>(){ -1, 30, 60 },
             newValue => newValue <= 0
                 ? Translation.Get(R.Messages.options_sampleRate_auto)

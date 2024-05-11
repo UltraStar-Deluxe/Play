@@ -17,6 +17,8 @@ public static partial class R_PlayShared
         public const string chipsComboEntryLabel = "chipsComboEntryLabel";
         public const string chipsComboEntryRoot = "chipsComboEntryRoot";
         public const string chipsComboLabel = "chipsComboLabel";
+        public const string chooserControlsRow = "chooserControlsRow";
+        public const string chooserLabel = "chooserLabel";
         public const string closeIcon = "closeIcon";
         public const string closeModifierDialogButton = "closeModifierDialogButton";
         public const string container = "container";
@@ -48,8 +50,6 @@ public static partial class R_PlayShared
         public const string isNoMedleyIcon = "isNoMedleyIcon";
         public const string itemImage = "itemImage";
         public const string itemLabel = "itemLabel";
-        public const string itemPickerControlsRow = "itemPickerControlsRow";
-        public const string itemPickerLabel = "itemPickerLabel";
         public const string labelContainer = "labelContainer";
         public const string marginTopElement = "marginTopElement";
         public const string micButton = "micButton";

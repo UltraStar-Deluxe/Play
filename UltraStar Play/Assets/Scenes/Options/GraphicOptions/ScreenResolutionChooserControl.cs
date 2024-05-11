@@ -6,10 +6,10 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenResolution>
+public class ScreenResolutionChooserControl : LabeledChooserControl<ScreenResolution>
 {
-    public ScreenResolutionPickerControl(ItemPicker itemPicker, Settings settings)
-        : base(itemPicker,
+    public ScreenResolutionChooserControl(Chooser chooser, Settings settings)
+        : base(chooser,
             GetItems(),
             item => Translation.Of($"{item.Width} x {item.Height} ({item.RefreshRate} Hz)"))
     {

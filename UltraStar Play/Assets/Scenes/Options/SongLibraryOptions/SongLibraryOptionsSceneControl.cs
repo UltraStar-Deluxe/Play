@@ -60,7 +60,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     private Toggle searchMidiFilesWithLyricsToggle;
 
     [Inject(UxmlName = R.UxmlNames.songDataFetchTypeChooser)]
-    private ItemPicker songDataFetchTypeChooser;
+    private Chooser songDataFetchTypeChooser;
 
     [Inject]
     private Injector injector;
@@ -106,7 +106,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             () => settings.SearchMidiFilesWithLyrics,
             newValue => settings.SearchMidiFilesWithLyrics = newValue);
 
-        new EnumItemPickerControl<EFetchType>(songDataFetchTypeChooser)
+        new EnumChooserControl<EFetchType>(songDataFetchTypeChooser)
             .Bind(() => settings.SongDataFetchType,
                 newValue => settings.SongDataFetchType = newValue);
 

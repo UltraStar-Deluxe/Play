@@ -8,14 +8,14 @@ using UnityEngine.UIElements;
 
 public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection
 {
-    [Inject(UxmlName = R.UxmlNames.resolutionPicker)]
-    private ItemPicker resolutionPicker;
+    [Inject(UxmlName = R.UxmlNames.resolutionChooser)]
+    private Chooser resolutionChooser;
 
-    [Inject(UxmlName = R.UxmlNames.targetFpsPicker)]
-    private ItemPicker targetFpsPicker;
+    [Inject(UxmlName = R.UxmlNames.targetFpsChooser)]
+    private Chooser targetFpsChooser;
 
-    [Inject(UxmlName = R.UxmlNames.fullscreenModePicker)]
-    private ItemPicker fullscreenModePicker;
+    [Inject(UxmlName = R.UxmlNames.fullscreenModeChooser)]
+    private Chooser fullscreenModeChooser;
 
     [Inject(UxmlName = R.UxmlNames.applyResolutionButton)]
     private Button applyResolutionButton;
@@ -34,17 +34,17 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
 
         if (PlatformUtils.IsStandalone)
         {
-            new ScreenResolutionPickerControl(resolutionPicker, settings);
-            new FullScreenModePickerControl(fullscreenModePicker, settings, gameObject);
+            new ScreenResolutionChooserControl(resolutionChooser, settings);
+            new FullScreenModeChooserControl(fullscreenModeChooser, settings, gameObject);
         }
         else
         {
-            resolutionPicker.HideByDisplay();
-            fullscreenModePicker.HideByDisplay();
+            resolutionChooser.HideByDisplay();
+            fullscreenModeChooser.HideByDisplay();
         }
 
-        TargetFpsItemPickerControl targetFpsPickerControl = new(targetFpsPicker);
-        targetFpsPickerControl.Bind(() => settings.TargetFps,
+        TargetFpsChooserControl targetFpsChooserControl = new(targetFpsChooser);
+        targetFpsChooserControl.Bind(() => settings.TargetFps,
                 newValue => settings.TargetFps = newValue);
     }
 

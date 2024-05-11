@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using UniRx;
 
-public class LabeledItemPickerControl<T> : ListedItemPickerControl<T>
+public class LabeledChooserControl<T> : ListedChooserControl<T>
 {
     private readonly string smallFontUssClass = "smallFont";
     private readonly Func<T, Translation> getLabelTextFunction;
 
     public bool AutoSmallFont { get; set; } = true;
 
-    public LabeledItemPickerControl(ItemPicker itemPicker, List<T> items,
+    public LabeledChooserControl(Chooser chooser, List<T> items,
          Func<T, Translation> getLabelTextFunction)
-        : base(itemPicker)
+        : base(chooser)
     {
         this.getLabelTextFunction = getLabelTextFunction;
         Selection.Subscribe(UpdateLabelText);
@@ -26,18 +26,18 @@ public class LabeledItemPickerControl<T> : ListedItemPickerControl<T>
 
     private void UpdateLabelText(T item)
     {
-        ItemPicker.ItemLabel.SetTranslatedText(getLabelTextFunction(item));
+        Chooser.ItemLabel.SetTranslatedText(getLabelTextFunction(item));
 
         if (AutoSmallFont)
         {
-            if (ItemPicker.ItemLabel.text.Length > 28
-                || ItemPicker.ItemLabel.text.Contains("\n"))
+            if (Chooser.ItemLabel.text.Length > 28
+                || Chooser.ItemLabel.text.Contains("\n"))
             {
-                ItemPicker.ItemLabel.AddToClassListIfNew(smallFontUssClass);
+                Chooser.ItemLabel.AddToClassListIfNew(smallFontUssClass);
             }
             else
             {
-                ItemPicker.ItemLabel.RemoveFromClassList(smallFontUssClass);
+                Chooser.ItemLabel.RemoveFromClassList(smallFontUssClass);
             }
         }
     }

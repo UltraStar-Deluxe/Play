@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class ItemPicker : VisualElement
+public class Chooser : VisualElement
 {
     // UIToolkit factory class
-    public new class UxmlFactory : UxmlFactory<ItemPicker, UxmlTraits> {};
+    public new class UxmlFactory : UxmlFactory<Chooser, UxmlTraits> {};
     public new class UxmlTraits : VisualElement.UxmlTraits
     {
         // Additional XML attributes
@@ -19,7 +19,7 @@ public class ItemPicker : VisualElement
         public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
         {
             base.Init(ve, bag, cc);
-            ItemPicker target = ve as ItemPicker;
+            Chooser target = ve as Chooser;
 
             // Read additional attributes from XML
             // In the UIBuilder, the XML attributes and target object fields are synchronized implicitly by name.
@@ -71,15 +71,15 @@ public class ItemPicker : VisualElement
 
     private object control;
 
-    public ItemPicker(string label) : this()
+    public Chooser(string label) : this()
     {
         Label = label;
     }
     
-    public ItemPicker()
+    public Chooser()
     {
         // Load UXML and add as child element
-        string path = "UIDocuments/ItemPicker";
+        string path = "UIDocuments/Chooser";
         VisualTreeAsset visualTreeAsset = Resources.Load<VisualTreeAsset>(path);
         if (visualTreeAsset == null)
         {
@@ -88,19 +88,19 @@ public class ItemPicker : VisualElement
         }
         visualTreeAsset.CloneTree(this);
 
-        LabelElement = this.Q<Label>(R_PlayShared.UxmlNames.itemPickerLabel);
+        LabelElement = this.Q<Label>(R_PlayShared.UxmlNames.chooserLabel);
         ItemLabel = this.Q<Label>(R_PlayShared.UxmlNames.itemLabel);
         ItemImage = this.Q<Image>(R_PlayShared.UxmlNames.itemImage);
         PreviousItemButton = this.Q<Button>(R_PlayShared.UxmlNames.previousItemButton);
         NextItemButton = this.Q<Button>(R_PlayShared.UxmlNames.nextItemButton);
     }
 
-    public virtual void InitControl(object itemPickerControl)
+    public virtual void InitControl(object chooserControl)
     {
         if (control != null)
         {
             throw new UnityException("Already initialized");
         }
-        control = itemPickerControl;
+        control = chooserControl;
     }
 }

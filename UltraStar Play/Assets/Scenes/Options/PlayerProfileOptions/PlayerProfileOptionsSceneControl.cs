@@ -135,12 +135,12 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         });
         UpdatePlayerProfileInactiveOverlay(playerProfile, playerProfileInactiveOverlay);
 
-        PlayerProfileImagePickerControl playerProfileImagePickerControl = new PlayerProfileImagePickerControl(visualElement.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), GetIndexInList(playerProfile), uiManager, webCamManager);
-        playerProfileImagePickerControl.Bind(() => playerProfile.ImagePath,
+        PlayerProfileImageChooserControl playerProfileImageChooserControl = new PlayerProfileImageChooserControl(visualElement.Q<Chooser>(R.UxmlNames.playerProfileImageChooser), GetIndexInList(playerProfile), uiManager, webCamManager);
+        playerProfileImageChooserControl.Bind(() => playerProfile.ImagePath,
                 newValue => playerProfile.ImagePath = newValue);
 
-        EnumItemPickerControl<EDifficulty> difficultyPicker = new(visualElement.Q<ItemPicker>(R.UxmlNames.difficultyPicker));
-        difficultyPicker.Bind(() => playerProfile.Difficulty,
+        EnumChooserControl<EDifficulty> difficultyChooser = new(visualElement.Q<Chooser>(R.UxmlNames.difficultyChooser));
+        difficultyChooser.Bind(() => playerProfile.Difficulty,
                 newValue => playerProfile.Difficulty = newValue);
 
         playerProfileList.Add(visualElement);
@@ -152,13 +152,13 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         {
             enabledToggle.HideByDisplay();
             deleteButton.HideByDisplay();
-            difficultyPicker.ItemPicker.HideByDisplay();
-            playerProfileImagePickerControl.ItemPicker.PreviousItemButton.HideByDisplay();
-            playerProfileImagePickerControl.ItemPicker.NextItemButton.HideByDisplay();
+            difficultyChooser.Chooser.HideByDisplay();
+            playerProfileImageChooserControl.Chooser.PreviousItemButton.HideByDisplay();
+            playerProfileImageChooserControl.Chooser.NextItemButton.HideByDisplay();
             onlinePlayerProfileIcon.SetInClassList("onlineMultiplayerHost", lobbyMemberPlayerProfile.IsHost);
             onlinePlayerProfileIconContainer.ShowByDisplay();
 
-            UpdateOnlineMultiplayerPlayerImage(lobbyMemberPlayerProfile, playerProfileImagePickerControl);
+            UpdateOnlineMultiplayerPlayerImage(lobbyMemberPlayerProfile, playerProfileImageChooserControl);
         }
         else
         {
@@ -168,11 +168,11 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         return visualElement;
     }
 
-    private void UpdateOnlineMultiplayerPlayerImage(LobbyMemberPlayerProfile lobbyMemberPlayerProfile, PlayerProfileImagePickerControl playerProfileImagePickerControl)
+    private void UpdateOnlineMultiplayerPlayerImage(LobbyMemberPlayerProfile lobbyMemberPlayerProfile, PlayerProfileImageChooserControl playerProfileImageChooserControl)
     {
         if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Netcode)
         {
-            playerProfileImagePickerControl.ItemPicker.ItemLabel.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(lobbyMemberPlayerProfile.Name));
+            playerProfileImageChooserControl.Chooser.ItemLabel.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(lobbyMemberPlayerProfile.Name));
         }
         else if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Steam)
         {
@@ -190,8 +190,8 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
                 })
                 .Subscribe(texture =>
                 {
-                    playerProfileImagePickerControl.ItemPicker.ItemImage.image = texture;
-                    playerProfileImagePickerControl.ItemPicker.ItemLabel.HideByDisplay();
+                    playerProfileImageChooserControl.Chooser.ItemImage.image = texture;
+                    playerProfileImageChooserControl.Chooser.ItemLabel.HideByDisplay();
                 });
         }
     }

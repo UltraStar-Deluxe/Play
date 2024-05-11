@@ -56,9 +56,9 @@ public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, IS
             () => field.label,
             newValue => field.SetTranslatedLabel(newValue)));
 
-        rootVisualElement.Query<ItemPicker>().ForEach(itemPicker => ApplyTranslation(
-            () => itemPicker.Label,
-            newValue => itemPicker.SetTranslatedLabel(newValue)));
+        rootVisualElement.Query<Chooser>().ForEach(chooser => ApplyTranslation(
+            () => chooser.Label,
+            newValue => chooser.SetTranslatedLabel(newValue)));
 
         rootVisualElement.Query<AccordionItem>().ForEach(accordionItem => ApplyTranslation(
             () => accordionItem.Title,

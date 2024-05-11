@@ -593,9 +593,9 @@ public static class ApplyThemeStyleUtils
                 {
                     ApplyTextShadow(label, textShadowConfig);
                 }
-                else if (visualElement is ItemPicker itemPicker)
+                else if (visualElement is Chooser chooser)
                 {
-                    ApplyTextShadow(itemPicker.LabelElement, textShadowConfig);
+                    ApplyTextShadow(chooser.LabelElement, textShadowConfig);
                 }
                 else
                 {

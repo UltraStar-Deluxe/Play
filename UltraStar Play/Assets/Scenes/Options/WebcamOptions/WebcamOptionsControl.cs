@@ -9,8 +9,8 @@ using UnityEngine.UIElements;
 
 public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
-    [Inject(UxmlName = R.UxmlNames.devicePicker)]
-    private ItemPicker devicePicker;
+    [Inject(UxmlName = R.UxmlNames.deviceChooser)]
+    private Chooser deviceChooser;
 
     [Inject(UxmlName = R.UxmlNames.webcamRenderContainer)]
     private Image webcamRenderContainer;
@@ -21,7 +21,7 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
     [Inject]
     private WebCamManager webCamManager;
 
-    private LabeledItemPickerControl<WebCamDevice> devicePickerControl;
+    private LabeledChooserControl<WebCamDevice> deviceChooserControl;
 
     protected override void Start()
     {
@@ -30,22 +30,22 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
         useWebcamToggle.value = settings.UseWebcamAsBackgroundInSingScene;
         useWebcamToggle.RegisterValueChangedCallback(evt => settings.UseWebcamAsBackgroundInSingScene = evt.newValue);
 
-        InitWebcamPicker();
+        InitWebcamChooser();
     }
 
-    private void InitWebcamPicker()
+    private void InitWebcamChooser()
     {
-        devicePickerControl = new LabeledItemPickerControl<WebCamDevice>(devicePicker, webCamManager.GetWebCamDevices(),
-            device => devicePickerControl.Items.Count <= 0
+        deviceChooserControl = new LabeledChooserControl<WebCamDevice>(deviceChooser, webCamManager.GetWebCamDevices(),
+            device => deviceChooserControl.Items.Count <= 0
                 ? Translation.Get(R.Messages.options_webcam_noWebcamsAvailable)
                 : Translation.Of(device.name));
-        if (!TryReSelectLastWebcam() && devicePickerControl.Items.Count > 0)
+        if (!TryReSelectLastWebcam() && deviceChooserControl.Items.Count > 0)
         {
-            devicePickerControl.Selection.Value = devicePickerControl.Items[0];
+            deviceChooserControl.Selection.Value = deviceChooserControl.Items[0];
         }
-        if (devicePickerControl.Items.Count > 0)
+        if (deviceChooserControl.Items.Count > 0)
         {
-            devicePickerControl.Selection
+            deviceChooserControl.Selection
                 .Subscribe(device =>
                 {
                     settings.CurrentWebcamDeviceName = device.name;
@@ -56,7 +56,7 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
         else
         {
             Debug.Log("No webcam found");
-            devicePickerControl.Items.Add(new WebCamDevice());
+            deviceChooserControl.Items.Add(new WebCamDevice());
         }
     }
 
@@ -67,10 +67,10 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
             return false;
         }
 
-        WebCamDevice lastSelectedDevice = devicePickerControl.Items
+        WebCamDevice lastSelectedDevice = deviceChooserControl.Items
             .FirstOrDefault(device => device.name == settings.CurrentWebcamDeviceName);
 
-        devicePickerControl.SelectItem(lastSelectedDevice);
+        deviceChooserControl.SelectItem(lastSelectedDevice);
         return true;
     }
 }

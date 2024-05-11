@@ -266,17 +266,17 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             return Translation.Of(Translation.Get(translationKey) + "¹");
         }
 
-        ItemPicker noteDisplayModePicker = new();
-        noteDisplayModePicker.SetTranslatedLabel(TranslationThatRequiresRestart(R.Messages.singScene_options_noteDisplayMode));
-        contextMenuPopup.AddVisualElement(noteDisplayModePicker);
-        new EnumItemPickerControl<ENoteDisplayMode>(noteDisplayModePicker)
+        Chooser noteDisplayModeChooser = new();
+        noteDisplayModeChooser.SetTranslatedLabel(TranslationThatRequiresRestart(R.Messages.singScene_options_noteDisplayMode));
+        contextMenuPopup.AddVisualElement(noteDisplayModeChooser);
+        new EnumChooserControl<ENoteDisplayMode>(noteDisplayModeChooser)
             .Bind(() => settings.NoteDisplayMode,
                  newValue => settings.NoteDisplayMode = newValue);
 
-        ItemPicker showSongProgressBarPicker = new();
-        showSongProgressBarPicker.SetTranslatedLabel(Translation.Get(R.Messages.singScene_options_showProgressBar));
-        contextMenuPopup.AddVisualElement(showSongProgressBarPicker);
-        new EnumItemPickerControl<ESongProgressBar>(showSongProgressBarPicker)
+        Chooser showSongProgressBarChooser = new();
+        showSongProgressBarChooser.SetTranslatedLabel(Translation.Get(R.Messages.singScene_options_showProgressBar));
+        contextMenuPopup.AddVisualElement(showSongProgressBarChooser);
+        new EnumChooserControl<ESongProgressBar>(showSongProgressBarChooser)
             .Bind(() => settings.ShowSongProgressBar,
                 newValue => settings.ShowSongProgressBar = newValue);
 

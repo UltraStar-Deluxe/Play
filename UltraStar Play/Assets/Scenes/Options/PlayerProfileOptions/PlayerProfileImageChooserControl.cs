@@ -5,7 +5,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
+public class PlayerProfileImageChooserControl : PicturedChooserControl<string>
 {
     private readonly int playerProfileIndex;
     private readonly UiManager uiManager;
@@ -13,20 +13,20 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
     private readonly Button takeWebCamImageButton;
     private readonly Button removeWebCamImageButton;
 
-    public PlayerProfileImagePickerControl(
-        ItemPicker itemPicker,
+    public PlayerProfileImageChooserControl(
+        Chooser chooser,
         int playerProfileIndex,
         UiManager uiManager,
         WebCamManager webCamManager)
-        : base(itemPicker, uiManager.GetRelativePlayerProfileImagePaths(false)
+        : base(chooser, uiManager.GetRelativePlayerProfileImagePaths(false)
             .Union(new List<string> { PlayerProfile.WebcamImagePath }).ToList())
     {
         this.playerProfileIndex = playerProfileIndex;
         this.uiManager = uiManager;
         this.webCamManager = webCamManager;
 
-        takeWebCamImageButton = ItemPicker.Q<Button>(R.UxmlNames.takeWebCamImageButton);
-        removeWebCamImageButton = ItemPicker.Q<Button>(R.UxmlNames.removeWebCamImageButton);
+        takeWebCamImageButton = Chooser.Q<Button>(R.UxmlNames.takeWebCamImageButton);
+        removeWebCamImageButton = Chooser.Q<Button>(R.UxmlNames.removeWebCamImageButton);
 
         takeWebCamImageButton.RegisterCallbackButtonTriggered(_ => TakeWebCamImage());
         removeWebCamImageButton.RegisterCallbackButtonTriggered(_ => RemoveWebCamImage());
@@ -39,14 +39,14 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
     public override void UpdateImageElement(string imagePath)
     {
         base.UpdateImageElement(imagePath);
-        ItemPicker.ItemImage.image = null;
+        Chooser.ItemImage.image = null;
 
         if (uiManager == null)
         {
             return;
         }
 
-        ItemPicker.ItemLabel.SetBorderRadius(Length.Percent(50));
+        Chooser.ItemLabel.SetBorderRadius(Length.Percent(50));
 
         if (imagePath == PlayerProfile.WebcamImagePath
             && webCamManager != null)
@@ -58,7 +58,7 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
                 removeWebCamImageButton.ShowByDisplay();
 
                 uiManager.LoadPlayerProfileImage(webCamImagePath)
-                    .Subscribe(loadedSprite => ItemPicker.ItemLabel.style.backgroundImage = new StyleBackground(loadedSprite));
+                    .Subscribe(loadedSprite => Chooser.ItemLabel.style.backgroundImage = new StyleBackground(loadedSprite));
             }
             else
             {
@@ -66,7 +66,7 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
                 removeWebCamImageButton.HideByDisplay();
 
                 WebCamTexture webCamTexture = webCamManager.StartSelectedWebCam();
-                ItemPicker.ItemImage.image = webCamTexture;
+                Chooser.ItemImage.image = webCamTexture;
             }
             return;
         }
@@ -74,7 +74,7 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
         takeWebCamImageButton.HideByDisplay();
         removeWebCamImageButton.HideByDisplay();
         uiManager.LoadPlayerProfileImage(imagePath)
-            .Subscribe(loadedSprite => ItemPicker.ItemLabel.style.backgroundImage = new StyleBackground(loadedSprite));
+            .Subscribe(loadedSprite => Chooser.ItemLabel.style.backgroundImage = new StyleBackground(loadedSprite));
     }
 
     protected override StyleBackground GetBackgroundImageValue(string item)

@@ -77,8 +77,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     [Inject]
     private SongEditorMidiFileImporter midiFileImporter;
 
-    private DropdownFieldControl<TrackAndChannel> midiTrackIndexPickerControl;
-    private DropdownFieldControl<EVoiceId> midiAssignToPlayerPickerControl;
+    private DropdownFieldControl<TrackAndChannel> midiTrackIndexChooserControl;
+    private DropdownFieldControl<EVoiceId> midiAssignToPlayerChooserControl;
 
     private MidiFile midiFile;
     private MidiTrack SelectedTrack
@@ -86,12 +86,12 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         get
         {
             if (midiFile == null
-                || midiTrackIndexPickerControl.SelectedItem == null)
+                || midiTrackIndexChooserControl.SelectedItem == null)
             {
                 return null;
             }
 
-            int selectedTrackIndex = midiTrackIndexPickerControl.SelectedItem.trackIndex;
+            int selectedTrackIndex = midiTrackIndexChooserControl.SelectedItem.trackIndex;
             if (selectedTrackIndex >= 0 && selectedTrackIndex < midiFile.Tracks.Length)
             {
                 return midiFile.Tracks[selectedTrackIndex];
@@ -137,9 +137,9 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         });
         VisualElementUtils.RegisterDirectClickCallback(importMidiFileDialogOverlay, CloseDialog);
 
-        midiTrackIndexPickerControl = new(trackAndChannelDropdownField, new List<TrackAndChannel>(), null,
+        midiTrackIndexChooserControl = new(trackAndChannelDropdownField, new List<TrackAndChannel>(), null,
             trackAndChannel => GetDisplayName(trackAndChannel));
-        midiTrackIndexPickerControl.Selection.Subscribe(_ =>
+        midiTrackIndexChooserControl.Selection.Subscribe(_ =>
         {
             bool wasPlaying = midiManager.IsPlayingMidiFile;
             StopPreview();
@@ -149,8 +149,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             }
         });
 
-        midiAssignToPlayerPickerControl = new(assignToPlayerDropdownField, EnumUtils.GetValuesAsList<EVoiceId>(), EVoiceId.P1, voice => GetVoiceDisplayName(voice));
-        midiAssignToPlayerPickerControl.SetSelection(EVoiceId.P1);
+        midiAssignToPlayerChooserControl = new(assignToPlayerDropdownField, EnumUtils.GetValuesAsList<EVoiceId>(), EVoiceId.P1, voice => GetVoiceDisplayName(voice));
+        midiAssignToPlayerChooserControl.SetSelection(EVoiceId.P1);
 
         midiFilePathTextField.DisableParseEscapeSequences();
         midiFilePathTextField.RegisterValueChangedCallback(evt => UpdateControls());
@@ -249,8 +249,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         Debug.Log("Starting preview of midi file");
         try
         {
-            int trackIndex = midiTrackIndexPickerControl.SelectedItem.trackIndex;
-            int channelIndex = midiTrackIndexPickerControl.SelectedItem.channelIndex;
+            int trackIndex = midiTrackIndexChooserControl.SelectedItem.trackIndex;
+            int channelIndex = midiTrackIndexChooserControl.SelectedItem.channelIndex;
             MidiFile midiFileCopy = MidiFileUtils.LoadMidiFile(MidiFilePath);
 
             MidiFileUtils.CalculateMidiEventTimesInMillis(
@@ -284,12 +284,12 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         EVoiceId voiceId;
         if (assignToPlayerToggle.value
-            && midiAssignToPlayerPickerControl.SelectedItem is EVoiceId.P1)
+            && midiAssignToPlayerChooserControl.SelectedItem is EVoiceId.P1)
         {
             voiceId = EVoiceId.P1;
         }
         else if (assignToPlayerToggle.value
-                 && midiAssignToPlayerPickerControl.SelectedItem is EVoiceId.P2)
+                 && midiAssignToPlayerChooserControl.SelectedItem is EVoiceId.P2)
         {
             voiceId = EVoiceId.P2;
         }
@@ -300,8 +300,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         midiFileImporter.ImportMidiFile(
             midiFilePathTextField.value,
-            midiTrackIndexPickerControl.SelectedItem.trackIndex,
-            midiTrackIndexPickerControl.SelectedItem.channelIndex,
+            midiTrackIndexChooserControl.SelectedItem.trackIndex,
+            midiTrackIndexChooserControl.SelectedItem.channelIndex,
             importMidiLyricsToggle.value,
             importMidiNotesToggle.value,
             voiceId,
@@ -342,7 +342,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        UpdateTrackIndexPicker();
+        UpdateTrackIndexChooser();
         UpdateMidiLyrics();
     }
 
@@ -377,10 +377,10 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         importMidiFileDialogButton.SetEnabled(!hasError);
     }
 
-    private void UpdateTrackIndexPicker()
+    private void UpdateTrackIndexChooser()
     {
         List<TrackAndChannel> trackAndChannels = MidiFileUtils.GetTracksAndChannels(midiFile);
-        midiTrackIndexPickerControl.Items = trackAndChannels;
+        midiTrackIndexChooserControl.Items = trackAndChannels;
 
         MidiFileUtils.CalculateMidiEventTimesInMillis(
             midiFile,
@@ -393,12 +393,12 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         {
             bestMatchnigTrackAndChannelLabel.SetTranslatedText(Translation.Get(R.Messages.songEditor_midiImportDialog_bestMatchingTrack,
                 "value", bestMatchingTrackAndChannel));
-            midiTrackIndexPickerControl.SetSelection(bestMatchingTrackAndChannel);
+            midiTrackIndexChooserControl.SetSelection(bestMatchingTrackAndChannel);
         }
         else
         {
             bestMatchnigTrackAndChannelLabel.SetTranslatedText(Translation.Empty);
-            midiTrackIndexPickerControl.SetSelection(trackAndChannels.FirstOrDefault());
+            midiTrackIndexChooserControl.SetSelection(trackAndChannels.FirstOrDefault());
         }
     }
 
