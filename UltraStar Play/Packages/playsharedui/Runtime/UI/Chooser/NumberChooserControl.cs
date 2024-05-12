@@ -15,7 +15,7 @@ public class NumberChooserControl : ComputedChooserControl<double>
         set
         {
             getLabelTextFunction = value;
-            UpdateLabelText(SelectedItem);
+            UpdateLabelText(Selection);
         }
     }
 
@@ -29,17 +29,17 @@ public class NumberChooserControl : ComputedChooserControl<double>
     public NumberChooserControl(Chooser chooser, double initialValue=0)
         : base(chooser, initialValue)
     {
-        Selection.Subscribe(newValue => UpdateLabelText(newValue));
+        SelectionAsObservable.Subscribe(newValue => UpdateLabelText(newValue));
     }
 
     public override void SelectNextItem()
     {
-        double currentValue = SelectedItem;
+        double currentValue = Selection;
         if (currentValue >= MaxValue)
         {
             if (WrapAround)
             {
-                SelectItem(MinValue);
+                Selection = MinValue;
             }
             return;
         }
@@ -52,7 +52,7 @@ public class NumberChooserControl : ComputedChooserControl<double>
 
         if (nextValue != currentValue)
         {
-            SelectItem(nextValue);
+            Selection = nextValue;
         }
     }
 
@@ -66,12 +66,12 @@ public class NumberChooserControl : ComputedChooserControl<double>
 
     public override void SelectPreviousItem()
     {
-        double currentValue = SelectedItem;
+        double currentValue = Selection;
         if (currentValue <= MinValue)
         {
             if (WrapAround)
             {
-                SelectItem(MaxValue);
+                Selection = MaxValue;
             }
             return;
         }
@@ -84,13 +84,13 @@ public class NumberChooserControl : ComputedChooserControl<double>
 
         if (nextValue != currentValue)
         {
-            SelectItem(nextValue);
+            Selection = nextValue;
         }
     }
 
     public void UpdateLabelText()
     {
-        UpdateLabelText(SelectedItem);
+        UpdateLabelText(Selection);
     }
 
     private void UpdateLabelText(double newValue)

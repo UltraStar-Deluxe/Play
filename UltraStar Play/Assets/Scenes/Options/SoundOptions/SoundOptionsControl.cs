@@ -73,9 +73,9 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
         settings.ObserveEveryValueChanged(it => it.VolumePercent)
             .Subscribe(newValue =>
             {
-                if (!volumeChooserControl.SelectedItem.Equals(newValue, 0.1f))
+                if (!volumeChooserControl.Selection.Equals(newValue, 0.1f))
                 {
-                    volumeChooserControl.SelectItem(newValue);
+                    volumeChooserControl.Selection = newValue;
                 }
             });
 

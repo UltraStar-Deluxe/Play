@@ -19,29 +19,26 @@ public abstract class AbstractChooserControl<T>
         }
     }
 
-    public IReactiveProperty<T> Selection { get; private set; } = new ReactiveProperty<T>();
+    private readonly IReactiveProperty<T> selectionProperty = new ReactiveProperty<T>();
+    public IObservable<T> SelectionAsObservable => selectionProperty;
 
-    public T SelectedItem
+    public T Selection
     {
-        get
+        get => selectionProperty.Value;
+        set
         {
-            return Selection.Value;
+            if (Equals(Selection, value))
+            {
+                return;
+            }
+            selectionProperty.Value = value;
         }
     }
 
     public void Bind(Func<T> getter, Action<T> setter)
     {
-        Selection.Value = getter.Invoke();
-        Selection.Subscribe(newValue => setter.Invoke(newValue));
-    }
-
-    public void SelectItem(T item)
-    {
-        if (Equals(SelectedItem, item))
-        {
-            return;
-        }
-        Selection.Value = item;
+        Selection = getter.Invoke();
+        SelectionAsObservable.Subscribe(newValue => setter.Invoke(newValue));
     }
 
     public abstract void SelectPreviousItem();

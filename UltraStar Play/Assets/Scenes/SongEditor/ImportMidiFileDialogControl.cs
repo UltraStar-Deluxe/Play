@@ -86,12 +86,12 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         get
         {
             if (midiFile == null
-                || midiTrackIndexChooserControl.SelectedItem == null)
+                || midiTrackIndexChooserControl.Selection == null)
             {
                 return null;
             }
 
-            int selectedTrackIndex = midiTrackIndexChooserControl.SelectedItem.trackIndex;
+            int selectedTrackIndex = midiTrackIndexChooserControl.Selection.trackIndex;
             if (selectedTrackIndex >= 0 && selectedTrackIndex < midiFile.Tracks.Length)
             {
                 return midiFile.Tracks[selectedTrackIndex];
@@ -139,7 +139,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         midiTrackIndexChooserControl = new(trackAndChannelDropdownField, new List<TrackAndChannel>(), null,
             trackAndChannel => GetDisplayName(trackAndChannel));
-        midiTrackIndexChooserControl.Selection.Subscribe(_ =>
+        midiTrackIndexChooserControl.SelectionAsObservable.Subscribe(_ =>
         {
             bool wasPlaying = midiManager.IsPlayingMidiFile;
             StopPreview();
@@ -150,7 +150,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         });
 
         midiAssignToPlayerChooserControl = new(assignToPlayerDropdownField, EnumUtils.GetValuesAsList<EVoiceId>(), EVoiceId.P1, voice => GetVoiceDisplayName(voice));
-        midiAssignToPlayerChooserControl.SetSelection(EVoiceId.P1);
+        midiAssignToPlayerChooserControl.Selection = EVoiceId.P1;
 
         midiFilePathTextField.DisableParseEscapeSequences();
         midiFilePathTextField.RegisterValueChangedCallback(evt => UpdateControls());
@@ -249,8 +249,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         Debug.Log("Starting preview of midi file");
         try
         {
-            int trackIndex = midiTrackIndexChooserControl.SelectedItem.trackIndex;
-            int channelIndex = midiTrackIndexChooserControl.SelectedItem.channelIndex;
+            int trackIndex = midiTrackIndexChooserControl.Selection.trackIndex;
+            int channelIndex = midiTrackIndexChooserControl.Selection.channelIndex;
             MidiFile midiFileCopy = MidiFileUtils.LoadMidiFile(MidiFilePath);
 
             MidiFileUtils.CalculateMidiEventTimesInMillis(
@@ -284,12 +284,12 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         EVoiceId voiceId;
         if (assignToPlayerToggle.value
-            && midiAssignToPlayerChooserControl.SelectedItem is EVoiceId.P1)
+            && midiAssignToPlayerChooserControl.Selection is EVoiceId.P1)
         {
             voiceId = EVoiceId.P1;
         }
         else if (assignToPlayerToggle.value
-                 && midiAssignToPlayerChooserControl.SelectedItem is EVoiceId.P2)
+                 && midiAssignToPlayerChooserControl.Selection is EVoiceId.P2)
         {
             voiceId = EVoiceId.P2;
         }
@@ -300,8 +300,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         midiFileImporter.ImportMidiFile(
             midiFilePathTextField.value,
-            midiTrackIndexChooserControl.SelectedItem.trackIndex,
-            midiTrackIndexChooserControl.SelectedItem.channelIndex,
+            midiTrackIndexChooserControl.Selection.trackIndex,
+            midiTrackIndexChooserControl.Selection.channelIndex,
             importMidiLyricsToggle.value,
             importMidiNotesToggle.value,
             voiceId,
@@ -393,12 +393,12 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         {
             bestMatchnigTrackAndChannelLabel.SetTranslatedText(Translation.Get(R.Messages.songEditor_midiImportDialog_bestMatchingTrack,
                 "value", bestMatchingTrackAndChannel));
-            midiTrackIndexChooserControl.SetSelection(bestMatchingTrackAndChannel);
+            midiTrackIndexChooserControl.Selection = bestMatchingTrackAndChannel;
         }
         else
         {
             bestMatchnigTrackAndChannelLabel.SetTranslatedText(Translation.Empty);
-            midiTrackIndexChooserControl.SetSelection(trackAndChannels.FirstOrDefault());
+            midiTrackIndexChooserControl.Selection = trackAndChannels.FirstOrDefault();
         }
     }
 

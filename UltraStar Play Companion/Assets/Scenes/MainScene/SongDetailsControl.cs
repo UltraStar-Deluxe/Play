@@ -205,7 +205,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         {
             if (control.MicProfile != null)
             {
-                dto.SingScenePlayerDataDto.PlayerProfileToVoiceIdMap[control.PlayerProfileName] = control.VoiceChooserControl.SelectedItem;
+                dto.SingScenePlayerDataDto.PlayerProfileToVoiceIdMap[control.PlayerProfileName] = control.VoiceChooserControl.Selection;
             }
         });
 
@@ -385,7 +385,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             playerEntryControl.SetAvailableVoiceIds(voiceIds);
             if (!voiceIds.IsNullOrEmpty())
             {
-                playerEntryControl.VoiceChooserControl.SelectItem(voiceIds[playerProfileIndex % voiceIds.Count]);
+                playerEntryControl.VoiceChooserControl.Selection = voiceIds[playerProfileIndex % voiceIds.Count];
             }
 
             playerEntryControl.IsSelected.Value = IsPlayerSelectedInSettings(playerProfile);

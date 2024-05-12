@@ -11,23 +11,23 @@ public class FullScreenModeChooserControl : EnumChooserControl<EFullScreenMode>
     {
         if (Application.isEditor)
         {
-            Selection.Value = EFullScreenMode.Windowed;
+            Selection = EFullScreenMode.Windowed;
         }
         else
         {
-            Selection.Value = Screen.fullScreenMode.ToCustomFullScreenMode();
+            Selection = Screen.fullScreenMode.ToCustomFullScreenMode();
             // The full-screen mode can change, e.g., via global keyboard shortcut. Thus, synchronize with the settings.
             settings.ObserveEveryValueChanged(it => it.FullScreenMode)
                 .Subscribe(newFullScreenMode =>
                 {
                     // Avoid infinite recursion.
-                    if (newFullScreenMode != Selection.Value)
+                    if (newFullScreenMode != Selection)
                     {
-                        Selection.Value = newFullScreenMode;
+                        Selection = newFullScreenMode;
                     }
                 })
                 .AddTo(gameObject);
         }
-        Selection.Subscribe(newValue => settings.FullScreenMode = newValue);
+        SelectionAsObservable.Subscribe(newValue => settings.FullScreenMode = newValue);
     }
 }

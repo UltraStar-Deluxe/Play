@@ -43,11 +43,11 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
                 : Translation.Of(device.name));
         if (!TryReSelectLastWebcam() && deviceChooserControl.Items.Count > 0)
         {
-            deviceChooserControl.Selection.Value = deviceChooserControl.Items[0];
+            deviceChooserControl.Selection = deviceChooserControl.Items[0];
         }
         if (deviceChooserControl.Items.Count > 0)
         {
-            deviceChooserControl.Selection
+            deviceChooserControl.SelectionAsObservable
                 .Subscribe(device =>
                 {
                     settings.CurrentWebcamDeviceName = device.name;
@@ -72,7 +72,7 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
         WebCamDevice lastSelectedDevice = deviceChooserControl.Items
             .FirstOrDefault(device => device.name == settings.CurrentWebcamDeviceName);
 
-        deviceChooserControl.SelectItem(lastSelectedDevice);
+        deviceChooserControl.Selection = lastSelectedDevice;
         return true;
     }
 }

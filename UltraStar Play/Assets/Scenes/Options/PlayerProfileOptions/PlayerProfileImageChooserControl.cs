@@ -33,7 +33,7 @@ public class PlayerProfileImageChooserControl : PicturedChooserControl<string>
 
         // The initial value might have be set in the base constructor, where the uiManager was not defined yet.
         // The the image must be updated now.
-        UpdateImageElement(SelectedItem);
+        UpdateImageElement(Selection);
     }
 
     public override void UpdateImageElement(string imagePath)
@@ -88,7 +88,7 @@ public class PlayerProfileImageChooserControl : PicturedChooserControl<string>
         webCamManager.SaveSnapshot(webCamImagePath);
         uiManager.UpdatePlayerProfileImagePaths();
         ImageManager.RemoveUnusedSpritesFromCache();
-        UpdateImageElement(SelectedItem);
+        UpdateImageElement(Selection);
     }
 
     private void RemoveWebCamImage()
@@ -98,7 +98,7 @@ public class PlayerProfileImageChooserControl : PicturedChooserControl<string>
         {
             File.Delete(webCamImagePath);
         }
-        UpdateImageElement(SelectedItem);
+        UpdateImageElement(Selection);
     }
 
     private string GetWebCamImagePath()

@@ -45,7 +45,7 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
             newValue => settings.DefaultMedleyTargetDurationInSeconds = (int)newValue);
 
         LanguageChooserControl languageChooserControl = new LanguageChooserControl(languageDropdownField);
-        languageChooserControl.Selection.Subscribe(newValue => OnLanguageChanged(newValue));
+        languageChooserControl.SelectionAsObservable.Subscribe(newValue => OnLanguageChanged(newValue));
     }
 
     private void OnLanguageChanged(CultureInfo newValue)

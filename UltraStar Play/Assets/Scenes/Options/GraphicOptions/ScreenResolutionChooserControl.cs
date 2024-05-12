@@ -15,17 +15,17 @@ public class ScreenResolutionChooserControl : LabeledChooserControl<ScreenResolu
     {
         if (Application.isEditor)
         {
-            Selection.Value = Items[0];
+            Selection = Items[0];
         }
         else
         {
             ScreenResolution currentScreenResolution = ApplicationUtils.GetScreenResolution();
-            if (!TrySelectItem(currentScreenResolution, false))
+            if (!TrySetSelection(currentScreenResolution, false))
             {
-                Selection.Value = GetBestMatchingScreenResolution(currentScreenResolution);
+                Selection = GetBestMatchingScreenResolution(currentScreenResolution);
             }
         }
-        Selection.Subscribe(newValue => settings.ScreenResolution = newValue);
+        SelectionAsObservable.Subscribe(newValue => settings.ScreenResolution = newValue);
     }
 
     private ScreenResolution GetBestMatchingScreenResolution(ScreenResolution targetResolution)

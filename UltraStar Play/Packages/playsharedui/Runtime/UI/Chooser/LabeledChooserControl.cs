@@ -14,14 +14,14 @@ public class LabeledChooserControl<T> : ListedChooserControl<T>
         : base(chooser)
     {
         this.getLabelTextFunction = getLabelTextFunction;
-        Selection.Subscribe(UpdateLabelText);
+        SelectionAsObservable.Subscribe(UpdateLabelText);
         Items = items;
-        UpdateLabelText(SelectedItem);
+        UpdateLabelText(Selection);
     }
 
     public void UpdateLabelText()
     {
-        UpdateLabelText(SelectedItem);
+        UpdateLabelText(Selection);
     }
 
     private void UpdateLabelText(T item)

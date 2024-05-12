@@ -3,6 +3,6 @@
     protected ComputedChooserControl(Chooser chooser, T initialValue)
         : base(chooser)
     {
-        SelectItem(initialValue);
+        Selection = initialValue;
     }
 }

@@ -280,12 +280,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         recordingDeviceChooserControl = new(recordingDeviceChooser, deviceNames,
             item => Translation.Of(item));
         recordingDeviceChooserControl.AutoSmallFont = false;
-        recordingDeviceChooserControl.SelectItem(settings.MicProfile.Name);
-        recordingDeviceChooserControl.Selection.Subscribe(newValue => settings.SetMicProfileName(newValue));
+        recordingDeviceChooserControl.Selection = settings.MicProfile.Name;
+        recordingDeviceChooserControl.SelectionAsObservable.Subscribe(newValue => settings.SetMicProfileName(newValue));
 
         // Language
         LanguageChooserControl languageChooserControl = new LanguageChooserControl(languageChooser);
-        languageChooserControl.Selection.Subscribe(newValue => OnLanguageChanged(newValue));
+        languageChooserControl.SelectionAsObservable.Subscribe(newValue => OnLanguageChanged(newValue));
 
         // Dev Mode
         FieldBindingUtils.Bind(devModeToggle,

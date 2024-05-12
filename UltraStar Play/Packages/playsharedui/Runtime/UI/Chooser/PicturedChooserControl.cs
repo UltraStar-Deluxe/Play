@@ -7,7 +7,7 @@ abstract public class PicturedChooserControl<T> : ListedChooserControl<T>
     protected PicturedChooserControl(Chooser chooser, List<T> items)
         : base(chooser)
     {
-        Selection.Subscribe(UpdateImageElement);
+        SelectionAsObservable.Subscribe(UpdateImageElement);
         Items = items;
     }
 

@@ -32,29 +32,29 @@ public abstract class ListedChooserControl<T> : AbstractChooserControl<T>
             }
 
             // Remove selection if not in the new items list.
-            if (HasSelectedItem && !items.Contains(SelectedItem))
+            if (HasSelection && !items.Contains(Selection))
             {
-                Selection.Value = default(T);
+                Selection = default(T);
             }
         }
     }
 
-    public virtual bool HasSelectedItem
+    public virtual bool HasSelection
     {
         get
         {
-            return Items.Contains(SelectedItem)
+            return Items.Contains(Selection)
                 // ValueTypes are never null, and thus always selected.
                 // Comparing with default(T) is used e.g. for structs, which are never null.
-                || typeof(T).IsValueType || !object.Equals(SelectedItem, default(T));
+                || typeof(T).IsValueType || !Equals(Selection, default(T));
         }
     }
 
-    public int SelectedItemIndex
+    public int SelectionIndex
     {
         get
         {
-            return Items.IndexOf(SelectedItem);
+            return Items.IndexOf(Selection);
         }
     }
 
@@ -65,23 +65,23 @@ public abstract class ListedChooserControl<T> : AbstractChooserControl<T>
             return;
         }
 
-        if (SelectedItemIndex < 0
+        if (SelectionIndex < 0
             && !Items.IsNullOrEmpty())
         {
-            Selection.Value = Items.LastOrDefault();
+            Selection = Items.LastOrDefault();
             return;
         }
-        
-        if (HasSelectedItem)
+
+        if (HasSelection)
         {
-            if (WrapAround || SelectedItemIndex > 0)
+            if (WrapAround || SelectionIndex > 0)
             {
-                Selection.Value = Items.GetElementBefore(SelectedItem, WrapAround);
+                Selection = Items.GetElementBefore(Selection, WrapAround);
             }
         }
         else
         {
-            Selection.Value = Items[0];
+            Selection = Items[0];
         }
     }
 
@@ -92,28 +92,28 @@ public abstract class ListedChooserControl<T> : AbstractChooserControl<T>
             return;
         }
 
-        if (SelectedItemIndex < 0
+        if (SelectionIndex < 0
             && !Items.IsNullOrEmpty())
         {
-            Selection.Value = Items.FirstOrDefault();
+            Selection = Items.FirstOrDefault();
             return;
         }
-        
-        if (HasSelectedItem)
+
+        if (HasSelection)
         {
             if (WrapAround
-                || SelectedItemIndex < Items.Count - 1)
+                || SelectionIndex < Items.Count - 1)
             {
-                Selection.Value = Items.GetElementAfter(SelectedItem, WrapAround);
+                Selection = Items.GetElementAfter(Selection, WrapAround);
             }
         }
         else
         {
-            Selection.Value = Items[0];
+            Selection = Items[0];
         }
     }
 
-    public bool TrySelectItem(T item, bool selectFirstItemAsFallback = true)
+    public bool TrySetSelection(T item, bool selectFirstItemAsFallback = true)
     {
         if (Items.IsNullOrEmpty())
         {
@@ -123,13 +123,13 @@ public abstract class ListedChooserControl<T> : AbstractChooserControl<T>
         int index = Items.IndexOf(item);
         if (index >= 0)
         {
-            Selection.Value = Items[index];
+            Selection = Items[index];
             return true;
         }
 
         if (selectFirstItemAsFallback)
         {
-            Selection.Value = Items[0];
+            Selection = Items[0];
         }
         return false;
     }
