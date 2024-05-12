@@ -155,7 +155,10 @@ public static class ApplyThemeStyleUtils
 
     private static void OnListViewSelectionChanged(ListViewH listView, IEnumerable<object> selectedObjects)
     {
-        VisualElement oldSelectedVisualElement = listViewToSelectedVisualElement[listView];
+        if (!listViewToSelectedVisualElement.TryGetValue(listView, out VisualElement oldSelectedVisualElement))
+        {
+            return;
+        }
         SetListViewItemActive(listView, oldSelectedVisualElement, false);
 
         VisualElement newSelectedVisualElement = listView.GetSelectedVisualElement();
