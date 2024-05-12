@@ -146,10 +146,10 @@ public class UltraStarSongMeta : LazyLoadedSongMeta
         Dictionary<EVoiceId, string> voiceIdToDisplayName,
         UltraStarSongFormatVersion version)
     {
-        Artist = artist;
+        Artist = artist.OrIfNull("");
         TxtFileBpm = txtFileBpm;
-        Audio = audioFile;
-        Title = title;
+        Audio = audioFile.OrIfNull("");
+        Title = title.OrIfNull("");
         Version = version;
 
         if (voiceIdToDisplayName == null)

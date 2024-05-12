@@ -46,7 +46,7 @@ public abstract class SongMeta
      * URL to an audio resource.
      * Intended as fallback, e.g., when the regular property points to a local file.
      */
-    public string AudioUrl { get; set; }
+    public string AudioUrl { get; set; } = "";
 
     /**
      * Path or URI to the audio file that contains only the voice of the singers.
@@ -58,7 +58,7 @@ public abstract class SongMeta
      * URL to an audio resource.
      * Intended as fallback, e.g., when the regular property points to a local file.
      */
-    public string VocalsAudioUrl { get; set; }
+    public string VocalsAudioUrl { get; set; } = "";
 
     /**
      * Path or URI to the audio file that contains only the instruments and no singing.
@@ -70,7 +70,7 @@ public abstract class SongMeta
      * URL to an audio resource.
      * Intended as fallback, e.g., when the regular property points to a local file.
      */
-    public string InstrumentalAudioUrl { get; set; }
+    public string InstrumentalAudioUrl { get; set; } = "";
 
     /**
      * Path or URI to an image file that should be displayed as background when singing.
@@ -81,7 +81,7 @@ public abstract class SongMeta
      * URL to a background image resource.
      * Intended as fallback, e.g., when the regular property points to a local file.
      */
-    public string BackgroundUrl { get; set; }
+    public string BackgroundUrl { get; set; } = "";
 
     /**
      * Path or URI to an image file that should be displayed as preview in song selection.
@@ -92,7 +92,7 @@ public abstract class SongMeta
      * URL to a cover image resource.
      * Intended as fallback, e.g., when the regular property points to a local file.
      */
-    public string CoverUrl { get; set; }
+    public string CoverUrl { get; set; } = "";
 
     /**
      * Editions of the song.
@@ -128,7 +128,7 @@ public abstract class SongMeta
      * URL to a video resource.
      * Intended as fallback, e.g., when the regular property points to a local file.
      */
-    public string VideoUrl { get; set; }
+    public string VideoUrl { get; set; } = "";
 
     /**
      * Beats per minute of the audio.
@@ -209,7 +209,7 @@ public abstract class SongMeta
      * Identifies the remote source of a song,
      * for example the online server where it was found.
      */
-    public virtual string RemoteSource { get; set; }
+    public virtual string RemoteSource { get; set; } = "";
 
     /**
      * Any value that does not have a dedicated field in
@@ -226,14 +226,14 @@ public abstract class SongMeta
 
     public virtual void SetAdditionalHeaderEntry(string key, string value)
     {
-        additionalHeaderEntries[key.ToLowerInvariant()] = value;
+        additionalHeaderEntries[key.ToLowerInvariant()] = value.OrIfNull("");
     }
 
     public virtual string GetAdditionalHeaderEntry(string key)
     {
         return additionalHeaderEntries.TryGetValue(key.ToLowerInvariant(), out string value)
             ? value
-            : null;
+            : "";
     }
 
     public virtual void SetFileInfo(FileInfo filePath, Encoding encoding = null)

@@ -55,7 +55,6 @@ public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
         {
             Artist = artistFromFolderName;
             Title = titleFromFolderName;
-            return;
         }
     }
 
@@ -77,8 +76,8 @@ public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
             return false;
         }
 
-        artist = parts[0];
-        title = parts[1];
+        artist = parts[0].OrIfNull("");
+        title = parts[1].OrIfNull("");
         return true;
     }
 }
