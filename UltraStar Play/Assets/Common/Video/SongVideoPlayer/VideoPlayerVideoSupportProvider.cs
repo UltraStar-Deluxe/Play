@@ -6,7 +6,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.Video;
 
-public class UnityVideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
+public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
 {
     [InjectedInInspector]
     public VideoPlayer videoPlayer;
@@ -23,12 +23,7 @@ public class UnityVideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
         videoPlayer.errorReceived -= OnVideoPlayerErrorReceived;
     }
 
-    private void OnDestroy()
-    {
-        RenderTextureUtils.Clear(videoPlayer.targetTexture);
-    }
-
-    public override bool IsSupported(string videoUri, SongMeta songMeta)
+    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
     {
         return !WebViewUtils.CanHandleWebViewUrl(videoUri)
             && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
@@ -36,7 +31,7 @@ public class UnityVideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
             && ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(videoUri));
     }
 
-    public override IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri)
+    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
     {
         videoPlayerErrorMessages.Clear();
         videoPlayer.url = videoUri;
@@ -58,7 +53,7 @@ public class UnityVideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
                 {
                     if (videoPlayerErrorMessages.Count > 0)
                     {
-                        UnloadVideo();
+                        Unload();
                         o.OnError(new VideoSupportProviderException($"Failed to load video: '{videoUri}'"));
                         return;
                     }
@@ -69,23 +64,23 @@ public class UnityVideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
         });
     }
 
-    public override void UnloadVideo()
+    public override void Unload()
     {
         RenderTextureUtils.Clear(videoPlayer.targetTexture);
         videoPlayerErrorMessages.Clear();
     }
 
-    public override void PlayVideo()
+    public override void Play()
     {
         videoPlayer.Play();
     }
 
-    public override void PauseVideo()
+    public override void Pause()
     {
         videoPlayer.Pause();
     }
 
-    public override void StopVideo()
+    public override void Stop()
     {
         videoPlayer.Stop();
         videoPlayer.clip = null;
@@ -117,11 +112,11 @@ public class UnityVideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
         {
             if (value)
             {
-                PlayVideo();
+                Play();
             }
             else
             {
-                PauseVideo();
+                Pause();
             }
         }
     }
@@ -132,13 +127,13 @@ public class UnityVideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
         set => videoPlayer.isLooping = value;
     }
 
-    public override float PlaybackSpeed
+    public override double PlaybackSpeed
     {
         get => videoPlayer.playbackSpeed;
-        set => videoPlayer.playbackSpeed = value;
+        set => videoPlayer.playbackSpeed = (float)value;
     }
 
-    public override double PositionInVideoInMillis
+    public override double PositionInMillis
     {
         get => videoPlayer.time * 1000;
         set => videoPlayer.time = value / 1000.0;

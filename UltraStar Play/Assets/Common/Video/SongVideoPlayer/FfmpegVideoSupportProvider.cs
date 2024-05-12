@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -8,34 +9,35 @@ public class FfmpegVideoSupportProvider : AbstractVideoSupportProvider
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    public override bool IsSupported(string videoUri, SongMeta songMeta)
+    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
     {
         return !WebRequestUtils.IsHttpOrHttpsUri(videoUri)
-               && settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never;
+               && settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
+               && ApplicationUtils.IsFfmpegSupportedAudioFormat(Path.GetExtension(videoUri));
     }
 
-    public override IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri)
+    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
     {
         // Loading is done by SongAudioPlayer
         return Observable.Return<VideoLoadedEvent>(new VideoLoadedEvent(videoUri));
     }
 
-    public override void UnloadVideo()
+    public override void Unload()
     {
         ResetFfmpegRenderTexture();
     }
 
-    public override void PlayVideo()
+    public override void Play()
     {
         // Handled by SongAudioPlayer
     }
 
-    public override void PauseVideo()
+    public override void Pause()
     {
         // Handled by SongAudioPlayer
     }
 
-    public override void StopVideo()
+    public override void Stop()
     {
         // Handled by SongAudioPlayer
     }
@@ -47,11 +49,11 @@ public class FfmpegVideoSupportProvider : AbstractVideoSupportProvider
         {
             if (value)
             {
-                PlayVideo();
+                Play();
             }
             else
             {
-                PauseVideo();
+                Pause();
             }
         }
     }
@@ -62,13 +64,13 @@ public class FfmpegVideoSupportProvider : AbstractVideoSupportProvider
         set { /* Not supported */ }
     }
 
-    public override float PlaybackSpeed
+    public override double PlaybackSpeed
     {
         get => 1;
         set { /* Not supported */ }
     }
 
-    public override double PositionInVideoInMillis
+    public override double PositionInMillis
     {
         get => songAudioPlayer.PositionInSongInMillis;
         set => songAudioPlayer.PositionInSongInMillis = value;

@@ -85,19 +85,18 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
         // The video has an additional delay to load.
         // As long as no frame is ready yet, the VideoPlayer.time is 0.
-        if (songVideoPlayer.IsLoaded
-            && (songVideoPlayer.PositionInVideoInMillis <= 0))
+        if (!songVideoPlayer.IsPartiallyLoaded
+            || (songVideoPlayer.PositionInVideoInMillis <= 0
+                // WebView must be visible to see controls, even when audio is not ready yet.
+                && songVideoPlayer.CurrentVideoSupportProvider is not WebViewVideoSupportProvider))
         {
             videoFadeInStartTimeInSeconds = Time.time;
         }
 
         float videoFadeInPercent = (Time.time - videoFadeInStartTimeInSeconds) / Math.Max(VideoFadeInDurationInSeconds, 0.001f);
         videoFadeInPercent = NumberUtils.Limit(videoFadeInPercent, 0, 1);
-        if (songVideoPlayer.IsLoaded)
-        {
-            VideoFadeIn.Value = videoFadeInPercent;
-        }
-        else if (songVideoPlayer.HasLoadedBackgroundImage)
+        VideoFadeIn.Value = videoFadeInPercent;
+        if (songVideoPlayer.HasLoadedBackgroundImage)
         {
             BackgroundImageFadeIn.Value = videoFadeInPercent;
         }
@@ -227,14 +226,13 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
+        songAudioPlayer.LoadAndPlayAudioAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Audio could not be loaded: '{songMeta.GetArtistDashTitle()}'");
+                Debug.LogError($"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                     "reason", ex.Message));
-                songAudioPlayer.PauseAudio();
             })
             .Subscribe(_ =>
             {

@@ -30,14 +30,14 @@ public class WebViewTests : AbstractMediaFileFormatTests
     [UnityTest]
     public IEnumerator ShouldUseLocalAudioTest([ValueSource(nameof(shouldUseLocalAudioFiles))] string filePrefix)
     {
-        yield return WebViewFileTest(filePrefix, localFileTargetDurationInMillis);
-        Assert.AreNotEqual(EAudioSupportProvider.WebView, SongAudioPlayer.AudioSupportProvider);
+        yield return WebViewFileTest(filePrefix, LocalFileTargetDurationInMillis);
+        Assert.IsFalse(SongAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
     }
 
     [UnityTest]
     public IEnumerator ShouldUseWebView([ValueSource(nameof(shouldUseWebViewFiles))] string filePrefix)
     {
-        yield return WebViewFileTest(filePrefix, webViewTargetDurationInMillis);
-        Assert.AreEqual(EAudioSupportProvider.WebView, SongAudioPlayer.AudioSupportProvider);
+        yield return WebViewFileTest(filePrefix, WebViewTargetDurationInMillis);
+        Assert.IsTrue(SongAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
     }
 }

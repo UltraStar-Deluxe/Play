@@ -7,19 +7,14 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     private VlcManager vlcManager;
     private MediaPlayer vlcMediaPlayer;
 
-    protected override void OnDestroy()
+    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
     {
-        base.OnDestroy();
-        DestroyVlcMediaPlayer();
+        return base.IsSupported(videoUri, videoEqualsAudio)
+               // The SongAudioPlayer's vlcMediaPlayer should be used when video and audio are equal
+               && !videoEqualsAudio;
     }
 
-    public override bool IsSupported(string videoUri, SongMeta songMeta)
-    {
-        return base.IsSupported(videoUri, songMeta)
-               && songMeta.Audio != songMeta.Video;
-    }
-
-    public override IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri)
+    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
     {
         // Instantiate new vlc player
         if (vlcMediaPlayer == null)
@@ -51,22 +46,23 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         });
     }
 
-    public override void UnloadVideo()
+    public override void Unload()
     {
+        base.Unload();
         DestroyVlcMediaPlayer();
     }
 
-    public override void PlayVideo()
+    public override void Play()
     {
         vlcMediaPlayer?.Play();
     }
 
-    public override void PauseVideo()
+    public override void Pause()
     {
         vlcMediaPlayer?.Pause();
     }
 
-    public override void StopVideo()
+    public override void Stop()
     {
         vlcMediaPlayer?.Stop();
     }
@@ -78,11 +74,11 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         {
             if (value)
             {
-                PlayVideo();
+                Play();
             }
             else
             {
-                PauseVideo();
+                Pause();
             }
         }
     }
@@ -93,7 +89,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         set { /* Not supported */ }
     }
 
-    public override float PlaybackSpeed
+    public override double PlaybackSpeed
     {
         get => 1;
         set
@@ -103,7 +99,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         }
     }
 
-    public override double PositionInVideoInMillis
+    public override double PositionInMillis
     {
         get => vlcMediaPlayer?.Time ?? 0;
         set => vlcMediaPlayer?.SetTime((long)value);

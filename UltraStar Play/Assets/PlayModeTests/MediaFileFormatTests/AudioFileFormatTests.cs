@@ -22,6 +22,11 @@ public class AudioFileFormatTests : AbstractMediaFileFormatTests
         new TestCaseData("wma-TestSong.txt").Returns(null),
     };
 
+    private static readonly List<TestCaseData> fileNamesWithMidiAudio = new List<TestCaseData>()
+    {
+        new TestCaseData("midi-TestSong.txt").Returns(null),
+    };
+
     [UnityTest]
     [TestCaseSource(nameof(fileNamesWithAudioSupportedByUnity))]
     public IEnumerator ShouldLoadUnitySupportedAudio(string txtFileName)
@@ -34,5 +39,12 @@ public class AudioFileFormatTests : AbstractMediaFileFormatTests
     public IEnumerator ShouldLoadThirdPartyLibSupportedAudio(string txtFileName)
     {
         yield return ShouldLoadAudioFile(txtFileName);
+    }
+
+    [UnityTest]
+    [TestCaseSource(nameof(fileNamesWithMidiAudio))]
+    public IEnumerator ShouldLoadMidi(string txtFileName)
+    {
+        yield return ShouldLoadAudioFile(txtFileName, 8000);
     }
 }

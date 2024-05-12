@@ -8,12 +8,12 @@ public class WebViewVideoSupportProvider : AbstractVideoSupportProvider
     [Inject]
     private WebViewManager webViewManager;
 
-    public override bool IsSupported(string videoUri, SongMeta songMeta)
+    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
     {
         return WebViewUtils.CanHandleWebViewUrl(videoUri);
     }
 
-    public override IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri)
+    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
     {
         return Observable.Create<VideoLoadedEvent>(o =>
         {
@@ -24,22 +24,22 @@ public class WebViewVideoSupportProvider : AbstractVideoSupportProvider
         });
     }
 
-    public override void UnloadVideo()
+    public override void Unload()
     {
         ResetWebViewRenderTexture();
     }
 
-    public override void PlayVideo()
+    public override void Play()
     {
         webViewManager.ResumePlayback();
     }
 
-    public override void PauseVideo()
+    public override void Pause()
     {
         webViewManager.PausePlayback();
     }
 
-    public override void StopVideo()
+    public override void Stop()
     {
         webViewManager.StopPlayback();
     }
@@ -66,13 +66,13 @@ public class WebViewVideoSupportProvider : AbstractVideoSupportProvider
         set { /* Not available */ }
     }
 
-    public override float PlaybackSpeed
+    public override double PlaybackSpeed
     {
         get => 1;
         set { /* Not available */ }
     }
 
-    public override double PositionInVideoInMillis
+    public override double PositionInMillis
     {
         get => webViewManager.EstimatedPlaybackPositionInMillis;
         set => webViewManager.SetPlaybackPositionInMillis(value);

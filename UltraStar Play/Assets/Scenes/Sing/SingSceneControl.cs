@@ -1438,10 +1438,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         double startPositionInSongInMillis = GetStartPositionInSongInMillis();
 
-        songAudioPlayer.LoadAndPlaySongAudioAsObservable(SongMeta, startPositionInSongInMillis)
+        songAudioPlayer.LoadAndPlayAudioAsObservable(SongMeta, startPositionInSongInMillis)
             .CatchIgnore((Exception ex) =>
             {
-                // Loading the audio failed.
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to load audio: {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
                 PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
                 sceneNavigator.LoadScene(EScene.SongSelectScene);
             })

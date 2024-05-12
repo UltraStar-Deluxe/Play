@@ -1086,10 +1086,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
 
         // Check that the used audio format can be loaded.
-        songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
+        songAudioPlayer.LoadAndPlayAudioAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
-                Debug.LogError( $"Audio file '{songMeta.Audio}' could not be loaded.");
+                Debug.LogException(ex);
+                Debug.LogError( $"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
                     "name", songMeta.Audio,
                     "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));

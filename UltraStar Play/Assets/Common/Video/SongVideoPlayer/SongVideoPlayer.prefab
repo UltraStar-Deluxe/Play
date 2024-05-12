@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3906242730807344510}
   - component: {fileID: 6784448477990193728}
   m_Layer: 0
-  m_Name: UnityVideoPlayerVideoSupportProvider
+  m_Name: VideoPlayerVideoSupportProvider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

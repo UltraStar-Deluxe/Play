@@ -14,12 +14,12 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
     protected static readonly string videoFileFormatTestFolderPath = Application.dataPath + "/PlayModeTests/MediaFileFormatTests/VideoFileFormatTests";
     protected static readonly string webViewFileFormatTestFolderPath = Application.dataPath + "/PlayModeTests/MediaFileFormatTests/WebViewTests";
 
-    protected static readonly double localFileTargetDurationInMillis = 4000;
-    protected static readonly double webViewTargetDurationInMillis = 242561;
-    private static readonly double maxDistanteToTargetDurationInMillis = 500;
+    protected const double LocalFileTargetDurationInMillis = 4000;
+    protected const double WebViewTargetDurationInMillis = 242561;
+    private const double MaxDistanteToTargetDurationInMillis = 500;
 
-    protected static readonly long localFileMaxWaitTimeInMillis = 5000;
-    protected static readonly long webViewMaxWaitTimeInMillis = 30000;
+    protected const long LocalFileMaxWaitTimeInMillis = 5000;
+    protected const long WebViewMaxWaitTimeInMillis = 30000;
 
     protected override string TestSceneName => "MediaFileFormatTestScene";
 
@@ -41,19 +41,19 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
         }
     }
 
-    protected IEnumerator ShouldLoadAudioFile(string txtFileName)
+    protected IEnumerator ShouldLoadAudioFile(string txtFileName, double targetDurationInMillis = LocalFileTargetDurationInMillis)
     {
-        yield return ShouldLoadFile(txtFileName, audioFileFormatTestFolderPath, localFileTargetDurationInMillis, localFileMaxWaitTimeInMillis);
+        yield return ShouldLoadFile(txtFileName, audioFileFormatTestFolderPath, targetDurationInMillis, LocalFileMaxWaitTimeInMillis);
     }
 
-    protected IEnumerator ShouldLoadVideoFile(string txtFileName)
+    protected IEnumerator ShouldLoadVideoFile(string txtFileName, double targetDurationInMillis = LocalFileTargetDurationInMillis)
     {
-        yield return ShouldLoadFile(txtFileName, videoFileFormatTestFolderPath, localFileTargetDurationInMillis, localFileMaxWaitTimeInMillis);
+        yield return ShouldLoadFile(txtFileName, videoFileFormatTestFolderPath, targetDurationInMillis, LocalFileMaxWaitTimeInMillis);
     }
 
-    protected IEnumerator WebViewFileTest(string filePrefix, double targetDurationInMillis)
+    protected IEnumerator WebViewFileTest(string filePrefix, double targetDurationInMillis = WebViewTargetDurationInMillis)
     {
-        yield return ShouldLoadFile(filePrefix, webViewFileFormatTestFolderPath, targetDurationInMillis, webViewMaxWaitTimeInMillis);
+        yield return ShouldLoadFile(filePrefix, webViewFileFormatTestFolderPath, targetDurationInMillis, WebViewMaxWaitTimeInMillis);
     }
 
     private IEnumerator ShouldLoadFile(string txtFileName, string folderPath, double targetDurationInMillis, long maxWaitTimeInMillis)
@@ -65,7 +65,7 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
         bool hasFailed = false;
 
         SongMeta songMeta = LoadSongMeta(songFilePath);
-        SongAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
+        SongAudioPlayer.LoadAndPlayAudioAsObservable(songMeta)
             .Select(evt =>
             {
                 double durationOfSongInMillis = SongAudioPlayer.DurationOfSongInMillis;
@@ -74,7 +74,7 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
                     Assert.Fail("SongAudioPlayer failed to load song (duration is 0).");
                 }
 
-                if (Math.Abs(durationOfSongInMillis - targetDurationInMillis) > maxDistanteToTargetDurationInMillis)
+                if (Math.Abs(durationOfSongInMillis - targetDurationInMillis) > MaxDistanteToTargetDurationInMillis)
                 {
                     Assert.Fail($"SongAudioPlayer loaded song with wrong duration {durationOfSongInMillis} ms (should be near {targetDurationInMillis} ms).");
                 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using LibVLCSharp;
 using UniInject;
 using UnityEngine;
@@ -19,15 +20,16 @@ public abstract class AbstractVlcVideoSupportProvider : AbstractVideoSupportProv
         }
     }
 
-    protected virtual void OnDestroy()
+    public override void Unload()
     {
         Destroy(vlcTexture);
     }
 
-    public override bool IsSupported(string videoUri, SongMeta songMeta)
+    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
     {
         return !WebRequestUtils.IsHttpOrHttpsUri(videoUri)
-               && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never;
+               && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
+               && ApplicationUtils.IsFfmpegSupportedAudioFormat(Path.GetExtension(videoUri));
     }
 
     public override void SetTargetTexture(RenderTexture renderTexture)

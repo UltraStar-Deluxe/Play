@@ -3,17 +3,17 @@ using UnityEngine;
 
 public interface IVideoSupportProvider
 {
-    public IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri);
-    public bool IsSupported(string videoUri, SongMeta songMeta);
-    public void UnloadVideo();
-    public void PlayVideo();
-    public void PauseVideo();
-    public void StopVideo();
+    public IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri);
+    public void Unload();
+    public bool IsSupported(string videoUri, bool videoEqualsAudio);
+    public void Play();
+    public void Pause();
+    public void Stop();
     public void SetBackgroundScaleMode(ESongBackgroundScaleMode mode);
     public void SetTargetTexture(RenderTexture renderTexture);
     public bool IsPlaying { get; set; }
     public bool IsLooping { get; set; }
-    public float PlaybackSpeed { get; set; }
-    public double PositionInVideoInMillis { get; set; }
+    public double PlaybackSpeed { get; set; }
+    public double PositionInMillis { get; set; }
     public double DurationInMillis { get; }
 }

@@ -73,19 +73,10 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         }
         VideoFadeIn.Subscribe(newValue =>
         {
-            if (currentSongSelectEntryControl == null)
-            {
-                return;
-            }
-
             songPreviewVideoImage.style.opacity = newValue * videoTargetAlpha;
         });
         BackgroundImageFadeIn.Subscribe(newValue =>
         {
-            if (currentSongSelectEntryControl == null)
-            {
-                return;
-            }
             songPreviewBackgroundImage.SetBackgroundImageAlpha(newValue);
         });
 

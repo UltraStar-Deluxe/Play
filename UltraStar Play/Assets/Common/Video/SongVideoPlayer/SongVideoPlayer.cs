@@ -31,6 +31,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     private AbstractVideoSupportProvider[] videoSupportProviders;
 
     private IVideoSupportProvider currentVideoSupportProvider;
+    public IVideoSupportProvider CurrentVideoSupportProvider => currentVideoSupportProvider;
 
     [Inject]
     private WebViewManager webViewManager;
@@ -46,7 +47,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         set
         {
             videoImageVisualElement = value;
-            if (IsLoaded
+            if (IsPartiallyLoaded
                 && videoImageVisualElement != null)
             {
                 videoImageVisualElement.ShowByDisplay();
@@ -71,8 +72,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private SongMeta loadedSongMeta;
 
-    public bool IsLoaded => currentVideoSupportProvider != null;
-    public bool IsFullyLoaded => IsLoaded && DurationInMillis > 0 && loadedSongMeta != null;
+    public bool IsPartiallyLoaded => currentVideoSupportProvider != null;
+    public bool IsFullyLoaded => IsPartiallyLoaded && DurationInMillis > 0 && loadedSongMeta != null;
 
     public double DurationInMillis { get; private set; }
 
@@ -84,7 +85,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         get => playbackSpeed;
         set
         {
-            if (!IsLoaded
+            if (!IsPartiallyLoaded
                 || float.IsNaN(value))
             {
                 return;
@@ -104,23 +105,23 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         get
         {
-            if (!IsLoaded)
+            if (!IsPartiallyLoaded)
             {
                 return 0;
             }
 
-            return currentVideoSupportProvider.PositionInVideoInMillis;
+            return currentVideoSupportProvider.PositionInMillis;
         }
 
         set
         {
-            if (!IsLoaded
+            if (!IsPartiallyLoaded
                 || double.IsNaN(value))
             {
                 return;
             }
 
-            currentVideoSupportProvider.PositionInVideoInMillis = value;
+            currentVideoSupportProvider.PositionInMillis = value;
         }
     }
 
@@ -149,7 +150,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         get => isLooping;
         set
         {
-            if (!IsLoaded)
+            if (!IsPartiallyLoaded)
             {
                 return;
             }
@@ -162,7 +163,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     private bool isPlaying;
     public bool IsPlaying => isPlaying;
 
-    private bool IsPlayingOfVideoProvider => IsLoaded && currentVideoSupportProvider.IsPlaying;
+    private bool IsPlayingOfVideoProvider => IsPartiallyLoaded && currentVideoSupportProvider.IsPlaying;
 
     private float lastApplyPlaybackStateToVideoProviderTimeInSeconds;
 
@@ -251,22 +252,26 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    private IObservable<VideoLoadedEvent> LoadAndPlayVideoAsObservable(SongMeta songMeta, string videoUri, IVideoSupportProvider[] availableVideoSupportProviders)
+    private IObservable<VideoLoadedEvent> DoLoadAndPlayVideoAsObservable(
+        string videoUri,
+        IVideoSupportProvider[] availableVideoSupportProviders,
+        bool videoEqualsAudio)
     {
+        UnloadVideo();
+
         IVideoSupportProvider videoSupportProvider = availableVideoSupportProviders
-            .FirstOrDefault(it => it.IsSupported(videoUri, songMeta));
+            .FirstOrDefault(it => it.IsSupported(videoUri, videoEqualsAudio));
         if (videoSupportProvider == null)
         {
             return ObservableUtils.LogExceptionThenThrow<VideoLoadedEvent>(
                     new SongAudioPlayerException($"Unsupported video resource '{videoUri}'."));
         }
 
-        Debug.Log($"Loading video via {videoSupportProvider}");
-        UnloadVideo();
+        Debug.Log($"Loading video '{videoUri}' via {videoSupportProvider}");
 
         return Observable.Create<VideoLoadedEvent>(o =>
         {
-            videoSupportProvider.LoadVideoAsObservable(videoUri)
+            videoSupportProvider.LoadAsObservable(videoUri)
                 .CatchIgnore((Exception ex) =>
                 {
                     Debug.LogException(ex);
@@ -280,7 +285,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                         o.OnError(new VideoSupportProviderException($"Failed to load video and no remaining video support providers: {videoUri}"));
                         return;
                     }
-                    LoadAndPlayVideoAsObservable(songMeta, videoUri, remainingVideoSupportProviders)
+                    DoLoadAndPlayVideoAsObservable(videoUri, remainingVideoSupportProviders, videoEqualsAudio)
                         .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
                 })
                 .Subscribe(evt =>
@@ -306,7 +311,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         StopAllCoroutines();
         StopVideo();
 
-        currentVideoSupportProvider?.UnloadVideo();
+        currentVideoSupportProvider?.Unload();
         currentVideoSupportProvider = null;
         DurationInMillis = 0;
         loadedSongMeta = null;
@@ -451,8 +456,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     public void ReloadVideo()
     {
         // This method is used in the SongEditor. But only on Standalone platform when the video file changed.
-        LoadAndPlaySongVideoAsObservable(loadedSongMeta)
-            .CatchIgnore((Exception ex) => Debug.LogException(ex))
+        LoadAndPlayVideoAsObservable(loadedSongMeta)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to reload video: {ex.Message}");
+            })
             // Subscribe to trigger the observable
             .Subscribe(evt => Debug.Log($"Loaded video: {evt.VideoUri}"));
     }
@@ -466,7 +475,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        LoadAndPlaySongVideoAsObservable(songMeta)
+        LoadAndPlayVideoAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
@@ -503,7 +512,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public IObservable<SongVideoLoadedEvent> LoadAndPlaySongVideoAsObservable(SongMeta songMeta)
+    public IObservable<SongVideoLoadedEvent> LoadAndPlayVideoAsObservable(SongMeta songMeta)
     {
         UnloadVideo();
 
@@ -528,17 +537,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 new SongVideoPlayerException($"Video resource does not exist: {videoUri}"));
         }
 
-        return LoadAndPlayVideoAsObservable(songMeta, videoUri, videoSupportProviders)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to load video '{videoUri}': {ex.Message}");
-            })
+        return DoLoadAndPlayVideoAsObservable(videoUri, videoSupportProviders, songMeta.Video == songMeta.Audio)
             .Select(evt =>
             {
                 loadedSongMeta = songMeta;
                 DurationInMillis = currentVideoSupportProvider.DurationInMillis;
-                currentVideoSupportProvider.PositionInVideoInMillis = songAudioPlayer.PositionInSongInMillis;
+                currentVideoSupportProvider.PositionInMillis = songAudioPlayer.PositionInSongInMillis;
                 currentVideoSupportProvider.SetTargetTexture(videoPlayer.targetTexture);
                 PlayVideo();
 
@@ -549,7 +553,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private void UpdateBackgroundScaleMode()
     {
-        if (!IsLoaded)
+        if (!IsPartiallyLoaded)
         {
             return;
         }
@@ -594,14 +598,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         if (IsPlaying
             && !currentVideoSupportProvider.IsPlaying)
         {
-            Debug.Log($"SongVideoPlayer should be playing, but {currentVideoSupportProvider.GetType().Name} is not. Starting its playback now.");
-            currentVideoSupportProvider.PlayVideo();
+            Debug.Log($"{nameof(SongVideoPlayer)} should be playing, but {currentVideoSupportProvider} is not. Starting its playback now.");
+            currentVideoSupportProvider.Play();
         }
         else if (!IsPlaying
                  && currentVideoSupportProvider.IsPlaying)
         {
-            Debug.Log($"SongVideoPlayer should not be playing, but {currentVideoSupportProvider.GetType().Name} is. Pausing its playback now.");
-            currentVideoSupportProvider.PauseVideo();
+            Debug.Log($"{nameof(SongVideoPlayer)} should not be playing, but {currentVideoSupportProvider} is. Pausing its playback now.");
+            currentVideoSupportProvider.Pause();
         }
     }
 
@@ -617,17 +621,17 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private void StopVideo()
     {
-        if (!IsLoaded)
+        if (!IsPartiallyLoaded)
         {
             return;
         }
 
-        currentVideoSupportProvider.StopVideo();
+        currentVideoSupportProvider.Stop();
     }
 
     private void SetPlaying(bool value)
     {
-        if (!IsLoaded)
+        if (!IsPartiallyLoaded)
         {
             return;
         }

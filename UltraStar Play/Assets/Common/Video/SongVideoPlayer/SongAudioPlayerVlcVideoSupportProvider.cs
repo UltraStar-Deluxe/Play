@@ -7,14 +7,14 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    public override bool IsSupported(string videoUri, SongMeta songMeta)
+    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
     {
-        return base.IsSupported(videoUri, songMeta)
-            && songMeta.Audio == songMeta.Video
+        return base.IsSupported(videoUri, videoEqualsAudio)
+            && videoEqualsAudio
             && songAudioPlayer.VlcMediaPlayer != null;
     }
 
-    public override IObservable<VideoLoadedEvent> LoadVideoAsObservable(string videoUri)
+    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
     {
         return Observable.Create<VideoLoadedEvent>(o =>
         {
@@ -22,27 +22,34 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
                 () => songAudioPlayer.VlcMediaPlayer != null
                       && songAudioPlayer.VlcMediaPlayer.Media != null
                       && songAudioPlayer.VlcMediaPlayer.Media.Duration > 0,
-                () => o.OnNext(new VideoLoadedEvent(videoUri))));
+                () =>
+                {
+                    mediaPlayer = songAudioPlayer.VlcMediaPlayer;
+                    o.OnNext(new VideoLoadedEvent(videoUri));
+                }));
             return Disposable.Empty;
         });
     }
 
-    public override void UnloadVideo()
+    public override void Unload()
+    {
+        base.Unload();
+        mediaPlayer = null;
+
+        // Rest is handled by SongAudioPlayer
+    }
+
+    public override void Play()
     {
         // Handled by SongAudioPlayer
     }
 
-    public override void PlayVideo()
+    public override void Pause()
     {
         // Handled by SongAudioPlayer
     }
 
-    public override void PauseVideo()
-    {
-        // Handled by SongAudioPlayer
-    }
-
-    public override void StopVideo()
+    public override void Stop()
     {
         // Handled by SongAudioPlayer
     }
@@ -69,13 +76,13 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
         set { /* Not available */ }
     }
 
-    public override float PlaybackSpeed
+    public override double PlaybackSpeed
     {
         get => 1;
         set { /* Not available */ }
     }
 
-    public override double PositionInVideoInMillis
+    public override double PositionInMillis
     {
         get => songAudioPlayer.PositionInSongInMillis;
         set => songAudioPlayer.PositionInSongInMillis = value;

@@ -1,8 +1,9 @@
-﻿using System;using UniInject;
+﻿using System;
+using UniInject;
 using UniRx;
 using UnityEngine;
 
-public abstract class AbstractVideoSupportProvider : MonoBehaviour, INeedInjection, IVideoSupportProvider
+public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjection, IAudioSupportProvider
 {
     [Inject]
     protected Settings settings;
@@ -10,21 +11,22 @@ public abstract class AbstractVideoSupportProvider : MonoBehaviour, INeedInjecti
     [Inject]
     protected SceneNavigator sceneNavigator;
 
-    public abstract IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri);
-    public abstract bool IsSupported(string videoUri, bool videoEqualsAudio);
+    public abstract IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio);
+    public abstract bool IsSupported(string audioUri);
     public abstract void Unload();
     public abstract void Play();
     public abstract void Pause();
     public abstract void Stop();
-    public abstract void SetTargetTexture(RenderTexture renderTexture);
     public abstract bool IsPlaying { get; set; }
-    public abstract bool IsLooping { get; set; }
     public abstract double PlaybackSpeed { get; set; }
+    public abstract void SetPlaybackSpeed(double newValue, bool changeTempoButKeepPitch);
     public abstract double PositionInMillis { get; set; }
     public abstract double DurationInMillis { get; }
+    public abstract double VolumeFactor { get; set; }
 
-    public virtual void SetBackgroundScaleMode(ESongBackgroundScaleMode mode)
+    protected virtual void OnDestroy()
     {
+        Unload();
     }
 
     protected virtual void OnInjectionFinished()
