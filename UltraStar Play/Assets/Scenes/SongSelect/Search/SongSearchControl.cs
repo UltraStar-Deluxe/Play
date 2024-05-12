@@ -195,7 +195,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     {
         playlistChooserControl.Reset();
         songSelectFilterControl.Reset();
-        searchTextField.value = "";
+        ResetSearchText();
     }
 
     private void UpdateAnyFiltersActive()
@@ -396,7 +396,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     public void ResetSearchText()
     {
         searchTextField.value = "";
-        searchTextField.Blur();
     }
 
     private void RegisterToggleSearchPropertyCallback(Toggle toggle, ESearchProperty searchProperty)

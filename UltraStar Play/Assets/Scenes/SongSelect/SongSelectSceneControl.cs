@@ -1333,12 +1333,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         StartSongRepositorySearch();
 
-        SongSelectEntry lastSelectedEntry = songRouletteControl.SelectedEntry;
         string rawSearchText = songSearchControl.GetRawSearchText();
-
-        if (lastRawSearchText.IsNullOrEmpty()
-            && !rawSearchText.IsNullOrEmpty())
+        if (!rawSearchText.IsNullOrEmpty()
+            && lastRawSearchText.IsNullOrEmpty())
         {
+            // Remember selection from before search
             selectedEntryBeforeSearch = songRouletteControl.SelectedEntry;
         }
         lastRawSearchText = rawSearchText;
@@ -1348,15 +1347,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             // Special search syntax used. Do not perform normal filtering.
             return;
         }
-
         UpdateFilteredSongs();
-        if (songSearchControl.GetSearchText().IsNullOrEmpty())
+
+        if (rawSearchText.IsNullOrEmpty())
         {
-            if (lastSelectedEntry != null)
-            {
-                songRouletteControl.SelectEntry(lastSelectedEntry);
-            }
-            else if (selectedEntryBeforeSearch != null)
+            // Restore selection from before search
+            if (selectedEntryBeforeSearch != null)
             {
                 songRouletteControl.SelectEntry(selectedEntryBeforeSearch);
             }
@@ -1631,7 +1627,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public void OnSubmitSearch()
     {
+        // Continue browsing songs from the currently selected entry.
         selectedEntryBeforeSearch = songRouletteControl.SelectedEntry;
+        songSearchControl.ResetSearchText();
+        songRouletteControl.Focus();
+    }
+
+    public void OnCancelSearch()
+    {
         songSearchControl.ResetSearchText();
         songRouletteControl.Focus();
     }

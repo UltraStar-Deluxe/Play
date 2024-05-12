@@ -211,7 +211,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         }
         else if (songSearchControl.IsSearchTextFieldFocused())
         {
-            songSelectSceneControl.OnSubmitSearch();
+            songSelectSceneControl.OnCancelSearch();
         }
         else if (songSelectSceneControl.SongQueueSlideInControl.Visible.Value)
         {

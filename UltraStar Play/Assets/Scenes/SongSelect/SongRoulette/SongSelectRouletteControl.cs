@@ -416,7 +416,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectRouletteControl.SetEntries");
 
-        int lastSelectedEntryIndex = NumberUtils.Limit(SelectedEntryIndex, 0, newEntries.Count - 1);
         SongSelectEntry lastSelectedEntry = SelectedEntry;
         entries = new List<SongSelectEntry>(newEntries);
 
@@ -426,24 +425,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (!newEntries.IsNullOrEmpty())
-        {
-            // Try to restore song selection
-            if (lastSelectedEntry != null)
-            {
-                int entryIndex = GetEntryIndex(lastSelectedEntry);
-                if (entryIndex >= 0)
-                {
-                    lastSelectedEntryIndex = entryIndex;
-                }
-            }
-
-            Selection.Value = new SongSelectEntrySelection(entries[lastSelectedEntryIndex], lastSelectedEntryIndex, entries.Count);
-        }
-        else
-        {
-            Selection.Value = new SongSelectEntrySelection(null, -1, 0);
-        }
+        RestoreLastSelection(lastSelectedEntry);
 
         if (!VisualElementUtils.HasGeometry(songListView))
         {
@@ -455,6 +437,24 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         }
 
         entryListChangedEventStream.OnNext(entries);
+    }
+
+    private void RestoreLastSelection(SongSelectEntry lastSelectedEntry)
+    {
+        if (entries.IsNullOrEmpty())
+        {
+            Selection.Value = new SongSelectEntrySelection(null, -1, 0);
+            return;
+        }
+
+        int restoredSelectedIndex = entries.IndexOf(lastSelectedEntry);
+        if (restoredSelectedIndex >= 0)
+        {
+            Selection.Value = new SongSelectEntrySelection(entries[restoredSelectedIndex], restoredSelectedIndex, entries.Count);
+            return;
+        }
+
+        Selection.Value = new SongSelectEntrySelection(entries.FirstOrDefault(), 0, entries.Count);
     }
 
     private void UpdateListViewItems()
