@@ -16,6 +16,7 @@ public abstract class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         Failed,
     }
 
+    [JsonIgnore]
     public virtual Action DoLoadSong { get; set; }
 
     [JsonIgnore]

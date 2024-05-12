@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
 [Serializable]
 public class Note
 {
-    public readonly static IComparer<Note> comparerByStartBeat = new NoteComparerByStartBeat();
+    public static readonly IComparer<Note> comparerByStartBeat = new NoteComparerByStartBeat();
 
     // Breaks the serialization loop with Sentence.notes. The field is restored by the Sentence.
+    [JsonIgnore]
     [NonSerialized]
     private Sentence sentence;
+    [JsonIgnore]
     public Sentence Sentence { get { return sentence; } }
 
     public ENoteType Type { get; private set; }
