@@ -39,6 +39,7 @@ public static partial class R_PlayShared
         public const string comboBoxButton = "comboBoxButton";
         public const string comboBoxTextField = "comboBoxTextField";
         public const string contextMenu = "contextMenu";
+        public const string contextMenuButton = "contextMenuButton";
         public const string contextMenuSeparator = "contextMenuSeparator";
         public const string controlLabel = "controlLabel";
         public const string controlLabel40Percent = "controlLabel40Percent";
