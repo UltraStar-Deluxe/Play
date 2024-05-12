@@ -25,13 +25,18 @@ function onPlayerStateChange(newPlayerState) {
         const durationInMillis = getPlayer().getDuration() * 1000;
         postMessage({type: 'DurationInMillis', value: durationInMillis});
 
-        if (event.data === YT.PlayerState.PLAYING) {
+        // newPlayerState is
+        // -1 => not started
+        //  0 => finished
+        //  1 => playing
+        //  2 => paused
+        //  3 => buffering
+        //  5 => video positioned
+        if (newPlayerState.data === 1) {
             postMessage({type: 'StartedOrResumed', value: true});
         } else {
             postMessage({type: 'StoppedOrPaused', value: true});
         }
-        
-        getPlayer().requestFullscreen();
     }
 }
 
@@ -49,7 +54,7 @@ function loadUrl(url)
 
     const urlObject = new URL(url);
     const videoId = urlObject.searchParams.get('v');
-    
+
     getPlayer().loadVideoById(videoId);
 }
 
