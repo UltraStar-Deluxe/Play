@@ -12,17 +12,17 @@ public class SongEditorPositionHistoryNavigationControl : INeedInjection, IInjec
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    private readonly List<double> positionInSongInMillisHistory = new();
+    private readonly List<double> positionInMillisHistory = new();
 
     private int historyIndex;
-    private double ignoreNewPositionInSongInMillis = -1;
+    private double ignoreNewPositionInMillis = -1;
     
     public void OnInjectionFinished()
     {
-        songAudioPlayer.PositionInSongEventStream
+        songAudioPlayer.PositionEventStream
             .Where(_ => !songAudioPlayer.IsPlaying)
             .Throttle(TimeSpan.FromMilliseconds(1000))
-            .Subscribe(positionInSongInMillis => AddNavigationPositionToHistory(positionInSongInMillis));
+            .Subscribe(positionInMillis => AddNavigationPositionToHistory(positionInMillis));
 
         InputManager.GetInputAction(R.InputActions.songEditor_navigateForward).PerformedAsObservable()
             .Where(_ => !songAudioPlayer.IsPlaying)
@@ -39,70 +39,70 @@ public class SongEditorPositionHistoryNavigationControl : INeedInjection, IInjec
     {
         // Short delay because initial position may not be set yet.
         MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.1f,
-            () => AddNavigationPositionToHistory(songAudioPlayer.PositionInSongInMillis)));
+            () => AddNavigationPositionToHistory(songAudioPlayer.PositionInMillis)));
     }
 
     private void NavigateBackwardInHistory()
     {
         int nextHistoryIndex = historyIndex + 1;
-        int indexInHistoryArray = positionInSongInMillisHistory.Count - nextHistoryIndex - 1;
+        int indexInHistoryArray = positionInMillisHistory.Count - nextHistoryIndex - 1;
         if (indexInHistoryArray < 0
-            || indexInHistoryArray >= positionInSongInMillisHistory.Count)
+            || indexInHistoryArray >= positionInMillisHistory.Count)
         {
             return;
         }
         historyIndex = nextHistoryIndex;
 
-        double loadedHistoryPositionInMillis = positionInSongInMillisHistory[indexInHistoryArray];
-        ignoreNewPositionInSongInMillis = loadedHistoryPositionInMillis;
-        songAudioPlayer.PositionInSongInMillis = loadedHistoryPositionInMillis;
+        double loadedHistoryPositionInMillis = positionInMillisHistory[indexInHistoryArray];
+        ignoreNewPositionInMillis = loadedHistoryPositionInMillis;
+        songAudioPlayer.PositionInMillis = loadedHistoryPositionInMillis;
     }
 
     private void NavigateForwardInHistory()
     {
         int nextHistoryIndex = historyIndex - 1;
-        int indexInHistoryArray = positionInSongInMillisHistory.Count - nextHistoryIndex - 1;
+        int indexInHistoryArray = positionInMillisHistory.Count - nextHistoryIndex - 1;
         if (indexInHistoryArray < 0
-            || indexInHistoryArray >= positionInSongInMillisHistory.Count)
+            || indexInHistoryArray >= positionInMillisHistory.Count)
         {
             return;
         }
         historyIndex = nextHistoryIndex;
         
-        double loadedHistoryPositionInMillis = positionInSongInMillisHistory[indexInHistoryArray];
-        ignoreNewPositionInSongInMillis = loadedHistoryPositionInMillis;
-        songAudioPlayer.PositionInSongInMillis = loadedHistoryPositionInMillis;
+        double loadedHistoryPositionInMillis = positionInMillisHistory[indexInHistoryArray];
+        ignoreNewPositionInMillis = loadedHistoryPositionInMillis;
+        songAudioPlayer.PositionInMillis = loadedHistoryPositionInMillis;
     }
 
-    private void AddNavigationPositionToHistory(double positionInSongInMillis)
+    private void AddNavigationPositionToHistory(double positionInMillis)
     {
-        if (ignoreNewPositionInSongInMillis >= 0 
-            && Math.Abs(ignoreNewPositionInSongInMillis - positionInSongInMillis) < 1)
+        if (ignoreNewPositionInMillis >= 0 
+            && Math.Abs(ignoreNewPositionInMillis - positionInMillis) < 1)
         {
-            ignoreNewPositionInSongInMillis = -1;
+            ignoreNewPositionInMillis = -1;
             return;
         }
         
         // Remove discarded positions from history
         while (historyIndex > 0
-               && positionInSongInMillisHistory.Count > 0)
+               && positionInMillisHistory.Count > 0)
         {
-            positionInSongInMillisHistory.RemoveLast();
+            positionInMillisHistory.RemoveLast();
             historyIndex--;
         }
         
-        if (positionInSongInMillisHistory.Count >= MaxPositionHistoryLength)
+        if (positionInMillisHistory.Count >= MaxPositionHistoryLength)
         {
-            positionInSongInMillisHistory.RemoveLast();
+            positionInMillisHistory.RemoveLast();
         }
         
-        if (positionInSongInMillisHistory.Count > 0
-            && Math.Abs(positionInSongInMillisHistory.LastOrDefault() - positionInSongInMillis) < 1000)
+        if (positionInMillisHistory.Count > 0
+            && Math.Abs(positionInMillisHistory.LastOrDefault() - positionInMillis) < 1000)
         {
             // Ignore similar position
             return;
         }
         
-        positionInSongInMillisHistory.Add(positionInSongInMillis);
+        positionInMillisHistory.Add(positionInMillis);
     }
 }

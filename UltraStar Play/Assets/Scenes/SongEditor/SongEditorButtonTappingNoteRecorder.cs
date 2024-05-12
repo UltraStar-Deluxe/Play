@@ -44,7 +44,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
 
     private void Start()
     {
-        songAudioPlayer.JumpBackInSongEventStream.Subscribe(OnJumpedBackInSong);
+        songAudioPlayer.JumpBackEventStream.Subscribe(OnJumpedBackInSong);
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnPlaybackStarted);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnPlaybackStopped);
 
@@ -59,7 +59,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
         });
     }
 
-    private void OnPlaybackStopped(double positionInSongInMillis)
+    private void OnPlaybackStopped(double positionInMillis)
     {
         if (hasRecordedNotes)
         {
@@ -67,10 +67,10 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
         }
     }
 
-    private void OnPlaybackStarted(double positionInSongInMillis)
+    private void OnPlaybackStarted(double positionInMillis)
     {
         hasRecordedNotes = false;
-        lastPitchDetectedBeat = GetBeat(positionInSongInMillis);
+        lastPitchDetectedBeat = GetBeat(positionInMillis);
         upcomingSortedRecordedNotes = GetUpcomingSortedRecordedNotes();
     }
 
@@ -252,7 +252,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
 
     private List<Note> GetUpcomingSortedRecordedNotes()
     {
-        int currentBeat = GetBeat(songAudioPlayer.PositionInSongInMillis - settings.SongEditorSettings.MicDelayInMillis);
+        int currentBeat = GetBeat(songAudioPlayer.PositionInMillis - settings.SongEditorSettings.MicDelayInMillis);
         ESongEditorLayer targetLayer = GetRecordingTargetLayer();
         List<Note> result = songEditorLayerManager.GetEnumLayerNotes(targetLayer).Where(note => (note.StartBeat >= currentBeat)).ToList();
         result.Sort(Note.comparerByStartBeat);
@@ -264,9 +264,9 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
         return ESongEditorLayer.ButtonRecording;
     }
 
-    private int GetBeat(double positionInSongInMillis)
+    private int GetBeat(double positionInMillis)
     {
-        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInSongInMillis);
+        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInMillis);
         return beat;
     }
 }

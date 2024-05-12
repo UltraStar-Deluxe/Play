@@ -13,7 +13,7 @@ public class DefaultSongEditorSceneDataProvider : MonoBehaviour, IDefaultSceneDa
     public SceneData GetDefaultSceneData()
     {
         SongEditorSceneData defaultSceneData = new();
-        defaultSceneData.PositionInSongInMillis = 0;
+        defaultSceneData.PositionInMillis = 0;
         defaultSceneData.SongMeta = GetDefaultSongMeta();
 
         // Set up PreviousSceneData to directly start the SingScene.

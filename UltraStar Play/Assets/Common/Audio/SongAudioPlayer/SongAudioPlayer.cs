@@ -28,7 +28,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     public IAudioSupportProvider CurrentAudioSupportProvider => currentAudioSupportProvider;
 
     // The last frame in which the position in the song was calculated
-    private int positionInSongInMillisFrame;
+    private int positionInMillisFrame;
 
     private readonly Subject<double> playbackStoppedEventStream = new();
     public IObservable<double> PlaybackStoppedEventStream => playbackStoppedEventStream;
@@ -36,8 +36,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private readonly Subject<double> playbackStartedEventStream = new();
     public IObservable<double> PlaybackStartedEventStream => playbackStartedEventStream;
 
-    private readonly Subject<double> positionInSongEventStream = new();
-    public IObservable<double> PositionInSongEventStream => positionInSongEventStream;
+    private readonly Subject<double> positionEventStream = new();
+    public IObservable<double> PositionEventStream => positionEventStream;
 
     private readonly Subject<double> playbackSpeedChangedEventStream = new();
     public IObservable<double> PlaybackSpeedChangedEventStream => playbackSpeedChangedEventStream;
@@ -45,31 +45,18 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private readonly Subject<SongAudioLoadedEvent> loadedEventStream = new();
     public IObservable<SongAudioLoadedEvent> LoadedEventStream => loadedEventStream;
 
-    public IObservable<Pair<double>> JumpBackInSongEventStream
-    {
-        get
-        {
-            return positionInSongEventStream.Pairwise().Where(pair => pair.Previous > pair.Current);
-        }
-    }
+    public IObservable<Pair<double>> JumpBackEventStream
+        => positionEventStream.Pairwise().Where(pair => pair.Previous > pair.Current);
 
-    public IObservable<Pair<double>> JumpForwardInSongEventStream
-    {
-        get
-        {
-            // The position will increase in normal playback. A big increase however, can always be considered as "jump".
-            // Furthermore, when not currently playing, then every forward change can be considered as "jump".
-            return positionInSongEventStream.Pairwise().Where(pair =>
-            {
-                return (pair.Previous + MinForwardJumpOffsetInMillis) < pair.Current
-                    || (!IsPlaying && pair.Previous < pair.Current);
-            });
-        }
-    }
+    public IObservable<Pair<double>> JumpForwardEventStream
+        // The position will increase in normal playback. A big increase however, can always be considered as "jump".
+        // Furthermore, when not currently playing, then every forward change can be considered as "jump".
+        => positionEventStream.Pairwise().Where(pair => (pair.Previous + MinForwardJumpOffsetInMillis) < pair.Current
+                                                        || (!IsPlaying && pair.Previous < pair.Current));
 
     // The current position in the song in milliseconds.
-    private double positionInSongInMillis;
-    public double PositionInSongInMillis
+    private double positionInMillis;
+    public double PositionInMillis
     {
         get
         {
@@ -82,12 +69,12 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             // even when they are queried in the same frame (e.g. Update() of different scripts).
             // For a given frame, the position in the song should be the same for all scripts,
             // which is why the value is only updated once per frame.
-            if (positionInSongInMillisFrame != Time.frameCount)
+            if (positionInMillisFrame != Time.frameCount)
             {
-                positionInSongInMillisFrame = Time.frameCount;
-                positionInSongInMillis = PositionInSongInMillisExact;
+                positionInMillisFrame = Time.frameCount;
+                positionInMillis = PositionInMillisExact;
             }
-            return positionInSongInMillis;
+            return positionInMillis;
         }
 
         set
@@ -98,15 +85,15 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 return;
             }
 
-            currentAudioSupportProvider.PositionInMillis = NumberUtils.Limit(value, 0, DurationOfSongInMillis - 1);
-            positionInSongEventStream.OnNext(positionInSongInMillis);
+            currentAudioSupportProvider.PositionInMillis = NumberUtils.Limit(value, 0, DurationInMillis - 1);
+            positionEventStream.OnNext(positionInMillis);
         }
     }
 
-    public double PositionInSongInSeconds
+    public double PositionInSeconds
     {
-        get => positionInSongInMillis / 1000.0;
-        set => PositionInSongInMillis = value * 1000.0;
+        get => positionInMillis / 1000.0;
+        set => PositionInMillis = value * 1000.0;
     }
 
     /**
@@ -114,7 +101,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
      * Note that this changes concurrently,
      * such that it can return different values when called multiple times in the same frame.
      */
-    public double PositionInSongInMillisExact
+    public double PositionInMillisExact
     {
         get
         {
@@ -130,23 +117,23 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
     }
 
-    public double DurationOfSongInMillis { get; private set; }
-    public double DurationOfSongInSeconds => DurationOfSongInMillis / 1000.0;
-    public double DurationOfSongInBeats => SongMetaBpmUtils.MillisToBeats(loadedSongMeta, DurationOfSongInMillis);
+    public double DurationInMillis { get; private set; }
+    public double DurationInSeconds => DurationInMillis / 1000.0;
+    public double DurationInBeats => SongMetaBpmUtils.MillisToBeats(loadedSongMeta, DurationInMillis);
 
     /**
      * Position in the song from 0 (start of song) to 1 (end of song).
      */
-    public double PositionInSongInPercent
+    public double PositionInPercent
     {
         get
         {
-            if (DurationOfSongInMillis <= 0)
+            if (DurationInMillis <= 0)
             {
                 return 0;
             }
 
-            return PositionInSongInMillis / DurationOfSongInMillis;
+            return PositionInMillis / DurationInMillis;
         }
     }
 
@@ -155,7 +142,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     public bool IsPlayingOfAudioProvider => IsFullyLoaded && currentAudioSupportProvider.IsPlaying;
 
     public bool IsPartiallyLoaded => currentAudioSupportProvider != null;
-    public bool IsFullyLoaded => IsPartiallyLoaded && DurationOfSongInMillis > 0 && loadedSongMeta != null;
+    public bool IsFullyLoaded => IsPartiallyLoaded && DurationInMillis > 0 && loadedSongMeta != null;
 
     private SongMeta loadedSongMeta;
 
@@ -243,15 +230,15 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         if (IsPlaying)
         {
-            positionInSongEventStream.OnNext(PositionInSongInMillis);
+            positionEventStream.OnNext(PositionInMillis);
         }
 
         // Apply playback state to (sadly buggy) AudioSupportProviders (ffmpeg and vlc).
         if (TimeUtils.IsDurationAboveThresholdInSeconds(lastApplyPlaybackStateToAudioProviderTimeInSeconds, 1))
         {
             lastApplyPlaybackStateToAudioProviderTimeInSeconds = Time.time;
-            if (DurationOfSongInMillis > 0
-                && PositionInSongInMillis < DurationOfSongInMillis - 100)
+            if (DurationInMillis > 0
+                && PositionInMillis < DurationInMillis - 100)
             {
                 ApplyPlaybackStateToAudioProvider();
             }
@@ -301,7 +288,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             .Select(evt =>
             {
                 loadedSongMeta = songMeta;
-                DurationOfSongInMillis = currentAudioSupportProvider.DurationInMillis;
+                DurationInMillis = currentAudioSupportProvider.DurationInMillis;
                 currentAudioSupportProvider.PositionInMillis = startPositionInMillis;
                 currentAudioSupportProvider.VolumeFactor = VolumeFactor;
                 if (IsPlaying)
@@ -365,7 +352,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
         currentAudioSupportProvider?.Unload();
         currentAudioSupportProvider = null;
-        DurationOfSongInMillis = 0;
+        DurationInMillis = 0;
         loadedSongMeta = null;
     }
 
@@ -389,7 +376,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
         currentAudioSupportProvider.Stop();
 
-        playbackStoppedEventStream.OnNext(PositionInSongInMillis);
+        playbackStoppedEventStream.OnNext(PositionInMillis);
     }
 
     public void PauseAudio()
@@ -403,7 +390,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         isPlaying = false;
         currentAudioSupportProvider.Pause();
 
-        playbackStoppedEventStream.OnNext(PositionInSongInMillis);
+        playbackStoppedEventStream.OnNext(PositionInMillis);
     }
 
     public void PlayAudio()
@@ -417,7 +404,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         isPlaying = true;
         currentAudioSupportProvider.Play();
 
-        playbackStartedEventStream.OnNext(PositionInSongInMillis);
+        playbackStartedEventStream.OnNext(PositionInMillis);
     }
 
     private void ApplyPlaybackStateToAudioProvider()
@@ -448,7 +435,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             return 0;
         }
 
-        double millisInSong = PositionInSongInMillis;
+        double millisInSong = PositionInMillis;
         double result = SongMetaBpmUtils.MillisToBeats(loadedSongMeta, millisInSong);
         if (result < 0
             && !allowNegativeResult)

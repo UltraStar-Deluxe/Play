@@ -24,8 +24,8 @@ public class OverviewAreaViewportIndicatorControl : INeedInjection, IInjectionFi
     {
         double viewportStartInMillis = viewportEvent.X;
         double viewportEndInMillis = viewportEvent.X + viewportEvent.Width;
-        double startPercent = viewportStartInMillis / songAudioPlayer.DurationOfSongInMillis;
-        double endPercent = viewportEndInMillis / songAudioPlayer.DurationOfSongInMillis;
+        double startPercent = viewportStartInMillis / songAudioPlayer.DurationInMillis;
+        double endPercent = viewportEndInMillis / songAudioPlayer.DurationInMillis;
 
         UpdatePositionAndWidth(startPercent, endPercent);
     }

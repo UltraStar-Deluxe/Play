@@ -377,10 +377,10 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         }
     }
 
-    public override float GetXInPercent(double positionInSongInMillis)
+    public override float GetXInPercent(double positionInMillis)
     {
         // The VerticalPitchIndicator's position is the position in the song (where players should be singing now).
-        double offsetInMillis = positionInSongInMillis - songAudioPlayer.PositionInSongInMillis;
+        double offsetInMillis = positionInMillis - songAudioPlayer.PositionInMillis;
         float offsetInPercent = (float)(offsetInMillis / DisplayedNoteDurationInMillis);
         return PitchIndicatorXPercent + offsetInPercent;
     }
@@ -388,10 +388,10 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     protected override bool TryGetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat, out Rect result)
     {
         // The VerticalPitchIndicator's position is the position in the song (where players should be singing now).
-        double millisInSong = songAudioPlayer.PositionInSongInMillis;
+        double millisInSong = songAudioPlayer.PositionInMillis;
 
         // Alternative: The VerticalPitchIndicator's position is the position where recording happens.
-        // double millisInSong = songAudioPlayer.PositionInSongInMillis - delayInMillis;
+        // double millisInSong = songAudioPlayer.PositionInMillis - delayInMillis;
         double currentBeatConsideringMicDelay = SongMetaBpmUtils.MillisToBeats(songMeta, millisInSong);
 
         Vector2 yStartEndPercent = GetYStartAndEndInPercentForMidiNote(midiNote, (int)noteStartBeat);

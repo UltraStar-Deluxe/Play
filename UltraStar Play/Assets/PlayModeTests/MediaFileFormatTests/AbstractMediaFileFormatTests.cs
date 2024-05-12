@@ -68,15 +68,15 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
         SongAudioPlayer.LoadAndPlayAudioAsObservable(songMeta)
             .Select(evt =>
             {
-                double durationOfSongInMillis = SongAudioPlayer.DurationOfSongInMillis;
-                if (durationOfSongInMillis <= 0)
+                double durationInMillis = SongAudioPlayer.DurationInMillis;
+                if (durationInMillis <= 0)
                 {
                     Assert.Fail("SongAudioPlayer failed to load song (duration is 0).");
                 }
 
-                if (Math.Abs(durationOfSongInMillis - targetDurationInMillis) > MaxDistanteToTargetDurationInMillis)
+                if (Math.Abs(durationInMillis - targetDurationInMillis) > MaxDistanteToTargetDurationInMillis)
                 {
-                    Assert.Fail($"SongAudioPlayer loaded song with wrong duration {durationOfSongInMillis} ms (should be near {targetDurationInMillis} ms).");
+                    Assert.Fail($"SongAudioPlayer loaded song with wrong duration {durationInMillis} ms (should be near {targetDurationInMillis} ms).");
                 }
 
                 return evt;
@@ -88,10 +88,10 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
             })
             .Subscribe(evt =>
             {
-                Debug.Log($"Successfully loaded song media (audio: '{songMeta.Audio}', audioUrl: '{songMeta.AudioUrl}', videoUrl: '{songMeta.VideoUrl}') after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. Song duration: {songAudioPlayer.DurationOfSongInMillis} ms");
+                Debug.Log($"Successfully loaded song media (audio: '{songMeta.Audio}', audioUrl: '{songMeta.AudioUrl}', videoUrl: '{songMeta.VideoUrl}') after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. Song duration: {songAudioPlayer.DurationInMillis} ms");
             });
 
-        yield return new WaitUntil(() => SongAudioPlayer.DurationOfSongInMillis > 0
+        yield return new WaitUntil(() => SongAudioPlayer.DurationInMillis > 0
                                          || hasFailed
                                          || TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis));
 

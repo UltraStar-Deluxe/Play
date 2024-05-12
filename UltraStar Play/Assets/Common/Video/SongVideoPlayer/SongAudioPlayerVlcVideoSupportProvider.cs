@@ -84,9 +84,9 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
 
     public override double PositionInMillis
     {
-        get => songAudioPlayer.PositionInSongInMillis;
-        set => songAudioPlayer.PositionInSongInMillis = value;
+        get => songAudioPlayer.PositionInMillis;
+        set => songAudioPlayer.PositionInMillis = value;
     }
 
-    public override double DurationInMillis => songAudioPlayer.DurationOfSongInMillis;
+    public override double DurationInMillis => songAudioPlayer.DurationInMillis;
 }

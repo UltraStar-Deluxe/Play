@@ -237,7 +237,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             .Subscribe(_ =>
             {
                 Debug.Log($"Skipping to song preview of {songMeta.Title} at {previewStartInMillis} ms");
-                songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
+                songAudioPlayer.PositionInMillis = previewStartInMillis;
                 songAudioPlayer.VolumeFactor = 0;
                 songAudioPlayer.PlayAudio();
             });

@@ -125,11 +125,11 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         {
             UpdateRecordingStartIndex();
         });
-        songAudioPlayer.JumpForwardInSongEventStream.Subscribe(evt =>
+        songAudioPlayer.JumpForwardEventStream.Subscribe(evt =>
         {
             UpdateRecordingStartIndex();
         });
-        songAudioPlayer.JumpBackInSongEventStream.Subscribe(evt =>
+        songAudioPlayer.JumpBackEventStream.Subscribe(evt =>
         {
             UpdateRecordingStartIndex();
         });
@@ -233,7 +233,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
 
     private void UpdateRecordingStartIndex()
     {
-        recordingStartIndex = (int)Math.Floor(songAudioPlayer.PositionInSongInSeconds * FinalSampleRate.Value);
+        recordingStartIndex = (int)Math.Floor(songAudioPlayer.PositionInSeconds * FinalSampleRate.Value);
         recordingIndex = recordingStartIndex;
         analyzeStartIndex = recordingIndex;
     }
@@ -335,7 +335,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         int channels = 1;
         audioClip = AudioClip.Create(GetType().Name, RecordingBuffer.Length, channels, FinalSampleRate.Value, false);
         audioClip.SetData(RecordingBuffer, 0);
-        Debug.Log($"Created AudioClip to buffer samples: {songAudioPlayer.DurationOfSongInSeconds} seconds @ {FinalSampleRate.Value} Hz => {audioClip.samples} samples");
+        Debug.Log($"Created AudioClip to buffer samples: {songAudioPlayer.DurationInSeconds} seconds @ {FinalSampleRate.Value} Hz => {audioClip.samples} samples");
     }
 
     private void InitRecordingBufferIfNeeded()
@@ -352,18 +352,18 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         {
             RecordingBuffer = cachedRecordingBuffer;
             HasRecordedAudio = cachedRecordingBuffer.AnyMatch(sample => sample != 0);
-            Debug.Log($"Reusing existing recording buffer: {songAudioPlayer.DurationOfSongInSeconds} seconds @ {FinalSampleRate.Value} Hz => {RecordingBuffer.Length} samples");
+            Debug.Log($"Reusing existing recording buffer: {songAudioPlayer.DurationInSeconds} seconds @ {FinalSampleRate.Value} Hz => {RecordingBuffer.Length} samples");
             return;
         }
 
         RecordingBuffer = new float[requiredRecordingBufferLength];
         songMetaToRecordedAudioSamples[songMeta] = RecordingBuffer;
-        Debug.Log($"Initialized new recording buffer: {songAudioPlayer.DurationOfSongInSeconds} seconds @ {FinalSampleRate.Value} Hz => {RecordingBuffer.Length} samples");
+        Debug.Log($"Initialized new recording buffer: {songAudioPlayer.DurationInSeconds} seconds @ {FinalSampleRate.Value} Hz => {RecordingBuffer.Length} samples");
     }
 
     private int GetRequiredRecordingBufferLengthInSamples()
     {
-        return (int)(songAudioPlayer.DurationOfSongInMillis / 1000.0 * FinalSampleRate.Value);
+        return (int)(songAudioPlayer.DurationInMillis / 1000.0 * FinalSampleRate.Value);
     }
 
     private void InitMicSampleRecorder()

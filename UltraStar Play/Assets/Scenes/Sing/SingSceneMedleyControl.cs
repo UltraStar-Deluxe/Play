@@ -61,7 +61,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         }
 
         if (!singSceneFinisher.IsSongFinished
-            && Math.Abs(songAudioPlayer.PositionInSongInMillis - CalculateMedleyEndInMillis()) < 1000)
+            && Math.Abs(songAudioPlayer.PositionInMillis - CalculateMedleyEndInMillis()) < 1000)
         {
             Debug.Log($"Trigger medley song finish");
             singSceneFinisher.TriggerEarlySongFinish();
@@ -74,9 +74,9 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         {
             if (!IsMedley)
             {
-                return songAudioPlayer.PositionInSongInPercent;
+                return songAudioPlayer.PositionInPercent;
             }
-            return (songAudioPlayer.PositionInSongInMillis - MedleyStartWithCountdownInMillis)
+            return (songAudioPlayer.PositionInMillis - MedleyStartWithCountdownInMillis)
                             / MedleyDurationWithCountdownInMillis;
         }
     }
@@ -105,7 +105,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
     private void DoStartCurrentMedleySong()
     {
         Debug.Log($"Starting current medley song '{singSceneControl.SongMeta.GetArtistDashTitle()}'");
-        singSceneControl.SkipToPositionInSong(CalculateMedleyStartWithCountdownInMillis());
+        singSceneControl.SkipToPosition(CalculateMedleyStartWithCountdownInMillis());
         countdownControl.StartCountdown(CountDownTimeInSeconds);
         audioFadeInControl.StartAudioFadeIn(CountDownTimeInSeconds);
     }
@@ -134,7 +134,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
     {
         if (!IsMedley)
         {
-            return songAudioPlayer.DurationOfSongInMillis;
+            return songAudioPlayer.DurationInMillis;
         }
         SongMeta songMeta = singSceneControl.SongMeta;
         int medleyEndBeat = SongMetaUtils.GetMedleyEndBeat(songMeta, settings.DefaultMedleyTargetDurationInSeconds);

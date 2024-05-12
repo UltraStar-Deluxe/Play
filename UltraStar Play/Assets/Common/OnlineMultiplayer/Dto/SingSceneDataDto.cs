@@ -12,7 +12,7 @@ namespace CommonOnlineMultiplayer
         public GameRoundSettingsDto GameRoundSettings { get; set; } = new();
         public PartyModeSceneDataDto PartyModeSceneData { get; set; }
 
-        public double PositionInSongInMillis { get; set; }
+        public double PositionInMillis { get; set; }
         public bool IsRestart { get; set; }
         public bool StartPaused { get; set; }
     }

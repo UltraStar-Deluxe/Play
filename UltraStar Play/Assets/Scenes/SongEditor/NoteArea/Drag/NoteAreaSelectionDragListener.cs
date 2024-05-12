@@ -187,7 +187,7 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
 
     private int GetDragStartBeat(NoteAreaDragEvent dragEvent)
     {
-        return dragEvent.PositionInSongInBeatsDragStart;
+        return dragEvent.PositionInBeatsDragStart;
     }
 
     private int GetDragEndBeat(NoteAreaDragEvent dragEvent)

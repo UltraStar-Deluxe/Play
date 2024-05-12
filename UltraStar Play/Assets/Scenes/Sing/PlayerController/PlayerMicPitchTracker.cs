@@ -17,7 +17,7 @@ using UnityEngine;
  */
 public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, IInjectionFinishedListener
 {
-    private const int SendPositionInSongIntervalInMillis = 2000;
+    private const int SendPositionIntervalInMillis = 2000;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -79,7 +79,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private int lastAnalyzedBeatFromConnectedClient;
 
-    private long lastUnixTimeMillisecondsWhenSentPositionInSongToClient = TimeUtils.GetUnixTimeMilliseconds();
+    private long lastUnixTimeMillisecondsWhenSentPositionToClient = TimeUtils.GetUnixTimeMilliseconds();
 
     private readonly Queue<BeatPitchEventAndTime> beatPitchEventsFromConnectedClientQueue = new();
 
@@ -238,7 +238,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
         SendMicProfileToConnectedClient();
         SendStartRecordingMessageToConnectedClient();
-        SendPositionInSongToClientRapidly();
+        SendPositionToClientRapidly();
     }
 
     private void EnqueuePitchEventsFromConnectedClient(BeatPitchEventsDto beatPitchEventsDto)
@@ -298,7 +298,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
         // Analyze the next beat with fully recorded mic samples
         double nextBeatToAnalyzeEndPositionInMs = SongMetaBpmUtils.BeatsToMillis(songMeta, BeatToAnalyze + 1);
-        if (nextBeatToAnalyzeEndPositionInMs >= songAudioPlayer.PositionInSongInMillis - micProfile.DelayInMillis)
+        if (nextBeatToAnalyzeEndPositionInMs >= songAudioPlayer.PositionInMillis - micProfile.DelayInMillis)
         {
             return;
         }
@@ -327,10 +327,10 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         // Read messages from client since last time the reader thread was active.
         // connectedClientHandler.ReadMessagesFromClient();
 
-        if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + SendPositionInSongIntervalInMillis < TimeUtils.GetUnixTimeMilliseconds())
+        if (lastUnixTimeMillisecondsWhenSentPositionToClient + SendPositionIntervalInMillis < TimeUtils.GetUnixTimeMilliseconds())
         {
             // Synchronize position in song with connected client.
-            SendPositionInSongToClient();
+            SendPositionToClient();
         }
 
         // Handle received messages after buffer time.
@@ -344,8 +344,8 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private void DequeuePitchEventsFromConnectedClient(long messageBufferTimeInMillis, int eventBufferTimeInBeats)
     {
-        int positionInSongInMillisConsideringMicDelay = (int)(songAudioPlayer.PositionInSongInMillis - micProfile.DelayInMillis);
-        int currentBeatConsideringMicDelay = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInSongInMillisConsideringMicDelay);
+        int positionInMillisConsideringMicDelay = (int)(songAudioPlayer.PositionInMillis - micProfile.DelayInMillis);
+        int currentBeatConsideringMicDelay = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInMillisConsideringMicDelay);
         long unixTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         int maxIterations = 100;
         for (int i = 0; i < maxIterations && !beatPitchEventsFromConnectedClientQueue.IsNullOrEmpty(); i++)
@@ -423,14 +423,14 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         {
             // Looks like the companion app does not know the current position in the song. Send it this info again.
             // Log.Verbose($"Received invalid beat from connected client: beat {pitchEvent.Beat}");
-            if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + (SendPositionInSongIntervalInMillis / 10) < TimeUtils.GetUnixTimeMilliseconds())
+            if (lastUnixTimeMillisecondsWhenSentPositionToClient + (SendPositionIntervalInMillis / 10) < TimeUtils.GetUnixTimeMilliseconds())
             {
-                SendPositionInSongToClient();
+                SendPositionToClient();
             }
             return;
         }
 
-        int currentBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, songAudioPlayer.PositionInSongInMillis);
+        int currentBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, songAudioPlayer.PositionInMillis);
         if (pitchEvent.Beat > currentBeat)
         {
             Log.Verbose(() => $"Received future beat from connected client (received: {pitchEvent.Beat}, current: {currentBeat}).");
@@ -441,7 +441,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         FirePitchEventFromConnectedClient(pitchEvent);
     }
 
-    public void SendPositionInSongToClientRapidly()
+    public void SendPositionToClientRapidly()
     {
         if (micProfile == null
             || !micProfile.IsInputFromConnectedClient)
@@ -462,12 +462,12 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         // Thus, send the new position in song more aggressively.
         List<float> delaysInSeconds = new(){ 0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
         delaysInSeconds.ForEach(delayInSeconds =>
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(delayInSeconds, () => SendPositionInSongToClient())));
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(delayInSeconds, () => SendPositionToClient())));
     }
 
-    private void SendPositionInSongToClient()
+    private void SendPositionToClient()
     {
-        lastUnixTimeMillisecondsWhenSentPositionInSongToClient = TimeUtils.GetUnixTimeMilliseconds();
+        lastUnixTimeMillisecondsWhenSentPositionToClient = TimeUtils.GetUnixTimeMilliseconds();
 
         if (micProfile == null
             || !micProfile.IsInputFromConnectedClient)
@@ -486,7 +486,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         {
             BeatsPerMinute = songMeta.BeatsPerMinute,
             SongGap = songMeta.GapInMillis,
-            PositionInSongInMillis = songAudioPlayer.PositionInSongInMillisExact,
+            PositionInSongInMillis = songAudioPlayer.PositionInMillisExact,
         };
         Log.Verbose(() => $"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
         connectedClientHandler.SendMessageToClient(positionInSongDto);
@@ -681,7 +681,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         }
 
         double beatInMs = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
-        double beatPassedBeforeMs = songAudioPlayer.PositionInSongInMillis - beatInMs;
+        double beatPassedBeforeMs = songAudioPlayer.PositionInMillis - beatInMs;
         int beatPassedBeforeSamplesInMicBuffer = Convert.ToInt32(((beatPassedBeforeMs - micProfile.DelayInMillis) / 1000) * MicSampleRecorder.FinalSampleRate.Value);
         // The newest sample has the highest index in the MicSampleBuffer
         int sampleBufferIndex = MicSampleRecorder.MicSamples.Length - beatPassedBeforeSamplesInMicBuffer;
@@ -823,7 +823,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             && micProfile.IsInputFromConnectedClient)
         {
             // Position changed heavily. Send the new position more aggressively to connected clients.
-            SendPositionInSongToClientRapidly();
+            SendPositionToClientRapidly();
         }
     }
 
@@ -866,7 +866,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     public void SendStartRecordingMessageToConnectedClient()
     {
         GetConnectedClientHandler()?.SendMessageToClient(new StartRecordingMessageDto());
-        SendPositionInSongToClientRapidly();
+        SendPositionToClientRapidly();
     }
 
     public override void StartRecording()

@@ -20,27 +20,27 @@ public class SetSongPropertyAction : INeedInjection
     [Inject]
     private PanelHelper panelHelper;
 
-    public void SetMedleyStart(double positionInSongInMillis)
+    public void SetMedleyStart(double positionInMillis)
     {
-        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInSongInMillis);
+        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInMillis);
         songMeta.MedleyStartInMillis = beat;
     }
 
-    public void SetMedleyEnd(double positionInSongInMillis)
+    public void SetMedleyEnd(double positionInMillis)
     {
-        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInSongInMillis);
+        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInMillis);
         songMeta.MedleyEndInMillis = beat;
     }
 
-    public void SetMedleyStartAndNotify(double positionInSongInMillis)
+    public void SetMedleyStartAndNotify(double positionInMillis)
     {
-        SetMedleyStart(positionInSongInMillis);
+        SetMedleyStart(positionInMillis);
         songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.MedleyStart));
     }
 
-    public void SetMedleyEndAndNotify(double positionInSongInMillis)
+    public void SetMedleyEndAndNotify(double positionInMillis)
     {
-        SetMedleyEnd(positionInSongInMillis);
+        SetMedleyEnd(positionInMillis);
         songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.MedleyEnd));
     }
 }

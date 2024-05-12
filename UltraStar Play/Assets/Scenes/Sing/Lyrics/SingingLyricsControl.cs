@@ -121,13 +121,13 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             .OrIfDefault(GetPlayerControlColor());
     }
 
-    public void Update(double positionInSongInMillis)
+    public void Update(double positionInMillis)
     {
-        UpdateNoteHighlighting(positionInSongInMillis);
-        UpdatePositionBeforeLyricsIndicator(positionInSongInMillis);
+        UpdateNoteHighlighting(positionInMillis);
+        UpdatePositionBeforeLyricsIndicator(positionInMillis);
     }
 
-    private void UpdatePositionBeforeLyricsIndicator(double positionInSongInMillis)
+    private void UpdatePositionBeforeLyricsIndicator(double positionInMillis)
     {
         if (CurrentSentence == null
             || CurrentSentence.Notes.IsNullOrEmpty()
@@ -148,7 +148,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        double positionBeforeLyricsPercent = (positionInSongInMillis - previousSentenceEndInMillis)
+        double positionBeforeLyricsPercent = (positionInMillis - previousSentenceEndInMillis)
                                              / (firstNoteStartBeatInMillis - previousSentenceEndInMillis);
 
         // Find start position of label
@@ -168,15 +168,15 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         positionBeforeLyricsIndicator.style.left = positionBeforeLyricsPx;
     }
 
-    private void UpdateNoteHighlighting(double positionInSongInMillis)
+    private void UpdateNoteHighlighting(double positionInMillis)
     {
         Note currentNote = SortedNotes.FirstOrDefault(note =>
-            SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat) <= positionInSongInMillis
-            && positionInSongInMillis < SongMetaBpmUtils.BeatsToMillis(songMeta, note.EndBeat));
-        HighlightNoteLyrics(positionInSongInMillis, currentNote);
+            SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat) <= positionInMillis
+            && positionInMillis < SongMetaBpmUtils.BeatsToMillis(songMeta, note.EndBeat));
+        HighlightNoteLyrics(positionInMillis, currentNote);
     }
 
-    private void HighlightNoteLyrics(double positionInSongInMillis, Note currentNote)
+    private void HighlightNoteLyrics(double positionInMillis, Note currentNote)
     {
         if (CurrentSentence == null)
         {
@@ -224,7 +224,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 double noteStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat);
                 double noteEndInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.EndBeat);
                 double noteDurationInMillis = noteEndInMillis - noteStartInMillis;
-                double noteDoneInMillis = positionInSongInMillis - noteStartInMillis;
+                double noteDoneInMillis = positionInMillis - noteStartInMillis;
                 if (noteDurationInMillis > 0
                     && noteDoneInMillis > 0)
                 {

@@ -38,30 +38,25 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private GameObject gameObject;
 
-    private OverviewAreaPositionInSongIndicatorControl positionInSongIndicatorControl;
-    private OverviewAreaViewportIndicatorControl viewportIndicatorControl;
-    private OverviewAreaNoteVisualizer noteVisualizer;
-    private OverviewAreaIssueVisualizer issueVisualizer;
-
     private AudioWaveFormVisualization audioWaveFormVisualization;
     private ContextMenuControl contextMenuControl;
 
     public void OnInjectionFinished()
     {
         RegisterPointerEvents();
-        positionInSongIndicatorControl = injector
+        injector
             .WithRootVisualElement(overviewArea)
-            .CreateAndInject<OverviewAreaPositionInSongIndicatorControl>();
+            .CreateAndInject<OverviewAreaPositionIndicatorControl>();
 
-        viewportIndicatorControl = injector
+        injector
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<OverviewAreaViewportIndicatorControl>();
 
-        noteVisualizer = injector
+        injector
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<OverviewAreaNoteVisualizer>();
 
-        issueVisualizer = injector
+        injector
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<OverviewAreaIssueVisualizer>();
 
@@ -152,7 +147,7 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
     private void ScrollToPointer(IPointerEvent evt)
     {
         double xPercent = evt.localPosition.x / overviewArea.contentRect.width;
-        double positionInSongInMillis = songAudioPlayer.DurationOfSongInMillis * xPercent;
-        songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+        double positionInMillis = songAudioPlayer.DurationInMillis * xPercent;
+        songAudioPlayer.PositionInMillis = positionInMillis;
     }
 }

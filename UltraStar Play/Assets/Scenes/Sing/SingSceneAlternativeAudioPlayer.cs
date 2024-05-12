@@ -71,10 +71,10 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         songAudioPlayer.PlaybackStoppedEventStream
             .Subscribe(_ => PauseInstrumentalAndVocalsAudio())
             .AddTo(gameObject);
-        songAudioPlayer.JumpForwardInSongEventStream
+        songAudioPlayer.JumpForwardEventStream
             .Subscribe(_ => SyncAudioPosition())
             .AddTo(gameObject);
-        songAudioPlayer.JumpBackInSongEventStream
+        songAudioPlayer.JumpBackEventStream
             .Subscribe(_ => SyncAudioPosition())
             .AddTo(gameObject);
 
@@ -133,7 +133,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
     private void SyncAudioPosition()
     {
-        float songAudioPlayerTimeInSeconds = (float)songAudioPlayer.PositionInSongInSeconds;
+        float songAudioPlayerTimeInSeconds = (float)songAudioPlayer.PositionInSeconds;
         instrumentalAudioSource.time = songAudioPlayerTimeInSeconds;
         vocalsAudioSource.time = songAudioPlayerTimeInSeconds;
     }

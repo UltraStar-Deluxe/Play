@@ -16,16 +16,16 @@ public class NoteAreaDragControl : AbstractDragControl<NoteAreaDragEvent>
         int midiNoteDragStart = noteAreaControl.ScreenPixelPositionToMidiNote(generalDragEvent.ScreenCoordinateInPixels.StartPosition.y);
         int midiNoteDistance = 0;
 
-        int positionInSongInMillisDragStart = noteAreaControl.ScreenPixelPositionToMillis(generalDragEvent.ScreenCoordinateInPixels.StartPosition.x);
+        int positionInMillisDragStart = noteAreaControl.ScreenPixelPositionToMillis(generalDragEvent.ScreenCoordinateInPixels.StartPosition.x);
         int millisDistance = 0;
 
-        int positionInSongInBeatsDragStart = noteAreaControl.ScreenPixelPositionToBeat(generalDragEvent.ScreenCoordinateInPixels.StartPosition.x);
+        int positionInBeatsDragStart = noteAreaControl.ScreenPixelPositionToBeat(generalDragEvent.ScreenCoordinateInPixels.StartPosition.x);
         int beatDistance = 0;
 
         NoteAreaDragEvent result = new(generalDragEvent,
             midiNoteDragStart, midiNoteDistance,
-            positionInSongInMillisDragStart, millisDistance,
-            positionInSongInBeatsDragStart, beatDistance);
+            positionInMillisDragStart, millisDistance,
+            positionInBeatsDragStart, beatDistance);
 
         return result;
     }
@@ -37,16 +37,16 @@ public class NoteAreaDragControl : AbstractDragControl<NoteAreaDragEvent>
         int midiNoteDragStart = dragStartEvent.MidiNoteDragStart;
         int midiNoteDistance = (int)Mathf.Round(generalDragEvent.LocalCoordinateInPercent.Distance.y * noteAreaControl.ViewportHeight);
 
-        int positionInSongInMillisDragStart = dragStartEvent.PositionInSongInMillisDragStart;
+        int positionInMillisDragStart = dragStartEvent.PositionInMillisDragStart;
         int millisDistance = (int)Mathf.Round(generalDragEvent.LocalCoordinateInPercent.Distance.x * noteAreaControl.ViewportWidth);
 
-        int positionInSongInBeatsDragStart = dragStartEvent.PositionInSongInBeatsDragStart;
+        int positionInBeatsDragStart = dragStartEvent.PositionInBeatsDragStart;
         int beatDistance = (int)Mathf.Round(generalDragEvent.LocalCoordinateInPercent.Distance.x * noteAreaControl.ViewportWidthInBeats);
 
         NoteAreaDragEvent result = new(generalDragEvent,
             midiNoteDragStart, midiNoteDistance,
-            positionInSongInMillisDragStart, millisDistance,
-            positionInSongInBeatsDragStart, beatDistance);
+            positionInMillisDragStart, millisDistance,
+            positionInBeatsDragStart, beatDistance);
 
         return result;
     }

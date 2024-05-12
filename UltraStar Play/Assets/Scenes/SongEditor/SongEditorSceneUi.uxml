@@ -30,7 +30,7 @@
                     <ui:VisualElement name="noteAreaIssues" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
                     <ui:VisualElement name="noteAreaSelectionFrame" picking-mode="Ignore" style="background-color: rgba(21, 88, 219, 0.5); position: absolute; display: none;" />
                     <ui:VisualElement name="lastNoteAreaSelectionFrame" picking-mode="Ignore" style="background-color: rgba(21, 88, 219, 0.25); position: absolute; display: none; top: 0; height: 4px; width: 218px;" />
-                    <ui:VisualElement name="noteAreaPositionInSongIndicator" picking-mode="Ignore" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute; left: 100px;" />
+                    <ui:VisualElement name="noteAreaPositionIndicator" picking-mode="Ignore" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute; left: 100px;" />
                     <ui:VisualElement name="mitPitchIndicatorContainer" picking-mode="Ignore" style="width: 100%; height: 100%;">
                         <MaterialIcon name="micPitchOutOfRangeIndicatorTop" icon="mic" class="errorFontColor" style="position: absolute; top: 5px;" />
                         <MaterialIcon name="micPitchOutOfRangeIndicatorBottom" icon="mic" class="errorFontColor" style="position: absolute; bottom: 5px;" />
@@ -86,7 +86,7 @@
                 <ui:VisualElement name="overviewAreaNotes" style="position: absolute; height: 100%; width: 100%;" />
                 <ui:VisualElement name="overviewAreaIssues" style="position: absolute; height: 100%; width: 100%;" />
                 <ui:VisualElement name="overviewAreaViewportIndicator" style="position: absolute; height: 100%; width: 30px; background-color: rgba(125, 198, 233, 0.5);" />
-                <ui:VisualElement name="overviewAreaPositionInSongIndicator" style="position: absolute; height: 100%; width: 1px; background-color: rgb(255, 0, 0);" />
+                <ui:VisualElement name="overviewAreaPositionIndicator" style="position: absolute; height: 100%; width: 1px; background-color: rgb(255, 0, 0);" />
                 <ui:Label display-tooltip-when-elided="true" name="overviewAreaLabel" />
             </ui:VisualElement>
             <ui:VisualElement name="statusBar" class="panel" style="width: 100%; height: auto; border-bottom-width: 0; border-left-width: 0; border-right-width: 0; padding-left: 5px; padding-right: 5px; padding-top: 1px; padding-bottom: 1px; justify-content: space-between; align-items: center; flex-direction: row; flex-shrink: 0;">

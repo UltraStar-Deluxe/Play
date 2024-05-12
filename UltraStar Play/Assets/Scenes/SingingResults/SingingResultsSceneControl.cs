@@ -312,7 +312,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     {
         SingSceneData singSceneData = SceneNavigator.GetSceneData(new SingSceneData());
         singSceneData.SongMetas = sceneData.SongMetas;
-        singSceneData.PositionInSongInMillis = 0;
+        singSceneData.PositionInMillis = 0;
         sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 

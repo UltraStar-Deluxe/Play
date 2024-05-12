@@ -68,7 +68,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     [Inject]
     private VlcManager vlcManager;
 
-    public bool forceSyncOnForwardJumpInTheSong;
+    public bool ForceSyncOnForwardJump { get; set; }
 
     private SongMeta loadedSongMeta;
 
@@ -130,8 +130,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private float nextSyncTimeInSeconds;
 
-    private IDisposable jumpBackInSongEventStreamDisposable;
-    private IDisposable jumpForwardInSongEventStreamDisposable;
+    private IDisposable jumpBackEventStreamDisposable;
+    private IDisposable jumpForwardEventStreamDisposable;
 
     private bool freezeVideo;
     public bool FreezeVideo
@@ -187,11 +187,11 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     private void InitEventSubscriber()
     {
         // Jump backward in song
-        if (jumpBackInSongEventStreamDisposable != null)
+        if (jumpBackEventStreamDisposable != null)
         {
-            jumpBackInSongEventStreamDisposable.Dispose();
+            jumpBackEventStreamDisposable.Dispose();
         }
-        jumpBackInSongEventStreamDisposable = songAudioPlayer.JumpBackInSongEventStream
+        jumpBackEventStreamDisposable = songAudioPlayer.JumpBackEventStream
             .Subscribe(evt =>
             {
                 if (Math.Abs(evt.Previous - evt.Current) > 400)
@@ -202,13 +202,13 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             .AddTo(gameObject);
 
         // Jump forward in song
-        if (jumpForwardInSongEventStreamDisposable != null)
+        if (jumpForwardEventStreamDisposable != null)
         {
-            jumpForwardInSongEventStreamDisposable.Dispose();
+            jumpForwardEventStreamDisposable.Dispose();
         }
-        if (forceSyncOnForwardJumpInTheSong)
+        if (ForceSyncOnForwardJump)
         {
-            jumpForwardInSongEventStreamDisposable = songAudioPlayer.JumpForwardInSongEventStream
+            jumpForwardEventStreamDisposable = songAudioPlayer.JumpForwardEventStream
                 .Subscribe(evt =>
                 {
                     if (Math.Abs(evt.Previous - evt.Current) > 400)
@@ -339,7 +339,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         if ((!songAudioPlayerIsPlaying
              && IsPlaying)
             || (IsFullyLoaded
-                && DurationInMillis <= songAudioPlayer.PositionInSongInSeconds
+                && DurationInMillis <= songAudioPlayer.PositionInSeconds
                 && !IsLooping)
             || FreezeVideo)
         {
@@ -349,7 +349,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                  && !IsPlaying)
 
         {
-            if (!IsWaitingForVideoGap(songAudioPlayer.PositionInSongInMillis, loadedSongMeta.VideoGapInMillis))
+            if (!IsWaitingForVideoGap(songAudioPlayer.PositionInMillis, loadedSongMeta.VideoGapInMillis))
             {
                 PlayVideo();
                 SyncVideoPositionWithAudio(true);
@@ -365,8 +365,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        double positionInAudioInMillis = songAudioPlayer.PositionInSongInMillis;
-        double durationOfAudioInMillis = songAudioPlayer.DurationOfSongInMillis;
+        double positionInAudioInMillis = songAudioPlayer.PositionInMillis;
+        double durationOfAudioInMillis = songAudioPlayer.DurationInMillis;
         if (IsWaitingForVideoGap(positionInAudioInMillis, loadedSongMeta.VideoGapInMillis))
         {
             return;
@@ -409,10 +409,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     }
 
     // Returns true if still waiting for the start of the video at the given position in the song.
-    private bool IsWaitingForVideoGap(double positionInSongInMillis, double videoGapInMillis)
+    private bool IsWaitingForVideoGap(double positionInMillis, double videoGapInMillis)
     {
         // A negative video gap means this duration has to be waited before playing the video.
-        return videoGapInMillis < 0 && positionInSongInMillis < -videoGapInMillis;
+        return videoGapInMillis < 0 && positionInMillis < -videoGapInMillis;
     }
 
     public void ShowBackgroundImage(SongMeta songMeta)
@@ -542,7 +542,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             {
                 loadedSongMeta = songMeta;
                 DurationInMillis = currentVideoSupportProvider.DurationInMillis;
-                currentVideoSupportProvider.PositionInMillis = songAudioPlayer.PositionInSongInMillis;
+                currentVideoSupportProvider.PositionInMillis = songAudioPlayer.PositionInMillis;
                 currentVideoSupportProvider.SetTargetTexture(videoPlayer.targetTexture);
                 PlayVideo();
 

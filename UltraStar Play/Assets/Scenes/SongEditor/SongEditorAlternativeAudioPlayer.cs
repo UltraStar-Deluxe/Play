@@ -40,14 +40,14 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             }
             AudioSource.Play();
         });
-        songAudioPlayer.JumpBackInSongEventStream.Subscribe(_ => AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds);
-        songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds);
+        songAudioPlayer.JumpBackEventStream.Subscribe(_ => AudioSource.time = (float)songAudioPlayer.PositionInSeconds);
+        songAudioPlayer.JumpForwardEventStream.Subscribe(_ => AudioSource.time = (float)songAudioPlayer.PositionInSeconds);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => AudioSource.Pause());
-        songAudioPlayer.PositionInSongEventStream.Subscribe(_ =>
+        songAudioPlayer.PositionEventStream.Subscribe(_ =>
         {
             if (!songAudioPlayer.IsPlaying)
             {
-                AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds;
+                AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
             }
         });
         songAudioPlayer.PlaybackSpeedChangedEventStream.Subscribe(newValue => AudioUtils.SetPitchWithPitchShifter(AudioSource, (float)newValue));
@@ -92,7 +92,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         {
             AudioSource.Stop();
             AudioSource.clip = targetAudioClip;
-            AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds;
+            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
 
             if (songAudioPlayer.IsPlaying)
             {

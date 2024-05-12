@@ -61,7 +61,7 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        int songDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
+        int songDurationInMillis = (int)songAudioPlayer.DurationInMillis;
         if (songDurationInMillis <= 0)
         {
             // Song is not loaded yet

@@ -352,7 +352,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     private void GoToIssue(SongIssue issue)
     {
         double issueStartPositionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, issue.StartBeat);
-        songAudioPlayer.PositionInSongInMillis = issueStartPositionInMillis;
+        songAudioPlayer.PositionInMillis = issueStartPositionInMillis;
     }
 
     private void InitTabGroup()

@@ -494,7 +494,7 @@ public static partial class R
         public const string noteAreaNotes = "noteAreaNotes";
         public const string noteAreaNotesBackground = "noteAreaNotesBackground";
         public const string noteAreaNotesForeground = "noteAreaNotesForeground";
-        public const string noteAreaPositionInSongIndicator = "noteAreaPositionInSongIndicator";
+        public const string noteAreaPositionIndicator = "noteAreaPositionIndicator";
         public const string noteAreaSelectionFrame = "noteAreaSelectionFrame";
         public const string noteAreaSentences = "noteAreaSentences";
         public const string noteAreaWaveform = "noteAreaWaveform";
@@ -538,7 +538,7 @@ public static partial class R
         public const string overviewAreaIssues = "overviewAreaIssues";
         public const string overviewAreaLabel = "overviewAreaLabel";
         public const string overviewAreaNotes = "overviewAreaNotes";
-        public const string overviewAreaPositionInSongIndicator = "overviewAreaPositionInSongIndicator";
+        public const string overviewAreaPositionIndicator = "overviewAreaPositionIndicator";
         public const string overviewAreaRecordedAudioWaveform = "overviewAreaRecordedAudioWaveform";
         public const string overviewAreaSentences = "overviewAreaSentences";
         public const string overviewAreaViewportIndicator = "overviewAreaViewportIndicator";

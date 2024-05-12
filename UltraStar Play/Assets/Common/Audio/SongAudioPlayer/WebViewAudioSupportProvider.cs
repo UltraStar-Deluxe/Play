@@ -93,8 +93,8 @@ public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
 
     public override double PositionInMillis
     {
-        get => webViewManager.EstimatedPlaybackPositionInMillis;
-        set => webViewManager.SetPlaybackPositionInMillis(value);
+        get => webViewManager.EstimatedPositionInMillis;
+        set => webViewManager.SetPositionInMillis(value);
     }
 
     public override double DurationInMillis => webViewManager.DurationInMillis;

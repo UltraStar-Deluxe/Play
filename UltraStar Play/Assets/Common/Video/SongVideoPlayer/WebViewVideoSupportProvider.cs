@@ -74,8 +74,8 @@ public class WebViewVideoSupportProvider : AbstractVideoSupportProvider
 
     public override double PositionInMillis
     {
-        get => webViewManager.EstimatedPlaybackPositionInMillis;
-        set => webViewManager.SetPlaybackPositionInMillis(value);
+        get => webViewManager.EstimatedPositionInMillis;
+        set => webViewManager.SetPositionInMillis(value);
     }
 
     public override double DurationInMillis => webViewManager.DurationInMillis;

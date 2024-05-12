@@ -24,23 +24,23 @@ public class TimeBarControl : INeedInjection
     private double LateStartInSongInMillis => songMeta?.StartInMillis ?? 0;
     private double EarlyEndInSongInMillis => songMeta?.EndInMillis ?? 0;
 
-    public void UpdateTimeValueLabel(double positionInSongInMillis, double durationOfSongInMillis)
+    public void UpdateTimeValueLabel(double positionInMillis, double durationInMillis)
     {
-        if (positionInSongInMillis < 0
-            || durationOfSongInMillis <= 0)
+        if (positionInMillis < 0
+            || durationInMillis <= 0)
         {
             timeValueLabel.HideByVisibility();
             return;
         }
         timeValueLabel.ShowByVisibility();
 
-        double positionInSongConsideringStartTag = positionInSongInMillis - LateStartInSongInMillis;
-        double durationOfSongInMillisConsideringEndTag = EarlyEndInSongInMillis > 0
-            ? Math.Min(durationOfSongInMillis, EarlyEndInSongInMillis)
-            : durationOfSongInMillis;
-        double durationOfSongInMillisConsideringStartAndEndTag = durationOfSongInMillisConsideringEndTag - LateStartInSongInMillis;
+        double positionConsideringStartTag = positionInMillis - LateStartInSongInMillis;
+        double durationInMillisConsideringEndTag = EarlyEndInSongInMillis > 0
+            ? Math.Min(durationInMillis, EarlyEndInSongInMillis)
+            : durationInMillis;
+        double durationInMillisConsideringStartAndEndTag = durationInMillisConsideringEndTag - LateStartInSongInMillis;
 
-        double remainingTimeInSeconds = (durationOfSongInMillisConsideringStartAndEndTag - positionInSongConsideringStartTag) / 1000;
+        double remainingTimeInSeconds = (durationInMillisConsideringStartAndEndTag - positionConsideringStartTag) / 1000;
         if (remainingTimeInSeconds < 0)
         {
             timeValueLabel.SetTranslatedText(Translation.Of("00:00"));
@@ -54,23 +54,23 @@ public class TimeBarControl : INeedInjection
         timeValueLabel.SetTranslatedText(Translation.Of($"{minsPadding}{mins}:{secsPadding}{secs}"));
     }
 
-    public void UpdatePositionIndicator(double positionInSongInMillis, double durationOfSongInMillis)
+    public void UpdatePositionIndicator(double positionInMillis, double durationInMillis)
     {
-        double positionInSongConsideringStartTag = positionInSongInMillis - LateStartInSongInMillis;
-        double durationOfSongInMillisConsideringEndTag = EarlyEndInSongInMillis > 0
-            ? Math.Min(durationOfSongInMillis, EarlyEndInSongInMillis)
-            : durationOfSongInMillis;
-        double durationOfSongInMillisConsideringStartAndEndTag = durationOfSongInMillisConsideringEndTag - LateStartInSongInMillis;
+        double positionConsideringStartTag = positionInMillis - LateStartInSongInMillis;
+        double durationInMillisConsideringEndTag = EarlyEndInSongInMillis > 0
+            ? Math.Min(durationInMillis, EarlyEndInSongInMillis)
+            : durationInMillis;
+        double durationInMillisConsideringStartAndEndTag = durationInMillisConsideringEndTag - LateStartInSongInMillis;
 
-        float positionInPercent = (float)(100 * positionInSongConsideringStartTag / durationOfSongInMillisConsideringStartAndEndTag);
+        float positionInPercent = (float)(100 * positionConsideringStartTag / durationInMillisConsideringStartAndEndTag);
         timeBarPositionIndicator.style.width = new StyleLength(new Length(positionInPercent, LengthUnit.Percent));
     }
 
-    public void UpdateTimeBarRectangles(SongMeta songMeta, List<PlayerControl> playerControls, double durationOfSongInMillis)
+    public void UpdateTimeBarRectangles(SongMeta songMeta, List<PlayerControl> playerControls, double durationInMillis)
     {
         innerTimeBarSentenceEntryContainer.Clear();
 
-        if (durationOfSongInMillis <= 0)
+        if (durationInMillis <= 0)
         {
             return;
         }
@@ -78,12 +78,12 @@ public class TimeBarControl : INeedInjection
         int playerControlIndex = 0;
         foreach (PlayerControl playerControl in playerControls)
         {
-            CreateRectangles(songMeta, playerControl, durationOfSongInMillis, playerControlIndex, playerControls.Count);
+            CreateRectangles(songMeta, playerControl, durationInMillis, playerControlIndex, playerControls.Count);
             playerControlIndex++;
         }
     }
 
-    private void CreateRectangles(SongMeta songMeta, PlayerControl playerControl, double durationOfSongInMillis, int playerIndex, int playerCount)
+    private void CreateRectangles(SongMeta songMeta, PlayerControl playerControl, double durationInMillis, int playerIndex, int playerCount)
     {
         foreach (Sentence sentence in playerControl.Voice.Sentences)
         {
@@ -101,27 +101,27 @@ public class TimeBarControl : INeedInjection
                 float heightPercent = playerCount > 0 ? (100 / playerCount) : 100;
                 float topPercent = playerIndex * heightPercent;
                 MicProfile micProfile = playerControl.MicProfile;
-                CreateRectangle(micProfile, startPosInMillis, endPosInMillis, durationOfSongInMillis, topPercent, heightPercent);
+                CreateRectangle(micProfile, startPosInMillis, endPosInMillis, durationInMillis, topPercent, heightPercent);
             }
             else
             {
                 // Just show where the lyrics are, independent of the concrete player
-                CreateRectangle(null, startPosInMillis, endPosInMillis, durationOfSongInMillis, 0, 100);
+                CreateRectangle(null, startPosInMillis, endPosInMillis, durationInMillis, 0, 100);
             }
         }
     }
 
-    private void CreateRectangle(MicProfile micProfile, double startPosInMillis, double endPosInMillis, double durationOfSongInMillis, float topPercent, float heightPercent)
+    private void CreateRectangle(MicProfile micProfile, double startPosInMillis, double endPosInMillis, double durationInMillis, float topPercent, float heightPercent)
     {
-        double durationOfSongInMillisConsideringEndTag = EarlyEndInSongInMillis > 0
-            ? Math.Min(durationOfSongInMillis, EarlyEndInSongInMillis)
-            : durationOfSongInMillis;
-        double durationOfSongInMillisConsideringStartAndEndTag = durationOfSongInMillisConsideringEndTag - LateStartInSongInMillis;
+        double durationInMillisConsideringEndTag = EarlyEndInSongInMillis > 0
+            ? Math.Min(durationInMillis, EarlyEndInSongInMillis)
+            : durationInMillis;
+        double durationInMillisConsideringStartAndEndTag = durationInMillisConsideringEndTag - LateStartInSongInMillis;
         double startPosInMillisConsideringStartTag = startPosInMillis - LateStartInSongInMillis;
         double endPosInMillisConsideringStartTag = endPosInMillis - LateStartInSongInMillis;
 
-        float startPosPercentage = (float)(100 * startPosInMillisConsideringStartTag / durationOfSongInMillisConsideringStartAndEndTag);
-        float endPosPercentage = (float)(100 * endPosInMillisConsideringStartTag / durationOfSongInMillisConsideringStartAndEndTag);
+        float startPosPercentage = (float)(100 * startPosInMillisConsideringStartTag / durationInMillisConsideringStartAndEndTag);
+        float endPosPercentage = (float)(100 * endPosInMillisConsideringStartTag / durationInMillisConsideringStartAndEndTag);
 
         if (endPosPercentage < 0
             || startPosPercentage > 100)
