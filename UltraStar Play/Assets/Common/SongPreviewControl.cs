@@ -216,7 +216,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         VideoFadeIn.Value = 0;
         BackgroundImageFadeIn.Value = 0;
 
-        songVideoPlayer.LoadAndPlaySongVideoOrShowBackgroundImage(songMeta);
+        songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(songMeta);
     }
 
     protected virtual void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)

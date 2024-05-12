@@ -848,7 +848,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(SongMeta, WebViewUtils.CanHandleWebViewUrl);
             if (SongMetaUtils.ResourceExists(SongMeta, videoUri))
             {
-                songVideoPlayer.LoadAndPlaySongVideoOrShowBackgroundImage(SongMeta);
+                songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
             }
             else
             {

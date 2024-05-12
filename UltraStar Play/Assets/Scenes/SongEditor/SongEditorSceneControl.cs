@@ -167,7 +167,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         songAudioPlayer.PlaybackStoppedEventStream
             .Subscribe(_ => OnAudioPlaybackStopped());
 
-        songVideoPlayer.LoadAndPlaySongVideoOrShowBackgroundImage(SongMeta);
+        songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
 
         HideEditLyricsPopup();
 

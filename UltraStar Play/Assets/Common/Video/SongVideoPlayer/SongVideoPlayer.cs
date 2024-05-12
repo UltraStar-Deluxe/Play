@@ -466,7 +466,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             .Subscribe(evt => Debug.Log($"Loaded video: {evt.VideoUri}"));
     }
 
-    public void LoadAndPlaySongVideoOrShowBackgroundImage(SongMeta songMeta)
+    public void LoadAndPlayVideoOrShowBackgroundImage(SongMeta songMeta)
     {
         if (!HasVideoUri(songMeta)
             || IsSongVideoPlaybackDisabled())
