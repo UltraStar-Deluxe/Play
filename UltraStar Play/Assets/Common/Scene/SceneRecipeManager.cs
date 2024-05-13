@@ -95,9 +95,6 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
             }
         }
         UltraStarPlaySceneInjectionManager.FireSceneInjectionFinishedEvent(new SceneInjectionFinishedEvent(loadedSceneInjector));
-
-        // Apply theme to loaded UI
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(loadedSceneVisualElement);
     }
 
     public void UnloadScene()

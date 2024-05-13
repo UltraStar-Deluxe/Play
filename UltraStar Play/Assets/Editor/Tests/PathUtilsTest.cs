@@ -3,7 +3,7 @@
 public class PathUtilsTest
 {
     [Test]
-    public void ReplaceInvalidCharsTest()
+    public void ShouldReplaceInvalidCharacters()
     {
         Assert.AreEqual("C:\\dummy-path/invalid_-folder_-name", PathUtils.ReplaceInvalidPathChars(
             "C:\\dummy-path/invalid*-folder|-name", '_'));

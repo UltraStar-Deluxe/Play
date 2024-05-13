@@ -5,18 +5,18 @@ using UnityEngine.TestTools;
 
 public class WebViewTests : AbstractMediaFileFormatTests
 {
-    private static string[] shouldUseLocalAudioFilePrefixes = new string[]
+    private static string[] shouldUseLocalAudioFiles = new string[]
     {
-        "AudioUrlAndExistingAudio-",
+        "AudioUrlAndExistingAudio-TestSong.txt",
     };
 
-    private static string[] shouldUseWebViewFilePrefixes = new string[]
+    private static string[] shouldUseWebViewFiles = new string[]
     {
-        "AudioUrlAndMissingAudio-",
-        "AudioUrlOnly-",
-        "AudioOnly-",
-        "VideoUrlOnly-",
-        "WebsiteOnly-",
+        "AudioUrlAndMissingAudio-TestSong.txt",
+        "AudioUrlOnly-TestSong.txt",
+        "AudioOnly-TestSong.txt",
+        "VideoUrlOnly-TestSong.txt",
+        "WebsiteOnly-TestSong.txt",
     };
 
     protected override void ConfigureTestSettings(TestSettings settings)
@@ -28,16 +28,16 @@ public class WebViewTests : AbstractMediaFileFormatTests
     }
 
     [UnityTest]
-    public IEnumerator ShouldUseLocalAudioTest([ValueSource(nameof(shouldUseLocalAudioFilePrefixes))] string filePrefix)
+    public IEnumerator ShouldUseLocalAudioTest([ValueSource(nameof(shouldUseLocalAudioFiles))] string filePrefix)
     {
-        yield return WebViewFileTest(filePrefix, localFileTargetDurationInMillis);
-        Assert.AreNotEqual(EAudioSupportProvider.WebView, SongAudioPlayer.AudioSupportProvider);
+        yield return WebViewFileTest(filePrefix, LocalFileTargetDurationInMillis);
+        Assert.IsFalse(SongAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
     }
 
     [UnityTest]
-    public IEnumerator ShouldUseWebView([ValueSource(nameof(shouldUseWebViewFilePrefixes))] string filePrefix)
+    public IEnumerator ShouldUseWebView([ValueSource(nameof(shouldUseWebViewFiles))] string filePrefix)
     {
-        yield return WebViewFileTest(filePrefix, webViewTargetDurationInMillis);
-        Assert.AreEqual(EAudioSupportProvider.WebView, SongAudioPlayer.AudioSupportProvider);
+        yield return WebViewFileTest(filePrefix, WebViewTargetDurationInMillis);
+        Assert.IsTrue(SongAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
     }
 }

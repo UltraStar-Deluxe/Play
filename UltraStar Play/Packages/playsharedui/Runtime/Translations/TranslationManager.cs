@@ -32,7 +32,7 @@ public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, IS
         ApplyTranslations();
     }
 
-    public static void ApplyTranslations(VisualElement rootVisualElement = null)
+    public static void ApplyTranslations(VisualElement root = null)
     {
         TranslationManager translationManager = Instance;
         if (translationManager == null)
@@ -40,27 +40,27 @@ public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, IS
             return;
         }
 
-        rootVisualElement ??= translationManager.uiDocument.rootVisualElement;
+        root ??= translationManager.uiDocument.rootVisualElement;
 
-        Log.Debug(() => $"Apply translations starting from element '{rootVisualElement.name}'");
+        // using DisposableStopwatch d = new($"Apply translations to '{root.name}' in frame {Time.frameCount}");
 
-        rootVisualElement.Query<Label>().ForEach(label => ApplyTranslation(
+        root.Query<Label>().ForEach(label => ApplyTranslation(
             () => label.text,
             newValue => label.SetTranslatedText(newValue)));
 
-        rootVisualElement.Query<Button>().ForEach(button => ApplyTranslation(
+        root.Query<Button>().ForEach(button => ApplyTranslation(
             () => button.text,
             newValue => button.SetTranslatedText(newValue)));
 
-        rootVisualElement.Query<BaseField<object>>().ForEach(field => ApplyTranslation(
+        root.Query<BaseField<object>>().ForEach(field => ApplyTranslation(
             () => field.label,
             newValue => field.SetTranslatedLabel(newValue)));
 
-        rootVisualElement.Query<ItemPicker>().ForEach(itemPicker => ApplyTranslation(
-            () => itemPicker.Label,
-            newValue => itemPicker.SetTranslatedLabel(newValue)));
+        root.Query<Chooser>().ForEach(chooser => ApplyTranslation(
+            () => chooser.Label,
+            newValue => chooser.SetTranslatedLabel(newValue)));
 
-        rootVisualElement.Query<AccordionItem>().ForEach(accordionItem => ApplyTranslation(
+        root.Query<AccordionItem>().ForEach(accordionItem => ApplyTranslation(
             () => accordionItem.Title,
             newValue => accordionItem.SetTranslatedTitle(newValue)));
     }

@@ -26,7 +26,7 @@ public static class ArchUnitTestUtils
         // Log assemblies that are used in the tests
         string assemblyCsv = assemblies
             .Select(assembly => assembly.GetName().Name)
-            .ToCsv();
+            .JoinWith(", ");
         Debug.Log($"Loading {assemblies.Count} assembly as architecture for ArchUnit tests: {assemblyCsv}");
 
         // Create ArchUnit architecture object from assemblies

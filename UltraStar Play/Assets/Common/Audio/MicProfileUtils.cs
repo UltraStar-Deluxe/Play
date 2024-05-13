@@ -23,7 +23,7 @@ public static class MicProfileUtils
         {
             string micProfileNamesCsv = newMicProfiles
                 .Select(micProfile => micProfile.GetDisplayNameWithChannel())
-                .ToCsv();
+                .JoinWith(", ");
             Debug.Log($"Found new mics: {micProfileNamesCsv}");
             settings.MicProfiles.AddRange(newMicProfiles);
             settings.MicProfiles.Sort(MicProfile.compareByName);

@@ -96,11 +96,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new();
 
-    private double positionInSongInMillisWhenPlaybackStarted;
+    private double positionInMillisWhenPlaybackStarted;
 
     private bool audioWaveFormInitialized;
 
-    public double StopPlaybackAfterPositionInSongInMillis { get; set; }
+    public double StopPlaybackAfterPositionInMillis { get; set; }
 
     private readonly OverviewAreaControl overviewAreaControl = new();
     private readonly VideoAreaControl videoAreaControl = new();
@@ -143,11 +143,18 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private void Start()
     {
-        Debug.Log($"Start editing of '{SongMeta.Title}' at {sceneData.PositionInSongInMillis} ms.");
+        Debug.Log($"Start editing of '{SongMeta.Title}' at {sceneData.PositionInMillis} ms.");
 
         InitSongEditorStyleSheet();
 
-        songAudioPlayer.LoadAndPlaySongAudioAsObservable(SongMeta, sceneData.PositionInSongInMillis, false)
+        songAudioPlayer.LoadAndPlayAudioAsObservable(SongMeta, sceneData.PositionInMillis, false)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to load audio: {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
+            })
             // Subscribe to trigger the (cold) observable.
             .Subscribe(_ =>
             {
@@ -156,11 +163,12 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             .AddTo(gameObject);
 
         songAudioPlayer.PlaybackStartedEventStream
-            .Subscribe(positionInSongInMillis => OnAudioPlaybackStarted(positionInSongInMillis));
+            .Subscribe(positionInMillis => OnAudioPlaybackStarted(positionInMillis));
         songAudioPlayer.PlaybackStoppedEventStream
             .Subscribe(_ => OnAudioPlaybackStopped());
 
-        songVideoPlayer.LoadAndPlaySongVideoOrShowBackgroundImage(SongMeta);
+        songVideoPlayer.ForceSyncOnForwardJump = true;
+        songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
 
         HideEditLyricsPopup();
 
@@ -186,7 +194,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         createSingAlongSongControl.CreateSingAlongSongAsObservable(SongMeta, true)
             .Subscribe(evt =>
             {
-                Debug.Log($"Created sing-along data for song '{SongMetaUtils.GetArtistDashTitle(SongMeta)}'");
+                Debug.Log($"Created sing-along data for song '{SongMeta.GetArtistDashTitle()}'");
                 editorNoteDisplayer.ClearNoteControls();
                 songMetaChangeEventStream.OnNext(new NotesChangedEvent());
             });
@@ -279,11 +287,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     {
         // Automatically stop playback after a given threshold (e.g. only play the selected notes)
         if (songAudioPlayer.IsPlaying
-            && StopPlaybackAfterPositionInSongInMillis > 0
-            && songAudioPlayer.PositionInSongInMillis > StopPlaybackAfterPositionInSongInMillis)
+            && StopPlaybackAfterPositionInMillis > 0
+            && songAudioPlayer.PositionInMillis > StopPlaybackAfterPositionInMillis)
         {
             songAudioPlayer.PauseAudio();
-            StopPlaybackAfterPositionInSongInMillis = 0;
+            StopPlaybackAfterPositionInMillis = 0;
         }
 
         lyricsAreaControl.Update();
@@ -301,13 +309,13 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
                                             invertedGoToLastPlaybackPositionBehavior);
         if (goToLastPlaybackPosition)
         {
-            songAudioPlayer.PositionInSongInMillis = positionInSongInMillisWhenPlaybackStarted;
+            songAudioPlayer.PositionInMillis = positionInMillisWhenPlaybackStarted;
         }
     }
 
-    private void OnAudioPlaybackStarted(double positionInSongInMillis)
+    private void OnAudioPlaybackStarted(double positionInMillis)
     {
-        positionInSongInMillisWhenPlaybackStarted = positionInSongInMillis;
+        positionInMillisWhenPlaybackStarted = positionInMillis;
     }
 
     public List<Note> GetAllVisibleNotes()
@@ -350,7 +358,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             singSceneData.SingScenePlayerData.SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles;
             singSceneData.SingScenePlayerData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
         }
-        singSceneData.PositionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
+        singSceneData.PositionInMillis = songAudioPlayer.PositionInMillis;
         sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 

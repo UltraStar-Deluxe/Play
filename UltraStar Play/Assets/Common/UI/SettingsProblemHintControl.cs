@@ -25,9 +25,10 @@ public class SettingsProblemHintControl
 
     public static List<Translation> GetAllSettingsProblems(
         Settings settings,
-        ModManager modManager)
+        ModManager modManager,
+        SongIssueManager songIssueManager)
     {
-        return GetSongLibrarySettingsProblems(settings)
+        return GetSongLibrarySettingsProblems(settings, songIssueManager)
             .Concat(GetRecordingSettingsProblems(settings))
             .Concat(GetPlayerSettingsProblems(settings))
             .Concat(GetModSettingsProblems(modManager))
@@ -45,7 +46,7 @@ public class SettingsProblemHintControl
         return result;
     }
 
-    public static List<Translation> GetSongLibrarySettingsProblems(Settings settings)
+    public static List<Translation> GetSongLibrarySettingsProblems(Settings settings, SongIssueManager songIssueManager)
     {
         List<Translation> result = new();
         if (settings.SongDirs.IsNullOrEmpty())
@@ -57,7 +58,7 @@ public class SettingsProblemHintControl
             result.Add(Translation.Get(R.Messages.settingsProblem_songFolderDoesNotExist));
         }
 
-        if (SongIssueManager.HasSongIssues)
+        if (songIssueManager.HasSongIssues)
         {
             result.Add(Translation.Get(R.Messages.settingsProblem_thereAreSongIssues));
         }

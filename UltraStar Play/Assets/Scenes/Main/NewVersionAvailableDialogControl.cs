@@ -40,8 +40,6 @@ public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInj
         remoteVersionProperties.TryGetValue("release", out remoteRelease);
         remoteVersionProperties.TryGetValue("name", out releaseName);
         remoteVersionProperties.TryGetValue("website_link", out websiteLink);
-
-        TranslationManager.ApplyTranslations(dialogRootVisualElement);
     }
 
     public override void OnInjectionFinished()

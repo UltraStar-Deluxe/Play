@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class UltraStarSongVoicesParser
 {
+    private static readonly char[] noteSegmentSeparators = { ' ' };
+
     private readonly StreamReader streamReader;
     private readonly bool isRelativeSongFormat;
     private readonly string filePath;
@@ -216,9 +218,8 @@ public class UltraStarSongVoicesParser
 
     private Note CreateNote(string line)
     {
-        char[] splitChars = { ' ' };
-        string[] data = line.Split(splitChars, 5);
-        if (data.Length < 5)
+        List<string> data = ParseNoteSegments(line);
+        if (data.Count < 5)
         {
             throw new UltraStarSongParserException(GetIncompleteNoteErrorMessage(line));
         }
@@ -250,6 +251,51 @@ public class UltraStarSongVoicesParser
             txtPitch,
             lyrics
         );
+    }
+
+    private List<string> ParseNoteSegments(string line)
+    {
+        if (line.IsNullOrEmpty())
+        {
+            return new List<string>();
+        }
+
+        StringBuilder currentStringBuilder = new StringBuilder();
+        List<StringBuilder> stringBuilders = new() { currentStringBuilder };
+        for (int i = 0; i < line.Length; i++)
+        {
+            char c = line[i];
+            switch (c)
+            {
+                case ' ':
+                    if (stringBuilders.Count < 4)
+                    {
+                        // Still looking for more parts
+                        if (currentStringBuilder.Length > 0)
+                        {
+                            currentStringBuilder = new StringBuilder();
+                            stringBuilders.Add(currentStringBuilder);
+                        }
+                    }
+                    else if (currentStringBuilder.Length > 0)
+                    {
+                        // Found all parts, the rest is lyrics
+                        currentStringBuilder = new StringBuilder();
+                        stringBuilders.Add(currentStringBuilder);
+                        for (i++; i < line.Length; i++)
+                        {
+                            currentStringBuilder.Append(line[i]);
+                        }
+                    }
+                    break;
+                default:
+                    currentStringBuilder.Append(c);
+                    break;
+            }
+        }
+        return stringBuilders
+            .Select(stringBuilder => stringBuilder.ToString())
+            .ToList();
     }
 
     private static string GetIncompleteNoteErrorMessage(string line)

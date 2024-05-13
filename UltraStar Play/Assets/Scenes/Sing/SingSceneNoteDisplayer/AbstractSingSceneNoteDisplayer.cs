@@ -484,7 +484,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         return new Vector2(yStart, yEnd);
     }
 
-    public virtual float GetXInPercent(double positionInSongInMillis)
+    public virtual float GetXInPercent(double positionInMillis)
     {
         return 0;
     }

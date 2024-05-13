@@ -4,14 +4,10 @@ using UnityEngine;
 [Serializable]
 public class SongIssue
 {
-    public static readonly Comparison<SongIssue> compareBySongMetaPath =
-        (a, b) => string.Compare(
-            SongMetaUtils.GetAbsoluteSongMetaFilePath(a.SongMeta),
-            SongMetaUtils.GetAbsoluteSongMetaFilePath(b.SongMeta), StringComparison.InvariantCulture);
     public static readonly Comparison<SongIssue> compareBySongMetaArtistAndTitle =
         (a, b) => string.Compare(
-            SongMetaUtils.GetArtistDashTitle(a.SongMeta),
-            SongMetaUtils.GetArtistDashTitle(b.SongMeta), StringComparison.InvariantCulture);
+            a.SongMeta.GetArtistDashTitle(),
+            b.SongMeta.GetArtistDashTitle(), StringComparison.InvariantCulture);
 
     public SongIssueData SongIssueData { get; private set; }
     public SongMeta SongMeta => SongIssueData?.SongMeta;
@@ -64,7 +60,7 @@ public class SongIssue
         string beatRangeInfo = StartBeat >= 0 && EndBeat >= 0
             ? $" (from beat {StartBeat}, until beat {EndBeat})"
             : "";
-        string songMetaInfo = $" (in song '{SongMetaUtils.GetArtistDashTitle(SongMeta)}')";
+        string songMetaInfo = $" (in song '{SongMeta.GetArtistDashTitle()}')";
         string logMessage = $"{Message}{beatRangeInfo}{songMetaInfo}";
         if (Severity == ESongIssueSeverity.Warning)
         {

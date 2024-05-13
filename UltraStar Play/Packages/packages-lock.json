@@ -63,6 +63,15 @@
       "dependencies": {},
       "hash": "abb643e689195bb4f1fb57ec013da680b141007d"
     },
+    "com.bsigame.visualelementevents": {
+      "version": "https://github.com/BSimonSweet/Unity-VisualElementEvents.git#cc25fdb9a6927632773e8f77e4587a3628ec1722",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.mono-cecil": "1.10.2"
+      },
+      "hash": "cc25fdb9a6927632773e8f77e4587a3628ec1722"
+    },
     "com.community.netcode.transport.facepunch": {
       "version": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.facepunch",
       "depth": 0,
@@ -134,6 +143,18 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.dt.app-ui": {
+      "version": "1.1.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.androidjni": "1.0.0",
+        "com.unity.modules.uielements": "1.0.0",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.modules.screencapture": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.ext.nunit": {
       "version": "2.0.5",
       "depth": 0,
@@ -195,6 +216,13 @@
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.4",
       "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.2.1",
+      "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -363,6 +391,13 @@
       "source": "git",
       "dependencies": {},
       "hash": "2ee62e21eded65257454d14d545f5db7484743b0"
+    },
+    "jillejr.newtonsoft.json-for-unity.converters": {
+      "version": "https://github.com/applejag/Newtonsoft.Json-for-Unity.Converters.git#1.6.3",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "464cdbbabb67661751cb73fd39c4e99e5b5eedb0"
     },
     "nuget.castle-core": {
       "version": "2.0.0",

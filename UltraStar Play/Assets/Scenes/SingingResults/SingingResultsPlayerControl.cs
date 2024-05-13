@@ -180,7 +180,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
 
     private void PlaySingingResultsRatingPopupSound()
     {
-        AudioManager.PlaySingingResultsRatingPopupSound();
+        SfxManager.PlaySingingResultsRatingPopupSound();
     }
 
     private void ResetScoreRowLabelTexts()
@@ -305,7 +305,6 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
         normalNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).SetTranslatedText(Translation.Get(R.Messages.score_notes));
         goldenNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).SetTranslatedText(Translation.Get(R.Messages.score_goldenNotes));
         phraseBonusScoreContainer.Q<Label>(R.UxmlNames.scoreName).SetTranslatedText(Translation.Get(R.Messages.score_perfectSentenceBonus));
-        TranslationManager.ApplyTranslations(visualElement);
     }
 
     private void SetScoreRowLabelText(VisualElement container, float interpolatedValue)

@@ -56,7 +56,7 @@ public static class UltraStarSongParser
         if (logIssues)
         {
             // Log issues
-            songIssues.ForEach(songIssue => Debug.LogWarning($"{songIssue.Message} in song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'"));
+            songIssues.ForEach(songIssue => Debug.LogWarning($"{songIssue.Message} in song '{songMeta.GetArtistDashTitle()}'"));
         }
 
         // Lazy load voices
@@ -260,8 +260,8 @@ public static class UltraStarSongParser
 
     private static bool TryParseHeaderField(string line, out string key, out string value)
     {
-        key = null;
-        value = null;
+        key = "";
+        value = "";
         if (line.IsNullOrEmpty()
             || !line.StartsWith('#'))
         {
@@ -277,7 +277,7 @@ public static class UltraStarSongParser
         key = line.Substring(1, indexOfSeparator -1).Trim();
         value = line.Substring(indexOfSeparator + 1, line.Length - indexOfSeparator - 1).Trim();
 
-        return !key.IsNullOrEmpty();
+        return !key.IsNullOrEmpty() && !value.IsNullOrEmpty();
     }
 
     private static void NormalizeHeaderFields(Dictionary<string, string> headerFields)

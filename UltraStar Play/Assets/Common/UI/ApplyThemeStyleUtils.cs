@@ -155,7 +155,10 @@ public static class ApplyThemeStyleUtils
 
     private static void OnListViewSelectionChanged(ListViewH listView, IEnumerable<object> selectedObjects)
     {
-        VisualElement oldSelectedVisualElement = listViewToSelectedVisualElement[listView];
+        if (!listViewToSelectedVisualElement.TryGetValue(listView, out VisualElement oldSelectedVisualElement))
+        {
+            return;
+        }
         SetListViewItemActive(listView, oldSelectedVisualElement, false);
 
         VisualElement newSelectedVisualElement = listView.GetSelectedVisualElement();
@@ -593,9 +596,9 @@ public static class ApplyThemeStyleUtils
                 {
                     ApplyTextShadow(label, textShadowConfig);
                 }
-                else if (visualElement is ItemPicker itemPicker)
+                else if (visualElement is Chooser chooser)
                 {
-                    ApplyTextShadow(itemPicker.LabelElement, textShadowConfig);
+                    ApplyTextShadow(chooser.LabelElement, textShadowConfig);
                 }
                 else
                 {

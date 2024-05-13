@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using FullSerializer;
+using Newtonsoft.Json;
 using UnityEngine;
 
 [Serializable]
@@ -16,9 +16,10 @@ public abstract class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         Failed,
     }
 
+    [JsonIgnore]
     public virtual Action DoLoadSong { get; set; }
 
-    [fsIgnore]
+    [JsonIgnore]
     public ELoadSongPhase LoadSongPhase { get; private set; }
 
     private bool hasSetFileInfo;
@@ -435,7 +436,7 @@ public abstract class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         {
             LoadSongPhase = ELoadSongPhase.Failed;
             Debug.LogException(ex);
-            Debug.LogError($"Failed load song '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
+            Debug.LogError($"Failed load song '{this.GetArtistDashTitle()}': {ex.Message}");
             return;
         }
 

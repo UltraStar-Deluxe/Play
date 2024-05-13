@@ -75,6 +75,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private Settings settings;
 
     [Inject]
+    private UiManager uiManager;
+
+    [Inject]
     private UIDocument uiDocument;
 
     [Inject]
@@ -122,23 +125,17 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         ContextMenuControl.AnyContextMenuOpenedEventStream
             .Subscribe(contextMenuPopupControl => ApplyThemeToContextMenuPopup(contextMenuPopupControl));
 
-        // Apply theme specific styles for new dialogs
-        AbstractDialogControl.DialogInjectionFinishedEventStream
-            .Subscribe(dialogControl =>
-            {
-                // Apply theme specific styles now and in the next frame because the dialog may be changed after instantiation.
-                ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);
-                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
-                    () => ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement)));
-            })
-            .AddTo(gameObject);
+        uiManager.ChildrenChangedEventStream
+            .Subscribe(evt => ApplyStyles(evt.targetChild));
+        ApplyStyles(uiDocument.rootVisualElement);
     }
 
     private void ApplyThemeToContextMenuPopup(ContextMenuPopupControl contextMenuPopupControl)
     {
         VisualElement root = contextMenuPopupControl.VisualElement;
         ThemeJson themeJson = GetCurrentTheme()?.ThemeJson;
-        if (themeJson == null)
+        if (themeJson == null
+            || root == null)
         {
             return;
         }
@@ -153,7 +150,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void OnSceneChanged()
     {
+        ApplyThemeStyleUtils.ClearCache();
         registeredSfxVisualElements.Clear();
+        alreadyProcessedVisualElements.Clear();
         ApplyThemeBackground(GetCurrentTheme());
     }
 
@@ -178,7 +177,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (isDropdownMenuOpened)
         {
             isDropdownMenuOpened = false;
-            ApplyThemeSpecificStylesToVisualElements(uiDocument.rootVisualElement.focusController.focusedElement as VisualElement);
+            VisualElement dropdownParent = uiDocument.rootVisualElement.focusController.focusedElement as VisualElement;
+            if (dropdownParent == null)
+            {
+                return;
+            }
+
+            alreadyProcessedVisualElements.Remove(dropdownParent);
+            ApplyStyles(dropdownParent);
         }
     }
 
@@ -257,9 +263,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
         {
-            alreadyProcessedVisualElements.Clear();
             ApplyThemeBackground(themeMeta);
-            ApplyThemeSpecificStylesToVisualElements(uiDocument.rootVisualElement);
+            alreadyProcessedVisualElements.Clear();
+            ApplyStyles(uiDocument.rootVisualElement);
             anyThemeLoaded = true;
         }));
     }
@@ -707,7 +713,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         if (defaultThemeMeta == null)
         {
-            string availableThemeMetasCsv = GetThemeMetas().Select(themeMeta => themeMeta.FileNameWithoutExtension).ToCsv();
+            string availableThemeMetasCsv = GetThemeMetas().Select(themeMeta => themeMeta.FileNameWithoutExtension).JoinWith(", ");
             Debug.LogError($"Default theme '{DefaultThemeName}' not found. Available themes: {availableThemeMetasCsv}");
         }
 
@@ -737,37 +743,26 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         ResolveThemeMetaUtils.ResolveThemes(themeMetas);
 
-        string themeNamesCsv = themeMetas.Select(themeMeta => themeMeta.FileNameWithoutExtension).ToCsv();
+        string themeNamesCsv = themeMetas.Select(themeMeta => themeMeta.FileNameWithoutExtension).JoinWith(", ");
         Debug.Log($"Found {themeMetas.Count} themes: {themeNamesCsv}");
 
         return themeMetas;
     }
 
-    public static void ApplyThemeSpecificStylesToVisualElements(VisualElement root)
+    private void ApplyStyles(VisualElement root = null)
     {
-        if (root == null)
-        {
-            return;
-        }
-
-        ThemeManager themeManager = Instance;
-        if (themeManager != null)
-        {
-            themeManager.DoApplyThemeSpecificStylesToVisualElements(root);
-        }
-    }
-
-    private void DoApplyThemeSpecificStylesToVisualElements(VisualElement root)
-    {
+        root ??= uiDocument.rootVisualElement;
         if (!applyThemeSpecificStyles
             // Settings can be null when running a specific scene in the Unity editor
             // and injection did not finish yet.
-            || settings == null)
+            || settings == null
+            || alreadyProcessedVisualElements.Contains(root))
         {
             return;
         }
+        alreadyProcessedVisualElements.Add(root);
 
-        // using DisposableStopwatch d = new("ThemeManager.DoApplyThemeSpecificStylesToVisualElements");
+        // using DisposableStopwatch d = new($"Apply styles to '{root.name}' in frame {Time.frameCount}");
 
         if (!settings.EnableDynamicThemes)
         {
@@ -788,29 +783,19 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             Debug.LogWarning("Not applying theme styles because current theme is null");
             return;
         }
-        ThemeJson themeJson = themeMeta.ThemeJson;
-
-        // if (!themeJson.styleSheets.IsNullOrEmpty())
-        // {
-        //     // Do not set inline styles when Style Sheets are used.
-        //     Log.Debug(() => "Not applying theme styles as inline styles because style sheets are used.");
-        //     return;
-        // }
-
-        ControlStyleConfig defaultControlStyleConfig = themeMeta.ThemeJson.defaultControl;
 
         // Scene specific elements
-        ApplyThemeSpecificStylesToVisualElements(root, GetCurrentScene());
+        ApplySceneSpecificStyles(themeMeta, root, GetCurrentScene());
 
-        // Basic font colors
-        ApplyThemeStyleUtils.ApplyPrimaryFontColor(themeJson.primaryFontColor, root);
-        ApplyThemeStyleUtils.ApplySecondaryFontColor(themeJson.secondaryFontColor, root);
-        ApplyThemeStyleUtils.ApplyWarningFontColor(themeJson.warningFontColor, root);
-        ApplyThemeStyleUtils.ApplyErrorFontColor(themeJson.errorFontColor, root);
+        // Text styles
+        ApplyTextStyles(themeMeta, root);
 
-        // Text shadow of elements without a background
-        ApplyThemeStyleUtils.ApplyNoBackgroundInHierarchyTextShadow(themeJson.noBackgroundInHierarchyTextShadow, root);
+        // Control styles
+        ApplyControlStyles(themeMeta, root);
+    }
 
+    private void ApplyControlStyles(ThemeMeta themeMeta, VisualElement root)
+    {
         // Buttons
         root.Query<Button>().ForEach(button =>
         {
@@ -820,10 +805,12 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             RegisterDefaultButtonSfxCallback(button);
         });
 
-        // ItemPickers
+        // Choosers
+        ControlStyleConfig defaultControlStyleConfig = themeMeta.ThemeJson.defaultControl;
+
         if (defaultControlStyleConfig != null)
         {
-            root.Query(null, "itemPickerControlsRow").ForEach(controlsRow =>
+            root.Query(null, "chooserControlsRow").ForEach(controlsRow =>
             {
                 defaultControlStyleConfig.backgroundColor.IfNotDefault(backgroundColor =>
                 {
@@ -933,6 +920,18 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         });
     }
 
+    private void ApplyTextStyles(ThemeMeta themeMeta, VisualElement root)
+    {
+        ThemeJson themeJson = themeMeta.ThemeJson;
+        ApplyThemeStyleUtils.ApplyPrimaryFontColor(themeJson.primaryFontColor, root);
+        ApplyThemeStyleUtils.ApplySecondaryFontColor(themeJson.secondaryFontColor, root);
+        ApplyThemeStyleUtils.ApplyWarningFontColor(themeJson.warningFontColor, root);
+        ApplyThemeStyleUtils.ApplyErrorFontColor(themeJson.errorFontColor, root);
+
+        // Text shadow of elements without a background
+        ApplyThemeStyleUtils.ApplyNoBackgroundInHierarchyTextShadow(themeJson.noBackgroundInHierarchyTextShadow, root);
+    }
+
     private void RegisterDefaultButtonSfxCallback(VisualElement visualElement)
     {
         if (registeredSfxVisualElements.Contains(visualElement))
@@ -942,11 +941,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         if (visualElement is Button button)
         {
-            button.RegisterCallbackButtonTriggered(_ => AudioManager.PlayButtonSound());
+            button.RegisterCallbackButtonTriggered(_ => SfxManager.PlayButtonSound());
         }
         else if (visualElement is Toggle toggle)
         {
-            toggle.RegisterValueChangedCallback(_ => AudioManager.PlayButtonSound());
+            toggle.RegisterValueChangedCallback(_ => SfxManager.PlayButtonSound());
         }
     }
 
@@ -1039,15 +1038,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         visualElement.RegisterCallback<PointerDownEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
     }
 
-    private void ApplyThemeSpecificStylesToVisualElements(
+    private void ApplySceneSpecificStyles(
+        ThemeMeta themeMeta,
         VisualElement root,
         EScene currentScene)
     {
-        ThemeMeta currentThemeMeta = GetCurrentTheme();
-
         if (currentScene is EScene.SingScene)
         {
-            currentThemeMeta.ThemeJson.lyricsContainerGradient.IfNotNull(gradient =>
+            themeMeta.ThemeJson.lyricsContainerGradient.IfNotNull(gradient =>
                 root.Query(null, "lyricsContainer").ForEach(element =>
                 {
                     element.style.backgroundImage = GradientManager.GetGradientTexture(gradient);
@@ -1057,7 +1055,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         if (currentScene is EScene.SongSelectScene)
         {
-            currentThemeMeta.ThemeJson.videoPreviewColor.IfNotDefault(color =>
+            themeMeta.ThemeJson.videoPreviewColor.IfNotDefault(color =>
             {
                 root.Query(R.UxmlNames.songPreviewVideoImage).ForEach(element =>
                 {
@@ -1072,7 +1070,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         List<string> ignoredUxmlNamesAndUssClasses = new ()
         {
-            "hiddenContinueButton"
+            "hiddenContinueButton",
+            "contextMenuButton",
         };
 
         foreach (string excludedNameOrClass in ignoredUxmlNamesAndUssClasses)

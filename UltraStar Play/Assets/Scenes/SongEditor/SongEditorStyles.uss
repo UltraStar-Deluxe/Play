@@ -259,7 +259,7 @@ SongEditorSideBarGroup > .unity-button {
     padding-bottom: 2px;
 }
 
-SongEditorSideBarGroup > ItemPicker {
+SongEditorSideBarGroup > Chooser {
     margin-bottom: 8px;
 }
 

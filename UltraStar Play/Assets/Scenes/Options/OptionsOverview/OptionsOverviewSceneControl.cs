@@ -103,6 +103,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
     private ModManager modManager;
 
     [Inject]
+    private SongIssueManager songIssueManager;
+
+    [Inject]
     private Injector injector;
 
     [Inject]
@@ -258,10 +261,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         openSteamWorkshopButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty());
         updateSteamWorkshopItemsButton.SetVisibleByDisplay(openSteamWorkshopButton.IsVisibleByDisplay());
 
-        // Apply theme and translations to loaded UI
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(loadedSceneVisualElement);
-        TranslationManager.ApplyTranslations(loadedSceneVisualElement);
-
         // Scroll with mouse drag
         MouseEventScrollControl.RegisterMouseScrollEvents();
 
@@ -291,7 +290,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
     {
         SettingsProblemHintControl songSettingsProblemHintControl = new(
             songSettingsProblemHintIcon,
-            SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings));
+            SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songIssueManager));
 
         SettingsProblemHintControl recordingSettingsProblemHintControl = new(
             recordingSettingsProblemHintIcon,
@@ -307,7 +306,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
         StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.5f, () =>
         {
-            songSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings));
+            songSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songIssueManager));
             recordingSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetRecordingSettingsProblems(settings));
             playerProfileSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetPlayerSettingsProblems(settings));
             modSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetModSettingsProblems(modManager));
@@ -409,7 +408,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
             issuesDialogControl = null;
             issuesButton.Focus();
         });
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(issuesDialogControl.DialogRootVisualElement);
     }
 
     private void OnDestroy()

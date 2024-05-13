@@ -45,7 +45,7 @@ public class LoadSongsOnDemandTests : AbstractPlayModeTest
     }
 
     [UnityTest]
-    public IEnumerator LoadSongsOnDemandTest() => IgnoreFailingMessages()
+    public IEnumerator ShouldLoadSongsOnDemand() => IgnoreFailingMessages()
         .ContinueWith(_ => ExpectSongScanFinished())
         .ContinueWith(_ => ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount))
         .ContinueWith(_ => SelectNextSong())

@@ -370,7 +370,7 @@ public static class VisualElementExtensions
 
         StringBuilder sb = new();
         sb.Append(indent);
-        sb.Append($"<{root.GetType().Name} name=\"{root.name}\" class=\"{root.GetClasses().ToCsv(" ", "", "")}\"");
+        sb.Append($"<{root.GetType().Name} name=\"{root.name}\" class=\"{root.GetClasses().JoinWith(" ")}\"");
         if (root.childCount > 0)
         {
             sb.Append(">\n");

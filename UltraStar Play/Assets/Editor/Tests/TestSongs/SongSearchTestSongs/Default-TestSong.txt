@@ -1,4 +1,4 @@
-﻿#TITLE:SomeTitle
+﻿#TITLE:Default-TestSong
 #ARTIST:SomeArtist
 #MP3:4s-TestAudio.ogg
 #BPM:200

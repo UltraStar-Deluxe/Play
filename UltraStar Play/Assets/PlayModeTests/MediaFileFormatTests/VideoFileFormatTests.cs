@@ -1,84 +1,41 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine.TestTools;
 
 public class VideoFileFormatTests : AbstractMediaFileFormatTests
 {
-    /////////////////////////////////////////////////////////
-    // Video formats supported by Unity at runtime
-    /////////////////////////////////////////////////////////
+    private static readonly List<TestCaseData> fileNamesWithVideoSupportedByUnity = new List<TestCaseData>()
+    {
+        new TestCaseData("avi-TestSong.txt").Returns(null),
+        new TestCaseData("mp4-TestSong.txt").Returns(null),
+        new TestCaseData("mp4-av1-TestSong.txt").Returns(null),
+        new TestCaseData("mp4-hvec-TestSong.txt").Returns(null),
+        new TestCaseData("webm-vp8-TestSong.txt").Returns(null),
+    };
+
+    private static readonly List<TestCaseData> fileNamesWithVideoSupportedByThirdPartyLib = new List<TestCaseData>()
+    {
+        new TestCaseData("f4v-TestSong.txt").Returns(null),
+        new TestCaseData("flv-TestSong.txt").Returns(null),
+        new TestCaseData("mkv-TestSong.txt").Returns(null),
+        new TestCaseData("mov-TestSong.txt").Returns(null),
+        new TestCaseData("mpeg2-TestSong.txt").Returns(null),
+        new TestCaseData("webm-vp9-TestSong.txt").Returns(null),
+        new TestCaseData("wmv-TestSong.txt").Returns(null),
+    };
 
     [UnityTest]
-    public IEnumerator AviTest()
+    [TestCaseSource(nameof(fileNamesWithVideoSupportedByUnity))]
+    public IEnumerator ShouldLoadUnitySupportedVideo(string txtFileName)
     {
-        yield return VideoFileTest("avi-");
+        yield return ShouldLoadVideoFile(txtFileName);
     }
 
     [UnityTest]
-    public IEnumerator Mp4Test()
+    [TestCaseSource(nameof(fileNamesWithVideoSupportedByThirdPartyLib))]
+    public IEnumerator ShouldLoadThirdPartyLibSupportedVideo(string txtFileName)
     {
-        yield return VideoFileTest("mp4-");
-    }
-
-    [UnityTest]
-    public IEnumerator Mp4Av1Test()
-    {
-        yield return VideoFileTest("mp4-av1-");
-    }
-
-    [UnityTest]
-    public IEnumerator Mp4HvecTest()
-    {
-        yield return VideoFileTest("mp4-hvec-");
-    }
-
-    [UnityTest]
-    public IEnumerator WebmVp8Test()
-    {
-        yield return VideoFileTest("webm-vp8-");
-    }
-
-    /////////////////////////////////////////////////////////
-    // common video formats supported by ffmpeg
-    /////////////////////////////////////////////////////////
-    [UnityTest]
-    public IEnumerator F4vTest()
-    {
-        yield return VideoFileTest("f4v-");
-    }
-
-    [UnityTest]
-    public IEnumerator FlvTest()
-    {
-        yield return VideoFileTest("flv-");
-    }
-
-    [UnityTest]
-    public IEnumerator MkvTest()
-    {
-        yield return VideoFileTest("mkv-");
-    }
-
-    [UnityTest]
-    public IEnumerator MovTest()
-    {
-        yield return VideoFileTest("mov-");
-    }
-
-    [UnityTest]
-    public IEnumerator Mpeg2Test()
-    {
-        yield return VideoFileTest("mpeg2-");
-    }
-
-    [UnityTest]
-    public IEnumerator WebVp9Test()
-    {
-        yield return VideoFileTest("webm-vp9-");
-    }
-
-    [UnityTest]
-    public IEnumerator WmvTest()
-    {
-        yield return VideoFileTest("wmv-");
+        yield return ShouldLoadVideoFile(txtFileName);
     }
 }

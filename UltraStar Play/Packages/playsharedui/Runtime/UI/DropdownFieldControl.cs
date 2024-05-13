@@ -27,24 +27,37 @@ public class DropdownFieldControl<T>
                     .Select(item => itemToString(item))
                     .ToList();
             }
-            
+
             if (items.IsNullOrEmpty()
-                || !items.Contains(SelectedItem))
+                || !items.Contains(Selection))
             {
                 dropdownField.value = dropdownField.choices.FirstOrDefault();
             }
         }
     }
 
-    public ReactiveProperty<T> Selection { get; private set; }
-    public T SelectedItem => Selection.Value;
+    private readonly ReactiveProperty<T> selectionProperty;
+    public IObservable<T> SelectionAsObservable => selectionProperty;
+
+    public T Selection
+    {
+        get => selectionProperty.Value;
+        set
+        {
+            if (Equals(Selection, value))
+            {
+                return;
+            }
+            selectionProperty.Value = value;
+        }
+    }
 
     public DropdownFieldControl(DropdownField dropdownField, List<T> items, T initialSelection,
         Func<T, string> itemToString)
     {
         this.dropdownField = dropdownField ?? throw new ArgumentNullException(nameof(dropdownField));
         this.itemToString = itemToString ?? throw new ArgumentNullException(nameof(itemToString));
-        this.Selection = new ReactiveProperty<T>(initialSelection);
+        this.selectionProperty = new ReactiveProperty<T>(initialSelection);
         this.Items = items;
 
         this.dropdownField.choices = items
@@ -60,13 +73,13 @@ public class DropdownFieldControl<T>
         this.dropdownField.RegisterValueChangedCallback(evt =>
         {
             T newValue = Items.FirstOrDefault(item => itemToString(item) == dropdownField.value);
-            if (!Equals(Selection.Value, newValue))
+            if (!Equals(Selection, newValue))
             {
-                SetSelection(newValue);
+                Selection = newValue;
             }
         });
 
-        Selection.Subscribe(newValue =>
+        SelectionAsObservable.Subscribe(newValue =>
         {
             if (newValue == null)
             {
@@ -80,10 +93,5 @@ public class DropdownFieldControl<T>
                 dropdownField.value = this.itemToString(newValue);
             }
         });
-    }
-
-    public void SetSelection(T newValue)
-    {
-        Selection.Value = newValue;
     }
 }

@@ -34,10 +34,10 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
 
     [Inject]
     private SongEditorLayerManager layerManager;
-    
+
     [Inject]
     private UIDocument uiDocument;
-    
+
     [Inject]
     private PanelHelper panelHelper;
 
@@ -60,7 +60,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
         Horizontal,
         Vertical
     }
-    
+
     public void OnInjectionFinished()
     {
         noteAreaControl.DragControl.AddListener(this);
@@ -312,8 +312,8 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
         int minBeatInSelection = snapshotNotes.Select(note => note.StartBeat).Min();
         int maxBeatInSelection = snapshotNotes.Select(note => note.EndBeat).Max();
         int anchorBeatInSelection = maxBeatInSelection;
-        int currentPointerBeat = dragEvent.PositionInSongInBeatsDragStart + dragEvent.BeatDistance;
-        float dragPercentRelativeToSelection = (float)(dragEvent.PositionInSongInBeatsDragStart - currentPointerBeat)
+        int currentPointerBeat = dragEvent.PositionInBeatsDragStart + dragEvent.BeatDistance;
+        float dragPercentRelativeToSelection = (float)(dragEvent.PositionInBeatsDragStart - currentPointerBeat)
                                                / (maxBeatInSelection - minBeatInSelection);
 
         foreach (Note note in notes)
@@ -343,8 +343,8 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
         int minBeatInSelection = snapshotNotes.Select(note => note.StartBeat).Min();
         int maxBeatInSelection = snapshotNotes.Select(note => note.EndBeat).Max();
         int anchorBeatInSelection = minBeatInSelection;
-        int currentPointerBeat = dragEvent.PositionInSongInBeatsDragStart + dragEvent.BeatDistance;
-        float dragPercentRelativeToSelection = (float)(currentPointerBeat - dragEvent.PositionInSongInBeatsDragStart)
+        int currentPointerBeat = dragEvent.PositionInBeatsDragStart + dragEvent.BeatDistance;
+        float dragPercentRelativeToSelection = (float)(currentPointerBeat - dragEvent.PositionInBeatsDragStart)
                                                / (maxBeatInSelection - minBeatInSelection);
 
         foreach (Note note in notes)

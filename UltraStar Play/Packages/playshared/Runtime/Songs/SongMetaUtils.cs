@@ -517,7 +517,7 @@ public static class SongMetaUtils
 
         if (songMetas.Count == 1)
         {
-            return GetArtistDashTitle(songMetas[0]);
+            songMetas[0].GetArtistDashTitle();
         }
 
         return songMetas
@@ -645,7 +645,7 @@ public static class SongMetaUtils
                 return "";
             }
 
-            return parts.ToCsv("\n   ", $"• {title}: ", "");
+            return parts.JoinWith("\n   ", $"• {title}: ", "");
         }
 
         string audioAuthor = selectedSong.GetAdditionalHeaderEntry($"AUDIOAUTHOR");
@@ -679,7 +679,7 @@ public static class SongMetaUtils
             GetAttributionText("Video", videoAuthor, videoLicense, videoSource),
             GetAttributionText("Background", backgroundAuthor, backgroundLicense, backgroundSource),
             GetAttributionText("Cover", coverAuthor, coverLicense, coverSource),
-        }.Where(it => !it.IsNullOrEmpty()).ToCsv("\n", "", "");
+        }.Where(it => !it.IsNullOrEmpty()).JoinWith("\n");
     }
 
     public static Voice CreateMergedVoice(List<Voice> voices)
@@ -782,7 +782,7 @@ public static class SongMetaUtils
 
     public static Color32 CreateColorForSongMeta(SongMeta songMeta)
     {
-        return ColorGenerationUtils.FromString(GetArtistDashTitle(songMeta));
+        return ColorGenerationUtils.FromString(songMeta.GetArtistDashTitle());
     }
 
     public static string ComputeScoreRelevantSongHash(SongMeta songMeta)

@@ -272,7 +272,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
                 else
                 {
                     // All iterations done
-                    Debug.Log($"Mic delay calibration successful, delays (ms): {delaysInMillis.ToCsv()}");
+                    Debug.Log($"Mic delay calibration successful, delays (ms): {delaysInMillis.JoinWith(", ")}");
                     return new MicDelayCalibrationResult(delaysInMillis);
                 }
             }

@@ -78,7 +78,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
             .SetCallbackAndAdd(requestData =>
             {
                 string json = requestData.Context.Request.GetBodyAsString();
-                SongQueueEntryDto songQueueEntryDto = JsonConverter.FromJson<SongQueueEntryDto>(json, false);
+                SongQueueEntryDto songQueueEntryDto = JsonConverter.FromJson<SongQueueEntryDto>(json);
 
                 string errorMessage = songQueueManager.GetSongQueueEntryErrorMessage(songQueueEntryDto);
                 if (!errorMessage.IsNullOrEmpty())
@@ -121,7 +121,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                 }
 
                 string json = requestData.Context.Request.GetBodyAsString();
-                SongQueueEntryDto newSongQueueEntryDto = JsonConverter.FromJson<SongQueueEntryDto>(json, false);
+                SongQueueEntryDto newSongQueueEntryDto = JsonConverter.FromJson<SongQueueEntryDto>(json);
 
                 SongQueueEntryDto oldSongQueueEntryDto = songQueueManager.GetSongQueueEntries()[index];
                 songQueueManager.UpdateSongQueueEntry(oldSongQueueEntryDto, newSongQueueEntryDto);

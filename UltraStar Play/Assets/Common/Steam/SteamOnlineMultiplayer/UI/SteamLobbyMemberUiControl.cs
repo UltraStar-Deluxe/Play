@@ -23,7 +23,7 @@ namespace SteamOnlineMultiplayer
 
         protected override void UpdateImage()
         {
-            Image itemElement = playerProfileImagePicker.ItemImage;
+            Image itemElement = playerProfileImageChooser.ItemImage;
 
             itemElement.SetBorderRadius(Length.Percent(50));
             SteamOnlineMultiplayerUtils.GetAvatarTextureAsObservable(steamLobbyMember.SteamId)

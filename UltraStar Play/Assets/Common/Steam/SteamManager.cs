@@ -21,11 +21,11 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private SteamWorkshopManager steamWorkshopManager;
 
-    private readonly Subject<bool> connectedToSteamEventStream = new();
-    public IObservable<bool> ConnectedToSteamEventStream => connectedToSteamEventStream;
+    private readonly Subject<VoidEvent> connectedToSteamEventStream = new();
+    public IObservable<VoidEvent> ConnectedToSteamEventStream => connectedToSteamEventStream;
 
-    private readonly Subject<bool> disconnectedFromSteamEventStream = new();
-    public IObservable<bool> DisconnectedFromSteamEventStream => disconnectedFromSteamEventStream;
+    private readonly Subject<VoidEvent> disconnectedFromSteamEventStream = new();
+    public IObservable<VoidEvent> DisconnectedFromSteamEventStream => disconnectedFromSteamEventStream;
 
     protected override object GetInstance()
     {
@@ -67,7 +67,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 
             steamWorkshopManager.DownloadWorkshopItems();
 
-            connectedToSteamEventStream.OnNext(true);
+            connectedToSteamEventStream.OnNext(VoidEvent.instance);
             Debug.Log($"Steam successfully initialized: PlayerName: {PlayerName}, SteamUser.VoiceRecord: {SteamUser.VoiceRecord}");
         }
         catch (Exception e)
@@ -83,6 +83,6 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         Debug.Log("Shutting down SteamClient...");
         SteamClient.Shutdown();
         Debug.Log("SteamClient shut down successfully");
-        disconnectedFromSteamEventStream.OnNext(true);
+        disconnectedFromSteamEventStream.OnNext(VoidEvent.instance);
     }
 }

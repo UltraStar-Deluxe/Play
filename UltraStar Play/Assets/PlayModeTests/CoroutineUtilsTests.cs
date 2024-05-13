@@ -8,7 +8,7 @@ using UnityEngine.TestTools;
 public class CoroutineUtilsTests : AbstractPlayModeTest
 {
     [UnityTest]
-    public IEnumerator CoroutineSequenceTest()
+    public IEnumerator SequenceIsExecutedStepByStep()
     {
         LogAssert.ignoreFailingMessages = true;
 
@@ -27,7 +27,7 @@ public class CoroutineUtilsTests : AbstractPlayModeTest
     }
 
     [UnityTest]
-    public IEnumerator ExceptionInCoroutineStopsSequenceTest()
+    public IEnumerator ExceptionInCoroutineStopsSequence()
     {
         LogAssert.ignoreFailingMessages = true;
 

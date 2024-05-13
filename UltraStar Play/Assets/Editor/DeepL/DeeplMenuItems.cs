@@ -249,7 +249,7 @@ public static class DeeplTranslationMenuItems
                 context = "karaoke game with song editor",
             };
         }
-        string jsonBody = NewtonsoftJsonConverter.ToJson(body);
+        string jsonBody = JsonConverter.ToJson(body);
         ClipboardUtils.CopyToClipboard(jsonBody);
         Debug.Log($"Copied JSON body to clipboard:\n{jsonBody}");
 

@@ -40,17 +40,42 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             }
             AudioSource.Play();
         });
-        songAudioPlayer.JumpBackInSongEventStream.Subscribe(_ => AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds);
-        songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds);
-        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => AudioSource.Pause());
-        songAudioPlayer.PositionInSongEventStream.Subscribe(_ =>
+        songAudioPlayer.JumpBackEventStream.Subscribe(_ =>
         {
-            if (!songAudioPlayer.IsPlaying)
+            if (AudioSource.clip == null)
             {
-                AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds;
+                return;
             }
+            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
         });
-        songAudioPlayer.PlaybackSpeedChangedEventStream.Subscribe(newValue => AudioUtils.SetPitchWithPitchShifter(AudioSource, newValue));
+        songAudioPlayer.JumpForwardEventStream.Subscribe(_ =>
+        {
+            if (AudioSource.clip == null)
+            {
+                return;
+            }
+            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
+        });
+        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ =>
+        {
+            if (AudioSource.clip == null)
+            {
+                return;
+            }
+
+            AudioSource.Pause();
+        });
+        songAudioPlayer.PositionEventStream.Subscribe(_ =>
+        {
+            if (AudioSource.clip == null
+                || !songAudioPlayer.IsPlaying)
+            {
+                return;
+            }
+
+            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
+        });
+        songAudioPlayer.PlaybackSpeedChangedEventStream.Subscribe(newValue => AudioUtils.SetPitchWithPitchShifter(AudioSource, (float)newValue));
     }
 
     private void Update()
@@ -92,7 +117,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         {
             AudioSource.Stop();
             AudioSource.clip = targetAudioClip;
-            AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds;
+            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
 
             if (songAudioPlayer.IsPlaying)
             {

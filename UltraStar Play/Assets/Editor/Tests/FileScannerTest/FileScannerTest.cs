@@ -15,7 +15,7 @@ public class FileScannerTest
     };
 
     [Test]
-    public void NonRecursiveTest()
+    public void NonRecursive()
     {
         FileScanner fileScanner = new(txtFilePattern, false, false);
         List<string> files = fileScanner.GetFiles(folderPath, false);
@@ -23,7 +23,7 @@ public class FileScannerTest
     }
 
     [Test]
-    public void NonRecursiveMultiplePatternsTest()
+    public void NonRecursiveMultiplePatterns()
     {
         FileScanner fileScanner = new(patterns, false, false);
         List<string> files = fileScanner.GetFiles(folderPath, false);
@@ -31,7 +31,7 @@ public class FileScannerTest
     }
 
     [Test]
-    public void RecursiveTest()
+    public void Recursive()
     {
         FileScanner fileScanner = new(txtFilePattern, false, false);
         List<string> files = fileScanner.GetFiles(folderPath, true);
@@ -39,7 +39,7 @@ public class FileScannerTest
     }
 
     [Test]
-    public void RecursiveMultiplePatternsTest()
+    public void RecursiveMultiplePatterns()
     {
         FileScanner fileScanner = new(patterns, false, false);
         List<string> files = fileScanner.GetFiles(folderPath, true);
@@ -47,7 +47,7 @@ public class FileScannerTest
     }
 
     [Test]
-    public void RecursiveExcludeHiddenFoldersTest()
+    public void RecursiveExcludeHiddenFolders()
     {
         FileScanner fileScanner = new(txtFilePattern, true, false);
         List<string> files = fileScanner.GetFiles(folderPath, true);
@@ -55,7 +55,7 @@ public class FileScannerTest
     }
 
     [Test]
-    public void RecursiveExcludeHiddenFilesTest()
+    public void RecursiveExcludeHiddenFiles()
     {
         FileScanner fileScanner = new(txtFilePattern, false, true);
         List<string> files = fileScanner.GetFiles(folderPath, true);

@@ -13,16 +13,10 @@ using UnityEngine;
 
 public class AudioSeparationManager : MonoBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        lockObject = new();
-        audioSeparationProcessCount = 0;
-    }
-    private static object lockObject = new();
-    private static int audioSeparationProcessCount;
-
     public static AudioSeparationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioSeparationManager>();
+
+    private readonly object lockObject = new();
+    private int audioSeparationProcessCount;
 
     [Inject]
     private UiManager uiManager;
@@ -95,7 +89,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                     {
                         o.OnError(new Exception(
                             $"Vocals isolation not supported for this audio file.\n" +
-                            $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.ToCsv(",", "", "")}"));
+                            $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.JoinWith(", ")}"));
                     }
                     o.OnNext(true);
                     o.OnCompleted();
@@ -254,7 +248,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
         else
         {
-            Debug.LogError($"Voice audio not found. Written files: {spleeterResult.WrittenFiles.ToCsv()}");
+            Debug.LogError($"Voice audio not found. Written files: {spleeterResult.WrittenFiles.JoinWith(", ")}");
         }
 
         // Check instrumental audio
@@ -279,7 +273,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
         else
         {
-            Debug.LogError($"Instrumental audio not found. Written files: {spleeterResult.WrittenFiles.ToCsv()}");
+            Debug.LogError($"Instrumental audio not found. Written files: {spleeterResult.WrittenFiles.JoinWith(", ")}");
         }
 
         // Remove folder that was created by spleeter

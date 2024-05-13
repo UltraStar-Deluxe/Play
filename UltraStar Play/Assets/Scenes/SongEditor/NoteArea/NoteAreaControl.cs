@@ -23,7 +23,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     // 1000 milliseconds
     public const int ViewportMinWidth = 1000;
-    public int ViewportMaxWidth => (int)songAudioPlayer.DurationOfSongInMillis;
+    public int ViewportMaxWidth => (int)songAudioPlayer.DurationInMillis;
 
     public const int MinViewportY = 0;
     public const int MaxViewportY = 127;
@@ -86,8 +86,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.noteArea)]
     public VisualElement VisualElement { get; private set; }
 
-    [Inject(UxmlName = R.UxmlNames.noteAreaPositionInSongIndicator)]
-    private VisualElement noteAreaPositionInSongIndicator;
+    [Inject(UxmlName = R.UxmlNames.noteAreaPositionIndicator)]
+    private VisualElement noteAreaPositionIndicator;
 
     private NoteAreaContextMenuControl contextMenuControl;
     public NoteAreaDragControl DragControl { get; private set; }
@@ -110,9 +110,9 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         panelHelper = new PanelHelper(uiDocument);
         MillisecondsPerBeat = SongMetaBpmUtils.MillisPerBeat(songMeta);
 
-        if (songAudioPlayer.PositionInSongInMillis == 0)
+        if (songAudioPlayer.PositionInMillis == 0)
         {
-            songAudioPlayer.PositionInSongInMillis = songMeta.GapInMillis - DefaultViewportWidthInMillis * 0.25f;
+            songAudioPlayer.PositionInMillis = songMeta.GapInMillis - DefaultViewportWidthInMillis * 0.25f;
         }
 
         songAudioPlayer.LoadedEventStream.Subscribe(_ => InitializeViewport());
@@ -121,7 +121,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
             InitializeViewport();
         });
 
-        songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
+        songAudioPlayer.PositionEventStream.Subscribe(SetPositionInMillis);
 
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
 
@@ -133,8 +133,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
             .WithRootVisualElement(VisualElement)
             .CreateAndInject<NoteAreaVerticalRulerControl>();
 
-        UpdatePositionInSongIndicator(songAudioPlayer.PositionInSongInMillis);
-        ViewportEventStream.Subscribe(_ => UpdatePositionInSongIndicator(songAudioPlayer.PositionInSongInMillis));
+        UpdatePositionIndicator(songAudioPlayer.PositionInMillis);
+        ViewportEventStream.Subscribe(_ => UpdatePositionIndicator(songAudioPlayer.PositionInMillis));
 
         VisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerClick(evt), TrickleDown.TrickleDown);
 
@@ -214,39 +214,39 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         SetViewportHorizontal(newViewportX, newViewportWidth);
     }
 
-    private void SetPositionInSongInMillis(double positionInSongInMillis)
+    private void SetPositionInMillis(double positionInMillis)
     {
         if (Mouse.current == null
             || !Mouse.current.middleButton.isPressed)
         {
             // Synchronize viewport with playback position, but only if not dragging the viewport manually.
-            MoveViewportToPositionInSongInMillis(positionInSongInMillis);
+            MoveViewportToPositionInMillis(positionInMillis);
         }
 
-        UpdatePositionInSongIndicator(positionInSongInMillis);
+        UpdatePositionIndicator(positionInMillis);
     }
 
-    private void MoveViewportToPositionInSongInMillis(double positionInSongInMillis)
+    private void MoveViewportToPositionInMillis(double positionInMillis)
     {
         float viewportAutomaticScrollingLeft = ViewportX + ViewportWidth * ViewportAutomaticScrollingBoarderPercent;
         float viewportAutomaticScrollingRight = ViewportX + ViewportWidth * (1 - ViewportAutomaticScrollingBoarderPercent);
 
-        if (positionInSongInMillis < ViewportX || positionInSongInMillis > (ViewportX + ViewportWidth))
+        if (positionInMillis < ViewportX || positionInMillis > (ViewportX + ViewportWidth))
         {
             // Center viewport to position in song
-            double newViewportX = positionInSongInMillis - ViewportWidth * 0.5;
+            double newViewportX = positionInMillis - ViewportWidth * 0.5;
             SetViewportX((int)newViewportX);
         }
-        else if (positionInSongInMillis < viewportAutomaticScrollingLeft)
+        else if (positionInMillis < viewportAutomaticScrollingLeft)
         {
             // Scroll left to new position
-            double newViewportX = positionInSongInMillis - ViewportWidth * ViewportAutomaticScrollingJumpPercent;
+            double newViewportX = positionInMillis - ViewportWidth * ViewportAutomaticScrollingJumpPercent;
             SetViewportX((int)newViewportX);
         }
-        else if (positionInSongInMillis > viewportAutomaticScrollingRight)
+        else if (positionInMillis > viewportAutomaticScrollingRight)
         {
             // Scroll right to new position
-            double newViewportX = positionInSongInMillis - ViewportWidth * (1 - ViewportAutomaticScrollingJumpPercent);
+            double newViewportX = positionInMillis - ViewportWidth * (1 - ViewportAutomaticScrollingJumpPercent);
             SetViewportX((int)newViewportX);
         }
     }
@@ -278,19 +278,19 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         return 1 - (double)(midiNote - ViewportY) / ViewportHeight;
     }
 
-    public double GetHorizontalPositionForMillis(double positionInSongInMillis)
+    public double GetHorizontalPositionForMillis(double positionInMillis)
     {
         if (ViewportWidth == 0)
         {
             return 0;
         }
-        return (positionInSongInMillis - ViewportX) / ViewportWidth;
+        return (positionInMillis - ViewportX) / ViewportWidth;
     }
 
     public double GetHorizontalPositionForBeat(int beat)
     {
-        double positionInSongInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
-        return GetHorizontalPositionForMillis(positionInSongInMillis);
+        double positionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
+        return GetHorizontalPositionForMillis(positionInMillis);
     }
 
     public bool IsInViewport(Note note)
@@ -555,8 +555,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         Vector2 localPoint = evt.localPosition;
         float rectWidth = VisualElement.worldBound.width;
         double xPercent = localPoint.x / rectWidth;
-        double positionInSongInMillis = ViewportX + (ViewportWidth * xPercent);
-        songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+        double positionInMillis = ViewportX + (ViewportWidth * xPercent);
+        songAudioPlayer.PositionInMillis = positionInMillis;
     }
 
     private void InitializeViewport()
@@ -579,15 +579,15 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         int width = DefaultViewportWidthInMillis;
         // Start at the beginning
         int x;
-        if (songAudioPlayer.PositionInSongInMillis <= 0)
+        if (songAudioPlayer.PositionInMillis <= 0)
         {
             int startOfFirstNoteInMillis = GetStartOfFirstNoteInMillis();
-            songAudioPlayer.PositionInSongInMillis = startOfFirstNoteInMillis;
+            songAudioPlayer.PositionInMillis = startOfFirstNoteInMillis;
             x = Math.Max(0, startOfFirstNoteInMillis - 1000);
         }
         else
         {
-            x = Math.Max(0, (int)songAudioPlayer.PositionInSongInMillis - 1000);
+            x = Math.Max(0, (int)songAudioPlayer.PositionInMillis - 1000);
         }
         // Full range of notes. At least one octave
         int height = Math.Max(12, maxMidiNote - minMidiNote + 2);
@@ -643,10 +643,10 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         return (int)Math.Round(MinMidiNoteInCurrentViewport + ViewportHeight * (1 - (y - rect.y) / rect.height));
     }
 
-    private void UpdatePositionInSongIndicator(double positionInSongInMillis)
+    private void UpdatePositionIndicator(double positionInMillis)
     {
-        float xPercent = (float)GetHorizontalPositionForMillis(positionInSongInMillis);
-        noteAreaPositionInSongIndicator.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
+        float xPercent = (float)GetHorizontalPositionForMillis(positionInMillis);
+        noteAreaPositionIndicator.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
     }
 
     public bool IsPointerOver()

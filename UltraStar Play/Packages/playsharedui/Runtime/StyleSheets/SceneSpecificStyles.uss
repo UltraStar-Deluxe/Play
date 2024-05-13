@@ -644,11 +644,11 @@
     border-color: var(--font-color);
 }
 
-#playerProfileImagePicker #previousItemButton {
+#playerProfileImageChooser #previousItemButton {
     width: 25px;
 }
 
-#playerProfileImagePicker #nextItemButton {
+#playerProfileImageChooser #nextItemButton {
     width: 25px;
 }
 
@@ -672,14 +672,14 @@
     min-width: 40px;
 }
 
-.optionsLabelAndItemPicker {
+.optionsLabelAndChooser {
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
     margin-bottom: 20px;
 }
 
-.optionsLabelAndItemPicker ItemPicker {
+.optionsLabelAndChooser Chooser {
     flex-grow: 1;
 }
 
@@ -753,7 +753,7 @@
     width: 300px;
 }
 
-#loadedOptionsRoot > ItemPicker {
+#loadedOptionsRoot > Chooser {
     margin-bottom: 16px;
     height: auto;
 }
@@ -782,7 +782,7 @@
     width: 300px;
 }
 
-#loadedOptionsRoot > ScrollView > ItemPicker {
+#loadedOptionsRoot > ScrollView > Chooser {
     margin-bottom: 16px;
     height: auto;
 }

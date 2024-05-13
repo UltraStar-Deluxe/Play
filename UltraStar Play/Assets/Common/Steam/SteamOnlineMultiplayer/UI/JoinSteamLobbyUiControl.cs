@@ -134,8 +134,6 @@ namespace SteamOnlineMultiplayer
             }
 
             hostedGameList.GetFirstAncestorOfType<AccordionItem>()?.UpdateTargetHeight();
-
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(hostedGameList);
         }
 
         public void Dispose()

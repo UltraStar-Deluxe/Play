@@ -193,7 +193,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             lastCaretPosition = textField.cursorIndex;
             if (syncLyricsAreaToggle.value)
             {
-                SyncPositionInSongWithSelectedText();
+                SyncPositionWithSelectedText();
             }
         }
     }
@@ -277,13 +277,13 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         textField.isReadOnly = wasReadOnly;
     }
 
-    private void SyncPositionInSongWithSelectedText()
+    private void SyncPositionWithSelectedText()
     {
         Note note = GetNoteForCaretPosition(textField.value, textField.cursorIndex);
         if (note != null)
         {
-            double positionInSongInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat);
-            songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+            double positionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat);
+            songAudioPlayer.PositionInMillis = positionInMillis;
         }
     }
 

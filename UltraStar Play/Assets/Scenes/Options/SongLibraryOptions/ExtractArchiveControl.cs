@@ -28,8 +28,8 @@ public class ExtractArchiveControl : MonoBehaviour
     private readonly Subject<ExtractArchiveProgressEvent> progressEventStream = new();
     public IObservable<ExtractArchiveProgressEvent> ProgressEventStream => progressEventStream;
 
-    private readonly Subject<bool> beforeDestroyEventStream = new();
-    public IObservable<bool> BeforeDestroyEventStream => beforeDestroyEventStream;
+    private readonly Subject<VoidEvent> beforeDestroyEventStream = new();
+    public IObservable<VoidEvent> BeforeDestroyEventStream => beforeDestroyEventStream;
 
     private bool isExtractArchiveStarted;
 
@@ -173,7 +173,7 @@ public class ExtractArchiveControl : MonoBehaviour
 
     private void OnDestroy()
     {
-        beforeDestroyEventStream.OnNext(true);
+        beforeDestroyEventStream.OnNext(VoidEvent.instance);
     }
 
     public class ExtractArchiveProgressEvent

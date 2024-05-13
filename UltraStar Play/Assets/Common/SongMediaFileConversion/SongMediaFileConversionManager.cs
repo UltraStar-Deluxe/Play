@@ -111,13 +111,13 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             songMetaManager.ReloadSong(songMeta);
             Debug.Log($"Successfully converted {mediaDescription} of '{SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta)}' to '{relativeTargetFilePath}'");
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_convertMediaSuccess,
-                "name", SongMetaUtils.GetArtistDashTitle(songMeta)));
+                "name", songMeta.GetArtistDashTitle()));
         }
 
         void OnFailure(ConversionError conversionError)
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_failedToConvert,
-                "name", SongMetaUtils.GetArtistDashTitle(songMeta)));
+                "name", songMeta.GetArtistDashTitle()));
         }
 
         ConvertFileToSupportedFormat(sourceFilePath,
@@ -310,7 +310,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             () => songMeta.VocalsAudio,
             newValue => songMeta.VocalsAudio = newValue,
             Translation.Get(R.Messages.job_convertVocalsAudioWithName,
-                "name", SongMetaUtils.GetArtistDashTitle(songMeta)),
+                "name", songMeta.GetArtistDashTitle()),
             true);
     }
 
@@ -322,7 +322,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             () => songMeta.InstrumentalAudio,
             newValue => songMeta.InstrumentalAudio = newValue,
             Translation.Get(R.Messages.job_convertInstrumentalAudioWithName,
-                "name", SongMetaUtils.GetArtistDashTitle(songMeta)),
+                "name", songMeta.GetArtistDashTitle()),
             true);
     }
 
@@ -338,7 +338,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             () => songMeta.Audio,
             newValue => songMeta.Audio = newValue,
             Translation.Get(R.Messages.job_convertAudioWithName,
-                            "name", SongMetaUtils.GetArtistDashTitle(songMeta)),
+                            "name", songMeta.GetArtistDashTitle()),
             isAudio);
     }
 
@@ -350,7 +350,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             () => songMeta.Video,
             newValue => songMeta.Video = newValue,
             Translation.Get(R.Messages.job_convertVideoWithName,
-                "name", SongMetaUtils.GetArtistDashTitle(songMeta)),
+                "name", songMeta.GetArtistDashTitle()),
             false);
     }
 

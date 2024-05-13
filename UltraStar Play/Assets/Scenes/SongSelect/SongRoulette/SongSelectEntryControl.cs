@@ -108,8 +108,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private bool isPopupMenuOpen;
     private float popupMenuClosedTimeInSeconds;
 
-    private readonly Subject<bool> clickOnSongImageEventStream = new();
-    public IObservable<bool> ClickOnSongImageEventStream => clickOnSongImageEventStream;
+    private readonly Subject<VoidEvent> clickOnSongImageEventStream = new();
+    public IObservable<VoidEvent> ClickOnSongImageEventStream => clickOnSongImageEventStream;
 
     private bool isInitialized;
 
@@ -185,7 +185,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         if (evt.button == 0
             && Vector2.Distance(pointerDownMousePosition ,evt.position) < MaxClickDistanceThresholdInPx)
         {
-            clickOnSongImageEventStream.OnNext(true);
+            clickOnSongImageEventStream.OnNext(VoidEvent.instance);
         }
     }
 
@@ -422,7 +422,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Failed to check whether other lobby members have song locally: song: '{SongMetaUtils.GetArtistDashTitle(songMeta)}', error: {ex.Message}");
+                Debug.LogError($"Failed to check whether other lobby members have song locally: song: '{songMeta.GetArtistDashTitle()}', error: {ex.Message}");
             })
             .Subscribe(response =>
             {
@@ -434,7 +434,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                 HasSongResponseDto responseDto = FastBufferReaderUtils.ReadJsonValuePacked<HasSongResponseDto>(response.MessagePayload);
                 if (!responseDto.HasSong)
                 {
-                    Debug.Log($"Netcode client {response.SenderNetcodeClientId} does not have the song '{SongMetaUtils.GetArtistDashTitle(songMeta)}', showing corresponding icon.");
+                    Debug.Log($"Netcode client {response.SenderNetcodeClientId} does not have the song '{songMeta.GetArtistDashTitle()}', showing corresponding icon.");
                     notAvailableInOnlineGameIcon.ShowByDisplay();
                 }
             }));
@@ -545,7 +545,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             && (songEntry.SongMeta?.Cover != lastSongMetaCover
                 || songEntry.SongMeta?.Background != lastSongMetaBackground))
         {
-            Debug.Log($"Updating cover image because cover or background changed in song '{SongMetaUtils.GetArtistDashTitle(songEntry.SongMeta)}'");
+            Debug.Log($"Updating cover image because cover or background changed in song '{songEntry.SongMeta.GetArtistDashTitle()}'");
             UpdateCover();
         }
     }

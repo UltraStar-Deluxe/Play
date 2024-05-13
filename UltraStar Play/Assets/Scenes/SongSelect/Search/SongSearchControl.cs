@@ -103,8 +103,8 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     private readonly Subject<SearchChangedEvent> searchChangedEventStream = new();
     public IObservable<SearchChangedEvent> SearchChangedEventStream => searchChangedEventStream;
 
-    private readonly Subject<bool> submitEventStream = new();
-    public IObservable<bool> SubmitEventStream => submitEventStream;
+    private readonly Subject<VoidEvent> submitEventStream = new();
+    public IObservable<VoidEvent> SubmitEventStream => submitEventStream;
 
     public void OnInjectionFinished()
     {
@@ -116,7 +116,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
         searchTextField.DisableParseEscapeSequences();
-        searchTextField.RegisterCallback<NavigationSubmitEvent>(_ => submitEventStream.OnNext(true));
+        searchTextField.RegisterCallback<NavigationSubmitEvent>(_ => submitEventStream.OnNext(VoidEvent.instance));
         new TextFieldHintControl(searchTextFieldHint);
 
         songSelectSceneInputControl.FuzzySearchText.Subscribe(newValue => searchTextFieldHint.SetVisibleByVisibility(newValue.IsNullOrEmpty()));
@@ -195,7 +195,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     {
         playlistChooserControl.Reset();
         songSelectFilterControl.Reset();
-        searchTextField.value = "";
+        ResetSearchText();
     }
 
     private void UpdateAnyFiltersActive()
@@ -225,7 +225,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     {
         string searchExp = searchTextField.value;
         searchExpressionIcon.RemoveFromClassList("errorFontColor");
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(searchExpressionIcon);
         searchExpressionIconTooltipControl.TooltipText = Translation.Get(R.Messages.songSelectScene_searchExpressionEnabled,
             "properties", GetAvailableSearchExpressionPropertiesCsv());
         if (nonPersistentSettings.IsSearchExpressionsEnabled.Value
@@ -243,7 +242,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
             {
                 Debug.Log($"Invalid search expression '{searchExp}': {e.Message}. Stack trace:\n{e.StackTrace}");
                 searchExpressionIcon.AddToClassList("errorFontColor");
-                ThemeManager.ApplyThemeSpecificStylesToVisualElements(searchExpressionIcon);
                 searchExpressionIconTooltipControl.TooltipText = Translation.Get(R.Messages.songSelectScene_searchExpressionError,
                     "errorDetails", e.Message);
                 return new List<SongMeta>();
@@ -398,7 +396,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     public void ResetSearchText()
     {
         searchTextField.value = "";
-        searchTextField.Blur();
     }
 
     private void RegisterToggleSearchPropertyCallback(Toggle toggle, ESearchProperty searchProperty)

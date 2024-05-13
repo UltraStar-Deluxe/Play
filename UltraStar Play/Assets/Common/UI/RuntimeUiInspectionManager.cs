@@ -135,7 +135,7 @@ public class RuntimeUiInspectionManager : AbstractSingletonBehaviour, INeedInjec
 
         string targetType = target.GetType().Name;
         string targetName = target.name;
-        string targetClasses = target.GetClasses().ToList().ToCsv(" ", "", "");
+        string targetClasses = target.GetClasses().ToList().JoinWith(" ");
         inspectionLabel.text = $"<{targetType} name=\"{targetName}\" class=\"{targetClasses}\"/>";
     }
 

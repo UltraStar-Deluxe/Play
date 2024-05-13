@@ -95,20 +95,20 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
-    [Inject(UxmlName = R.UxmlNames.recordingDevicePicker)]
-    private ItemPicker recordingDevicePicker;
+    [Inject(UxmlName = R.UxmlNames.recordingDeviceChooser)]
+    private Chooser recordingDeviceChooser;
 
-    [Inject(UxmlName = R.UxmlNames.languagePicker)]
-    private DropdownField languagePicker;
+    [Inject(UxmlName = R.UxmlNames.languageChooser)]
+    private DropdownField languageChooser;
 
-    [Inject(UxmlName = R.UxmlNames.devModePicker)]
-    private ItemPicker devModePicker;
+    [Inject(UxmlName = R.UxmlNames.devModeToggle)]
+    private Toggle devModeToggle;
 
-    [Inject(UxmlName = R.UxmlNames.targetFpsPicker)]
-    private ItemPicker targetFpsPicker;
+    [Inject(UxmlName = R.UxmlNames.targetFpsChooser)]
+    private Chooser targetFpsChooser;
 
-    [Inject(UxmlName = R.UxmlNames.minimumLogLevelPicker)]
-    private ItemPicker minimumLogLevelPicker;
+    [Inject(UxmlName = R.UxmlNames.minimumLogLevelChooser)]
+    private Chooser minimumLogLevelChooser;
 
     [Inject]
     private TranslationManager translationManager;
@@ -161,8 +161,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     [Inject(UxmlName = R.UxmlNames.copyLogButton)]
     private Button copyLogButton;
 
-    private LabeledItemPickerControl<string> recordingDevicePickerControl;
-    private BoolPickerControl devModePickerControl;
+    private LabeledChooserControl<string> recordingDeviceChooserControl;
 
     private float frameCountTime;
     private int frameCount;
@@ -278,26 +277,26 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         // Recording device
         List<string> deviceNames = Microphone.devices.ToList();
         deviceNames.Sort();
-        recordingDevicePickerControl = new(recordingDevicePicker, deviceNames,
+        recordingDeviceChooserControl = new(recordingDeviceChooser, deviceNames,
             item => Translation.Of(item));
-        recordingDevicePickerControl.AutoSmallFont = false;
-        recordingDevicePickerControl.SelectItem(settings.MicProfile.Name);
-        recordingDevicePickerControl.Selection.Subscribe(newValue => settings.SetMicProfileName(newValue));
+        recordingDeviceChooserControl.AutoSmallFont = false;
+        recordingDeviceChooserControl.Selection = settings.MicProfile.Name;
+        recordingDeviceChooserControl.SelectionAsObservable.Subscribe(newValue => settings.SetMicProfileName(newValue));
 
         // Language
-        LanguageChooserControl languageChooserControl = new LanguageChooserControl(languagePicker);
-        languageChooserControl.Selection.Subscribe(newValue => OnLanguageChanged(newValue));
+        LanguageChooserControl languageChooserControl = new LanguageChooserControl(languageChooser);
+        languageChooserControl.SelectionAsObservable.Subscribe(newValue => OnLanguageChanged(newValue));
 
         // Dev Mode
-        devModePickerControl = new BoolPickerControl(devModePicker);
-        devModePickerControl.SelectItem(settings.IsDevModeEnabled);
-        devModePickerControl.Selection.Subscribe(newValue => settings.IsDevModeEnabled = newValue);
+        FieldBindingUtils.Bind(devModeToggle,
+            () => settings.IsDevModeEnabled,
+            newValue => settings.IsDevModeEnabled = newValue);
         settings
             .ObserveEveryValueChanged(it => it.IsDevModeEnabled)
             .Subscribe(newValue => OnDevModeEnabledChanged(newValue));
 
         // Minimum log level
-        new EnumItemPickerControl<ELogEventLevel>(minimumLogLevelPicker).Bind(
+        new EnumChooserControl<ELogEventLevel>(minimumLogLevelChooser).Bind(
             () => settings.MinimumLogLevel,
             newValue =>
             {
@@ -306,9 +305,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             });
 
         // Target FPS
-        LabeledItemPickerControl<int> targetFpsPickerControl = new(targetFpsPicker, new List<int> { -1, 5, 10, 15, 20, 30, 60, 90, 120 },
+        LabeledChooserControl<int> targetFpsChooserControl = new(targetFpsChooser, new List<int> { -1, 5, 10, 15, 20, 30, 60, 90, 120 },
             item => item > 0 ? Translation.Of(item.ToString()) : Translation.Of("Auto"));
-        targetFpsPickerControl.Bind(
+        targetFpsChooserControl.Bind(
             () => settings.TargetFps,
             newValue => settings.TargetFps = newValue);
 
@@ -385,14 +384,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     {
         sceneTitle.text = Translation.Get(R.Messages.companionApp_title);
         connectionStatusText.text = Translation.Get(R.Messages.companionApp_connecting);
-        recordingDevicePicker.Label = Translation.Get(R.Messages.options_recording_title);
-        languagePicker.label = Translation.Get(R.Messages.language);
-        devModePicker.Label = Translation.Get(R.Messages.companionApp_devMode);
+        recordingDeviceChooser.Label = Translation.Get(R.Messages.options_recording_title);
+        languageChooser.label = Translation.Get(R.Messages.language);
+        devModeToggle.label = Translation.Get(R.Messages.companionApp_devMode);
         visualizeAudioToggle.label = Translation.Get(R.Messages.companionApp_visualizeMicInput);
         closeMenuButton.text = Translation.Get(R.Messages.common_back);
 
-        recordingDevicePickerControl.UpdateLabelText();
-        devModePickerControl.UpdateLabelText();
+        recordingDeviceChooserControl.UpdateLabelText();
         songListControl.UpdateTranslation();
     }
 

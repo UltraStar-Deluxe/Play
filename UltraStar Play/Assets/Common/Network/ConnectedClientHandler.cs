@@ -20,7 +20,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
     public long JitterInMillis => averageJitterInMillis;
 
     private float lastUpdateAverageJitterTimeInSeconds;
-    
+
     public ConnectedClientHandler(
         NetPeer peer,
         string clientName,
@@ -34,14 +34,14 @@ public class ConnectedClientHandler : IConnectedClientHandler
             throw new ArgumentException("Attempt to create ConnectedClientHandler without ClientId");
         }
     }
-    
+
     public void HandleMessageFromClient(string message)
     {
         if (message == null)
         {
             return;
         }
-        
+
         message = message.Trim();
         if (!message.StartsWith("{")
             || !message.EndsWith("}"))
@@ -65,14 +65,14 @@ public class ConnectedClientHandler : IConnectedClientHandler
             Debug.LogWarning($"Received message with invalid type from client: {json}");
             return;
         }
-        
+
         switch (messageType)
         {
             case CompanionAppMessageType.BeatPitchEvents:
                 BeatPitchEventsDto beatPitchEventsDto = JsonConverter.FromJson<BeatPitchEventsDto>(json);
-                
+
                 UpdateJitterStats(beatPitchEventsDto);
-                
+
                 receivedMessageStream.OnNext(beatPitchEventsDto);
                 return;
             default:
@@ -84,7 +84,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
     private void UpdateJitterStats(CompanionAppMessageDto companionAppMessageDto)
     {
         long messageDtoUnixTimeInMillis = companionAppMessageDto.UnixTimeMilliseconds;
-        
+
         long lastMessageDelay = !delayValuesInMillis.IsEmpty
             ? delayValuesInMillis.LastOrDefault()
             : 0;

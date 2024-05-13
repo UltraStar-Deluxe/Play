@@ -15,13 +15,13 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
 
     [Inject]
     private ISettings settings;
-    
+
     private readonly List<MicSampleRecorder> micSampleRecorders = new();
     public IReadOnlyList<MicSampleRecorder> MicSampleRecorders => micSampleRecorders;
-    
+
     private readonly Subject<ConnectedMicDevicesChangedEvent> connectedMicDevicesChangesStream = new();
     public IObservable<ConnectedMicDevicesChangedEvent> ConnectedMicDevicesChangesStream => connectedMicDevicesChangesStream;
-  
+
     private string[] CurrentConnectedMicDevices => Microphone.devices;
     private string[] lastConnectedMicDevices;
 
@@ -53,7 +53,7 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
             {
                 micSampleRecorders.ForEach(it => it.PlayRecordedAudio = newValue);
             });
-        
+
         settings.ObserveEveryValueChanged(it => it.MicrophonePlaybackVolumePercent)
             .Subscribe(newValue =>
             {
@@ -106,7 +106,7 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         {
             return micSampleRecorder;
         }
-        
+
         GameObject micSampleRecorderGameObject = new GameObject($"MicSampleRecorder '{micProfile.GetDisplayNameWithChannel()}'");
         micSampleRecorderGameObject.transform.parent = transform;
         micSampleRecorderGameObject.AddComponent<AudioSource>();
@@ -118,13 +118,13 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         micSampleRecorders.Add(micSampleRecorder);
         return micSampleRecorder;
     }
-    
+
     private void SetLastConnectedMicDevices(string[] devices)
     {
         // Create copy of array
         lastConnectedMicDevices = devices.ToArray();
     }
-    
+
     private void UpdateConnectedMicDevices()
     {
         if (CurrentConnectedMicDevices == null

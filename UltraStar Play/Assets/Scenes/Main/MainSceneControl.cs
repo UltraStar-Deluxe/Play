@@ -111,6 +111,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     [Inject]
     private ModManager modManager;
 
+    [Inject]
+    private SongIssueManager songIssueManager;
+
     private MessageDialogControl quitGameDialogControl;
     private NewSongDialogControl newSongDialogControl;
     private OnlineMultiplayerConnectionDialogControl onlineMultiplayerConnectionDialogControl;
@@ -161,7 +164,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
         settingsProblemHintControl = new SettingsProblemHintControl(
             settingsProblemHintIcon,
-            SettingsProblemHintControl.GetAllSettingsProblems(settings, modManager));
+            SettingsProblemHintControl.GetAllSettingsProblems(settings, modManager, songIssueManager));
 
         micSampleRecorderManager.ConnectedMicDevicesChangesStream
             .Subscribe(_ => UpdateSettingsProblemHint())
@@ -187,7 +190,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     private void UpdateSettingsProblemHint()
     {
-        settingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetAllSettingsProblems(settings, modManager));
+        settingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetAllSettingsProblems(settings, modManager, songIssueManager));
     }
 
     private void OpenSongSelectScene()
@@ -229,10 +232,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         quitGameDialogControl.DialogClosedEventStream.Subscribe(_ => quitGameDialogControl = null);
         quitGameDialogControl.Message = Translation.Get(R.Messages.mainScene_quitDialog_message);
 
-        quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_quit), _ => CloseQuitGameDialog());
-        quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_cancel), _ => ApplicationUtils.QuitOrStopPlayMode());
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(quitGameDialogControl.DialogRootVisualElement);
+        quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_quit), _ => ApplicationUtils.QuitOrStopPlayMode());
+        quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_cancel), _ => CloseQuitGameDialog());
     }
 
     public void OpenNewSongDialog()
@@ -244,8 +245,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
         VisualElement visualElement = newSongDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(visualElement);
-        // TODO would be nice to find a way to automatize calling this method when a new dialog/visual element/etc. is spawned
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(visualElement);
 
         newSongDialogControl = injector
             .WithRootVisualElement(visualElement)
@@ -257,8 +256,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
                 newSongDialogControl = null;
                 createSongButton.Focus();
             });
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(visualElement);
     }
 
     public List<IBinding> GetBindings()

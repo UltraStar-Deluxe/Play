@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BsiGame.UI.UIElements;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -10,7 +11,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
+public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -21,6 +22,9 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
 
     private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
+
+    private readonly Subject<ChildrenChangedEvent> childrenChangedEventStream = new();
+    public IObservable<ChildrenChangedEvent> ChildrenChangedEventStream => childrenChangedEventStream;
 
     [InjectedInInspector]
     public VisualTreeAsset messageDialogUi;
@@ -61,6 +65,8 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     [Inject]
     private Settings settings;
 
+    private readonly HashSet<VisualElement> visualElementsWithChildChangeManipulator = new();
+
     protected override object GetInstance()
     {
         return Instance;
@@ -74,6 +80,29 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     protected override void StartSingleton()
     {
         UpdatePlayerProfileImagePaths();
+    }
+
+    public void OnInjectionFinished()
+    {
+        // The UIDocument can change when the scene changes. Thus, registering events must be done in OnInjectionFinished.
+        RegisterChildrenChangedEvent();
+    }
+
+    private void RegisterChildrenChangedEvent()
+    {
+        if (visualElementsWithChildChangeManipulator.Contains(uiDocument.rootVisualElement))
+        {
+            return;
+        }
+        visualElementsWithChildChangeManipulator.Add(uiDocument.rootVisualElement);
+        uiDocument.rootVisualElement.AddManipulator(new ChildChangeManipulator());
+        uiDocument.rootVisualElement.RegisterCallback<ChildChangeEvent>(evt => childrenChangedEventStream.OnNext(new ChildrenChangedEvent()
+        {
+            targetParent = evt.targetParent,
+            targetChild = evt.targetChild,
+            newChildCount = evt.newChildCount,
+            previousChildCount = evt.previousChildCount,
+        }));
     }
 
     private void Update()

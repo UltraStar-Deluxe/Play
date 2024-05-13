@@ -69,7 +69,7 @@ namespace CommonOnlineMultiplayer
 
             return Observable.Create<NamedMessage>(o =>
             {
-                Log.Debug(() => $"Sending observable request to targetNetcodeClientIds {targetNetcodeClientIds.ToCsv(", ", "", "")}:  messageName: {messageName}, requestId: {requestId}");
+                Log.Debug(() => $"Sending observable request to targetNetcodeClientIds {targetNetcodeClientIds.JoinWith(", ")}:  messageName: {messageName}, requestId: {requestId}");
 
                 IDisposable namedMessageHandlerDisposable = null;
                 runningRequestData.OnTimeout = () =>
@@ -84,7 +84,7 @@ namespace CommonOnlineMultiplayer
                     }
 
                     // Notify subscribers
-                    o.OnError(new TimeoutException($"Received no response for message {messageName} with requestId {requestId} within {timeoutInMillis} ms (targetNetcodeClientIds: {targetNetcodeClientIds.ToCsv(", ", "", "")}, networkDelivery: {reliableNetworkDelivery})"));
+                    o.OnError(new TimeoutException($"Received no response for message {messageName} with requestId {requestId} within {timeoutInMillis} ms (targetNetcodeClientIds: {targetNetcodeClientIds.JoinWith(", ")}, networkDelivery: {reliableNetworkDelivery})"));
                 };
 
                 // Register handler for response message

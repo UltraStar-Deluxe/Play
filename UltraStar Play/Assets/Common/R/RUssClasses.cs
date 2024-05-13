@@ -13941,7 +13941,7 @@ public static partial class R
         public const string opacity_80 = "opacity-80";
         public const string opacity_90 = "opacity-90";
         public const string opacity_95 = "opacity-95";
-        public const string optionsLabelAndItemPicker = "optionsLabelAndItemPicker";
+        public const string optionsLabelAndChooser = "optionsLabelAndChooser";
         public const string optionsOverviewButton = "optionsOverviewButton";
         public const string optionsSceneTitleAndImageContainer = "optionsSceneTitleAndImageContainer";
         public const string optionsSceneTitleContainer = "optionsSceneTitleContainer";

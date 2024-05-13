@@ -20,25 +20,25 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
     private UIDocument uiDoc;
 
     [Inject(UxmlName = R.UxmlNames.volumeChooser)]
-    private ItemPicker volumeChooser;
+    private Chooser volumeChooser;
 
     [Inject(UxmlName = R.UxmlNames.vocalsAudioVolumeChooser)]
-    private ItemPicker vocalsAudioVolumeChooser;
+    private Chooser vocalsAudioVolumeChooser;
 
     [Inject(UxmlName = R.UxmlNames.musicVolumeChooser)]
-    private ItemPicker musicVolumeChooser;
+    private Chooser musicVolumeChooser;
 
     [Inject(UxmlName = R.UxmlNames.previewVolumeChooser)]
-    private ItemPicker previewVolumeChooser;
+    private Chooser previewVolumeChooser;
 
     [Inject(UxmlName = R.UxmlNames.backgroundMusicVolumeChooser)]
-    private ItemPicker backgroundMusicVolumeChooser;
+    private Chooser backgroundMusicVolumeChooser;
 
-    [Inject(UxmlName = R.UxmlNames.animateSceneChangeVolumePicker)]
-    private ItemPicker animateSceneChangeVolumePicker;
+    [Inject(UxmlName = R.UxmlNames.animateSceneChangeVolumeChooser)]
+    private Chooser animateSceneChangeVolumeChooser;
 
     [Inject(UxmlName = R.UxmlNames.sfxVolumeChooser)]
-    private ItemPicker sfxVolumeChooser;
+    private Chooser sfxVolumeChooser;
 
     [Inject(UxmlName = R.UxmlNames.soundfontPathTextField)]
     private TextField soundfontPathTextField;
@@ -53,42 +53,42 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
     {
         base.Start();
 
-        PercentNumberPickerControl volumePickerControl = new(volumeChooser);
-        volumePickerControl.Bind(() => settings.VolumePercent,
+        PercentNumberChooserControl volumeChooserControl = new(volumeChooser);
+        volumeChooserControl.Bind(() => settings.VolumePercent,
             newValue => settings.VolumePercent = (int)newValue);
 
-        PercentNumberPickerControl musicVolumePickerControl = new(musicVolumeChooser);
-        musicVolumePickerControl.Bind(() => settings.MusicVolumePercent,
+        PercentNumberChooserControl musicVolumeChooserControl = new(musicVolumeChooser);
+        musicVolumeChooserControl.Bind(() => settings.MusicVolumePercent,
             newValue => settings.MusicVolumePercent = (int)newValue);
 
-        PercentNumberPickerControl previewVolumePickerControl = new(previewVolumeChooser);
-        previewVolumePickerControl.Bind(() => settings.PreviewVolumePercent,
+        PercentNumberChooserControl previewVolumeChooserControl = new(previewVolumeChooser);
+        previewVolumeChooserControl.Bind(() => settings.PreviewVolumePercent,
             newValue => settings.PreviewVolumePercent = (int)newValue);
 
-        PercentNumberPickerControl backgroundMusicVolumePickerControl = new(backgroundMusicVolumeChooser);
-        backgroundMusicVolumePickerControl.Bind(() => settings.BackgroundMusicVolumePercent,
+        PercentNumberChooserControl backgroundMusicVolumeChooserControl = new(backgroundMusicVolumeChooser);
+        backgroundMusicVolumeChooserControl.Bind(() => settings.BackgroundMusicVolumePercent,
             newValue => settings.BackgroundMusicVolumePercent = (int)newValue);
 
         // Volume can be changed via REST API
         settings.ObserveEveryValueChanged(it => it.VolumePercent)
             .Subscribe(newValue =>
             {
-                if (!volumePickerControl.SelectedItem.NearlyEquals(newValue, 0.1f))
+                if (!volumeChooserControl.Selection.Equals(newValue, 0.1f))
                 {
-                    volumePickerControl.SelectItem(newValue);
+                    volumeChooserControl.Selection = newValue;
                 }
             });
 
-        PercentNumberPickerControl animateSceneChangeVolumePickerControl = new(animateSceneChangeVolumePicker);
-        animateSceneChangeVolumePickerControl.Bind(() => settings.SceneChangeSoundVolumePercent,
+        PercentNumberChooserControl animateSceneChangeVolumeChooserControl = new(animateSceneChangeVolumeChooser);
+        animateSceneChangeVolumeChooserControl.Bind(() => settings.SceneChangeSoundVolumePercent,
             newValue => settings.SceneChangeSoundVolumePercent = (int)newValue);
 
-        PercentNumberPickerControl sfxVolumeChooserControl = new(sfxVolumeChooser);
+        PercentNumberChooserControl sfxVolumeChooserControl = new(sfxVolumeChooser);
         sfxVolumeChooserControl.Bind(() => settings.SfxVolumePercent,
             newValue => settings.SfxVolumePercent = (int)newValue);
 
-        PercentNumberPickerControl vocalsAudioVolumePickerControl = new(vocalsAudioVolumeChooser);
-        vocalsAudioVolumePickerControl.Bind(() => settings.VocalsAudioVolumePercent,
+        PercentNumberChooserControl vocalsAudioVolumeChooserControl = new(vocalsAudioVolumeChooser);
+        vocalsAudioVolumeChooserControl.Bind(() => settings.VocalsAudioVolumePercent,
             newValue => settings.VocalsAudioVolumePercent = (int)newValue);
 
         soundfontPathTextField.DisableParseEscapeSequences();

@@ -8,41 +8,56 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
 
-// Handles loading and caching of images.
+/**
+ * Handles loading and caching of images.
+ */
 public class ImageManager : AbstractSingletonBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        spriteHolders.Clear();
-        ClearCache();
-    }
-
     public static ImageManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ImageManager>();
 
-    private static readonly HashSet<ISpriteHolder> spriteHolders = new();
+    private readonly HashSet<ISpriteHolder> spriteHolders = new();
 
     // When the cache has reached the critical size, then unused sprites are searched in the scene
     // and removed from memory.
-    private static readonly int criticalCacheSize = 50;
-    private static readonly Dictionary<string, CachedSprite> spriteCache = new();
+    private readonly int criticalCacheSize = 50;
+    private readonly Dictionary<string, CachedSprite> spriteCache = new();
 
     protected override object GetInstance()
     {
         return Instance;
     }
 
+    protected override void OnDestroySingleton()
+    {
+        ClearCache();
+    }
+
     public static void AddSpriteHolder(ISpriteHolder spriteHolder)
+    {
+        Instance.DoAddSpriteHolder(spriteHolder);
+    }
+
+    private void DoAddSpriteHolder(ISpriteHolder spriteHolder)
     {
         spriteHolders.Add(spriteHolder);
     }
 
-    public static void RemoveSpriteHolder(ISpriteHolder spriteHolder)
+    public void RemoveSpriteHolder(ISpriteHolder spriteHolder)
+    {
+        Instance.DoRemoveSpriteHolder(spriteHolder);
+    }
+
+    private void DoRemoveSpriteHolder(ISpriteHolder spriteHolder)
     {
         spriteHolders.Remove(spriteHolder);
     }
 
     public static void ReloadImage(string uri, UIDocument uiDocument)
+    {
+        Instance.DoReloadImage(uri, uiDocument);
+    }
+
+    private void DoReloadImage(string uri, UIDocument uiDocument)
     {
         if (!spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
             || cachedSprite.Sprite == null)
@@ -71,17 +86,17 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
     {
         Sprite result = null;
         // Load with busy waiting
-        LoadSpriteFromUri(uri, true)
+        Instance.DoLoadSpriteFromUri(uri, true)
             .Subscribe(sprite => result = sprite);
         return result;
     }
 
     public static IObservable<Sprite> LoadSpriteFromUri(string uri)
     {
-        return LoadSpriteFromUri(uri, false);
+        return Instance.DoLoadSpriteFromUri(uri, false);
     }
 
-    private static IObservable<Sprite> LoadSpriteFromUri(string uri, bool busyWaiting)
+    private IObservable<Sprite> DoLoadSpriteFromUri(string uri, bool busyWaiting)
     {
         if (uri.IsNullOrEmpty())
         {
@@ -135,7 +150,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
         });
     }
 
-    private static void AddSpriteToCache(Sprite sprite, string source)
+    private void AddSpriteToCache(Sprite sprite, string source)
     {
         // Check critical size of cache BEFORE adding the new sprite.
         // (Otherwise the new sprite will be removed immediately because it is not used yet.)
@@ -149,7 +164,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
         spriteCache[source] = cachedSprite;
     }
 
-    private static void ClearCache()
+    private void ClearCache()
     {
         foreach (CachedSprite cachedSprite in new List<CachedSprite>(spriteCache.Values))
         {
@@ -159,6 +174,15 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
     }
 
     public static void RemoveUnusedSpritesFromCache()
+    {
+        if (Instance == null)
+        {
+            return;
+        }
+        Instance.DoRemoveUnusedSpritesFromCache();
+    }
+
+    private void DoRemoveUnusedSpritesFromCache()
     {
         HashSet<Sprite> usedSprites = new();
         // Remember the sprites of all registered ISpriteHolder as still in use.
@@ -190,7 +214,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
         unusedSprites.ForEach(RemoveCachedSprite);
     }
 
-    private static void RemoveCachedSprite(CachedSprite cachedSprite)
+    private void RemoveCachedSprite(CachedSprite cachedSprite)
     {
         spriteCache.Remove(cachedSprite.Source);
         // Destroying the texture is important to free the memory.

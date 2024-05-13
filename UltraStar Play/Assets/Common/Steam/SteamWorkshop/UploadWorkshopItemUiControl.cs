@@ -80,9 +80,9 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     public void PublishWorkshopItem()
     {
-        ulong itemId = workshopItemChooserControl.SelectedItem.IsNewItem
+        ulong itemId = workshopItemChooserControl.Selection.IsNewItem
             ? 0
-            : workshopItemChooserControl.SelectedItem.SteamWorkshopItem.Id;
+            : workshopItemChooserControl.Selection.SteamWorkshopItem.Id;
         string contentFolderPath = workshopItemFolderTextField.value.Trim();
         string previewImagePath = workshopItemImageTextField.value.Trim();
         string title = workshopItemTitleTextField.value.Trim();
@@ -148,7 +148,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
                                             && item.SteamWorkshopItem.Id.Value == newlyPublishedFileId);
                 if (newlyPublishedWorkshopItemChooserEntry != null)
                 {
-                    workshopItemChooserControl.SetSelection(newlyPublishedWorkshopItemChooserEntry);
+                    workshopItemChooserControl.Selection = newlyPublishedWorkshopItemChooserEntry;
                 }
             });
     }
@@ -158,7 +158,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         Translation errorMessage = GetContentFolderErrorMessage(newContentFolder);
         if (errorMessage.Value.IsNullOrEmpty())
         {
-            string expectedSubfoldersCsv = GetExistingContentFolderSubfolders(newContentFolder).ToCsv(", ", "", "");
+            string expectedSubfoldersCsv = GetExistingContentFolderSubfolders(newContentFolder).JoinWith(", ");
             statusLabel.SetTranslatedText(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_contentFolders,
                 "names", expectedSubfoldersCsv));
             FillTextFieldWithDefaultsFromFolder(newContentFolder);
@@ -221,7 +221,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
             entries,
             entries[0],
             item => item.DisplayName);
-        workshopItemChooserControl.Selection
+        workshopItemChooserControl.SelectionAsObservable
             .Subscribe(newValue => OnWorkshopItemChooserSelectionChanged(newValue));
 
         if (steamWorkshopManager.DownloadState is not SteamWorkshopManager.EDownloadState.Finished)
@@ -272,7 +272,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
             return "Not connected to Steam.";
         }
 
-        if (workshopItemChooserControl.SelectedItem.IsNewItem)
+        if (workshopItemChooserControl.Selection.IsNewItem)
         {
             // For an new item, all mandatory fields must be set.
             if (!DirectoryUtils.Exists(contentFolderPath))

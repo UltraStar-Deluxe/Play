@@ -80,8 +80,6 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
         ToggleButton firstToggleButton = toggleButtons.FirstOrDefault();
         firstToggleButton.SetActive(true);
         lastActiveToggleButton = firstToggleButton;
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(aboutTextsScrollView);
     }
 
     private void CreateAboutTextButton(KeyValuePair<string, string> aboutTextEntry)

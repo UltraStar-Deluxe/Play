@@ -1,103 +1,101 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FullSerializer;
+using Newtonsoft.Json;
+using UnityEngine;
+using Newtonsoft.Json.UnityConverters.Math;
 
-// Implements serialization / deserialization of JSON using
-// the serialization lib FullSerializer.
+/**
+ * Implements serialization / deserialization of JSON using the serialization lib Newtonsoft.Json (aka. Json.NET).
+ */
 public static class JsonConverter
 {
-    // Indentation for pretty printing JSON.
-    private const string IndentString = "    ";
-
     // Cannot clear this list in RuntimeInitializeLoadType.SubsystemRegistration because it would clear already added converters.
     // Instead, use a dictionary such that every converter is only once in the collection, even when in the Unity editor.
-    private static readonly Dictionary<string, Func<fsBaseConverter>> customConverterProviders = new();
-    public static IReadOnlyCollection<string> CustomConverterTypeNames => customConverterProviders.Keys;
+    private static readonly Dictionary<string, Newtonsoft.Json.JsonConverter> customConverters = new();
+    public static IReadOnlyCollection<string> CustomConverterTypeNames => customConverters.Keys;
 
-    private static fsSerializer CreateSerializer()
+    private static readonly List<Newtonsoft.Json.JsonConverter> defaultConverters = new List<Newtonsoft.Json.JsonConverter>
     {
-        fsSerializer newSerializer = new();
-        newSerializer.AddConverter(new EnumDefaultValueFallbackConverter());
-        newSerializer.AddConverter(new Color32Converter());
-        newSerializer.AddConverter(new GradientConfigConverter());
-        newSerializer.AddConverter(new ReactivePropertyConverter());
-        customConverterProviders.Values.ForEach(customConverterProvider => newSerializer.AddConverter(customConverterProvider.Invoke()));
-        return newSerializer;
-    }
+        new StringEnumDefaultValueFallbackConverter(),
+        new Color32Converter(),
+        new GradientConfigConverter(),
+        new ReactivePropertyConverter(),
+        new Vector2Converter(),
+        new Vector2IntConverter(),
+        new Vector3Converter(),
+        new Vector3IntConverter(),
+        new Vector4Converter(),
+    };
+
+    private static bool isInitialized;
 
     public static string ToJson<T>(T obj, bool prettyPrint = false)
     {
-        CreateSerializer()
-            .TrySerialize(typeof(T), obj, out fsData data)
-            .AssertSuccessWithoutWarnings();
-        string json = fsJsonPrinter.CompressedJson(data);
-        if (prettyPrint)
-        {
-            json = FormatJson(json);
-        }
+        InitIfNotDoneYet();
+
+        Formatting formatting = prettyPrint
+            ? Formatting.Indented
+            : Formatting.None;
+        string json = JsonConvert.SerializeObject(obj, formatting);
         return json;
     }
 
-    public static object FromJson(string json, Type type, bool assertSuccessWithoutWarnings = true)
+    public static object FromJson(string json, Type type)
     {
-        fsData data = fsJsonParser.Parse(json);
-        object deserialized = new();
-        fsResult tryDeserialize = CreateSerializer()
-            .TryDeserialize(data, type, ref deserialized);
-        if (assertSuccessWithoutWarnings)
+        InitIfNotDoneYet();
+
+        return JsonConvert.DeserializeObject(json, type);
+    }
+
+    public static T FromJson<T>(string json) where T : new()
+    {
+        InitIfNotDoneYet();
+
+        return JsonConvert.DeserializeObject<T>(json);
+    }
+
+    public static void FillFromJson<T>(string json, T existingInstance)
+    {
+        InitIfNotDoneYet();
+
+        JsonConvert.PopulateObject(json, existingInstance);
+    }
+
+    public static void FillFromJsonCopy<T>(string json, T existingInstance)
+    {
+        InitIfNotDoneYet();
+
+        object copy = FromJson(json, existingInstance.GetType());
+        PropertyUtils.CopyProperties(copy, existingInstance);
+    }
+
+    public static void AddConverter<T>(JsonConverter<T> converter)
+    {
+        Debug.Log($"Added JsonConverter {converter} for type {typeof(T)}");
+
+        customConverters[typeof(T).FullName] = converter;
+
+        Init();
+    }
+
+    private static void InitIfNotDoneYet()
+    {
+        if (isInitialized)
         {
-            tryDeserialize.AssertSuccessWithoutWarnings();
+            return;
         }
-        return deserialized;
+
+        Init();
     }
 
-    public static T FromJson<T>(string json, bool assertSuccessWithoutWarnings = true) where T : new()
+    private static void Init()
     {
-        return (T)FromJson(json, typeof(T), assertSuccessWithoutWarnings);
-    }
+        isInitialized = true;
 
-    public static void FillFromJson<T>(string json, T existingInstance, bool assertSuccessWithoutWarnings = true)
-    {
-        fsData data = fsJsonParser.Parse(json);
-        fsResult fsResult = CreateSerializer()
-            .TryDeserialize<T>(data, ref existingInstance);
-
-        if (assertSuccessWithoutWarnings)
+        JsonConvert.DefaultSettings = () => new JsonSerializerSettings
         {
-            fsResult.AssertSuccessWithoutWarnings();
-        }
-    }
-
-    public static void FillFromJsonCopy<T>(string json, T existingInstance, bool assertSuccessWithoutWarnings = true)
-    {
-        object loadedModSettings = FromJson(json, existingInstance.GetType(), false);
-        PropertyUtils.CopyProperties(loadedModSettings, existingInstance);
-    }
-
-    // https://stackoverflow.com/questions/4580397/json-formatter-in-c
-    private static string FormatJson(string json)
-    {
-        int indentation = 0;
-        int quoteCount = 0;
-        var result =
-            from ch in json
-            let quotes = ch == '"' ? quoteCount++ : quoteCount
-            let lineBreak = ch == ',' && quotes % 2 == 0 ? ch + Environment.NewLine + String.Concat(Enumerable.Repeat(IndentString, indentation)) : null
-            let openChar = ch == '{' || ch == '[' ? ch + Environment.NewLine + String.Concat(Enumerable.Repeat(IndentString, ++indentation)) : ch.ToString()
-            let closeChar = ch == '}' || ch == ']' ? Environment.NewLine + String.Concat(Enumerable.Repeat(IndentString, --indentation)) + ch : ch.ToString()
-            select lineBreak == null
-                        ? openChar.Length > 1
-                            ? openChar
-                            : closeChar
-                        : lineBreak;
-
-        return String.Concat(result);
-    }
-
-    public static void AddCustomConverter<T>(Func<T> customConverterProvider) where T : fsBaseConverter
-    {
-        string converterTypeName = typeof(T).FullName;
-        customConverterProviders[converterTypeName] = customConverterProvider;
+            Converters = defaultConverters.Union(customConverters.Values).ToList(),
+        };
     }
 }

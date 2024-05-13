@@ -34,14 +34,14 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
     [Inject]
     private SingSceneData sceneData;
 
-    private double positionInSongInMillisMax;
+    private double positionInMillisMax;
 
     private bool hasFinishedScene;
 
     private void Update()
     {
-        double durationOfSongInMillis = songAudioPlayer.DurationOfSongInMillis;
-        if (durationOfSongInMillis <= 0)
+        double durationInMillis = songAudioPlayer.DurationInMillis;
+        if (durationInMillis <= 0)
         {
             return;
         }
@@ -57,20 +57,20 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
             }
 
             if (hasBeenNearEndOfSong
-                && positionInSongInMillisMax > songAudioPlayer.PositionInSongInMillis)
+                && positionInMillisMax > songAudioPlayer.PositionInMillis)
             {
                 // Do not go back to old time value.
-                songAudioPlayer.PositionInSongInMillis = positionInSongInMillisMax - 1;
+                songAudioPlayer.PositionInMillis = positionInMillisMax - 1;
             }
         }
         else
         {
-            double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
+            double positionInMillis = songAudioPlayer.PositionInMillis;
 
             // Normal detection of song finished.
             // This only works when the position is not reset to zero when the AudioClip finishes.
             // 16 ms is roughly 1 frame at 60 FPS
-            if (Math.Abs(durationOfSongInMillis - positionInSongInMillis) <= 16)
+            if (Math.Abs(durationInMillis - positionInMillis) <= 16)
             {
                 IsSongFinished = true;
                 songVideoPlayer.FreezeVideo = true;
@@ -80,7 +80,7 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
             if (hasBeenNearEndOfSong)
             {
                 // The position is back to a previous value.
-                if (positionInSongInMillis < positionInSongInMillisMax)
+                if (positionInMillis < positionInMillisMax)
                 {
                     IsSongFinished = true;
                     songVideoPlayer.FreezeVideo = true;
@@ -88,13 +88,13 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
                 }
                 else
                 {
-                    positionInSongInMillisMax = positionInSongInMillis;
+                    positionInMillisMax = positionInMillis;
                 }
             }
             else
             {
                 // The position is near the end of the song.
-                double missingMillis = durationOfSongInMillis - positionInSongInMillis;
+                double missingMillis = durationInMillis - positionInMillis;
                 if (missingMillis < 500)
                 {
                     hasBeenNearEndOfSong = true;
@@ -105,7 +105,7 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
             // This can be used to skip the ending of the audio file.
             if (songMeta.EndInMillis > 0
                 // #END tag is in milliseconds (but #START is in seconds)
-                && positionInSongInMillis > songMeta.EndInMillis)
+                && positionInMillis > songMeta.EndInMillis)
             {
                 IsSongFinished = true;
             }

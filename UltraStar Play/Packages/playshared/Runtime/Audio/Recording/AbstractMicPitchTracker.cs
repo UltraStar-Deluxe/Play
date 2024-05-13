@@ -148,7 +148,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
     public static PitchEvent AnalyzeBeat(
         SongMeta songMeta,
         int beat,
-        double positionInSongInMillis,
+        double positionInMillis,
         int micSampleRate,
         int micDelayInMillis,
         int micAmplificationFactor,
@@ -167,9 +167,9 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         float beatLengthInMillis = beatEndInMillis - beatStartInMillis;
         int beatLengthInSamples = (int)(beatLengthInMillis * micSampleRate / 1000f);
 
-        // The newest sample in the buffer corresponds to (positionInSong - micDelay)
-        float positionInSongInMillisConsideringMicDelay = (float)(positionInSongInMillis - micDelayInMillis);
-        float distanceToNewestSamplesInMillis = positionInSongInMillisConsideringMicDelay - beatEndInMillis;
+        // The newest sample in the buffer corresponds to (position - micDelay)
+        float positionInMillisConsideringMicDelay = (float)(positionInMillis - micDelayInMillis);
+        float distanceToNewestSamplesInMillis = positionInMillisConsideringMicDelay - beatEndInMillis;
         int distanceToNewestSamplesInSamples = (int)(distanceToNewestSamplesInMillis * micDelayInMillis / 1000f);
         distanceToNewestSamplesInSamples = NumberUtils.Limit(distanceToNewestSamplesInSamples, 0, micSampleBuffer.Length - 1);
 

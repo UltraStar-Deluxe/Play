@@ -68,10 +68,10 @@ ToggleButton.active:hover:focus {
 }
 
 /**************************************************/
-/* ITEM PICKER */
+/* ITEM CHOOSER */
 /**************************************************/
 
-ItemPicker {
+Chooser {
     height: var(--control-height);
     min-width: var(--control-height-small);
     flex-direction: row;
@@ -93,7 +93,7 @@ ItemPicker {
     height: var(--control-height);
 }
 
-.itemPickerControlsRow {
+.chooserControlsRow {
     border-radius: 5px;
     background-color: var(--control-color);
     align-items: stretch;
@@ -101,7 +101,7 @@ ItemPicker {
     flex-grow: 1;
 }
 
-.itemPickerItemLabel {
+.chooserItemLabel {
     -unity-background-scale-mode: scale-to-fit;
     white-space: normal;
     flex-grow: 1;
@@ -114,11 +114,11 @@ ItemPicker {
     -unity-text-align: middle-center;
 }
 
-.itemPickerItemImage {
+.chooserItemImage {
     flex-grow: 1;
 }
 
-.itemPickerButton {
+.chooserButton {
     flex-grow: 0;
     flex-shrink: 0;
     width: 40px;
@@ -131,12 +131,12 @@ ItemPicker {
     padding: 0;
 }
 
-.itemPickerPreviousItemButton {
+.chooserPreviousItemButton {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-.itemPickerNextItemButton {
+.chooserNextItemButton {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
@@ -306,7 +306,7 @@ ChipsCombo {
     font-size: var(--font-size-s);
 }
 
-.contextMenu > ItemPicker {
+.contextMenu > Chooser {
     flex-direction: column;
     width: auto;
     height: auto;
@@ -315,7 +315,7 @@ ChipsCombo {
     margin-bottom: 4px;
 }
 
-.contextMenu > ItemPicker > #itemPickerLabel {
+.contextMenu > Chooser > #chooserLabel {
     width: auto;
 }
 

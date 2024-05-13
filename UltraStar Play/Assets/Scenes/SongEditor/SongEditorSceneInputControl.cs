@@ -96,10 +96,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Jump to start / end of song
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToStartOfSong).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => songAudioPlayer.PositionInSongInMillis = 0);
+            .Subscribe(_ => songAudioPlayer.PositionInMillis = 0);
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToEndOfSong).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => songAudioPlayer.PositionInSongInMillis = songAudioPlayer.DurationOfSongInMillis - 1);
+            .Subscribe(_ => songAudioPlayer.PositionInMillis = songAudioPlayer.DurationInMillis - 1);
 
         // Play / pause
         InputManager.GetInputAction(R.InputActions.songEditor_togglePause).PerformedAsObservable()
@@ -447,14 +447,14 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
                 int stepInMillis = (int)(SongMetaBpmUtils.MillisPerBeat(songMeta) * timeFactor);
                 if (Keyboard.current.leftArrowKey.isPressed)
                 {
-                    songAudioPlayer.PositionInSongInMillis -= stepInMillis;
+                    songAudioPlayer.PositionInMillis -= stepInMillis;
                 }
                 else if (Keyboard.current.rightArrowKey.isPressed)
                 {
-                    songAudioPlayer.PositionInSongInMillis += stepInMillis;
+                    songAudioPlayer.PositionInMillis += stepInMillis;
                 }
 
-                songAudioPlayer.PositionInSongInMillis += stepInMillis * direction;
+                songAudioPlayer.PositionInMillis += stepInMillis * direction;
             }
         }
         else
@@ -629,8 +629,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         int maxBeat = notes.Select(it => it.EndBeat).Max();
         double maxMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, maxBeat);
         double minMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, minBeat);
-        songEditorSceneControl.StopPlaybackAfterPositionInSongInMillis = maxMillis;
-        songAudioPlayer.PositionInSongInMillis = minMillis;
+        songEditorSceneControl.StopPlaybackAfterPositionInMillis = maxMillis;
+        songAudioPlayer.PositionInMillis = minMillis;
         songAudioPlayer.PlayAudio();
     }
 

@@ -58,9 +58,9 @@ public class ClassicGameRoundModifierConditionSettings
         }
         UpdateFields();
 
-        ItemPicker conditionChooser = new();
+        Chooser conditionChooser = new();
         conditionChooser.SetTranslatedLabel(Translation.Empty);
-        EnumItemPickerControl<EClassicGameRoundModifierCondition> conditionChooserControl = new(conditionChooser);
+        EnumChooserControl<EClassicGameRoundModifierCondition> conditionChooserControl = new(conditionChooser);
         conditionChooserControl.Bind(
             () => condition,
             newValue =>

@@ -11,7 +11,7 @@ public class SongEditorPlayModeTests : AbstractPlayModeTest
     protected static readonly string testFolderPath = Application.dataPath + "/PlayModeTests/SongEditorPlayModeTests";
 
     [UnityTest]
-    public IEnumerator EditSongViaSongEditorTest()
+    public IEnumerator CanEditSongAndSaveChanges()
     {
         LogAssert.ignoreFailingMessages = true;
 

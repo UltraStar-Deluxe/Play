@@ -247,7 +247,7 @@ namespace SteamOnlineMultiplayer
             SteamLobbyConnectionRequestDto requestDto;
             try
             {
-                requestDto = JsonConverter.FromJson<SteamLobbyConnectionRequestDto>(payload, false);
+                requestDto = JsonConverter.FromJson<SteamLobbyConnectionRequestDto>(payload);
                 if (!IsConnectionRequestDataValid(requestDto, out string errorMessage))
                 {
                     Debug.Log($"DenyRequest because connection data is invalid: {errorMessage}");
