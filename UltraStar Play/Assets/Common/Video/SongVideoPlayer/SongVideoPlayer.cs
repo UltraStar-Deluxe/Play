@@ -480,6 +480,9 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to load video of '{songMeta.GetArtistDashTitle()}': {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason",
+                    ex.Message));
                 ShowBackgroundImage(songMeta);
             })
             // Subscribe to trigger observable
