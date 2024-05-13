@@ -23,7 +23,7 @@ ImportLrcDialogUi.uxml, *, importLrcIssueLabel
 ImportMidiFileDialogUi.uxml, *, bestMatchnigTrackAndChannelLabel
 ImportMidiFileDialogUi.uxml, *, midiFileIssueLabel
 IssueSideBarEntryUi.uxml, *, *
-ItemPicker.uxml, *, *
+Chooser.uxml, *, *
 JobListEntryUi.uxml, *, *
 JobListUi.uxml, *, *
 JoinSteamLobbyUi.uxml, *, joinHostedGameButton
