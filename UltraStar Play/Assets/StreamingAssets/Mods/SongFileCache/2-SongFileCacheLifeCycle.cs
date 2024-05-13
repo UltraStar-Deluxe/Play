@@ -101,8 +101,8 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
             && HasEqualSettings(loadedSongsCache, modSettings))
         {
             // Quick and dirty JSON comparison to determine whether songs changed
-            string loadedSongsCacheJson = NewtonsoftJsonConverter.ToJson(loadedSongsCache);
-            string newSongsCacheJson = NewtonsoftJsonConverter.ToJson(newSongsCache);
+            string loadedSongsCacheJson = JsonConverter.ToJson(loadedSongsCache);
+            string newSongsCacheJson = JsonConverter.ToJson(newSongsCache);
             if (loadedSongsCacheJson == newSongsCacheJson)
             {
                 Debug.Log($"{nameof(SongFileCacheLifeCycle)} - Found songs are equal to last cached songs. Thus, not updating cache.");
@@ -130,7 +130,7 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
         Debug.Log($"{nameof(SongFileCacheLifeCycle)} - saving songs to cache file: {cacheFilePath}");
         try
         {
-            string json = NewtonsoftJsonConverter.ToJson(songsCache);
+            string json = JsonConverter.ToJson(songsCache);
             FileUtils.WriteAllText(cacheFilePath, json);
         }
         catch (Exception ex)
@@ -146,7 +146,7 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
         try
         {
             string json = FileUtils.ReadAllText(cacheFilePath);
-            SongCache songsCache = NewtonsoftJsonConverter.FromJson<SongCache>(json);
+            SongCache songsCache = JsonConverter.FromJson<SongCache>(json);
             return songsCache;
         }
         catch (Exception ex)
