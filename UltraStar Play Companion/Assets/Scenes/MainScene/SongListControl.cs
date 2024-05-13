@@ -202,7 +202,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
         mainGameHttpClient.GetRequest(HttpApiEndpointPaths.SongQueue,
             response =>
             {
-                ListDto<SongQueueEntryDto> listDto = JsonConverter.FromJson<ListDto<SongQueueEntryDto>>(response, false);
+                ListDto<SongQueueEntryDto> listDto = JsonConverter.FromJson<ListDto<SongQueueEntryDto>>(response);
                 if (listDto == null)
                 {
                     songQueueContainer.Add(new Label("Failed to load song queue."));
@@ -282,7 +282,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
         {
             Translation.Get(R.Messages.enum_SongProperty_Artist),
             Translation.Get(R.Messages.enum_SongProperty_Title),
-        }.ToCsv(", ", "", "");
+        }.JoinWith(", ");
         songSearchHint.SetTranslatedText(Translation.Of($"Search in {searchPropertiesCsv}"));
     }
 

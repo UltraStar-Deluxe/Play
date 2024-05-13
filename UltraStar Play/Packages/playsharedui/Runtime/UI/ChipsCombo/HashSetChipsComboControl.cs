@@ -129,7 +129,7 @@ public class HashSetChipsComboControl<T>
         chipsComboDialog = null;
     }
 
-    public void SelectItem(HashSet<T> modifiers)
+    public void SetSelection(HashSet<T> modifiers)
     {
         if (modifiers == null
             || modifiers.SetEquals(Selection.Value))

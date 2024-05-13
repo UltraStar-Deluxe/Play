@@ -28,8 +28,8 @@ namespace CommonOnlineMultiplayer
         [Inject(UxmlName = R.UxmlNames.webCamButtonOverlay)]
         protected VisualElement webCamButtonOverlay;
 
-        [Inject(UxmlName = R.UxmlNames.playerProfileImagePicker)]
-        protected ItemPicker playerProfileImagePicker;
+        [Inject(UxmlName = R.UxmlNames.playerProfileImageChooser)]
+        protected Chooser playerProfileImageChooser;
 
         [Inject(UxmlName = R.UxmlNames.onlinePlayerProfileIcon)]
         protected VisualElement onlinePlayerProfileIcon;
@@ -49,17 +49,17 @@ namespace CommonOnlineMultiplayer
 
             webCamButtonOverlay.HideByDisplay();
 
-            playerProfileImagePicker.ItemLabel.HideByDisplay();
-            playerProfileImagePicker.PreviousItemButton.HideByDisplay();
-            playerProfileImagePicker.NextItemButton.HideByDisplay();
-            playerProfileImagePicker.ItemImage.AddToClassList("circle");
+            playerProfileImageChooser.ItemLabel.HideByDisplay();
+            playerProfileImageChooser.PreviousItemButton.HideByDisplay();
+            playerProfileImageChooser.NextItemButton.HideByDisplay();
+            playerProfileImageChooser.ItemImage.AddToClassList("circle");
             onlinePlayerProfileIcon.SetInClassList("onlineMultiplayerHost", lobbyMember.IsHost);
             UpdateImage();
         }
 
         protected virtual void UpdateImage()
         {
-            Image imageElement = playerProfileImagePicker.ItemImage;
+            Image imageElement = playerProfileImageChooser.ItemImage;
             imageElement.style.backgroundImage = new StyleBackground(UiManager.Instance.fallbackPlayerProfileImage);
             imageElement.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(lobbyMember.DisplayName));
         }

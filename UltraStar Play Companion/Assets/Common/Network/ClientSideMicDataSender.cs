@@ -130,7 +130,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
             .ToList();
         if (beatPitchEventDtos.Count > 3)
         {
-            Debug.LogWarning($"Sending {beatPitchEventDtos.Count} beats to server: {beatPitchEventDtos.Select(it => it.Beat).ToCsv(", ")}");
+            Debug.LogWarning($"Sending {beatPitchEventDtos.Count} beats to server: {beatPitchEventDtos.Select(it => it.Beat).JoinWith(", ")}");
         }
 
         BeatPitchEventsDto beatPitchEventsDto = new BeatPitchEventsDto(beatPitchEventDtos)

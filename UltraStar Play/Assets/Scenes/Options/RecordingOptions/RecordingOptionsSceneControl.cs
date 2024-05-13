@@ -42,23 +42,23 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
     [Inject]
     private MicSampleRecorderManager micSampleRecorderManager;
 
-    [Inject(UxmlName = R.UxmlNames.devicePicker)]
-    private ItemPicker devicePicker;
+    [Inject(UxmlName = R.UxmlNames.deviceChooser)]
+    private Chooser deviceChooser;
 
-    [Inject(UxmlName = R.UxmlNames.amplificationPicker)]
-    private ItemPicker amplificationPicker;
+    [Inject(UxmlName = R.UxmlNames.amplificationChooser)]
+    private Chooser amplificationChooser;
 
-    [Inject(UxmlName = R.UxmlNames.noiseSuppressionPicker)]
-    private ItemPicker noiseSuppressionPicker;
+    [Inject(UxmlName = R.UxmlNames.noiseSuppressionChooser)]
+    private Chooser noiseSuppressionChooser;
 
-    [Inject(UxmlName = R.UxmlNames.delayPicker)]
-    private ItemPicker delayPicker;
+    [Inject(UxmlName = R.UxmlNames.delayChooser)]
+    private Chooser delayChooser;
 
-    [Inject(UxmlName = R.UxmlNames.colorPicker)]
-    private ItemPicker colorPicker;
+    [Inject(UxmlName = R.UxmlNames.colorChooser)]
+    private Chooser colorChooser;
 
-    [Inject(UxmlName = R.UxmlNames.sampleRatePicker)]
-    private ItemPicker sampleRatePicker;
+    [Inject(UxmlName = R.UxmlNames.sampleRateChooser)]
+    private Chooser sampleRateChooser;
 
     [Inject(UxmlName = R.UxmlNames.enabledToggle)]
     private SlideToggle enabledToggle;
@@ -100,16 +100,16 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
     private VisualElement playRecordedAudioInfoContainer;
 
     [Inject(UxmlName = R.UxmlNames.micPlaybackVolumeChooser)]
-    private ItemPicker micPlaybackVolumeChooser;
+    private Chooser micPlaybackVolumeChooser;
 
-    private SampleRatePickerControl sampleRatePickerControl;
-    private LabeledItemPickerControl<MicProfile> devicePickerControl;
-    private LabeledItemPickerControl<int> amplificationPickerControl;
-    private LabeledItemPickerControl<int> noiseSuppressionPickerControl;
-    private NumberPickerControl delayPickerControl;
-    private ColorPickerControl colorPickerControl;
+    private SampleRateChooserControl sampleRateChooserControl;
+    private LabeledChooserControl<MicProfile> deviceChooserControl;
+    private LabeledChooserControl<int> amplificationChooserControl;
+    private LabeledChooserControl<int> noiseSuppressionChooserControl;
+    private NumberChooserControl delayChooserControl;
+    private ColorChooserControl colorChooserControl;
 
-    private MicProfile SelectedMicProfile => devicePickerControl.SelectedItem;
+    private MicProfile SelectedMicProfile => deviceChooserControl.Selection;
 
     private IDisposable connectedClientReceivedMessageStreamDisposable;
 
@@ -123,17 +123,17 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         List<MicProfile> micProfiles = CreateAndPersistMicProfiles();
         UpdateNoConnectedMicsContainer(micProfiles);
 
-        new AutoFitLabelControl(devicePicker.ItemLabel, 10, 15);
+        new AutoFitLabelControl(deviceChooser.ItemLabel, 10, 15);
 
-        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, micProfiles,
+        deviceChooserControl = new LabeledChooserControl<MicProfile>(deviceChooser, micProfiles,
             item => item != null ? Translation.Of(item.GetDisplayNameWithChannel()) : Translation.Empty);
-        devicePickerControl.AutoSmallFont = false;
+        deviceChooserControl.AutoSmallFont = false;
         if (!TryReSelectLastMicProfile()
-            && !devicePickerControl.Items.IsNullOrEmpty())
+            && !deviceChooserControl.Items.IsNullOrEmpty())
         {
-            devicePickerControl.Selection.Value = devicePickerControl.Items[0];
+            deviceChooserControl.Selection = deviceChooserControl.Items[0];
         }
-        devicePickerControl.Selection.Subscribe(micProfile =>
+        deviceChooserControl.SelectionAsObservable.Subscribe(micProfile =>
             {
                 if (micProfile == null)
                 {
@@ -144,31 +144,31 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 settings.LastMicProfileChannelIndexInRecordingOptionsScene = micProfile.ChannelIndex;
             });
 
-        amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationPicker, amplificationItems, item => Translation.Of(item + " %"));
-        noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionPicker, noiseSuppressionItems, item => Translation.Of(item + " %"));
-        delayPickerControl = new NumberPickerControl(delayPicker);
-        delayPickerControl.GetLabelTextFunction = item => item + " ms";
-        colorPickerControl = new ColorPickerControl(colorPicker, themeManager.GetMicrophoneColors());
-        sampleRatePickerControl = new SampleRatePickerControl(sampleRatePicker, item => GetSampleRateLabel(item));
+        amplificationChooserControl = new LabeledChooserControl<int>(amplificationChooser, amplificationItems, item => Translation.Of(item + " %"));
+        noiseSuppressionChooserControl = new LabeledChooserControl<int>(noiseSuppressionChooser, noiseSuppressionItems, item => Translation.Of(item + " %"));
+        delayChooserControl = new NumberChooserControl(delayChooser);
+        delayChooserControl.GetLabelTextFunction = item => item + " ms";
+        colorChooserControl = new ColorChooserControl(colorChooser, themeManager.GetMicrophoneColors());
+        sampleRateChooserControl = new SampleRateChooserControl(sampleRateChooser, item => GetSampleRateLabel(item));
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(_ => DeleteSelectedRecordingDevice());
 
         // Select random color via context menu
-        VisualElement colorPickerColorElement = colorPicker.Q<VisualElement>(null, R_PlayShared.UssClasses.itemPickerItemLabel);
-        if (colorPickerColorElement != null)
+        VisualElement colorChooserColorElement = colorChooser.Q<VisualElement>(null, R_PlayShared.UssClasses.chooserItemLabel);
+        if (colorChooserColorElement != null)
         {
             ContextMenuControl contextMenuControl = injector
-                .WithRootVisualElement(colorPickerColorElement)
+                .WithRootVisualElement(colorChooserColorElement)
                 .CreateAndInject<ContextMenuControl>();
             contextMenuControl.FillContextMenuAction = contextMenuPopupControl =>
             {
                 contextMenuPopupControl.AddButton(Translation.Get(R.Messages.options_recording_action_selectRandomColor),
-                    () => colorPickerControl.SelectItem(Colors.CreateRandomColor()));
+                    () => colorChooserControl.Selection = Colors.CreateRandomColor());
             };
         }
 
-        devicePickerControl.Selection.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
-        amplificationPickerControl.Selection.Subscribe(newValue =>
+        deviceChooserControl.SelectionAsObservable.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
+        amplificationChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
             if (SelectedMicProfile == null)
             {
@@ -177,7 +177,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
             SelectedMicProfile.Amplification = newValue;
             SendSelectedMicProfileToConnectedClient();
         });
-        noiseSuppressionPickerControl.Selection.Subscribe(newValue =>
+        noiseSuppressionChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
             if (SelectedMicProfile == null)
             {
@@ -186,7 +186,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
             SelectedMicProfile.NoiseSuppression = newValue;
             SendSelectedMicProfileToConnectedClient();
         });
-        delayPickerControl.Selection.Subscribe(newValue =>
+        delayChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
             if (SelectedMicProfile == null)
             {
@@ -195,7 +195,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
             SelectedMicProfile.DelayInMillis = (int)newValue;
             SendSelectedMicProfileToConnectedClient();
         });
-        colorPickerControl.Selection.Subscribe(newValue =>
+        colorChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
             if (SelectedMicProfile == null)
             {
@@ -204,7 +204,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
             SelectedMicProfile.Color = newValue;
             SendSelectedMicProfileToConnectedClient();
         });
-        sampleRatePickerControl.Selection.Subscribe(newValue =>
+        sampleRateChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
             if (SelectedMicProfile == null)
             {
@@ -222,8 +222,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 
         // Update recording device of connected client, when the client (dis)connects
         serverSideConnectRequestManager.ClientConnectionChangedEventStream
-            .Where(clientConnectedEvent => devicePickerControl.SelectedItem?.ConnectedClientId == clientConnectedEvent.ConnectedClientHandler.ClientId)
-            .Subscribe(newValue => OnRecordingDeviceSelected(devicePickerControl.SelectedItem))
+            .Where(clientConnectedEvent => deviceChooserControl.Selection?.ConnectedClientId == clientConnectedEvent.ConnectedClientHandler.ClientId)
+            .Subscribe(newValue => OnRecordingDeviceSelected(deviceChooserControl.Selection))
             .AddTo(gameObject);
 
         serverSideConnectRequestManager.ConnectedClientMicProfileChangedEventStream
@@ -242,8 +242,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 if (calibrationResult.IsSuccess)
                 {
                     double medianValue = calibrationResult.DelaysInMilliseconds[calibrationResult.DelaysInMilliseconds.Count / 2];
-                    double roundedMedianValue = ((int)(medianValue / delayPickerControl.StepValue)) * delayPickerControl.StepValue;
-                    delayPickerControl.SelectItem(roundedMedianValue);
+                    double roundedMedianValue = ((int)(medianValue / delayChooserControl.StepValue)) * delayChooserControl.StepValue;
+                    delayChooserControl.Selection = roundedMedianValue;
                 }
                 else
                 {
@@ -278,8 +278,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
             () => settings.PlayRecordedAudio,
             newValue => settings.PlayRecordedAudio = newValue);
 
-        PercentNumberPickerControl micPlaybackVolumePickerControl = new(micPlaybackVolumeChooser);
-        micPlaybackVolumePickerControl.Bind(
+        PercentNumberChooserControl micPlaybackVolumeChooserControl = new(micPlaybackVolumeChooser);
+        micPlaybackVolumeChooserControl.Bind(
             () => settings.MicrophonePlaybackVolumePercent,
             newValue => settings.MicrophonePlaybackVolumePercent = (int)newValue);
 
@@ -299,16 +299,16 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 
         List<MicProfile> micProfiles = CreateAndPersistMicProfiles();
         MicProfile lastMicProfile = SelectedMicProfile;
-        devicePickerControl.Items = micProfiles;
-        Debug.Log($"MicProfiles: {devicePickerControl.Items.ToCsv()}");
-        if (devicePickerControl.Items.Count > 0)
+        deviceChooserControl.Items = micProfiles;
+        Debug.Log($"MicProfiles: {deviceChooserControl.Items.JoinWith(", ")}");
+        if (deviceChooserControl.Items.Count > 0)
         {
-            MicProfile nextSelectedMicProfile = devicePickerControl.Items[0];
+            MicProfile nextSelectedMicProfile = deviceChooserControl.Items[0];
 
             // Try to restore selection
             if (lastMicProfile != null)
             {
-                MicProfile matchingMicProfile = devicePickerControl.Items.FirstOrDefault(micProfile =>
+                MicProfile matchingMicProfile = deviceChooserControl.Items.FirstOrDefault(micProfile =>
                     micProfile.Name == lastMicProfile.Name
                     && micProfile.ChannelIndex == lastMicProfile.ChannelIndex);
                 if (matchingMicProfile != null)
@@ -317,8 +317,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 }
             }
 
-            devicePickerControl.Selection.Value = nextSelectedMicProfile;
-            devicePickerControl.UpdateLabelText();
+            deviceChooserControl.Selection = nextSelectedMicProfile;
+            deviceChooserControl.UpdateLabelText();
 
             OnRecordingDeviceSelected(nextSelectedMicProfile);
         }
@@ -340,7 +340,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 
     private void UpdateSampleRateLabel()
     {
-        sampleRatePickerControl.UpdateLabelText();
+        sampleRateChooserControl.UpdateLabelText();
     }
 
     private Translation GetSampleRateLabel(int item)
@@ -368,7 +368,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
             return false;
         }
 
-        MicProfile lastMicProfile = devicePickerControl.Items
+        MicProfile lastMicProfile = deviceChooserControl.Items
             .FirstOrDefault(micProfile => micProfile.Name == settings.LastMicProfileNameInRecordingOptionsScene
                                           && micProfile.ChannelIndex == settings.LastMicProfileChannelIndexInRecordingOptionsScene);
         if (lastMicProfile == null)
@@ -376,7 +376,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
             return false;
         }
 
-        devicePickerControl.SelectItem(lastMicProfile);
+        deviceChooserControl.Selection = lastMicProfile;
         return true;
     }
 
@@ -432,22 +432,22 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         }
 
         micPitchTracker.MicProfile = micProfile;
-        amplificationPickerControl.TrySelectItem(micProfile.Amplification);
-        noiseSuppressionPickerControl.TrySelectItem(micProfile.NoiseSuppression);
-        delayPickerControl.SelectItem(micProfile.DelayInMillis);
+        amplificationChooserControl.TrySetSelection(micProfile.Amplification);
+        noiseSuppressionChooserControl.TrySetSelection(micProfile.NoiseSuppression);
+        delayChooserControl.Selection = micProfile.DelayInMillis;
 
         Color32 micProfileColor = micProfile.Color
-            .OrIfDefault(colorPickerControl.Items.FirstOrDefault());
-        if (colorPickerControl.Items.Contains(micProfileColor))
+            .OrIfDefault(colorChooserControl.Items.FirstOrDefault());
+        if (colorChooserControl.Items.Contains(micProfileColor))
         {
-            colorPickerControl.TrySelectItem(micProfileColor);
+            colorChooserControl.TrySetSelection(micProfileColor);
         }
         else
         {
-            colorPickerControl.SelectItem(micProfile.Color);
+            colorChooserControl.Selection = micProfile.Color;
         }
 
-        sampleRatePickerControl.TrySelectItem(micProfile.SampleRate);
+        sampleRateChooserControl.TrySetSelection(micProfile.SampleRate);
 
         enabledToggle.value = micProfile.IsEnabled;
         UpdateRecordingDeviceInactiveOverlay();
@@ -497,9 +497,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 
     private void OnConnectedClientMicProfileChanged(MicProfile micProfile)
     {
-        if (devicePickerControl.SelectedItem == micProfile)
+        if (deviceChooserControl.Selection == micProfile)
         {
-            devicePickerControl.UpdateLabelText();
+            deviceChooserControl.UpdateLabelText();
         }
     }
 

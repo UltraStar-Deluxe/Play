@@ -15,7 +15,7 @@ public static class FileScannerUtils
                 List<string> txtFilesInSongDir = fileScanner.GetFiles(folder, true);
                 files.AddRange(txtFilesInSongDir);
 
-                Log.Debug(() => $"Found {txtFilesInSongDir.Count} files matching patterns {fileExtensionPatterns.ToCsv(", ")} in folder: '{folder}'");
+                Log.Debug(() => $"Found {txtFilesInSongDir.Count} files matching patterns {fileExtensionPatterns.JoinWith(", ")} in folder: '{folder}'");
             }
             catch (Exception ex)
             {

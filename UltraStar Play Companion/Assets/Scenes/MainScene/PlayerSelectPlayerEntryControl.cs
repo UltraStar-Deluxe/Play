@@ -40,7 +40,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
     private Label teamLabel;
 
     [Inject(UxmlName = R.UxmlNames.voiceChooser)]
-    private ItemPicker voiceChooser;
+    private Chooser voiceChooser;
 
     [Inject(UxmlName = R.UxmlNames.selectedToggle)]
     private Toggle selectedToggle;
@@ -64,7 +64,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
 
     public ReactiveProperty<bool> IsSelected { get; private set; } = new();
 
-    public LabeledItemPickerControl<EExtendedVoiceId> VoiceChooserControl { get; private set; }
+    public LabeledChooserControl<EExtendedVoiceId> VoiceChooserControl { get; private set; }
 
     private MicSelectionDialogControl micSelectionDialogControl;
 
@@ -84,7 +84,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
             UpdateMicIcon();
         });
 
-        VoiceChooserControl = new EnumItemPickerControl<EExtendedVoiceId>(voiceChooser);
+        VoiceChooserControl = new EnumChooserControl<EExtendedVoiceId>(voiceChooser);
 
         UpdateMicIcon();
     }
@@ -154,7 +154,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         VoiceChooserControl.Items = voiceIds;
         if (VoiceChooserControl.Items.Count <= 1)
         {
-            VoiceChooserControl.ItemPicker.HideByDisplay();
+            VoiceChooserControl.Chooser.HideByDisplay();
         }
     }
 

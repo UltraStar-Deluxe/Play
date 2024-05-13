@@ -28,7 +28,7 @@ Get started
 
 1. Install the font files you want to use
 
-2. Use your app's font picker to view the font family and all the
+2. Use your app's font chooser to view the font family and all the
 available styles
 
 Learn more about variable fonts

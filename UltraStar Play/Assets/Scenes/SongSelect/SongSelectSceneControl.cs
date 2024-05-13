@@ -408,7 +408,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                     uiManager.CreateConfirmationDialogControl(
                         Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_title),
                         Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_message,
-                            "suggestionName", SongMetaUtils.GetArtistDashTitle(songMeta),
+                            "suggestionName", songMeta.GetArtistDashTitle(),
                             "suggestorName", lobbyMember.DisplayName),
                         Translation.Get(R.Messages.common_yes),
                         _ => songRouletteControl.SelectEntryBySongMeta(songMeta),
@@ -513,10 +513,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.UpdateSongQueue");
 
-        string newSongQueueLengthAsString = SongQueueManager.SongQueueLength.ToString();
+        string newSongQueueLengthAsString = songQueueManager.SongQueueLength.ToString();
         if (songQueueLengthLabel.text != newSongQueueLengthAsString)
         {
-            songQueueLengthContainer.SetVisibleByDisplay(SongQueueManager.SongQueueLength > 0);
+            songQueueLengthContainer.SetVisibleByDisplay(songQueueManager.SongQueueLength > 0);
             songQueueLengthLabel.SetTranslatedText(Translation.Of(newSongQueueLengthAsString));
             LeanTween.value(gameObject, Vector3.one * 1.5f, Vector3.one, 1.5f)
                 .setEaseOutBounce()
@@ -524,7 +524,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
         songQueueUiControl.SetSongQueueEntryDtos(songQueueManager.GetSongQueueEntries());
         startSongQueueButton.SetEnabled(!songQueueManager.IsSongQueueEmpty);
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(songQueueOverlay);
     }
 
     private void UpdateModifiersActiveIcon()
@@ -759,8 +758,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         AccordionItem attributionAccordionItem = new(Translation.Get(R.Messages.action_showAttribution));
         attributionAccordionItem.Add(AttributionUtils.CreateAttributionVisualElement(songMeta));
         lyricsDialogControl.AddVisualElement(attributionAccordionItem);
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(lyricsDialogControl.DialogRootVisualElement);
     }
 
     public void InitSongMetas()
@@ -1089,10 +1086,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
 
         // Check that the used audio format can be loaded.
-        songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
+        songAudioPlayer.LoadAndPlayAudioAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
-                Debug.LogError( $"Audio file '{songMeta.Audio}' could not be loaded.");
+                Debug.LogException(ex);
+                Debug.LogError( $"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
                     "name", songMeta.Audio,
                     "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
@@ -1274,7 +1272,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         uiManager.CreateConfirmationDialogControl(
             Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_title),
             Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_message,
-                "suggestionName", SongMetaUtils.GetArtistDashTitle(songMeta)),
+                "suggestionName", songMeta.GetArtistDashTitle()),
             Translation.Get(R.Messages.common_yes),
             _ => SendSuggestSongMessageForOnlineMultiplayer(songMeta),
             Translation.Get(R.Messages.common_no));
@@ -1287,7 +1285,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             FastBufferWriterUtils.WriteJsonValuePacked(new SuggestSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
             NetworkManager.ServerClientId);
         NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_suggestedSongToHost,
-            "name", SongMetaUtils.GetArtistDashTitle(songMeta)));
+            "name", songMeta.GetArtistDashTitle()));
     }
 
     private void OpenAskToAssignMicsDialog(List<PlayerProfile> playerProfilesWithoutMics, Action onIgnoreAndStart)
@@ -1297,7 +1295,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         askToAssignMicsDialog = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_missingMicDialog_title));
         string playerNamesCsv = playerProfilesWithoutMics
             .Select(it => it.Name)
-            .ToCsv(", ", "", "");
+            .JoinWith(", ");
         askToAssignMicsDialog.Message = Translation.Get(R.Messages.songSelectScene_missingMicDialog_message,
             "playerNames", playerNamesCsv);
         askToAssignMicsDialog.AddButton(Translation.Get(R.Messages.songSelectScene_missingMicDialog_ignoreAndStart), _ =>
@@ -1335,12 +1333,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         StartSongRepositorySearch();
 
-        SongSelectEntry lastSelectedEntry = songRouletteControl.SelectedEntry;
         string rawSearchText = songSearchControl.GetRawSearchText();
-
-        if (lastRawSearchText.IsNullOrEmpty()
-            && !rawSearchText.IsNullOrEmpty())
+        if (!rawSearchText.IsNullOrEmpty()
+            && lastRawSearchText.IsNullOrEmpty())
         {
+            // Remember selection from before search
             selectedEntryBeforeSearch = songRouletteControl.SelectedEntry;
         }
         lastRawSearchText = rawSearchText;
@@ -1350,15 +1347,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             // Special search syntax used. Do not perform normal filtering.
             return;
         }
-
         UpdateFilteredSongs();
-        if (songSearchControl.GetSearchText().IsNullOrEmpty())
+
+        if (rawSearchText.IsNullOrEmpty())
         {
-            if (lastSelectedEntry != null)
-            {
-                songRouletteControl.SelectEntry(lastSelectedEntry);
-            }
-            else if (selectedEntryBeforeSearch != null)
+            // Restore selection from before search
+            if (selectedEntryBeforeSearch != null)
             {
                 songRouletteControl.SelectEntry(selectedEntryBeforeSearch);
             }
@@ -1401,7 +1395,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.Log($"Failed to add search result entry '{SongMetaUtils.GetArtistDashTitle(searchResultEntry.SongMeta)}'");
+            Debug.Log($"Failed to add search result entry '{searchResultEntry.SongMeta.GetArtistDashTitle()}'");
         }
     }
 
@@ -1633,7 +1627,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public void OnSubmitSearch()
     {
+        // Continue browsing songs from the currently selected entry.
         selectedEntryBeforeSearch = songRouletteControl.SelectedEntry;
+        songSearchControl.ResetSearchText();
+        songRouletteControl.Focus();
+    }
+
+    public void OnCancelSearch()
+    {
         songSearchControl.ResetSearchText();
         songRouletteControl.Focus();
     }

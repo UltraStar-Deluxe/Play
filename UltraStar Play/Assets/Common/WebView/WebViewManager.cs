@@ -22,6 +22,9 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     [InjectedInInspector]
     public TextAsset defaultWebViewHtml;
 
+    [InjectedInInspector]
+    public RenderTexture defaultRenderTexture;
+
     [Inject]
     private UIDocument uiDocument;
 
@@ -38,7 +41,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     public IWebView WebView => webView; // Public getter to allow modding
 
     private bool IsWebViewInitialized => webView != null;
-    private readonly Subject<bool> webViewInitializedEventStream = new();
+    private readonly Subject<VoidEvent> webViewInitializedEventStream = new();
 
     private bool isPlaying;
     public bool IsPlaying
@@ -68,13 +71,13 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     }
 
 
-    private long receivedPlaybackPositionUpdatedTimeInMillis;
-    private double receivedPlaybackPositionInMillis;
+    private long receivedPositionUpdatedTimeInMillis;
+    private double receivedPositionInMillis;
 
-    private int estimatedPlaybackPositionUpdatedFrameCount;
-    private long estimatedPlaybackPositionUpdatedTimeInMillis;
-    private double estimatedPlaybackPositionInMillis;
-    public double EstimatedPlaybackPositionInMillis
+    private int estimatedPositionUpdatedFrameCount;
+    private long estimatedPositionUpdatedTimeInMillis;
+    private double estimatedPositionInMillis;
+    public double EstimatedPositionInMillis
     {
         get
         {
@@ -83,7 +86,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                 return 0;
             }
 
-            return estimatedPlaybackPositionInMillis;
+            return estimatedPositionInMillis;
         }
     }
 
@@ -271,35 +274,35 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        UpdatePlaybackPositionInMillisEstimate();
-        SendPlaybackPositionInMillisIfNeeded();
+        UpdatePositionInMillisEstimate();
+        SendPositionInMillisIfNeeded();
     }
 
-    private void SendPlaybackPositionInMillisIfNeeded()
+    private void SendPositionInMillisIfNeeded()
     {
         long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-        long timeInMillisSinceLastUpdate = currentTimeInMillis - receivedPlaybackPositionUpdatedTimeInMillis;
+        long timeInMillisSinceLastUpdate = currentTimeInMillis - receivedPositionUpdatedTimeInMillis;
         if (timeInMillisSinceLastUpdate > 100)
         {
             webView.ExecuteJavaScript("sendPlaybackPositionInMillis()");
         }
     }
 
-    private void UpdatePlaybackPositionInMillisEstimate()
+    private void UpdatePositionInMillisEstimate()
     {
         if (!isPlaying
             || !isContentLoaded
-            || estimatedPlaybackPositionUpdatedFrameCount == Time.frameCount
-            || receivedPlaybackPositionInMillis <= 0)
+            || estimatedPositionUpdatedFrameCount == Time.frameCount
+            || receivedPositionInMillis <= 0)
         {
             return;
         }
 
         long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-        long deltaTimeInMillis = currentTimeInMillis - estimatedPlaybackPositionUpdatedTimeInMillis;
-        estimatedPlaybackPositionInMillis += (int)deltaTimeInMillis;
-        estimatedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
-        estimatedPlaybackPositionUpdatedFrameCount = Time.frameCount;
+        long deltaTimeInMillis = currentTimeInMillis - estimatedPositionUpdatedTimeInMillis;
+        estimatedPositionInMillis += (int)deltaTimeInMillis;
+        estimatedPositionUpdatedTimeInMillis = currentTimeInMillis;
+        estimatedPositionUpdatedFrameCount = Time.frameCount;
     }
 
     private void OnWebViewPrefabInstanceInitialized(object sender, EventArgs e)
@@ -310,7 +313,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
         webView.LoadHtml(defaultWebViewHtml.text);
 
-        webViewInitializedEventStream.OnNext(true);
+        webViewInitializedEventStream.OnNext(VoidEvent.instance);
     }
 
     private void OnWebViewLoadProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -377,17 +380,17 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                         long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
 
                         // Log how far away from the actual time the estimate has become.
-                        // double oldEstimatedPlaybackPositionInMillis = EstimatedPlaybackPositionInMillis;
+                        // double oldEstimatedPlaybackPositionInMillis = EstimatedPositionInMillis;
                         // double oldEstimatedPlaybackPositionInMillisOffset = numberWebViewMessageDto.value -
                         //                                                     oldEstimatedPlaybackPositionInMillis;
                         // Log.Verbose(() => $"Received new playback position. Old estimate offset: {oldEstimatedPlaybackPositionInMillisOffset}");
 
-                        receivedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
-                        receivedPlaybackPositionInMillis = numberWebViewMessageDto.value;
+                        receivedPositionUpdatedTimeInMillis = currentTimeInMillis;
+                        receivedPositionInMillis = numberWebViewMessageDto.value;
 
-                        estimatedPlaybackPositionUpdatedFrameCount = Time.frameCount;
-                        estimatedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
-                        estimatedPlaybackPositionInMillis = receivedPlaybackPositionInMillis;
+                        estimatedPositionUpdatedFrameCount = Time.frameCount;
+                        estimatedPositionUpdatedTimeInMillis = currentTimeInMillis;
+                        estimatedPositionInMillis = receivedPositionInMillis;
                         break;
                     }
                     case WebViewMessageType.DurationInMillis:
@@ -493,7 +496,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             // Already loaded.
             Debug.Log($"Reusing already loaded web page for URL {url}");
-            SetPlaybackPositionInMillis(0);
+            SetPositionInMillis(0);
             return true;
         }
 
@@ -562,17 +565,17 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         UpdateVolume();
     }
 
-    public void SetPlaybackPositionInMillis(double value)
+    public void SetPositionInMillis(double value)
     {
         if (!IsWebViewInitialized)
         {
             return;
         }
         webView.ExecuteJavaScript($"setPlaybackPositionInMillis({value})");
-        receivedPlaybackPositionInMillis = value;
-        estimatedPlaybackPositionInMillis = value;
-        estimatedPlaybackPositionUpdatedTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-        estimatedPlaybackPositionUpdatedFrameCount = Time.frameCount;
+        receivedPositionInMillis = value;
+        estimatedPositionInMillis = value;
+        estimatedPositionUpdatedTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        estimatedPositionUpdatedFrameCount = Time.frameCount;
     }
 
     public void PausePlayback()
@@ -630,5 +633,10 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             webViewCamera.targetTexture = targetTexture;
             UpdateWebViewCameraActive();
         }
+    }
+
+    public void ResetWebViewRenderTexture()
+    {
+        SetWebViewRenderTexture(defaultRenderTexture);
     }
 }

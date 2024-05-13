@@ -62,7 +62,7 @@ public class SongEditorStatusBarControl : INeedInjection, IInjectionFinishedList
         statusBarSongInfoLabel.text = $"{songMeta.Artist} - {songMeta.Title}";
         statusBarPositionInfoLabel.text = "";
 
-        songAudioPlayer.PositionInSongEventStream
+        songAudioPlayer.PositionEventStream
             .Subscribe(millis =>
             {
                 statusBarPositionInfoLabel.text = TimeUtils.GetMinutesAndSecondsDurationString(millis);

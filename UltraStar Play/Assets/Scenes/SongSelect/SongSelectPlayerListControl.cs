@@ -192,8 +192,6 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         };
 
         playerEntryControls.Add(listEntryControl);
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerEntryVisualElement);
     }
 
     private void UseMicProfileWhereNeeded(MicProfile micProfile)

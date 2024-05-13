@@ -14,9 +14,31 @@ public class SongSelectSearchTests : AbstractPlayModeTest
     protected override string TestSceneName => EScene.SongSelectScene.ToString();
 
     [UnityTest]
-    public IEnumerator SongSearchIgnoresAccentsTest() => ExpectAnySongSelectEntry()
+    public IEnumerator SongSearchShouldIgnoreAccents() => ExpectAnySongSelectEntry()
         .ContinueWith(_ => SetSearchText("eLLo"))
         .ContinueWith(ExpectSongSelectEntryWithArtistName("HèllóArtist"))
+        .ToYieldInstruction(this.Executor);
+
+    [UnityTest]
+    public IEnumerator CancelSongSearchShouldGoBackToLastSelection() => ExpectAnySongSelectEntry()
+        .ContinueWith(_ => SelectSongSelectEntryWithTitle("ArtistHelloWithAccent-TestSong"))
+        .ContinueWith(_ => WaitForSeconds(1))
+        .ContinueWith(_ => SetSearchText("Default-TestSong"))
+        .ContinueWith(_ => WaitForSeconds(1))
+        .ContinueWith(_ => CancelSearch())
+        .ContinueWith(_ => WaitForSeconds(1))
+        .ContinueWith(_ => ExpectSelectedSongSelectEntryWithTitle("ArtistHelloWithAccent-TestSong"))
+        .ToYieldInstruction(this.Executor);
+
+    [UnityTest]
+    public IEnumerator SubmitSongSearchShouldContinueAtCurrentSelection() => ExpectAnySongSelectEntry()
+        .ContinueWith(_ => SelectSongSelectEntryWithTitle("ArtistHelloWithAccent-TestSong"))
+        .ContinueWith(_ => WaitForSeconds(1))
+        .ContinueWith(_ => SetSearchText("ArtistHelloNoAccent"))
+        .ContinueWith(_ => WaitForSeconds(1))
+        .ContinueWith(_ => SubmitSearch())
+        .ContinueWith(_ => WaitForSeconds(1))
+        .ContinueWith(_ => ExpectSelectedSongSelectEntryWithTitle("ArtistHelloNoAccent-TestSong"))
         .ToYieldInstruction(this.Executor);
 
     protected override List<string> GetRelativeTestSongFilePaths()
@@ -67,4 +89,29 @@ public class SongSelectSearchTests : AbstractPlayModeTest
                                    .Artist
                                    .Contains(text, StringComparison.InvariantCultureIgnoreCase));
                     }).ExpectWithinSeconds(5));
+
+    private static ITestInstruction<object> ExpectSelectedSongSelectEntryWithTitle(string title) =>
+        FindFirstObjectByType<SongSelectSceneControl>()
+            .ContinueWith(songSelectSceneControl => WaitForCondition(
+                $"expect selected song entry with title '{title}'",
+                () => (songSelectSceneControl.songRouletteControl.SelectedEntry as SongSelectSongEntry).SongMeta.Title == title)
+                .ExpectWithinSeconds(5));
+
+    private static ITestInstruction<object> SelectSongSelectEntryWithTitle(string title) =>
+        FindFirstObjectByType<SongSelectSceneControl>()
+            .ContinueWith(songSelectSceneControl => Do(
+                    $"select song entry with title '{title}'",
+                    () =>
+                    {
+                        songSelectSceneControl.songRouletteControl.SelectEntry(songSelectSceneControl.songRouletteControl.Entries
+                            .FirstOrDefault(entry => entry is SongSelectSongEntry songEntry && songEntry.SongMeta.Title == title));
+                    }));
+
+    private ITestInstruction<object> CancelSearch()
+        => Do($"cancel search",
+            () => InputFixture.PressAndRelease(Keyboard.escapeKey));
+
+    private ITestInstruction<object> SubmitSearch()
+        => Do($"submit search",
+            () => InputFixture.PressAndRelease(Keyboard.enterKey));
 }

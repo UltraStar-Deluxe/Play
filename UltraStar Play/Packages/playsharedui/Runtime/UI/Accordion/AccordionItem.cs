@@ -50,11 +50,11 @@ public class AccordionItem : VisualElement
 
     public override VisualElement contentContainer => ContentElement;
 
-    private readonly Subject<bool> beforeContentVisibleChangedEventStream = new();
-    public IObservable<bool> BeforeContentVisibleChangedEventStream => beforeContentVisibleChangedEventStream;
+    private readonly Subject<VoidEvent> beforeContentVisibleChangedEventStream = new();
+    public IObservable<VoidEvent> BeforeContentVisibleChangedEventStream => beforeContentVisibleChangedEventStream;
 
-    private readonly Subject<bool> afterContentVisibleChangedEventStream = new();
-    public IObservable<bool> AfterContentVisibleChangedEventStream => afterContentVisibleChangedEventStream;
+    private readonly Subject<VoidEvent> afterContentVisibleChangedEventStream = new();
+    public IObservable<VoidEvent> AfterContentVisibleChangedEventStream => afterContentVisibleChangedEventStream;
 
     private Label TitleElement { get; set; }
     private Button ToggleContentButton { get; set; }
@@ -107,7 +107,7 @@ public class AccordionItem : VisualElement
                 ContentElement.style.height = targetContentHeight;
             }
 
-            afterContentVisibleChangedEventStream.OnNext(ContentVisible);
+            afterContentVisibleChangedEventStream.OnNext(VoidEvent.instance);
         });
 
         Title = title;
@@ -143,7 +143,7 @@ public class AccordionItem : VisualElement
             return;
         }
 
-        beforeContentVisibleChangedEventStream.OnNext(true);
+        beforeContentVisibleChangedEventStream.OnNext(VoidEvent.instance);
 
         this.AddToClassList("expanded");
         if (targetContentHeight >= 0)
@@ -164,7 +164,7 @@ public class AccordionItem : VisualElement
             return;
         }
 
-        beforeContentVisibleChangedEventStream.OnNext(false);
+        beforeContentVisibleChangedEventStream.OnNext(VoidEvent.instance);
 
         this.RemoveFromClassList("expanded");
         if (targetContentHeight >= 0)

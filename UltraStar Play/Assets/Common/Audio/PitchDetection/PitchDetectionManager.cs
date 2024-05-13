@@ -14,14 +14,8 @@ using UnityEngine;
 
 public class PitchDetectionManager : MonoBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        lockObject = new();
-        basicPitchProcessCount = 0;
-    }
-    private static object lockObject = new();
-    private static int basicPitchProcessCount;
+    private readonly object lockObject = new();
+    private int basicPitchProcessCount;
 
     public static PitchDetectionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PitchDetectionManager>();
 
@@ -63,7 +57,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         {
             return Observable.Throw<BasicPitchDetectionResult>(
                 new Exception($"Pitch Detection using Basic Pitch not supported for this audio file.\n" +
-                              $"Requires one of {ApplicationUtils.supportedBasicPitchDetectionAudioFiles.ToCsv(",", "", "")}"));
+                              $"Requires one of {ApplicationUtils.supportedBasicPitchDetectionAudioFiles.JoinWith(", ")}"));
         }
 
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
@@ -223,7 +217,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         }
         else
         {
-            Debug.LogError($"MIDI file of Basic Pitch not found. Written files: {basicPitchResult.WrittenFiles.ToCsv()}");
+            Debug.LogError($"MIDI file of Basic Pitch not found. Written files: {basicPitchResult.WrittenFiles.JoinWith(", ")}");
             midiFilePath = "";
             return false;
         }

@@ -36,8 +36,8 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
 
     private void Start()
     {
-        songAudioPlayer.JumpBackInSongEventStream.Subscribe(_ => RestartMidiPlayAlong());
-        songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => RestartMidiPlayAlong());
+        songAudioPlayer.JumpBackEventStream.Subscribe(_ => RestartMidiPlayAlong());
+        songAudioPlayer.JumpForwardEventStream.Subscribe(_ => RestartMidiPlayAlong());
     }
 
     void Update()
@@ -114,7 +114,7 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
         followingNotes.Sort(Note.comparerByStartBeat);
         Note firstNote = followingNotes.FirstOrDefault();
         double firstNoteStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, firstNote.StartBeat);
-        double distanceToFirstNoteStartInMillis = firstNoteStartInMillis - songAudioPlayer.PositionInSongInMillis;
+        double distanceToFirstNoteStartInMillis = firstNoteStartInMillis - songAudioPlayer.PositionInMillis;
         distanceToFirstNoteStartInMillis += settings.SongEditorSettings.MidiPlaybackOffsetInMillis;
 
         if (distanceToFirstNoteStartInMillis < 0)

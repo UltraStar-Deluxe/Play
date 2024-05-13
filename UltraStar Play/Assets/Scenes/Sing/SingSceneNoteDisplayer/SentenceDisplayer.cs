@@ -57,8 +57,8 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         double delayInMillis = 0;
         if (sentence != null)
         {
-            double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
-            double durationInMillisUntilSentenceStart = SongMetaBpmUtils.BeatsToMillis(songMeta, sentence.MinBeat) - positionInSongInMillis;
+            double positionInMillis = songAudioPlayer.PositionInMillis;
+            double durationInMillisUntilSentenceStart = SongMetaBpmUtils.BeatsToMillis(songMeta, sentence.MinBeat) - positionInMillis;
             delayInMillis = Math.Min(durationInMillisUntilSentenceStart, MaxMicDelayInMillis);
         }
 
@@ -156,7 +156,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         UpdateTargetNoteLabelWith(targetNoteControl, indexInList);
     }
 
-    public override float GetXInPercent(double positionInSongInMillis)
+    public override float GetXInPercent(double positionInMillis)
     {
         if (currentSentence == null)
         {
@@ -168,7 +168,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         double sentenceStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, sentenceStartBeat);
         double sentenceLengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta) * sentenceLengthInBeat;
         double delayInMillis = micProfile?.DelayInMillis ?? 0;
-        double xPercent = (float)(positionInSongInMillis - sentenceStartInMillis - delayInMillis) / sentenceLengthInMillis;
+        double xPercent = (float)(positionInMillis - sentenceStartInMillis - delayInMillis) / sentenceLengthInMillis;
         return (float)xPercent;
     }
 

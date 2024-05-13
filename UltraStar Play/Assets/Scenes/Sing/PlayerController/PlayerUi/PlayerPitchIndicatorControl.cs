@@ -87,8 +87,8 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
             }
         }
 
-        double positionInSongInMillisConsideringMicDelay = songAudioPlayer.PositionInSongInMillis - micDelay;
-        float xPosPercent = 100f * noteDisplayer.GetXInPercent(positionInSongInMillisConsideringMicDelay);
+        double positionInMillisConsideringMicDelay = songAudioPlayer.PositionInMillis - micDelay;
+        float xPosPercent = 100f * noteDisplayer.GetXInPercent(positionInMillisConsideringMicDelay);
         xPosPercent = NumberUtils.Limit(xPosPercent, 0, float.MaxValue);
         
         playerPitchIndicator.style.left =  new StyleLength(Length.Percent(xPosPercent));

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FullSerializer;
+using Newtonsoft.Json;
 
 [Serializable]
 public class HighScoreEntry
@@ -15,7 +15,7 @@ public class HighScoreEntry
      * Identifies the remote source of a highscore entry,
      * for example the online server where it was found.
      */
-    [fsIgnore]
+    [JsonIgnore]
     public string RemoteSource { get; private set; }
 
     public HighScoreEntry(

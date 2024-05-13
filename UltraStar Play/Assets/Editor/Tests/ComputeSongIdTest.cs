@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -9,7 +7,7 @@ public class ComputeSongIdTest
     private static readonly string folderPath = $"{Application.dataPath}/Editor/Tests/TestSongs";
 
     [Test]
-    public void ComputeScoreRelevantSongHashTest()
+    public void ScoreRelevantSongHashDidNotChange()
     {
         string originalFilePath = $"{folderPath}/ScoreRelevantSongHash-TestSong.txt";
         UltraStarSongMeta songMeta = LoadSong(originalFilePath);

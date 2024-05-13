@@ -89,12 +89,12 @@ public class NoteAreaContextMenuControl : ContextMenuControl
 
         if (selectedNotes.Count == 0)
         {
-            double positionInSongInMillis = noteAreaControl.ScreenPixelPositionToMillis(contextMenu.Position.x);
+            double positionInMillis = noteAreaControl.ScreenPixelPositionToMillis(contextMenu.Position.x);
 
             contextMenu.AddSeparator();
-            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setGap), () => setMusicGapAction.ExecuteAndNotify(positionInSongInMillis));
-            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyStart), () => setSongPropertyAction.SetMedleyStartAndNotify(positionInSongInMillis));
-            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyEnd), () => setSongPropertyAction.SetMedleyEndAndNotify(positionInSongInMillis));
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setGap), () => setMusicGapAction.ExecuteAndNotify(positionInMillis));
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyStart), () => setSongPropertyAction.SetMedleyStartAndNotify(positionInMillis));
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyEnd), () => setSongPropertyAction.SetMedleyEndAndNotify(positionInMillis));
         }
     }
 }

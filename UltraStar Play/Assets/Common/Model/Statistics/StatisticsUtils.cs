@@ -114,7 +114,7 @@ public static class StatisticsUtils
             return;
         }
 
-        Debug.Log($"Recording song started stats for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+        Debug.Log($"Recording song started stats for '{songMeta.GetArtistDashTitle()}'");
         SongStatistics songStatistics = CreateLocalStatistics(statistics, songMeta);
         songStatistics.IncrementSongStarted();
 
@@ -131,7 +131,7 @@ public static class StatisticsUtils
             return;
         }
 
-        Debug.Log($"Recording song finished for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+        Debug.Log($"Recording song finished for '{songMeta.GetArtistDashTitle()}'");
         SongStatistics songStatistics = CreateLocalStatistics(statistics, songMeta);
         songStatistics.IncrementSongFinished();
         statistics.IsDirty = true;
@@ -158,7 +158,7 @@ public static class StatisticsUtils
             return;
         }
 
-        Debug.Log($"Recording high score entries for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+        Debug.Log($"Recording high score entries for '{songMeta.GetArtistDashTitle()}'");
         SongStatistics songStatistics = CreateLocalStatistics(statistics, songMeta);
         highScoreEntries.ForEach(songStatistics.AddHighScore);
         statistics.IsDirty = true;
@@ -189,7 +189,7 @@ public static class StatisticsUtils
             {
                 try
                 {
-                    Debug.Log($"Recording high score entries for '{SongMetaUtils.GetArtistDashTitle(songMeta)}' using mod object of type {highScoreWriter.GetType().Name}");
+                    Debug.Log($"Recording high score entries for '{songMeta.GetArtistDashTitle()}' using mod object of type {highScoreWriter.GetType().Name}");
                     highScoreWriter.WriteHighScoreRecord(highScoreRecord, songMeta);
                 }
                 catch (Exception ex)

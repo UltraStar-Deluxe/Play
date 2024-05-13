@@ -10,18 +10,11 @@ using UnityEngine;
 
 public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        playlists.Clear();
-    }
-
     public static PlaylistManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PlaylistManager>();
 
     public static readonly string favoritesPlaylistName = "Favorites";
 
-    // static references to be persisted across scenes
-    private static List<IPlaylist> playlists = new();
+    private List<IPlaylist> playlists = new();
 
     public IReadOnlyList<IPlaylist> Playlists
     {

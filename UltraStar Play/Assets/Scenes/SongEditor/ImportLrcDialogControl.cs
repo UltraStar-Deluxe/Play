@@ -50,7 +50,7 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
 
     private readonly LrcFormatImporter lrcFormatImporter = new();
 
-    private readonly Subject<bool> lrcTextChangedEventStream = new();
+    private readonly Subject<ChangeEvent<string>> lrcTextChangedEventStream = new();
 
     public void OnInjectionFinished()
     {
@@ -58,7 +58,7 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
 
         importLrcTextField.DisableParseEscapeSequences();
         importLrcTextField.value = "";
-        importLrcTextField.RegisterValueChangedCallback(evt => lrcTextChangedEventStream.OnNext(true));
+        importLrcTextField.RegisterValueChangedCallback(evt => lrcTextChangedEventStream.OnNext(evt));
         lrcTextChangedEventStream.Throttle(new TimeSpan(0, 0, 0, 0, 200))
             .Subscribe(_ => UpdateErrorMessage());
 

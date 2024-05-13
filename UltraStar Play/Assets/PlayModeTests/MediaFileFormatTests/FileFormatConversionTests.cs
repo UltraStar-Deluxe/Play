@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 using UnityEngine;
@@ -8,6 +9,24 @@ public class FileFormatConversionTests : AbstractMediaFileFormatTests
 {
     private static readonly string tempFolder = $"{Application.temporaryCachePath}/MediaFileConversionTest";
 
+    private static readonly List<TestCaseData> fileNamesWithAudioSupportedByFfmpeg = new List<TestCaseData>()
+    {
+        new TestCaseData("aac-TestSong.txt").Returns(null),
+        new TestCaseData("aiff-TestSong.txt").Returns(null),
+        new TestCaseData("flac-TestSong.txt").Returns(null),
+    };
+
+    private static readonly List<TestCaseData> fileNamesWithVideoSupportedByFfmpeg = new List<TestCaseData>()
+    {
+        new TestCaseData("f4v-TestSong.txt").Returns(null),
+        new TestCaseData("flv-TestSong.txt").Returns(null),
+        new TestCaseData("mkv-TestSong.txt").Returns(null),
+        new TestCaseData("mov-TestSong.txt").Returns(null),
+        new TestCaseData("mpeg2-TestSong.txt").Returns(null),
+        new TestCaseData("webm-vp9-TestSong.txt").Returns(null),
+        new TestCaseData("wmv-TestSong.txt").Returns(null),
+    };
+
     [OneTimeSetUp]
     public void DeleteTempFolder()
     {
@@ -15,7 +34,7 @@ public class FileFormatConversionTests : AbstractMediaFileFormatTests
     }
 
     [Test]
-    public void GetTargetFileNameFromFfmpegArgumentsTest()
+    public void ShouldReturnTargetFileNameFromFfmpegArguments()
     {
         string targetFileName = SongMediaFileConversionManager.GetTargetFileNameFromFfmpegArguments(
             "-y -i \"F:/Dev/UltraStar-Songs-Dev/Some Artist - Some Title/Some Artist - Some Title.mp4\" -c:v libvpx -c:a libvorbis \"F:/Dev/UltraStar-Songs-Dev/Some Artist - Some Title/Some Artist - Some Title-vp8.webm\"");
@@ -26,87 +45,25 @@ public class FileFormatConversionTests : AbstractMediaFileFormatTests
         Assert.AreEqual("Some Artist - Some Title-vp8.webm", targetFileName2);
     }
 
-    /////////////////////////////////////////////////////////
-    // common audio formats supported by ffmpeg
-    /////////////////////////////////////////////////////////
     [UnityTest]
-    public IEnumerator AacTest()
+    [TestCaseSource(nameof(fileNamesWithAudioSupportedByFfmpeg))]
+    public IEnumerator ShouldConvertAudio(string txtFileName)
     {
-        return AudioFileConversionTest("aac-");
+        yield return ShouldConvertFile(txtFileName, audioFileFormatTestFolderPath, true);
     }
 
     [UnityTest]
-    public IEnumerator AiffTest()
+    [TestCaseSource(nameof(fileNamesWithVideoSupportedByFfmpeg))]
+    public IEnumerator ShouldConvertVideo(string txtFileName)
     {
-        return AudioFileConversionTest("aiff-");
+        return ShouldConvertFile(txtFileName, videoFileFormatTestFolderPath, false);
     }
 
-    [UnityTest]
-    public IEnumerator FlacTest()
-    {
-        return AudioFileConversionTest("flac-");
-    }
-
-    /////////////////////////////////////////////////////////
-    // common video formats supported by ffmpeg
-    /////////////////////////////////////////////////////////
-    [UnityTest]
-    public IEnumerator F4vConversionTest()
-    {
-        return VideoFileConversionTest("f4v-");
-    }
-
-    [UnityTest]
-    public IEnumerator FlvConversionTest()
-    {
-        return VideoFileConversionTest("flv-");
-    }
-
-    [UnityTest]
-    public IEnumerator MkvConversionTest()
-    {
-        return VideoFileConversionTest("mkv-");
-    }
-
-    [UnityTest]
-    public IEnumerator MovConversionTest()
-    {
-        return VideoFileConversionTest("mov-");
-    }
-
-    [UnityTest]
-    public IEnumerator Mpeg2ConversionTest()
-    {
-        return VideoFileConversionTest("mpeg2-");
-    }
-
-    [UnityTest]
-    public IEnumerator WebVp9ConversionTest()
-    {
-        return VideoFileConversionTest("webm-vp9-");
-    }
-
-    [UnityTest]
-    public IEnumerator WmvConversionTest()
-    {
-        return VideoFileConversionTest("wmv-");
-    }
-
-    private IEnumerator VideoFileConversionTest(string songFilePrefix)
-    {
-        return FileConversionTest(songFilePrefix, videoFileFormatTestFolderPath, "webm", false);
-    }
-
-    private IEnumerator AudioFileConversionTest(string songFilePrefix)
-    {
-        return FileConversionTest(songFilePrefix, audioFileFormatTestFolderPath, "ogg", true);
-    }
-
-    private IEnumerator FileConversionTest(string songFilePrefix, string testFolderPath, string targetFileExtension, bool isAudio)
+    private IEnumerator ShouldConvertFile(string txtFileName, string testFolderPath, bool isAudio)
     {
         LogAssert.ignoreFailingMessages = true;
 
-        string songFilePath = GetSongMetaFilePath(songFilePrefix, testFolderPath);
+        string songFilePath = GetSongMetaFilePath(txtFileName, testFolderPath);
         SongMeta songMeta = LoadSongMeta(songFilePath);
         string originalSourceFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
 
@@ -126,7 +83,6 @@ public class FileFormatConversionTests : AbstractMediaFileFormatTests
         }
 
         bool isSuccessful = false;
-        bool ignoreEqualFileExtension = true;
         int maxRetry = 3;
         long conversionStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         SongMediaFileConversionManager.MinTargetFileSizeInBytes = 10 * 1024; // 10 KB

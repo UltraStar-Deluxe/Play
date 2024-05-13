@@ -101,7 +101,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         focusableNavigator.AddCustomNavigationTarget(highscoreTitleButton, Vector2.up, songListView);
 
         songAudioPlayer.LoadedEventStream
-            .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
+            .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationInMillis));
         settings.ObserveEveryValueChanged(it => it.Difficulty)
             .Subscribe(_ =>
             {

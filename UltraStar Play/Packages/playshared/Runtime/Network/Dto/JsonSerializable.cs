@@ -1,4 +1,6 @@
-﻿// Marker interface that an object can be serialized to JSON (via extension method) 
+﻿/**
+ * Marker interface that an object can be serialized to JSON (via extension method)
+ */
 public interface JsonSerializable
 {
 }

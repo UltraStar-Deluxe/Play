@@ -11,41 +11,41 @@ using UnityEngine.UIElements;
 
 public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
-    [Inject(UxmlName = R.UxmlNames.reduceAudioVolumeItemPicker)]
-    private ItemPicker reduceAudioVolumeItemPicker;
+    [Inject(UxmlName = R.UxmlNames.reduceAudioVolumeChooser)]
+    private Chooser reduceAudioVolumeChooser;
 
-    [Inject(UxmlName = R.UxmlNames.passTheMicTimeItemPicker)]
-    private ItemPicker passTheMicTimeItemPicker;
+    [Inject(UxmlName = R.UxmlNames.passTheMicTimeChooser)]
+    private Chooser passTheMicTimeChooser;
 
     [Inject(UxmlName = R.UxmlNames.languageDropdownField)]
     private DropdownField languageDropdownField;
 
-    [Inject(UxmlName = R.UxmlNames.defaultMedleyTargetDurationPicker)]
-    private ItemPicker defaultMedleyTargetDurationPicker;
+    [Inject(UxmlName = R.UxmlNames.defaultMedleyTargetDurationChooser)]
+    private Chooser defaultMedleyTargetDurationChooser;
 
     protected override void Start()
     {
         base.Start();
 
-        NumberPickerControl passTheMicTimeItemPickerControl = new NumberPickerControl(passTheMicTimeItemPicker, 20);
-        passTheMicTimeItemPickerControl.GetLabelTextFunction = newValue => $"{newValue} s";
-        passTheMicTimeItemPickerControl.Bind(
+        NumberChooserControl passTheMicTimeChooserControl = new NumberChooserControl(passTheMicTimeChooser, 20);
+        passTheMicTimeChooserControl.GetLabelTextFunction = newValue => $"{newValue} s";
+        passTheMicTimeChooserControl.Bind(
             () => settings.PassTheMicTimeInSeconds,
             newValue => settings.PassTheMicTimeInSeconds = (int)newValue);
 
-        NumberPickerControl reduceAudioVolumeItemPickerControl = new PercentNumberPickerControl(reduceAudioVolumeItemPicker, 2);
-        reduceAudioVolumeItemPickerControl.Bind(
+        NumberChooserControl reduceAudioVolumeChooserControl = new PercentNumberChooserControl(reduceAudioVolumeChooser, 2);
+        reduceAudioVolumeChooserControl.Bind(
             () => settings.ReducedAudioVolumePercent,
             newValue => settings.ReducedAudioVolumePercent = (int)newValue);
 
-        NumberPickerControl defaultMedleyDurationPickerControl = new NumberPickerControl(defaultMedleyTargetDurationPicker, 30);
-        defaultMedleyDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue} s";
-        defaultMedleyDurationPickerControl.Bind(
+        NumberChooserControl defaultMedleyDurationChooserControl = new NumberChooserControl(defaultMedleyTargetDurationChooser, 30);
+        defaultMedleyDurationChooserControl.GetLabelTextFunction = newValue => $"{newValue} s";
+        defaultMedleyDurationChooserControl.Bind(
             () => settings.DefaultMedleyTargetDurationInSeconds,
             newValue => settings.DefaultMedleyTargetDurationInSeconds = (int)newValue);
 
         LanguageChooserControl languageChooserControl = new LanguageChooserControl(languageDropdownField);
-        languageChooserControl.Selection.Subscribe(newValue => OnLanguageChanged(newValue));
+        languageChooserControl.SelectionAsObservable.Subscribe(newValue => OnLanguageChanged(newValue));
     }
 
     private void OnLanguageChanged(CultureInfo newValue)

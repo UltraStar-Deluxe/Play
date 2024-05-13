@@ -47,8 +47,8 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     private Vector2 lastSize;
     private Vector2 lastPosition;
 
-    private readonly Subject<bool> contextMenuClosedEventStream = new();
-    public IObservable<bool> ContextMenuClosedEventStream => contextMenuClosedEventStream;
+    private readonly Subject<VoidEvent> contextMenuClosedEventStream = new();
+    public IObservable<VoidEvent> ContextMenuClosedEventStream => contextMenuClosedEventStream;
 
     /**
      * Optional object to associate data with the popup menu.
@@ -158,7 +158,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         closeContextMenuDisposable.Dispose();
         visualElement.RemoveFromHierarchy();
         OpenContextMenuPopups.Remove(this);
-        contextMenuClosedEventStream.OnNext(true);
+        contextMenuClosedEventStream.OnNext(VoidEvent.instance);
     }
 
     private static void CloseAllOpenContextMenus()

@@ -2,7 +2,7 @@
     <ui:VisualElement name="loadedOptionsRoot">
         <ui:ScrollView>
             <ui:Toggle name="searchMidiFilesWithLyricsToggle" label="$options_searchMidiFilesWithLyrics" class="noBackgroundInHierarchy" style="flex-shrink: 0;" />
-            <ItemPicker name="songDataFetchTypeChooser" label="$options_songDataFetchType" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+            <Chooser name="songDataFetchTypeChooser" label="$options_songDataFetchType" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ui:Label tabindex="-1" text="$options_songLibrary_songFolderListTitle" name="songFolderListTitle" class="noBackgroundInHierarchy" style="-unity-font-style: bold;" />
             <ui:VisualElement name="androidSongFolderHintContainer" style="width: 100%; margin-bottom: 10px; flex-shrink: 0; flex-direction: row; align-items: center;">
                 <MaterialIcon name="infoIcon" icon="info_outline" class="smallFont mr-1" />

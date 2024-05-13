@@ -131,13 +131,13 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
         int endBeat;
         if (reducedDistanceInBeats >= 0)
         {
-            startBeat = dragEvent.PositionInSongInBeatsDragStart;
-            endBeat = dragEvent.PositionInSongInBeatsDragStart + reducedDistanceInBeats;
+            startBeat = dragEvent.PositionInBeatsDragStart;
+            endBeat = dragEvent.PositionInBeatsDragStart + reducedDistanceInBeats;
         }
         else
         {
-            startBeat = dragEvent.PositionInSongInBeatsDragStart + reducedDistanceInBeats;
-            endBeat = dragEvent.PositionInSongInBeatsDragStart;
+            startBeat = dragEvent.PositionInBeatsDragStart + reducedDistanceInBeats;
+            endBeat = dragEvent.PositionInBeatsDragStart;
         }
 
         int lengthInBeats = endBeat - startBeat;
@@ -220,7 +220,7 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
 
     private int GetDragStartBeat(NoteAreaDragEvent dragEvent)
     {
-        return dragEvent.PositionInSongInBeatsDragStart;
+        return dragEvent.PositionInBeatsDragStart;
     }
 
     private int GetDragEndBeat(NoteAreaDragEvent dragEvent)

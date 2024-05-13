@@ -52,8 +52,8 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
     private readonly Subject<string> valueChangedEventStream = new();
     public IObservable<string> ValueChangedEventStream => valueChangedEventStream;
 
-    private readonly Subject<bool> deleteEventStream = new();
-    public IObservable<bool> DeleteEventStream => deleteEventStream;
+    private readonly Subject<VoidEvent> deleteEventStream = new();
+    public IObservable<VoidEvent> DeleteEventStream => deleteEventStream;
 
     private readonly Subject<bool> songFolderEnabledChangedEventStream = new();
     public IObservable<bool> SongFolderEnabledChangedEventStream => songFolderEnabledChangedEventStream;
@@ -114,7 +114,7 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
             openSongFolderButton.HideByDisplay();
         }
 
-        deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(true));
+        deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(VoidEvent.instance));
         textField.DisableParseEscapeSequences();
         textField.RegisterValueChangedCallback(evt =>
         {

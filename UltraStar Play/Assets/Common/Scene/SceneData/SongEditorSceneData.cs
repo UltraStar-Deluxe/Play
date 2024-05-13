@@ -8,7 +8,7 @@ public class SongEditorSceneData : SceneData
     public SceneData PreviousSceneData { get; set; }
 
     public SongMeta SongMeta { get; set; }
-    public double PositionInSongInMillis { get; set; }
+    public double PositionInMillis { get; set; }
     public List<PlayerProfile> SelectedPlayerProfiles { get; set; } = new();
     public Dictionary<PlayerProfile, MicProfile> PlayerProfileToMicProfileMap { get; set; } = new();
     public bool CreateSingAlongDataViaAiTools { get; set; }

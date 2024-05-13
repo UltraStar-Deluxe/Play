@@ -208,7 +208,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         });
         if (shouldPlayApplause)
         {
-            AudioManager.PlaySoundEffect(singingResultsApplauseAudioClip, 0.8f);
+            SfxManager.PlaySoundEffect(singingResultsApplauseAudioClip, 0.8f);
         }
 
         // TODO: Good score bar sound effect?
@@ -250,7 +250,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private void InitSongPreview()
     {
-        songAudioPlayer.LoadAndPlaySongAudio(sceneData.SongMetas.LastOrDefault());
+        songAudioPlayer.LoadAndPlayAudio(sceneData.SongMetas.LastOrDefault());
         songPreviewControl.previewDelayInSeconds = 0;
         songPreviewControl.AudioFadeInDurationInSeconds = 2;
         songPreviewControl.VideoFadeInDurationInSeconds = 2;
@@ -264,7 +264,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             return;
         }
 
-        AudioManager.PlaySoundEffect(teamResultsApplauseAudioClip, 0.8f);
+        SfxManager.PlaySoundEffect(teamResultsApplauseAudioClip, 0.8f);
 
         // Create particle effect
         if (!initializedTeamResultsParticleEffects)
@@ -312,7 +312,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     {
         SingSceneData singSceneData = SceneNavigator.GetSceneData(new SingSceneData());
         singSceneData.SongMetas = sceneData.SongMetas;
-        singSceneData.PositionInSongInMillis = 0;
+        singSceneData.PositionInMillis = 0;
         sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 

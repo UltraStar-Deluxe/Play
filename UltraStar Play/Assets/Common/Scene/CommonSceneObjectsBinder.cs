@@ -27,6 +27,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(MidiManager.Instance);
         bb.BindExistingInstance(ImageManager.Instance);
         bb.BindExistingInstance(AudioManager.Instance);
+        bb.BindExistingInstance(SfxManager.Instance);
         bb.BindExistingInstance(TranslationManager.Instance);
         bb.BindExistingInstance(ContextMenuPopupManager.Instance);
         bb.BindExistingInstance(WebCamManager.Instance);

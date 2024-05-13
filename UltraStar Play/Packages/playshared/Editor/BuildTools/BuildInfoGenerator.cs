@@ -48,7 +48,7 @@ public class BuildInfoGenerator : IPreprocessBuildWithReport
             .ToList();
         File.WriteAllLines(versionFile, versionFileLines);
 
-        Debug.Log($"New contents of {versionFile}:\n{versionFileLines.ToCsv(", ")}");
+        Debug.Log($"New contents of {versionFile}:\n{versionFileLines.JoinWith(", ")}");
 
         // Unity needs a hint that this asset has changed.
         AssetDatabase.ImportAsset(versionFile);

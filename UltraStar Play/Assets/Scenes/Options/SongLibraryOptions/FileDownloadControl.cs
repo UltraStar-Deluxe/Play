@@ -7,16 +7,16 @@ using UnityEngine.Networking;
 public class FileDownloadControl : MonoBehaviour
 {
     public UnityWebRequest WebRequest { get; private set; }
-    
+
     private readonly Subject<DownloadProgressEvent> progressEventStream = new();
     public IObservable<DownloadProgressEvent> ProgressEventStream => progressEventStream;
-    
+
     public ReactiveProperty<ulong> FinalDownloadSizeInBytes { get; private set; } = new();
     public bool HasFinalDownloadSize => FinalDownloadSizeInBytes.Value > 0;
 
-    private readonly Subject<bool> beforeDestroyEventStream = new();
-    public IObservable<bool> BeforeDestroyEventStream => beforeDestroyEventStream;
-    
+    private readonly Subject<VoidEvent> beforeDestroyEventStream = new();
+    public IObservable<VoidEvent> BeforeDestroyEventStream => beforeDestroyEventStream;
+
     public ReactiveProperty<bool> IsDone { get; private set; } = new();
     public ReactiveProperty<string> ErrorMessage { get; private set; } = new();
     public IObservable<bool> HasError => ErrorMessage.Select(errorMessage => !errorMessage.IsNullOrEmpty());
@@ -24,7 +24,7 @@ public class FileDownloadControl : MonoBehaviour
     public IObservable<bool> IsDoneWithoutError => IsDone.CombineLatest(HasError, (isDone, hasError) => isDone && !hasError);
 
     private bool isInitialized;
-    
+
     public static FileDownloadControl Create(UnityWebRequest webRequest, Transform parent)
     {
         string name = $"{nameof(FileDownloadControl)} {webRequest.url}";
@@ -33,7 +33,7 @@ public class FileDownloadControl : MonoBehaviour
         {
             gameObject.transform.parent = parent;
         }
-        
+
         FileDownloadControl fileDownloadControl = gameObject.AddComponent<FileDownloadControl>();
         fileDownloadControl.WebRequest = webRequest;
         fileDownloadControl.Init();
@@ -50,16 +50,16 @@ public class FileDownloadControl : MonoBehaviour
         WebRequest.Abort();
         Destroy(gameObject);
     }
-    
+
     private void Init()
     {
         if (isInitialized)
         {
             return;
         }
-        
+
         isInitialized = true;
-        
+
         FetchFileSize();
     }
 
@@ -69,9 +69,9 @@ public class FileDownloadControl : MonoBehaviour
         {
             return;
         }
-        
+
         UpdateReactiveProperties();
-        
+
         if (IsDone.Value || !ErrorMessage.Value.IsNullOrEmpty())
         {
             Destroy(gameObject);
@@ -120,12 +120,12 @@ public class FileDownloadControl : MonoBehaviour
             progressEventStream.OnNext(new DownloadProgressEvent(WebRequest.downloadedBytes, FinalDownloadSizeInBytes.Value));
         }
     }
-    
+
     private void OnDestroy()
     {
-        beforeDestroyEventStream.OnNext(true);
+        beforeDestroyEventStream.OnNext(VoidEvent.instance);
         WebRequest?.Dispose();
-        
+
         // If the request was not finished yet, then it is now aborted and thus not successful.
         if (!IsDone.Value)
         {
@@ -157,7 +157,7 @@ public class FileDownloadControl : MonoBehaviour
         webRequest.downloadHandler = downloadHandler;
         return webRequest;
     }
-    
+
     public static DownloadHandler CreateDownloadHandler(string targetPath)
     {
         DownloadHandlerFile downloadHandler = new(targetPath);

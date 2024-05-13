@@ -4,7 +4,24 @@ using static UltraStarPlaylistParser;
 public class UltraStarPlaylistTest
 {
     [Test]
-    public void ParsePlaylistTest()
+    public void EditPlaylist()
+    {
+        UltraStarPlaylist playlist = new("");
+        playlist.AddLineEntry(new UltraStartPlaylistLineEntry("# comment"));
+        Assert.IsFalse(playlist.HasSongEntry("The artist", "The title"));
+        Assert.AreEqual(1, playlist.GetLines().Length);
+
+        playlist.AddLineEntry(new UltraStartPlaylistSongEntry("The artist", "The title"));
+        Assert.IsTrue(playlist.HasSongEntry("The artist", "The title"));
+        Assert.AreEqual(2, playlist.GetLines().Length);
+
+        playlist.RemoveSongEntry("The artist", "The title");
+        Assert.IsFalse(playlist.HasSongEntry("The artist", "The title"));
+        Assert.AreEqual(1, playlist.GetLines().Length);
+    }
+
+    [Test]
+    public void ParsePlaylist()
     {
         UltraStarPlaylist playlist;
         void AssetPlaylistIsLoadedCorrectly(string expectedName)
@@ -29,24 +46,7 @@ public class UltraStarPlaylistTest
     }
 
     [Test]
-    public void EditPlaylistTest()
-    {
-        UltraStarPlaylist playlist = new("");
-        playlist.AddLineEntry(new UltraStartPlaylistLineEntry("# comment"));
-        Assert.IsFalse(playlist.HasSongEntry("The artist", "The title"));
-        Assert.AreEqual(1, playlist.GetLines().Length);
-
-        playlist.AddLineEntry(new UltraStartPlaylistSongEntry("The artist", "The title"));
-        Assert.IsTrue(playlist.HasSongEntry("The artist", "The title"));
-        Assert.AreEqual(2, playlist.GetLines().Length);
-
-        playlist.RemoveSongEntry("The artist", "The title");
-        Assert.IsFalse(playlist.HasSongEntry("The artist", "The title"));
-        Assert.AreEqual(1, playlist.GetLines().Length);
-    }
-
-    [Test]
-    public void ParsePlaylistLineTest()
+    public void ParsePlaylistLine()
     {
         UltraStartPlaylistLineEntry entry;
         entry = UltraStarPlaylistLineParser.ParseLine("# this is a comment");

@@ -58,7 +58,7 @@ public class CoreGameLoopTests : AbstractPlayModeTest
     }
 
     [UnityTest]
-    public IEnumerator CoreGameLoopTest() => IgnoreFailingMessages()
+    public IEnumerator CoreGameLoopWorksWithoutErrors() => IgnoreFailingMessages()
         .ContinueWith(_ => StartSinging())
         .ContinueWith(_ => ExpectScene(EScene.SingScene))
         .ContinueWith(_ => ExpectScene(EScene.SingingResultsScene, TestSongAudioLengthInSeconds + 2))

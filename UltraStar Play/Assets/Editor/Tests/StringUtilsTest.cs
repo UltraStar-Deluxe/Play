@@ -4,7 +4,7 @@ using NUnit.Framework;
 public class StringUtilsTest
 {
     [Test]
-    public void TrimStartAndEndTest()
+    public void ShouldTrimStartAndEnd()
     {
         string prefix = "prefix-";
         string suffix = "-suffix";
@@ -24,7 +24,7 @@ public class StringUtilsTest
     }
 
     [Test]
-    public void ReplaceInvalidCharactersTest()
+    public void ShouldReplaceInvalidCharacters()
     {
         Assert.AreEqual("dummy-file__-name", StringUtils.ReplaceInvalidChars(
             "dummy-file*|-name", '_', new HashSet<char>() { '*', '|' }));
@@ -34,7 +34,7 @@ public class StringUtilsTest
     }
 
     [Test]
-    public void CountOccurrencesInStringTest()
+    public void ShouldCountOccurrencesInString()
     {
         Assert.AreEqual(3, StringUtils.CountOccurrencesInString("abcaa", "a"));
         Assert.AreEqual(1, StringUtils.CountOccurrencesInString("abcaa", "ab"));

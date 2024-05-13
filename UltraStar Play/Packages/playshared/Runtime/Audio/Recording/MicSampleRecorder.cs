@@ -165,7 +165,7 @@ public class MicSampleRecorder : MonoBehaviour
         if (!micDevices.Contains(micProfile.Name))
         {
             IsRecording.Value = false;
-            Debug.LogWarning($"Did not find mic '{micProfile.Name}'. Available mic devices: {micDevices.ToCsv()}");
+            Debug.LogWarning($"Did not find mic '{micProfile.Name}'. Available mic devices: {micDevices.JoinWith(", ")}");
             return;
         }
 

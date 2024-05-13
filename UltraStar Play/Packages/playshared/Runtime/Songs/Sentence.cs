@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using UnityEngine;
 
 [Serializable]
 public class Sentence
 {
-    public readonly static IComparer<Sentence> comparerByStartBeat = new SentenceComparerByStartBeat();
+    public static readonly IComparer<Sentence> comparerByStartBeat = new SentenceComparerByStartBeat();
 
     // Breaks the serialization loop with Voice.sentences. The field is restored by the Voice.
+    [JsonIgnore]
     [NonSerialized]
     private Voice voice;
+    [JsonIgnore]
     public Voice Voice { get { return voice; } }
 
     // LinebreakBeat can be set to extend the duration the sentence is shown.

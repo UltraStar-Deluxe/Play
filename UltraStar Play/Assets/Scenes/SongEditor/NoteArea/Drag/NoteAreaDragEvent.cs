@@ -5,26 +5,26 @@ public class NoteAreaDragEvent
     public int MidiNoteDragStart { get; private set; }
     public int MidiNoteDistance { get; private set; }
 
-    public int PositionInSongInMillisDragStart { get; private set; }
+    public int PositionInMillisDragStart { get; private set; }
     public int MillisDistance { get; private set; }
 
-    public int PositionInSongInBeatsDragStart { get; private set; }
+    public int PositionInBeatsDragStart { get; private set; }
     public int BeatDistance { get; private set; }
 
     public NoteAreaDragEvent(GeneralDragEvent generalDragEvent,
         int midiNoteDragStart, int midiNoteDistance,
-        int positionInSongInMillisDragStart, int millisDistance,
-        int positionInSongInBeatsDragStart, int beatDistance)
+        int positionInMillisDragStart, int millisDistance,
+        int positionInBeatsDragStart, int beatDistance)
     {
         GeneralDragEvent = generalDragEvent;
 
         MidiNoteDragStart = midiNoteDragStart;
         MidiNoteDistance = midiNoteDistance;
 
-        PositionInSongInMillisDragStart = positionInSongInMillisDragStart;
+        PositionInMillisDragStart = positionInMillisDragStart;
         MillisDistance = millisDistance;
 
-        PositionInSongInBeatsDragStart = positionInSongInBeatsDragStart;
+        PositionInBeatsDragStart = positionInBeatsDragStart;
         BeatDistance = beatDistance;
     }
 }

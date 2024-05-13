@@ -28,8 +28,8 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     private GameRoundSettings gameRoundSettings;
     private GameRoundSettings GameRoundSettings => gameRoundSettings;
 
-    private readonly Subject<bool> dialogClosedEventStream = new();
-    public IObservable<bool> DialogClosedEventStream => dialogClosedEventStream;
+    private readonly Subject<VoidEvent> dialogClosedEventStream = new();
+    public IObservable<VoidEvent> DialogClosedEventStream => dialogClosedEventStream;
 
     public bool IsVisible => visualElement.IsVisibleByDisplay();
 
@@ -68,8 +68,6 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
         {
             CreateGameRoundModifierControl(gameRoundModifier);
         }
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(modifierContainer);
     }
 
     private void CreateGameRoundModifierControl(IGameRoundModifier modifier)
@@ -99,7 +97,7 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     {
         visualElement.HideByDisplay();
         gameRoundSettings = null;
-        dialogClosedEventStream.OnNext(true);
+        dialogClosedEventStream.OnNext(VoidEvent.instance);
     }
 
     public void OpenDialog(GameRoundSettings newGameRoundSettings)

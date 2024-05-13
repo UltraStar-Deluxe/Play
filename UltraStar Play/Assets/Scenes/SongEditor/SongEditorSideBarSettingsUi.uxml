@@ -6,7 +6,7 @@
             <ui:Toggle name="adjustFollowingNotesToggle" label="$songEditor_options_adjustFollowingNotes" />
             <ui:Toggle name="syncLyricsAreaToggle" label="$songEditor_options_syncLyricsArea" />
             <ui:Toggle name="autoSaveToggle" label="$songEditor_options_autoSave" />
-            <ItemPicker no-previous-button="true" name="drawNoteLayerPicker" wrap-around="true" label="$songEditor_options_drawNoteLayer" class="controlWithLabelVertical mb-2" style="flex-direction: column;" />
+            <Chooser no-previous-button="true" name="drawNoteLayerChooser" wrap-around="true" label="$songEditor_options_drawNoteLayer" class="controlWithLabelVertical mb-2" style="flex-direction: column;" />
             <ui:IntegerField picking-mode="Ignore" value="100" text="300" name="spaceBetweenNotesTimeInMillisTextField" label="$songEditor_options_spaceBetweenNotes_duration" is-delayed="true" style="flex-direction: column;" />
             <ui:Button text="$songEditor_options_spaceBetweenNotes_button" display-tooltip-when-elided="true" name="addSpaceBetweenNotesButton" style="height: auto;" />
         </SongEditorSideBarGroup>
@@ -15,10 +15,10 @@
             <ui:Slider picking-mode="Ignore" value="42" high-value="100" name="musicVolumeSlider" label="$songEditor_options_volume" style="flex-direction: column;" />
             <ui:Slider picking-mode="Ignore" value="42" high-value="1.5" name="musicPlaybackSpeedSlider" low-value="0.5" label="$songEditor_options_playbackSpeed" style="flex-direction: column;" />
             <ui:Button text="$songEditor_options_playbackSpeed_reset" display-tooltip-when-elided="true" name="resetMusicPlaybackSpeedButton" />
-            <ItemPicker name="playbackAudioPicker" no-previous-button="true" wrapAround="true" label="$songEditor_options_playbackAudio" class="controlWithLabelVertical" />
+            <Chooser name="playbackAudioChooser" no-previous-button="true" wrapAround="true" label="$songEditor_options_playbackAudio" class="controlWithLabelVertical" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="micRecordingGroup" label="$songEditor_options_microphone_title">
-            <ItemPicker no-previous-button="true" name="micDeviceItemPicker" wrap-around="true" label="$songEditor_options_microphone" class="controlWithLabelVertical mb-2" style="flex-direction: column;" />
+            <Chooser no-previous-button="true" name="micDeviceChooser" wrap-around="true" label="$songEditor_options_microphone" class="controlWithLabelVertical mb-2" style="flex-direction: column;" />
             <ui:TextField picking-mode="Ignore" value="300" name="micDelayTextField" is-delayed="true" label="$songEditor_options_microphoneDelay" style="flex-direction: column;" />
             <ui:Toggle name="speechRecognitionWhenRecordingToggle" label="$songEditor_options_speechRecognitionWhenRecording" />
             <ui:TextField picking-mode="Ignore" value="A#4" name="micRecordingPitchTextField" is-delayed="true" label="$songEditor_options_defaultPitch" class="smallControl" style="flex-grow: 1; flex-direction: column;" />
@@ -29,13 +29,13 @@
             <ui:Button text="$songEditor_options_speechRecognition_modelPath_change" display-tooltip-when-elided="true" name="selectModelPathButton" />
             <ui:TextField name="speechRecognitionPromptTextField" is-delayed="true" multiline="true" label="$songEditor_options_speechRecognition_prompt" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column;" />
             <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" label="$songEditor_options_speechRecognition_phrases" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column; display: none;" />
-            <ItemPicker name="speechRecognitionAudioPicker" no-previous-button="true" wrapAround="true" label="$songEditor_options_speechRecognition_audio" class="controlWithLabelVertical" />
+            <Chooser name="speechRecognitionAudioChooser" no-previous-button="true" wrapAround="true" label="$songEditor_options_speechRecognition_audio" class="controlWithLabelVertical" />
             <ui:Button text="$songEditor_options_speechRecognition_perform" display-tooltip-when-elided="true" name="doSpeechRecognitionButton" style="width: 100%; height: auto;" />
             <ui:Toggle name="splitSyllablesAfterSpeechRecognitionToggle" label="$songEditor_options_speechRecognition_splitSyllablesAfterwards" />
             <ui:Button text="$songEditor_options_speechRecognition_splitSyllables" display-tooltip-when-elided="true" name="splitSyllablesInSelectionButton" style="height: auto;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="pitchDetectionGroup" label="$songEditor_options_pitchDetection_title">
-            <ItemPicker name="pitchDetectionAudioPicker" no-previous-button="true" wrapAround="true" label="$songEditor_options_pitchDetection_audio" class="controlWithLabelVertical" />
+            <Chooser name="pitchDetectionAudioChooser" no-previous-button="true" wrapAround="true" label="$songEditor_options_pitchDetection_audio" class="controlWithLabelVertical" />
             <ui:Button text="$songEditor_options_pitchDetection_perform" name="doPitchDetectionInSelectionButton" style="width: 100%; height: auto;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="buttonRecordingGroup" label="$songEditor_options_buttonTapping_title">
@@ -64,8 +64,8 @@
             <ui:TextField picking-mode="Ignore" value="4" name="sentenceLineSizeTextField" label="$songEditor_options_sentenceLineSize" style="flex-direction: column;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="labelsGroup" label="$songEditor_options_labels_title">
-            <ItemPicker name="timeLabelFormatPicker" no-previous-button="true" wrapAround="true" label="$songEditor_options_labels_time" class="controlWithLabelVertical" />
-            <ItemPicker name="pitchLabelFormatPicker" no-previous-button="true" wrapAround="true" label="$songEditor_options_labels_pitch" class="controlWithLabelVertical" />
+            <Chooser name="timeLabelFormatChooser" no-previous-button="true" wrapAround="true" label="$songEditor_options_labels_time" class="controlWithLabelVertical" />
+            <Chooser name="pitchLabelFormatChooser" no-previous-button="true" wrapAround="true" label="$songEditor_options_labels_pitch" class="controlWithLabelVertical" />
         </SongEditorSideBarGroup>
     </ui:ScrollView>
 </ui:UXML>

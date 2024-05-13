@@ -71,8 +71,6 @@ public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinish
         titleTextField.RegisterValueChangedCallback(evt => UpdateOkButtonEnabled());
 
         cancelButton.Focus();
-
-        TranslationManager.ApplyTranslations(visualElement);
     }
 
     private void OnAudioFileTextFieldChanged(string newValue)

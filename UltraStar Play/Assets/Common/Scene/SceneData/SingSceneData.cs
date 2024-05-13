@@ -13,7 +13,7 @@ public class SingSceneData : SceneData
 
     public PartyModeSceneData partyModeSceneData;
 
-    public double PositionInSongInMillis { get; set; }
+    public double PositionInMillis { get; set; }
     public bool IsRestart { get; set; }
     public bool StartPaused { get; set; }
     public Dictionary<PlayerProfile, List<ISingingResultsPlayerScore>> PlayerProfileToScoreDataMap { get; set; } = new();
@@ -27,7 +27,7 @@ public class SingSceneData : SceneData
         SongMetas = new(other.SongMetas);
         SingScenePlayerData = new(other.SingScenePlayerData);
         MedleySongIndex = other.MedleySongIndex;
-        PositionInSongInMillis = other.PositionInSongInMillis;
+        PositionInMillis = other.PositionInMillis;
         IsRestart = other.IsRestart;
         PlayerProfileToScoreDataMap = new(other.PlayerProfileToScoreDataMap);
         partyModeSceneData = other.partyModeSceneData;

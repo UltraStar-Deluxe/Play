@@ -259,8 +259,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
         helpDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
             _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToSongEditor)));
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(helpDialogControl.DialogRootVisualElement);
     }
 
     private void DoSpeechRecognition()
@@ -354,7 +352,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     private void GoToIssue(SongIssue issue)
     {
         double issueStartPositionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, issue.StartBeat);
-        songAudioPlayer.PositionInSongInMillis = issueStartPositionInMillis;
+        songAudioPlayer.PositionInMillis = issueStartPositionInMillis;
     }
 
     private void InitTabGroup()

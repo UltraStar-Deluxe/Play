@@ -21,14 +21,14 @@ public class SetMusicGapAction : INeedInjection
     [Inject]
     private PanelHelper panelHelper;
 
-    public void Execute(double positionInSongInMillis)
+    public void Execute(double positionInMillis)
     {
-        songMeta.GapInMillis = (float)positionInSongInMillis;
+        songMeta.GapInMillis = (float)positionInMillis;
     }
 
-    public void ExecuteAndNotify(double positionInSongInMillis)
+    public void ExecuteAndNotify(double positionInMillis)
     {
-        Execute(positionInSongInMillis);
+        Execute(positionInMillis);
         songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Gap));
     }
 }

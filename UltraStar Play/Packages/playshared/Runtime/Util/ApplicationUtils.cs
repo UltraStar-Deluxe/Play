@@ -393,7 +393,7 @@ public static class ApplicationUtils
             Debug.LogException(ex);
 
             List<string> fallbackList = new List<string>() { "ogg", "mp3", "wav" };
-            Debug.LogError($"Failed to load audio file extensions from file. Using fallback list: {fallbackList.ToCsv()}");
+            Debug.LogError($"Failed to load audio file extensions from file. Using fallback list: {fallbackList.JoinWith(", ")}");
             return fallbackList;
         }
     }
@@ -409,7 +409,7 @@ public static class ApplicationUtils
             Debug.LogException(ex);
 
             List<string> fallbackList = new List<string>() { "ogg", "mp3", "wav" };
-            Debug.LogError($"Failed to load ffmpeg supported audio file extensions from file. Using fallback list: {fallbackList.ToCsv()}");
+            Debug.LogError($"Failed to load ffmpeg supported audio file extensions from file. Using fallback list: {fallbackList.JoinWith(", ")}");
             return fallbackList;
         }
     }

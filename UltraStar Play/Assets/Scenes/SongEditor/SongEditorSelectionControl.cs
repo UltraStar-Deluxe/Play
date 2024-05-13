@@ -83,7 +83,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             minMidiNote = allNotes.Select(note => note.MidiNote).Min();
             maxMidiNote = allNotes.Select(note => note.MidiNote).Max();
         }
-        NoteAreaSelectionDragListener.lastSelectionRect.Value = NoteAreaRect.CreateFromMillis(songMeta, 0, (int)songAudioPlayer.DurationOfSongInMillis, minMidiNote, maxMidiNote);
+        NoteAreaSelectionDragListener.lastSelectionRect.Value = NoteAreaRect.CreateFromMillis(songMeta, 0, (int)songAudioPlayer.DurationInMillis, minMidiNote, maxMidiNote);
     }
 
     public void AddToSelection(List<EditorNoteControl> uiNotes)
@@ -218,7 +218,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         noteSelectionChangeEventStream.OnNext(new NoteSelectionChangeEvent(selectedNotes));
     }
 
-    public void SelectNextNote(bool updatePositionInSong = true)
+    public void SelectNextNote(bool updatePosition = true)
     {
         EditorNoteControl editorNoteControl = editorNoteDisplayer.EditorNoteControls.FirstOrDefault(it => it.IsEditingLyrics());
         bool wasEditingLyrics = false;
@@ -264,10 +264,10 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         {
             SetSelection(new List<Note> { nextNote });
 
-            if (updatePositionInSong)
+            if (updatePosition)
             {
                 double noteStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, nextNote.StartBeat);
-                songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
+                songAudioPlayer.PositionInMillis = noteStartInMillis;
             }
 
             if (wasEditingLyrics)
@@ -281,7 +281,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         }
     }
 
-    public void SelectPreviousNote(bool updatePositionInSong = true)
+    public void SelectPreviousNote(bool updatePosition = true)
     {
         bool wasEditingLyrics = false;
         EditorNoteControl editorNoteControl = editorNoteDisplayer.EditorNoteControls.FirstOrDefault(it => it.IsEditingLyrics());
@@ -324,10 +324,10 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         {
             SetSelection(new List<Note> { previousNote });
 
-            if (updatePositionInSong)
+            if (updatePosition)
             {
                 double noteStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, previousNote.StartBeat);
-                songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
+                songAudioPlayer.PositionInMillis = noteStartInMillis;
             }
 
             if (wasEditingLyrics)

@@ -108,8 +108,6 @@ public class SingingResultsHighscoreControl : INeedInjection
         {
             CreateHighscoreEntry(topSongEntries[i], i);
         }
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(highscoreEntryList);
     }
 
     private void CreateHighscoreEntry(HighScoreEntry highScoreEntry, int index)
