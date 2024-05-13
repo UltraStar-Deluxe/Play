@@ -40,15 +40,40 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             }
             AudioSource.Play();
         });
-        songAudioPlayer.JumpBackEventStream.Subscribe(_ => AudioSource.time = (float)songAudioPlayer.PositionInSeconds);
-        songAudioPlayer.JumpForwardEventStream.Subscribe(_ => AudioSource.time = (float)songAudioPlayer.PositionInSeconds);
-        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => AudioSource.Pause());
+        songAudioPlayer.JumpBackEventStream.Subscribe(_ =>
+        {
+            if (AudioSource.clip == null)
+            {
+                return;
+            }
+            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
+        });
+        songAudioPlayer.JumpForwardEventStream.Subscribe(_ =>
+        {
+            if (AudioSource.clip == null)
+            {
+                return;
+            }
+            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
+        });
+        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ =>
+        {
+            if (AudioSource.clip == null)
+            {
+                return;
+            }
+
+            AudioSource.Pause();
+        });
         songAudioPlayer.PositionEventStream.Subscribe(_ =>
         {
-            if (!songAudioPlayer.IsPlaying)
+            if (AudioSource.clip == null
+                || !songAudioPlayer.IsPlaying)
             {
-                AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
+                return;
             }
+
+            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
         });
         songAudioPlayer.PlaybackSpeedChangedEventStream.Subscribe(newValue => AudioUtils.SetPitchWithPitchShifter(AudioSource, (float)newValue));
     }
