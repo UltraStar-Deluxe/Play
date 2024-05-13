@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UniRx;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
 public class SongMetaManager : AbstractSingletonBehaviour
@@ -135,7 +137,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
     private async Task ScanSongsAsync(string generatedSongFolderAbsolutePath, CancellationToken cancellationToken)
     {
         Debug.Log($"Started song scan on thread {Thread.CurrentThread.ManagedThreadId}");
-        using DisposableStopwatch d = new($"Finished song-scan-thread after <ms> ms. Found {allSongMetas.Count} songs.");
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
 
         try
         {
@@ -147,7 +150,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 .ToList();
 
             await Task.WhenAll(allSongFolders
-                .Select(songFolder => ScanFolderAsync(songFolder, cancellationToken)));
+                .Select(songFolder => Task.Run(async () => await ScanFolderAsync(songFolder, cancellationToken))));
         }
         catch (Exception ex)
         {
@@ -157,6 +160,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         finally
         {
             isSongScanFinished = true;
+            Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms. Found {allSongMetas.Count} songs.");
             songScanFinishedEventStream.OnNext(new SongScanFinishedEvent(allSongMetas.Count));
         }
     }
@@ -183,7 +187,13 @@ public class SongMetaManager : AbstractSingletonBehaviour
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_configureOnDemandSongLoading));
         }
 
-        await LoadTxtFilesAsync(txtFiles, cancellationToken);
+        // Process batches of files in parallel
+        int batchSize = settings.SongScanMaxBatchCount > 1
+            ? Math.Max(100, txtFiles.Count / (settings.SongScanMaxBatchCount - 1))
+            : txtFiles.Count;
+        List<List<string>> txtFileBatches = SplitIntoSmallerLists(txtFiles, batchSize);
+        await Task.WhenAll(txtFileBatches.Select(txtFileBatch =>
+            Task.Run(async () => await LoadTxtFilesAsync(txtFileBatch, cancellationToken))));
     }
 
     private async Task ScanMidiFilesAsync(string folder, CancellationToken cancellationToken)
@@ -236,7 +246,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private async Task LoadTxtFilesAsync(List<string> txtFiles, CancellationToken cancellationToken)
     {
-        Log.Verbose(() => $"Load {txtFiles.Count} txt files on thread {Thread.CurrentThread.ManagedThreadId}");
+        Log.Debug(() => $"Load {txtFiles.Count} txt files on thread {Thread.CurrentThread.ManagedThreadId}");
         cancellationToken.ThrowIfCancellationRequested();
 
         await Task.WhenAll(txtFiles
@@ -245,7 +255,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private async Task LoadMidiFilesAsync(List<string> midiFiles, CancellationToken cancellationToken)
     {
-        Log.Verbose(() => $"Load {midiFiles.Count} MIDI files on thread {Thread.CurrentThread.ManagedThreadId}");
+        Log.Debug(() => $"Load {midiFiles.Count} MIDI files on thread {Thread.CurrentThread.ManagedThreadId}");
         cancellationToken.ThrowIfCancellationRequested();
 
         await Task.WhenAll(midiFiles
@@ -418,5 +428,15 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
 
         return allSongMetas.Contains(songMeta);
+    }
+
+    private static List<List<T>> SplitIntoSmallerLists<T>(List<T> source, int chunkSize)
+    {
+        // https://stackoverflow.com/questions/11463734/split-a-list-into-smaller-lists-of-n-size
+        return source
+            .Select((element, index) => new { Index = index, Value = element })
+            .GroupBy(pair => pair.Index / chunkSize)
+            .Select(grouping => grouping.Select(pair => pair.Value).ToList())
+            .ToList();
     }
 }

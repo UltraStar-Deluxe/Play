@@ -73,6 +73,7 @@ public class Settings : ISettings
     public string GeneratedFolderPath { get; set; } = "";
     public bool SaveVocalsAndInstrumentalAudioInFolderOfSong { get; set; }
     public EFetchType SongDataFetchType { get; set; } = EFetchType.Upfront;
+    public int SongScanMaxBatchCount { get; set; } = 1;
 
     /**
      * The UltraStar song format version that is used to save a song when otherwise none is specified or unknown.

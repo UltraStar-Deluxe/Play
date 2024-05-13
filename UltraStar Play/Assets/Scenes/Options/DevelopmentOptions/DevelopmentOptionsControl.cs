@@ -87,6 +87,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.messageBufferTimeTextField)]
     private IntegerField messageBufferTimeTextField;
 
+    [Inject(UxmlName = R.UxmlNames.songScanMaxBatchCountChooser)]
+    private IntegerField songScanMaxBatchCountChooser;
+
     [Inject]
     private ThemeManager themeManager;
 
@@ -257,6 +260,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(webViewCustomUserAgentTextField,
             () => settings.CustomUserAgent,
             newValue => settings.CustomUserAgent = newValue);
+
+        FieldBindingUtils.Bind(songScanMaxBatchCountChooser,
+            () => settings.SongScanMaxBatchCount,
+            newValue => settings.SongScanMaxBatchCount = newValue);
 
         FieldBindingUtils.Bind(useUniversalCharsetDetectorToggle,
             () => settings.UseUniversalCharsetDetector,

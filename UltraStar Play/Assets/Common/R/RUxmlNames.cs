@@ -817,6 +817,7 @@ public static partial class R
         public const string songScanInProgressIcon = "songScanInProgressIcon";
         public const string songScanInProgressLabel = "songScanInProgressLabel";
         public const string songScanInProgressProgressLabel = "songScanInProgressProgressLabel";
+        public const string songScanMaxBatchCountChooser = "songScanMaxBatchCountChooser";
         public const string SongSelectEditPlaylistDialogUi = "SongSelectEditPlaylistDialogUi";
         public const string songSelectionChooser = "songSelectionChooser";
         public const string songSelectionJokerCountChooser = "songSelectionJokerCountChooser";
