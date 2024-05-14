@@ -5,18 +5,21 @@ using UnityEngine.TestTools;
 
 public class WebViewTests : AbstractMediaFileFormatTests
 {
+    private const long WebViewMaxWaitTimeInMillis = 30000;
+    private const double WebViewTargetDurationInMillis = 242561;
+
     private static string[] shouldUseLocalAudioFiles = new string[]
     {
-        "AudioUrlAndExistingAudio-TestSong.txt",
+        "WebViewTests/AudioUrlAndExistingAudio-TestSong.txt",
     };
 
     private static string[] shouldUseWebViewFiles = new string[]
     {
-        "AudioUrlAndMissingAudio-TestSong.txt",
-        "AudioUrlOnly-TestSong.txt",
-        "AudioOnly-TestSong.txt",
-        "VideoUrlOnly-TestSong.txt",
-        "WebsiteOnly-TestSong.txt",
+        "WebViewTests/AudioUrlAndMissingAudio-TestSong.txt",
+        "WebViewTests/AudioUrlOnly-TestSong.txt",
+        "WebViewTests/AudioOnly-TestSong.txt",
+        "WebViewTests/VideoUrlOnly-TestSong.txt",
+        "WebViewTests/WebsiteOnly-TestSong.txt",
     };
 
     protected override void ConfigureTestSettings(TestSettings settings)
@@ -30,14 +33,14 @@ public class WebViewTests : AbstractMediaFileFormatTests
     [UnityTest]
     public IEnumerator ShouldUseLocalAudioTest([ValueSource(nameof(shouldUseLocalAudioFiles))] string filePrefix)
     {
-        yield return WebViewFileTest(filePrefix, LocalFileTargetDurationInMillis);
+        yield return SongAudioPlayerShouldLoadFile(filePrefix);
         Assert.IsFalse(SongAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
     }
 
     [UnityTest]
     public IEnumerator ShouldUseWebView([ValueSource(nameof(shouldUseWebViewFiles))] string filePrefix)
     {
-        yield return WebViewFileTest(filePrefix, WebViewTargetDurationInMillis);
+        yield return SongAudioPlayerShouldLoadFile(filePrefix, WebViewTargetDurationInMillis, WebViewMaxWaitTimeInMillis);
         Assert.IsTrue(SongAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
     }
 }
