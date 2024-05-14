@@ -89,7 +89,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private SceneNavigator sceneNavigator;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private Statistics statistics;
@@ -1253,7 +1253,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private List<CompanionClientHandlerAndMicProfile> GetCompanionClientHandlers()
     {
         IEnumerable<MicProfile> micProfiles = PlayerControls.Select(playerProfile => playerProfile.MicProfile);
-        return serverSideConnectRequestManager.GetCompanionClientHandlers(micProfiles);
+        return serverSideCompanionClientManager.GetCompanionClientHandlers(micProfiles);
     }
 
     private void UpdateSongStartedStats()

@@ -124,12 +124,12 @@ public static class SettingsUtils
         return settings.SceneChangeDurationInSeconds > 0;
     }
 
-    public static List<MicProfile> GetAvailableMicProfiles(Settings settings, ThemeManager themeManager, ServerSideConnectRequestManager serverSideConnectRequestManager)
+    public static List<MicProfile> GetAvailableMicProfiles(Settings settings, ThemeManager themeManager, ServerSideCompanionClientManager serverSideCompanionClientManager)
     {
-        List<MicProfile> allMicProfiles = MicProfileUtils.CreateAndPersistMicProfiles(settings, themeManager, serverSideConnectRequestManager);
+        List<MicProfile> allMicProfiles = MicProfileUtils.CreateAndPersistMicProfiles(settings, themeManager, serverSideCompanionClientManager);
 
         return allMicProfiles
-            .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
+            .Where(it => it.IsEnabledAndConnected(serverSideCompanionClientManager))
             .ToList();
     }
 

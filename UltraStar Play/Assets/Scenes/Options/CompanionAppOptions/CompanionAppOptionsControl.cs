@@ -23,7 +23,7 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     private VisualElement noCompanionClientsContainer;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private Injector injector;
@@ -38,7 +38,7 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
         base.Start();
 
         UpdateCompanionClients();
-        serverSideConnectRequestManager.ClientConnectionChangedEventStream
+        serverSideCompanionClientManager.ClientConnectionChangedEventStream
             .Subscribe(_ => UpdateCompanionClients())
             .AddTo(gameObject);
     }
@@ -46,7 +46,7 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     private void UpdateCompanionClients()
     {
         companionClientList.Clear();
-        List<ICompanionClientHandler> allCompanionClientHandlers = serverSideConnectRequestManager.GetAllCompanionClientHandlers();
+        List<ICompanionClientHandler> allCompanionClientHandlers = serverSideCompanionClientManager.GetAllCompanionClientHandlers();
         allCompanionClientHandlers.Sort((a, b) => string.Compare(a.ClientName, b.ClientName, StringComparison.InvariantCultureIgnoreCase));
         allCompanionClientHandlers.ForEach(clientHandler =>
             {
@@ -54,9 +54,9 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
             });
 
         companionClientCountLabel.SetTranslatedText(Translation.Get(R.Messages.options_companionClientCount,
-            "count", serverSideConnectRequestManager.CompanionClientCount));
+            "count", serverSideCompanionClientManager.CompanionClientCount));
 
-        bool noCompanionClients = serverSideConnectRequestManager.CompanionClientCount <= 0;
+        bool noCompanionClients = serverSideCompanionClientManager.CompanionClientCount <= 0;
         noCompanionClientsContainer.SetVisibleByDisplay(noCompanionClients);
         if (noCompanionClients)
         {

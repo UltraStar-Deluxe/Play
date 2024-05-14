@@ -19,7 +19,7 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
     private MicSampleRecorderManager micSampleRecorderManager;
     
     [Inject(Optional = true)]
-    private IServerSideConnectRequestManager serverSideConnectRequestManager;
+    private IServerSideCompanionClientManager serverSideCompanionClientManager;
     
     public MicProfile MicProfile
     {
@@ -80,9 +80,9 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
             MicProfile micProfile = micSampleRecorder.MicProfile;
             if (micProfile != null
                 && micProfile.IsInputFromConnectedClient
-                && serverSideConnectRequestManager != null)
+                && serverSideCompanionClientManager != null)
             {
-                if (serverSideConnectRequestManager.TryGetCompanionClientHandler(micProfile.ConnectedClientId,
+                if (serverSideCompanionClientManager.TryGet(micProfile.ConnectedClientId,
                         out ICompanionClientHandler companionClientHandler))
                 {
                     micSampleRecorderDisposables.Add(companionClientHandler.ReceivedMessageStream

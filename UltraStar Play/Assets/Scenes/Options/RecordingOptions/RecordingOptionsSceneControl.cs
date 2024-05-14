@@ -28,7 +28,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
     private UiManager uiManager;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private UIDocument uiDocument;
@@ -221,12 +221,12 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
             .AddTo(gameObject);
 
         // Update recording device of connected client, when the client (dis)connects
-        serverSideConnectRequestManager.ClientConnectionChangedEventStream
+        serverSideCompanionClientManager.ClientConnectionChangedEventStream
             .Where(clientConnectedEvent => deviceChooserControl.Selection?.ConnectedClientId == clientConnectedEvent.CompanionClientHandler.ClientId)
             .Subscribe(newValue => OnRecordingDeviceSelected(deviceChooserControl.Selection))
             .AddTo(gameObject);
 
-        serverSideConnectRequestManager.CompanionClientMicProfileChangedEventStream
+        serverSideCompanionClientManager.CompanionClientMicProfileChangedEventStream
             .Subscribe(OnCompanionClientMicProfileChanged)
             .AddTo(gameObject);
 
@@ -410,7 +410,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
     {
         if (SelectedMicProfile == null
             || SelectedMicProfile.ConnectedClientId.IsNullOrEmpty()
-            || !serverSideConnectRequestManager.TryGetCompanionClientHandler(SelectedMicProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
+            || !serverSideCompanionClientManager.TryGet(SelectedMicProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
         {
             return null;
         }
@@ -452,7 +452,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         enabledToggle.value = micProfile.IsEnabled;
         UpdateRecordingDeviceInactiveOverlay();
 
-        bool isConnected = micProfile.IsConnected(serverSideConnectRequestManager);
+        bool isConnected = micProfile.IsConnected(serverSideCompanionClientManager);
         notConnectedContainer.SetVisibleByDisplay(!isConnected);
         deleteButton.SetVisibleByDisplay(!isConnected);
 
@@ -480,7 +480,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
             return;
         }
 
-        if (!SelectedMicProfile.IsConnected(serverSideConnectRequestManager))
+        if (!SelectedMicProfile.IsConnected(serverSideCompanionClientManager))
         {
             settings.MicProfiles.Remove(SelectedMicProfile);
             UpdateRecordingDevices();
@@ -492,7 +492,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         return MicProfileUtils.CreateAndPersistMicProfiles(
             settings,
             themeManager,
-            serverSideConnectRequestManager);
+            serverSideCompanionClientManager);
     }
 
     private void OnCompanionClientMicProfileChanged(MicProfile micProfile)
@@ -515,7 +515,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 
         if (SelectedMicProfile == null
             || !SelectedMicProfile.IsInputFromConnectedClient
-            || !serverSideConnectRequestManager.TryGetCompanionClientHandler(SelectedMicProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
+            || !serverSideCompanionClientManager.TryGet(SelectedMicProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
         {
             return;
         }

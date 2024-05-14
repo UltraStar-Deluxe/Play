@@ -106,7 +106,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     private UltraStarPlayHttpServer httpServer;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private InGameDebugConsoleManager inGameDebugConsoleManager;
@@ -281,7 +281,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 }
             });
 
-        connectionEndpointLabel.text = $"Connection endpoint: {serverSideConnectRequestManager.GetConnectionEndpoint()}";
+        connectionEndpointLabel.text = $"Connection endpoint: {serverSideCompanionClientManager.GetConnectionEndpoint()}";
 
         if (HttpServer.IsSupported)
         {

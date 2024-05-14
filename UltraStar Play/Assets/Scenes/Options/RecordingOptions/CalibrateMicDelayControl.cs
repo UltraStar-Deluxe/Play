@@ -31,7 +31,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
     private Settings settings;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     private enum ECalibrationPhase
     {
@@ -101,7 +101,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
         {
             if (MicProfile.IsInputFromConnectedClient)
             {
-                if (!serverSideConnectRequestManager.TryGetCompanionClientHandler(MicProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
+                if (!serverSideCompanionClientManager.TryGet(MicProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
                 {
                     throw new Exception("Mic calibration aborted, no connected client found for mic input.");
                 }

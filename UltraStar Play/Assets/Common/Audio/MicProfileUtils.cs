@@ -8,11 +8,11 @@ public static class MicProfileUtils
     public static List<MicProfile> CreateAndPersistMicProfiles(
         Settings settings,
         ThemeManager themeManager,
-        ServerSideConnectRequestManager serverSideConnectRequestManager)
+        ServerSideCompanionClientManager serverSideCompanionClientManager)
     {
         List<MicProfile> persistedMicProfiles = settings.MicProfiles;
         List<Color32> microphoneColors = themeManager.GetMicrophoneColors();
-        List<ICompanionClientHandler> companionClientHandlers = serverSideConnectRequestManager.GetAllCompanionClientHandlers();
+        List<ICompanionClientHandler> companionClientHandlers = serverSideCompanionClientManager.GetAllCompanionClientHandlers();
         List<MicProfile> micProfiles = CreateMicProfiles(persistedMicProfiles, microphoneColors, companionClientHandlers, settings);
         micProfiles.Sort(MicProfile.compareByName);
 

@@ -11,7 +11,7 @@ public class CompanionClientListEntryControl : INeedInjection, IInjectionFinishe
     private Settings settings;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject(UxmlName = R.UxmlNames.clientNameLabel)]
     private Label clientNameLabel;

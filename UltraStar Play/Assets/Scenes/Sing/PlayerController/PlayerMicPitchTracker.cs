@@ -32,7 +32,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     private PlayerProfile playerProfile;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private SingSceneMedleyControl medleyControl;
@@ -183,7 +183,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         if (micProfile.IsInputFromConnectedClient)
         {
             InitPitchDetectionFromCompanionClient();
-            serverSideConnectRequestManager.ClientConnectionChangedEventStream
+            serverSideCompanionClientManager.ClientConnectionChangedEventStream
                 .Where(evt => evt.IsConnected)
                 .Subscribe(_ => OnClientConnectionChanged())
                 .AddTo(gameObject);
@@ -264,7 +264,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             return null;
         }
 
-        serverSideConnectRequestManager.TryGetCompanionClientHandler(micProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler);
+        serverSideCompanionClientManager.TryGet(micProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler);
         return companionClientHandler;
     }
 

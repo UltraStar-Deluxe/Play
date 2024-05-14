@@ -63,7 +63,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     private ThemeManager themeManager;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
@@ -347,12 +347,12 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     private List<MicProfile> GetAvailableMicProfiles()
     {
-        return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);
+        return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideCompanionClientManager);
     }
 
     private List<CompanionClientHandlerAndMicProfile> GetCompanionClientHandlers()
     {
-        return serverSideConnectRequestManager.GetCompanionClientHandlers(GetAvailableMicProfiles());
+        return serverSideCompanionClientManager.GetCompanionClientHandlers(GetAvailableMicProfiles());
     }
 
     private void SendStopRecordingMessageToAllCompanionClients()
@@ -371,7 +371,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         {
             return null;
         }
-        return serverSideConnectRequestManager.GetCompanionClientHandlers(new List<MicProfile> { micProfile }).FirstOrDefault();
+        return serverSideCompanionClientManager.GetCompanionClientHandlers(new List<MicProfile> { micProfile }).FirstOrDefault();
     }
 
     private void SendStopRecordingMessageToCompanionClient()

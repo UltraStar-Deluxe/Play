@@ -96,7 +96,7 @@ public class SettingsProblemHintControl
             result.Add(Translation.Get(R.Messages.settingsProblem_noMicProfiles));
         }
         else if (settings.MicProfiles
-                 .AllMatch(micProfile => !micProfile.IsEnabled || !micProfile.IsConnected(ServerSideConnectRequestManager.Instance)))
+                 .AllMatch(micProfile => !micProfile.IsEnabled || !micProfile.IsConnected(ServerSideCompanionClientManager.Instance)))
         {
             result.Add(Translation.Get(R.Messages.settingsProblem_noConnectedAndEnabledMicProfile));
         }

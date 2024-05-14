@@ -22,7 +22,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     public IReadOnlyList<SongSelectPlayerEntryControl> PlayerEntryControls => playerEntryControls;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private MicSampleRecorderManager micSampleRecorderManager;
@@ -54,7 +54,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         LoadLastPlayerProfileToMicProfileMap();
 
         // Remove/add MicProfile when Client (dis)connects.
-        serverSideConnectRequestManager.ClientConnectionChangedEventStream
+        serverSideCompanionClientManager.ClientConnectionChangedEventStream
             .ObserveOnMainThread()
             .Subscribe(OnClientConnectionChanged)
             .AddTo(gameObject);
@@ -145,7 +145,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
     private List<MicProfile> GetAvailableMicProfiles()
     {
-        return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);
+        return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideCompanionClientManager);
     }
 
     private void UpdateListEntries()
@@ -324,7 +324,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             .Select(it => it.MicProfile)
             .ToList();
         List<MicProfile> enabledAndConnectedMicProfiles = settings.MicProfiles
-            .Where(it => it.IsEnabled && it.IsConnected(serverSideConnectRequestManager))
+            .Where(it => it.IsEnabled && it.IsConnected(serverSideCompanionClientManager))
             .ToList();
         List<MicProfile> unusedMicProfiles = enabledAndConnectedMicProfiles
             .Where(it => !usedMicProfiles.Contains(it))
@@ -394,7 +394,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         }
 
         // Restore the previously assigned microphones
-        List<MicProfile> availableMicProfiles = SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);
+        List<MicProfile> availableMicProfiles = SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideCompanionClientManager);
         foreach (SongSelectPlayerEntryControl playerEntryControl in playerEntryControls)
         {
             if (!playerEntryControl.IsSelected.Value)
@@ -410,7 +410,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
                 continue;
             }
 
-            if (!lastUsedMicProfile.IsConnected(serverSideConnectRequestManager)
+            if (!lastUsedMicProfile.IsConnected(serverSideCompanionClientManager)
                 || !lastUsedMicProfile.IsEnabled)
             {
                 // Mic cannot or should not be used at the moment.
