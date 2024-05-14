@@ -10,7 +10,8 @@ using UnityEngine.TestTools;
 
 public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
 {
-    protected static readonly string fileFormatTestFolderPath = Application.dataPath + "/PlayModeTests/MediaFileFormatTests";
+    protected static readonly string fileFormatTestFolderPath = $"{Application.dataPath}/PlayModeTests/MediaFileFormatTests";
+    protected static readonly string mediaFileFormatTestFolderPath = $"{fileFormatTestFolderPath}/MediaFileFormatTestSongs";
 
     protected const double DefaultTargetDurationInMillis = 4000;
     private const double MaxDistanteToTargetDurationInMillis = 500;
@@ -96,7 +97,9 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
 
     protected string GetSongMetaFilePath(string txtFilePath)
     {
-        return $"{fileFormatTestFolderPath}/{txtFilePath}";
+        return txtFilePath.Contains("/")
+            ? $"{fileFormatTestFolderPath}/{txtFilePath}"
+            : $"{mediaFileFormatTestFolderPath}/{txtFilePath}";
     }
 
     protected SongMeta LoadSongMeta(string songFilePath)

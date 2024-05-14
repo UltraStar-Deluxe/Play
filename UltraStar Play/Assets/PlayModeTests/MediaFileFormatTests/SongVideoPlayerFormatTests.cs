@@ -7,22 +7,28 @@ public class SongVideoPlayerFormatTests : AbstractMediaFileFormatTests
 {
     private static readonly List<TestCaseData> supportedByUnity = new List<TestCaseData>()
     {
-        new TestCaseData("VideoFileFormatTests/avi-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mp4-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mp4-hvec-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/webm-vp8-TestSong.txt").Returns(null),
+        new TestCaseData("avi-TestSong.txt").Returns(null),
+        new TestCaseData("mp4-TestSong.txt").Returns(null),
+        new TestCaseData("mp4-hvec-TestSong.txt").Returns(null),
+        new TestCaseData("webm-vp8-TestSong.txt").Returns(null),
     };
 
     private static readonly List<TestCaseData> supportedByThirdPartyLib = new List<TestCaseData>()
     {
-        new TestCaseData("VideoFileFormatTests/f4v-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/flv-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mkv-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mov-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mp4-av1-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mpeg2-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/webm-vp9-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/wmv-TestSong.txt").Returns(null),
+        new TestCaseData("f4v-TestSong.txt").Returns(null),
+        new TestCaseData("flv-TestSong.txt").Returns(null),
+        new TestCaseData("mkv-TestSong.txt").Returns(null),
+        new TestCaseData("mov-TestSong.txt").Returns(null),
+        new TestCaseData("mp4-av1-TestSong.txt").Returns(null),
+        new TestCaseData("mpeg2-TestSong.txt").Returns(null),
+        new TestCaseData("webm-vp9-TestSong.txt").Returns(null),
+        new TestCaseData("wmv-TestSong.txt").Returns(null),
+
+        // Mix of audio and video file formats
+        new TestCaseData("flac-mkv-TestSong.txt").Returns(null),
+        new TestCaseData("flac-webm-vp8-TestSong.txt").Returns(null),
+        new TestCaseData("ogg-mkv-TestSong.txt").Returns(null),
+        new TestCaseData("ogg-webm-vp8-TestSong.txt").Returns(null),
     };
 
     [UnityTest]

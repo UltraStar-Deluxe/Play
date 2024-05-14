@@ -31,16 +31,16 @@ public class WebViewTests : AbstractMediaFileFormatTests
     }
 
     [UnityTest]
-    public IEnumerator ShouldUseLocalAudioTest([ValueSource(nameof(shouldUseLocalAudioFiles))] string filePrefix)
+    public IEnumerator ShouldUseLocalAudioTest([ValueSource(nameof(shouldUseLocalAudioFiles))] string txtFilePath)
     {
-        yield return SongAudioPlayerShouldLoadFile(filePrefix);
+        yield return SongAudioPlayerShouldLoadFile(txtFilePath);
         Assert.IsFalse(SongAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
     }
 
     [UnityTest]
-    public IEnumerator ShouldUseWebView([ValueSource(nameof(shouldUseWebViewFiles))] string filePrefix)
+    public IEnumerator ShouldUseWebView([ValueSource(nameof(shouldUseWebViewFiles))] string txtFilePath)
     {
-        yield return SongAudioPlayerShouldLoadFile(filePrefix, WebViewTargetDurationInMillis, WebViewMaxWaitTimeInMillis);
+        yield return SongAudioPlayerShouldLoadFile(txtFilePath, WebViewTargetDurationInMillis, WebViewMaxWaitTimeInMillis);
         Assert.IsTrue(SongAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
     }
 }

@@ -7,40 +7,40 @@ public class SongAudioPlayerFileFormatTests : AbstractMediaFileFormatTests
 {
     private static readonly List<TestCaseData> supportedByUnity = new List<TestCaseData>()
     {
-        new TestCaseData("AudioFileFormatTests/mp3-ConstantBitRate-TestSong.txt").Returns(null),
-        new TestCaseData("AudioFileFormatTests/mp3-VariableBitRate-TestSong.txt").Returns(null),
-        new TestCaseData("AudioFileFormatTests/ogg-TestSong.txt").Returns(null),
-        new TestCaseData("AudioFileFormatTests/wav-TestSong.txt").Returns(null),
+        new TestCaseData("mp3-ConstantBitRate-TestSong.txt").Returns(null),
+        new TestCaseData("mp3-VariableBitRate-TestSong.txt").Returns(null),
+        new TestCaseData("ogg-TestSong.txt").Returns(null),
+        new TestCaseData("wav-TestSong.txt").Returns(null),
 
         // Supported via Unity video player
-        new TestCaseData("VideoFileFormatTests/avi-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mp4-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mp4-hvec-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/webm-vp8-TestSong.txt").Returns(null),
+        new TestCaseData("avi-TestSong.txt").Returns(null),
+        new TestCaseData("mp4-TestSong.txt").Returns(null),
+        new TestCaseData("mp4-hvec-TestSong.txt").Returns(null),
+        new TestCaseData("webm-vp8-TestSong.txt").Returns(null),
     };
 
     private static readonly List<TestCaseData> supportedByThirdPartyLib = new List<TestCaseData>()
     {
-        new TestCaseData("AudioFileFormatTests/aac-TestSong.txt").Returns(null),
-        new TestCaseData("AudioFileFormatTests/aiff-TestSong.txt").Returns(null),
-        new TestCaseData("AudioFileFormatTests/flac-TestSong.txt").Returns(null),
-        new TestCaseData("AudioFileFormatTests/m4a-TestSong.txt").Returns(null),
-        new TestCaseData("AudioFileFormatTests/wma-TestSong.txt").Returns(null),
+        new TestCaseData("aac-TestSong.txt").Returns(null),
+        new TestCaseData("aiff-TestSong.txt").Returns(null),
+        new TestCaseData("flac-TestSong.txt").Returns(null),
+        new TestCaseData("m4a-TestSong.txt").Returns(null),
+        new TestCaseData("wma-TestSong.txt").Returns(null),
 
         // Supported via third party video player
-        new TestCaseData("VideoFileFormatTests/f4v-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/flv-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mkv-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mov-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mp4-av1-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/mpeg2-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/webm-vp9-TestSong.txt").Returns(null),
-        new TestCaseData("VideoFileFormatTests/wmv-TestSong.txt").Returns(null),
+        new TestCaseData("f4v-TestSong.txt").Returns(null),
+        new TestCaseData("flv-TestSong.txt").Returns(null),
+        new TestCaseData("mkv-TestSong.txt").Returns(null),
+        new TestCaseData("mov-TestSong.txt").Returns(null),
+        new TestCaseData("mp4-av1-TestSong.txt").Returns(null),
+        new TestCaseData("mpeg2-TestSong.txt").Returns(null),
+        new TestCaseData("webm-vp9-TestSong.txt").Returns(null),
+        new TestCaseData("wmv-TestSong.txt").Returns(null),
     };
 
     private static readonly List<TestCaseData> supportedByMidiManager = new List<TestCaseData>()
     {
-        new TestCaseData("AudioFileFormatTests/midi-TestSong.txt").Returns(null),
+        new TestCaseData("midi-TestSong.txt").Returns(null),
     };
 
     [UnityTest]
