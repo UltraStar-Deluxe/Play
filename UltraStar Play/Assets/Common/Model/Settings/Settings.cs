@@ -144,7 +144,7 @@ public class Settings : ISettings
     public int HttpServerPort { get; set; } = 6789;
     public string HttpServerHost { get; set; } = new("");
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
-    public int ConnectedClientMessageBufferTimeInMillis { get; set; } = 150;
+    public int CompanionClientMessageBufferTimeInMillis { get; set; } = 150;
 
     // WebView settings
     public List<string> AcceptedWebViewHosts { get; set; } = new();

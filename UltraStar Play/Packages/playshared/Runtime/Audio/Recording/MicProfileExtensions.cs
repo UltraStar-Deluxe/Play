@@ -5,7 +5,7 @@ public static class MicProfileExtensions
 {
     public static bool IsConnected(this MicProfile micProfile, IServerSideConnectRequestManager serverSideConnectRequestManager)
     {
-        return (micProfile.IsInputFromConnectedClient && serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId, out IConnectedClientHandler _))
+        return (micProfile.IsInputFromConnectedClient && serverSideConnectRequestManager.TryGetCompanionClientHandler(micProfile.ConnectedClientId, out ICompanionClientHandler _))
                || (!micProfile.IsInputFromConnectedClient
                    && IMicrophoneAdapter.Instance.Devices.Contains(micProfile.Name)
                    && (micProfile.ChannelIndex == 0 || IMicrophoneAdapter.Instance.UsePortAudio));

@@ -17,13 +17,13 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 {
     public static ServerSideConnectRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ServerSideConnectRequestManager>();
 
-    public int ConnectedClientCount => liteNetLibServer.ConnectedPeersCount;
+    public int CompanionClientCount => liteNetLibServer.ConnectedPeersCount;
 
     private readonly Subject<ClientConnectionChangedEvent> clientConnectionChangedEventStream = new();
     public IObservable<ClientConnectionChangedEvent> ClientConnectionChangedEventStream => clientConnectionChangedEventStream.ObserveOnMainThread();
 
-    private readonly Subject<MicProfile> connectedClientMicProfileChangedEventStream = new();
-    public IObservable<MicProfile> ConnectedClientMicProfileChangedEventStream => connectedClientMicProfileChangedEventStream;
+    private readonly Subject<MicProfile> companionClientMicProfileChangedEventStream = new();
+    public IObservable<MicProfile> CompanionClientMicProfileChangedEventStream => companionClientMicProfileChangedEventStream;
 
     [Inject]
     private HttpServer httpServer;
@@ -34,7 +34,7 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     private NetManager liteNetLibServer;
     private NetPeer liteNetLibPeer;
 
-    private readonly Dictionary<NetPeer, IConnectedClientHandler> peerToConnectedClientHandler = new();
+    private readonly Dictionary<NetPeer, ICompanionClientHandler> peerToCompanionClientHandler = new();
     private readonly Dictionary<NetPeer, ConnectRequestDto> peerToConnectRequestDto = new();
 
     protected override object GetInstance()
@@ -68,7 +68,7 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
         if (Instance == this)
         {
-            RemoveAllConnectedClientHandlers();
+            RemoveAllCompanionClientHandlers();
         }
     }
 
@@ -89,16 +89,16 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             .ForEach(micProfile =>
             {
                 if (micProfile.IsInputFromConnectedClient
-                    && micProfile.ConnectedClientId == clientConnectionChangedEvent.ConnectedClientHandler.ClientId
-                    && micProfile.Name != clientConnectionChangedEvent.ConnectedClientHandler.ClientName)
+                    && micProfile.ConnectedClientId == clientConnectionChangedEvent.CompanionClientHandler.ClientId
+                    && micProfile.Name != clientConnectionChangedEvent.CompanionClientHandler.ClientName)
                 {
-                    micProfile.Name = clientConnectionChangedEvent.ConnectedClientHandler.ClientName;
-                    connectedClientMicProfileChangedEventStream.OnNext(micProfile);
+                    micProfile.Name = clientConnectionChangedEvent.CompanionClientHandler.ClientName;
+                    companionClientMicProfileChangedEventStream.OnNext(micProfile);
                 }
             });
     }
 
-    private void RemoveAllConnectedClientHandlers()
+    private void RemoveAllCompanionClientHandlers()
     {
         foreach (NetPeer peer in liteNetLibServer.ConnectedPeerList.ToList())
         {
@@ -106,43 +106,43 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         }
     }
 
-    private ConnectedClientHandler RegisterConnectedClient(
+    private CompanionClientHandler RegisterCompanionClient(
         NetPeer peer,
         string clientName,
         string clientId)
     {
-        ConnectedClientHandler connectedClientHandler = new(peer, clientName, clientId);
-        peerToConnectedClientHandler[peer] = connectedClientHandler;
-        return connectedClientHandler;
+        CompanionClientHandler companionClientHandler = new(peer, clientName, clientId);
+        peerToCompanionClientHandler[peer] = companionClientHandler;
+        return companionClientHandler;
     }
 
-    public List<IConnectedClientHandler> GetAllConnectedClientHandlers()
+    public List<ICompanionClientHandler> GetAllCompanionClientHandlers()
     {
-        return peerToConnectedClientHandler.Values.ToList();
+        return peerToCompanionClientHandler.Values.ToList();
     }
 
-    public bool TryGetConnectedClientHandler(string clientId, out IConnectedClientHandler connectedClientHandler)
+    public bool TryGetCompanionClientHandler(string clientId, out ICompanionClientHandler companionClientHandler)
     {
         if (clientId == null)
         {
-            connectedClientHandler = null;
+            companionClientHandler = null;
             return false;
         }
 
-        connectedClientHandler = peerToConnectedClientHandler.Values.FirstOrDefault(it => it.ClientId == clientId);
-        return connectedClientHandler != null;
+        companionClientHandler = peerToCompanionClientHandler.Values.FirstOrDefault(it => it.ClientId == clientId);
+        return companionClientHandler != null;
     }
 
-    public List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers(IEnumerable<MicProfile> micProfiles)
+    public List<CompanionClientHandlerAndMicProfile> GetCompanionClientHandlers(IEnumerable<MicProfile> micProfiles)
     {
-        List<ConnectedClientHandlerAndMicProfile> result = new();
+        List<CompanionClientHandlerAndMicProfile> result = new();
         micProfiles
             .Where(micProfile => micProfile != null && micProfile.IsInputFromConnectedClient)
             .ForEach(micProfile =>
             {
-                if (TryGetConnectedClientHandler(micProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
+                if (TryGetCompanionClientHandler(micProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
                 {
-                    result.Add(new ConnectedClientHandlerAndMicProfile(connectedClientHandler, micProfile));
+                    result.Add(new CompanionClientHandlerAndMicProfile(companionClientHandler, micProfile));
                 }
             });
         return result;
@@ -187,13 +187,13 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
         Debug.LogWarning($"Peer disconnected: {peer.EndPoint}, reason: {disconnectInfo.Reason}");
-        if (!peerToConnectedClientHandler.TryGetValue(peer, out IConnectedClientHandler connectedClientHandler))
+        if (!peerToCompanionClientHandler.TryGetValue(peer, out ICompanionClientHandler companionClientHandler))
         {
             return;
         }
 
-        peerToConnectedClientHandler.Remove(peer);
-        clientConnectionChangedEventStream.OnNext(new ClientConnectionChangedEvent(connectedClientHandler, false));
+        peerToCompanionClientHandler.Remove(peer);
+        clientConnectionChangedEventStream.OnNext(new ClientConnectionChangedEvent(companionClientHandler, false));
     }
 
     public void OnNetworkError(IPEndPoint endPoint, SocketError socketError)
@@ -211,9 +211,9 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
         Log.Verbose(() => $"Received message from client {peer.EndPoint}: {message}");
 
-        if (peerToConnectedClientHandler.TryGetValue(peer, out IConnectedClientHandler connectedClientHandler))
+        if (peerToCompanionClientHandler.TryGetValue(peer, out ICompanionClientHandler companionClientHandler))
         {
-            connectedClientHandler.HandleMessageFromClient(message);
+            companionClientHandler.HandleMessageFromClient(message);
         }
         else
         {
@@ -284,8 +284,8 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
             // Register client
             peerToConnectRequestDto[peer] = connectRequestDto;
-            ConnectedClientHandler newConnectedClientHandler = RegisterConnectedClient(peer, connectRequestDto.ClientName, connectRequestDto.ClientId);
-            clientConnectionChangedEventStream.OnNext(new ClientConnectionChangedEvent(newConnectedClientHandler, true));
+            CompanionClientHandler newCompanionClientHandler = RegisterCompanionClient(peer, connectRequestDto.ClientName, connectRequestDto.ClientId);
+            clientConnectionChangedEventStream.OnNext(new ClientConnectionChangedEvent(newCompanionClientHandler, true));
         }
         catch (Exception e)
         {

@@ -1044,7 +1044,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             PlayerProfileToMicProfileMap = sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap,
             SelectedPlayerProfiles = sceneData.SingScenePlayerData.SelectedPlayerProfiles,
         };
-        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
         sceneNavigator.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 
@@ -1128,7 +1128,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         SongSelectSceneData songSelectSceneData = new();
         songSelectSceneData.SongMeta = SongMeta;
         songSelectSceneData.partyModeSceneData = sceneData.partyModeSceneData;
-        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 
@@ -1214,7 +1214,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             UpdateHighScoreStatistics(highScoreEntries);
         }
 
-        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
         sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
     }
 
@@ -1250,10 +1250,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         return averageScore;
     }
 
-    private List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers()
+    private List<CompanionClientHandlerAndMicProfile> GetCompanionClientHandlers()
     {
         IEnumerable<MicProfile> micProfiles = PlayerControls.Select(playerProfile => playerProfile.MicProfile);
-        return serverSideConnectRequestManager.GetConnectedClientHandlers(micProfiles);
+        return serverSideConnectRequestManager.GetCompanionClientHandlers(micProfiles);
     }
 
     private void UpdateSongStartedStats()
@@ -1451,7 +1451,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 Debug.LogError($"Failed to load audio: {ex.Message}");
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                     "reason", ex.Message));
-                PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+                PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
                 sceneNavigator.LoadScene(EScene.SongSelectScene);
             })
             .Subscribe(_ =>

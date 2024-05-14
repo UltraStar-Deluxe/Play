@@ -2,10 +2,10 @@
 using UniInject;
 using UnityEngine.UIElements;
 
-public class ConnectedClientListEntryControl : INeedInjection, IInjectionFinishedListener
+public class CompanionClientListEntryControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
-    private IConnectedClientHandler clientHandler;
+    private ICompanionClientHandler clientHandler;
 
     [Inject]
     private Settings settings;

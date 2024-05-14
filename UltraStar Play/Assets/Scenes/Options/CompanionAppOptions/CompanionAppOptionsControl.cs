@@ -10,17 +10,17 @@ using UnityEngine.UIElements;
 
 public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
-    [FormerlySerializedAs("connectedClientListEntryAsset")] [InjectedInInspector]
-    public VisualTreeAsset connectedClientListEntryUi;
+    [FormerlySerializedAs("companionClientListEntryAsset")] [InjectedInInspector]
+    public VisualTreeAsset companionClientListEntryUi;
 
-    [Inject(UxmlName = R.UxmlNames.connectedClientCountLabel)]
-    private Label connectedClientCountLabel;
+    [Inject(UxmlName = R.UxmlNames.companionClientCountLabel)]
+    private Label companionClientCountLabel;
 
-    [Inject(UxmlName = R.UxmlNames.connectedClientList)]
-    private ScrollView connectedClientList;
+    [Inject(UxmlName = R.UxmlNames.companionClientList)]
+    private ScrollView companionClientList;
 
-    [Inject(UxmlName = R.UxmlNames.noConnectedClientsContainer)]
-    private VisualElement noConnectedClientsContainer;
+    [Inject(UxmlName = R.UxmlNames.noCompanionClientsContainer)]
+    private VisualElement noCompanionClientsContainer;
 
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
@@ -31,47 +31,47 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     [Inject]
     private UiManager uiManager;
 
-    private readonly List<ConnectedClientListEntryControl> connectedClientListEntryControls = new();
+    private readonly List<CompanionClientListEntryControl> companionClientListEntryControls = new();
 
     protected override void Start()
     {
         base.Start();
 
-        UpdateConnectedClients();
+        UpdateCompanionClients();
         serverSideConnectRequestManager.ClientConnectionChangedEventStream
-            .Subscribe(_ => UpdateConnectedClients())
+            .Subscribe(_ => UpdateCompanionClients())
             .AddTo(gameObject);
     }
 
-    private void UpdateConnectedClients()
+    private void UpdateCompanionClients()
     {
-        connectedClientList.Clear();
-        List<IConnectedClientHandler> allConnectedClientHandlers = serverSideConnectRequestManager.GetAllConnectedClientHandlers();
-        allConnectedClientHandlers.Sort((a, b) => string.Compare(a.ClientName, b.ClientName, StringComparison.InvariantCultureIgnoreCase));
-        allConnectedClientHandlers.ForEach(clientHandler =>
+        companionClientList.Clear();
+        List<ICompanionClientHandler> allCompanionClientHandlers = serverSideConnectRequestManager.GetAllCompanionClientHandlers();
+        allCompanionClientHandlers.Sort((a, b) => string.Compare(a.ClientName, b.ClientName, StringComparison.InvariantCultureIgnoreCase));
+        allCompanionClientHandlers.ForEach(clientHandler =>
             {
-                connectedClientList.Add(CreateClientEntry(clientHandler));
+                companionClientList.Add(CreateClientEntry(clientHandler));
             });
 
-        connectedClientCountLabel.SetTranslatedText(Translation.Get(R.Messages.options_connectedClientCount,
-            "count", serverSideConnectRequestManager.ConnectedClientCount));
+        companionClientCountLabel.SetTranslatedText(Translation.Get(R.Messages.options_companionClientCount,
+            "count", serverSideConnectRequestManager.CompanionClientCount));
 
-        bool noConnectedClients = serverSideConnectRequestManager.ConnectedClientCount <= 0;
-        noConnectedClientsContainer.SetVisibleByDisplay(noConnectedClients);
-        if (noConnectedClients)
+        bool noCompanionClients = serverSideConnectRequestManager.CompanionClientCount <= 0;
+        noCompanionClientsContainer.SetVisibleByDisplay(noCompanionClients);
+        if (noCompanionClients)
         {
             HighlightHelpIcon();
         }
     }
 
-    private VisualElement CreateClientEntry(IConnectedClientHandler clientHandler)
+    private VisualElement CreateClientEntry(ICompanionClientHandler clientHandler)
     {
-        VisualElement visualElement = connectedClientListEntryUi.CloneTreeAndGetFirstChild();
-        ConnectedClientListEntryControl control = injector
+        VisualElement visualElement = companionClientListEntryUi.CloneTreeAndGetFirstChild();
+        CompanionClientListEntryControl control = injector
             .WithRootVisualElement(visualElement)
             .WithBindingForInstance(clientHandler)
-            .CreateAndInject<ConnectedClientListEntryControl>();
-        connectedClientListEntryControls.Add(control);
+            .CreateAndInject<CompanionClientListEntryControl>();
+        companionClientListEntryControls.Add(control);
         return visualElement;
     }
 

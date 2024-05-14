@@ -101,12 +101,12 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
         {
             if (MicProfile.IsInputFromConnectedClient)
             {
-                if (!serverSideConnectRequestManager.TryGetConnectedClientHandler(MicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
+                if (!serverSideConnectRequestManager.TryGetCompanionClientHandler(MicProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
                 {
                     throw new Exception("Mic calibration aborted, no connected client found for mic input.");
                 }
 
-                beatPitchEventsStreamSubscription = connectedClientHandler.ReceivedMessageStream
+                beatPitchEventsStreamSubscription = companionClientHandler.ReceivedMessageStream
                     .Where(message => message is BeatPitchEventsDto)
                     .Select(message => message as BeatPitchEventsDto)
                     .Subscribe(dto => lastReceivedBeatPitchEventsDto = dto);
@@ -221,7 +221,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
             // Check if newly recorded samples are above threshold volume
             bool isAboveThresholdVolume = false;
-            bool isCorrectPitchFromConnectedClient = false;
+            bool isCorrectPitchFromCompanionClient = false;
             int newSampleCount = CalculateNewSampleCount(micPitchTracker.FinalSampleRate.Value, previousSampleCheckTimeInMillis, currentTimeInMillis);
             previousSampleCheckTimeInMillis = currentTimeInMillis;
             // Debug.Log($"Mic delay calibration iteration {iteration}, new sample count: {newSampleCount}");
@@ -231,7 +231,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
                 BeatPitchEventsDto receivedBeatPitchEventsDto = lastReceivedBeatPitchEventsDtoGetter?.Invoke();
                 if (receivedBeatPitchEventsDto != null)
                 {
-                    isCorrectPitchFromConnectedClient = receivedBeatPitchEventsDto
+                    isCorrectPitchFromCompanionClient = receivedBeatPitchEventsDto
                         .BeatPitchEvents
                         .AnyMatch(dto => dto.MidiNote == sineToneMidiNote);
                 }
@@ -251,7 +251,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
             }
 
             if ((!MicProfile.IsInputFromConnectedClient && isAboveThresholdVolume)
-                || (MicProfile.IsInputFromConnectedClient && isCorrectPitchFromConnectedClient))
+                || (MicProfile.IsInputFromConnectedClient && isCorrectPitchFromCompanionClient))
             {
                 long delayInMillis = currentTimeInMillis - iterationStartTimeInMillis;
                 delaysInMillis.Add(delayInMillis);

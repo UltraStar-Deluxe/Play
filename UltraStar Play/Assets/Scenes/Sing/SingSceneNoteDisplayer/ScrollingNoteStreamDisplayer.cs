@@ -48,7 +48,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         if (micProfile != null)
         {
             delayInMillis = micProfile.IsInputFromConnectedClient
-                ? micProfile.DelayInMillis + settings.ConnectedClientMessageBufferTimeInMillis
+                ? micProfile.DelayInMillis + settings.CompanionClientMessageBufferTimeInMillis
                 : micProfile.DelayInMillis;
             effectsContainer.Add(CreateRecordingPositionIndicator());
         }

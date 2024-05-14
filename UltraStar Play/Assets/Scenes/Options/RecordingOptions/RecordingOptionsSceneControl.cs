@@ -111,10 +111,10 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 
     private MicProfile SelectedMicProfile => deviceChooserControl.Selection;
 
-    private IDisposable connectedClientReceivedMessageStreamDisposable;
+    private IDisposable companionClientReceivedMessageStreamDisposable;
 
-    private readonly Subject<BeatPitchEvent> connectedClientBeatPitchEventStream = new();
-    public IObservable<BeatPitchEvent> ConnectedClientBeatPitchEventStream => connectedClientBeatPitchEventStream;
+    private readonly Subject<BeatPitchEvent> companionClientBeatPitchEventStream = new();
+    public IObservable<BeatPitchEvent> CompanionClientBeatPitchEventStream => companionClientBeatPitchEventStream;
 
     protected override void Start()
     {
@@ -175,7 +175,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 return;
             }
             SelectedMicProfile.Amplification = newValue;
-            SendSelectedMicProfileToConnectedClient();
+            SendSelectedMicProfileToCompanionClient();
         });
         noiseSuppressionChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
@@ -184,7 +184,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 return;
             }
             SelectedMicProfile.NoiseSuppression = newValue;
-            SendSelectedMicProfileToConnectedClient();
+            SendSelectedMicProfileToCompanionClient();
         });
         delayChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
@@ -193,7 +193,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 return;
             }
             SelectedMicProfile.DelayInMillis = (int)newValue;
-            SendSelectedMicProfileToConnectedClient();
+            SendSelectedMicProfileToCompanionClient();
         });
         colorChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
@@ -202,7 +202,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 return;
             }
             SelectedMicProfile.Color = newValue;
-            SendSelectedMicProfileToConnectedClient();
+            SendSelectedMicProfileToCompanionClient();
         });
         sampleRateChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
@@ -211,7 +211,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
                 return;
             }
             SelectedMicProfile.SampleRate = newValue;
-            SendSelectedMicProfileToConnectedClient();
+            SendSelectedMicProfileToCompanionClient();
         });
         micPitchTracker.FinalSampleRate
             .Subscribe(_ => UpdateSampleRateLabel())
@@ -222,12 +222,12 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 
         // Update recording device of connected client, when the client (dis)connects
         serverSideConnectRequestManager.ClientConnectionChangedEventStream
-            .Where(clientConnectedEvent => deviceChooserControl.Selection?.ConnectedClientId == clientConnectedEvent.ConnectedClientHandler.ClientId)
+            .Where(clientConnectedEvent => deviceChooserControl.Selection?.ConnectedClientId == clientConnectedEvent.CompanionClientHandler.ClientId)
             .Subscribe(newValue => OnRecordingDeviceSelected(deviceChooserControl.Selection))
             .AddTo(gameObject);
 
-        serverSideConnectRequestManager.ConnectedClientMicProfileChangedEventStream
-            .Subscribe(OnConnectedClientMicProfileChanged)
+        serverSideConnectRequestManager.CompanionClientMicProfileChangedEventStream
+            .Subscribe(OnCompanionClientMicProfileChanged)
             .AddTo(gameObject);
 
         micSampleRecorderManager.ConnectedMicDevicesChangesStream
@@ -406,22 +406,22 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         UpdateRecordingDeviceInactiveOverlay();
     }
 
-    private IConnectedClientHandler GetConnectedClientHandler()
+    private ICompanionClientHandler GetCompanionClientHandler()
     {
         if (SelectedMicProfile == null
             || SelectedMicProfile.ConnectedClientId.IsNullOrEmpty()
-            || !serverSideConnectRequestManager.TryGetConnectedClientHandler(SelectedMicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
+            || !serverSideConnectRequestManager.TryGetCompanionClientHandler(SelectedMicProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
         {
             return null;
         }
 
-        return connectedClientHandler;
+        return companionClientHandler;
     }
 
-    private void SendSelectedMicProfileToConnectedClient()
+    private void SendSelectedMicProfileToCompanionClient()
     {
-        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
-        connectedClientHandler?.SendMessageToClient(new MicProfileMessageDto(SelectedMicProfile));
+        ICompanionClientHandler companionClientHandler = GetCompanionClientHandler();
+        companionClientHandler?.SendMessageToClient(new MicProfileMessageDto(SelectedMicProfile));
     }
 
     private void OnRecordingDeviceSelected(MicProfile micProfile)
@@ -495,7 +495,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
             serverSideConnectRequestManager);
     }
 
-    private void OnConnectedClientMicProfileChanged(MicProfile micProfile)
+    private void OnCompanionClientMicProfileChanged(MicProfile micProfile)
     {
         if (deviceChooserControl.Selection == micProfile)
         {
@@ -507,20 +507,20 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 
     private void InitPitchDetectionFromConnectionClient()
     {
-        if (connectedClientReceivedMessageStreamDisposable != null)
+        if (companionClientReceivedMessageStreamDisposable != null)
         {
-            connectedClientReceivedMessageStreamDisposable.Dispose();
-            connectedClientReceivedMessageStreamDisposable = null;
+            companionClientReceivedMessageStreamDisposable.Dispose();
+            companionClientReceivedMessageStreamDisposable = null;
         }
 
         if (SelectedMicProfile == null
             || !SelectedMicProfile.IsInputFromConnectedClient
-            || !serverSideConnectRequestManager.TryGetConnectedClientHandler(SelectedMicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
+            || !serverSideConnectRequestManager.TryGetCompanionClientHandler(SelectedMicProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
         {
             return;
         }
 
-        connectedClientReceivedMessageStreamDisposable = connectedClientHandler.ReceivedMessageStream
+        companionClientReceivedMessageStreamDisposable = companionClientHandler.ReceivedMessageStream
             .Subscribe(dto =>
             {
                 if (dto is BeatPitchEventDto beatPitchEventDto)
@@ -537,7 +537,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 
     private void FireBeatPitchEvent(BeatPitchEventDto beatPitchEventDto)
     {
-        connectedClientBeatPitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat, beatPitchEventDto.Frequency));
+        companionClientBeatPitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat, beatPitchEventDto.Frequency));
     }
 
     public List<IBinding> GetBindings()

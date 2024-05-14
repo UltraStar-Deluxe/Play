@@ -32,7 +32,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         micPitchTracker.PitchEventStream
             .Subscribe(OnPitchDetected)
             .AddTo(gameObject);
-        recordingOptionsSceneControl.ConnectedClientBeatPitchEventStream
+        recordingOptionsSceneControl.CompanionClientBeatPitchEventStream
             .Subscribe(OnPitchDetected)
             .AddTo(gameObject);
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>

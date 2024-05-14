@@ -322,8 +322,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
         // Message delay
         FieldBindingUtils.Bind(messageBufferTimeTextField,
-            () => settings.ConnectedClientMessageBufferTimeInMillis,
-            newValue => settings.ConnectedClientMessageBufferTimeInMillis = newValue);
+            () => settings.CompanionClientMessageBufferTimeInMillis,
+            newValue => settings.CompanionClientMessageBufferTimeInMillis = newValue);
         messageBufferTimeTextField.DisableChangeValueByDragging();
 
         // Spleeter command (audio separation)

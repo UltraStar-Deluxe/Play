@@ -42,7 +42,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ca45ed0d8caa38a438fe47861f7706e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  connectedClientListEntryAsset: {fileID: 9197481963319205126, guid: dbc9d9d5de277f04e81903d38ab77e8e,
+  m_Name:
+  m_EditorClassIdentifier:
+  companionClientListEntryAsset: {fileID: 9197481963319205126, guid: dbc9d9d5de277f04e81903d38ab77e8e,
     type: 3}
