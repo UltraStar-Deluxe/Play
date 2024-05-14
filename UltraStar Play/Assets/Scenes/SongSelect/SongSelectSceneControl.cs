@@ -1086,7 +1086,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
 
         // Check that the used audio format can be loaded.
-        songAudioPlayer.LoadAndPlayAudioAsObservable(songMeta)
+        songAudioPlayer.LoadAndPlayAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
