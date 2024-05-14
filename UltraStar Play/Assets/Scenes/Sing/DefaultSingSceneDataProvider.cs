@@ -53,7 +53,7 @@ public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProv
     private MicProfile GetMicProfile(int index)
     {
         List<MicProfile> micProfiles = SettingsManager.Instance.Settings.MicProfiles
-            .Where(it => it.IsEnabled && it.IsConnected(ServerSideConnectRequestManager.Instance))
+            .Where(it => it.IsEnabled && it.IsConnected(ServerSideCompanionClientManager.Instance))
             .ToList();
         if (index >= micProfiles.Count)
         {

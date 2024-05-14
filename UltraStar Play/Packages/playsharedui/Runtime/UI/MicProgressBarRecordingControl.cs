@@ -19,7 +19,7 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
     private MicSampleRecorderManager micSampleRecorderManager;
     
     [Inject(Optional = true)]
-    private IServerSideConnectRequestManager serverSideConnectRequestManager;
+    private IServerSideCompanionClientManager serverSideCompanionClientManager;
     
     public MicProfile MicProfile
     {
@@ -36,7 +36,7 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
     private long lastRecordingEventTimeInMillis;
     private double noiseAboveThresholdDurationInMillis;
 
-    private readonly CircularBuffer<int> lastReceivedMidiNotesFromConnectedClient = new(10);
+    private readonly CircularBuffer<int> lastReceivedMidiNotesFromCompanionClient = new(10);
     
     public void OnInjectionFinished()
     {
@@ -80,13 +80,13 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
             MicProfile micProfile = micSampleRecorder.MicProfile;
             if (micProfile != null
                 && micProfile.IsInputFromConnectedClient
-                && serverSideConnectRequestManager != null)
+                && serverSideCompanionClientManager != null)
             {
-                if (serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId,
-                        out IConnectedClientHandler connectedClientHandler))
+                if (serverSideCompanionClientManager.TryGet(micProfile.ConnectedClientId,
+                        out ICompanionClientHandler companionClientHandler))
                 {
-                    micSampleRecorderDisposables.Add(connectedClientHandler.ReceivedMessageStream
-                        .Subscribe(evt => OnConnectedClientMessageReceived(evt)));
+                    micSampleRecorderDisposables.Add(companionClientHandler.ReceivedMessageStream
+                        .Subscribe(evt => OnCompanionClientMessageReceived(evt)));
                 }
             }
         }
@@ -94,7 +94,7 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
         lastRecordingEventTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
 
-    private void OnConnectedClientMessageReceived(JsonSerializable evt)
+    private void OnCompanionClientMessageReceived(JsonSerializable evt)
     {
         if (evt is StopRecordingMessageDto)
         {
@@ -116,8 +116,8 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
                 return;
             }
             
-            lastReceivedMidiNotesFromConnectedClient.PushBack(midiNote);
-            int medianMidiNote = NumberUtils.Median(lastReceivedMidiNotesFromConnectedClient.ToList());
+            lastReceivedMidiNotesFromCompanionClient.PushBack(midiNote);
+            int medianMidiNote = NumberUtils.Median(lastReceivedMidiNotesFromCompanionClient.ToList());
             if (Math.Abs(medianMidiNote - beatPitchEventDto.MidiNote) <= 2)
             {
                 noiseAboveThresholdDurationInMillis += deltaTimeInMillis;

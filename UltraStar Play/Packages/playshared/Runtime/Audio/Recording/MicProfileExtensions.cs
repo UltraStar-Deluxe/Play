@@ -3,17 +3,17 @@ using PortAudioForUnity;
 
 public static class MicProfileExtensions
 {
-    public static bool IsConnected(this MicProfile micProfile, IServerSideConnectRequestManager serverSideConnectRequestManager)
+    public static bool IsConnected(this MicProfile micProfile, IServerSideCompanionClientManager serverSideCompanionClientManager)
     {
-        return (micProfile.IsInputFromConnectedClient && serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId, out IConnectedClientHandler _))
+        return (micProfile.IsInputFromConnectedClient && serverSideCompanionClientManager.TryGet(micProfile.ConnectedClientId, out ICompanionClientHandler _))
                || (!micProfile.IsInputFromConnectedClient
                    && IMicrophoneAdapter.Instance.Devices.Contains(micProfile.Name)
                    && (micProfile.ChannelIndex == 0 || IMicrophoneAdapter.Instance.UsePortAudio));
     }
 
-    public static bool IsEnabledAndConnected(this MicProfile micProfile, IServerSideConnectRequestManager serverSideConnectRequestManager)
+    public static bool IsEnabledAndConnected(this MicProfile micProfile, IServerSideCompanionClientManager serverSideCompanionClientManager)
     {
-        return micProfile.IsEnabled && micProfile.IsConnected(serverSideConnectRequestManager);
+        return micProfile.IsEnabled && micProfile.IsConnected(serverSideCompanionClientManager);
     }
 
     public static string GetDisplayNameWithChannel(this MicProfile micProfile)

@@ -12,7 +12,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
     public static SongQueueRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongQueueRestControl>();
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private SongQueueManager songQueueManager;
@@ -49,7 +49,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
             .SetCallbackAndAdd(requestData =>
             {
                 List<MicProfile> enabledMicrophoneProfiles = settings.MicProfiles
-                    .Where(microphoneProfile => microphoneProfile.IsEnabledAndConnected(serverSideConnectRequestManager))
+                    .Where(microphoneProfile => microphoneProfile.IsEnabledAndConnected(serverSideCompanionClientManager))
                     .ToList();
                 ListDto<MicProfile> dto = new()
                 {

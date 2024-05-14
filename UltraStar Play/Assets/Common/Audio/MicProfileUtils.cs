@@ -8,12 +8,12 @@ public static class MicProfileUtils
     public static List<MicProfile> CreateAndPersistMicProfiles(
         Settings settings,
         ThemeManager themeManager,
-        ServerSideConnectRequestManager serverSideConnectRequestManager)
+        ServerSideCompanionClientManager serverSideCompanionClientManager)
     {
         List<MicProfile> persistedMicProfiles = settings.MicProfiles;
         List<Color32> microphoneColors = themeManager.GetMicrophoneColors();
-        List<IConnectedClientHandler> connectedClientHandlers = serverSideConnectRequestManager.GetAllConnectedClientHandlers();
-        List<MicProfile> micProfiles = CreateMicProfiles(persistedMicProfiles, microphoneColors, connectedClientHandlers, settings);
+        List<ICompanionClientHandler> companionClientHandlers = serverSideCompanionClientManager.GetAllCompanionClientHandlers();
+        List<MicProfile> micProfiles = CreateMicProfiles(persistedMicProfiles, microphoneColors, companionClientHandlers, settings);
         micProfiles.Sort(MicProfile.compareByName);
 
         List<MicProfile> newMicProfiles = micProfiles
@@ -32,7 +32,7 @@ public static class MicProfileUtils
         return micProfiles;
     }
 
-    public static List<MicProfile> CreateMicProfiles(List<MicProfile> persistedMicProfiles, List<Color32> micProfileColors, List<IConnectedClientHandler> connectedClientHandlers, Settings settings)
+    public static List<MicProfile> CreateMicProfiles(List<MicProfile> persistedMicProfiles, List<Color32> micProfileColors, List<ICompanionClientHandler> companionClientHandlers, Settings settings)
     {
         // Create list of connected and loaded microphones without duplicates.
         // A loaded microphone might have been created with hardware that is not connected now.
@@ -72,12 +72,12 @@ public static class MicProfileUtils
         }
 
         // Create mic profiles for connected companion apps that are not yet in the list
-        foreach (IConnectedClientHandler connectedClientHandler in connectedClientHandlers)
+        foreach (ICompanionClientHandler companionClientHandler in companionClientHandlers)
         {
-            bool alreadyInList = micProfiles.AnyMatch(it => it.ConnectedClientId == connectedClientHandler.ClientId && it.IsInputFromConnectedClient);
+            bool alreadyInList = micProfiles.AnyMatch(it => it.ConnectedClientId == companionClientHandler.ClientId && it.IsInputFromConnectedClient);
             if (!alreadyInList)
             {
-                MicProfile micProfile = new(connectedClientHandler.ClientName, 0, connectedClientHandler.ClientId);
+                MicProfile micProfile = new(companionClientHandler.ClientName, 0, companionClientHandler.ClientId);
                 micProfiles.Add(micProfile);
             }
         }

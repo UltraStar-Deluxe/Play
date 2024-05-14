@@ -32,7 +32,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         micPitchTracker.PitchEventStream
             .Subscribe(OnPitchDetected)
             .AddTo(gameObject);
-        recordingOptionsSceneControl.ConnectedClientBeatPitchEventStream
+        recordingOptionsSceneControl.CompanionClientBeatPitchEventStream
             .Subscribe(OnPitchDetected)
             .AddTo(gameObject);
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
@@ -87,7 +87,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         micPitchTracker.MicProfile = micProfile;
         if (!micProfile.Name.IsNullOrEmpty()
             && !micProfile.IsInputFromConnectedClient
-            && micProfile.IsEnabledAndConnected(ServerSideConnectRequestManager.Instance))
+            && micProfile.IsEnabledAndConnected(ServerSideCompanionClientManager.Instance))
         {
             micPitchTracker.StartRecording();
         }

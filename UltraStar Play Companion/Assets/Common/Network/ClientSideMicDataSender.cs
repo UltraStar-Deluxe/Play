@@ -23,7 +23,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
     private Settings companionAppSettings;
 
     [Inject]
-    private ClientSideConnectRequestManager clientSideConnectRequestManager;
+    private ClientSideCompanionClientManager clientSideCompanionClientManager;
 
     private readonly CircularBuffer<PositionInSongData> receivedPositionInSongTimes = new(3);
     private PositionInSongData bestPositionInSongData;
@@ -38,7 +38,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
     {
         ResetPositionInSong();
 
-        clientSideConnectRequestManager.ConnectEventStream
+        clientSideCompanionClientManager.ConnectEventStream
             .Subscribe(UpdateConnectionStatus)
             .AddTo(gameObject);
         RecordingEventStream.Subscribe(evt => OnRecordingEvent(evt));
@@ -170,7 +170,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
     private void SendMessageToServer(JsonSerializable jsonSerializable)
     {
         Log.Verbose(() => $"SendMessageToServer - method: {companionAppSettings.MicDataDeliveryMethod}, message: " + jsonSerializable.ToJson());
-        clientSideConnectRequestManager.SendMessageToServer(jsonSerializable, companionAppSettings.MicDataDeliveryMethod);
+        clientSideCompanionClientManager.SendMessageToServer(jsonSerializable, companionAppSettings.MicDataDeliveryMethod);
     }
 
     private double GetEstimatedPositionInSongInMillis()
@@ -274,9 +274,9 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         }
 
         if (connectEvent.IsSuccess
-            && clientSideConnectRequestManager.IsConnected)
+            && clientSideCompanionClientManager.IsConnected)
         {
-            receivedMessageStreamDisposable = clientSideConnectRequestManager.ReceivedMessageStream
+            receivedMessageStreamDisposable = clientSideCompanionClientManager.ReceivedMessageStream
                 .Subscribe(dto =>
                 {
                     if (dto is StopRecordingMessageDto)

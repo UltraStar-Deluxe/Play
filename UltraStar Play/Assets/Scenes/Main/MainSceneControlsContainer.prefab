@@ -42,13 +42,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c60078599f5b3224eaf34cad3a67004e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   versionPropertiesTextAsset: {fileID: 4900000, guid: 3ad2bf299d7def44da7e32ee50ae50f3,
     type: 3}
   newSongDialogUi: {fileID: 9197481963319205126, guid: d26d2933254a3114aae87f65770c961c,
     type: 3}
-  connectedClientEntryUi: {fileID: 9197481963319205126, guid: 02348618f8cffba42864c8979a4bd8ba,
+  companionClientEntryUi: {fileID: 9197481963319205126, guid: 02348618f8cffba42864c8979a4bd8ba,
     type: 3}
   onlineMultiplayerConnectionDialogUi: {fileID: 9197481963319205126, guid: 9c3e722be3fae1e41b7f3ea338b29834,
     type: 3}
@@ -96,8 +96,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51bdc6016371dba458421f473c93d932, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   localVersionTextAsset: {fileID: 4900000, guid: 3ad2bf299d7def44da7e32ee50ae50f3,
     type: 3}
   newVersionDialogUxml: {fileID: 9197481963319205126, guid: c0e2e6b52c0d55b40b80105b9b989bd2,
@@ -178,8 +178,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 878474830ae8ee9428aaa74ff7e97a56, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   songTemplateTxtFile: {fileID: 4900000, guid: d6c8331b03ca00649befee7b063f8cda, type: 3}
   songTemplateCover: {fileID: 4900000, guid: 64a33e42792a0b844be35a6d28ef55be, type: 3}
   songTemplateBackground: {fileID: 4900000, guid: eee02bb202ba30b4b92771c8479a247f,

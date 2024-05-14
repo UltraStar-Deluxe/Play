@@ -103,10 +103,10 @@ public static partial class R
         public const string commitHashLabel = "commitHashLabel";
         public const string commonScoreIcon = "commonScoreIcon";
         public const string commonScoreSentenceRatingContainer = "commonScoreSentenceRatingContainer";
+        public const string companionClientCountLabel = "companionClientCountLabel";
+        public const string companionClientList = "companionClientList";
+        public const string companionClientListEntryUiRoot = "companionClientListEntryUiRoot";
         public const string confirmDeletePlaylistButton = "confirmDeletePlaylistButton";
-        public const string connectedClientCountLabel = "connectedClientCountLabel";
-        public const string connectedClientList = "connectedClientList";
-        public const string connectedClientListEntryUiRoot = "connectedClientListEntryUiRoot";
         public const string connectedClientsListScrollView = "connectedClientsListScrollView";
         public const string connectedClientsListTitle = "connectedClientsListTitle";
         public const string connectionEndpointLabel = "connectionEndpointLabel";
@@ -470,9 +470,9 @@ public static partial class R
         public const string nextSentenceContainer = "nextSentenceContainer";
         public const string nextSentenceLabel = "nextSentenceLabel";
         public const string nicknameCharacterContainer = "nicknameCharacterContainer";
-        public const string noConnectedClientsContainer = "noConnectedClientsContainer";
-        public const string noConnectedClientsIcon = "noConnectedClientsIcon";
-        public const string noConnectedClientsLabel = "noConnectedClientsLabel";
+        public const string noCompanionClientsContainer = "noCompanionClientsContainer";
+        public const string noCompanionClientsIcon = "noCompanionClientsIcon";
+        public const string noCompanionClientsLabel = "noCompanionClientsLabel";
         public const string noConnectedMicsContainer = "noConnectedMicsContainer";
         public const string noConnectedMicsIcon = "noConnectedMicsIcon";
         public const string noConnectedMicsLabel = "noConnectedMicsLabel";

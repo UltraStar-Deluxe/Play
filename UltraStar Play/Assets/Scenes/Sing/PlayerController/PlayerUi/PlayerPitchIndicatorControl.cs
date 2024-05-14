@@ -7,10 +7,10 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
 {
     [Inject(UxmlName = R.UxmlNames.noteContainer)]
     private VisualElement noteContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerPitchIndicator)]
     private VisualElement playerPitchIndicator;
-    
+
     [Inject(UxmlName = R.UxmlNames.pitchIndicatorIcon)]
     private VisualElement pitchIndicatorIcon;
 
@@ -19,23 +19,23 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
 
     [Inject]
     private AbstractSingSceneNoteDisplayer noteDisplayer;
-    
+
     [Inject]
     private SongAudioPlayer songAudioPlayer;
-    
+
     [Inject]
     private Settings settings;
-    
+
     [Inject(Optional = true)]
     private MicProfile micProfile;
-    
+
     private int lastPitchEventMidiNote;
     private int lastPitchEventBeat;
 
-    private bool IsPitchIndicatorVisible => settings.ShowPitchIndicator 
+    private bool IsPitchIndicatorVisible => settings.ShowPitchIndicator
                                             && noteDisplayer is not NoNoteSingSceneDisplayer
                                             && micProfile != null;
-    
+
     public void OnInjectionFinished()
     {
         settings.ObserveEveryValueChanged(it => it.ShowPitchIndicator)
@@ -69,10 +69,10 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
         {
             return;
         }
-        
+
         Vector2 yPosRangeFactor = noteDisplayer.GetYStartAndEndInPercentForMidiNote(midiNote, startBeat);
         float height = 100f * (yPosRangeFactor.y - yPosRangeFactor.x);
-        
+
         float yPosPercent = 100f * yPosRangeFactor.x;
         yPosPercent = NumberUtils.Limit(yPosPercent, 0, 100);
         float smoothYPos = playerPitchIndicator.style.top.value.value + (yPosPercent - playerPitchIndicator.style.top.value.value) * (10f * Time.deltaTime);
@@ -83,14 +83,14 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
             micDelay += micProfile.DelayInMillis;
             if (micProfile.IsInputFromConnectedClient)
             {
-                micDelay += settings.ConnectedClientMessageBufferTimeInMillis;
+                micDelay += settings.CompanionClientMessageBufferTimeInMillis;
             }
         }
 
         double positionInMillisConsideringMicDelay = songAudioPlayer.PositionInMillis - micDelay;
         float xPosPercent = 100f * noteDisplayer.GetXInPercent(positionInMillisConsideringMicDelay);
         xPosPercent = NumberUtils.Limit(xPosPercent, 0, float.MaxValue);
-        
+
         playerPitchIndicator.style.left =  new StyleLength(Length.Percent(xPosPercent));
         playerPitchIndicator.style.top =  new StyleLength(Length.Percent(smoothYPos));
         playerPitchIndicator.style.height = new StyleLength(Length.Percent(height));

@@ -19,7 +19,7 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
     private int httpServerPort;
 
     [Inject]
-    private ClientSideConnectRequestManager clientSideConnectRequestManager;
+    private ClientSideCompanionClientManager clientSideCompanionClientManager;
 
     [Inject]
     private Settings settings;
@@ -36,7 +36,7 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
-        clientSideConnectRequestManager.ConnectEventStream
+        clientSideCompanionClientManager.ConnectEventStream
             .Where(connectEvent => connectEvent.IsSuccess)
             .Subscribe(connectEvent =>
             {
@@ -46,7 +46,7 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
                 connectionEventStream.OnNext(true);
             });
 
-        clientSideConnectRequestManager.ReceivedMessageStream
+        clientSideCompanionClientManager.ReceivedMessageStream
             .Subscribe(dto =>
             {
                 if (dto is PermissionsMessageDto permissionsMessageDto)

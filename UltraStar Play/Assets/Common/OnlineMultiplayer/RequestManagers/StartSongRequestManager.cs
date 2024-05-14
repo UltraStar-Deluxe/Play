@@ -29,7 +29,7 @@ namespace CommonOnlineMultiplayer
         private ThemeManager themeManager;
 
         [Inject]
-        private ServerSideConnectRequestManager serverSideConnectRequestManager;
+        private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
         protected override object GetInstance()
         {
@@ -98,7 +98,7 @@ namespace CommonOnlineMultiplayer
 
         private List<MicProfile> GetAvailableMicProfiles()
         {
-            return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);
+            return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideCompanionClientManager);
         }
     }
 }

@@ -52,10 +52,10 @@ public static class DefaultSettingsFactory
             ThemeJson defaultThemeJson = themeManager.GetDefaultTheme().ThemeJson;
             List<Color32> micProfileColors = themeManager.GetMicrophoneColors(defaultThemeJson);
 
-            List<IConnectedClientHandler> connectedClientHandlers = new List<IConnectedClientHandler>();
+            List<ICompanionClientHandler> companionClientHandlers = new List<ICompanionClientHandler>();
             List<MicProfile> persistedMicProfiles = new();
 
-            defaultSettings.MicProfiles = MicProfileUtils.CreateMicProfiles(persistedMicProfiles, micProfileColors, connectedClientHandlers, defaultSettings);
+            defaultSettings.MicProfiles = MicProfileUtils.CreateMicProfiles(persistedMicProfiles, micProfileColors, companionClientHandlers, defaultSettings);
         }
         catch (Exception e)
         {
