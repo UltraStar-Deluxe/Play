@@ -1,10 +1,13 @@
 ﻿using System;
 using LibVLCSharp;
+using UniInject;
 using UniRx;
 
 public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 {
+    [Inject]
     private VlcManager vlcManager;
+
     private MediaPlayer vlcMediaPlayer;
 
     public override bool IsSupported(string videoUri, bool videoEqualsAudio)
