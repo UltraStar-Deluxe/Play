@@ -14,6 +14,13 @@ public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
         return AudioManager.LoadAudioClipFromUri(audioUri, streamAudio)
             .Select(loadedAudioClip =>
             {
+                if (this == null)
+                {
+                    string errorMessage = $"Failed to load audio clip '{audioUri}': {nameof(AudioSourceAudioSupportProvider)} has been destroyed already.";
+                    Debug.LogError(errorMessage);
+                    throw new AudioSupportProviderException(errorMessage);
+                }
+
                 if (loadedAudioClip == null)
                 {
                     audioSource.Stop();

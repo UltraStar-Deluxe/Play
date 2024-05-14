@@ -147,7 +147,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
         InitSongEditorStyleSheet();
 
-        songAudioPlayer.LoadAndPlayAudioAsObservable(SongMeta, sceneData.PositionInMillis, false)
+        songAudioPlayer.LoadAndPlayAsObservable(SongMeta, sceneData.PositionInMillis, false)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);

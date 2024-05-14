@@ -11,20 +11,20 @@ public class FileFormatConversionTests : AbstractMediaFileFormatTests
 
     private static readonly List<TestCaseData> fileNamesWithAudioSupportedByFfmpeg = new List<TestCaseData>()
     {
-        new TestCaseData("aac-TestSong.txt").Returns(null),
-        new TestCaseData("aiff-TestSong.txt").Returns(null),
-        new TestCaseData("flac-TestSong.txt").Returns(null),
+        new TestCaseData("AudioFileFormatTests/aac-TestSong.txt").Returns(null),
+        new TestCaseData("AudioFileFormatTests/aiff-TestSong.txt").Returns(null),
+        new TestCaseData("AudioFileFormatTests/flac-TestSong.txt").Returns(null),
     };
 
     private static readonly List<TestCaseData> fileNamesWithVideoSupportedByFfmpeg = new List<TestCaseData>()
     {
-        new TestCaseData("f4v-TestSong.txt").Returns(null),
-        new TestCaseData("flv-TestSong.txt").Returns(null),
-        new TestCaseData("mkv-TestSong.txt").Returns(null),
-        new TestCaseData("mov-TestSong.txt").Returns(null),
-        new TestCaseData("mpeg2-TestSong.txt").Returns(null),
-        new TestCaseData("webm-vp9-TestSong.txt").Returns(null),
-        new TestCaseData("wmv-TestSong.txt").Returns(null),
+        new TestCaseData("VideoFileFormatTests/f4v-TestSong.txt").Returns(null),
+        new TestCaseData("VideoFileFormatTests/flv-TestSong.txt").Returns(null),
+        new TestCaseData("VideoFileFormatTests/mkv-TestSong.txt").Returns(null),
+        new TestCaseData("VideoFileFormatTests/mov-TestSong.txt").Returns(null),
+        new TestCaseData("VideoFileFormatTests/mpeg2-TestSong.txt").Returns(null),
+        new TestCaseData("VideoFileFormatTests/webm-vp9-TestSong.txt").Returns(null),
+        new TestCaseData("VideoFileFormatTests/wmv-TestSong.txt").Returns(null),
     };
 
     [OneTimeSetUp]
@@ -47,23 +47,23 @@ public class FileFormatConversionTests : AbstractMediaFileFormatTests
 
     [UnityTest]
     [TestCaseSource(nameof(fileNamesWithAudioSupportedByFfmpeg))]
-    public IEnumerator ShouldConvertAudio(string txtFileName)
+    public IEnumerator ShouldConvertAudio(string txtFilePath)
     {
-        yield return ShouldConvertFile(txtFileName, audioFileFormatTestFolderPath, true);
+        yield return ShouldConvertFile(txtFilePath, true);
     }
 
     [UnityTest]
     [TestCaseSource(nameof(fileNamesWithVideoSupportedByFfmpeg))]
-    public IEnumerator ShouldConvertVideo(string txtFileName)
+    public IEnumerator ShouldConvertVideo(string txtFilePath)
     {
-        return ShouldConvertFile(txtFileName, videoFileFormatTestFolderPath, false);
+        return ShouldConvertFile(txtFilePath, false);
     }
 
-    private IEnumerator ShouldConvertFile(string txtFileName, string testFolderPath, bool isAudio)
+    private IEnumerator ShouldConvertFile(string txtFilePath, bool isAudio)
     {
         LogAssert.ignoreFailingMessages = true;
 
-        string songFilePath = GetSongMetaFilePath(txtFileName, testFolderPath);
+        string songFilePath = GetSongMetaFilePath(txtFilePath);
         SongMeta songMeta = LoadSongMeta(songFilePath);
         string originalSourceFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
 

@@ -61,11 +61,16 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         return Observable.Create<AudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => vlcMediaPlayer != null
-                      && vlcMediaPlayer.Media != null
-                      && vlcMediaPlayer.Media.Duration > 0,
+                () => this == null || DurationInMillis > 0,
                 () =>
                 {
+                    if (this == null)
+                    {
+                        string errorMessage = $"Failed to load audio clip '{audioUri}': {nameof(VlcAudioSupportProvider)} has been destroyed already.";
+                        Debug.LogError(errorMessage);
+                        throw new AudioSupportProviderException(errorMessage);
+                    }
+
                     o.OnNext(new AudioLoadedEvent(audioUri));
                 }));
             return Disposable.Empty;
@@ -158,7 +163,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         set => vlcMediaPlayer.SetTime((long)Math.Max(1, value));
     }
 
-    public override double DurationInMillis => vlcMediaPlayer.Length;
+    public override double DurationInMillis => vlcMediaPlayer?.Length ?? 0;
 
     public override double VolumeFactor
     {

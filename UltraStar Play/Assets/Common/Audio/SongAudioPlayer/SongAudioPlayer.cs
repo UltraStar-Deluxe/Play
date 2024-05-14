@@ -6,7 +6,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class SongAudioPlayer : MonoBehaviour, INeedInjection
+public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<SongAudioLoadedEvent>
 {
     // The playback position increase in milliseconds from one frame to the next to be counted as "jump".
     // An event is fired when jumping forward in the song.
@@ -250,12 +250,12 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
     }
 
-    public void LoadAndPlayAudio(
+    public void LoadAndPlay(
         SongMeta songMeta,
         double startPositionInMillis = 0,
         bool streamAudio = true)
     {
-        LoadAndPlayAudioAsObservable(
+        LoadAndPlayAsObservable(
                 songMeta,
                 startPositionInMillis,
                 streamAudio)
@@ -267,12 +267,15 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                     "reason", ex.Message));
             })
             // Subscribe to trigger observable
-            .Subscribe(evt => Debug.Log($"Successfully loaded audio of song '{songMeta.GetArtistDashTitle()}'"));
+            .Subscribe(evt => Debug.Log($"Loaded audio: {evt.MediaUri}'"));
     }
 
-    public IObservable<SongAudioLoadedEvent> LoadAndPlayAudioAsObservable(
+    public IObservable<SongAudioLoadedEvent> LoadAndPlayAsObservable(SongMeta songMeta)
+        => LoadAndPlayAsObservable(songMeta, 0);
+
+    public IObservable<SongAudioLoadedEvent> LoadAndPlayAsObservable(
         SongMeta songMeta,
-        double startPositionInMillis = 0,
+        double startPositionInMillis,
         bool streamAudio = true)
     {
         UnloadAudio();
@@ -284,7 +287,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 new SongAudioPlayerException($"Audio resource does not exist: {audioUri}"));
         }
 
-        return DoLoadAndPlayAudioAsObservable(audioUri, audioSupportProviders, streamAudio)
+        return DoLoadAndPlayAsObservable(audioUri, audioSupportProviders, streamAudio)
             .Select(evt =>
             {
                 loadedSongMeta = songMeta;
@@ -301,7 +304,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             });
     }
 
-    private IObservable<AudioLoadedEvent> DoLoadAndPlayAudioAsObservable(
+    private IObservable<AudioLoadedEvent> DoLoadAndPlayAsObservable(
         string audioUri,
         IAudioSupportProvider[] availableAudioSupportProviders,
         bool streamAudio)
@@ -332,7 +335,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                         o.OnError(new VideoSupportProviderException($"Failed to load audio and no remaining audio support providers: {audioUri}"));
                         return;
                     }
-                    DoLoadAndPlayAudioAsObservable(audioUri, remainingAudioSupportProviders, streamAudio)
+                    DoLoadAndPlayAsObservable(audioUri, remainingAudioSupportProviders, streamAudio)
                         .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
                 })
                 .Subscribe(evt =>
@@ -364,7 +367,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     public void ReloadAudio()
     {
-        LoadAndPlayAudio(loadedSongMeta);
+        LoadAndPlay(loadedSongMeta);
     }
 
     private void StopAudio()

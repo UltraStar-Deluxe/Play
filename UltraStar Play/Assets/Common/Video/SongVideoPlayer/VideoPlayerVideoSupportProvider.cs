@@ -48,7 +48,9 @@ public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
         return Observable.Create<VideoLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => videoPlayer.length > 0 || videoPlayerErrorMessages.Count > 0,
+                () => this == null
+                      || videoPlayer.length > 0
+                      || videoPlayerErrorMessages.Count > 0,
                 () =>
                 {
                     if (videoPlayerErrorMessages.Count > 0)

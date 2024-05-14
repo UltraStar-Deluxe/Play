@@ -1,10 +1,10 @@
 ﻿#TITLE:TestTitle
 #ARTIST:TestArtist
 #MP3:flv-TestVideo.flv
-#_VIDEO:TestVideo.mp4
+#VIDEO:flv-TestVideo.flv
 #BPM:200
 - 0
 : 4 3 9 Hel
-: 8 3 9  lo 
+: 8 3 9  lo
 : 12 3 9  world!
 E
