@@ -775,7 +775,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         // Trigger achievement
         if (songMetas.Count > 100)
         {
-            achievementEventStream.OnNext(AchievementId.browseMoreThan100Songs);
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.browseMoreThan100Songs));
         }
     }
 

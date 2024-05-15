@@ -218,7 +218,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             {
                 if (evt is NotesChangedEvent)
                 {
-                    achievementEventStream.OnNext(AchievementId.editNotesInSongEditor);
+                    achievementEventStream.OnNext(new AchievementEvent(AchievementId.editNotesInSongEditor));
                 }
             })
             .AddTo(gameObject);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CommonOnlineMultiplayer;
 using Steamworks.Data;
 using UniInject;
 using UniRx;
@@ -26,7 +27,16 @@ public class SteamAchievementManager : AbstractSingletonBehaviour, INeedInjectio
     protected override void StartSingleton()
     {
         achievementEventStream
-            .Subscribe(achievementId => TriggerAchievement(achievementId))
+            .Subscribe(evt =>
+            {
+                if (evt.PlayerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+                    && lobbyMemberPlayerProfile.IsRemote)
+                {
+                    // If the achievement is associated to a player, then trigger only for local players.
+                    return;
+                }
+                TriggerAchievement(evt.AchievementId);
+            })
             .AddTo(gameObject);
     }
 

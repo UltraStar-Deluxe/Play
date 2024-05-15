@@ -603,12 +603,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         if (sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.Count == 2
             && sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.Values.Distinct().Count() > 1)
         {
-            achievementEventStream.OnNext(AchievementId.startDuetWithDifferentLyrics);
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.startDuetWithDifferentLyrics));
         }
 
         if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 4)
         {
-            achievementEventStream.OnNext(AchievementId.startSongWithFourOrMorePlayers);
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.startSongWithFourOrMorePlayers));
         }
 
         // Medley with at least two entries
@@ -616,7 +616,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             && sceneData.MedleySongIndex >= 0
             && sceneData.SongMetas.Count > 1)
         {
-            achievementEventStream.OnNext(AchievementId.startMedleyWithAtLeastTwoSongs);
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.startMedleyWithAtLeastTwoSongs));
         }
     }
 
@@ -912,7 +912,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         if (settings.UseWebcamAsBackgroundInSingScene)
         {
-            achievementEventStream.OnNext(AchievementId.useWebcamInSingScene);
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.useWebcamInSingScene));
         }
 
         passTheMicControl.Update();
@@ -1090,17 +1090,17 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private void TriggerAchievementsAfterEndOfSong()
     {
-        achievementEventStream.OnNext(AchievementId.completeSong);
+        achievementEventStream.OnNext(new AchievementEvent(AchievementId.completeSong));
 
         if (settings.VocalsAudioVolumePercent <= 0)
         {
-            achievementEventStream.OnNext(AchievementId.completeSongWithVocalsVolumeZero);
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.completeSongWithVocalsVolumeZero));
         }
 
         completedSongCountSinceAppStart++;
         if (completedSongCountSinceAppStart > 10)
         {
-            achievementEventStream.OnNext(AchievementId.completeMoreThan10SongsInARow);
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.completeMoreThan10SongsInARow));
         }
     }
 
@@ -1393,7 +1393,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         // Trigger achievement
         if (songAudioPlayer.PositionInMillis > 60000)
         {
-            achievementEventStream.OnNext(AchievementId.pauseSingingAfterOneMinute);
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.pauseSingingAfterOneMinute));
         }
 
         if (sendOnlineMultiplayerMessage)

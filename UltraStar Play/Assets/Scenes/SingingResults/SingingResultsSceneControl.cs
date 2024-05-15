@@ -186,15 +186,12 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private void TriggerAchievementsOnSingingResultsStart()
     {
-        if (sceneData.PlayerProfiles
-            .AnyMatch(playerProfile =>
-                playerProfile != null
-                && playerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard
-                && sceneData.GetPlayerScores(playerProfile)?.TotalScore > 9000
-                && CommonOnlineMultiplayerUtils.IsLocalPlayerProfile(playerProfile)))
-        {
-            achievementEventStream.OnNext(AchievementId.getMoreThan9000Points);
-        }
+        PlayerProfile localPlayerProfileOver9000 = sceneData.PlayerProfiles.FirstOrDefault(playerProfile =>
+            playerProfile != null
+            && playerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard
+            && sceneData.GetPlayerScores(playerProfile)?.TotalScore > 9000
+            && CommonOnlineMultiplayerUtils.IsLocalPlayerProfile(playerProfile));
+        achievementEventStream.OnNext(new AchievementEvent(AchievementId.getMoreThan9000Points, localPlayerProfileOver9000));
     }
 
     private void InitSingingResults()
@@ -295,7 +292,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         }
 
         // Trigger achievement
-        achievementEventStream.OnNext(AchievementId.showFinalTeamResults);
+        achievementEventStream.OnNext(new AchievementEvent(AchievementId.showFinalTeamResults));
     }
 
     private void InitVfx()
