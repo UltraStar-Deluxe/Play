@@ -227,39 +227,5 @@ namespace CommonOnlineMultiplayer
         {
             LobbyMemberManager.OnNetcodeClientConnectionApproval(connectionApprovalRequest, response);
         }
-
-        // public T GetNetworkBehaviour<T>(UnityNetcodeClientId netcodeClientId)
-        //     where T : NetworkBehaviour
-        // {
-        //     GameObject lobbyMemberGameObject = networkManager.SpawnManager.GetPlayerNetworkObject(netcodeClientId).gameObject;
-        //     return lobbyMemberGameObject.GetComponentInChildren<T>();
-        // }
-        //
-        // public T GetNetworkBehaviourOfOwnLobbyMember<T>()
-        //     where T : NetworkBehaviour
-        // {
-        //     return GetNetworkBehaviour<T>(OwnLobbyMemberNetworkObject.OwnerClientId);
-        // }
-        //
-        // public T AddNetworkBehaviourIfMissing<T>(UnityNetcodeClientId netcodeClientId)
-        //     where T : NetworkBehaviour
-        // {
-        //     NetworkObject networkObject = networkManager.SpawnManager.GetPlayerNetworkObject(netcodeClientId);
-        //     if (networkObject == null)
-        //     {
-        //         throw new OnlineMultiplayerException($"Cannot add component of type {typeof(T)} because no lobby member found with Netcode id {netcodeClientId}");
-        //     }
-        //
-        //     T existingComponent = networkObject.GetComponentInChildren<T>();
-        //     if (existingComponent)
-        //     {
-        //         return existingComponent;
-        //     }
-        //
-        //     GameObject newGameObject = new();
-        //     newGameObject.name = typeof(T).Name;
-        //     newGameObject.transform.parent = networkObject.transform;
-        //     return newGameObject.AddComponent<T>();
-        // }
     }
 }

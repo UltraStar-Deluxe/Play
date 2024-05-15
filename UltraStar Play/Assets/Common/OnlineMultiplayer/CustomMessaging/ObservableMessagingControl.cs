@@ -240,7 +240,7 @@ namespace CommonOnlineMultiplayer
                 request =>
                 {
                     // Read responseMessageName,
-                    // such that the response can be send directly to the corresponding recipient code
+                    // such that the response can be send directly to the corresponding recipient
                     FastBufferReader fastBufferReader = request.MessagePayload;
                     fastBufferReader.ReadValueSafe(out string responseMessageName);
 
