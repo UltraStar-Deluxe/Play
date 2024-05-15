@@ -14,5 +14,3 @@ sh download-litenetlib.sh
 sh download-nhyphenator.sh
 sh download-third-party-assets.sh
 
-# Optionally download demo song package
-sh download-songs.sh
