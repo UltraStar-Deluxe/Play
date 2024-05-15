@@ -38,12 +38,6 @@ namespace CommonOnlineMultiplayer
 
         protected override void StartSingleton()
         {
-            onlineMultiplayerManager.OwnNetcodeClientStartedEventStream
-                .Subscribe(_ => InitOnlineMultiplayerRequestHandlers());
-        }
-
-        private void InitOnlineMultiplayerRequestHandlers()
-        {
             onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
                 nameof(StartSingSceneRequestDto),
                 response =>
@@ -75,7 +69,8 @@ namespace CommonOnlineMultiplayer
                         },
                     };
                     sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
-                });
+                })
+                .AddTo(gameObject);
         }
 
         private MicProfile GetOwnLobbyMemberMicProfile()

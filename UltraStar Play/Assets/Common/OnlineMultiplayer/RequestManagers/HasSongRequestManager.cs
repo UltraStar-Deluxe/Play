@@ -20,12 +20,6 @@ namespace CommonOnlineMultiplayer
 
         protected override void StartSingleton()
         {
-            onlineMultiplayerManager.OwnNetcodeClientStartedEventStream
-                .Subscribe(_ => InitOnlineMultiplayerRequestHandlers());
-        }
-
-        private void InitOnlineMultiplayerRequestHandlers()
-        {
             onlineMultiplayerManager.ObservableMessagingControl.RegisterObservedMessageHandler(
                 nameof(HasSongRequestDto),
                 observedMessage =>
@@ -37,7 +31,8 @@ namespace CommonOnlineMultiplayer
                     onlineMultiplayerManager.ObservableMessagingControl.SendResponseMessage(
                         observedMessage,
                         FastBufferWriterUtils.WriteJsonValuePacked(responseDto));
-                });
+                })
+                .AddTo(gameObject);
         }
     }
 }
