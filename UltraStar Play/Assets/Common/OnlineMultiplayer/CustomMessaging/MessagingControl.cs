@@ -13,8 +13,7 @@ namespace CommonOnlineMultiplayer
         private const string ForwardToClientsMessageName = "FORWARD_TO_CLIENTS";
         private const string ForwardToClientMessageName = "FORWARD_TO_CLIENT";
 
-        private readonly Dictionary<string, List<NamedMessageHandler>> messageNameToHandlers = new();
-        private readonly Dictionary<string, HandleNamedMessageHelper> messageNameToHandleNamedMessageHelper = new();
+        private readonly Dictionary<string, NamedMessageHandlerDelegator> messageNameToHandleNamedMessageHelper = new();
 
         private bool hasRegisteredForwardNamedMessageHandlers;
 
@@ -213,24 +212,17 @@ namespace CommonOnlineMultiplayer
             string messageName,
             Action<NamedMessage> handleMessage)
         {
-            if (!messageNameToHandlers.TryGetValue(messageName, out List<NamedMessageHandler> messageHandlers))
+            if (!messageNameToHandleNamedMessageHelper.TryGetValue(messageName, out NamedMessageHandlerDelegator namedMessageHandlerDelegator))
             {
-                messageHandlers = new();
-                messageNameToHandlers[messageName] = messageHandlers;
-            }
-
-            if (!messageNameToHandleNamedMessageHelper.ContainsKey(messageName))
-            {
-                HandleNamedMessageHelper handleNamedMessageHelper = new HandleNamedMessageHelper(messageName, messageHandlers);
-                messageNameToHandleNamedMessageHelper[messageName] = handleNamedMessageHelper;
-                NetworkManager.CustomMessagingManager.RegisterNamedMessageHandler(messageName, handleNamedMessageHelper.HandleNamedMessage);
+                namedMessageHandlerDelegator = new NamedMessageHandlerDelegator(messageName);
+                messageNameToHandleNamedMessageHelper[messageName] = namedMessageHandlerDelegator;
+                NetworkManager.CustomMessagingManager.RegisterNamedMessageHandler(messageName, namedMessageHandlerDelegator.HandleNamedMessage);
             }
 
             NamedMessageHandler namedMessageHandler = new NamedMessageHandler(handleMessage);
+            namedMessageHandlerDelegator.Add(namedMessageHandler);
 
-            messageHandlers.Add(namedMessageHandler);
-
-            Log.Debug(() => $"RegisterNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
+            Log.Debug(() => $"RegisterNamedMessageHandler - new count of handlers for message name '{messageName}': {namedMessageHandlerDelegator.Count}");
 
             bool isDisposed = false;
             return Disposable.Create(() =>
@@ -241,13 +233,12 @@ namespace CommonOnlineMultiplayer
                 }
                 isDisposed = true;
 
-                messageHandlers.Remove(namedMessageHandler);
-                if (messageHandlers.IsNullOrEmpty())
+                namedMessageHandlerDelegator.Remove(namedMessageHandler);
+                if (namedMessageHandlerDelegator.Count <= 0)
                 {
-                    messageNameToHandlers.Remove(messageName);
                     messageNameToHandleNamedMessageHelper.Remove(messageName);
                 }
-                Log.Debug(() => $"RemoveNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
+                Log.Debug(() => $"RemoveNamedMessageHandler - new count of handlers for message name '{messageName}': {namedMessageHandlerDelegator.Count}");
             });
         }
     }
