@@ -28,9 +28,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     public VisualTreeAsset newSongDialogUi;
 
     [InjectedInInspector]
-    public VisualTreeAsset companionClientEntryUi;
+    public VisualTreeAsset connectedClientEntryUi;
 
-    [FormerlySerializedAs("onlineMultiplayerConnectionUi")] [InjectedInInspector]
+    [InjectedInInspector]
     public VisualTreeAsset onlineMultiplayerConnectionDialogUi;
 
     [InjectedInInspector]
@@ -264,7 +264,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         bb.BindExistingInstance(createSongFromTemplateControl);
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);
-        bb.Bind(nameof(companionClientEntryUi)).ToExistingInstance(companionClientEntryUi);
+        bb.Bind(nameof(connectedClientEntryUi)).ToExistingInstance(connectedClientEntryUi);
         return bb.GetBindings();
     }
 
