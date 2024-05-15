@@ -54,9 +54,6 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     private Injector injector;
 
     [Inject]
-    private OnlineMultiplayerManager onlineMultiplayerManager;
-
-    [Inject]
     private Settings settings;
 
     [Inject]
@@ -144,8 +141,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     private int lastUpdateAllMicPitchTrackersFrameCount;
 
-    public bool CanSelectMic => PlayerProfile is not LobbyMemberPlayerProfile
-                                || PlayerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile;
+    public bool CanSelectMic => PlayerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+                                || lobbyMemberPlayerProfile.IsLocal;
 
     public void OnInjectionFinished()
     {
