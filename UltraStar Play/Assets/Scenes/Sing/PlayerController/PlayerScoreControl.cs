@@ -19,19 +19,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     public static readonly int maxPerfectSentenceBonusScore = 1000;
     public static readonly int maxScoreForNotes = maxScore - maxPerfectSentenceBonusScore;
 
-    public int TotalScore
-    {
-        get
-        {
-            if (onlineMultiplayerManager.IsOnlineGame
-                && CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(playerProfile))
-            {
-                return singingResultsPlayerScoreFromOnlineMultiplayerPeer?.TotalScore ?? 0;
-            }
-
-            return calculationData.TotalScore;
-        }
-    }
+    public int TotalScore => PlayerScore.TotalScore;
 
     [Inject]
     private PlayerPerformanceAssessmentControl playerPerformanceAssessmentControl;
@@ -45,21 +33,28 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     [Inject]
     private PlayerProfile playerProfile;
 
-    [Inject]
-    private OnlineMultiplayerManager onlineMultiplayerManager;
-
     private readonly Subject<ScoreChangedEvent> scoreChangedEventStream = new();
     public IObservable<ScoreChangedEvent> ScoreChangedEventStream => scoreChangedEventStream;
 
     private ScoreCalculationData calculationData = new();
-    public ISingingResultsPlayerScore CalculationData => calculationData;
-
-    private ISingingResultsPlayerScore singingResultsPlayerScoreFromOnlineMultiplayerPeer;
+    private ISingingResultsPlayerScore playerScore;
+    public ISingingResultsPlayerScore PlayerScore
+    {
+        get => playerScore;
+        set
+        {
+            playerScore = value;
+            FireScoreChangedEventWithCurrentScore();
+        }
+    }
 
     private readonly HashSet<int> processedBeats = new();
     private int firstBeatToScoreInclusive;
 
-    private readonly List<IDisposable> disposables = new();
+    private void Awake()
+    {
+        PlayerScore = new ScoreCalculationData();
+    }
 
     public void OnInjectionFinished()
     {
@@ -67,13 +62,6 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
         playerPerformanceAssessmentControl.NoteAssessedEventStream.Subscribe(evt => OnNoteAssessed(evt));
         playerPerformanceAssessmentControl.SentenceAssessedEventStream.Subscribe(evt => OnSentenceAssessed(evt));
-
-        InitOnlineMultiplayer();
-    }
-
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
     }
 
     private void OnNoteAssessed(PlayerPerformanceAssessmentControl.NoteAssessedEvent evt)
@@ -170,79 +158,6 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         }
 
         FireScoreChangedEventWithCurrentScore();
-
-        if (onlineMultiplayerManager.IsOnlineGame
-            && CommonOnlineMultiplayerUtils.IsLocalPlayerProfile(playerProfile))
-        {
-            SendPlayerScoreMessageToOtherLobbyMembers();
-        }
-    }
-
-    private void InitOnlineMultiplayer()
-    {
-        if (!onlineMultiplayerManager.IsOnlineGame)
-        {
-            return;
-        }
-
-        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
-            GetPlayerScoreMessageName(),
-            message => OnPlayerScoreMessage(message)));
-    }
-
-    private void SendPlayerScoreMessageToOtherLobbyMembers()
-    {
-        if (!onlineMultiplayerManager.IsOnlineGame
-            || CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(playerProfile))
-        {
-            return;
-        }
-
-        SingingResultsPlayerScoreRequestDto playerScoreRequestDto = new()
-        {
-            SingingResultsPlayerScore = CreateSingingResultsPlayerScore(),
-        };
-
-        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
-            GetPlayerScoreMessageName(),
-            FastBufferWriterUtils.WriteJsonValuePacked(playerScoreRequestDto),
-            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
-    }
-
-    public ISingingResultsPlayerScore CreateSingingResultsPlayerScore()
-    {
-        if (onlineMultiplayerManager.IsOnlineGame
-            && playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
-            && lobbyMemberPlayerProfile.IsRemote)
-        {
-            return new SingingResultsPlayerScore(singingResultsPlayerScoreFromOnlineMultiplayerPeer);
-        }
-
-        return new SingingResultsPlayerScore()
-        {
-            NormalNotesTotalScore = calculationData.NormalNotesTotalScore,
-            GoldenNotesTotalScore = calculationData.GoldenNotesTotalScore,
-            PerfectSentenceBonusTotalScore = calculationData.PerfectSentenceBonusTotalScore,
-            ModTotalScore = calculationData.ModTotalScore,
-        };
-    }
-
-    private void OnPlayerScoreMessage(NamedMessage message)
-    {
-        SingingResultsPlayerScoreRequestDto requestDto = FastBufferReaderUtils.ReadJsonValuePacked<SingingResultsPlayerScoreRequestDto>(message.MessagePayload);
-        singingResultsPlayerScoreFromOnlineMultiplayerPeer = requestDto.SingingResultsPlayerScore;
-
-        FireScoreChangedEventWithCurrentScore();
-    }
-
-    private string GetPlayerScoreMessageName()
-    {
-        if (playerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
-        {
-            throw new IllegalStateException("Failed to construct online multiplayer message name because player is not a lobby member.");
-        }
-
-        return $"{nameof(SingingResultsPlayerScoreRequestDto)}-{lobbyMemberPlayerProfile.Name}-{lobbyMemberPlayerProfile.UnityNetcodeClientId}";
     }
 
     private void UpdateMaxScores(IReadOnlyCollection<Sentence> sentences)
