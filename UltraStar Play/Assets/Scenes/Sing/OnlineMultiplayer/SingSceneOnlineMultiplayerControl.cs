@@ -21,6 +21,7 @@ public class SingSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjection, 
 
     private readonly List<IDisposable> disposables = new();
 
+    // TODO: better pattern than boolean flags and try-finally to prevent reacting to own triggered events?
     private bool isFinishingSceneByOnlineMultiplayerMessage;
     private bool isAbortingSceneByOnlineMultiplayerMessage;
     private bool isPausingByOnlineMultiplayerMessage;
