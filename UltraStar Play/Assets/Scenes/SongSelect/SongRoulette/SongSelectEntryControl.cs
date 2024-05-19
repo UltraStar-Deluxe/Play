@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -57,9 +55,6 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private VisualElement notAvailableInOnlineGameIcon;
 
     [Inject]
-    private OnlineMultiplayerManager onlineMultiplayerManager;
-
-    [Inject]
     private CreateSingAlongSongControl createSingAlongSongControl;
 
     [Inject]
@@ -87,19 +82,12 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private SongSelectEntry songSelectEntry;
     public SongSelectEntry SongSelectEntry
     {
-        get
-        {
-            return songSelectEntry;
-        }
-        set
-        {
-            songSelectEntry = value;
-            VisualElement.SetVisibleByVisibility(songSelectEntry != null);
-            UpdateLabels();
-            UpdateIcons();
-            UpdateCover();
-        }
+        get => songSelectEntryProperty.Value;
+        set => songSelectEntryProperty.Value = value;
     }
+
+    private readonly ReactiveProperty<SongSelectEntry> songSelectEntryProperty = new();
+    public IObservable<SongSelectEntry> SongSelectEntryAsObservable => songSelectEntryProperty;
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
@@ -119,8 +107,6 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     private string lastSongMetaCover;
     private string lastSongMetaBackground;
-
-    private readonly List<IDisposable> disposables = new();
 
     public void OnInjectionFinished()
     {
@@ -163,6 +149,16 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
         settings.ObserveEveryValueChanged(it => it.Difficulty)
             .Subscribe(_ => UpdateIcons());
+
+        SongSelectEntryAsObservable.Subscribe(newValue => OnSongSelectEntryChanged(newValue));
+    }
+
+    private void OnSongSelectEntryChanged(SongSelectEntry newValue)
+    {
+        VisualElement.SetVisibleByVisibility(newValue != null);
+        UpdateLabels();
+        UpdateIcons();
+        UpdateCover();
     }
 
     private void InitSongMenu()
@@ -402,42 +398,11 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             });
 
         notAvailableInOnlineGameIcon.HideByDisplay();
-        if (onlineMultiplayerManager.IsOnlineGame)
-        {
-            CheckOtherPlayersHaveSongLocally(songMeta);
-        }
     }
 
-    private void CheckOtherPlayersHaveSongLocally(SongMeta songMeta)
+    public void ShowNotAvailableInOnlineGameIcon()
     {
-        if (onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        disposables.Add(onlineMultiplayerManager.ObservableMessagingControl.SendNamedMessageToClientsAsObservable(
-            nameof(HasSongRequestDto),
-            FastBufferWriterUtils.WriteJsonValuePacked(new HasSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
-            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to check whether other lobby members have song locally: song: '{songMeta.GetArtistDashTitle()}', error: {ex.Message}");
-            })
-            .Subscribe(response =>
-            {
-                if (SongEntryChanged(songMeta))
-                {
-                    return;
-                }
-
-                HasSongResponseDto responseDto = FastBufferReaderUtils.ReadJsonValuePacked<HasSongResponseDto>(response.MessagePayload);
-                if (!responseDto.HasSong)
-                {
-                    Debug.Log($"Netcode client {response.SenderNetcodeClientId} does not have the song '{songMeta.GetArtistDashTitle()}', showing corresponding icon.");
-                    notAvailableInOnlineGameIcon.ShowByDisplay();
-                }
-            }));
+        notAvailableInOnlineGameIcon.ShowByDisplay();
     }
 
     private bool SongEntryChanged(SongMeta songMeta)
@@ -524,8 +489,6 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     {
         SongSelectEntry = null;
         UnregisterCallbacks();
-        disposables.ForEach(it => it.Dispose());
-        disposables.Clear();
     }
 
     public void OpenContextMenu()
