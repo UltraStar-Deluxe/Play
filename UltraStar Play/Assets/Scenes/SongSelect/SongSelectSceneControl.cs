@@ -7,7 +7,6 @@ using System.Threading;
 using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
-using Unity.Netcode;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -19,6 +18,7 @@ using IBinding = UniInject.IBinding;
 
 public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
+    private static readonly ProfilerMarker onInjectionFinishedProfilerMarker = new ProfilerMarker("SongSelectSceneControl.OnInjectionFinished");
     private readonly IComparer<object> songMetaPropertyComparer = new NullOrEmptyValueLastComparer();
 
     private const string VirtualRootFolderName = "SONG_SELECT_ROOT";
@@ -128,9 +128,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     [Inject]
     private SongQueueManager songQueueManager;
-
-    [Inject]
-    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
     private VisualElement noSongsFoundContainer;
@@ -245,9 +242,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     public VisualElementSlideInControl SongQueueSlideInControl { get; private set; }
     public VisualElementSlideInControl ModifiersOverlaySlideInControl { get; private set; }
 
-    private static readonly ProfilerMarker onInjectionFinishedProfilerMarker = new ProfilerMarker("SongSelectSceneControl.OnInjectionFinished");
-
-    private readonly List<IDisposable> disposables = new();
+    private readonly Subject<BeforeSongStartedEvent> beforeSongStartedEventStream = new();
+    public IObservable<BeforeSongStartedEvent> BeforeSongStartedEventStream => beforeSongStartedEventStream;
 
     public void OnInjectionFinished()
     {
@@ -371,8 +367,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         // Hide slide-in controls with click outside
         InitHideSlideInControlsViaClick();
 
-        InitOnlineMultiplayer();
-
         UpdateTranslation();
     }
 
@@ -381,40 +375,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         InitSongMetas();
         UpdateFilteredSongs();
         UpdateSongScanLabels(isSongScanFinished);
-    }
-
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
-    }
-
-    private void InitOnlineMultiplayer()
-    {
-        if (!onlineMultiplayerManager.IsHost)
-        {
-            return;
-        }
-
-        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
-            nameof(SuggestSongRequestDto),
-            request =>
-            {
-                SuggestSongRequestDto requestDto = FastBufferReaderUtils.ReadJsonValuePacked<SuggestSongRequestDto>(request.MessagePayload);
-                LobbyMember lobbyMember = onlineMultiplayerManager.LobbyMemberManager.GetLobbyMember(request.SenderNetcodeClientId);
-                SongMeta songMeta = songMetaManager.GetSongMetaByGloballyUniqueId(requestDto.GloballyUniqueSongId);
-                if (songMeta != null
-                    && songMeta != SelectedSong)
-                {
-                    uiManager.CreateConfirmationDialogControl(
-                        Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_title),
-                        Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_message,
-                            "suggestionName", songMeta.GetArtistDashTitle(),
-                            "suggestorName", lobbyMember.DisplayName),
-                        Translation.Get(R.Messages.common_yes),
-                        _ => songRouletteControl.SelectEntryBySongMeta(songMeta),
-                        Translation.Get(R.Messages.common_no));
-                }
-            }));
     }
 
     private void InitSongQueue()
@@ -935,11 +895,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         return singScenePlayerData;
     }
 
-    private void StartSingScene(SongMeta songMeta)
-    {
-        StartSingSceneWithGivenSongAndSettings(songMeta);
-    }
-
     private void StartSingSceneWithNextSongQueueEntry()
     {
         if (songQueueManager.IsSongQueueEmpty)
@@ -951,7 +906,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 
-    private void StartSingSceneWithGivenSongAndSettings(SongMeta songMeta)
+    public void StartSingSceneWithGivenSongAndSettings(SongMeta songMeta, bool startPaused, bool fireBeforeSongStartedEvent)
     {
         if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
         {
@@ -959,56 +914,24 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        if (onlineMultiplayerManager.IsOnlineGame
-            && onlineMultiplayerManager.IsHost)
+        if (fireBeforeSongStartedEvent)
         {
-            AllPlayersHaveSongLocallyAsObservable(songMeta)
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to get whether all players have song locally: {ex.Message}");
-                    NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
-                })
-                .Subscribe(result =>
-                {
-                    if (result.AllPlayersHaveSongLocally)
-                    {
-                        DoStartSingSceneWithGivenSongAndSettings(songMeta, true);
-                    }
-                    else
-                    {
-                        NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_playersDontHaveSongLocally,
-                            "names", result.PlayersThatDoNotHaveSongLocally.JoinWith(", ")));
-                    }
-                });
-        }
-        else
-        {
-            DoStartSingSceneWithGivenSongAndSettings(songMeta, false);
-        }
-    }
-
-    private void DoStartSingSceneWithGivenSongAndSettings(SongMeta songMeta, bool startPaused)
-    {
-        SingSceneData singSceneData = CreateSingSceneDataWithGivenSongAndSettings(songMeta, startPaused);
-        if (singSceneData != null)
-        {
-            sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
-
-            if (onlineMultiplayerManager.IsOnlineGame
-                && onlineMultiplayerManager.IsHost)
+            BeforeSongStartedEvent evt = new(songMeta);
+            beforeSongStartedEventStream.OnNext(evt);
+            if (!evt.CancelReason.IsNullOrEmpty())
             {
-                // Connected lobby members must also start this song now. Thus, send required data to them.
-                SingSceneDataDto singSceneDataDto = NetcodeMessageDtoConverterUtils.ToDto(singSceneData);
-                onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
-                    nameof(StartSingSceneRequestDto),
-                    FastBufferWriterUtils.WriteJsonValuePacked(new StartSingSceneRequestDto()
-                    {
-                        SingSceneDataDto = singSceneDataDto,
-                    }),
-                    onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds);
+                Log.Debug(() => $"Not starting song: {evt.CancelReason}");
+                return;
             }
         }
+
+        SingSceneData singSceneData = CreateSingSceneDataWithGivenSongAndSettings(songMeta, startPaused);
+        if (singSceneData == null)
+        {
+            return;
+        }
+
+        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 
     private void StartSongEditorScene(SongMeta songMeta)
@@ -1095,7 +1018,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                     "name", songMeta.Audio,
                     "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
             })
-            .Subscribe(_ => StartSingScene(songMeta));
+            .Subscribe(_ => StartSingSceneWithGivenSongAndSettings(songMeta, false, true));
     }
 
     private void ShowFailedToLoadVoicesDialog(SongMeta songMeta)
@@ -1208,13 +1131,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void AttemptStartSong(SongMeta songMeta, bool ignoreRandomlySelectedSong = false, bool ignoreMissingMicProfiles = false)
     {
-        if (onlineMultiplayerManager.IsOnlineGame
-            && !onlineMultiplayerManager.IsHost)
-        {
-            ShowSuggestSongToHostDialog(songMeta);
-            return;
-        }
-
         List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
         Dictionary<PlayerProfile, MicProfile> selectedPlayerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
 
@@ -1249,8 +1165,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         // Ask to connect a Companion App when there are players without mics.
         List<PlayerProfile> playerProfilesWithoutMics = selectedPlayerProfiles
-            .Where(selectedPlayerProfile => selectedPlayerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile
-                || lobbyMemberPlayerProfile.UnityNetcodeClientId == onlineMultiplayerManager.OwnLobbyMemberUnityNetcodeClientId)
+            .Where(selectedPlayerProfile => CommonOnlineMultiplayerUtils.IsLocalPlayerProfile(selectedPlayerProfile))
             .Where(selectedPlayerProfile =>
                 !selectedPlayerProfileToMicProfileMap.TryGetValue(selectedPlayerProfile, out MicProfile micProfile)
                 || micProfile == null)
@@ -1265,27 +1180,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
 
         CheckAudioThenStartSingScene(songMeta);
-    }
-
-    private void ShowSuggestSongToHostDialog(SongMeta songMeta)
-    {
-        uiManager.CreateConfirmationDialogControl(
-            Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_title),
-            Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_message,
-                "suggestionName", songMeta.GetArtistDashTitle()),
-            Translation.Get(R.Messages.common_yes),
-            _ => SendSuggestSongMessageForOnlineMultiplayer(songMeta),
-            Translation.Get(R.Messages.common_no));
-    }
-
-    private void SendSuggestSongMessageForOnlineMultiplayer(SongMeta songMeta)
-    {
-        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClient(
-            nameof(SuggestSongRequestDto),
-            FastBufferWriterUtils.WriteJsonValuePacked(new SuggestSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
-            NetworkManager.ServerClientId);
-        NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_suggestedSongToHost,
-            "name", songMeta.GetArtistDashTitle()));
     }
 
     private void OpenAskToAssignMicsDialog(List<PlayerProfile> playerProfilesWithoutMics, Action onIgnoreAndStart)
@@ -1701,57 +1595,5 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         });
 
         dialogControl.AddInformationMessage($"AI model parameters can be changed in the song editor");
-    }
-
-    public IObservable<AllPlayersHaveSongLocallyResult> AllPlayersHaveSongLocallyAsObservable(SongMeta songMeta)
-    {
-        return Observable.Create<AllPlayersHaveSongLocallyResult>(o =>
-        {
-            AllPlayersHaveSongLocallyResult result = new();
-
-            HasSongRequestDto requestDto = new HasSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta));
-            onlineMultiplayerManager.ObservableMessagingControl.SendNamedMessageToClientsAsObservable(
-                    nameof(HasSongRequestDto),
-                    FastBufferWriterUtils.WriteJsonValuePacked(requestDto),
-                    onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds)
-                .CatchIgnore((Exception ex) =>
-                {
-                    o.OnError(ex);
-                })
-                .DoOnCompleted(() =>
-                {
-                    o.OnNext(result);
-                    o.OnCompleted();
-                })
-                .Subscribe(response =>
-                {
-                    HasSongResponseDto responseDtoDto = FastBufferReaderUtils.ReadJsonValuePacked<HasSongResponseDto>(response.MessagePayload);
-                    if (!responseDtoDto.HasSong)
-                    {
-                        LobbyMemberPlayerProfile lobbyMemberPlayerProfile = nonPersistentSettings.LobbyMemberPlayerProfiles
-                            .FirstOrDefault(it => it.UnityNetcodeClientId == response.SenderNetcodeClientId);
-                        result.AddPlayerThatDoesNotHaveSongLocally(lobbyMemberPlayerProfile?.Name);
-                    }
-                });
-
-            return Disposable.Empty;
-        });
-    }
-
-    public class AllPlayersHaveSongLocallyResult
-    {
-        public bool AllPlayersHaveSongLocally { get; private set; }
-        public List<string> PlayersThatDoNotHaveSongLocally { get; private set; } = new();
-
-        public AllPlayersHaveSongLocallyResult()
-        {
-            AllPlayersHaveSongLocally = true;
-        }
-
-        public void AddPlayerThatDoesNotHaveSongLocally(string playerName)
-        {
-            AllPlayersHaveSongLocally = false;
-            PlayersThatDoNotHaveSongLocally.Add(playerName);
-        }
     }
 }
