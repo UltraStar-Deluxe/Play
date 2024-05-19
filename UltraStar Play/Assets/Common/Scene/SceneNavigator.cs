@@ -97,7 +97,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
         EScene currentScene = sceneRecipeManager.GetCurrentScene();
 
-        beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));
+        beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene, GetSceneData(scene)));
 
         if (SettingsUtils.ShouldAnimateSceneChange(settings))
         {
