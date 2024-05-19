@@ -2,11 +2,11 @@
 {
     public abstract class NetcodeMessageDto : JsonSerializable
     {
-        public ENetcodeMessageType MessageType { get; private set; }
+        public string MessageType { get; private set; }
 
-        protected NetcodeMessageDto(ENetcodeMessageType messageType)
+        protected NetcodeMessageDto()
         {
-            MessageType = messageType;
+            MessageType = GetType().Name;
         }
     }
 }
