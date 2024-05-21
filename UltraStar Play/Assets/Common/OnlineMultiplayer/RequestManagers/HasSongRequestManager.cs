@@ -3,12 +3,9 @@ using UniRx;
 
 namespace CommonOnlineMultiplayer
 {
-    public class HasSongRequestManager : AbstractSingletonBehaviour, INeedInjection
+    public class HasSongRequestManager : AbstractOnlineMultiplayerRequestManager
     {
         public static HasSongRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<HasSongRequestManager>();
-
-        [Inject]
-        private OnlineMultiplayerManager onlineMultiplayerManager;
 
         [Inject]
         private SongMetaManager songMetaManager;
@@ -18,7 +15,7 @@ namespace CommonOnlineMultiplayer
             return Instance;
         }
 
-        protected override void StartSingleton()
+        protected override void InitOnlineMultiplayerRequestHandlers()
         {
             onlineMultiplayerManager.ObservableMessagingControl.RegisterObservedMessageHandler(
                 nameof(HasSongRequestDto),

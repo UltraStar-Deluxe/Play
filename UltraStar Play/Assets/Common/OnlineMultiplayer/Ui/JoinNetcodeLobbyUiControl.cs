@@ -43,8 +43,7 @@ namespace CommonOnlineMultiplayer
         {
             CommonOnlineMultiplayerUtils.ConfigureUnityTransport(networkManager, settings);
 
-            LobbyConnectionRequestDto requestDto = new(
-                "Dummy Client");
+            LobbyConnectionRequestDto requestDto = new("Dummy Client");
             string payload = requestDto.ToJson();
             networkManager.NetworkConfig.ConnectionData = Encoding.UTF8.GetBytes(payload);
             networkManager.StartClient();

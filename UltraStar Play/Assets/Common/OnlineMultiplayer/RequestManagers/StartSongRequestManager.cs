@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
-    public class StartSongRequestManager : AbstractSingletonBehaviour, INeedInjection
+    public class StartSongRequestManager : AbstractOnlineMultiplayerRequestManager
     {
         public static StartSongRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StartSongRequestManager>();
 
@@ -15,9 +15,6 @@ namespace CommonOnlineMultiplayer
 
         [Inject]
         private SongMetaManager songMetaManager;
-
-        [Inject]
-        private OnlineMultiplayerManager onlineMultiplayerManager;
 
         [Inject]
         private Settings settings;
@@ -36,7 +33,7 @@ namespace CommonOnlineMultiplayer
             return Instance;
         }
 
-        protected override void StartSingleton()
+        protected override void InitOnlineMultiplayerRequestHandlers()
         {
             onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
                 nameof(StartSingSceneRequestDto),

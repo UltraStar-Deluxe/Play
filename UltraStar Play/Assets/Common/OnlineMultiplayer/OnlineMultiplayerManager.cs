@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
-    public class OnlineMultiplayerManager : AbstractSingletonBehaviour, INeedInjection
+    public class OnlineMultiplayerManager : AbstractSingletonBehaviour, INeedInjection, IInjectionFinishedListener
     {
         public static OnlineMultiplayerManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<OnlineMultiplayerManager>();
 
@@ -91,9 +91,9 @@ namespace CommonOnlineMultiplayer
             return Instance;
         }
 
-        protected override void AwakeSingleton()
+        public void OnInjectionFinished()
         {
-            MessagingControl = new MessagingControl();
+            MessagingControl = new MessagingControl(networkManager);
             ObservableMessagingControl = new ObservableMessagingControl(MessagingControl);
         }
 

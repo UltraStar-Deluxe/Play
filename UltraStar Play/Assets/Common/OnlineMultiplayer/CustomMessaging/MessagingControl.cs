@@ -13,16 +13,20 @@ namespace CommonOnlineMultiplayer
         private const string ForwardToClientsMessageName = "FORWARD_TO_CLIENTS";
         private const string ForwardToClientMessageName = "FORWARD_TO_CLIENT";
 
-        private readonly Dictionary<string, NamedMessageHandlerDelegator> messageNameToHandleNamedMessageHelper = new();
+        private readonly NetworkManager networkManager;
 
+        private readonly Dictionary<string, NamedMessageHandlerDelegator> messageNameToHandleNamedMessageHelper = new();
         private bool hasRegisteredForwardNamedMessageHandlers;
 
-        private NetworkManager NetworkManager => NetworkManager.Singleton;
+        public MessagingControl(NetworkManager networkManager)
+        {
+            this.networkManager = networkManager;
+        }
 
         public void RegisterNamedMessageHandlersToForwardMessagesIfNeeded()
         {
             if (hasRegisteredForwardNamedMessageHandlers
-                || !NetworkManager.IsServer)
+                || !networkManager.IsServer)
             {
                 return;
             }
@@ -94,15 +98,15 @@ namespace CommonOnlineMultiplayer
 
             Log.Verbose(() => $"Sending message {messageName} to Netcode clients {targetNetcodeClientIds.JoinWith(", ")}");
 
-            if (NetworkManager.IsServer)
+            if (networkManager.IsServer)
             {
-                NetworkManager.CustomMessagingManager.SendNamedMessage(
+                networkManager.CustomMessagingManager.SendNamedMessage(
                     messageName,
                     targetNetcodeClientIds,
                     fastBufferWriter,
                     networkDelivery);
             }
-            else if (NetworkManager.IsClient)
+            else if (networkManager.IsClient)
             {
                 // Only the server can send to clients directly. Other clients can only send to the server.
                 // We are not the server, thus we need to sent the message to the server, which then forwards it to the clients.
@@ -128,16 +132,16 @@ namespace CommonOnlineMultiplayer
         {
             Log.Verbose(() => $"Sending message {messageName} to Netcode client {targetNetcodeClientId}");
 
-            if (NetworkManager.IsServer
+            if (networkManager.IsServer
                 || targetNetcodeClientId == NetworkManager.ServerClientId)
             {
-                NetworkManager.CustomMessagingManager.SendNamedMessage(
+                networkManager.CustomMessagingManager.SendNamedMessage(
                     messageName,
                     targetNetcodeClientId,
                     fastBufferWriter,
                     networkDelivery);
             }
-            else if (NetworkManager.IsClient)
+            else if (networkManager.IsClient)
             {
                 // Only the server can send to clients directly. Other clients can only send to the server.
                 // We are not the server and do not send to the server,
@@ -201,7 +205,7 @@ namespace CommonOnlineMultiplayer
             FastBufferWriter fastBufferWriter,
             NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
         {
-            NetworkManager.CustomMessagingManager.SendNamedMessage(
+            networkManager.CustomMessagingManager.SendNamedMessage(
                 messageName,
                 NetworkManager.ServerClientId,
                 fastBufferWriter,
@@ -216,7 +220,7 @@ namespace CommonOnlineMultiplayer
             {
                 namedMessageHandlerDelegator = new NamedMessageHandlerDelegator(messageName);
                 messageNameToHandleNamedMessageHelper[messageName] = namedMessageHandlerDelegator;
-                NetworkManager.CustomMessagingManager.RegisterNamedMessageHandler(messageName, namedMessageHandlerDelegator.HandleNamedMessage);
+                networkManager.CustomMessagingManager.RegisterNamedMessageHandler(messageName, namedMessageHandlerDelegator.HandleNamedMessage);
             }
 
             NamedMessageHandler namedMessageHandler = new NamedMessageHandler(handleMessage);
