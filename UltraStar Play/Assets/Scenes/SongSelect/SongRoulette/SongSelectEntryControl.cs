@@ -277,8 +277,12 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                 () => songMetaManager.ReloadSong(songEntry.SongMeta));
         }
 
-        contextMenuPopup.AddButton(Translation.Get(R.Messages.action_recreateSong), "replay_circle_filled",
-        () => songSelectSceneControl.AskToRecreateSingAlongData(songEntry.SongMeta));
+        if (Application.isEditor)
+        {
+            // TODO: enable the "recreate song" feature in production when AI tools are running on Unity API?
+            contextMenuPopup.AddButton(Translation.Get(R.Messages.action_recreateSong), "replay_circle_filled",
+            () => songSelectSceneControl.AskToRecreateSingAlongData(songEntry.SongMeta));
+        }
 
         contextMenuPopup.AddButton(Translation.Get(R.Messages.action_showInfo), "lyrics",
             () =>
