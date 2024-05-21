@@ -7,7 +7,7 @@ using UniRx;
 using Unity.Netcode;
 using UnityEngine;
 
-public class SongSelectOnlineMultiplayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public class SongSelectSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private OnlineMultiplayerManager onlineMultiplayerManager;
