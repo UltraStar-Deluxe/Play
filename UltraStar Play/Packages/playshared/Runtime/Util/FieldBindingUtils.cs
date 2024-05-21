@@ -9,11 +9,19 @@ public class FieldBindingUtils
     {
         Bind(null, baseField, valueGetter, valueSetter, false);
     }
-    
+
     public static void Bind<T>(GameObject gameObject, BaseField<T> baseField, Func<T> valueGetter, Action<T> valueSetter, bool observeValueGetter = true)
     {
         baseField.value = valueGetter();
-        baseField.RegisterValueChangedCallback(evt => valueSetter(evt.newValue));
+        baseField.RegisterValueChangedCallback(evt =>
+        {
+            if (evt.target is Label)
+            {
+               // Workaround for Unity, which fires a ChangeEvent for the label ( https://forum.unity.com/threads/proper-way-to-get-changed-values-from-a-textfield.1432954/ )
+                return;
+            }
+            valueSetter(evt.newValue);
+        });
 
         // Update field when settings change.
         if (observeValueGetter)
