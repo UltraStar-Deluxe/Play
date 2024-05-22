@@ -89,6 +89,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.songScanMaxBatchCountChooser)]
     private IntegerField songScanMaxBatchCountChooser;
 
+    [Inject(UxmlName = R.UxmlNames.simulateJitterInMillisField)]
+    private IntegerField simulateJitterInMillisField;
+
     [Inject]
     private ThemeManager themeManager;
 
@@ -457,6 +460,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new EnumChooserControl<ENetworkDelivery>(beatAnalyzedEventNetworkDeliveryChooser)
             .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,
                 newValue => settings.BeatAnalyzedEventNetworkDelivery = newValue);
+
+        FieldBindingUtils.Bind(simulateJitterInMillisField,
+            () => settings.SimulateJitterInMillis,
+            newValue => settings.SimulateJitterInMillis = newValue);
 
         // Mods
         uploadWorkshopItemButton.RegisterCallbackButtonTriggered(evt => ShowUploadNewModDialog());

@@ -195,4 +195,5 @@ public class Settings : ISettings
     public string UnityTransportIpAddress { get; set; } = "127.0.0.1";
     public ushort UnityTransportPort { get; set; } = 7777;
     public ENetworkDelivery BeatAnalyzedEventNetworkDelivery { get; set; } = ENetworkDelivery.ReliableSequenced;
+    public int SimulateJitterInMillis { get; set; }
 }

@@ -758,6 +758,7 @@ public static partial class R
         public const string sideBarSecondaryColumnUi = "sideBarSecondaryColumnUi";
         public const string sideBarSettingsUi = "sideBarSettingsUi";
         public const string sideBarSongPropertiesUi = "sideBarSongPropertiesUi";
+        public const string simulateJitterInMillisField = "simulateJitterInMillisField";
         public const string SingingLyricsCurrentSentenceUi = "SingingLyricsCurrentSentenceUi";
         public const string SingingLyricsNextSentenceUi = "SingingLyricsNextSentenceUi";
         public const string SingingLyricsTopUi = "SingingLyricsTopUi";

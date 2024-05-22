@@ -16,6 +16,9 @@ namespace CommonOnlineMultiplayer
         private NetworkManager networkManager;
 
         [Inject]
+        private Settings settings;
+
+        [Inject]
         private NonPersistentSettings nonPersistentSettings;
 
         [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
@@ -113,6 +116,9 @@ namespace CommonOnlineMultiplayer
 
             LobbyMemberConnectionChangedEventSteam
                 .Subscribe(evt => UpdateLobbyMemberPlayerProfiles());
+
+            settings.ObserveEveryValueChanged(it => it.SimulateJitterInMillis)
+                .Subscribe(newValue => MessagingControl.SimulateJitterInMillis = newValue);
         }
 
         protected override void OnDestroySingleton()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UniRx;
 using Unity.Collections;
 using Unity.Netcode;
@@ -17,6 +18,8 @@ namespace CommonOnlineMultiplayer
 
         private readonly Dictionary<string, NamedMessageHandlerDelegator> messageNameToHandleNamedMessageHelper = new();
         private bool hasRegisteredForwardNamedMessageHandlers;
+
+        public int SimulateJitterInMillis { get; set; }
 
         public MessagingControl(NetworkManager networkManager)
         {
@@ -100,7 +103,7 @@ namespace CommonOnlineMultiplayer
 
             if (networkManager.IsServer)
             {
-                networkManager.CustomMessagingManager.SendNamedMessage(
+                SendNamedMessage(
                     messageName,
                     targetNetcodeClientIds,
                     fastBufferWriter,
@@ -135,7 +138,7 @@ namespace CommonOnlineMultiplayer
             if (networkManager.IsServer
                 || targetNetcodeClientId == NetworkManager.ServerClientId)
             {
-                networkManager.CustomMessagingManager.SendNamedMessage(
+                SendNamedMessage(
                     messageName,
                     targetNetcodeClientId,
                     fastBufferWriter,
@@ -205,11 +208,76 @@ namespace CommonOnlineMultiplayer
             FastBufferWriter fastBufferWriter,
             NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
         {
-            networkManager.CustomMessagingManager.SendNamedMessage(
+            SendNamedMessage(
                 messageName,
                 NetworkManager.ServerClientId,
                 fastBufferWriter,
                 networkDelivery);
+        }
+
+        private void SendNamedMessage(
+            string messageName,
+            ulong clientId,
+            FastBufferWriter fastBufferWriter,
+            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
+        {
+            if (SimulateJitterInMillis <= 0)
+            {
+                networkManager.CustomMessagingManager.SendNamedMessage(
+                    messageName,
+                    clientId,
+                    fastBufferWriter,
+                    networkDelivery);
+                return;
+            }
+
+            ThreadUtils.RunOnBackgroundThread(() =>
+            {
+                SimulateJitter();
+                ThreadUtils.RunOnMainThread(() => {
+                    networkManager.CustomMessagingManager.SendNamedMessage(
+                        messageName,
+                        clientId,
+                        fastBufferWriter,
+                        networkDelivery);
+                });
+            });
+        }
+
+        private void SendNamedMessage(
+            string messageName,
+            IReadOnlyList<ulong> clientIds,
+            FastBufferWriter fastBufferWriter,
+            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
+        {
+            if (SimulateJitterInMillis <= 0)
+            {
+                networkManager.CustomMessagingManager.SendNamedMessage(
+                    messageName,
+                    clientIds,
+                    fastBufferWriter,
+                    networkDelivery);
+                return;
+            }
+
+            ThreadUtils.RunOnBackgroundThread(() =>
+            {
+                SimulateJitter();
+                ThreadUtils.RunOnMainThread(() => {
+                    networkManager.CustomMessagingManager.SendNamedMessage(
+                        messageName,
+                        clientIds,
+                        fastBufferWriter,
+                        networkDelivery);
+                });
+            });
+        }
+
+        private void SimulateJitter()
+        {
+            int sleepTime = RandomUtils.Range(1, SimulateJitterInMillis);
+            Log.Verbose(() => $"Simulating jitter by sleeping {sleepTime} ms");
+            Thread.Sleep(sleepTime);
         }
 
         public IDisposable RegisterNamedMessageHandler(
