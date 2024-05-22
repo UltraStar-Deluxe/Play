@@ -6,6 +6,7 @@ using UniInject;
 using UniRx;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class SongSelectSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
@@ -95,7 +96,7 @@ public class SongSelectSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjec
             disposables.Add(songSelectSceneControl.BeforeSongStartedEventStream.Subscribe(evt =>
             {
                 evt.CancelReason = "only host can start singing";
-                ShowSuggestSongToHostDialog(evt.SongMeta);
+                SendSuggestSongMessage(evt.SongMeta);
             }));
         }
 
@@ -110,27 +111,32 @@ public class SongSelectSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjec
                 if (songMeta != null
                     && songMeta != songSelectSceneControl.SelectedSong)
                 {
-                    uiManager.CreateConfirmationDialogControl(
-                        Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_title),
-                        Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_message,
-                            "suggestionName", songMeta.GetArtistDashTitle(),
-                            "suggestorName", lobbyMember.DisplayName),
-                        Translation.Get(R.Messages.common_yes),
-                        _ => songRouletteControl.SelectEntryBySongMeta(songMeta),
-                        Translation.Get(R.Messages.common_no));
+                    CreateSuggestedSongNotification(songMeta, songMeta.GetArtistDashTitle(), lobbyMember.DisplayName);
                 }
             }));
     }
 
-    private void ShowSuggestSongToHostDialog(SongMeta songMeta)
+    private void CreateSuggestedSongNotification(SongMeta songMeta, string suggestionName, string suggestorName)
     {
-        uiManager.CreateConfirmationDialogControl(
-            Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_title),
-            Translation.Get(R.Messages.songSelectScene_sendSongSuggestionDialog_message,
-                "suggestionName", songMeta.GetArtistDashTitle()),
-            Translation.Get(R.Messages.common_yes),
-            _ => SendSuggestSongMessage(songMeta),
-            Translation.Get(R.Messages.common_no));
+        VisualElement content = new();
+        content.name = nameof(content);
+
+        Label notificationLabel = new();
+        notificationLabel.name = nameof(notificationLabel);
+        notificationLabel.SetTranslatedText(Translation.Get(R.Messages.songSelectScene_receivedSongSuggestionDialog_message,
+            "suggestionName", suggestionName,
+            "suggestorName", suggestorName));
+
+        Button confirmButton = new();
+        confirmButton.name = nameof(confirmButton);
+        confirmButton.text = Translation.Get(R.Messages.common_ok);
+        confirmButton.AddToClassList(R.UssClasses.transparentButton);
+        confirmButton.RegisterCallbackButtonTriggered(_ => songRouletteControl.SelectEntryBySongMeta(songMeta));
+
+        content.Add(notificationLabel);
+        content.Add(confirmButton);
+
+        NotificationManager.CreateNotification(content);
     }
 
     private void SendSuggestSongMessage(SongMeta songMeta)
