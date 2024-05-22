@@ -19,7 +19,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     public static readonly int maxPerfectSentenceBonusScore = 1000;
     public static readonly int maxScoreForNotes = maxScore - maxPerfectSentenceBonusScore;
 
-    public int TotalScore => PlayerScore.TotalScore;
+    public int TotalScore => PlayerScore?.TotalScore ?? 0;
 
     [Inject]
     private PlayerPerformanceAssessmentControl playerPerformanceAssessmentControl;
@@ -43,8 +43,15 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         get => playerScore;
         set
         {
+            int oldTotalScore = TotalScore;
+            int newTotalScore = value.TotalScore;
+
             playerScore = value;
-            FireScoreChangedEventWithCurrentScore();
+
+            if (oldTotalScore != newTotalScore)
+            {
+                FireScoreChangedEventWithCurrentScore();
+            }
         }
     }
 
@@ -53,7 +60,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void Awake()
     {
-        PlayerScore = new ScoreCalculationData();
+        PlayerScore = calculationData;
     }
 
     public void OnInjectionFinished()

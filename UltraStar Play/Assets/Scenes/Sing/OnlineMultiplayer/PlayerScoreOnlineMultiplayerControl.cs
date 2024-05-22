@@ -20,7 +20,17 @@ public class PlayerScoreOnlineMultiplayerControl : MonoBehaviour, INeedInjection
 
     public void OnInjectionFinished()
     {
-        playerScoreControl.PlayerScore = new SingingResultsPlayerScore();
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        if (CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(playerProfile))
+        {
+            // The score is received from remote messages
+            playerScoreControl.PlayerScore = new SingingResultsPlayerScore();
+        }
+
         playerScoreControl.ScoreChangedEventStream.Subscribe(evt =>
         {
             if (onlineMultiplayerManager.IsOnlineGame
