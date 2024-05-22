@@ -86,6 +86,8 @@ namespace CommonOnlineMultiplayer
         public MessagingControl MessagingControl { get; private set; }
         public ObservableMessagingControl ObservableMessagingControl { get; private set; }
 
+        private bool isInitialized;
+
         protected override object GetInstance()
         {
             return Instance;
@@ -93,8 +95,8 @@ namespace CommonOnlineMultiplayer
 
         public void OnInjectionFinished()
         {
-            MessagingControl = new MessagingControl(networkManager);
-            ObservableMessagingControl = new ObservableMessagingControl(MessagingControl);
+            // Injection is done per-scene, but initialization should be done only once and before Start is called in other scripts.
+            Init();
         }
 
         protected override void StartSingleton()
@@ -226,6 +228,18 @@ namespace CommonOnlineMultiplayer
             NetworkManager.ConnectionApprovalResponse response)
         {
             LobbyMemberManager.OnNetcodeClientConnectionApproval(connectionApprovalRequest, response);
+        }
+
+        private void Init()
+        {
+            if (isInitialized)
+            {
+                return;
+            }
+            isInitialized = true;
+
+            MessagingControl = new MessagingControl(networkManager);
+            ObservableMessagingControl = new ObservableMessagingControl(MessagingControl);
         }
     }
 }
