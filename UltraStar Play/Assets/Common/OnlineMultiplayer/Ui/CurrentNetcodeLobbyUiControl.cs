@@ -52,7 +52,8 @@ namespace CommonOnlineMultiplayer
         {
             lobbyInfoContainer.HideByDisplay();
 
-            connectedClientsListTitle.SetTranslatedText(Translation.Get(R.Messages.onlineGame_lobby_list_title));
+            connectedClientsListTitle.SetTranslatedText(Translation.Get(R.Messages.onlineGame_lobby_title,
+                "lobbyName", lobbyManager.CurrentLobby?.Name ?? ""));
             connectedClientsListScrollView.Clear();
 
             disconnectOnlineGameButton.RegisterCallbackButtonTriggered(_ => lobbyManager.LeaveCurrentLobby());
