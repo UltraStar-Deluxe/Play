@@ -9,7 +9,7 @@ namespace CommonOnlineMultiplayer
     public class NamedMessageHandlerDelegator
     {
         private readonly string messageName;
-        private readonly List<NamedMessageHandler> messageHandlers;
+        private readonly List<NamedMessageHandler> messageHandlers = new();
 
         public NamedMessageHandlerDelegator(string messageName)
         {
