@@ -29,43 +29,28 @@ public class PlayerScoreOnlineMultiplayerControl : MonoBehaviour, INeedInjection
         {
             // The score is received from remote messages
             playerScoreControl.PlayerScore = new SingingResultsPlayerScore();
+            disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+                GetPlayerScoreMessageName(),
+                message => OnPlayerScoreMessage(message)));
         }
-
-        playerScoreControl.ScoreChangedEventStream.Subscribe(evt =>
+        else
         {
-            if (onlineMultiplayerManager.IsOnlineGame
-                && CommonOnlineMultiplayerUtils.IsLocalPlayerProfile(playerProfile))
+            // Send score to remote clients
+            playerScoreControl.ScoreChangedEventStream.Subscribe(evt =>
             {
                 SendPlayerScoreMessageToOtherLobbyMembers();
-            }
-        });
-    }
-
-    private void InitOnlineMultiplayer()
-    {
-        if (!onlineMultiplayerManager.IsOnlineGame)
-        {
-            return;
+            });
         }
-
-        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
-            GetPlayerScoreMessageName(),
-            message => OnPlayerScoreMessage(message)));
     }
 
     private void SendPlayerScoreMessageToOtherLobbyMembers()
     {
-        if (!onlineMultiplayerManager.IsOnlineGame
-            || CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(playerProfile))
-        {
-            return;
-        }
-
         SingingResultsPlayerScoreRequestDto playerScoreRequestDto = new()
         {
             SingingResultsPlayerScore = new SingingResultsPlayerScore(playerScoreControl.PlayerScore),
         };
 
+        Log.Debug(() => $"Sending score to other lobby members: {GetPlayerScoreMessageName()} - {JsonConverter.ToJson(playerScoreRequestDto)}");
         onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
             GetPlayerScoreMessageName(),
             FastBufferWriterUtils.WriteJsonValuePacked(playerScoreRequestDto),

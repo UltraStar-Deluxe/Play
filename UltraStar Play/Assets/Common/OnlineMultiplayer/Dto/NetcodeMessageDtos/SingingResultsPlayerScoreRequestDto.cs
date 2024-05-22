@@ -2,6 +2,6 @@
 {
     public class SingingResultsPlayerScoreRequestDto : NetcodeRequestDto
     {
-        public ISingingResultsPlayerScore SingingResultsPlayerScore { get; set; }
+        public SingingResultsPlayerScore SingingResultsPlayerScore { get; set; }
     }
 }
