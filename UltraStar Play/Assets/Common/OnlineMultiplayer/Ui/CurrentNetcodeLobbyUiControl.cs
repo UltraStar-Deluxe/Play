@@ -23,6 +23,9 @@ namespace CommonOnlineMultiplayer
         [Inject(UxmlName = R.UxmlNames.disconnectOnlineGameButton)]
         private Button disconnectOnlineGameButton;
 
+        [Inject(UxmlName = R.UxmlNames.lobbyInfoContainer)]
+        private VisualElement lobbyInfoContainer;
+
         [Inject(Key = nameof(connectedClientEntryUi))]
         private VisualTreeAsset connectedClientEntryUi;
 
@@ -47,6 +50,8 @@ namespace CommonOnlineMultiplayer
 
         public void OnInjectionFinished()
         {
+            lobbyInfoContainer.HideByDisplay();
+
             connectedClientsListTitle.SetTranslatedText(Translation.Get(R.Messages.onlineGame_lobby_list_title));
             connectedClientsListScrollView.Clear();
 
