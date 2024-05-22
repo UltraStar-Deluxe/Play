@@ -12,6 +12,9 @@ public class JsonConverterTest
         string json = "{\"" + propertyName + "\": \"Alice\"}";
         HasPrivatePropertySetter parsed = JsonConverter.FromJson<HasPrivatePropertySetter>(json);
         Assert.AreEqual("Alice", parsed.ExampleProperty);
+
+        string serializedJson = JsonConverter.ToJson(parsed);
+        Assert.IsTrue(serializedJson.Contains("ExampleProperty"));
     }
 
     [Test]

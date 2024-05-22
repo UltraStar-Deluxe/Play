@@ -97,7 +97,7 @@ public static class JsonConverter
         JsonConvert.DefaultSettings = () => new JsonSerializerSettings
         {
             Converters = defaultConverters.Union(customConverters.Values).ToList(),
-            ContractResolver = new PrivateSetterAndCtorCamelCasePropertyNamesContractResolver()
+            ContractResolver = new PrivateSetterAndCtorContractResolver()
         };
     }
 }
