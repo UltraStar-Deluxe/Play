@@ -12,7 +12,7 @@ using UnityEngine;
  * Analyzes each beat of a player in the sing scene.
  * Thereby, it applies some additional rounding an joker rules.
  */
-public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, IInjectionFinishedListener
+public class PlayerMicPitchTracker : AbstractMicPitchTracker
 {
     private const int SendPositionIntervalInMillis = 2000;
 
@@ -83,11 +83,10 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     {
         base.OnInjectionFinished();
 
-
         // Find first sentence to analyze
         SetRecordingSentence(recordingSentenceIndex);
 
-        roundingDistance = playerProfile.Difficulty.GetRoundingDistanceInMidiNotes();
+        roundingDistance = GetRoundingDistanceInMidiNotes(playerProfile.Difficulty);
         BeatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
     }
 
@@ -124,11 +123,6 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private void InitPitchDetectionFromLocalMicrophone()
     {
-        if (!RecordNotes)
-        {
-            return;
-        }
-
         MicSampleRecorder.StartRecording();
 
         // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
@@ -753,6 +747,18 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         else
         {
             base.StopRecording();
+        }
+    }
+
+    private static float GetRoundingDistanceInMidiNotes(EDifficulty difficulty)
+    {
+        switch (difficulty)
+        {
+            case EDifficulty.Easy: return 2;
+            case EDifficulty.Medium: return 1;
+            case EDifficulty.Hard: return 0.5f;
+            default:
+                throw new UnityException("Unhandled difficulty: " + difficulty);
         }
     }
 
