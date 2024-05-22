@@ -83,10 +83,6 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     {
         base.OnInjectionFinished();
 
-        if (micProfile == null)
-        {
-            RecordNotes = false;
-        }
 
         // Find first sentence to analyze
         SetRecordingSentence(recordingSentenceIndex);
@@ -97,6 +93,11 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     public void InitPitchDetection()
     {
+        if (micProfile == null)
+        {
+            RecordNotes = false;
+        }
+
         if (!RecordNotes)
         {
             return;
