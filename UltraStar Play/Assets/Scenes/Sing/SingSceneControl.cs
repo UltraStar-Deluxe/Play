@@ -771,7 +771,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void SkipToPosition(double positionInMillis)
     {
-        if (IsCanceledByEvent(beforeRestartEventStream))
+        if (IsCanceledByEvent(beforeSkipEventStream))
         {
             return;
         }
