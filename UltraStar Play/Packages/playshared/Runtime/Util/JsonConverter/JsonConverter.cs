@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JsonNet.ContractResolvers;
 using Newtonsoft.Json;
-using UnityEngine;
 using Newtonsoft.Json.UnityConverters.Math;
+using UnityEngine;
 
 /**
  * Implements serialization / deserialization of JSON using the serialization lib Newtonsoft.Json (aka. Json.NET).
@@ -96,6 +97,7 @@ public static class JsonConverter
         JsonConvert.DefaultSettings = () => new JsonSerializerSettings
         {
             Converters = defaultConverters.Union(customConverters.Values).ToList(),
+            ContractResolver = new PrivateSetterAndCtorCamelCasePropertyNamesContractResolver()
         };
     }
 }

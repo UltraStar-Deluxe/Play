@@ -14,7 +14,8 @@
         "com.achimmihca.utfunknownunity",
         "com.achimmihca.portaudioforunity",
         "IngameDebugConsole.Runtime",
-        "LiteNetLib"
+        "LiteNetLib",
+        "JsonNet.ContractResolvers"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

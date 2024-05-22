@@ -4,6 +4,17 @@ using UnityEngine;
 public class JsonConverterTest
 {
     [Test]
+    [TestCase("exampleProperty")]
+    [TestCase("ExampleProperty")]
+    [TestCase("EXAMPLEPROPERTY")]
+    public void ShouldDeserializePrivatePropertySetter(string propertyName)
+    {
+        string json = "{\"" + propertyName + "\": \"Alice\"}";
+        HasPrivatePropertySetter parsed = JsonConverter.FromJson<HasPrivatePropertySetter>(json);
+        Assert.AreEqual("Alice", parsed.ExampleProperty);
+    }
+
+    [Test]
     public void GradientConfigRoundTrip()
     {
         GradientConfig originalGradientConfig = new GradientConfig(Colors.CreateColor("#11223344"), Colors.CreateColor("#55667788"), 32);
@@ -77,5 +88,10 @@ public class JsonConverterTest
     private class GradientConfigHolder
     {
         public GradientConfig gradientConfig;
+    }
+
+    private class HasPrivatePropertySetter
+    {
+        public string ExampleProperty { get; private set; }
     }
 }
