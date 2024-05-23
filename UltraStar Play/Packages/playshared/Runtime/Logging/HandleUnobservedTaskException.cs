@@ -1,6 +1,10 @@
 ﻿using System.Threading.Tasks;
 using UnityEngine;
 
+/**
+ * Unity by default does not log uncaught Exceptions from Tasks.
+ * Thus, this class registers a method to handle such Exceptions.
+ */
 public static class HandleUnobservedTaskException
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
