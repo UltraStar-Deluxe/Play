@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class SingSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
+    private const int SingSceneReadyResponseTimeoutInMillis = 2000;
+
     [Inject]
     private OnlineMultiplayerManager onlineMultiplayerManager;
 
@@ -243,7 +245,6 @@ public class SingSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjection, 
         }
 
         int maxFailedAttempts = 6;
-        long timeoutInMillis = 500;
 
         // Send message to all lobby members to start playback when all clients are ready
         onlineMultiplayerManager.ObservableMessagingControl.SendNamedMessageToClientsAsObservable(
@@ -251,7 +252,7 @@ public class SingSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjection, 
                 FastBufferWriterUtils.WriteJsonValuePacked(new SingSceneReadyRequestDto()),
                 onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds,
                 EReliableNetworkDelivery.ReliableSequenced,
-                timeoutInMillis)
+                SingSceneReadyResponseTimeoutInMillis)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
@@ -268,7 +269,7 @@ public class SingSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjection, 
                     // Try again after short delay (if this error was not triggered by a timeout already)
                     float delayInSeconds = ex is TimeoutException
                         ? 0
-                        : timeoutInMillis / 1000f;
+                        : SingSceneReadyResponseTimeoutInMillis / 1000f;
                     singSceneControl.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(delayInSeconds,
                         () => SendInitialUnpauseMessageWhenAllReadyToStart(failedAttempts + 1)));
                 }
