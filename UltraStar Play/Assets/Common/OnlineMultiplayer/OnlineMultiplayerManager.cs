@@ -86,7 +86,8 @@ namespace CommonOnlineMultiplayer
             }
         }
 
-        public MessagingControl MessagingControl { get; private set; }
+        private DelayedMessagingControl messagingControl;
+        public IMessagingControl MessagingControl => messagingControl;
         public ObservableMessagingControl ObservableMessagingControl { get; private set; }
 
         private bool isInitialized;
@@ -118,7 +119,7 @@ namespace CommonOnlineMultiplayer
                 .Subscribe(evt => UpdateLobbyMemberPlayerProfiles());
 
             settings.ObserveEveryValueChanged(it => it.SimulateJitterInMillis)
-                .Subscribe(newValue => MessagingControl.SimulateJitterInMillis = newValue);
+                .Subscribe(newValue => messagingControl.DelayInMillis = newValue);
         }
 
         protected override void OnDestroySingleton()
@@ -244,8 +245,9 @@ namespace CommonOnlineMultiplayer
             }
             isInitialized = true;
 
-            MessagingControl = new MessagingControl(networkManager);
-            ObservableMessagingControl = new ObservableMessagingControl(MessagingControl);
+            MessagingControl regularMessagingControl = new MessagingControl(networkManager);
+            messagingControl = new DelayedMessagingControl(regularMessagingControl);
+            ObservableMessagingControl = new ObservableMessagingControl(messagingControl);
         }
     }
 }

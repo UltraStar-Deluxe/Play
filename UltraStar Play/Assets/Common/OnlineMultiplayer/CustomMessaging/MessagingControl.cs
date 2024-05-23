@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using UniRx;
 using Unity.Collections;
 using Unity.Netcode;
@@ -9,7 +8,7 @@ using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
-    public class MessagingControl
+    public class MessagingControl : IMessagingControl
     {
         private const string ForwardToClientsMessageName = "FORWARD_TO_CLIENTS";
         private const string ForwardToClientMessageName = "FORWARD_TO_CLIENT";
@@ -18,8 +17,6 @@ namespace CommonOnlineMultiplayer
 
         private readonly Dictionary<string, NamedMessageHandlerDelegator> messageNameToHandleNamedMessageHelper = new();
         private bool hasRegisteredForwardNamedMessageHandlers;
-
-        public int SimulateJitterInMillis { get; set; }
 
         public MessagingControl(NetworkManager networkManager)
         {
@@ -221,27 +218,11 @@ namespace CommonOnlineMultiplayer
             FastBufferWriter fastBufferWriter,
             NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
         {
-            if (SimulateJitterInMillis <= 0)
-            {
-                networkManager.CustomMessagingManager.SendNamedMessage(
-                    messageName,
-                    clientId,
-                    fastBufferWriter,
-                    networkDelivery);
-                return;
-            }
-
-            ThreadUtils.RunOnBackgroundThread(() =>
-            {
-                SimulateJitter();
-                ThreadUtils.RunOnMainThread(() => {
-                    networkManager.CustomMessagingManager.SendNamedMessage(
-                        messageName,
-                        clientId,
-                        fastBufferWriter,
-                        networkDelivery);
-                });
-            });
+            networkManager.CustomMessagingManager.SendNamedMessage(
+                messageName,
+                clientId,
+                fastBufferWriter,
+                networkDelivery);
         }
 
         private void SendNamedMessage(
@@ -250,34 +231,11 @@ namespace CommonOnlineMultiplayer
             FastBufferWriter fastBufferWriter,
             NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
         {
-            if (SimulateJitterInMillis <= 0)
-            {
-                networkManager.CustomMessagingManager.SendNamedMessage(
-                    messageName,
-                    clientIds,
-                    fastBufferWriter,
-                    networkDelivery);
-                return;
-            }
-
-            ThreadUtils.RunOnBackgroundThread(() =>
-            {
-                SimulateJitter();
-                ThreadUtils.RunOnMainThread(() => {
-                    networkManager.CustomMessagingManager.SendNamedMessage(
-                        messageName,
-                        clientIds,
-                        fastBufferWriter,
-                        networkDelivery);
-                });
-            });
-        }
-
-        private void SimulateJitter()
-        {
-            int sleepTime = RandomUtils.Range(1, SimulateJitterInMillis);
-            Log.Verbose(() => $"Simulating jitter by sleeping {sleepTime} ms");
-            Thread.Sleep(sleepTime);
+            networkManager.CustomMessagingManager.SendNamedMessage(
+                messageName,
+                clientIds,
+                fastBufferWriter,
+                networkDelivery);
         }
 
         public IDisposable RegisterNamedMessageHandler(
