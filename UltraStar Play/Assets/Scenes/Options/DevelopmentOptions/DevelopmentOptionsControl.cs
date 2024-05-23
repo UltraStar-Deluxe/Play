@@ -462,8 +462,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 newValue => settings.BeatAnalyzedEventNetworkDelivery = newValue);
 
         FieldBindingUtils.Bind(simulateJitterInMillisField,
-            () => settings.SimulateJitterInMillis,
-            newValue => settings.SimulateJitterInMillis = newValue);
+            () => settings.OnlineMultiplayerSimulatedJitterInMillis,
+            newValue => settings.OnlineMultiplayerSimulatedJitterInMillis = newValue);
 
         // Mods
         uploadWorkshopItemButton.RegisterCallbackButtonTriggered(evt => ShowUploadNewModDialog());

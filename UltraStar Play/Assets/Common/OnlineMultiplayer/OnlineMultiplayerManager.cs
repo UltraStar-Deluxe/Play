@@ -118,7 +118,7 @@ namespace CommonOnlineMultiplayer
             LobbyMemberConnectionChangedEventSteam
                 .Subscribe(evt => UpdateLobbyMemberPlayerProfiles());
 
-            settings.ObserveEveryValueChanged(it => it.SimulateJitterInMillis)
+            settings.ObserveEveryValueChanged(it => it.OnlineMultiplayerSimulatedJitterInMillis)
                 .Subscribe(newValue => messagingControl.DelayInMillis = newValue);
         }
 
