@@ -16,26 +16,25 @@ namespace CommonOnlineMultiplayer
         private readonly NetworkManager networkManager;
 
         private readonly Dictionary<string, NamedMessageHandlerDelegator> messageNameToHandleNamedMessageHelper = new();
-        private bool hasRegisteredForwardNamedMessageHandlers;
 
         public MessagingControl(NetworkManager networkManager)
         {
             this.networkManager = networkManager;
         }
 
-        public void RegisterNamedMessageHandlersToForwardMessagesIfNeeded()
+        public void RegisterNamedMessageHandlersToForwardMessages()
         {
-            if (hasRegisteredForwardNamedMessageHandlers
-                || !networkManager.IsServer)
+            if (!networkManager.IsServer)
             {
                 return;
             }
-            hasRegisteredForwardNamedMessageHandlers = true;
 
+            networkManager.CustomMessagingManager.UnregisterNamedMessageHandler(ForwardToClientsMessageName);
             RegisterNamedMessageHandler(
                 ForwardToClientsMessageName,
                 ForwardNamedMessageToClients);
 
+            networkManager.CustomMessagingManager.UnregisterNamedMessageHandler(ForwardToClientMessageName);
             RegisterNamedMessageHandler(
                 ForwardToClientMessageName,
                 ForwardNamedMessageToClient);
@@ -56,6 +55,18 @@ namespace CommonOnlineMultiplayer
                 originalMessageWriter,
                 targetNetcodeClientIds.First(),
                 networkDelivery);
+        }
+
+        public void ClearNamedMessageHandlers()
+        {
+            if (networkManager.CustomMessagingManager != null)
+            {
+                foreach (KeyValuePair<string,NamedMessageHandlerDelegator> entry in messageNameToHandleNamedMessageHelper)
+                {
+                    networkManager.CustomMessagingManager.UnregisterNamedMessageHandler(entry.Key);
+                }
+            }
+            messageNameToHandleNamedMessageHelper.Clear();
         }
 
         private void ForwardNamedMessageToClients(NamedMessage request)

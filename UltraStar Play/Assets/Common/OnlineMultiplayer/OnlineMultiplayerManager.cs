@@ -143,15 +143,7 @@ namespace CommonOnlineMultiplayer
         private void OnNetcodeLocalServerStarted()
         {
             Debug.Log($"OnNetcodeLocalServerStarted");
-            MessagingControl.RegisterNamedMessageHandlersToForwardMessagesIfNeeded();
-        }
-
-        private void UpdateLobbyMemberPlayerProfiles()
-        {
-            IReadOnlyList<LobbyMember> lobbyMembers = LobbyMemberManager.GetLobbyMembers();
-            nonPersistentSettings.LobbyMemberPlayerProfiles = lobbyMembers
-                .Select(it => new LobbyMemberPlayerProfile(it.DisplayName, it.UnityNetcodeClientId))
-                .ToList();
+            MessagingControl.RegisterNamedMessageHandlersToForwardMessages();
         }
 
         private void OnNetcodeLocalClientStarted()
@@ -163,6 +155,7 @@ namespace CommonOnlineMultiplayer
         private void OnNetcodeLocalClientStopped(bool wasHostMode)
         {
             Debug.Log($"OnNetcodeLocalClientStopped(wasHostMode: {wasHostMode})");
+            MessagingControl.ClearNamedMessageHandlers();
             NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_disconnected));
 
             if (LobbyManager.CurrentLobby != null)
@@ -248,6 +241,14 @@ namespace CommonOnlineMultiplayer
             MessagingControl regularMessagingControl = new MessagingControl(networkManager);
             messagingControl = new DelayedMessagingControl(regularMessagingControl);
             ObservableMessagingControl = new ObservableMessagingControl(messagingControl);
+        }
+
+        private void UpdateLobbyMemberPlayerProfiles()
+        {
+            IReadOnlyList<LobbyMember> lobbyMembers = LobbyMemberManager.GetLobbyMembers();
+            nonPersistentSettings.LobbyMemberPlayerProfiles = lobbyMembers
+                .Select(it => new LobbyMemberPlayerProfile(it.DisplayName, it.UnityNetcodeClientId))
+                .ToList();
         }
     }
 }

@@ -6,11 +6,13 @@ namespace CommonOnlineMultiplayer
 {
     public interface IMessagingControl
     {
-        void RegisterNamedMessageHandlersToForwardMessagesIfNeeded();
+        void RegisterNamedMessageHandlersToForwardMessages();
 
         public IDisposable RegisterNamedMessageHandler(
             string messageName,
             Action<NamedMessage> handleMessage);
+
+        void ClearNamedMessageHandlers();
 
         void SendNamedMessageToClients(
             string messageName,

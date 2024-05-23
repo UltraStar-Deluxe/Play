@@ -8,11 +8,11 @@ namespace CommonOnlineMultiplayer
 {
     public class DelayedMessagingControl : IMessagingControl
     {
-        private readonly MessagingControl messagingControl;
+        private readonly IMessagingControl messagingControl;
 
         public int DelayInMillis { get; set; }
 
-        public DelayedMessagingControl(MessagingControl messagingControl)
+        public DelayedMessagingControl(IMessagingControl messagingControl)
         {
             this.messagingControl = messagingControl;
         }
@@ -32,14 +32,19 @@ namespace CommonOnlineMultiplayer
             CoroutineUtils.ExecuteAfterDelayInSeconds(sleepTimeInSeconds, action));
         }
 
-        public void RegisterNamedMessageHandlersToForwardMessagesIfNeeded()
+        public void RegisterNamedMessageHandlersToForwardMessages()
         {
-            messagingControl.RegisterNamedMessageHandlersToForwardMessagesIfNeeded();
+            messagingControl.RegisterNamedMessageHandlersToForwardMessages();
         }
 
         public IDisposable RegisterNamedMessageHandler(string messageName, Action<NamedMessage> handleMessage)
         {
             return messagingControl.RegisterNamedMessageHandler(messageName, handleMessage);
+        }
+
+        public void ClearNamedMessageHandlers()
+        {
+            messagingControl.ClearNamedMessageHandlers();
         }
 
         public void SendNamedMessageToClients(
