@@ -771,6 +771,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void SkipToPosition(double positionInMillis)
     {
+        if (Math.Abs(positionInMillis - songAudioPlayer.PositionInMillis) < 1)
+        {
+            return;
+        }
+
         if (IsCanceledByEvent(beforeSkipEventStream))
         {
             return;
