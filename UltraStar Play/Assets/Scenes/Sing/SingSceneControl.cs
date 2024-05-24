@@ -776,7 +776,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return;
         }
 
-        if (IsCanceledByEvent(beforeSkipEventStream))
+        if (CancelableEvent.IsCanceledByEvent(beforeSkipEventStream))
         {
             return;
         }
@@ -792,7 +792,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void Restart()
     {
-        if (IsCanceledByEvent(beforeRestartEventStream))
+        if (CancelableEvent.IsCanceledByEvent(beforeRestartEventStream))
         {
             return;
         }
@@ -1387,23 +1387,5 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 singingLyricsControl.FadeIn(animTimeInSeconds);
             }
         }
-    }
-
-    private bool IsCanceledByEvent(Subject<CancelableEvent> eventStream)
-    {
-        CancelableEvent evt = new();
-        eventStream.OnNext(evt);
-        bool isCanceled = !evt.cancelMessage.Value.IsNullOrEmpty();
-        if (isCanceled)
-        {
-            NotificationManager.CreateNotification(evt.cancelMessage);
-        }
-
-        return isCanceled;
-    }
-
-    public class CancelableEvent
-    {
-        public Translation cancelMessage;
     }
 }

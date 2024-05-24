@@ -116,6 +116,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 	[Inject]
     private AchievementEventStream achievementEventStream;
 
+    private readonly Subject<CancelableEvent> beforeRestartEventStream = new();
+    public IObservable<CancelableEvent> BeforeRestartEventStream => beforeRestartEventStream;
+
     private readonly List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
     private readonly NextGameRoundUiControl nextGameRoundUiControl = new();
     private readonly TeamResultsUiControl teamResultsUiControl = new();
@@ -307,6 +310,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private void RestartSingScene()
     {
+        if (CancelableEvent.IsCanceledByEvent(beforeRestartEventStream))
+        {
+            return;
+        }
+
         SingSceneData singSceneData = SceneNavigator.GetSceneData(new SingSceneData());
         singSceneData.SongMetas = sceneData.SongMetas;
         singSceneData.PositionInMillis = 0;

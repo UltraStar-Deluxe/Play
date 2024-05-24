@@ -41,14 +41,12 @@ public class SingSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjection, 
             SendInitialUnpauseMessageWhenAllReadyToStart(0);
         }
 
-        // Only host can restart
+        // Cannot restart directly
         singSceneControl.BeforeRestartEventStream.Subscribe(evt =>
         {
-            if (!onlineMultiplayerManager.IsHost)
-            {
-                evt.cancelMessage = Translation.Get(R.Messages.onlineGame_error_hostMustRestart);
-            }
+            evt.cancelMessage = Translation.Get(R.Messages.onlineGame_error_notAvailable);
         });
+
         singSceneControl.RestartedEventStream.Subscribe(evt => SendRestartMessage());
 
         // Cannot skip to next lyrics
