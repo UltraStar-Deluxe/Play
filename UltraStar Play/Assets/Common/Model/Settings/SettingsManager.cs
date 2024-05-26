@@ -19,8 +19,14 @@ public class SettingsManager : AbstractSingletonBehaviour
         set
         {
             settingsLoaderSaver = value;
-            Instance.settings = null;
-            Instance.LoadSettings();
+
+            // Reset already loaded settings.
+            if (DontDestroyOnLoadManager.Instance != null
+                && Instance != null)
+            {
+                Instance.settings = null;
+                Instance.LoadSettings();
+            }
         }
     }
 
