@@ -6,17 +6,26 @@ using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
-    public struct HandleNamedMessageHelper
+    public class NamedMessageHandlerDelegator
     {
         private readonly string messageName;
-        private readonly IReadOnlyList<NamedMessageHandler> messageHandlers;
+        private readonly List<NamedMessageHandler> messageHandlers = new();
 
-        public HandleNamedMessageHelper(
-            string messageName,
-            IReadOnlyList<NamedMessageHandler> messageHandlers)
+        public NamedMessageHandlerDelegator(string messageName)
         {
             this.messageName = messageName;
-            this.messageHandlers = messageHandlers;
+        }
+
+        public int Count => messageHandlers.Count;
+
+        public void Add(NamedMessageHandler handler)
+        {
+            messageHandlers.AddIfNotContains(handler);
+        }
+
+        public void Remove(NamedMessageHandler handler)
+        {
+            messageHandlers.Remove(handler);
         }
 
         public void HandleNamedMessage(ulong senderNetcodeClientId, FastBufferReader messagePayload)
@@ -37,7 +46,7 @@ namespace CommonOnlineMultiplayer
             }
             else if (messageHandlers.Count > 1)
             {
-                // The reader can only be read once.
+                // The FastBufferReader can only be read once.
                 // Thus, for multiple handlers, we need to make a copy of the data.
                 byte[] messageBytes = new byte[messageLength];
                 if (!messagePayload.TryBeginRead(messageBytes.Length))

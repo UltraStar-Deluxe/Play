@@ -8,7 +8,6 @@ using Serilog.Events;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -89,6 +88,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlName = R.UxmlNames.songScanMaxBatchCountChooser)]
     private IntegerField songScanMaxBatchCountChooser;
+
+    [Inject(UxmlName = R.UxmlNames.simulateJitterInMillisField)]
+    private IntegerField simulateJitterInMillisField;
 
     [Inject]
     private ThemeManager themeManager;
@@ -458,6 +460,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new EnumChooserControl<ENetworkDelivery>(beatAnalyzedEventNetworkDeliveryChooser)
             .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,
                 newValue => settings.BeatAnalyzedEventNetworkDelivery = newValue);
+
+        FieldBindingUtils.Bind(simulateJitterInMillisField,
+            () => settings.OnlineMultiplayerSimulatedJitterInMillis,
+            newValue => settings.OnlineMultiplayerSimulatedJitterInMillis = newValue);
 
         // Mods
         uploadWorkshopItemButton.RegisterCallbackButtonTriggered(evt => ShowUploadNewModDialog());

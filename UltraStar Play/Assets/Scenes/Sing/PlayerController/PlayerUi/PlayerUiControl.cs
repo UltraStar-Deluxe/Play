@@ -267,7 +267,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             ShowMicDisconnectedInfo();
 
             // Trigger achievement
-            achievementEventStream.OnNext(AchievementId.disconnectCompanionAppWhenSinging);
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.disconnectCompanionAppWhenSinging, playerProfile));
         }
     }
 

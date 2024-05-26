@@ -154,7 +154,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
                 if (perfectSentenceCount > 10
                     && PlayerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard)
                 {
-                    achievementEventStream.OnNext(AchievementId.getMoreThan10PerfectRatingsInASong);
+                    achievementEventStream.OnNext(new AchievementEvent(AchievementId.getMoreThan10PerfectRatingsInASong, PlayerProfile));
                 }
             }
         });

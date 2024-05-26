@@ -31,9 +31,6 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private Settings settings;
 
     [Inject]
-    private OnlineMultiplayerManager onlineMultiplayerManager;
-
-    [Inject]
     private ThemeManager themeManager;
 
     [Inject]
@@ -282,8 +279,8 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     {
         List<MicProfile> unusedMicProfiles = FindUnusedMicProfiles();
         if (unusedMicProfiles.IsNullOrEmpty()
-            || (playerProfile is LobbyMemberPlayerProfile
-                && playerProfile != onlineMultiplayerManager.OwnLobbyMemberPlayerProfile))
+            || (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+                && lobbyMemberPlayerProfile.IsRemote))
         {
             return null;
         }

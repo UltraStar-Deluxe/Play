@@ -4,7 +4,6 @@ using System.Diagnostics;
 using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
@@ -98,7 +97,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
         EScene currentScene = sceneRecipeManager.GetCurrentScene();
 
-        beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));
+        beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene, GetSceneData(scene)));
 
         if (SettingsUtils.ShouldAnimateSceneChange(settings))
         {

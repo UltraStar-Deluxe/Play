@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using CommonOnlineMultiplayer;
 using UniRx;
 
 public class NonPersistentSettings

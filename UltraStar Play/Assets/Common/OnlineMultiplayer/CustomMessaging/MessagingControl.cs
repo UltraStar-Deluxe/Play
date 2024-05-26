@@ -8,31 +8,33 @@ using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
-    public class MessagingControl
+    public class MessagingControl : IMessagingControl
     {
         private const string ForwardToClientsMessageName = "FORWARD_TO_CLIENTS";
         private const string ForwardToClientMessageName = "FORWARD_TO_CLIENT";
 
-        private readonly Dictionary<string, List<NamedMessageHandler>> messageNameToHandlers = new();
-        private readonly Dictionary<string, HandleNamedMessageHelper> messageNameToHandleNamedMessageHelper = new();
+        private readonly NetworkManager networkManager;
 
-        private bool hasRegisteredForwardNamedMessageHandlers;
+        private readonly Dictionary<string, NamedMessageHandlerDelegator> messageNameToHandleNamedMessageHelper = new();
 
-        private NetworkManager NetworkManager => NetworkManager.Singleton;
-
-        public void RegisterNamedMessageHandlersToForwardMessagesIfNeeded()
+        public MessagingControl(NetworkManager networkManager)
         {
-            if (hasRegisteredForwardNamedMessageHandlers
-                || !NetworkManager.IsServer)
+            this.networkManager = networkManager;
+        }
+
+        public void RegisterNamedMessageHandlersToForwardMessages()
+        {
+            if (!networkManager.IsServer)
             {
                 return;
             }
-            hasRegisteredForwardNamedMessageHandlers = true;
 
+            networkManager.CustomMessagingManager.UnregisterNamedMessageHandler(ForwardToClientsMessageName);
             RegisterNamedMessageHandler(
                 ForwardToClientsMessageName,
                 ForwardNamedMessageToClients);
 
+            networkManager.CustomMessagingManager.UnregisterNamedMessageHandler(ForwardToClientMessageName);
             RegisterNamedMessageHandler(
                 ForwardToClientMessageName,
                 ForwardNamedMessageToClient);
@@ -53,6 +55,18 @@ namespace CommonOnlineMultiplayer
                 originalMessageWriter,
                 targetNetcodeClientIds.First(),
                 networkDelivery);
+        }
+
+        public void ClearNamedMessageHandlers()
+        {
+            if (networkManager.CustomMessagingManager != null)
+            {
+                foreach (KeyValuePair<string,NamedMessageHandlerDelegator> entry in messageNameToHandleNamedMessageHelper)
+                {
+                    networkManager.CustomMessagingManager.UnregisterNamedMessageHandler(entry.Key);
+                }
+            }
+            messageNameToHandleNamedMessageHelper.Clear();
         }
 
         private void ForwardNamedMessageToClients(NamedMessage request)
@@ -95,15 +109,15 @@ namespace CommonOnlineMultiplayer
 
             Log.Verbose(() => $"Sending message {messageName} to Netcode clients {targetNetcodeClientIds.JoinWith(", ")}");
 
-            if (NetworkManager.IsServer)
+            if (networkManager.IsServer)
             {
-                NetworkManager.CustomMessagingManager.SendNamedMessage(
+                SendNamedMessage(
                     messageName,
                     targetNetcodeClientIds,
                     fastBufferWriter,
                     networkDelivery);
             }
-            else if (NetworkManager.IsClient)
+            else if (networkManager.IsClient)
             {
                 // Only the server can send to clients directly. Other clients can only send to the server.
                 // We are not the server, thus we need to sent the message to the server, which then forwards it to the clients.
@@ -129,16 +143,16 @@ namespace CommonOnlineMultiplayer
         {
             Log.Verbose(() => $"Sending message {messageName} to Netcode client {targetNetcodeClientId}");
 
-            if (NetworkManager.IsServer
+            if (networkManager.IsServer
                 || targetNetcodeClientId == NetworkManager.ServerClientId)
             {
-                NetworkManager.CustomMessagingManager.SendNamedMessage(
+                SendNamedMessage(
                     messageName,
                     targetNetcodeClientId,
                     fastBufferWriter,
                     networkDelivery);
             }
-            else if (NetworkManager.IsClient)
+            else if (networkManager.IsClient)
             {
                 // Only the server can send to clients directly. Other clients can only send to the server.
                 // We are not the server and do not send to the server,
@@ -202,9 +216,35 @@ namespace CommonOnlineMultiplayer
             FastBufferWriter fastBufferWriter,
             NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
         {
-            NetworkManager.CustomMessagingManager.SendNamedMessage(
+            SendNamedMessage(
                 messageName,
                 NetworkManager.ServerClientId,
+                fastBufferWriter,
+                networkDelivery);
+        }
+
+        private void SendNamedMessage(
+            string messageName,
+            ulong clientId,
+            FastBufferWriter fastBufferWriter,
+            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
+        {
+            networkManager.CustomMessagingManager.SendNamedMessage(
+                messageName,
+                clientId,
+                fastBufferWriter,
+                networkDelivery);
+        }
+
+        private void SendNamedMessage(
+            string messageName,
+            IReadOnlyList<ulong> clientIds,
+            FastBufferWriter fastBufferWriter,
+            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
+        {
+            networkManager.CustomMessagingManager.SendNamedMessage(
+                messageName,
+                clientIds,
                 fastBufferWriter,
                 networkDelivery);
         }
@@ -213,24 +253,17 @@ namespace CommonOnlineMultiplayer
             string messageName,
             Action<NamedMessage> handleMessage)
         {
-            if (!messageNameToHandlers.TryGetValue(messageName, out List<NamedMessageHandler> messageHandlers))
+            if (!messageNameToHandleNamedMessageHelper.TryGetValue(messageName, out NamedMessageHandlerDelegator namedMessageHandlerDelegator))
             {
-                messageHandlers = new();
-                messageNameToHandlers[messageName] = messageHandlers;
-            }
-
-            if (!messageNameToHandleNamedMessageHelper.ContainsKey(messageName))
-            {
-                HandleNamedMessageHelper handleNamedMessageHelper = new HandleNamedMessageHelper(messageName, messageHandlers);
-                messageNameToHandleNamedMessageHelper[messageName] = handleNamedMessageHelper;
-                NetworkManager.CustomMessagingManager.RegisterNamedMessageHandler(messageName, handleNamedMessageHelper.HandleNamedMessage);
+                namedMessageHandlerDelegator = new NamedMessageHandlerDelegator(messageName);
+                messageNameToHandleNamedMessageHelper[messageName] = namedMessageHandlerDelegator;
+                networkManager.CustomMessagingManager.RegisterNamedMessageHandler(messageName, namedMessageHandlerDelegator.HandleNamedMessage);
             }
 
             NamedMessageHandler namedMessageHandler = new NamedMessageHandler(handleMessage);
+            namedMessageHandlerDelegator.Add(namedMessageHandler);
 
-            messageHandlers.Add(namedMessageHandler);
-
-            Log.Debug(() => $"RegisterNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
+            Log.Debug(() => $"RegisterNamedMessageHandler - new count of handlers for message name '{messageName}': {namedMessageHandlerDelegator.Count}");
 
             bool isDisposed = false;
             return Disposable.Create(() =>
@@ -241,13 +274,12 @@ namespace CommonOnlineMultiplayer
                 }
                 isDisposed = true;
 
-                messageHandlers.Remove(namedMessageHandler);
-                if (messageHandlers.IsNullOrEmpty())
+                namedMessageHandlerDelegator.Remove(namedMessageHandler);
+                if (namedMessageHandlerDelegator.Count <= 0)
                 {
-                    messageNameToHandlers.Remove(messageName);
                     messageNameToHandleNamedMessageHelper.Remove(messageName);
                 }
-                Log.Debug(() => $"RemoveNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
+                Log.Debug(() => $"RemoveNamedMessageHandler - new count of handlers for message name '{messageName}': {namedMessageHandlerDelegator.Count}");
             });
         }
     }

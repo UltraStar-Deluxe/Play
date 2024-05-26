@@ -15,7 +15,7 @@ public static class UltraStarFormatWriter
 
         if (songMeta is not UltraStarSongMeta ultraStarSongMeta)
         {
-            ultraStarSongMeta = new(songMeta);
+            ultraStarSongMeta = new UltraStarSongMeta(songMeta);
         }
         WriteFileWithUltraStarSongMeta(absolutePath, ultraStarSongMeta, version, writeByteOrderMark);
     }
@@ -30,9 +30,9 @@ public static class UltraStarFormatWriter
     {
         if (songMeta is not UltraStarSongMeta ultraStarSongMeta)
         {
-            ultraStarSongMeta = new(songMeta);
+            ultraStarSongMeta = new UltraStarSongMeta(songMeta);
         }
-        return ToUltraStarSongFormat(ultraStarSongMeta);
+        return ToUltraStarSongFormat(ultraStarSongMeta, ultraStarSongMeta.Version);
     }
 
     private static string ToUltraStarSongFormat(UltraStarSongMeta songMeta, UltraStarSongFormatVersion version)
