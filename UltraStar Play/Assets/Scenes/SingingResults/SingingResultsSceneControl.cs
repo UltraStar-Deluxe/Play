@@ -194,7 +194,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             && playerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard
             && sceneData.GetPlayerScores(playerProfile)?.TotalScore > 9000
             && CommonOnlineMultiplayerUtils.IsLocalPlayerProfile(playerProfile));
-        achievementEventStream.OnNext(new AchievementEvent(AchievementId.getMoreThan9000Points, localPlayerProfileOver9000));
+        if (localPlayerProfileOver9000 != null)
+        {
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.getMoreThan9000Points, localPlayerProfileOver9000));
+        }
     }
 
     private void InitSingingResults()
