@@ -34,7 +34,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         }
 
         mediaPlayer.Media = new Media(new Uri(videoUri));
-        mediaPlayer.PlayAsync();
+        mediaPlayer.Play();
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.

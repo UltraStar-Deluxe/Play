@@ -53,8 +53,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         vlcMediaPlayer.Media = new Media(new Uri(audioUri));
 
         // Play to trigger loading
-        vlcMediaPlayer.PlayAsync();
-        vlcMediaPlayer.PauseAsync();
+        vlcMediaPlayer.Play();
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
