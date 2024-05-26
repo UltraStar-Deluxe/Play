@@ -26,7 +26,7 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
         videoPlayer.errorReceived -= OnVideoPlayerErrorReceived;
     }
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio)
+    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         videoPlayer.url = audioUri;
         if (videoPlayer.url.IsNullOrEmpty())
@@ -38,6 +38,7 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
 
         // Must play the video to trigger loading.
         videoPlayer.Play();
+        PositionInMillis = startPositionInMillis;
 
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
         return Observable.Create<AudioLoadedEvent>(o =>

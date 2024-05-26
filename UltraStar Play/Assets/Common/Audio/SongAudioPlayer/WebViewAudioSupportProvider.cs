@@ -8,7 +8,7 @@ public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
     [Inject]
     private WebViewManager webViewManager;
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio)
+    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         bool success = webViewManager.LoadUrl(audioUri);
         if (!success)
@@ -41,6 +41,7 @@ public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
                         return;
                     }
 
+                    PositionInMillis = startPositionInMillis;
                     o.OnNext(new AudioLoadedEvent(audioUri));
                 }));
 

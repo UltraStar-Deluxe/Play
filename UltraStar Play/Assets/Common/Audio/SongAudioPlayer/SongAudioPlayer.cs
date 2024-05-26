@@ -288,12 +288,11 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
                 new SongAudioPlayerException($"Audio resource does not exist: {audioUri}"));
         }
 
-        return DoLoadAndPlayAsObservable(audioUri, audioSupportProviders, streamAudio)
+        return DoLoadAndPlayAsObservable(audioUri, audioSupportProviders, streamAudio, startPositionInMillis)
             .Select(evt =>
             {
                 loadedSongMeta = songMeta;
                 DurationInMillis = currentAudioSupportProvider.DurationInMillis;
-                currentAudioSupportProvider.PositionInMillis = startPositionInMillis;
                 currentAudioSupportProvider.VolumeFactor = VolumeFactor;
                 if (IsPlaying)
                 {
@@ -308,7 +307,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
     private IObservable<AudioLoadedEvent> DoLoadAndPlayAsObservable(
         string audioUri,
         IAudioSupportProvider[] availableAudioSupportProviders,
-        bool streamAudio)
+        bool streamAudio,
+        double startPositionInMillis)
     {
         IAudioSupportProvider audioSupportProvider = availableAudioSupportProviders
             .FirstOrDefault(it => it.IsSupported(audioUri));
@@ -322,7 +322,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
 
         return Observable.Create<AudioLoadedEvent>(o =>
         {
-            audioSupportProvider.LoadAsObservable(audioUri, streamAudio)
+            audioSupportProvider.LoadAsObservable(audioUri, streamAudio, startPositionInMillis)
                 .CatchIgnore((Exception ex) =>
                 {
                     Debug.LogException(ex);
@@ -336,7 +336,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
                         o.OnError(new VideoSupportProviderException($"Failed to load audio and no remaining audio support providers: {audioUri}"));
                         return;
                     }
-                    DoLoadAndPlayAsObservable(audioUri, remainingAudioSupportProviders, streamAudio)
+                    DoLoadAndPlayAsObservable(audioUri, remainingAudioSupportProviders, streamAudio, startPositionInMillis)
                         .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
                 })
                 .Subscribe(evt =>

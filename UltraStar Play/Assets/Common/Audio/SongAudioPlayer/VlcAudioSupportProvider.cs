@@ -33,7 +33,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         }
     }
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio)
+    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         if (vlcMediaPlayer == null)
         {
@@ -53,7 +53,8 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         vlcMediaPlayer.Media = new Media(new Uri(audioUri));
 
         // Play to trigger loading
-        vlcMediaPlayer.Play();
+        Play();
+        PositionInMillis = startPositionInMillis;
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.

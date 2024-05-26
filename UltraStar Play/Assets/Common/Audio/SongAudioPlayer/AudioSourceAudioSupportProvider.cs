@@ -9,7 +9,7 @@ public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
     [InjectedInInspector]
     public AudioSource audioSource;
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio)
+    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         return AudioManager.LoadAudioClipFromUri(audioUri, streamAudio)
             .Select(loadedAudioClip =>
@@ -30,6 +30,7 @@ public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
                 }
 
                 audioSource.clip = loadedAudioClip;
+                PositionInMillis = startPositionInMillis;
                 return new AudioLoadedEvent(audioUri);
             });
     }

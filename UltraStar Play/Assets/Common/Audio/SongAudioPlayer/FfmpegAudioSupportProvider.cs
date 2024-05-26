@@ -28,7 +28,7 @@ public class FfmpegAudioSupportProvider : AbstractAudioSupportProvider
         }
     }
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio)
+    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         DestroyFfmpegPlayer();
 
@@ -43,6 +43,7 @@ public class FfmpegAudioSupportProvider : AbstractAudioSupportProvider
 
         // Play to trigger loading
         ffplayCommand.Play();
+        PositionInMillis = startPositionInMillis;
 
         return Observable.Create<AudioLoadedEvent>(o =>
         {

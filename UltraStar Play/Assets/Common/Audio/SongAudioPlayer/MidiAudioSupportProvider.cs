@@ -12,7 +12,7 @@ public class MidiAudioSupportProvider : AbstractAudioSupportProvider
     [Inject]
     private MidiManager midiManager;
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio)
+    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         AudioClip audioClip = midiManager.CreateAudioClip(audioUri);
         if (audioClip == null)
@@ -22,6 +22,8 @@ public class MidiAudioSupportProvider : AbstractAudioSupportProvider
         }
 
         audioSourceAudioSupportProvider.audioSource.clip = audioClip;
+        PositionInMillis = startPositionInMillis;
+        Play();
         return Observable.Return<AudioLoadedEvent>(new AudioLoadedEvent(audioUri));
     }
 
