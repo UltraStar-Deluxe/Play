@@ -136,7 +136,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
 
     protected virtual List<string> GetRelativeTestSongFilePaths()
     {
-        return new List<string>();
+        return new List<string>() { "SingingTestSongs/ThreeQuartersA4OneQuarterC5-TestSong.txt" };
     }
 
     protected virtual void ConfigureTestStatistics(TestStatistics statistics)
@@ -145,6 +145,27 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
 
     protected virtual void ConfigureTestSettings(TestSettings settings)
     {
+        PlayerProfile playerProfile = new PlayerProfile("TestPlayer1", EDifficulty.Medium);
+        settings.PlayerProfiles = new List<PlayerProfile>()
+        {
+            playerProfile,
+        };
+
+        MicProfile micProfile = new MicProfile("TestMic1");
+        settings.MicProfiles = new List<MicProfile>()
+        {
+            micProfile,
+        };
+
+        // Song select should automatically assign the last used mic to the player.
+        settings.PlayerProfileNameToLastUsedMicProfile.Add(playerProfile.Name, new MicProfileReference(micProfile));
+
+        // Simulate connected mic with A4 pitch frequency
+        SimulatedMicrophoneAdapter.SetSimulatedDevices(new List<string>()
+        {
+            micProfile.Name,
+        });
+        SimulatedMicrophoneAdapter.SetSimulatedDevicePitchInHz(playerProfile.Name, 440);
     }
 
     private IEnumerator LoadTestScene()
