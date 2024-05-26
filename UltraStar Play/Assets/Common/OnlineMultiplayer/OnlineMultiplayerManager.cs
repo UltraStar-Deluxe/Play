@@ -42,14 +42,16 @@ namespace CommonOnlineMultiplayer
         /**
          * Each connected Netcode peer has a client, but only one of them is the host and server.
          */
-        public bool IsOnlineGame => networkManager.IsClient;
+        public bool IsOnlineGame => networkManager != null && networkManager.IsClient;
 
         /**
          * The host is the Netcode server that adds a client for itself automatically.
          */
-        public bool IsHost => networkManager.IsHost;
+        public bool IsHost => networkManager != null && networkManager.IsHost;
 
-        public LobbyMember OwnLobbyMember => LobbyMemberManager.GetLobbyMember(networkManager.LocalClientId);
+        public LobbyMember OwnLobbyMember => networkManager != null
+            ? LobbyMemberManager.GetLobbyMember(networkManager.LocalClientId)
+            : null;
         public PlayerProfile OwnLobbyMemberPlayerProfile
         {
             get
@@ -63,8 +65,12 @@ namespace CommonOnlineMultiplayer
                     .FirstOrDefault(it => it.UnityNetcodeClientId == ownLobbyMember.UnityNetcodeClientId);
             }
         }
-        public NetworkObject OwnLobbyMemberNetworkObject => networkManager.SpawnManager.GetLocalPlayerObject();
-        public UnityNetcodeClientId OwnLobbyMemberUnityNetcodeClientId => networkManager.LocalClientId;
+        public NetworkObject OwnLobbyMemberNetworkObject => networkManager != null
+            ? networkManager.SpawnManager.GetLocalPlayerObject()
+            : null;
+        public UnityNetcodeClientId OwnLobbyMemberUnityNetcodeClientId => networkManager != null
+            ? networkManager.LocalClientId
+            : 0;
 
         public IReadOnlyList<ulong> OtherLobbyMembersUnityNetcodeClientIds
         {
