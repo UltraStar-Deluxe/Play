@@ -15,12 +15,20 @@ public class ResponsibleVisualElementUtils
             $"get UI elements with UXML name '{uxmlName}' and USS class '{ussClass}' from root element '{GetRootVisualElement(root)?.name}'",
             () => GetRootVisualElement(root).Query<T>(uxmlName, ussClass).ToList());
 
+    public static ITestInstruction<object> SetElementValue<T>(string uxmlName, T newValue)
+        => GetElement<BaseField<T>>(uxmlName)
+            .ContinueWith(element => SetElementValue(element, newValue));
+
     public static ITestInstruction<object> SetElementValue<T>(BaseField<T> element, T newValue)
         => ExpectElementIsFocusableNow(element)
             .ContinueWith(Do(
                     $"set value '{newValue}' for UI element '{element?.name}'",
                     () => element.value = newValue)
                 .ContinueWith(ExpectElementHasValue(element, newValue)));
+
+    public static ITestInstruction<object> ClickButton(string uxmlName)
+        => GetElement<Button>(uxmlName)
+            .ContinueWith(element => ClickButton(element));
 
     public static ITestInstruction<object> ClickButton(Button button)
         => ExpectElementIsFocusableNow(button)

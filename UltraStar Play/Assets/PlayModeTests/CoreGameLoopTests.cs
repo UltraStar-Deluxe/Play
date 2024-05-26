@@ -21,39 +21,18 @@ public class CoreGameLoopTests : AbstractPlayModeTest
     private PlayerProfile testPlayerProfile;
     private MicProfile testMicProfile;
 
-    protected override List<string> GetRelativeTestSongFilePaths()
-    {
-        return new List<string>
-        {
-            "SingingTestSongs/ThreeQuartersA4OneQuarterC5-TestSong.txt",
-        };
-    }
-
     protected override void ConfigureTestSettings(TestSettings settings)
     {
+        base.ConfigureTestSettings(settings);
+
+        testPlayerProfile = settings.PlayerProfiles.FirstOrDefault();
+        testMicProfile = settings.MicProfiles.FirstOrDefault();
+
         // Disable joker rule for simple note hit or miss definition.
         settings.JokerRuleEnabled = false;
 
-        testPlayerProfile = new PlayerProfile("TestPlayer1", EDifficulty.Medium);
-        settings.PlayerProfiles = new List<PlayerProfile>()
-        {
-            testPlayerProfile,
-        };
-
-        testMicProfile = new MicProfile("TestMic1");
-        settings.MicProfiles = new List<MicProfile>()
-        {
-            testMicProfile,
-        };
-
-        // Song select should automatically assign the last used mic to the player.
-        settings.PlayerProfileNameToLastUsedMicProfile.Add(testPlayerProfile.Name, new MicProfileReference(testMicProfile));
-
         // Simulate connected mic with A4 pitch frequency
-        SimulatedMicrophoneAdapter.SetSimulatedDevices(new List<string>()
-        {
-            testMicProfile.Name,
-        });
+        SimulatedMicrophoneAdapter.SetSimulatedDevices(new List<string>() { testMicProfile.Name });
         SimulatedMicrophoneAdapter.SetSimulatedDevicePitchInHz(testPlayerProfile.Name, 440);
     }
 
