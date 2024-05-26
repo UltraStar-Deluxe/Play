@@ -100,8 +100,26 @@ public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
 
     public override double PositionInMillis
     {
-        get => audioSource.time * 1000.0;
-        set => audioSource.time = (float)(value / 1000.0);
+        // Must use audioSource.timeSamples
+        // because audioSource.time is not always updated by Unity when AudioSource is paused.
+        get
+        {
+            double samplesPerMillisecond = SamplesPerMillisecond;
+            if (samplesPerMillisecond <= 0)
+            {
+                return 0;
+            }
+            return audioSource.timeSamples / samplesPerMillisecond;
+        }
+        set
+        {
+            double samplesPerMillisecond = SamplesPerMillisecond;
+            if (samplesPerMillisecond <= 0)
+            {
+                return;
+            }
+            audioSource.timeSamples = (int)(value * samplesPerMillisecond);
+        }
     }
 
     public override double DurationInMillis => audioSource.clip.length * 1000.0;
@@ -111,4 +129,6 @@ public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
         get => audioSource.volume;
         set => audioSource.volume = (float)value;
     }
+
+    private double SamplesPerMillisecond => audioSource.clip.frequency / 1000.0;
 }

@@ -86,6 +86,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
             }
 
             currentAudioSupportProvider.PositionInMillis = NumberUtils.Limit(value, 0, DurationInMillis - 1);
+            positionInMillis = PositionInMillisExact;
             positionEventStream.OnNext(positionInMillis);
         }
     }
