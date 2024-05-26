@@ -68,14 +68,15 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
                 Debug.Log($"Changing scenes took {stopwatch.ElapsedMilliseconds} ms (including animation if fade in/out transition is used)");
             }
         }).AddTo(gameObject);
-    }
 
-    protected override void OnEnableSingleton()
-    {
+        // Cannot register this in OnEnable because injection may not have finished yet in OnEnable.
         SceneManager.sceneLoaded += OnSceneLoaded;
+
+        // Fire initial sceneChangedEvent
+        sceneChangedEventStream.OnNext(new SceneChangedEvent(ESceneUtils.GetSceneByBuildIndex(SceneManager.GetActiveScene().buildIndex)));
     }
 
-    protected override void OnDisableSingleton()
+    protected override void OnDestroySingleton()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
