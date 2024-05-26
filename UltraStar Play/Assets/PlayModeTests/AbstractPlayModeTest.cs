@@ -25,6 +25,12 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         yield return new WaitForEndOfFrame();
     }
 
+    [UnityTearDown]
+    public IEnumerator UnityTearDown()
+    {
+        yield return TearDownTestFixture();
+    }
+
     private IEnumerator SetUpTestFixture()
     {
         SettingsManager.SettingsLoaderSaver = new TestSettingsLoaderSaver();
@@ -47,6 +53,14 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         Keyboard = InputSystem.GetDevice<Keyboard>();
 
         Executor = new UnityTestInstructionExecutor();
+    }
+
+    private IEnumerator TearDownTestFixture()
+    {
+        SettingsManager.SettingsLoaderSaver = null;
+        StatisticsManager.StatisticsLoaderSaver = null;
+        IMicrophoneAdapter.Instance = new PortAudioForUnityMicrophoneAdapter();
+        yield return null;
     }
 
     private void AssertMicSampleRecorderIsSimulated()
