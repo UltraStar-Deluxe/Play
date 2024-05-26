@@ -25,16 +25,26 @@ public class PlayerScoreOnlineMultiplayerControl : MonoBehaviour, INeedInjection
             return;
         }
 
+        // Score is updated only at the end of sentences.
+        // This is done for remote players via messages,
+        // and synthetically for local players to keep scores synchronized.
+        playerScoreControl.PlayerScore = new SingingResultsPlayerScore();
+
         if (CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(playerProfile))
         {
             // The score is received from remote messages
-            playerScoreControl.PlayerScore = new SingingResultsPlayerScore();
             disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
                 GetPlayerScoreMessageName(),
                 message => OnPlayerScoreMessage(message)));
         }
         else
         {
+            // Update local score
+            playerScoreControl.ScoreCalculatedEventStream.Subscribe(evt =>
+            {
+                playerScoreControl.PlayerScore = new SingingResultsPlayerScore(playerScoreControl.CalculationData);
+            });
+
             // Send score to remote clients
             playerScoreControl.ScoreChangedEventStream.Subscribe(evt =>
             {

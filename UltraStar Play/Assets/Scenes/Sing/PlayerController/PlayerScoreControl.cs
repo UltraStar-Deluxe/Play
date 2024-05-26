@@ -33,10 +33,15 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     [Inject]
     private PlayerProfile playerProfile;
 
+    private readonly Subject<ScoreCalculatedEvent> scoreCalculatedEventStream = new();
+    public IObservable<ScoreCalculatedEvent> ScoreCalculatedEventStream => scoreCalculatedEventStream;
+
     private readonly Subject<ScoreChangedEvent> scoreChangedEventStream = new();
     public IObservable<ScoreChangedEvent> ScoreChangedEventStream => scoreChangedEventStream;
 
     private ScoreCalculationData calculationData = new();
+    public ISingingResultsPlayerScore CalculationData => calculationData;
+
     private ISingingResultsPlayerScore playerScore;
     public ISingingResultsPlayerScore PlayerScore
     {
@@ -50,7 +55,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
             if (oldTotalScore != newTotalScore)
             {
-                FireScoreChangedEventWithCurrentScore();
+                FireScoreChangedEvent();
             }
         }
     }
@@ -69,6 +74,10 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
         playerPerformanceAssessmentControl.NoteAssessedEventStream.Subscribe(evt => OnNoteAssessed(evt));
         playerPerformanceAssessmentControl.SentenceAssessedEventStream.Subscribe(evt => OnSentenceAssessed(evt));
+        ScoreCalculatedEventStream
+            // Fire changed in next frame such that others can manipulate the score if needed (e.g. online multiplayer).
+            .DelayFrame(1)
+            .Subscribe(_ => FireScoreChangedEvent());
     }
 
     private void OnNoteAssessed(PlayerPerformanceAssessmentControl.NoteAssessedEvent evt)
@@ -164,7 +173,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
                              + $"NormalNoteLengthTotal {calculationData.NormalNoteLengthTotal}, GoldenNoteLengthTotal {calculationData.GoldenNoteLengthTotal})");
         }
 
-        FireScoreChangedEventWithCurrentScore();
+        FireScoreCalculatedEvent();
     }
 
     private void UpdateMaxScores(IReadOnlyCollection<Sentence> sentences)
@@ -253,23 +262,23 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    public void SetModTotalScore(int newModTotalScore, bool fireScoreChangedEvent = false)
+    public void SetModTotalScore(int newModTotalScore, bool sendEvent = false)
     {
         calculationData.ModTotalScore = newModTotalScore;
-        if (fireScoreChangedEvent)
+        if (sendEvent)
         {
-            FireScoreChangedEventWithCurrentScore();
+            FireScoreCalculatedEvent();
         }
     }
 
-    private ScoreChangedEvent CreateScoreChangedEventWithCurrentScore()
+    private void FireScoreCalculatedEvent()
     {
-        return new ScoreChangedEvent(TotalScore);
+        scoreCalculatedEventStream.OnNext(new ScoreCalculatedEvent(calculationData.TotalScore));
     }
 
-    private void FireScoreChangedEventWithCurrentScore()
+    private void FireScoreChangedEvent()
     {
-        scoreChangedEventStream.OnNext(CreateScoreChangedEventWithCurrentScore());
+        scoreChangedEventStream.OnNext(new ScoreChangedEvent(TotalScore));
     }
 
     public class ScoreChangedEvent
@@ -277,6 +286,16 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         public int TotalScore { get; private set; }
 
         public ScoreChangedEvent(int totalScore)
+        {
+            TotalScore = totalScore;
+        }
+    }
+
+    public class ScoreCalculatedEvent
+    {
+        public int TotalScore { get; private set; }
+
+        public ScoreCalculatedEvent(int totalScore)
         {
             TotalScore = totalScore;
         }
