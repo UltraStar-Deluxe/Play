@@ -566,6 +566,8 @@ public static partial class R
         public const string pitchLabelFormatChooser = "pitchLabelFormatChooser";
         public const string plainLabelContainer = "plainLabelContainer";
         public const string playbackAudioChooser = "playbackAudioChooser";
+        public const string playbackPostEndTimeInMillisTextField = "playbackPostEndTimeInMillisTextField";
+        public const string playbackPreBeginTimeInMillisTextField = "playbackPreBeginTimeInMillisTextField";
         public const string player = "player";
         public const string playerEntry = "playerEntry";
         public const string playerImage = "playerImage";

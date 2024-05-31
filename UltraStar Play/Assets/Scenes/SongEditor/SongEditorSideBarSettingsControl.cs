@@ -155,6 +155,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.splitSyllablesInSelectionButton)]
     private Button splitSyllablesInSelectionButton;
 
+    [Inject(UxmlName = R.UxmlNames.playbackPreBeginTimeInMillisTextField)]
+    private IntegerField playbackPreBeginTimeInMillisTextField;
+
+    [Inject(UxmlName = R.UxmlNames.playbackPostEndTimeInMillisTextField)]
+    private IntegerField playbackPostEndTimeInMillisTextField;
+
     [Inject]
     private SongMeta songMeta;
 
@@ -485,6 +491,14 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         new EnumChooserControl<ESongEditorPitchLabelFormat>(pitchLabelFormatChooser)
             .Bind(() => settings.SongEditorSettings.PitchLabelFormat,
                 newValue => settings.SongEditorSettings.PitchLabelFormat = newValue);
+
+        Bind(playbackPreBeginTimeInMillisTextField,
+            () => settings.SongEditorSettings.PlaybackPreBeginInMillis,
+            newValue => settings.SongEditorSettings.PlaybackPreBeginInMillis = newValue);
+
+        Bind(playbackPostEndTimeInMillisTextField,
+            () => settings.SongEditorSettings.PlaybackPostEndInMillis,
+            newValue => settings.SongEditorSettings.PlaybackPostEndInMillis = newValue);
     }
 
     private void SplitSyllablesInSelection()

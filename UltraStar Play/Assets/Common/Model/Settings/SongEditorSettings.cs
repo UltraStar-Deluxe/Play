@@ -9,9 +9,11 @@ public class SongEditorSettings
     public ESongEditorSamplesSource PlaybackSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
     public ESongEditorAudioWaveformSamplesSource AudioWaveformSamplesSource { get; set; } = ESongEditorAudioWaveformSamplesSource.SameAsPlayback;
     public bool GoToLastPlaybackPosition { get; set; } = true;
+    public int PlaybackPreBeginInMillis { get; set; }
+    public int PlaybackPostEndInMillis { get; set; }
 
     public ESongEditorDrawNoteLayer DrawNoteLayer { get; set; }
-    
+
     // Recording in SongEditorScene
     public MicProfile MicProfile { get; set; }
     public int MicDelayInMillis { get; set; } = 450;
@@ -42,7 +44,7 @@ public class SongEditorSettings
     public bool ShowNotePitchLabel { get; set; } = true;
     public ESongEditorTimeLabelFormat TimeLabelFormat { get; set; } = ESongEditorTimeLabelFormat.Beats;
     public ESongEditorPitchLabelFormat PitchLabelFormat { get; set; } = ESongEditorPitchLabelFormat.Notes;
-    
+
     public float GridSizeInPx { get; set; } = 1;
     public float SentenceLineSizeInPx { get; set; } = 2;
 
@@ -59,7 +61,7 @@ public class SongEditorSettings
 
     // Audio separation
     public string AudioSeparationCommand { get; set; } = "";
-    
+
     // Editing
     public int SpaceBetweenNotesInMillis { get; set; } = SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis;
 }
