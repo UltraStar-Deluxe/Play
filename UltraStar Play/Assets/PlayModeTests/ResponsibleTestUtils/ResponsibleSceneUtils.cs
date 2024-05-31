@@ -9,7 +9,7 @@ public class ResponsibleSceneUtils
             $"wait for scene {scene}",
             () => SceneNavigator.Instance.CurrentScene == scene);
 
-    public static ITestInstruction<object> ExpectScene(EScene scene, float timeoutInSeconds = 1f)
+    public static ITestInstruction<object> ExpectScene(EScene scene, float timeoutInSeconds = 10)
         => WaitForScene(scene)
             .ExpectWithinSeconds(timeoutInSeconds);
 

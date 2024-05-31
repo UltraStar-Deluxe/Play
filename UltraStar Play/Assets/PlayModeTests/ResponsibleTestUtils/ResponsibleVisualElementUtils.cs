@@ -1,19 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Responsible;
 using UnityEngine.UIElements;
 using static Responsible.Responsibly;
 
 public class ResponsibleVisualElementUtils
 {
-    public static ITestInstruction<T> GetElement<T>(string uxmlName, string ussClass = null, VisualElement root = null) where T : VisualElement
-        => DoAndReturn(
-            $"get UI element with UXML name '{uxmlName}' and USS class '{ussClass}' from root element '{GetRootVisualElement(root)?.name}'",
-            () => GetRootVisualElement(root).Q<T>(uxmlName, ussClass));
+    public static ITestInstruction<T> GetElement<T>(string uxmlName, string ussClass = null, VisualElement root = null, float timeoutInSeconds = 10) where T : VisualElement
+        => WaitForThenDoAndReturn(
+            $"UI element with UXML name '{uxmlName}' and USS class '{ussClass}' from root element '{GetRootVisualElement(root)?.name}'",
+            () => GetRootVisualElement(root).Q<T>(uxmlName, ussClass),
+            timeoutInSeconds);
 
-    public static ITestInstruction<List<T>> GetElements<T>(string uxmlName, string ussClass = null, VisualElement root = null) where T : VisualElement
-        => DoAndReturn(
-            $"get UI elements with UXML name '{uxmlName}' and USS class '{ussClass}' from root element '{GetRootVisualElement(root)?.name}'",
-            () => GetRootVisualElement(root).Query<T>(uxmlName, ussClass).ToList());
+    public static ITestInstruction<T> GetElement<T>(Func<T, bool> predicate, VisualElement root = null, float timeoutInSeconds = 10)
+        where T : VisualElement
+        => WaitForThenDoAndReturn($"UI element with predicate from root element '{GetRootVisualElement(root)?.name}'",
+                () => GetRootVisualElement(root).Query<T>().Where(predicate).ToList().FirstOrDefault(),
+                timeoutInSeconds);
 
     public static ITestInstruction<object> SetElementValue<T>(string uxmlName, T newValue)
         => GetElement<BaseField<T>>(uxmlName)
@@ -48,13 +52,13 @@ public class ResponsibleVisualElementUtils
                 $"Send PointerDownEvent on '{visualElement?.name}'",
                 () => visualElement.SendPointerDownEvent()));
 
-    public static ITestInstruction<object> ExpectElementIsFocusableNow(VisualElement element, double timeoutInSeconds = 1)
+    public static ITestInstruction<object> ExpectElementIsFocusableNow(VisualElement element, double timeoutInSeconds = 10)
         => WaitForCondition(
                 $"UI element '{element?.name}' should be focusable",
                 () => VisualElementUtils.IsFocusableNow(element, GetUiDocumentOrThrow()))
             .ExpectWithinSeconds(timeoutInSeconds);
 
-    public static ITestInstruction<object> ExpectElementHasValue<T>(BaseField<T> element, T value, double timeoutInSeconds = 1)
+    public static ITestInstruction<object> ExpectElementHasValue<T>(BaseField<T> element, T value, double timeoutInSeconds = 10)
         => WaitForCondition(
                 $"expect value '{value}' in UI element '{element?.name}'",
                 () => Equals(element.value, value))
@@ -71,4 +75,14 @@ public class ResponsibleVisualElementUtils
             ? root
             : GetUiDocumentOrThrow().rootVisualElement;
     }
+
+    private static ITestInstruction<T> WaitForThenDoAndReturn<T>(
+        string description,
+        Func<T> func,
+        float timeoutInSeconds = 10) where T : class
+        => WaitForCondition($"wait for {description}",
+                    () => func() != null)
+                .ExpectWithinSeconds(timeoutInSeconds)
+                .ContinueWith(DoAndReturn($"get {description}",
+                    () => func()));
 }

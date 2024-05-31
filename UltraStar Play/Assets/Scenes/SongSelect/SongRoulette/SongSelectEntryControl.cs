@@ -240,13 +240,13 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                 if (playlistManager.HasSongEntry(playlist, songEntry.SongMeta))
                 {
                     contextMenuPopup.AddButton(Translation.Get(R.Messages.songSelectScene_action_removeFromPlaylist,
-                            "playlist", playlistName), "favorite_border",
+                            "playlist", playlistName), "favorite_border", R.Messages.songSelectScene_action_removeFromPlaylist,
                         () => playlistManager.RemoveSongFromPlaylist(ultraStarPlaylist, songEntry.SongMeta));
                 }
                 else
                 {
                     contextMenuPopup.AddButton(Translation.Get(R.Messages.songSelectScene_action_addToPlaylist,
-                            "playlist", playlistName), "favorite",
+                            "playlist", playlistName), "favorite", R.Messages.songSelectScene_action_addToPlaylist,
                         () => playlistManager.AddSongToPlaylist(ultraStarPlaylist, songEntry.SongMeta));
                 }
             });

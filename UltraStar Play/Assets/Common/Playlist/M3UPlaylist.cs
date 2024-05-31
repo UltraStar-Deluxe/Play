@@ -7,15 +7,16 @@ public class M3UPlaylist : IPlaylist
 
     public string FileName => Path.GetFileNameWithoutExtension(FilePath);
     public string Name => FileName;
-    public virtual bool IsEmpty => audioFilePaths.Count == 0;
-    
+    public virtual bool IsEmpty => Count <= 0;
+    public virtual int Count => audioFilePaths.Count;
+
     private readonly HashSet<string> audioFilePaths = new();
 
     public M3UPlaylist(string filePath)
     {
         FilePath = filePath;
     }
-    
+
     public bool HasSongEntry(SongMeta songMeta)
     {
         if (WebRequestUtils.IsHttpOrHttpsUri(songMeta.Audio)
@@ -25,7 +26,7 @@ public class M3UPlaylist : IPlaylist
         }
 
         string normalizedSongMetaAbsoluteAudioFilePath = new FileInfo(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio)).FullName;
-        
+
         return audioFilePaths.AnyMatch(audioFilePath =>
         {
             string audioFileAbsolutePath = GetAbsoluteAudioFilePath(audioFilePath);

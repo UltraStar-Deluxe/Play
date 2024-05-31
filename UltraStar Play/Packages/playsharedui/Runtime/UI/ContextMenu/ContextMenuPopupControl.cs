@@ -145,8 +145,13 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     public VisualElement AddButton(Translation text, string icon, Action action)
     {
+        return AddButton(text, icon, "", action);
+    }
+
+    public VisualElement AddButton(Translation text, string icon, string name, Action action)
+    {
         VisualElement contextMenuItemVisualElement = contextMenuPopupManager.contextMenuItemUi.CloneTree().Children().First();
-        ContextMenuItemControl contextMenuItemControl = new(text, icon, action);
+        ContextMenuItemControl contextMenuItemControl = new(text, icon, name, action);
         contextMenuItemControl.ItemTriggeredEventStream.Subscribe(evt => CloseContextMenu());
         injector.WithRootVisualElement(contextMenuItemVisualElement).Inject(contextMenuItemControl);
         visualElement.Add(contextMenuItemVisualElement);
