@@ -4,6 +4,7 @@ using System.Linq;
 using Responsible;
 using UnityEngine.UIElements;
 using static Responsible.Responsibly;
+using static ResponsibleUtils;
 
 public class ResponsibleVisualElementUtils
 {
@@ -75,14 +76,4 @@ public class ResponsibleVisualElementUtils
             ? root
             : GetUiDocumentOrThrow().rootVisualElement;
     }
-
-    private static ITestInstruction<T> WaitForThenDoAndReturn<T>(
-        string description,
-        Func<T> func,
-        float timeoutInSeconds = 10) where T : class
-        => WaitForCondition($"wait for {description}",
-                    () => func() != null)
-                .ExpectWithinSeconds(timeoutInSeconds)
-                .ContinueWith(DoAndReturn($"get {description}",
-                    () => func()));
 }
