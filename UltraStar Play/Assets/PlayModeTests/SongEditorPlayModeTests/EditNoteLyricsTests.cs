@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Responsible;
@@ -39,6 +38,26 @@ public class LyricsEditingTest : AbstractPlayModeTest
         .ContinueWith(_ => Do("submit lyrics editing", () => InputFixture.PressAndRelease(Keyboard.enterKey)))
         .ContinueWith(_ => WaitForCondition("expect lyrics have been changed",
             () => SongMetaUtils.GetLyrics(SongMeta, EVoiceId.P1).Contains(EditedNoteText))
+            .ExpectWithinSeconds(10))
+        .ToYieldInstruction(Executor);
+
+    [UnityTest]
+    public IEnumerator ShouldEditLyricsViaLyricsArea() => ExpectScene(EScene.SongEditorScene)
+        .ContinueWith(_ => WaitForThenDoAndReturn("note with original text", () => GetNoteElementByLyrics(OriginalNoteText)))
+        .ContinueWith(_ => ClickButton(R.UxmlNames.toggleLyricsAreaEditModeButton))
+        .ContinueWith(_ => WaitForSeconds(1))
+        .ContinueWith(_ => GetElement<TextField>(R.UxmlNames.lyricsAreaTextField))
+        .ContinueWith(textField => WaitForCondition("TextField has original text",
+                () => textField.value.Contains(OriginalNoteText)).ExpectWithinSeconds(10))
+        .ContinueWith(_ => GetElement<TextField>(R.UxmlNames.lyricsAreaTextField))
+        .ContinueWith(textField => SetElementValue(textField, textField.value.Replace(OriginalNoteText, EditedNoteText)))
+        .ContinueWith(_ => GetElement<TextField>(R.UxmlNames.lyricsAreaTextField))
+        .ContinueWith(textField => WaitForCondition("TextField has edited text",
+            () => textField.value.Contains(EditedNoteText)).ExpectWithinSeconds(10))
+        .ContinueWith(_ => WaitForSeconds(1))
+        .ContinueWith(_ => ClickButton(R.UxmlNames.toggleLyricsAreaEditModeButton))
+        .ContinueWith(_ => WaitForCondition("expect lyrics have been changed",
+                () => SongMetaUtils.GetLyrics(SongMeta, EVoiceId.P1).Contains(EditedNoteText))
             .ExpectWithinSeconds(10))
         .ToYieldInstruction(Executor);
 
