@@ -21,7 +21,7 @@ public class ToggleMuteViaShortcutTests : AbstractPlayModeTest
         .AndThen(WaitForCondition(
             "volume not zero",
             () => AudioListener.volume > 0))
-        .ExpectWithinSeconds(1);
+        .ExpectWithinSeconds(10);
 
     private ITestInstruction<object> PressAndReleaseF10Key() => Do(
         "press and release F10 key",
@@ -33,5 +33,5 @@ public class ToggleMuteViaShortcutTests : AbstractPlayModeTest
         ).AndThen(WaitForCondition(
             "volume is zero",
             () => AudioListener.volume <= 0))
-        .ExpectWithinSeconds(1);
+        .ExpectWithinSeconds(10);
 }

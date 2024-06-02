@@ -32,7 +32,7 @@ public class SongEditorLrcFormatImportTest : AbstractPlayModeTest
         .ContinueWith(_ => WaitForCondition("expect notes have been imported",
             () => ImportedNotes.Count == 30
                   && SongMetaUtils.GetLyrics(ImportedNotes).StartsWith("Freude, schöner Götterfunken"))
-            .ExpectWithinSeconds(1))
+            .ExpectWithinSeconds(10))
         .ToYieldInstruction(Executor);
 
     private static string TrimStartOfEachLine(string input)

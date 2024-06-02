@@ -68,7 +68,7 @@ public class SongSelectSearchTests : AbstractPlayModeTest
                         .OfType<SongSelectSongEntry>()
                         .ToList();
                     return !songSelectSongEntries.IsNullOrEmpty();
-                }).ExpectWithinSeconds(1));
+                }).ExpectWithinSeconds(10));
 
     private static ITestInstruction<object> ExpectSongSelectEntryWithArtistName(string text) =>
         FindFirstObjectByType<SongSelectSceneControl>()

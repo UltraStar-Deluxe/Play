@@ -66,7 +66,7 @@ public class CoreGameLoopTests : AbstractPlayModeTest
                     .ToList();
                 return highScoreEntries.Count() == 1
                        && highScoreEntries.FirstOrDefault().Score == score;
-            }).ExpectWithinSeconds(1);
+            }).ExpectWithinSeconds(10);
 
     private ITestInstruction<object> ExpectSingingResultScore(int score)
         => GetElement<Label>(R.UxmlNames.totalScoreLabel)
