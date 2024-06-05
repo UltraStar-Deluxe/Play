@@ -6,7 +6,7 @@ using UnityEngine.TestTools;
 
 // Tests some custom converters that are registered in RuntimeInitializeLoadType.SubsystemRegistration,
 // and thus not registered during Play Mode test.
-public class JsonConverterPlayModeTests : AbstractPlayModeTest
+public class JsonConverterPlayModeTest : AbstractPlayModeTest
 {
     // TODO: Refactor common code of these tests
     [UnityTest]

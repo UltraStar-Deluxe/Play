@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.TestTools;
 
-public class CoroutineUtilsTests : AbstractPlayModeTest
+public class CoroutineUtilsTest : AbstractPlayModeTest
 {
     [UnityTest]
     public IEnumerator SequenceIsExecutedStepByStep()

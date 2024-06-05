@@ -8,7 +8,7 @@ using static Responsible.Responsibly;
 using static ResponsibleSceneUtils;
 using static ResponsibleVisualElementUtils;
 
-public class SongSelectPlaylistTests : AbstractPlayModeTest
+public class SongSelectPlaylistTest : AbstractPlayModeTest
 {
     private const string TestPlaylistName = "TestPlaylist";
 

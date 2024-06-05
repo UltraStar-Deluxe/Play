@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
-public class WebViewTests : AbstractMediaFileFormatTests
+public class WebViewTest : AbstractMediaFileFormatTest
 {
     private const long WebViewMaxWaitTimeInMillis = 30000;
     private const double WebViewTargetDurationInMillis = 242561;

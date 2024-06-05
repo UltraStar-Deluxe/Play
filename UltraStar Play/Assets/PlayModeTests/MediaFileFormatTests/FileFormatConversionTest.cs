@@ -5,7 +5,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-public class FileFormatConversionTests : AbstractMediaFileFormatTests
+public class FileFormatConversionTest : AbstractMediaFileFormatTest
 {
     private static readonly string tempFolder = $"{Application.temporaryCachePath}/MediaFileConversionTest";
 

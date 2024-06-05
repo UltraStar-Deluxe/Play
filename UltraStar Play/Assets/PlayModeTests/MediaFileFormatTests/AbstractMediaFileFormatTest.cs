@@ -8,7 +8,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
+public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
 {
     protected static readonly string fileFormatTestFolderPath = $"{Application.dataPath}/PlayModeTests/MediaFileFormatTests";
     protected static readonly string mediaFileFormatTestFolderPath = $"{fileFormatTestFolderPath}/MediaFileFormatTestSongs";

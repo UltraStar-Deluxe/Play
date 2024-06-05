@@ -6,7 +6,7 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-public class SongEditorPlayModeTests : AbstractPlayModeTest
+public class SongEditorPlayModeTest : AbstractPlayModeTest
 {
     protected static readonly string testFolderPath = Application.dataPath + "/PlayModeTests/SongEditorPlayModeTests";
 

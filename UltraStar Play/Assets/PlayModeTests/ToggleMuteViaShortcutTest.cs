@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.TestTools;
 using static Responsible.Responsibly;
 
-public class ToggleMuteViaShortcutTests : AbstractPlayModeTest
+public class ToggleMuteViaShortcutTest : AbstractPlayModeTest
 {
     protected override string TestSceneName => EScene.MainScene.ToString();
 

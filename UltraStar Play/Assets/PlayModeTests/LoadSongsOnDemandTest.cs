@@ -9,7 +9,7 @@ using UnityEngine.TestTools;
 using static Responsible.Responsibly;
 using static ResponsibleLogAssertUtils;
 
-public class LoadSongsOnDemandTests : AbstractPlayModeTest
+public class LoadSongsOnDemandTest : AbstractPlayModeTest
 {
     protected override string TestSceneName => EScene.SongSelectScene.ToString();
 
@@ -23,7 +23,7 @@ public class LoadSongsOnDemandTests : AbstractPlayModeTest
         settings.SongDataFetchType = EFetchType.OnDemand;
         settings.ShowSongIndexInSongSelect = true;
 
-        string testSongFolder = ApplicationUtils.GetTemporaryCachePath($"{nameof(LoadSongsOnDemandTests)}");
+        string testSongFolder = ApplicationUtils.GetTemporaryCachePath($"{nameof(LoadSongsOnDemandTest)}");
         CopyTestSongs(testSongFolder);
         settings.SongDirs = new List<string>{ testSongFolder };
     }

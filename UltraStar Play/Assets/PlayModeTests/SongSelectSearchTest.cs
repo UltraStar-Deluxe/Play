@@ -9,7 +9,7 @@ using static Responsible.Responsibly;
 using static ResponsibleVisualElementUtils;
 using static ResponsibleFindComponentUtils;
 
-public class SongSelectSearchTests : AbstractPlayModeTest
+public class SongSelectSearchTest : AbstractPlayModeTest
 {
     protected override string TestSceneName => EScene.SongSelectScene.ToString();
 

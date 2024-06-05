@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
-public class SongVideoPlayerFormatTests : AbstractMediaFileFormatTests
+public class SongVideoPlayerFormatTest : AbstractMediaFileFormatTest
 {
     private static readonly List<TestCaseData> supportedByUnity = new List<TestCaseData>()
     {

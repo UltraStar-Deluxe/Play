@@ -9,7 +9,7 @@ using static ResponsibleSceneUtils;
 using static ResponsibleLogAssertUtils;
 using static ResponsibleVisualElementUtils;
 
-public class CoreGameLoopTests : AbstractPlayModeTest
+public class CoreGameLoopTest : AbstractPlayModeTest
 {
     private const float TestSongAudioLengthInSeconds = 4;
 
