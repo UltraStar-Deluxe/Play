@@ -11,6 +11,16 @@ public class UltraStarSongFormatTest
     private static readonly string folderPath = Application.dataPath + "/Editor/Tests/TestSongs";
 
     [Test]
+    public void ShouldHandleNoSpaceAfterNoteType()
+    {
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/TestSong-NoSpaceAfterNoteType.txt", out List<SongIssue> songIssues, null, true);
+        Assert.NotNull(songMeta);
+        Assert.IsTrue(SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1).ToLowerInvariant().Contains("hello"));
+        Assert.AreEqual(ENoteType.Normal, SongMetaUtils.GetAllNotes(songMeta)[0].Type);
+        Assert.AreEqual(ENoteType.Golden, SongMetaUtils.GetAllNotes(songMeta)[1].Type);
+    }
+
+    [Test]
     public void ShouldHandleMultipleSpacesAsNoteSeparator()
     {
         SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/TestSong-MultipleSpacesAsNoteSeparator.txt", out List<SongIssue> songIssues, null, true);
