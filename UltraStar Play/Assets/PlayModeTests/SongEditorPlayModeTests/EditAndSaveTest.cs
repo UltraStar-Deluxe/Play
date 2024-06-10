@@ -6,9 +6,9 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-public class SongEditorPlayModeTest : AbstractPlayModeTest
+public class EditAndSaveTest : AbstractPlayModeTest
 {
-    protected static readonly string testFolderPath = Application.dataPath + "/PlayModeTests/SongEditorPlayModeTests";
+    protected static readonly string testFolderPath = Application.dataPath + "/Editor/Tests/TestSongs";
 
     [UnityTest]
     public IEnumerator CanEditSongAndSaveChanges()
@@ -16,9 +16,9 @@ public class SongEditorPlayModeTest : AbstractPlayModeTest
         LogAssert.ignoreFailingMessages = true;
 
         // Load SongMeta from temporary file
-        string testSongFolderName = "EditSongMeta-TestSong";
+        string testSongFolderName = "SongEditorTestSongs";
         string testSongFolderPath = $"{testFolderPath}/{testSongFolderName}";
-        string testSongMetaFileName = "EditSongMeta-TestSong.txt";
+        string testSongMetaFileName = "EditSongMeta.txt";
         string originalSongMetaPath = $"{testSongFolderPath}/{testSongMetaFileName}";
         SongMeta originalSongMeta = new LazyLoadedFromFileSongMeta(originalSongMetaPath);
 

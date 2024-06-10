@@ -18,8 +18,6 @@ public class SongEditorLrcFormatImportTest : AbstractPlayModeTest
         [00:19.58]Deine Zauber binden wieder, was die Mode streng geteilt,
         [00:29.19]alle Menschen werden Brüder, wo dein sanfter Flügel weilt.");
 
-    protected override List<string> GetRelativeTestSongFilePaths()
-        => new List<string> { "SingingTestSongs/ThreeQuartersA4OneQuarterC5-TestSong.txt" };
 
     private SongEditorLayerManager SongEditorLayerManager => GameObject.FindObjectOfType<SongEditorSceneControl>().songEditorLayerManager;
     private List<Note> ImportedNotes => SongEditorLayerManager.GetLayerNotes(SongEditorLayerManager.GetEnumLayer(ESongEditorLayer.Import));

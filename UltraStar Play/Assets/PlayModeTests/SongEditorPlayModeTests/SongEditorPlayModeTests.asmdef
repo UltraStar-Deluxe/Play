@@ -1,5 +1,5 @@
 {
-    "name": "PlayModeTests",
+    "name": "SongEditorPlayModeTests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
@@ -17,7 +17,8 @@
         "Scenes",
         "SongEditorScene",
         "Unity.InputSystem.IntegrationTests",
-        "EditorTests"
+        "EditorTests",
+        "PlayModeTests"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

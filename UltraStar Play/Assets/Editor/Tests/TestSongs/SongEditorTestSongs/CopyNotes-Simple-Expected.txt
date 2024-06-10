@@ -1,0 +1,14 @@
+#TITLE:CopyNotesTest
+#ARTIST:SomeArtist
+#MP3:ogg-TestAudio.ogg
+#BPM:200
+P1
+: 4 3 9 Hel
+: 8 3 9 lo
+: 12 3 9  world
+- 15
+: 16 3 9 Hel
+: 20 3 9 lo
+: 24 3 9  world
+- 27
+E

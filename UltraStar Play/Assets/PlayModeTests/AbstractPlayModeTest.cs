@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using PrimeInputActions;
+using Responsible;
 using Responsible.Unity;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using static Responsible.Responsibly;
 
 public abstract class AbstractPlayModeTest : AbstractResponsibleTest
 {

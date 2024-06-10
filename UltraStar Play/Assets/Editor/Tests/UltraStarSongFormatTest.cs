@@ -173,6 +173,7 @@ public class UltraStarSongFormatTest
         SongMeta copiedSongMeta = new UltraStarSongMeta();
         copiedSongMeta.CopyValues(originalSongMeta);
 
+        AssertSongMetaFields(copiedSongMeta);
         SongMetaAssertUtils.AssertSongMetasAreEqual(originalSongMeta, copiedSongMeta);
     }
 
@@ -221,11 +222,26 @@ public class UltraStarSongFormatTest
 
         SongMeta savedSongMeta = loadSongMeta(savedFilePath);
 
+        AssertSongMetaFields(savedSongMeta);
         SongMetaAssertUtils.AssertSongMetasAreEqual(originalSongMeta, savedSongMeta);
     }
 
     private static string ReplaceHeaderField(string originalFileContent, string headerName, string newValue)
     {
         return Regex.Replace(originalFileContent, $"#{headerName}:.+", $"#{headerName}:{newValue}");
+    }
+
+    private static void AssertSongMetaFields(SongMeta actual)
+    {
+        Assert.AreEqual("First Vocals", actual.GetVoiceDisplayName(EVoiceId.P1));
+        Assert.AreEqual("Second Vocals", actual.GetVoiceDisplayName(EVoiceId.P2));
+
+        Assert.AreEqual("42,5", actual.GetAdditionalHeaderEntry("NUMBERWITHCOMMA"));
+        Assert.AreEqual("43.2", actual.GetAdditionalHeaderEntry("NUMBERWITHDOT"));
+        Assert.AreEqual("SomeOtherValue", actual.GetAdditionalHeaderEntry("UNSUPPORTEDFIELD"));
+
+        Assert.AreEqual(2, actual.VoiceCount);
+        Assert.IsNotEmpty(SongMetaUtils.GetLyrics(actual, EVoiceId.P1));
+        Assert.IsNotEmpty(SongMetaUtils.GetLyrics(actual, EVoiceId.P2));
     }
 }
