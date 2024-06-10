@@ -135,7 +135,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Delete notes
         InputManager.GetInputAction(R.InputActions.songEditor_delete).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => deleteNotesAction.ExecuteAndNotify(selectionControl.GetSelectedNotes()));
+            .Subscribe(_ => DeleteSelectedNotes());
 
         // Undo
         InputManager.GetInputAction(R.InputActions.songEditor_undo).PerformedAsObservable()
@@ -239,6 +239,11 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_zoomOutVertical).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(context => noteAreaControl.ZoomVertical(-1));
+    }
+
+    public void DeleteSelectedNotes()
+    {
+        deleteNotesAction.ExecuteAndNotify(selectionControl.GetSelectedNotes());
     }
 
     private void AssignSelectedNotesToOwnSentence()

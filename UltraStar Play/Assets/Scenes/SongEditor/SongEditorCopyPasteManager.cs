@@ -107,6 +107,8 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
                                      && copyPasteData.copiedNoteToOriginalVoiceMap.ContainsKey(copiedNote)
                                      && copyPasteData.copiedNoteToOriginalVoiceMap[copiedNote] == voice)
                 .ToList();
+
+            Note lastCopiedNote = copiedNotesFromVoice.LastOrDefault();
             List<Note> pastedNotesFromVoice = copiedNotesFromVoice.Select(copiedNote =>
             {
                 Note pastedNote = copiedNote.Clone();
@@ -115,6 +117,16 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
                 pastedNote.SetStartAndEndBeat(
                     pastedNote.StartBeat + distanceInBeats,
                     pastedNote.EndBeat + distanceInBeats);
+
+                // Prevent words from merging by adding trailing space at end of phrase
+                if (!pastedNote.Text.EndsWith(" ")
+                    && copyPasteData.copiedNoteToWasLastNoteInSentenceMap.TryGetValue(copiedNote, out bool wasLastNoteInSentence)
+                    && wasLastNoteInSentence
+                    && copiedNote != lastCopiedNote)
+                {
+                    pastedNote.SetText(pastedNote.Text + " ");
+                }
+
                 return pastedNote;
             }).ToList();
 
@@ -136,7 +148,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             }
         });
 
-        // Select copied notes.
+        // Select notes.
         selectionControl.SetSelection(pastedNotes);
 
         songMetaChangeEventStream.OnNext(new NotesPastedEvent());
@@ -176,6 +188,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
                 && note.Sentence.Voice != null)
             {
                 copyPasteData.copiedNoteToOriginalSentenceMap[copiedNote] = note.Sentence;
+                copyPasteData.copiedNoteToWasLastNoteInSentenceMap[copiedNote] = note.Sentence.Notes.LastOrDefault() == note;
                 copyPasteData.copiedNoteToOriginalVoiceMap[copiedNote] = note.Sentence.Voice;
             }
             else
@@ -197,6 +210,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         // Flag to check whether deserialized JSON is actually copy paste data.
         public List<Note> copiedNotes = new();
         public Dictionary<Note, ESongEditorLayer> copiedNoteToLayerMap = new();
+        public Dictionary<Note, bool> copiedNoteToWasLastNoteInSentenceMap = new();
         public Dictionary<Note, Sentence> copiedNoteToOriginalSentenceMap = new();
         public Dictionary<Note, Voice> copiedNoteToOriginalVoiceMap = new();
     }

@@ -1,41 +1,60 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using Responsible;
 using UnityEngine;
 using UnityEngine.TestTools;
 using static Responsible.Responsibly;
 using static ResponsibleSceneUtils;
+using static ResponsibleLogAssertUtils;
 
 public class CopyAndPasteTest : AbstractSongEditorActionTest
 {
+    private static readonly List<TestCaseData> testCases = new List<TestCaseData>()
+    {
+        new TestCaseData("SongEditorTestSongs/Copy-Note.txt").Returns(null),
+        new TestCaseData("SongEditorTestSongs/Copy-Sentence.txt").Returns(null),
+        new TestCaseData("SongEditorTestSongs/Copy-Sentences.txt").Returns(null),
+        new TestCaseData("SongEditorTestSongs/Copy-Voices.txt").Returns(null),
+    };
+
     protected SongEditorSelectionControl SongEditorSelectionControl => Object.FindObjectOfType<SongEditorSelectionControl>();
     protected SongEditorCopyPasteManager SongEditorCopyPasteManager => Object.FindObjectOfType<SongEditorCopyPasteManager>();
+    protected SongEditorSceneInputControl SongEditorSceneInputControl => Object.FindObjectOfType<SongEditorSceneInputControl>();
 
     [UnityTest]
-    public IEnumerator ShouldCopyAndPasteNotes()
-    {
-        LogAssert.ignoreFailingMessages = true;
+    [TestCaseSource(nameof(testCases))]
+    public IEnumerator CopyAndPasteShouldPreserveNotes(string songFilePath) => IgnoreFailingMessages()
+        .ContinueWith(OpenSongEditorWithNewSong(songFilePath))
+        .ContinueWith(ExpectScene(EScene.SongEditorScene))
+        // Select all and copy
+        .ContinueWith(SelectAll())
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(CopyNotes())
+        .ContinueWith(WaitForSeconds(1))
+        // Select all again, go to first note, then delete
+        .ContinueWith(SelectAll())
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(MoveToFirstSelectedNote())
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(DeleteNotes())
+        .ContinueWith(WaitForSeconds(1))
+        // Paste
+        .ContinueWith(PasteNotes())
+        .ContinueWith(WaitForSeconds(1))
 
-        return OpenSongEditorWithNewSong("SongEditorTestSongs/CopyNotes-Simple.txt")
-            .ContinueWith(_ => ExpectScene(EScene.SongEditorScene))
-            .ContinueWith(_ => CopyAndPasteNotes())
-            .ContinueWith(_ => WaitForSeconds(10))
-            .ContinueWith(_ =>
-                ExpectCurrentSongEqualsExpectedResult("SongEditorTestSongs/CopyNotes-Simple-Expected.txt"))
-            .ToYieldInstruction(this.Executor);
-    }
+        .ContinueWith(ExpectCurrentSongEqualsExpectedResult(songFilePath))
+        .ToYieldInstruction(this.Executor);
 
-    private ITestInstruction<object> CopyAndPasteNotes()
-        => SelectAll()
-            .ContinueWith(_ => WaitForSeconds(1))
-            .ContinueWith(CopyNotes())
-            .ContinueWith(_ => WaitForSeconds(1))
-            .ContinueWith(MoveBehindLastNote())
-            .ContinueWith(_ => WaitForSeconds(1))
-            .ContinueWith(PasteNotes());
+    private ITestInstruction<object> MoveToFirstSelectedNote()
+        => Do("move to first selected note", () => SongAudioPlayer.PositionInMillis = GetFirstSelectedNotePositionInMillis());
 
     private ITestInstruction<object> MoveBehindLastNote()
         => Do("move behind last note", () => SongAudioPlayer.PositionInMillis = GetPositionBehindLastNoteInMillis());
+
+    private ITestInstruction<object> DeleteNotes()
+        => Do("delete selected notes", () => SongEditorSceneInputControl.DeleteSelectedNotes());
 
     private ITestInstruction<object> CopyNotes()
         // TODO: Input simulation does not work reliably for some reason
@@ -57,6 +76,12 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
     private double GetPositionBehindLastNoteInMillis()
     {
         int positionInBeats = SongMetaUtils.GetAllNotes(SongMeta).Select(note => note.EndBeat).Max() + 2;
+        return SongMetaBpmUtils.BeatsToMillis(SongMeta, positionInBeats);
+    }
+
+    private double GetFirstSelectedNotePositionInMillis()
+    {
+        int positionInBeats = SongEditorSelectionControl.GetSelectedNotes().Select(note => note.StartBeat).Min();
         return SongMetaBpmUtils.BeatsToMillis(SongMeta, positionInBeats);
     }
 }
