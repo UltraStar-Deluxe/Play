@@ -59,12 +59,12 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
     private ITestInstruction<object> CopyNotes()
         // TODO: Input simulation does not work reliably for some reason
         // => TriggerInputAction(R.InputActions.songEditor_copy);
-        => Do("copy selected notes", () => SongEditorCopyPasteManager.CopySelectedNotes());
+        => Do("copy selected notes", () => SongEditorCopyPasteManager.CopySelection());
 
     private ITestInstruction<object> PasteNotes()
         // TODO: Input simulation does not work reliably for some reason
         // => TriggerInputAction(R.InputActions.songEditor_paste);
-        => Do("paste copied notes", () => SongEditorCopyPasteManager.PasteCopiedNotes());
+        => Do("paste copied notes", () => SongEditorCopyPasteManager.Paste());
 
     private ITestInstruction<object> SelectAll()
         // TODO: Input simulation does not work reliably for some reason

@@ -351,7 +351,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         return false;
     }
 
-    public AbstractSongEditorLayer GetLayerOfNote(Note note)
+    public AbstractSongEditorLayer GetLayer(Note note)
     {
         if (note.Sentence != null
             && note.Sentence.Voice != null
