@@ -23,6 +23,13 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
     protected SongAudioPlayer SongAudioPlayer => GameObject.FindObjectOfType<SongAudioPlayer>();
     protected SongVideoPlayer SongVideoPlayer => GameObject.FindObjectOfType<SongVideoPlayer>();
 
+    protected override void ConfigureTestSettings(TestSettings settings)
+    {
+        base.ConfigureTestSettings(settings);
+        settings.LogVlcOutput = true;
+        settings.LogFfmpegOutput = true;
+    }
+
     protected IEnumerator SongAudioPlayerShouldLoadFile(
         string txtFilePath,
         double targetDurationInMillis = DefaultTargetDurationInMillis,

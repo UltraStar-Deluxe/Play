@@ -93,7 +93,7 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
             {
                 if (settings.LogVlcOutput)
                 {
-                    Debug.Log(e.FormattedLog);
+                    Debug.Log($"[libVLC] {e.FormattedLog}");
                 }
             }
             catch (Exception ex)
