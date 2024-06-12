@@ -10,16 +10,16 @@ public class WebViewTest : AbstractMediaFileFormatTest
 
     private static string[] shouldUseLocalAudioFiles = new string[]
     {
-        "WebViewTests/AudioUrlAndExistingAudio-TestSong.txt",
+        "WebViewTests/AudioUrlAndExistingAudio.txt",
     };
 
     private static string[] shouldUseWebViewFiles = new string[]
     {
-        "WebViewTests/AudioUrlAndMissingAudio-TestSong.txt",
-        "WebViewTests/AudioUrlOnly-TestSong.txt",
-        "WebViewTests/AudioOnly-TestSong.txt",
-        "WebViewTests/VideoUrlOnly-TestSong.txt",
-        "WebViewTests/WebsiteOnly-TestSong.txt",
+        "WebViewTests/AudioUrlAndMissingAudio.txt",
+        "WebViewTests/AudioUrlOnly.txt",
+        "WebViewTests/AudioOnly.txt",
+        "WebViewTests/VideoUrlOnly.txt",
+        "WebViewTests/WebsiteOnly.txt",
     };
 
     protected override void ConfigureTestSettings(TestSettings settings)

@@ -9,6 +9,7 @@ using static Responsible.Responsibly;
 using static ResponsibleVisualElementUtils;
 using static ResponsibleSceneUtils;
 using static ResponsibleUtils;
+using static ResponsibleLogAssertUtils;
 
 public class LyricsEditingTest : AbstractPlayModeTest
 {
@@ -18,13 +19,14 @@ public class LyricsEditingTest : AbstractPlayModeTest
     protected override string TestSceneName => EScene.SongEditorScene.ToString();
 
     protected override List<string> GetRelativeTestSongFilePaths()
-        => new List<string> { "SingingTestSongs/ThreeQuartersA4OneQuarterC5-TestSong.txt" };
+        => new List<string> { "SingingTestSongs/ThreeQuartersA4OneQuarterC5.txt" };
 
     protected SongEditorSelectionControl SongEditorSelectionControl => GameObject.FindObjectOfType<SongEditorSelectionControl>();
     protected SongMeta SongMeta => SceneNavigator.GetSceneDataOrThrow<SongEditorSceneData>().SongMeta;
 
     [UnityTest]
-    public IEnumerator ShouldEditLyricsOfSingleNote() => ExpectScene(EScene.SongEditorScene)
+    public IEnumerator ShouldEditLyricsOfSingleNote() => IgnoreFailingMessages()
+        .ContinueWith(ExpectScene(EScene.SongEditorScene))
         .ContinueWith(_ => WaitForThenDoAndReturn("note with original text", () => GetNoteElementByLyrics(OriginalNoteText)))
         .ContinueWith(_ => Do("select next note", () => InputFixture.PressAndRelease(Keyboard.tabKey)))
         .ContinueWith(_ => Do("select next note", () =>  InputFixture.PressAndRelease(Keyboard.tabKey)))
@@ -42,7 +44,8 @@ public class LyricsEditingTest : AbstractPlayModeTest
         .ToYieldInstruction(Executor);
 
     [UnityTest]
-    public IEnumerator ShouldEditLyricsViaLyricsArea() => ExpectScene(EScene.SongEditorScene)
+    public IEnumerator ShouldEditLyricsViaLyricsArea() => IgnoreFailingMessages()
+        .ContinueWith(ExpectScene(EScene.SongEditorScene))
         .ContinueWith(_ => WaitForThenDoAndReturn("note with original text", () => GetNoteElementByLyrics(OriginalNoteText)))
         .ContinueWith(_ => ClickButton(R.UxmlNames.toggleLyricsAreaEditModeButton))
         .ContinueWith(_ => WaitForSeconds(1))

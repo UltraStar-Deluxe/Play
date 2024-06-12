@@ -153,7 +153,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
 
     protected virtual List<string> GetRelativeTestSongFilePaths()
     {
-        return new List<string>() { "SingingTestSongs/ThreeQuartersA4OneQuarterC5-TestSong.txt" };
+        return new List<string>() { "SingingTestSongs/ThreeQuartersA4OneQuarterC5.txt" };
     }
 
     protected virtual void ConfigureTestStatistics(TestStatistics statistics)

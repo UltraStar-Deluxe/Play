@@ -21,33 +21,33 @@ public class SongSelectSearchTest : AbstractPlayModeTest
 
     [UnityTest]
     public IEnumerator CancelSongSearchShouldGoBackToLastSelection() => ExpectAnySongSelectEntry()
-        .ContinueWith(_ => SelectSongSelectEntryWithTitle("ArtistHelloWithAccent-TestSong"))
+        .ContinueWith(_ => SelectSongSelectEntryWithTitle("ArtistHelloWithAccent"))
         .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => SetSearchText("Default-TestSong"))
+        .ContinueWith(_ => SetSearchText("Default"))
         .ContinueWith(_ => WaitForSeconds(1))
         .ContinueWith(_ => CancelSearch())
         .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => ExpectSelectedSongSelectEntryWithTitle("ArtistHelloWithAccent-TestSong"))
+        .ContinueWith(_ => ExpectSelectedSongSelectEntryWithTitle("ArtistHelloWithAccent"))
         .ToYieldInstruction(this.Executor);
 
     [UnityTest]
     public IEnumerator SubmitSongSearchShouldContinueAtCurrentSelection() => ExpectAnySongSelectEntry()
-        .ContinueWith(_ => SelectSongSelectEntryWithTitle("ArtistHelloWithAccent-TestSong"))
+        .ContinueWith(_ => SelectSongSelectEntryWithTitle("ArtistHelloWithAccent"))
         .ContinueWith(_ => WaitForSeconds(1))
         .ContinueWith(_ => SetSearchText("ArtistHelloNoAccent"))
         .ContinueWith(_ => WaitForSeconds(1))
         .ContinueWith(_ => SubmitSearch())
         .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => ExpectSelectedSongSelectEntryWithTitle("ArtistHelloNoAccent-TestSong"))
+        .ContinueWith(_ => ExpectSelectedSongSelectEntryWithTitle("ArtistHelloNoAccent"))
         .ToYieldInstruction(this.Executor);
 
     protected override List<string> GetRelativeTestSongFilePaths()
     {
         return new List<string>
         {
-            "SongSearchTestSongs/Default-TestSong.txt",
-            "SongSearchTestSongs/ArtistHelloNoAccent-TestSong.txt",
-            "SongSearchTestSongs/ArtistHelloWithAccent-TestSong.txt",
+            "SongSearchTestSongs/Default.txt",
+            "SongSearchTestSongs/ArtistHelloNoAccent.txt",
+            "SongSearchTestSongs/ArtistHelloWithAccent.txt",
         };
     }
 

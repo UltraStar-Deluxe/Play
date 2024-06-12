@@ -1,6 +1,6 @@
 #TITLE:CopyNotesTest
 #ARTIST:SomeArtist
-#MP3:ogg-TestAudio.ogg
+#MP3:ogg.ogg
 #BPM:200
 P1
 : 4 3 9 Hel

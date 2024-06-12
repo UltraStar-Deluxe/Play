@@ -18,9 +18,9 @@ public class SongSelectPlaylistTest : AbstractPlayModeTest
     {
         return new List<string>
         {
-            "SongSearchTestSongs/Default-TestSong.txt",
-            "SongSearchTestSongs/ArtistHelloNoAccent-TestSong.txt",
-            "SongSearchTestSongs/ArtistHelloWithAccent-TestSong.txt",
+            "SongSearchTestSongs/Default.txt",
+            "SongSearchTestSongs/ArtistHelloNoAccent.txt",
+            "SongSearchTestSongs/ArtistHelloWithAccent.txt",
         };
     }
 

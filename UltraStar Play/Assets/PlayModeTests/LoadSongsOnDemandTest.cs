@@ -32,7 +32,7 @@ public class LoadSongsOnDemandTest : AbstractPlayModeTest
     {
         for (int i = 0; i < TotalSongCount; i++)
         {
-            string targetFilePath = $"{testSongFolder}/TestSong-{i}/SomeArtist - SomeTitle{i}.txt";
+            string targetFilePath = $"{testSongFolder}/{i}/SomeArtist - SomeTitle{i}.txt";
             SongMeta songMeta = new UltraStarSongMeta(
                 "SomeArtist",
                 $"SomeTitle{i}",

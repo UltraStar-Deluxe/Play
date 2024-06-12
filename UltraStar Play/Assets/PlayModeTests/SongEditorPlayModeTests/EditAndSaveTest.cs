@@ -27,9 +27,9 @@ public class EditAndSaveTest : AbstractPlayModeTest
         string copiedSongMetaPath = $"{tmpSongFolderPath}/{testSongMetaFileName}";
         SongMeta editedSongMeta = new LazyLoadedFromFileSongMeta(copiedSongMetaPath);
 
-        if (!FileUtils.Exists($"{tmpSongFolderPath}/ogg-TestAudio.ogg"))
+        if (!FileUtils.Exists($"{tmpSongFolderPath}/ogg.ogg"))
         {
-            throw new FileNotFoundException($"ogg-TestAudio.ogg not found in folder '{tmpSongFolderPath}'");
+            throw new FileNotFoundException($"ogg.ogg not found in folder '{tmpSongFolderPath}'");
         }
 
         // Open song editor

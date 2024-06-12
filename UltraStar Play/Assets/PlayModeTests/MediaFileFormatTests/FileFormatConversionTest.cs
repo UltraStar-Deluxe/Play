@@ -11,20 +11,20 @@ public class FileFormatConversionTest : AbstractMediaFileFormatTest
 
     private static readonly List<TestCaseData> fileNamesWithAudioSupportedByFfmpeg = new List<TestCaseData>()
     {
-        new TestCaseData("aac-TestSong.txt").Returns(null),
-        new TestCaseData("aiff-TestSong.txt").Returns(null),
-        new TestCaseData("flac-TestSong.txt").Returns(null),
+        new TestCaseData("aac.txt").Returns(null),
+        new TestCaseData("aiff.txt").Returns(null),
+        new TestCaseData("flac.txt").Returns(null),
     };
 
     private static readonly List<TestCaseData> fileNamesWithVideoSupportedByFfmpeg = new List<TestCaseData>()
     {
-        new TestCaseData("f4v-TestSong.txt").Returns(null),
-        new TestCaseData("flv-TestSong.txt").Returns(null),
-        new TestCaseData("mkv-TestSong.txt").Returns(null),
-        new TestCaseData("mov-TestSong.txt").Returns(null),
-        new TestCaseData("mpeg2-TestSong.txt").Returns(null),
-        new TestCaseData("webm-vp9-TestSong.txt").Returns(null),
-        new TestCaseData("wmv-TestSong.txt").Returns(null),
+        new TestCaseData("f4v.txt").Returns(null),
+        new TestCaseData("flv.txt").Returns(null),
+        new TestCaseData("mkv.txt").Returns(null),
+        new TestCaseData("mov.txt").Returns(null),
+        new TestCaseData("mpeg2.txt").Returns(null),
+        new TestCaseData("webm-vp9.txt").Returns(null),
+        new TestCaseData("wmv.txt").Returns(null),
     };
 
     [OneTimeSetUp]
