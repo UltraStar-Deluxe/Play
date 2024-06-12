@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Responsible;
 using UnityEngine.UIElements;
@@ -26,8 +25,9 @@ public class ResponsibleVisualElementUtils
 
     public static ITestInstruction<object> SetElementValue<T>(BaseField<T> element, T newValue)
         => ExpectElementIsFocusableNow(element)
+            .ContinueWith(Do($"focus UI element {element.name}", () => element.Focus()))
             .ContinueWith(Do(
-                    $"set value '{newValue}' for UI element '{element?.name}'",
+                    $"set value '{newValue}' for UI element '{element.name}'",
                     () => element.value = newValue)
                 .ContinueWith(ExpectElementHasValue(element, newValue)));
 
