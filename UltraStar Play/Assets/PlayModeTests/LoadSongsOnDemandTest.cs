@@ -16,6 +16,8 @@ public class LoadSongsOnDemandTest : AbstractPlayModeTest
     private const int TotalSongCount = 20;
     private const int InitiallyVisibleSongCount = 4;
 
+    protected override List<string> GetRelativeTestSongFilePaths() => new List<string>();
+
     protected override void ConfigureTestSettings(TestSettings settings)
     {
         Log.MinimumLogLevel = ELogEventLevel.Debug;
