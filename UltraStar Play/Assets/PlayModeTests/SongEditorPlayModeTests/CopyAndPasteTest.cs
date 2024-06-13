@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Responsible;
+using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
 using static Responsible.Responsibly;
 using static ResponsibleSceneUtils;
 using static ResponsibleLogAssertUtils;
 
-public class CopyAndPasteTest : AbstractSongEditorActionTest
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class CopyAndPasteTest : AbstractSongEditorActionTest, IInjectionFinishedListener
 {
     private static readonly List<TestCaseData> testCases = new List<TestCaseData>()
     {
@@ -19,9 +23,14 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
         new TestCaseData("SongEditorTestSongs/Copy-Voices.txt").Returns(null),
     };
 
-    protected SongEditorSelectionControl SongEditorSelectionControl => Object.FindObjectOfType<SongEditorSelectionControl>();
-    protected SongEditorCopyPasteManager SongEditorCopyPasteManager => Object.FindObjectOfType<SongEditorCopyPasteManager>();
-    protected SongEditorSceneInputControl SongEditorSceneInputControl => Object.FindObjectOfType<SongEditorSceneInputControl>();
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private SongEditorSelectionControl songEditorSelectionControl;
+
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private SongEditorCopyPasteManager songEditorCopyPasteManager;
+
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private SongEditorSceneInputControl songEditorSceneInputControl;
 
     [UnityTest]
     [TestCaseSource(nameof(testCases))]
@@ -48,29 +57,29 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
         .ToYieldInstruction(this.Executor);
 
     private ITestInstruction<object> MoveToFirstSelectedNote()
-        => Do("move to first selected note", () => SongAudioPlayer.PositionInMillis = GetFirstSelectedNotePositionInMillis());
+        => Do("move to first selected note", () => songAudioPlayer.PositionInMillis = GetFirstSelectedNotePositionInMillis());
 
     private ITestInstruction<object> MoveBehindLastNote()
-        => Do("move behind last note", () => SongAudioPlayer.PositionInMillis = GetPositionBehindLastNoteInMillis());
+        => Do("move behind last note", () => songAudioPlayer.PositionInMillis = GetPositionBehindLastNoteInMillis());
 
     private ITestInstruction<object> DeleteNotes()
-        => Do("delete selected notes", () => SongEditorSceneInputControl.DeleteSelectedNotes());
+        => Do("delete selected notes", () => songEditorSceneInputControl.DeleteSelectedNotes());
 
     private ITestInstruction<object> CopyNotes()
         // TODO: Input simulation does not work reliably for some reason
         // => TriggerInputAction(R.InputActions.songEditor_copy);
-        => Do("copy selected notes", () => SongEditorCopyPasteManager.CopySelection());
+        => Do("copy selected notes", () => songEditorCopyPasteManager.CopySelection());
 
     private ITestInstruction<object> PasteNotes()
         // TODO: Input simulation does not work reliably for some reason
         // => TriggerInputAction(R.InputActions.songEditor_paste);
-        => Do("paste copied notes", () => SongEditorCopyPasteManager.Paste());
+        => Do("paste copied notes", () => songEditorCopyPasteManager.Paste());
 
     private ITestInstruction<object> SelectAll()
         // TODO: Input simulation does not work reliably for some reason
         // => Do("select all", () => TriggerInputAction(R.InputActions.songEditor_selectAll))
-        => Do("select all", () => SongEditorSelectionControl.SelectAll())
-            .ContinueWith(_ => WaitForCondition("has selected notes", () => !SongEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty())
+        => Do("select all", () => songEditorSelectionControl.SelectAll())
+            .ContinueWith(_ => WaitForCondition("has selected notes", () => !songEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty())
                 .ExpectWithinSeconds(10));
 
     private double GetPositionBehindLastNoteInMillis()
@@ -81,7 +90,12 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
 
     private double GetFirstSelectedNotePositionInMillis()
     {
-        int positionInBeats = SongEditorSelectionControl.GetSelectedNotes().Select(note => note.StartBeat).Min();
+        int positionInBeats = songEditorSelectionControl.GetSelectedNotes().Select(note => note.StartBeat).Min();
         return SongMetaBpmUtils.BeatsToMillis(SongMeta, positionInBeats);
+    }
+
+    public void OnInjectionFinished()
+    {
+        Debug.Log("OnInjectionFinished");
     }
 }

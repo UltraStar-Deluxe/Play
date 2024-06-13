@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Responsible;
+using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
@@ -21,8 +22,12 @@ public class LyricsEditingTest : AbstractPlayModeTest
     protected override List<string> GetRelativeTestSongFilePaths()
         => new List<string> { "SingingTestSongs/ThreeQuartersA4OneQuarterC5.txt" };
 
-    protected SongEditorSelectionControl SongEditorSelectionControl => GameObject.FindObjectOfType<SongEditorSelectionControl>();
-    protected SongMeta SongMeta => SceneNavigator.GetSceneDataOrThrow<SongEditorSceneData>().SongMeta;
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private SongEditorSelectionControl songEditorSelectionControl;
+
+    [Inject]
+    private SongEditorSceneData songEditorSceneData;
+    private SongMeta SongMeta => songEditorSceneData.SongMeta;
 
     [UnityTest]
     public IEnumerator ShouldEditLyricsOfSingleNote() => IgnoreFailingMessages()
@@ -31,8 +36,8 @@ public class LyricsEditingTest : AbstractPlayModeTest
         .ContinueWith(_ => Do("select next note", () => InputFixture.PressAndRelease(Keyboard.tabKey)))
         .ContinueWith(_ => Do("select next note", () =>  InputFixture.PressAndRelease(Keyboard.tabKey)))
         .ContinueWith(_ => WaitForCondition("expect note selected",
-                () => SongEditorSelectionControl.GetSelectedNotes().Count == 1
-                      && SongEditorSelectionControl.GetSelectedNotes()[0].Text == OriginalNoteText)
+                () => songEditorSelectionControl.GetSelectedNotes().Count == 1
+                      && songEditorSelectionControl.GetSelectedNotes()[0].Text == OriginalNoteText)
             .ExpectWithinSeconds(10))
         .ContinueWith(_ => Do("open lyrics editing", () => InputFixture.PressAndRelease(Keyboard.f2Key)))
         .ContinueWith(_ => WaitForSeconds(1))

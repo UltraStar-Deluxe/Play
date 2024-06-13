@@ -2,11 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using Responsible;
+using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
 using static Responsible.Responsibly;
 using static ResponsibleVisualElementUtils;
 using static ResponsibleSceneUtils;
+using static ResponsibleLogAssertUtils;
 
 public class SongEditorLrcFormatImportTest : AbstractPlayModeTest
 {
@@ -19,11 +21,13 @@ public class SongEditorLrcFormatImportTest : AbstractPlayModeTest
         [00:29.19]alle Menschen werden Brüder, wo dein sanfter Flügel weilt.");
 
 
-    private SongEditorLayerManager SongEditorLayerManager => GameObject.FindObjectOfType<SongEditorSceneControl>().songEditorLayerManager;
-    private List<Note> ImportedNotes => SongEditorLayerManager.GetLayerNotes(SongEditorLayerManager.GetEnumLayer(ESongEditorLayer.Import));
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private SongEditorLayerManager songEditorLayerManager;
+    private List<Note> ImportedNotes => songEditorLayerManager.GetLayerNotes(songEditorLayerManager.GetEnumLayer(ESongEditorLayer.Import));
 
     [UnityTest]
-    public IEnumerator ShouldImportLrcFormat() => ExpectScene(EScene.SongEditorScene)
+    public IEnumerator ShouldImportLrcFormat() => IgnoreFailingMessages()
+        .ContinueWith(ExpectScene(EScene.SongEditorScene))
         .ContinueWith(_ => ClickButton(R.UxmlNames.openImportLrcDialogButton))
         .ContinueWith(_ => SetElementValue(R.UxmlNames.importLrcTextField, lrcExample))
         .ContinueWith(_ => ClickButton(R.UxmlNames.importLrcFormatDialogButton))

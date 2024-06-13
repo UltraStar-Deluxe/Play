@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -20,8 +21,11 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
 
     protected override string TestSceneName => "MediaFileFormatTestScene";
 
-    protected SongAudioPlayer SongAudioPlayer => GameObject.FindObjectOfType<SongAudioPlayer>();
-    protected SongVideoPlayer SongVideoPlayer => GameObject.FindObjectOfType<SongVideoPlayer>();
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    protected SongAudioPlayer songAudioPlayer;
+
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    protected SongVideoPlayer songVideoPlayer;
 
     protected override void ConfigureTestSettings(TestSettings settings)
     {
@@ -35,7 +39,7 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
         double targetDurationInMillis = DefaultTargetDurationInMillis,
         long maxWaitTimeInMillis = DefaultMaxWaitTimeInMillis)
     {
-        yield return SongMediaPlayerShouldLoadFile(SongAudioPlayer, txtFilePath, targetDurationInMillis, maxWaitTimeInMillis);
+        yield return SongMediaPlayerShouldLoadFile(songAudioPlayer, txtFilePath, targetDurationInMillis, maxWaitTimeInMillis);
     }
 
     protected IEnumerator SongVideoPlayerShouldLoadFile(
@@ -45,8 +49,8 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
     {
         // The SongVideoPlayer requires a running SongAudioPlayer.
         // For example for time sync and to reuse video if possible (depending on VideoSupportProvider).
-        yield return SongMediaPlayerShouldLoadFile(SongAudioPlayer, txtFilePath, targetDurationInMillis, maxWaitTimeInMillis);
-        yield return SongMediaPlayerShouldLoadFile(SongVideoPlayer, txtFilePath, targetDurationInMillis, maxWaitTimeInMillis);
+        yield return SongMediaPlayerShouldLoadFile(songAudioPlayer, txtFilePath, targetDurationInMillis, maxWaitTimeInMillis);
+        yield return SongMediaPlayerShouldLoadFile(songVideoPlayer, txtFilePath, targetDurationInMillis, maxWaitTimeInMillis);
     }
 
     private IEnumerator SongMediaPlayerShouldLoadFile<T>(

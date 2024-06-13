@@ -7,15 +7,19 @@ using NUnit.Framework;
 using PrimeInputActions;
 using Responsible;
 using Responsible.Unity;
+using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using static Responsible.Responsibly;
 
-public abstract class AbstractPlayModeTest : AbstractResponsibleTest
+public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjection
 {
     protected virtual string TestSceneName => "CommonTestScene";
+
+    private IDisposable sceneInjectionFinishedSubscription;
 
     [UnitySetUp]
     public IEnumerator UnitySetUp()
@@ -40,6 +44,10 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         StatisticsManager.StatisticsLoaderSaver = new TestStatisticsLoaderSaver();
         IMicrophoneAdapter.Instance = new SimulatedMicrophoneAdapter();
 
+        sceneInjectionFinishedSubscription = UltraStarPlaySceneInjectionManager
+            .SceneInjectionFinishedEventStream
+            .Subscribe(evt => evt.SceneInjector.Inject(this));
+
         yield return LoadSceneByName("CommonTestScene");
 
         AssertUtils.HasType<TestSettings>(SettingsManager.Instance.Settings);
@@ -63,6 +71,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         SettingsManager.SettingsLoaderSaver = null;
         StatisticsManager.StatisticsLoaderSaver = null;
         IMicrophoneAdapter.Instance = new PortAudioForUnityMicrophoneAdapter();
+        sceneInjectionFinishedSubscription?.Dispose();
         yield return null;
     }
 

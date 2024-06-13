@@ -11,7 +11,8 @@ public class ResponsibleSceneUtils
 
     public static ITestInstruction<object> ExpectScene(EScene scene, float timeoutInSeconds = 10)
         => WaitForScene(scene)
-            .ExpectWithinSeconds(timeoutInSeconds);
+            .ExpectWithinSeconds(timeoutInSeconds)
+            .ContinueWith(WaitForFrames(2));
 
     public static ITestInstruction<T> GetSceneData<T>() where T : SceneData
         => DoAndReturn(

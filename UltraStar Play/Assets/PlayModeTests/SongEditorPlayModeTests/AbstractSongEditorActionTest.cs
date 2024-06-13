@@ -2,16 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using Responsible;
+using UniInject;
 using UnityEngine;
 using static ResponsibleSceneUtils;
 using static Responsible.Responsibly;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
 
 public abstract class AbstractSongEditorActionTest : AbstractSongEditorTest
 {
     protected override string TestSceneName => "CommonTestScene";
 
-    protected SongAudioPlayer SongAudioPlayer => GameObject.FindObjectOfType<SongAudioPlayer>();
-    protected SongMeta SongMeta => SceneNavigator.GetSceneDataOrThrow<SongEditorSceneData>().SongMeta;
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    protected SongAudioPlayer songAudioPlayer;
+
+    [Inject]
+    protected SongEditorSceneData songEditorSceneData;
+
+    protected SongMeta SongMeta => songEditorSceneData.SongMeta;
 
     protected ITestInstruction<object> ExpectCurrentSongEqualsExpectedResult(string expectedResultSong)
         => DoAndReturn("load expected result",
