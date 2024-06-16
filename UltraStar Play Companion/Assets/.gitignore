@@ -1,3 +1,5 @@
+VERSION.txt
+
 Plugins/UniRx/
 Plugins/UniRx.meta
 
@@ -17,3 +19,6 @@ Plugins/Serilog/Serilog.Sinks.File.meta
 
 Plugins/LeanTween/
 Plugins/LeanTween.meta
+
+Plugins/LiteNetLib/
+Plugins/LiteNetLib.meta

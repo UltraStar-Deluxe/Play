@@ -1,7 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using PrimeInputActions;
-using ProTrans;
+using CommonOnlineMultiplayer;
+using SteamOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -27,52 +28,74 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     [Inject]
     private WebCamManager webCamManager;
 
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
+
     protected override void Start()
     {
         base.Start();
-        
+
         UpdatePlayerProfileList();
 
         addButton.RegisterCallbackButtonTriggered(_ =>
         {
-            settings.PlayerProfiles.Add(new PlayerProfile());
-            CreatePlayerProfileEntry(settings.PlayerProfiles.FirstOrDefault(), settings.PlayerProfiles.Count - 1);
+            PlayerProfile newPlayerProfile = new PlayerProfile();
+            newPlayerProfile.Name = GetNewPlayerProfileName();
+            settings.PlayerProfiles.Add(newPlayerProfile);
+            VisualElement playerProfileEntryVisualElement = CreatePlayerProfileEntry(newPlayerProfile);
+            playerProfileEntryVisualElement.RegisterHasGeometryCallbackOneShot(_ => playerProfileEntryVisualElement.ScrollToSelf());
 
             // Focus on the name of the newly added player to directly allow changing its name
-            TextField nameTextField = playerProfileList[playerProfileList.childCount-1].Q<TextField>("nameTextField");
+            TextField nameTextField = playerProfileList[playerProfileList.childCount - 1].Q<TextField>("nameTextField");
+            nameTextField.DisableParseEscapeSequences();
             nameTextField.Focus();
-            
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
         });
+    }
+
+    private string GetNewPlayerProfileName()
+    {
+        bool ExistsPlayerProfileWithName(string newName)
+        {
+            return settings.PlayerProfiles.Any(playerProfile =>
+            {
+                string nameWithoutWhiteSpace = playerProfile.Name.Replace(" ", "");
+                string newNameWithoutWhiteSpace = newName.Replace(" ", "");
+                return nameWithoutWhiteSpace.Equals(newNameWithoutWhiteSpace, StringComparison.InvariantCultureIgnoreCase);
+            });
+        }
+
+        int index = 1;
+        string playerProfileName = $"Player{index:00}";
+        while (ExistsPlayerProfileWithName(playerProfileName))
+        {
+            index++;
+            playerProfileName = $"Player{index:00}";
+        }
+
+        return playerProfileName;
     }
 
     private void UpdatePlayerProfileList()
     {
         playerProfileList.Clear();
-        int index = 0;
-        settings.PlayerProfiles.ForEach(playerProfile =>
-        {
-            CreatePlayerProfileEntry(playerProfile, index);
-            index++;
-        });
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
+        settings.PlayerProfiles
+            .Union(nonPersistentSettings.LobbyMemberPlayerProfiles)
+            .ForEach(playerProfile => CreatePlayerProfileEntry(playerProfile));
     }
 
     private void UpdatePlayerProfileInactiveOverlay(PlayerProfile playerProfile, VisualElement playerProfileInactiveOverlay)
     {
         playerProfileInactiveOverlay.ShowByDisplay();
-        if (playerProfile.IsEnabled)
-        {
-            playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(Colors.clearBlack);
-        }
-        else
-        {
-            playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(new Color(0, 0, 0, 0.5f));
-        }
+        playerProfileInactiveOverlay.SetInClassList("hidden", playerProfile.IsEnabled);
     }
-    
-    private void CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)
+
+    private int GetIndexInList(PlayerProfile playerProfile)
+    {
+        // Dynamically return index in list because the list can change while the scene is open.
+        return settings.PlayerProfiles.IndexOf(playerProfile);
+    }
+
+    private VisualElement CreatePlayerProfileEntry(PlayerProfile playerProfile)
     {
         VisualElement visualElement = playerProfileListEntryAsset.CloneTree().Children().FirstOrDefault();
 
@@ -81,11 +104,21 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         Button deleteButton = visualElement.Q<Button>(R.UxmlNames.deleteButton);
         deleteButton.RegisterCallbackButtonTriggered(_ =>
         {
-            settings.PlayerProfiles.RemoveAt(indexInList);
+            if (!settings.PlayerProfiles.Contains(playerProfile))
+            {
+                return;
+            }
+
+            if (GetIndexInList(playerProfile) < settings.PlayerProfiles.Count)
+            {
+                settings.PlayerProfiles.RemoveAt(GetIndexInList(playerProfile));
+            }
             visualElement.RemoveFromHierarchy();
         });
 
         TextField nameTextField = visualElement.Q<TextField>(R.UxmlNames.nameTextField);
+        nameTextField.isReadOnly = playerProfile is LobbyMemberPlayerProfile;
+        nameTextField.DisableParseEscapeSequences();
         nameTextField.value = playerProfile.Name;
         nameTextField.RegisterValueChangedCallback(evt => playerProfile.Name = evt.newValue);
 
@@ -98,37 +131,68 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         });
         UpdatePlayerProfileInactiveOverlay(playerProfile, playerProfileInactiveOverlay);
 
-        new PlayerProfileImagePickerControl(visualElement.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), indexInList, uiManager, webCamManager)
-            .Bind(() => playerProfile.ImagePath,
+        PlayerProfileImageChooserControl playerProfileImageChooserControl = new PlayerProfileImageChooserControl(visualElement.Q<Chooser>(R.UxmlNames.playerProfileImageChooser), GetIndexInList(playerProfile), uiManager, webCamManager);
+        playerProfileImageChooserControl.Bind(() => playerProfile.ImagePath,
                 newValue => playerProfile.ImagePath = newValue);
 
-        new DifficultyPicker(visualElement.Q<ItemPicker>(R.UxmlNames.difficultyPicker))
-            .Bind(() => playerProfile.Difficulty,
+        EnumChooserControl<EDifficulty> difficultyChooser = new(visualElement.Q<Chooser>(R.UxmlNames.difficultyChooser));
+        difficultyChooser.Bind(() => playerProfile.Difficulty,
                 newValue => playerProfile.Difficulty = newValue);
 
         playerProfileList.Add(visualElement);
+
+        VisualElement onlinePlayerProfileIconContainer = visualElement.Q<VisualElement>(R.UxmlNames.onlinePlayerProfileIconContainer);
+        VisualElement onlinePlayerProfileIcon = visualElement.Q<VisualElement>(R.UxmlNames.onlinePlayerProfileIcon);
+
+        if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
+        {
+            enabledToggle.HideByDisplay();
+            deleteButton.HideByDisplay();
+            difficultyChooser.Chooser.HideByDisplay();
+            playerProfileImageChooserControl.Chooser.PreviousItemButton.HideByDisplay();
+            playerProfileImageChooserControl.Chooser.NextItemButton.HideByDisplay();
+            onlinePlayerProfileIcon.SetInClassList("onlineMultiplayerHost", lobbyMemberPlayerProfile.IsHost);
+            onlinePlayerProfileIconContainer.ShowByDisplay();
+
+            UpdateOnlineMultiplayerPlayerImage(lobbyMemberPlayerProfile, playerProfileImageChooserControl);
+        }
+        else
+        {
+            onlinePlayerProfileIconContainer.HideByDisplay();
+        }
+
+        return visualElement;
     }
 
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
+    private void UpdateOnlineMultiplayerPlayerImage(LobbyMemberPlayerProfile lobbyMemberPlayerProfile, PlayerProfileImageChooserControl playerProfileImageChooserControl)
     {
-        Dictionary<string, string> titleToContentMap = new()
+        if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Netcode)
         {
-            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile_title),
-                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile) },
-            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_difficulty_title),
-                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_difficulty) },
-            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages_title),
-                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages) },
-            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages_title),
-                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages,
-                    "path", ApplicationUtils.ReplacePathsWithDisplayString(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder())) },
-        };
-        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_title),
-            titleToContentMap);
-        helpDialogControl.AddButton("Images Folder",
-            _ => ApplicationUtils.OpenDirectory(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder()));
-        return helpDialogControl;
+            playerProfileImageChooserControl.Chooser.ItemLabel.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(lobbyMemberPlayerProfile.Name));
+        }
+        else if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Steam)
+        {
+            SteamLobbyMember steamLobbyMember = onlineMultiplayerManager.LobbyMemberManager.GetLobbyMember(lobbyMemberPlayerProfile.UnityNetcodeClientId) as SteamLobbyMember;
+            if (steamLobbyMember == null)
+            {
+                return;
+            }
+
+            SteamOnlineMultiplayerUtils.GetAvatarTextureAsObservable(steamLobbyMember.SteamId)
+                .CatchIgnore((Exception ex) =>
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to get avatar image of Steam user '{steamLobbyMember.DisplayName}' with id {steamLobbyMember.SteamId}");
+                })
+                .Subscribe(texture =>
+                {
+                    playerProfileImageChooserControl.Chooser.ItemImage.image = texture;
+                    playerProfileImageChooserControl.Chooser.ItemLabel.HideByDisplay();
+                });
+        }
     }
+
+    public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=PlayerProfileImage";
+
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToPlayerProfiles);
 }

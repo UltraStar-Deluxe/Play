@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using CircularBuffer;
-using UnityEngine;
 
 public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 {
@@ -29,6 +29,20 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
     // when there is a candadite with the same halftone in the history.
     // This creates a tendency towards previously detected pitches.
     public float HalftoneContinuationBias { get; set; }
+
+    private readonly Dictionary<int, float> midiNoteToFrequency = CreateMidiNoteToFrequencyMap();
+
+    private static Dictionary<int, float> CreateMidiNoteToFrequencyMap()
+    {
+        Dictionary<int, float> result = new();
+
+        for (int midiNote = 0; midiNote < 127; midiNote++)
+        {
+            float frequency = MidiUtils.CalculateFrequency(midiNote);
+            result.Add(midiNote, frequency);
+        }
+        return result;
+    }
 
     public CamdAudioSamplesAnalyzer(int sampleRateHz, int maxSampleLength)
     {
@@ -89,11 +103,13 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         FindBestCandidate(currentCandidates, candidateHistory);
 
         int midiNote = bestCandidate.halftone + MinNote;
+        midiNoteToFrequency.TryGetValue(midiNote, out float frequency);
+        
         if (midiNote < MidiUtils.SingableNoteMin || midiNote > MidiUtils.SingableNoteMax)
         {
             // This pitch is impossible to sing.
             // Thus, assume the pitch detection failed and do not add the pitch to the history.
-            return new PitchEvent(midiNote);
+            return new PitchEvent(midiNote, frequency);
         }
         else
         {
@@ -107,7 +123,7 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
                 candidateHistory.PushFront(new CamdPitchCandidate(bestCurrentCandidate));
             }
 
-            return new PitchEvent(midiNote);
+            return new PitchEvent(midiNote, frequency);
         }
     }
 

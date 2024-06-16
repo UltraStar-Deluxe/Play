@@ -1,11 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songPropertiesSideBarContainer" class="secondarySideBarPanel" style="display: flex;">
-        <ui:Label text="Song Properties" display-tooltip-when-elided="true" name="songPropertiesTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
-        <ui:TextField picking-mode="Ignore" value="999" text="999" name="bpmTextField" label="BPM" style="margin-bottom: 5px; flex-direction: column;" />
-        <ui:Button text="Click to find BPM" display-tooltip-when-elided="true" name="detectBpmButton" class="smallFont" style="width: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 1px;" />
-        <ui:Label text="No clicks yet" display-tooltip-when-elided="true" name="detectBpmLabel" class="smallFont" style="-unity-text-align: upper-center; margin-bottom: 5px;" />
-        <ui:Button text="Set BPM&#10;keep note duration" display-tooltip-when-elided="true" name="setBpmKeepNoteDurationButton" class="smallFont" style="width: 100%; margin-left: 0; margin-right: 0; margin-bottom: 5px; height: 40px; margin-top: 0;" />
-        <ui:Button text="Set BPM&#10;change note duration" display-tooltip-when-elided="true" name="setBpmChangeNoteDurationButton" class="smallFont" style="width: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 5px; height: 40px;" />
+        <ui:Label text="$songEditor_songProperties_title" name="songPropertiesTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
+        <ui:TextField picking-mode="Ignore" value="999" name="bpmTextField" label="$songEditor_songProperties_bpm" style="margin-bottom: 5px; flex-direction: column;" />
+        <ui:Button text="$songEditor_songProperties_clickToFindBpm" display-tooltip-when-elided="true" name="detectBpmButton" class="smallFont" style="width: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 1px;" />
+        <ui:Label text="$songEditor_clickToFindBpm_initialValue" display-tooltip-when-elided="true" name="detectBpmLabel" class="smallFont" style="-unity-text-align: upper-center; margin-bottom: 5px;" />
+        <ui:Button text="$songEditor_clickToFindBpm_setKeepingNoteDuration" display-tooltip-when-elided="true" name="setBpmKeepNoteDurationButton" class="smallFont" style="width: 100%; margin-left: 0; margin-right: 0; margin-bottom: 5px; height: 40px; margin-top: 0;" />
+        <ui:Button text="$songEditor_clickToFindBpm_setChangingNoteDuration" display-tooltip-when-elided="true" name="setBpmChangeNoteDurationButton" class="smallFont" style="width: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 5px; height: 40px;" />
     </ui:ScrollView>
 </ui:UXML>

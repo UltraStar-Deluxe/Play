@@ -1,15 +1,26 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="root">
-        <ui:VisualElement name="androidSongFolderHintContainer" style="width: 100%; margin-bottom: 10px; flex-shrink: 0;">
-            <ui:Label text="Android requires songs to be stored in the folder ..." display-tooltip-when-elided="true" name="androidSongFolderHintLabel" style="width: 100%; white-space: normal;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="songListContainer" style="width: 100%; flex-grow: 1;">
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="songList" class="roundCorners mb-3" style="width: 100%; height: 100%; min-height: 50px;">
-                <ui:Label text="Label" display-tooltip-when-elided="true" />
-            </ui:ScrollView>
-            <ui:Button name="addButton" class="middleCenterText circleButton lightButton" style="font-size: 30px; align-self: center;">
-                <MaterialIcon name="addIcon" icon="add" />
-            </ui:Button>
-        </ui:VisualElement>
+    <ui:VisualElement name="loadedOptionsRoot">
+        <ui:ScrollView>
+            <ui:Toggle name="searchMidiFilesWithLyricsToggle" label="$options_searchMidiFilesWithLyrics" class="noBackgroundInHierarchy" style="flex-shrink: 0;" />
+            <Chooser name="songDataFetchTypeChooser" label="$options_songDataFetchType" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+            <ui:Label tabindex="-1" text="$options_songLibrary_songFolderListTitle" name="songFolderListTitle" class="noBackgroundInHierarchy" style="-unity-font-style: bold;" />
+            <ui:VisualElement name="androidSongFolderHintContainer" style="width: 100%; margin-bottom: 10px; flex-shrink: 0; flex-direction: row; align-items: center;">
+                <MaterialIcon name="infoIcon" icon="info_outline" class="smallFont mr-1" />
+                <ui:Label text="Android requires songs to be stored in specific folders" display-tooltip-when-elided="true" name="androidSongFolderHintLabel" class="noBackgroundInHierarchy" style="width: 100%; white-space: normal;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="songListContainer" style="width: 100%; flex-grow: 1;">
+                <ui:VisualElement name="songFolderList" />
+                <ui:VisualElement name="row" class="mt-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: center; flex-shrink: 0;">
+                    <ui:Button display-tooltip-when-elided="true" name="addSongFolderButton" style="flex-direction: row;">
+                        <MaterialIcon tabindex="-1" name="addSongFolderIcon" icon="create_new_folder" class="mx-2" style="font-size: 24px;" />
+                        <ui:Label tabindex="-1" text="$action_addSongFolder" display-tooltip-when-elided="true" name="downloadSongsButtonLabel" />
+                    </ui:Button>
+                    <ui:Button display-tooltip-when-elided="true" name="downloadSongArchiveButton" class="ml-2" style="flex-direction: row;">
+                        <MaterialIcon tabindex="-1" name="downloadSongArchiveIcon" icon="cloud_download" class="mx-2" style="font-size: 24px;" />
+                        <ui:Label tabindex="-1" text="$action_downloadArchive" display-tooltip-when-elided="true" name="downloadSongsButtonLabel" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

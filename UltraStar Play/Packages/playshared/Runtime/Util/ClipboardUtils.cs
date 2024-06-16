@@ -11,4 +11,9 @@ public static class ClipboardUtils
 
         GUIUtility.systemCopyBuffer = text;
     }
+    
+    public static string GetClipboardText()
+    {
+        return  GUIUtility.systemCopyBuffer;
+    }
 }

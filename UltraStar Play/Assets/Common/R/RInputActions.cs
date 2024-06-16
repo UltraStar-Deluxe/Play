@@ -4,19 +4,25 @@ public static partial class R
     public static class InputActions
     {
         public static readonly string songEditor_anyKeyboardKey = "songEditor/anyKeyboardKey";
+        public static readonly string songEditor_assignToOwnSentence = "songEditor/assignToOwnSentence";
         public static readonly string songEditor_copy = "songEditor/copy";
         public static readonly string songEditor_cut = "songEditor/cut";
         public static readonly string songEditor_delete = "songEditor/delete";
         public static readonly string songEditor_editLyrics = "songEditor/editLyrics";
         public static readonly string songEditor_jumpToEndOfSong = "songEditor/jumpToEndOfSong";
         public static readonly string songEditor_jumpToStartOfSong = "songEditor/jumpToStartOfSong";
+        public static readonly string songEditor_navigateBackward = "songEditor/navigateBackward";
+        public static readonly string songEditor_navigateForward = "songEditor/navigateForward";
+        public static readonly string songEditor_openSearch = "songEditor/openSearch";
         public static readonly string songEditor_paste = "songEditor/paste";
+        public static readonly string songEditor_pitchDetection = "songEditor/pitchDetection";
         public static readonly string songEditor_playSelectedNotes = "songEditor/playSelectedNotes";
         public static readonly string songEditor_redo = "songEditor/redo";
         public static readonly string songEditor_save = "songEditor/save";
         public static readonly string songEditor_selectAll = "songEditor/selectAll";
         public static readonly string songEditor_selectNextNote = "songEditor/selectNextNote";
         public static readonly string songEditor_selectPreviousNote = "songEditor/selectPreviousNote";
+        public static readonly string songEditor_speechRecognition = "songEditor/speechRecognition";
         public static readonly string songEditor_toggleNoteTypeFreestyle = "songEditor/toggleNoteTypeFreestyle";
         public static readonly string songEditor_toggleNoteTypeGolden = "songEditor/toggleNoteTypeGolden";
         public static readonly string songEditor_toggleNoteTypeNormal = "songEditor/toggleNoteTypeNormal";
@@ -42,7 +48,10 @@ public static partial class R
         public static readonly string usplay_anyKeyboardModifierPressedOrReleased = "usplay/anyKeyboardModifierPressedOrReleased";
         public static readonly string usplay_back = "usplay/back";
         public static readonly string usplay_closeContextMenu = "usplay/closeContextMenu";
+        public static readonly string usplay_decreaseVolume = "usplay/decreaseVolume";
         public static readonly string usplay_enter = "usplay/enter";
+        public static readonly string usplay_increaseVolume = "usplay/increaseVolume";
+        public static readonly string usplay_navigateToParentFolder = "usplay/navigateToParentFolder";
         public static readonly string usplay_nextCharacterQuickJumpCharacter = "usplay/nextCharacterQuickJumpCharacter";
         public static readonly string usplay_nextSong = "usplay/nextSong";
         public static readonly string usplay_openContextMenu = "usplay/openContextMenu";
@@ -52,6 +61,8 @@ public static partial class R
         public static readonly string usplay_randomSong = "usplay/randomSong";
         public static readonly string usplay_restartSong = "usplay/restartSong";
         public static readonly string usplay_search = "usplay/search";
+        public static readonly string usplay_singSceneOpenContextMenu = "usplay/singSceneOpenContextMenu";
+        public static readonly string usplay_singSceneShowGovernanceOverlay = "usplay/singSceneShowGovernanceOverlay";
         public static readonly string usplay_skipToNextLyrics = "usplay/skipToNextLyrics";
         public static readonly string usplay_space = "usplay/space";
         public static readonly string usplay_start = "usplay/start";
@@ -64,5 +75,6 @@ public static partial class R
         public static readonly string usplay_togglePlayers = "usplay/togglePlayers";
         public static readonly string usplay_toggleResultGraph = "usplay/toggleResultGraph";
         public static readonly string usplay_toggleSongMenu = "usplay/toggleSongMenu";
+        public static readonly string usplay_toggleWebViewControl = "usplay/toggleWebViewControl";
     }
 }

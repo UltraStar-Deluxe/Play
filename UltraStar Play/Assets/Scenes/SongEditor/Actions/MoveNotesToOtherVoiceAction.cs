@@ -12,122 +12,69 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
 
     // The notes can be moved if there exists a note
     // that is not yet inside a voice with one of the given voice names.
-    public bool CanMoveNotesToVoice(List<Note> selectedNotes, params string[] voiceNames)
+    public bool CanMoveNotesToVoice(List<Note> selectedNotes, params EVoiceId[] voiceIds)
     {
-        return selectedNotes.AnyMatch(note => !HasVoice(note, voiceNames));
+        return selectedNotes.AnyMatch(note => !HasVoice(note, voiceIds));
     }
 
-    public MovedNotesToVoiceEvent MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
+    public MovedNotesToVoiceEvent MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, EVoiceId voiceId, bool smartSplit = true)
     {
-        Voice targetVoice = SongMetaUtils.GetOrCreateVoice(songMeta, voiceName);
-        List<Sentence> changedSentences = new();
-        List<Sentence> removedSentences = new();
-        List<Sentence> createdSentences = new();
-
-        List<SentenceWithRange> createdSentencesWithRange = new();
-
-        List<Sentence> sortedTargetSentences = targetVoice.Sentences.ToList();
-        sortedTargetSentences.Sort(Sentence.comparerByStartBeat);
-
-        selectedNotes.Sort(Note.comparerByStartBeat);
-        selectedNotes.ForEach(note =>
+        if (smartSplit
+            && ShouldSplit(songMeta, selectedNotes))
         {
-            Sentence oldSentence = note.Sentence;
-            // Find or create a sentence in the target voice for the note
-            Sentence targetSentence;
-            Sentence existingTargetSentence = SongMetaUtils.FindExistingSentenceForNote(sortedTargetSentences, note);
-            if (existingTargetSentence == null)
-            {
-                SentenceWithRange existingSentenceWithRange = createdSentencesWithRange
-                    .FirstOrDefault(sentenceWithRange => sentenceWithRange.ContainsBeatRange(note.StartBeat, note.EndBeat));
-                if (existingSentenceWithRange != null)
+            List<List<Note>> noteGroups = MoveNotesToOtherVoiceUtils.SplitIntoSentences(songMeta, selectedNotes);
+            List<MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult> moveNotesToVoiceResults = noteGroups
+                .Select(noteGroup =>
                 {
-                    existingTargetSentence = existingSentenceWithRange.Sentence;
-                }
-            }
+                    MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteGroup, voiceId);
+                    return moveNotesToVoiceResult;
+                })
+                .ToList();
 
-            if (existingTargetSentence != null)
-            {
-                targetSentence = existingTargetSentence;
-            }
-            else
-            {
-                // Create sentence to fill the gap between adjacent sentences.
-                Sentence previousSentence = sortedTargetSentences
-                    .LastOrDefault(sentence => sentence.MaxBeat < note.StartBeat);
-                Sentence nextSentence = sortedTargetSentences
-                    .LastOrDefault(sentence => sentence.MinBeat > note.EndBeat);
-                int newSentenceFromBeat = previousSentence != null
-                    ? previousSentence.ExtendedMaxBeat
-                    : int.MinValue;
-                int newSentenceUntilBeat = nextSentence != null
-                    ? nextSentence.MinBeat
-                    : int.MaxValue;
-                Sentence createdSentence = new(newSentenceFromBeat, newSentenceUntilBeat);
-                createdSentence.SetVoice(targetVoice);
+            return new MovedNotesToVoiceEvent(
+                moveNotesToVoiceResults.SelectMany(it => it.Notes).ToList(),
+                moveNotesToVoiceResults.SelectMany(it => it.ChangedSentences).ToList(),
+                moveNotesToVoiceResults.SelectMany(it => it.RemovedSentences).ToList());
+        }
 
-                createdSentences.Add(createdSentence);
-                sortedTargetSentences.Add(createdSentence);
-                sortedTargetSentences.Sort(Sentence.comparerByStartBeat);
-
-                // Remember this sentence with its full range (that fills the gap between adjacent sentences)
-                // The MinBeat and MaxBeat of the sentence will change to fit the notes,
-                // such that the original range has to be stored in a dedicated data structure.
-                createdSentencesWithRange.Add(new SentenceWithRange(createdSentence, newSentenceFromBeat, newSentenceUntilBeat));
-
-                targetSentence = createdSentence;
-            }
-            targetSentence.AddNote(note);
-
-            // Set lyrics if none yet (otherwise, there is a warning because of missing lyrics)
-            if (note.Text.IsNullOrEmpty())
-            {
-                note.SetText(" ");
-            }
-
-            changedSentences.Add(targetSentence);
-            if (oldSentence != null)
-            {
-                // Remove old sentence if empty now
-                if (oldSentence.Notes.Count == 0 && oldSentence.Voice != null)
-                {
-                    removedSentences.Add(oldSentence);
-                    oldSentence.SetVoice(null);
-                }
-                else
-                {
-                    changedSentences.Add(oldSentence);
-                }
-            }
-        });
-
-        // Fit sentences to their notes (make them as small as possible)
-        changedSentences
-            .Union(createdSentences)
-            .ForEach(sentence =>
-        {
-            sentence.FitToNotes();
-        });
-
-        return new MovedNotesToVoiceEvent(selectedNotes, changedSentences, removedSentences);
+        MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, selectedNotes, voiceId);
+        return new MovedNotesToVoiceEvent(
+            moveNotesToVoiceResult.Notes,
+            moveNotesToVoiceResult.ChangedSentences,
+            moveNotesToVoiceResult.RemovedSentences);
     }
 
-    public void MoveNotesToVoiceAndNotify(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
+    private bool ShouldSplit(SongMeta songMeta, List<Note> selectedNotes)
     {
-        MovedNotesToVoiceEvent movedNotesToVoiceEvent = MoveNotesToVoice(songMeta, selectedNotes, voiceName);
+        // Split the notes into multiple sentences if needed
+        bool hasDifferentSentences = selectedNotes.Select(note => note.Sentence).Distinct().Count() > 1;
+        if (hasDifferentSentences)
+        {
+            return false;
+        }
+
+        int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
+        double lengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta) * lengthInBeats;
+        bool isVeryLong = lengthInMillis > 10000;
+        return isVeryLong;
+    }
+
+    public void MoveNotesToVoiceAndNotify(SongMeta songMeta, List<Note> selectedNotes, EVoiceId voiceId)
+    {
+        MovedNotesToVoiceEvent movedNotesToVoiceEvent = MoveNotesToVoice(songMeta, selectedNotes, voiceId);
         songMetaChangeEventStream.OnNext(movedNotesToVoiceEvent);
     }
 
-    private static bool HasVoice(Note note, string[] voiceNames)
+    private static bool HasVoice(Note note, EVoiceId[] voiceIds)
     {
-        if (voiceNames.IsNullOrEmpty()
+        if (voiceIds.IsNullOrEmpty()
             || note == null)
         {
             return false;
         }
         return note.Sentence != null
                && note.Sentence.Voice != null
-               && voiceNames.AnyMatch(voiceName => Voice.VoiceNameEquals(note.Sentence.Voice.Name, voiceName));
+               && voiceIds.AnyMatch(voiceId => note.Sentence.Voice.Id == voiceId);
     }
 
     private class SentenceWithRange

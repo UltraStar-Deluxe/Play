@@ -2,6 +2,9 @@ using System;
 using UniInject;
 using UnityEngine;
 
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
 // Handles automatically finishing the SingScene.
 // The Unity AudioPlayer changes the playback position back to zero when the AudioClip has finished.
 // This script detects this falling flank in the playback position
@@ -10,60 +13,89 @@ using UnityEngine;
 // when the song has been near its end already.
 public class SingSceneFinisher : MonoBehaviour, INeedInjection
 {
+    public bool IsSongFinished { get; private set; }
+
     private bool hasBeenNearEndOfSong;
-    private bool isSongFinished;
+    private bool isEarlyFinish;
     private float durationAfterSongFinishedInSeconds;
 
     [Inject]
     private SingSceneControl singSceneControl;
 
     [Inject]
+    private SongAudioPlayer songAudioPlayer;
+
+    [Inject]
+    private SongVideoPlayer songVideoPlayer;
+
+    [Inject]
     private SongMeta songMeta;
 
-    private double positionInSongInMillisOld;
+    [Inject]
+    private SingSceneData sceneData;
 
-    void Update()
+    private double positionInMillisMax;
+
+    private bool hasFinishedScene;
+
+    private void Update()
     {
-        double durationOfSongInMillis = singSceneControl.DurationOfSongInMillis;
-        if (durationOfSongInMillis <= 0)
+        double durationInMillis = songAudioPlayer.DurationInMillis;
+        if (durationInMillis <= 0)
         {
             return;
         }
 
-        if (isSongFinished)
+        if (IsSongFinished)
         {
             durationAfterSongFinishedInSeconds += Time.deltaTime;
-            if (durationAfterSongFinishedInSeconds >= 1)
+            if (durationAfterSongFinishedInSeconds >= 1.5f
+                && !hasFinishedScene)
             {
-                singSceneControl.FinishScene(true);
+                hasFinishedScene = true;
+                singSceneControl.FinishScene(!isEarlyFinish, true);
+            }
+
+            if (hasBeenNearEndOfSong
+                && positionInMillisMax > songAudioPlayer.PositionInMillis)
+            {
+                // Do not go back to old time value.
+                songAudioPlayer.PositionInMillis = positionInMillisMax - 1;
             }
         }
         else
         {
-            double positionInSongInMillis = singSceneControl.PositionInSongInMillis;
+            double positionInMillis = songAudioPlayer.PositionInMillis;
 
             // Normal detection of song finished.
             // This only works when the position is not reset to zero when the AudioClip finishes.
-            if (Math.Abs(durationOfSongInMillis - positionInSongInMillis) <= 1)
+            // 16 ms is roughly 1 frame at 60 FPS
+            if (Math.Abs(durationInMillis - positionInMillis) <= 16)
             {
-                isSongFinished = true;
+                IsSongFinished = true;
+                songVideoPlayer.FreezeVideo = true;
             }
 
             // Detect end of the song by looking for a falling flank in the playback position.
             if (hasBeenNearEndOfSong)
             {
-                // The position is back to the start.
-                if (positionInSongInMillis < 1000 && positionInSongInMillis < positionInSongInMillisOld)
+                // The position is back to a previous value.
+                if (positionInMillis < positionInMillisMax)
                 {
-                    isSongFinished = true;
+                    IsSongFinished = true;
+                    songVideoPlayer.FreezeVideo = true;
+                    songAudioPlayer.PauseAudio();
                 }
-                positionInSongInMillisOld = positionInSongInMillis;
+                else
+                {
+                    positionInMillisMax = positionInMillis;
+                }
             }
             else
             {
                 // The position is near the end of the song.
-                double missingMillis = durationOfSongInMillis - positionInSongInMillis;
-                if (missingMillis < 1000)
+                double missingMillis = durationInMillis - positionInMillis;
+                if (missingMillis < 500)
                 {
                     hasBeenNearEndOfSong = true;
                 }
@@ -71,12 +103,24 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
 
             // Detect end of the song by #END tag of txt file.
             // This can be used to skip the ending of the audio file.
-            if (songMeta.End > 0
+            if (songMeta.EndInMillis > 0
                 // #END tag is in milliseconds (but #START is in seconds)
-                && positionInSongInMillis > songMeta.End)
+                && positionInMillis > songMeta.EndInMillis)
             {
-                isSongFinished = true;
+                IsSongFinished = true;
             }
         }
+    }
+
+    public void TriggerEarlySongFinish()
+    {
+        if (IsSongFinished)
+        {
+            return;
+        }
+
+        Debug.Log("Trigger early song finish");
+        IsSongFinished = true;
+        isEarlyFinish = true;
     }
 }

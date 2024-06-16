@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="background" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+        <ui:VisualElement name="labelContainer" class="overlay" style="background-color: rgba(0, 0, 0, 0);">
+            <ui:Label tabindex="-1" text="Play Mode Test" display-tooltip-when-elided="true" name="playModeTestLabel" />
+            <ui:Label tabindex="-1" text="Status: ?" display-tooltip-when-elided="true" name="playModeTestStatusLabel" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

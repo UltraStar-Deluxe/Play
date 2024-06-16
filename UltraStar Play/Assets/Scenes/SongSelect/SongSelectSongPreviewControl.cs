@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using UniInject;
 using UniRx;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -15,14 +14,19 @@ public class SongSelectSongPreviewControl : SongPreviewControl
     [Inject]
     private SongSelectSceneData sceneData;
 
+    [Inject]
+    private SongSelectSceneControl songSelectSceneControl;
+
+    [Inject]
+    private ThemeManager themeManager;
+
     [Inject(UxmlName = R.UxmlNames.songPreviewVideoImage)]
     private VisualElement songPreviewVideoImage;
 
     [Inject(UxmlName = R.UxmlNames.songPreviewBackgroundImage)]
     private VisualElement songPreviewBackgroundImage;
 
-    
-    private SongEntryControl currentSongEntryControl;
+    private SongSelectEntryControl currentSongSelectEntryControl;
 
     private int initialSongIndex;
 
@@ -34,17 +38,22 @@ public class SongSelectSongPreviewControl : SongPreviewControl
     {
         base.Start();
 
-        StartSongPreviewEventStream.Subscribe(_ =>
+        AudioFadeInDurationInSeconds = settings.PreviewFadeInDurationInSeconds;
+        VideoFadeInDurationInSeconds = settings.PreviewFadeInDurationInSeconds;
+
+        songPreviewVideoImage.style.opacity = 0;
+        StartSongPreviewEventStream.Subscribe(songMeta =>
         {
-            if (currentSongEntryControl == null)
+            if (currentSongSelectEntryControl == null)
             {
                 return;
             }
 
-            if (SongMetaUtils.VideoResourceExists(currentSongEntryControl.SongMeta))
+            string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
+            if (SongMetaUtils.ResourceExists(songMeta, videoUri))
             {
                 songPreviewVideoImage.ShowByDisplay();
-                songPreviewVideoImage.SetBackgroundImageAlpha(0);
+                songPreviewVideoImage.style.opacity = 0;
             }
 
             songPreviewBackgroundImage.ShowByDisplay();
@@ -57,27 +66,24 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         });
 
         // Video / background image fade-in
+        float videoTargetAlpha = themeManager.GetCurrentTheme().ThemeJson.videoPreviewColor.a / 255f;
+        if (videoTargetAlpha <= 0)
+        {
+            videoTargetAlpha = 1;
+        }
         VideoFadeIn.Subscribe(newValue =>
         {
-            if (currentSongEntryControl == null)
-            {
-                return;
-            }
-            songPreviewVideoImage.SetBackgroundImageAlpha(newValue);
+            songPreviewVideoImage.style.opacity = newValue * videoTargetAlpha;
         });
         BackgroundImageFadeIn.Subscribe(newValue =>
         {
-            if (currentSongEntryControl == null)
-            {
-                return;
-            }
             songPreviewBackgroundImage.SetBackgroundImageAlpha(newValue);
         });
 
         if (sceneData != null
             && sceneData.SongMeta != null)
         {
-            initialSongIndex = songRouletteControl.Songs.IndexOf(sceneData.SongMeta);
+            initialSongIndex = songRouletteControl.GetEntryIndexBySongMeta(sceneData.SongMeta);
         }
     }
 
@@ -85,42 +91,52 @@ public class SongSelectSongPreviewControl : SongPreviewControl
     {
         base.Update();
 
-        if (songRouletteControl.Selection.Value.SongMeta != currentPreviewSongMeta)
+        if (songRouletteControl.Selection.Value.Entry is SongSelectSongEntry songEntry
+            && songEntry.SongMeta != currentPreviewSongMeta)
         {
             StartSongPreview(songRouletteControl.Selection.Value);
         }
     }
 
-    public void StartSongPreview(SongSelection songSelection)
+    public void StartSongPreview(SongSelectEntrySelection songSelectEntrySelection)
     {
-        if (songSelection.SongIndex != initialSongIndex)
+        if (songSelectEntrySelection.Index != initialSongIndex)
         {
             isFirstSelectedSong = false;
         }
 
-        if (isFirstSelectedSong)
+        if (isFirstSelectedSong
+            && !songSelectSceneControl.HasPartyModeSceneData)
         {
             return;
         }
 
-        currentSongEntryControl = songRouletteControl.SongEntryControls
-            .FirstOrDefault(it => it.SongMeta == songSelection.SongMeta);
+        if (songSelectEntrySelection.Entry is not SongSelectSongEntry selectedSongEntry)
+        {
+            return;
+        }
 
-        StartSongPreview(songSelection.SongMeta);
+        currentSongSelectEntryControl = songRouletteControl.EntryControls
+            .FirstOrDefault(it => it.SongSelectEntry == selectedSongEntry);
+
+        StartSongPreview(selectedSongEntry.SongMeta);
     }
 
     public override void StartSongPreview(SongMeta songMeta)
     {
-        if (currentSongEntryControl == null)
+        if (currentSongSelectEntryControl == null)
         {
             return;
         }
+        songPreviewVideoImage.HideByDisplay();
+        songPreviewBackgroundImage.HideByDisplay();
+
         base.StartSongPreview(songMeta);
     }
 
     protected override void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
     {
-        if (currentSongEntryControl == null)
+        if (currentSongSelectEntryControl == null)
         {
             return;
         }
@@ -129,7 +145,7 @@ public class SongSelectSongPreviewControl : SongPreviewControl
 
     protected override void StartVideoPreview(SongMeta songMeta)
     {
-        if (currentSongEntryControl == null)
+        if (currentSongSelectEntryControl == null)
         {
             return;
         }

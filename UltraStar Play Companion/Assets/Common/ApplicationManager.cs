@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UniInject;
+using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem.EnhancedTouch;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 {
@@ -18,30 +21,63 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
     [Range(-1, 60)]
     public int targetFrameRate = 30;
 
-
     [Inject]
     private Settings settings;
 
+    private readonly Subject<Finger> fingerUpEventStream = new();
+    public IObservable<Finger> FingerUpEventStream => fingerUpEventStream;
+
+    private readonly Subject<Finger> fingerDownEventStream = new();
+    public IObservable<Finger> FingerDownEventStream => fingerDownEventStream;
+    
     protected override object GetInstance()
     {
         return Instance;
     }
 
+    protected override void AwakeSingleton()
+    {
+        EnhancedTouchSupport.Enable();
+    }
+
     protected override void StartSingleton()
     {
+        UpdateTargetFps();
+        settings.ObserveEveryValueChanged(it => it.TargetFps)
+            .Subscribe(_ => UpdateTargetFps())
+            .AddTo(gameObject);
+    }
+
+    private void UpdateTargetFps()
+    {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+        
         targetFrameRate = settings.TargetFps;
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = targetFrameRate;
+        if (targetFrameRate > 0)
+        {
+            Application.targetFrameRate = targetFrameRate;
+            QualitySettings.vSyncCount = 0;
+        }
+        else
+        {
+            Application.targetFrameRate = -1;
+            QualitySettings.vSyncCount = 1;
+        }
     }
 
     protected override void OnEnableSingleton()
     {
-        Application.logMessageReceivedThreaded += Log.HandleUnityLog;
+        Touch.onFingerDown += OnFingerDown;
+        Touch.onFingerUp += OnFingerUp;
     }
 
     protected override void OnDisableSingleton()
     {
-        Application.logMessageReceivedThreaded -= Log.HandleUnityLog;
+        Touch.onFingerDown -= OnFingerDown;
+        Touch.onFingerUp -= OnFingerUp;
     }
 
     void Update()
@@ -88,12 +124,22 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         {
             if (PlatformUtils.IsStandalone)
             {
-                return System.Environment.GetCommandLineArgs();
+                return Environment.GetCommandLineArgs();
             }
             else
             {
                 return Array.Empty<string>();
             }
         }
+    }
+    
+    private void OnFingerUp(Finger obj)
+    {
+       fingerUpEventStream.OnNext(obj);
+    }
+    
+    private void OnFingerDown(Finger obj)
+    {
+       fingerDownEventStream.OnNext(obj);
     }
 }

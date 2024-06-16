@@ -1,109 +1,63 @@
 ﻿using System;
 using System.Collections.Generic;
-using FullSerializer;
+using Newtonsoft.Json;
 using UnityEngine;
 
-public class GradientConfigConverter  : fsConverter
+public class GradientConfigConverter : JsonConverter<GradientConfig>
 {
-    public override bool CanProcess(Type type)
+    public override void WriteJson(JsonWriter writer, GradientConfig value, JsonSerializer serializer)
     {
-        return type == typeof(GradientConfig);
+        writer.WriteValue($"{GradientConfigUtils.ToCssSyntax(value)}");
     }
 
-    public override object CreateInstance(fsData data, Type storageType)
+    public override GradientConfig ReadJson(JsonReader reader, Type objectType, GradientConfig existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
-        return null;
-    }
-    
-    public override fsResult TrySerialize(object instance, out fsData serialized, Type storageType)
-    {
-        if (instance is not GradientConfig gradientConfig)
+        if (reader.TokenType is JsonToken.Null)
         {
-            throw new InvalidOperationException("FullSerializer Internal Error -- Unexpected serialization type");
+            return null;
         }
 
-        serialized = new fsData($"{GradientConfigUtils.ToCssSyntax(gradientConfig)}");
-        return fsResult.Success;
-    }
-
-    public override fsResult TryDeserialize(fsData data, ref object instance, Type storageType)
-    {
-        if (storageType != typeof(GradientConfig))
+        if (reader.TokenType is JsonToken.String)
         {
-            throw new InvalidOperationException("FullSerializer Internal Error -- Unexpected deserialization type");
+            // Try parse string object in the form "linear-gradient(angle, startColor, endColor)", where angle is optional.
+            string dataAsString = (string)reader.Value;
+            return GradientConfigUtils.FromCssSyntax(dataAsString);
         }
 
-        if (data.IsString == false)
-        {
-            return ParseGradientConfigFromDataAsDictionary(data, ref instance);
-        }
-
-        return ParseGradientConfigFromDataAsString(data, ref instance);
-    }
-
-    /**
-     * Try parse string object in the form "linear-gradient(angle, startColor, endColor)", where angle is optional.
-     */
-    private fsResult ParseGradientConfigFromDataAsString(fsData data, ref object instance)
-    {
-        string dataAsString = data.AsString;
         try
         {
-            instance = GradientConfigUtils.FromCssSyntax(dataAsString);
+            // Try parse object in the form {"startColor":"#RRGGBBAA","endColor":"#RRGGBBAA", "angleDegrees":"360"}
+            Dictionary<string, object> dataAsDictionary = serializer.Deserialize<Dictionary<string, object>>(reader);
+            Color32 startColor = GetColor(dataAsDictionary, "startColor", Colors.clearBlack);
+            Color32 endColor = GetColor(dataAsDictionary, "endColor", Colors.clearBlack);
+            float angleDegrees = GetAngleInDegrees(dataAsDictionary, "angleDegrees", 0);
+            return new GradientConfig(startColor, endColor, angleDegrees);
         }
         catch (Exception ex)
         {
-            Debug.LogError($"Unable to parse {data} into a GradientConfig: {ex.Message}");
-            // Ignore this issue
-            return fsResult.Success;
+            Debug.LogException(ex);
+            Debug.LogError($"ParseGradientConfigFromDataAsDictionary failed: {ex.Message}");
+            return null;
         }
-
-        if (instance != null)
-        {
-            return fsResult.Success;
-        }
-
-        return fsResult.Fail($"Unable to parse {data} into a GradientConfig");
     }
 
-    /**
-     * Try parse object in the form {"startColor":"#RRGGBBAA","endColor":"#RRGGBBAA", "angleDegrees":"360"}
-     */
-    private fsResult ParseGradientConfigFromDataAsDictionary(fsData data, ref object instance)
+    private static Color32 GetColor(Dictionary<string, object> dataAsDictionary, string key, Color32 fallbackValue)
     {
-        Dictionary<string, fsData> dataAsDictionary = data.AsDictionary;
-
-        Color32 GetColorFromDataAsDictionary(string key, Color32 fallbackValue)
+        if (dataAsDictionary.TryGetValue(key, out object colorData))
         {
-            if (dataAsDictionary.TryGetValue(key, out fsData colorData))
-            {
-                return Colors.CreateColor(colorData.AsString);
-            }
-            return fallbackValue;
+            return Colors.CreateColor(Convert.ToString(colorData));
         }
 
-        float GetAngleInDegreesFromDataAsDictionary(string key, float fallbackValue)
+        return fallbackValue;
+    }
+
+    private static float GetAngleInDegrees(Dictionary<string, object> dataAsDictionary, string key, float fallbackValue)
+    {
+        if (dataAsDictionary.TryGetValue(key, out object angleData))
         {
-            if (dataAsDictionary.TryGetValue(key, out fsData angleData))
-            {
-                return (float)angleData.AsDouble;
-            }
-            return fallbackValue;
+            return Convert.ToSingle(angleData);
         }
-        
-        try
-        {
-            Color32 startColor = GetColorFromDataAsDictionary("startColor", Colors.clearBlack);
-            Color32 endColor = GetColorFromDataAsDictionary("endColor", Colors.clearBlack);
-            float angleDegrees = GetAngleInDegreesFromDataAsDictionary("angleDegree", 0);
-            instance = new GradientConfig(startColor, endColor, angleDegrees);
-            return fsResult.Success;
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError(ex);
-            instance = Colors.white;
-            return fsResult.Fail($"Unable to parse {data} into a GradientConfig");
-        }
+
+        return fallbackValue;
     }
 }

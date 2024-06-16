@@ -1,32 +1,34 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background" style="flex-grow: 1; align-items: center; justify-content: center; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
-        <ui:VisualElement name="logo" class="fontColor" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); position: absolute; -unity-background-scale-mode: scale-to-fit; background-image: url(&apos;project://database/Assets/Scenes/Loading/UltraStarPlayLogo_2023_02.png?fileID=2800000&amp;guid=09b1a89e71bf9c447b3ecae7f999395e&amp;type=3#UltraStarPlayLogo_2023_02&apos;); width: 50%; height: 100%; left: 50px; top: 20px;" />
-        <ui:VisualElement name="column" class="child-mb-3" style="position: absolute; left: 66%;">
-            <ui:Button text="Sing" name="startButton" class="mainSceneButton" />
-            <ui:Button text="Team&#10;&amp; Tournament" name="partyButton" class="mainSceneButton" />
+    <ui:VisualElement name="background" style="flex-grow: 1; align-items: center; justify-content: center;">
+        <ui:VisualElement name="logo" style="flex-grow: 1; position: absolute; width: 100%; left: 0; align-items: flex-start; top: 0; height: 60%;" />
+        <ui:VisualElement name="row" style="position: absolute; top: 66.6%;">
+            <ui:Button text="$mainScene_button_sing" name="startButton" class="mb-3" style="height: 60px; width: 160px; font-size: 18px;" />
+            <ui:Button text="$mainScene_button_party" name="partyButton" class="mainSceneButton ml-5" style="width: 160px; height: 60px; font-size: 18px;" />
+            <ui:Button text="$mainScene_button_onlineGame" name="onlineGameButton" class="mainSceneButton ml-5" style="width: 160px; height: 60px; font-size: 18px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="bottomButtonRow" class="child-mr-2" style="width: 100%; align-items: center; flex-direction: row; justify-content: flex-end; position: absolute; bottom: 5px;">
-            <ui:Button name="versionInfoContainer" class="transparentButton focusableNavigatorIgnore" style="right: 5px; margin-right: auto; overflow: visible; align-items: flex-start;">
-                <ui:Label text="Version xx.yy.zz" name="semanticVersionText" style="font-size: 12px; -unity-text-align: upper-center; border-top-left-radius: 12px; border-bottom-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; height: auto;" />
+        <ui:VisualElement name="bottomButtonRow" class="child-mr-2 pb-2 px-2" style="width: 100%; align-items: center; flex-direction: row; justify-content: flex-end; position: absolute; bottom: 0;">
+            <ui:Button name="versionInfoContainer" class="transparentButton focusableNavigatorIgnore" style="overflow: visible; align-items: flex-start; margin-right: auto;">
+                <ui:Label text="Version xx.yy.zz" name="semanticVersionLabel" style="font-size: 12px; -unity-text-align: upper-center; border-top-left-radius: 12px; border-bottom-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; height: auto;" />
                 <ui:VisualElement name="versionDetailsContainer" style="background-color: rgba(0, 0, 0, 0); bottom: 110%; position: absolute; display: none; align-items: flex-start;">
-                    <ui:Label text="Commit: 5e07588" name="commitHashText" style="font-size: 12px; -unity-text-align: middle-left;" />
-                    <ui:Label text="Build timestamp: yyMMddHHmm" name="buildTimeStampText" style="font-size: 12px; -unity-text-align: middle-left;" />
+                    <ui:Label text="Commit: 5e07588" name="commitHashLabel" style="font-size: 12px; -unity-text-align: middle-left;" />
+                    <ui:Label text="Unity version: abcd.x.yfz" name="unityVersionLabel" style="font-size: 12px; -unity-text-align: middle-left;" />
+                    <ui:Label text="Build timestamp: yyMMddHHmm" name="buildTimeStampLabel" style="font-size: 12px; -unity-text-align: middle-left;" />
                 </ui:VisualElement>
             </ui:Button>
-            <ui:Button name="createSongButton" class="transparentButton circleButton" style="right: 5px;">
+            <ui:Button name="createSongButton" class="transparentButton circleButton">
                 <MaterialIcon name="createSongIcon" icon="handyman" />
             </ui:Button>
-            <ui:Button name="settingsButton" class="transparentButton circleButton" style="right: 5px; overflow: visible;">
+            <ui:Button name="settingsButton" class="transparentButton circleButton" style="overflow: visible;">
                 <MaterialIcon name="settingsIcon" icon="settings" />
                 <MaterialIcon name="settingsProblemHintIcon" icon="warning" class="settingsProblemHintIcon rounded warningFontColor" style="position: absolute; bottom: 100%;" />
             </ui:Button>
-            <ui:Button name="aboutButton" class="transparentButton circleButton" style="right: 5px;">
+            <ui:Button name="aboutButton" class="transparentButton circleButton">
                 <MaterialIcon name="aboutIcon" icon="info_outline" />
             </ui:Button>
-            <ui:Button name="creditsButton" class="transparentButton circleButton" style="right: 5px;">
+            <ui:Button name="creditsButton" class="transparentButton circleButton">
                 <MaterialIcon name="creditsIcon" icon="groups" />
             </ui:Button>
-            <ui:Button name="quitButton" class="transparentButton circleButton" style="right: 5px;">
+            <ui:Button name="quitButton" class="transparentButton circleButton">
                 <MaterialIcon name="quitIcon" icon="logout" />
             </ui:Button>
         </ui:VisualElement>

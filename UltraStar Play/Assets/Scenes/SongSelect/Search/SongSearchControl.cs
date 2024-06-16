@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic;
-using ProTrans;
+using System.Reflection;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -11,10 +11,13 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITranslator
+public class SongSearchControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject(UxmlName = R.UxmlNames.searchTextField)]
     private TextField searchTextField;
@@ -25,38 +28,53 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject(UxmlName = R.UxmlNames.searchPropertyButton)]
     private Button searchPropertyButton;
 
-    [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownTitle)]
-    private Label searchPropertyDropdownTitle;
+    [Inject(UxmlName = R.UxmlNames.filterActiveIcon)]
+    private VisualElement filterActiveIcon;
+
+    [Inject(UxmlName = R.UxmlNames.resetActiveFiltersButton)]
+    private Button resetActiveFiltersButton;
+
+    [Inject(UxmlName = R.UxmlNames.filterInactiveIcon)]
+    private VisualElement filterInactiveIcon;
 
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownOverlay)]
     private VisualElement searchPropertyDropdownOverlay;
 
-    [Inject(UxmlName = R.UxmlNames.artistPropertyContainer)]
-    private VisualElement artistPropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.playlistDropdownField)]
+    private DropdownField playlistDropdownField;
 
-    [Inject(UxmlName = R.UxmlNames.titlePropertyContainer)]
-    private VisualElement titlePropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.artistPropertyToggle)]
+    private Toggle artistPropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.genrePropertyContainer)]
-    private VisualElement genrePropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.titlePropertyToggle)]
+    private Toggle titlePropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.yearPropertyContainer)]
-    private VisualElement yearPropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.genrePropertyToggle)]
+    private Toggle genrePropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.editionPropertyContainer)]
-    private VisualElement editionPropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.tagPropertyToggle)]
+    private Toggle tagPropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.languagePropertyContainer)]
-    private VisualElement languagePropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.yearPropertyToggle)]
+    private Toggle yearPropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.lyricsPropertyContainer)]
-    private VisualElement lyricsPropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.editionPropertyToggle)]
+    private Toggle editionPropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.searchErrorIcon)]
-    private VisualElement searchErrorIcon;
-    
+    [Inject(UxmlName = R.UxmlNames.languagePropertyToggle)]
+    private Toggle languagePropertyToggle;
+
+    [Inject(UxmlName = R.UxmlNames.lyricsPropertyToggle)]
+    private Toggle lyricsPropertyToggle;
+
+    [Inject(UxmlName = R.UxmlNames.searchExpressionIcon)]
+    private VisualElement searchExpressionIcon;
+
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownContainer)]
     private VisualElement searchPropertyDropdownContainer;
+
+    [Inject]
+    private SongSelectionPlaylistChooserControl playlistChooserControl;
 
     [Inject]
     private Injector injector;
@@ -64,7 +82,19 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject]
     private SongRouletteControl songRouletteControl;
 
-    private TooltipControl searchErrorIconTooltipControl;
+    [Inject]
+    private SongSelectSceneControl songSelectSceneControl;
+
+    [Inject]
+    private SongSelectFilterControl songSelectFilterControl;
+
+    [Inject]
+    private PlaylistManager playlistManager;
+
+    [Inject]
+    private SongSelectSceneInputControl songSelectSceneInputControl;
+
+    private TooltipControl searchExpressionIconTooltipControl;
 
     public bool IsSearchPropertyDropdownVisible => searchPropertyDropdownOverlay.IsVisibleByDisplay();
 
@@ -73,20 +103,33 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     private readonly Subject<SearchChangedEvent> searchChangedEventStream = new();
     public IObservable<SearchChangedEvent> SearchChangedEventStream => searchChangedEventStream;
 
+    private readonly Subject<VoidEvent> submitEventStream = new();
+    public IObservable<VoidEvent> SubmitEventStream => submitEventStream;
+
     public void OnInjectionFinished()
     {
-        searchProperties = new HashSet<ESearchProperty>(settings.SongSelectSettings.searchProperties);
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSearchControl.OnInjectionFinished");
+
+        searchProperties = new HashSet<ESearchProperty>(settings.SearchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
         {
-            UpdateSearchTextFieldHint();
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
-        searchTextField.RegisterCallback<FocusEvent>(evt => UpdateSearchTextFieldHint());
-        searchTextField.RegisterCallback<BlurEvent>(evt => UpdateSearchTextFieldHint(true));
-        UpdateSearchTextFieldHint();
+        searchTextField.DisableParseEscapeSequences();
+        searchTextField.RegisterCallback<NavigationSubmitEvent>(_ => submitEventStream.OnNext(VoidEvent.instance));
+        new TextFieldHintControl(searchTextFieldHint);
 
-        searchErrorIcon.HideByDisplay();
-        searchErrorIconTooltipControl = new(searchErrorIcon);
+        songSelectSceneInputControl.FuzzySearchText.Subscribe(newValue => searchTextFieldHint.SetVisibleByVisibility(newValue.IsNullOrEmpty()));
+
+        searchExpressionIcon.HideByDisplay();
+        nonPersistentSettings.IsSearchExpressionsEnabled.Subscribe(newValue => searchExpressionIcon.SetVisibleByDisplay(newValue));
+        searchExpressionIconTooltipControl = new(searchExpressionIcon);
+
+        // Apply last search expression if any
+        if (!nonPersistentSettings.LastValidSearchExpression.Value.IsNullOrEmpty())
+        {
+            searchTextField.value = nonPersistentSettings.LastValidSearchExpression.Value;
+        }
 
         HideSearchPropertyDropdownOverlay();
         searchPropertyButton.RegisterCallbackButtonTriggered(_ =>
@@ -102,64 +145,74 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         });
         VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(searchPropertyDropdownOverlay);
 
-        RegisterToggleSearchPropertyCallback(artistPropertyContainer.Q<Toggle>(), ESearchProperty.Artist);
-        RegisterToggleSearchPropertyCallback(titlePropertyContainer.Q<Toggle>(), ESearchProperty.Title);
-        RegisterToggleSearchPropertyCallback(genrePropertyContainer.Q<Toggle>(), ESearchProperty.Genre);
-        RegisterToggleSearchPropertyCallback(yearPropertyContainer.Q<Toggle>(), ESearchProperty.Year);
-        RegisterToggleSearchPropertyCallback(editionPropertyContainer.Q<Toggle>(), ESearchProperty.Edition);
-        RegisterToggleSearchPropertyCallback(languagePropertyContainer.Q<Toggle>(), ESearchProperty.Language);
-        RegisterToggleSearchPropertyCallback(lyricsPropertyContainer.Q<Toggle>(), ESearchProperty.Lyrics);
+        filterActiveIcon.HideByDisplay();
+        nonPersistentSettings.PlaylistName
+            .Subscribe(_ => UpdateAnyFiltersActive());
+        playlistManager.PlaylistChangeEventStream
+            .Subscribe(_ => UpdateAnyFiltersActive());
+        songSelectFilterControl.FiltersChangedEventStream
+            .Subscribe(_ => UpdateAnyFiltersActive());
+        resetActiveFiltersButton.RegisterCallbackButtonTriggered(_ => ResetActiveFilters());
+
+        if (!nonPersistentSettings.ActiveSearchPropertyFilters.IsNullOrEmpty())
+        {
+            songSelectFilterControl.InitFilters();
+        }
+
+        RegisterToggleSearchPropertyCallback(artistPropertyToggle, ESearchProperty.Artist);
+        RegisterToggleSearchPropertyCallback(titlePropertyToggle, ESearchProperty.Title);
+        RegisterToggleSearchPropertyCallback(languagePropertyToggle, ESearchProperty.Language);
+        RegisterToggleSearchPropertyCallback(genrePropertyToggle, ESearchProperty.Genre);
+        RegisterToggleSearchPropertyCallback(tagPropertyToggle, ESearchProperty.Tags);
+        RegisterToggleSearchPropertyCallback(editionPropertyToggle, ESearchProperty.Edition);
+        RegisterToggleSearchPropertyCallback(yearPropertyToggle, ESearchProperty.Year);
+        RegisterToggleSearchPropertyCallback(lyricsPropertyToggle, ESearchProperty.Lyrics);
 
         new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
+        new UseAvailableScreenHeightControl(searchPropertyDropdownContainer);
 
-        songRouletteControl.SongListChangedEventStream.Subscribe(songList =>
-        {
-            if (songList.IsNullOrEmpty()
-                && !GetRawSearchText().IsNullOrEmpty())
-            {
-                searchTextField.AddToClassList("noSearchResults");
-            }
-            else
-            {
-                searchTextField.RemoveFromClassList("noSearchResults");
-            }
-        });
+        songRouletteControl.EntryListChangedEventStream
+            .Subscribe(_ => UpdateSearchTextFieldStyle());
+        songSelectSceneControl.IsSongRepositorySearchRunning
+            .Subscribe(_ => UpdateSearchTextFieldStyle());
     }
 
-    private void UpdateSearchTextFieldHint(bool isBlurEvent = false)
+    private void UpdateSearchTextFieldStyle()
     {
-        searchTextFieldHint.SetVisibleByDisplay(
-            GetRawSearchText().IsNullOrEmpty()
-            && (isBlurEvent || searchTextField.focusController.focusedElement != searchTextField));
-    }
-
-    private string GetTranslation(ESearchProperty searchProperty)
-    {
-        switch (searchProperty)
+        if (songRouletteControl.Entries.IsNullOrEmpty()
+            && !GetRawSearchText().IsNullOrEmpty()
+            && !songSelectSceneControl.IsSongRepositorySearchRunning.Value)
         {
-            case ESearchProperty.Artist:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_artist);
-            case ESearchProperty.Title:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_title);
-            case ESearchProperty.Year:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_year);
-            case ESearchProperty.Genre:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_genre);
-            case ESearchProperty.Language:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_language);
-            case ESearchProperty.Edition:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_edition);
-            case ESearchProperty.Lyrics:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
-            default:
-                return searchProperty.ToString();
+            searchTextField.AddToClassList("noSearchResults");
         }
+        else
+        {
+            searchTextField.RemoveFromClassList("noSearchResults");
+        }
+    }
+
+    private void ResetActiveFilters()
+    {
+        playlistChooserControl.Reset();
+        songSelectFilterControl.Reset();
+        ResetSearchText();
+    }
+
+    private void UpdateAnyFiltersActive()
+    {
+        IPlaylist activePlaylist = playlistManager.GetPlaylistByName(nonPersistentSettings.PlaylistName.Value);
+        bool isAnyFilterOrPlaylistActive = songSelectFilterControl.IsAnyFilterActive
+                                           || (activePlaylist != null &&
+                                               activePlaylist is not UltraStarAllSongsPlaylist);
+
+        filterActiveIcon.SetVisibleByDisplay(isAnyFilterOrPlaylistActive);
+        filterInactiveIcon.SetVisibleByDisplay(!isAnyFilterOrPlaylistActive);
     }
 
     public void ShowSearchPropertyDropdownOverlay()
     {
         searchPropertyDropdownOverlay.ShowByDisplay();
-        artistPropertyContainer.Q<Toggle>().Focus();
+        playlistDropdownField.Focus();
     }
 
     public void HideSearchPropertyDropdownOverlay()
@@ -171,24 +224,32 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public List<SongMeta> GetFilteredSongMetas(List<SongMeta> songMetas)
     {
         string searchExp = searchTextField.value;
-        searchErrorIcon.HideByDisplay();
-        if (IsSearchExpression(searchExp))
+        searchExpressionIcon.RemoveFromClassList("errorFontColor");
+        searchExpressionIconTooltipControl.TooltipText = Translation.Get(R.Messages.songSelectScene_searchExpressionEnabled,
+            "properties", GetAvailableSearchExpressionPropertiesCsv());
+        if (nonPersistentSettings.IsSearchExpressionsEnabled.Value
+            && !searchExp.IsNullOrEmpty())
         {
             try
             {
                 List<SongMeta> searchExpSongMetas = songMetas.AsQueryable()
                     .Where(searchExp)
                     .ToList();
+                nonPersistentSettings.LastValidSearchExpression.Value = searchExp;
                 return searchExpSongMetas;
             }
             catch (Exception e)
             {
                 Debug.Log($"Invalid search expression '{searchExp}': {e.Message}. Stack trace:\n{e.StackTrace}");
-                searchErrorIcon.ShowByDisplay();
-                searchErrorIconTooltipControl.TooltipText = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionError,
+                searchExpressionIcon.AddToClassList("errorFontColor");
+                searchExpressionIconTooltipControl.TooltipText = Translation.Get(R.Messages.songSelectScene_searchExpressionError,
                     "errorDetails", e.Message);
                 return new List<SongMeta>();
             }
+        }
+        else
+        {
+            nonPersistentSettings.LastValidSearchExpression.Value = "";
         }
 
         // Ignore prefix for special search syntax
@@ -202,42 +263,41 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         return filteredSongs;
     }
 
-    private bool IsSearchExpression(string searchExp)
+    private string GetAvailableSearchExpressionPropertiesCsv()
     {
-        bool IsSongPropertyRelation(ESongProperty songProperty)
-        {
-            List<string> relations = new() { "=", "!=", "<", ">", ">=", "<=" };
-            List<string> methods = new() { ".Contains(", ".StartsWith(", ".EndsWith(",
-                ".ToLower(", ".ToUpper(", ".ToLowerInvariant(", ".ToUpperInvariant(" };
-            string searchExpNoWhitespace = searchExp.Replace(" ", "");
-            return relations.AnyMatch(relation =>
-                       searchExpNoWhitespace.StartsWith($"{songProperty}{relation}")
-                       || searchExpNoWhitespace.Contains($"{relation}{songProperty}"))
-                   || methods.AnyMatch(boolMethod =>
-                       searchExpNoWhitespace.StartsWith($"{songProperty}{boolMethod}"));
-        }
-
-        return !searchExp.IsNullOrEmpty()
-               && EnumUtils.GetValuesAsList<ESongProperty>().AnyMatch(songProperty => IsSongPropertyRelation(songProperty));
+        return typeof(SongMeta).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Select(property => property.Name)
+            .OrderBy(propertyName => propertyName)
+            .JoinWith(", ");
     }
 
     private bool SongMetaMatchesSearchedProperties(SongMeta songMeta, string searchText)
     {
+        if (songMeta == null)
+        {
+            return false;
+        }
+
+        if (searchText.IsNullOrEmpty())
+        {
+             return true;
+        }
+
         if (searchProperties.Contains(ESearchProperty.Artist)
             && !songMeta.Artist.IsNullOrEmpty()
-            && songMeta.Artist.ToLowerInvariant().Contains(searchText))
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Artist, searchText))
         {
             return true;
         }
         if (searchProperties.Contains(ESearchProperty.Title)
             && !songMeta.Title.IsNullOrEmpty()
-            && songMeta.Title.ToLowerInvariant().Contains(searchText))
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Title, searchText))
         {
             return true;
         }
         if (searchProperties.Contains(ESearchProperty.Genre)
             && !songMeta.Genre.IsNullOrEmpty()
-            && songMeta.Genre.ToLowerInvariant().Contains(searchText))
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Genre, searchText))
         {
             return true;
         }
@@ -248,13 +308,19 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         }
         if (searchProperties.Contains(ESearchProperty.Edition)
             && !songMeta.Edition.IsNullOrEmpty()
-            && songMeta.Edition.ToLowerInvariant().Contains(searchText))
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Edition, searchText))
+        {
+            return true;
+        }
+        if (searchProperties.Contains(ESearchProperty.Tags)
+            && !songMeta.Tag.IsNullOrEmpty()
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Tag, searchText))
         {
             return true;
         }
         if (searchProperties.Contains(ESearchProperty.Language)
             && !songMeta.Language.IsNullOrEmpty()
-            && songMeta.Language.ToLowerInvariant().Contains(searchText))
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Language, searchText))
         {
             return true;
         }
@@ -268,14 +334,23 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private bool SongMetaMatchesLyrics(SongMeta songMeta, string searchText)
     {
+        if (songMeta == null)
+        {
+            return false;
+        }
+
+        if (searchText.IsNullOrEmpty())
+        {
+            return true;
+        }
+
         // TODO: Implement search on separate thread and concurrent update of search result.
-        string searchTextLower = searchText.ToLowerInvariant();
-        return songMeta.GetVoices()
-            .Select(voice => SongMetaUtils.GetLyrics(songMeta, voice)
+        return songMeta.Voices
+            .Select(voice => SongMetaUtils.GetLyrics(voice)
                 // The character '~' is often used in UltraStar files to indicate a change of pitch during the same syllable.
                 // Thus, it should be ignored when searching in lyrics.
                 .Replace("~", ""))
-            .Any(lyrics => lyrics.ToLowerInvariant().Contains(searchTextLower));
+            .Any(lyrics => StringUtils.ContainsIgnoreCaseAndDiacritics(lyrics, searchText));
     }
 
     public string GetRawSearchText()
@@ -293,23 +368,17 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         searchTextField.Focus();
     }
 
-    public bool IsSearchTextFieldFocused()
-    {
-        return searchTextField.focusController.focusedElement == searchTextField
-               || !searchTextField.value.IsNullOrEmpty();
-    }
-
     public void AddSearchProperty(ESearchProperty searchProperty)
     {
         searchProperties.Add(searchProperty);
-        settings.SongSelectSettings.searchProperties = searchProperties.ToList();
+        settings.SearchProperties = searchProperties.ToList();
         searchChangedEventStream.OnNext(new SearchPropertyChangedEvent());
     }
 
     public void RemoveSearchProperty(ESearchProperty searchProperty)
     {
         searchProperties.Remove(searchProperty);
-        settings.SongSelectSettings.searchProperties = searchProperties.ToList();
+        settings.SearchProperties = searchProperties.ToList();
         searchChangedEventStream.OnNext(new SearchPropertyChangedEvent());
     }
 
@@ -321,12 +390,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public void ResetSearchText()
     {
         searchTextField.value = "";
-        searchTextField.Blur();
     }
 
     private void RegisterToggleSearchPropertyCallback(Toggle toggle, ESearchProperty searchProperty)
     {
-        toggle.value = settings.SongSelectSettings.searchProperties.Contains(searchProperty);
+        toggle.value = settings.SearchProperties.Contains(searchProperty);
         toggle.RegisterValueChangedCallback(evt =>
         {
             if (evt.newValue)
@@ -354,18 +422,5 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public class SearchTextChangedEvent : SearchChangedEvent
     {
 
-    }
-
-    public void UpdateTranslation()
-    {
-        searchPropertyDropdownTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchPropertyDropdownTitle);
-        artistPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_artist);
-        titlePropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_title);
-        editionPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_edition);
-        genrePropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_genre);
-        languagePropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_language);
-        lyricsPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
-        yearPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_year);
-        searchTextFieldHint.text = "What do you want to sing today?";
     }
 }

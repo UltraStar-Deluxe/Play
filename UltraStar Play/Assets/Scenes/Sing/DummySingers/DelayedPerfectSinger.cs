@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class DelayedPerfectSinger : PerfectSinger
 {
@@ -48,10 +46,11 @@ public class DelayedPerfectSinger : PerfectSinger
 
     protected override BeatPitchEvent GetDummyPitchEvent(int beat)
     {
-        Note noteAtBeat = GetNoteAtBeat(beat);
+        Note noteAtBeat = GetNoteAtBeat(beat, true, false);
         int midiNote = noteAtBeat != null
             ? noteAtBeat.MidiNote
             : 60;
-        return new BeatPitchEvent(midiNote + offset, beat);
+        float frequency = 0;
+        return new BeatPitchEvent(midiNote + offset, beat, frequency);
     }
 }

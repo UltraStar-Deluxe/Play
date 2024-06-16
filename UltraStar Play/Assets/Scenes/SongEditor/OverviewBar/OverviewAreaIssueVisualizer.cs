@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UniInject;
+﻿using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -21,20 +19,18 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
+    [Inject]
+    private SongEditorIssueAnalyzerControl issueAnalyzerControl;
+
     [Inject(UxmlName = R.UxmlNames.overviewAreaIssues)]
     private VisualElement overviewAreaIssues;
-
-    private IReadOnlyCollection<SongIssue> issues = new List<SongIssue>();
 
     private DynamicTexture dynamicTexture;
 
     public void OnInjectionFinished()
     {
-        songMetaChangeEventStream.Subscribe(_ =>
-        {
-            issues = SongMetaAnalyzer.AnalyzeIssues(songMeta, SongEditorIssueAnalyzerControl.MaxSongIssueCountPerMessage);
-            UpdateIssueOverviewImage();
-        });
+        songAudioPlayer.LoadedEventStream.Subscribe(_ => UpdateIssueOverviewImage());
+        issueAnalyzerControl.IssuesEventStream.Subscribe(_ => UpdateIssueOverviewImage());
 
         overviewAreaIssues.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
@@ -51,7 +47,7 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
         }
 
         dynamicTexture.ClearTexture();
-        foreach (SongIssue issue in issues)
+        foreach (SongIssue issue in issueAnalyzerControl.Issues)
         {
             DrawIssue(issue);
         }
@@ -65,12 +61,15 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        Color color = SongIssueUtils.GetColorForIssue(issue);
+        int songDurationInMillis = (int)songAudioPlayer.DurationInMillis;
+        if (songDurationInMillis <= 0)
+        {
+            // Song is not loaded yet
+            return;
+        }
 
-        int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
-
-        int startMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
-        int endMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, issue.EndBeat);
+        int startMillis = (int)SongMetaBpmUtils.BeatsToMillis(songMeta, issue.StartBeat);
+        int endMillis = (int)SongMetaBpmUtils.BeatsToMillis(songMeta, issue.EndBeat);
 
         // Use a minimum width of 0.5% such that the issue is not overlooked
         int lengthInMillis = endMillis - startMillis;
@@ -88,6 +87,7 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
             ObjectUtils.Swap(ref xStart, ref xEnd);
         }
 
-        dynamicTexture.DrawRectByCorners(xStart, 0, xEnd, (int)(dynamicTexture.TextureHeight * 0.5f), color);
+        Color color = issue.Severity == ESongIssueSeverity.Error ? Colors.red : Colors.yellow;
+        dynamicTexture.DrawRectByCorners(xStart, 0, xEnd, (int)(dynamicTexture.TextureHeight * 0.25f), color);
     }
 }

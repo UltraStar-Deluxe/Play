@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniInject.Extensions;
 using UniRx;
@@ -19,7 +20,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     public PlayerMicPitchTracker PlayerMicPitchTracker { get; private set; }
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    public MicSampleRecorder MicSampleRecorder { get; private set; }
+    public PlayerPerformanceAssessmentControl PlayerPerformanceAssessmentControl { get; private set; }
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public PlayerScoreControl PlayerScoreControl { get; private set; }
@@ -29,7 +30,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     [Inject(Key = nameof(playerProfileIndex))]
     private int playerProfileIndex;
-    
+
     [Inject(Optional = true)]
     public MicProfile MicProfile { get; private set; }
 
@@ -38,48 +39,66 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     [Inject(Key = nameof(playerUi))]
     private VisualTreeAsset playerUi;
-    
+
     [Inject(Key = nameof(playerInfoUi))]
     private VisualTreeAsset playerInfoUi;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerInfoUiListBottomLeft)]
     private VisualElement playerInfoUiListBottomLeft;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerInfoUiListBottomRight)]
     private VisualElement playerInfoUiListBottomRight;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerInfoUiListTopLeft)]
     private VisualElement playerInfoUiListTopLeft;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerInfoUiListTopRight)]
     private VisualElement playerInfoUiListTopRight;
 
     [Inject]
     private SingSceneData sceneData;
-    
+
     private readonly Subject<EnterSentenceEvent> enterSentenceEventStream = new();
     public IObservable<EnterSentenceEvent> EnterSentenceEventStream => enterSentenceEventStream;
 
     // The sorted sentences of the Voice
     public List<Sentence> SortedSentences { get; private set; } = new();
 
+    public int MaxBeatInVoice => SortedSentences.LastOrDefault()?.ExtendedMaxBeat ?? 0;
+
     [Inject]
     private Injector injector;
-
-    // An injector with additional bindings, such as the PlayerProfile and the MicProfile.
-    private Injector childrenInjector;
-
-    public PlayerUiControl PlayerUiControl { get; private set; }
 
     [Inject]
     private SongMeta songMeta;
 
+    [Inject]
+    private Settings settings;
+
+    [Inject]
+    private AchievementEventStream achievementEventStream;
+
+    public PlayerUiControl PlayerUiControl { get; private set; } = new();
+
+    // An injector with additional bindings, such as the PlayerProfile and the MicProfile.
+    private Injector childrenInjector;
+
     private int displaySentenceIndex;
+
+    private int perfectSentenceCount;
+
+    private List<Note> sortedNotesInVoice;
+    private List<Sentence> sortedSentencesInVoice;
 
     public void OnInjectionFinished()
     {
-        this.PlayerUiControl = new PlayerUiControl();
-        this.childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
+        childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
+
+        sortedNotesInVoice = SongMetaUtils.GetAllNotes(Voice);
+        sortedNotesInVoice.Sort(Note.comparerByStartBeat);
+
+        sortedSentencesInVoice = Voice.Sentences.ToList();
+        sortedSentencesInVoice.Sort(Sentence.comparerByStartBeat);
 
         SortedSentences = Voice.Sentences.ToList();
         SortedSentences.Sort(Sentence.comparerByStartBeat);
@@ -87,18 +106,17 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         // Create UI
         VisualElement playerUiVisualElement = playerUi.CloneTree().Children().First();
         playerUiVisualElement.userData = this;
-        VisualElement playerInfoUiVisualElement = playerInfoUi.CloneTree().Children().First();
+        VisualElement playerInfoUiVisualElement = playerUiVisualElement.Q(R.UxmlNames.playerInfoContainer);
         playerInfoUiVisualElement.userData = this;
-        AddPlayerInfoUiToUiDocument(playerInfoUiVisualElement);
-        
+        if (!settings.ShowPlayerInfoNextToNotes)
+        {
+            // Move player info UI to top / bottom
+            AddPlayerInfoUiToTopOrBottom(playerInfoUiVisualElement);
+        }
+
         // Inject all children.
         // The injector hierarchy is searched from the bottom up.
         // Thus, we can create an injection hierarchy with elements that are not necessarily in the same VisualElement hierarchy.
-        Injector playerUiControlInjector = childrenInjector.CreateChildInjector()
-            .WithRootVisualElement(playerInfoUiVisualElement)
-            .CreateChildInjector()
-            .WithRootVisualElement(playerUiVisualElement);
-        playerUiControlInjector.Inject(PlayerUiControl);
         foreach (INeedInjection childThatNeedsInjection in gameObject.GetComponentsInChildren<INeedInjection>(true))
         {
             if (childThatNeedsInjection is not PlayerControl)
@@ -106,23 +124,58 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
                 childrenInjector.Inject(childThatNeedsInjection);
             }
         }
+
+        // The UiControl must be injected last because it depends on the other controls
+        Injector playerUiControlInjector = childrenInjector.CreateChildInjector()
+            .WithRootVisualElement(playerInfoUiVisualElement)
+            .CreateChildInjector()
+            .WithRootVisualElement(playerUiVisualElement);
+        playerUiControlInjector.Inject(PlayerUiControl);
+
+        PlayerMicPitchTracker.MicProfile = MicProfile;
+
         SetDisplaySentenceIndex(0);
+
+        InitAchievements();
     }
 
-    private void AddPlayerInfoUiToUiDocument(VisualElement playerInfoUiVisualElement)
+    private void InitAchievements()
     {
-        bool hasTopPlayerInfoUiRow = (sceneData.SelectedPlayerProfiles.Count > 1 
-                                      && sceneData.PlayerProfileToVoiceNameMap.Values
+        if (CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(PlayerProfile))
+        {
+            return;
+        }
+
+        PlayerPerformanceAssessmentControl.SentenceAssessedEventStream.Subscribe(evt =>
+        {
+            if (evt.IsPerfect)
+            {
+                perfectSentenceCount++;
+                if (perfectSentenceCount > 10
+                    && PlayerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard)
+                {
+                    achievementEventStream.OnNext(new AchievementEvent(AchievementId.getMoreThan10PerfectRatingsInASong, PlayerProfile));
+                }
+            }
+        });
+    }
+
+    private void AddPlayerInfoUiToTopOrBottom(VisualElement playerInfoUiVisualElement)
+    {
+        bool hasTopPlayerInfoUiRow = (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 1
+                                      && sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.Values
                                           .Distinct()
-                                          .Count() > 1) 
-                                     || sceneData.SelectedPlayerProfiles.Count > 8;
-        
-        int voiceIndex = songMeta.GetVoices().IndexOf(Voice);
+                                          .Count() > 1)
+                                     || sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 8;
+
+        List<Voice> voices = songMeta.Voices
+            .OrderBy(voice => voice.Id)
+            .ToList();
+        int voiceIndex = voices.IndexOf(Voice);
         if (hasTopPlayerInfoUiRow
             && voiceIndex <= 0)
         {
             // Prefer position near the top lyrics
-            Debug.Log("Prefer top");
             List<VisualElement> playerInfoUiLists = new()
             {
                 playerInfoUiListTopLeft,
@@ -136,7 +189,6 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         else
         {
             // Prefer position near the bottom lyrics
-            Debug.Log("Prefer bottom");
             List<VisualElement> playerInfoUiLists = new()
             {
                 playerInfoUiListBottomLeft,
@@ -167,9 +219,9 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     private Injector CreateChildrenInjectorWithAdditionalBindings()
     {
         Injector newInjector = UniInjectUtils.CreateInjector(injector);
-        newInjector.AddBindingForInstance(MicSampleRecorder);
         newInjector.AddBindingForInstance(PlayerMicPitchTracker);
         newInjector.AddBindingForInstance(PlayerNoteRecorder);
+        newInjector.AddBindingForInstance(PlayerPerformanceAssessmentControl);
         newInjector.AddBindingForInstance(PlayerScoreControl);
         newInjector.AddBindingForInstance(PlayerUiControl);
         newInjector.AddBindingForInstance(newInjector);
@@ -180,11 +232,17 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     public void SetCurrentBeat(double currentBeat)
     {
         // Change the current display sentence, when the current beat is over its last note.
-        if (displaySentenceIndex < SortedSentences.Count && currentBeat >= GetDisplaySentence().LinebreakBeat)
+        if (displaySentenceIndex < SortedSentences.Count
+            && currentBeat >= GetDisplaySentence().LinebreakBeat)
         {
             Sentence nextDisplaySentence = GetUpcomingSentenceForBeat(currentBeat);
             int nextDisplaySentenceIndex = SortedSentences.IndexOf(nextDisplaySentence);
-            if (nextDisplaySentenceIndex >= 0)
+            if (nextDisplaySentenceIndex < 0)
+            {
+                // After last sentence
+                SetDisplaySentenceIndex(SortedSentences.Count);
+            }
+            else
             {
                 SetDisplaySentenceIndex(nextDisplaySentenceIndex);
             }
@@ -199,6 +257,16 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
         // Update the UI
         enterSentenceEventStream.OnNext(new EnterSentenceEvent(displaySentence, displaySentenceIndex));
+    }
+
+    public IReadOnlyList<Note> GetSortedNotesInVoice()
+    {
+        return sortedNotesInVoice;
+    }
+
+    public IReadOnlyList<Sentence> GetSortedSentencesInVoice()
+    {
+        return sortedSentencesInVoice;
     }
 
     public Sentence GetSentence(int index)
@@ -222,7 +290,12 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     private Sentence GetUpcomingSentenceForBeat(double currentBeat)
     {
-        Sentence result = Voice.Sentences
+        if (SortedSentences.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        Sentence result = SortedSentences
             .FirstOrDefault(sentence => currentBeat < sentence.LinebreakBeat);
         return result;
     }
@@ -238,7 +311,18 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         {
             return null;
         }
-        return SortedSentences.Last().Notes.OrderBy(note => note.EndBeat).Last();
+        return SortedSentences
+            .LastOrDefault()
+            .Notes
+            .OrderBy(note => note.EndBeat)
+            .LastOrDefault();
+    }
+
+    public void SkipToBeat(int beat)
+    {
+        PlayerScoreControl.SkipToBeat(beat);
+        PlayerMicPitchTracker.SkipToBeat(beat);
+        Debug.Log($"Skipped forward to beat {beat} for player {PlayerProfile.Name}");
     }
 
     public class EnterSentenceEvent

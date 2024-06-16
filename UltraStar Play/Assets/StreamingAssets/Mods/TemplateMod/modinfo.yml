@@ -1,0 +1,13 @@
+name: MODNAME
+version: 1.0.0
+description: Example description
+website: https://example.com
+authors:
+  - Someone
+  - someone@example.com
+# Additional assemblies from the app domain that need to be accessed by your mod.
+requiredAssemblies:
+  - UnityEngine.VideoModule
+# Additional types from the standard library that need to be accessed by your mod.
+requiredTypes:
+  - System.Uri

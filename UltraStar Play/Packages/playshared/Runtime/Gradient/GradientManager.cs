@@ -24,8 +24,8 @@ public static class GradientManager
             return texture;
         }
 
-        Texture2D texture2D = TextureUtils.CreateGradientTexture(16, 16);
-        TextureUtils.FillTextureWithGradient(texture2D, gradientConfig.startColor, gradientConfig.endColor, gradientConfig.angleDegrees);
+        Texture2D texture2D = GradientUtils.CreateGradientTexture(16, 16);
+        GradientUtils.FillTextureWithGradient(texture2D, gradientConfig.startColor, gradientConfig.endColor, gradientConfig.angleDegrees);
         gradientConfigToTexture[gradientConfig] = texture2D;
         return texture2D;
     }
@@ -33,7 +33,7 @@ public static class GradientManager
     public static List<GradientConfig> GetGradientConfigsForTransition(GradientConfig fromGradient, GradientConfig toGradient, float animTimeInSeconds)
     {
         List<GradientConfig> gradientConfigs = new();
-        int targetFrameRate = Application.targetFrameRate;
+        int targetFrameRate = ApplicationUtils.CurrentFrameRate;
         if (targetFrameRate <= 0)
         {
             targetFrameRate = 30;

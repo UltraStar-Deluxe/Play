@@ -1,6 +1,5 @@
-﻿using System.Linq;
-using PrimeInputActions;
-using ProTrans;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -9,10 +8,10 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
+public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
-    [Inject(UxmlName = R.UxmlNames.devicePicker)]
-    private ItemPicker devicePicker;
+    [Inject(UxmlName = R.UxmlNames.deviceChooser)]
+    private Chooser deviceChooser;
 
     [Inject(UxmlName = R.UxmlNames.webcamRenderContainer)]
     private Image webcamRenderContainer;
@@ -23,37 +22,35 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject]
     private WebCamManager webCamManager;
 
-    private LabeledItemPickerControl<WebCamDevice> devicePickerControl;
+    private LabeledChooserControl<WebCamDevice> deviceChooserControl;
 
     protected override void Start()
     {
         base.Start();
-        
-        InitWebcamPicker();
+
+        useWebcamToggle.value = settings.UseWebcamAsBackgroundInSingScene;
+        useWebcamToggle.RegisterValueChangedCallback(evt => settings.UseWebcamAsBackgroundInSingScene = evt.newValue);
+
+        InitWebcamChooser();
     }
 
-    public void UpdateTranslation()
+    private void InitWebcamChooser()
     {
-        useWebcamToggle.label = TranslationManager.GetTranslation(R.Messages.options_webcam_useAsBackGroundInSingingScene);
-        useWebcamToggle.value = settings.WebcamSettings.UseAsBackgroundInSingScene;
-        useWebcamToggle.RegisterValueChangedCallback(evt => settings.WebcamSettings.UseAsBackgroundInSingScene = evt.newValue);
-        devicePicker.Label = TranslationManager.GetTranslation(R.Messages.options_webcam_device);
-    }
-
-    private void InitWebcamPicker()
-    {
-        devicePickerControl = new LabeledItemPickerControl<WebCamDevice>(devicePicker, webCamManager.GetWebCamDevices());
-        devicePickerControl.GetLabelTextFunction = device => device.name;
-        if (!TryReSelectLastWebcam() && devicePickerControl.Items.Count > 0)
+        List<WebCamDevice> webCamDevices = webCamManager.GetWebCamDevices();
+        deviceChooserControl = new LabeledChooserControl<WebCamDevice>(deviceChooser, webCamDevices,
+            device => webCamDevices.Count <= 0
+                ? Translation.Get(R.Messages.options_webcam_noWebcamsAvailable)
+                : Translation.Of(device.name));
+        if (!TryReSelectLastWebcam() && deviceChooserControl.Items.Count > 0)
         {
-            devicePickerControl.Selection.Value = devicePickerControl.Items[0];
+            deviceChooserControl.Selection = deviceChooserControl.Items[0];
         }
-        if (devicePickerControl.Items.Count > 0)
+        if (deviceChooserControl.Items.Count > 0)
         {
-            devicePickerControl.Selection
+            deviceChooserControl.SelectionAsObservable
                 .Subscribe(device =>
                 {
-                    settings.WebcamSettings.CurrentDeviceName = device.name;
+                    settings.CurrentWebcamDeviceName = device.name;
                     WebCamTexture webCamTexture = webCamManager.StartSelectedWebCam();
                     webcamRenderContainer.image = webCamTexture;
                 });
@@ -61,22 +58,21 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         else
         {
             Debug.Log("No webcam found");
-            devicePickerControl.GetLabelTextFunction = nullDevice => TranslationManager.GetTranslation(R.Messages.options_webcam_noWebcamsAvailable);
-            devicePickerControl.Items.Add(new WebCamDevice());
+            deviceChooserControl.Items.Add(new WebCamDevice());
         }
     }
 
     private bool TryReSelectLastWebcam()
     {
-        if (settings.WebcamSettings.CurrentDeviceName.IsNullOrEmpty())
+        if (settings.CurrentWebcamDeviceName.IsNullOrEmpty())
         {
             return false;
         }
 
-        WebCamDevice lastSelectedDevice = devicePickerControl.Items
-            .FirstOrDefault(device => device.name == settings.WebcamSettings.CurrentDeviceName);
+        WebCamDevice lastSelectedDevice = deviceChooserControl.Items
+            .FirstOrDefault(device => device.name == settings.CurrentWebcamDeviceName);
 
-        devicePickerControl.SelectItem(lastSelectedDevice);
+        deviceChooserControl.Selection = lastSelectedDevice;
         return true;
     }
 }

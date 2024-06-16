@@ -34,11 +34,6 @@ public static class CollectionExtensions
         return prefix + string.Join(separator, enumerable) + suffix;
     }
 
-    public static string ToCsv<T>(this IEnumerable<T> enumerable, string separator = ",", string prefix = "[", string suffix = "]")
-    {
-        return enumerable.JoinWith(separator, prefix, suffix);
-    }
-
     public static void AddIfNotContains<T>(this ICollection<T> collection, T item)
     {
         if (!collection.Contains(item))
@@ -173,7 +168,7 @@ public static class CollectionExtensions
         int index = 0;
         foreach (T elem in enumerable)
         {
-            if (object.Equals(elem, element))
+            if (Equals(elem, element))
             {
                 return index;
             }
@@ -183,16 +178,31 @@ public static class CollectionExtensions
     }
 
     public static T FindMinElement<T>(this IEnumerable<T> enumerable, Func<T, float> valueFunction)
-        where T : class
     {
-        T minElement = null;
-        float minDistance = 0;
+        T minElement = default(T);
+        float minValue = float.MaxValue;
         foreach (T element in enumerable)
         {
             float currentValue = valueFunction(element);
-            if (minElement == null || currentValue < minDistance)
+            if (currentValue < minValue)
             {
-                minDistance = currentValue;
+                minValue = currentValue;
+                minElement = element;
+            }
+        }
+        return minElement;
+    }
+
+    public static T FindMinElement<T>(this IEnumerable<T> enumerable, Func<T, double> valueFunction)
+    {
+        T minElement = default(T);
+        double minValue = double.MaxValue;
+        foreach (T element in enumerable)
+        {
+            double currentValue = valueFunction(element);
+            if (currentValue < minValue)
+            {
+                minValue = currentValue;
                 minElement = element;
             }
         }
@@ -200,16 +210,31 @@ public static class CollectionExtensions
     }
 
     public static T FindMaxElement<T>(this IEnumerable<T> enumerable, Func<T, float> valueFunction)
-        where T : class
     {
-        T maxElement = null;
-        float maxDistance = 0;
+        T maxElement = default(T);
+        float maxValue = float.MinValue;
         foreach (T element in enumerable)
         {
             float currentValue = valueFunction(element);
-            if (maxElement == null || currentValue > maxDistance)
+            if (currentValue > maxValue)
             {
-                maxDistance = currentValue;
+                maxValue = currentValue;
+                maxElement = element;
+            }
+        }
+        return maxElement;
+    }
+
+    public static T FindMaxElement<T>(this IEnumerable<T> enumerable, Func<T, double> valueFunction)
+    {
+        T maxElement = default(T);
+        double maxValue = double.MinValue;
+        foreach (T element in enumerable)
+        {
+            double currentValue = valueFunction(element);
+            if (currentValue > maxValue)
+            {
+                maxValue = currentValue;
                 maxElement = element;
             }
         }
@@ -229,5 +254,52 @@ public static class CollectionExtensions
     public static void AddRange<T>(this HashSet<T> hashSet, IEnumerable<T> enumerable)
     {
         enumerable.ForEach(item => hashSet.Add(item));
+    }
+
+    public static void RemoveRange<T>(this HashSet<T> hashSet, IEnumerable<T> enumerable)
+    {
+        enumerable.ForEach(item => hashSet.Remove(item));
+    }
+
+    public static void AddRange<K, V>(this Dictionary<K, V> targetDictionary, IReadOnlyDictionary<K, V> sourceDictionary)
+    {
+        sourceDictionary.ForEach(entry => targetDictionary[entry.Key] = entry.Value);
+    }
+
+    public static void RemoveRange<K, V>(this Dictionary<K, V> targetDictionary, IReadOnlyDictionary<K, V> sourceDictionary)
+    {
+        sourceDictionary.ForEach(entry => targetDictionary.Remove(entry.Key));
+    }
+
+    public static void Replace<T>(this List<T> list, T item, T replacement)
+    {
+        int index = list.IndexOf(item);
+        if (index < 0)
+        {
+            return;
+        }
+
+        list[index] = replacement;
+    }
+
+    public static void RemoveAll<T>(this List<T> list, IEnumerable<T> enumerable)
+    {
+        enumerable.ForEach(item => list.Remove(item));
+    }
+
+    public static void RemoveFirst<T>(this List<T> list)
+    {
+        if (!list.IsNullOrEmpty())
+        {
+            list.RemoveAt(0);
+        }
+    }
+
+    public static void RemoveLast<T>(this List<T> list)
+    {
+        if (!list.IsNullOrEmpty())
+        {
+            list.RemoveAt(list.Count - 1);
+        }
     }
 }

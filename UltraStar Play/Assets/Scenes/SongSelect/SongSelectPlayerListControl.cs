@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -10,16 +12,6 @@ using UnityEngine.UIElements;
 
 public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        lastPlayerProfileToMicProfileMap = null;
-    }
-
-    // Static reference to be persisted across scenes.
-    // Used to restore the player-microphone assignment.
-    private static Dictionary<PlayerProfile, MicProfile> lastPlayerProfileToMicProfileMap;
-
     [InjectedInInspector]
     public VisualTreeAsset playerEntryUi;
 
@@ -27,12 +19,25 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private VisualElement playerList;
 
     private readonly List<SongSelectPlayerEntryControl> playerEntryControls = new();
+    public IReadOnlyList<SongSelectPlayerEntryControl> PlayerEntryControls => playerEntryControls;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
-    
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
+
+    [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
+
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private ThemeManager themeManager;
+
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
+
+    [Inject]
+    private SongSelectSceneControl songSelectSceneControl;
 
     [Inject]
     private Injector injector;
@@ -44,50 +49,117 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     {
         UpdateListEntries();
         LoadLastPlayerProfileToMicProfileMap();
-        
+
         // Remove/add MicProfile when Client (dis)connects.
-        serverSideConnectRequestManager.ClientConnectedEventStream
-            .Subscribe(HandleClientConnectedEvent)
+        serverSideCompanionClientManager.ClientConnectionChangedEventStream
+            .ObserveOnMainThread()
+            .Subscribe(OnClientConnectionChanged)
             .AddTo(gameObject);
+
+        micSampleRecorderManager.ConnectedMicDevicesChangesStream
+            .Subscribe(OnConnectedMicDevicesChanged)
+            .AddTo(gameObject);
+
+        if (songSelectSceneControl.HasPartyModeSceneData)
+        {
+            SelectMicsForPartyMode();
+        }
     }
 
-    private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
+    private void Update()
+    {
+        playerEntryControls.ForEach(it => it.Update());
+    }
+
+    private void SelectMicsForPartyMode()
+    {
+        // Assign mics by re-selecting every player profile of this round.
+        // TODO: Prefer same mic of the team from last round
+        playerEntryControls.ForEach(playerEntryControl => playerEntryControl.SetSelected(false, true));
+        playerEntryControls.ForEach(playerEntryControl => playerEntryControl.SetSelected(true, true));
+    }
+
+    private void OnClientConnectionChanged(ClientConnectionChangedEvent evt)
     {
         // Find existing or create new MicProfile for the newly connected device
-        MicProfile micProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId);
-        if (micProfile == null)
+        MicProfile connectedMicProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == evt.CompanionClientHandler.ClientId);
+        if (connectedMicProfile == null)
         {
-            micProfile = new MicProfile(connectionEvent.ConnectedClientHandler.ClientName, connectionEvent.ConnectedClientHandler.ClientId);
-            settings.MicProfiles.Add(micProfile);
+            connectedMicProfile = new MicProfile(evt.CompanionClientHandler.ClientName, 0, evt.CompanionClientHandler.ClientId);
+            settings.MicProfiles.Add(connectedMicProfile);
         }
-        
-        if (connectionEvent.IsConnected)
+
+        if (evt.IsConnected)
         {
             // Assign to player if needed
-            UseMicProfileWhereNeeded(micProfile);
+            UseMicProfileWhereNeeded(connectedMicProfile);
         }
-        else if (!connectionEvent.IsConnected)
+        else if (!evt.IsConnected)
         {
             // Remove from players where already assigned
+            RemoveMicProfileFromListEntries(connectedMicProfile);
+        }
+
+        // Refresh mic selection dialog.
+        if (SongSelectPlayerEntryControl.MicSelectionDialogControl != null)
+        {
+            SongSelectPlayerEntryControl.MicSelectionDialogControl.MicProfiles = GetAvailableMicProfiles();
+        }
+
+        // Update MicPitchTrackers of all players
+        playerEntryControls.ForEach(it => it.UpdateMicPitchTracker());
+    }
+
+    private void OnConnectedMicDevicesChanged(ConnectedMicDevicesChangedEvent evt)
+    {
+        // Assign newly connected mic devices to player if needed
+        List<MicProfile> connectedMicProfiles = evt.ConnectedMicDevices
+            .SelectMany(micDeviceName => SettingsUtils.GetMicProfiles(settings, micDeviceName))
+            .ToList();
+        foreach (MicProfile micProfile in connectedMicProfiles)
+        {
+            UseMicProfileWhereNeeded(micProfile);
+        }
+
+        // Remove newly disconnected players where already assigned
+        List<MicProfile> disconnectedMicProfile = evt.DisconnectedMicDevices
+            .SelectMany(micDeviceName => SettingsUtils.GetMicProfiles(settings, micDeviceName))
+            .ToList();
+        foreach (MicProfile micProfile in disconnectedMicProfile)
+        {
             RemoveMicProfileFromListEntries(micProfile);
         }
+
+        // Refresh mic selection dialog.
+        if (SongSelectPlayerEntryControl.MicSelectionDialogControl != null)
+        {
+            SongSelectPlayerEntryControl.MicSelectionDialogControl.MicProfiles = GetAvailableMicProfiles();
+        }
+
+        // Update MicPitchTrackers of all players
+        playerEntryControls.ForEach(it => it.UpdateMicPitchTracker());
     }
-    
+
+    private List<MicProfile> GetAvailableMicProfiles()
+    {
+        return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideCompanionClientManager);
+    }
+
     private void UpdateListEntries()
     {
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectPlayerListControl.UpdateListEntries");
+
         // Remove old entries
         playerList.Clear();
         playerEntryControls.Clear();
 
         // Create new entries
-        List<PlayerProfile> playerProfiles = settings.PlayerProfiles;
-        List<PlayerProfile> enabledPlayerProfiles = playerProfiles.Where(it => it.IsEnabled).ToList();
+        List<PlayerProfile> enabledPlayerProfiles = songSelectSceneControl.GetEnabledPlayerProfiles();
         foreach (PlayerProfile playerProfile in enabledPlayerProfiles)
         {
             CreateListEntry(playerProfile);
         }
         UpdateVoiceSelection();
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerList);
     }
 
     private void CreateListEntry(PlayerProfile playerProfile)
@@ -97,11 +169,24 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
         SongSelectPlayerEntryControl listEntryControl = injector
             .WithRootVisualElement(playerEntryVisualElement)
+            .WithBindingForInstance(playerProfile)
+            .WithBindingForInstance(PartyModeUtils.GetTeam(songSelectSceneControl.PartyModeSceneData, playerProfile))
             .CreateAndInject<SongSelectPlayerEntryControl>();
         listEntryControl.Init(playerProfile);
 
         listEntryControl.IsSelected.Value = playerProfile.IsSelected;
-        listEntryControl.IsSelected.Subscribe(newValue => OnSelectionStatusChanged(listEntryControl, newValue));
+        listEntryControl.IsSelected.Subscribe(newValue => OnPlayerEntrySelectionStatusChanged(listEntryControl, newValue));
+        listEntryControl.SetSelected(playerProfile.IsSelected, false);
+        listEntryControl.OnMicProfileSelected = newMicProfile =>
+        {
+            // Remove this mic profile from other players
+            playerEntryControls
+                .Where(it => it != listEntryControl && it.MicProfile == newMicProfile)
+                .ForEach(it => it.MicProfile = null);
+
+            // Remember this mic
+            settings.PlayerProfileNameToLastUsedMicProfile[playerProfile.Name] = new MicProfileReference(newMicProfile);
+        };
 
         playerEntryControls.Add(listEntryControl);
     }
@@ -113,36 +198,67 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         {
             return;
         }
-        
-        SongSelectPlayerEntryControl listEntryControlWithMatchingMicProfile = playerEntryControls.FirstOrDefault(it =>
-               it.MicProfile != null
-            && it.MicProfile.ConnectedClientId == micProfile.ConnectedClientId);
+
+        List<SongSelectPlayerEntryControl> relevantPlayerEntryControls = playerEntryControls
+            .Where(it => it.CanSelectMic)
+            .ToList();
+
+        SongSelectPlayerEntryControl listEntryControlWithMatchingMicProfile = relevantPlayerEntryControls.FirstOrDefault(it =>
+            Equals(it.MicProfile, micProfile));
         if (listEntryControlWithMatchingMicProfile != null)
         {
             // Already in use. Cannot be assign to other players.
             return;
         }
-        
-        SongSelectPlayerEntryControl listEntryControlWithMissingMicProfile = playerEntryControls.FirstOrDefault(it => it.PlayerProfile.IsSelected && it.MicProfile == null);
+
+        List<SongSelectPlayerEntryControl> listEntryControlsWithMissingMicProfile = relevantPlayerEntryControls
+            .Where(it => it.PlayerProfile.IsSelected && it.MicProfile == null)
+            .ToList();
+        if (listEntryControlsWithMissingMicProfile.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        // Prefer player with same name
+        SongSelectPlayerEntryControl listEntryControlWithMissingMicProfileAndSameName = listEntryControlsWithMissingMicProfile.FirstOrDefault(it =>
+            string.Equals(it.PlayerProfile.Name, micProfile.Name, StringComparison.InvariantCultureIgnoreCase));
+        if (listEntryControlWithMissingMicProfileAndSameName != null)
+        {
+            listEntryControlWithMissingMicProfileAndSameName.MicProfile = micProfile;
+            return;
+        }
+
+        // Prefer player that used this mic last time
+        SongSelectPlayerEntryControl listEntryControlWithMissingMicProfileThatUsedThisMicProfileLastTime = listEntryControlsWithMissingMicProfile.FirstOrDefault(it =>
+            settings.PlayerProfileNameToLastUsedMicProfile.TryGetValue(it.PlayerProfile.Name, out MicProfileReference lastUsedMicProfileReference)
+                  && lastUsedMicProfileReference != null
+                  && lastUsedMicProfileReference.Equals(micProfile));
+        if (listEntryControlWithMissingMicProfileThatUsedThisMicProfileLastTime != null)
+        {
+            listEntryControlWithMissingMicProfileThatUsedThisMicProfileLastTime.MicProfile = micProfile;
+            return;
+        }
+
+        // Assign to first player with missing mic profile
+        SongSelectPlayerEntryControl listEntryControlWithMissingMicProfile = listEntryControlsWithMissingMicProfile.FirstOrDefault();
         if (listEntryControlWithMissingMicProfile != null)
         {
             listEntryControlWithMissingMicProfile.MicProfile = micProfile;
         }
     }
-    
+
     private void RemoveMicProfileFromListEntries(MicProfile micProfile)
     {
         foreach (SongSelectPlayerEntryControl listEntry in playerEntryControls)
         {
-            if (listEntry.MicProfile != null
-                && listEntry.MicProfile.ConnectedClientId == micProfile.ConnectedClientId)
+            if (Equals(listEntry.MicProfile, micProfile))
             {
                 listEntry.MicProfile = null;
             }
         }
     }
-    
-    private void OnSelectionStatusChanged(SongSelectPlayerEntryControl listEntryControl, bool newValue)
+
+    private void OnPlayerEntrySelectionStatusChanged(SongSelectPlayerEntryControl listEntryControl, bool newValue)
     {
         listEntryControl.PlayerProfile.IsSelected = newValue;
         if (newValue == false)
@@ -151,12 +267,52 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         }
         else
         {
-            List<MicProfile> unusedMicProfiles = FindUnusedMicProfiles();
-            if (!unusedMicProfiles.IsNullOrEmpty())
+            MicProfile unusedMicProfile = GetUnusedMicProfileForPlayer(listEntryControl.PlayerProfile);
+            if (unusedMicProfile != null)
             {
-                listEntryControl.MicProfile = unusedMicProfiles[0];
+                listEntryControl.MicProfile = unusedMicProfile;
             }
         }
+    }
+
+    private MicProfile GetUnusedMicProfileForPlayer(PlayerProfile playerProfile)
+    {
+        List<MicProfile> unusedMicProfiles = FindUnusedMicProfiles();
+        if (unusedMicProfiles.IsNullOrEmpty()
+            || (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+                && lobbyMemberPlayerProfile.IsRemote))
+        {
+            return null;
+        }
+
+        // Prefer MicProfile that was last used by this player
+        if (settings.PlayerProfileNameToLastUsedMicProfile.TryGetValue(playerProfile.Name, out MicProfileReference lastUsedMicProfileReference)
+            && lastUsedMicProfileReference != null)
+        {
+            MicProfile lastUsedMicProfile = unusedMicProfiles.FirstOrDefault(it => lastUsedMicProfileReference.Equals(it));
+            if (lastUsedMicProfile != null)
+            {
+                return lastUsedMicProfile;
+            }
+        }
+
+        // Prefer MicProfile with same name as player. This could be a mic from the Companion App.
+        MicProfile micProfileWithMatchingName = unusedMicProfiles.FirstOrDefault(unusedMicProfile =>
+            string.Equals(unusedMicProfile.Name, playerProfile.Name, StringComparison.InvariantCultureIgnoreCase));
+        if (micProfileWithMatchingName != null)
+        {
+            return micProfileWithMatchingName;
+        }
+
+        // Ignore mic profiles that match other player names
+        HashSet<string> playerNames = playerEntryControls
+            .Select(otherPlayerEntryControl => otherPlayerEntryControl.PlayerProfile.Name)
+            .ToHashSet();
+        List<MicProfile> unusedMicProfilesNotMatchingAnyPlayerName = unusedMicProfiles
+            .Where(unusedMicProfile => !playerNames.Contains(unusedMicProfile.Name))
+            .ToList();
+
+        return unusedMicProfilesNotMatchingAnyPlayerName.FirstOrDefault();
     }
 
     private List<MicProfile> FindUnusedMicProfiles()
@@ -165,7 +321,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             .Select(it => it.MicProfile)
             .ToList();
         List<MicProfile> enabledAndConnectedMicProfiles = settings.MicProfiles
-            .Where(it => it.IsEnabled && it.IsConnected(serverSideConnectRequestManager))
+            .Where(it => it.IsEnabled && it.IsConnected(serverSideCompanionClientManager))
             .ToList();
         List<MicProfile> unusedMicProfiles = enabledAndConnectedMicProfiles
             .Where(it => !usedMicProfiles.Contains(it))
@@ -187,7 +343,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         Dictionary<PlayerProfile, MicProfile> result = new();
         playerEntryControls.ForEach(entry =>
         {
-            if (entry.IsSelected.Value && entry.MicProfile != null)
+            if (entry.IsSelected.Value
+                && entry.CanSelectMic
+                && entry.MicProfile != null)
             {
                 result.Add(entry.PlayerProfile, entry.MicProfile);
             }
@@ -195,20 +353,11 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         return result;
     }
 
-    public Dictionary<PlayerProfile,string> GetSelectedPlayerProfileToVoiceNameMap()
+    public Dictionary<PlayerProfile, EExtendedVoiceId> GetSelectedPlayerProfileToExtendedVoiceIdMap()
     {
-        Dictionary<PlayerProfile,string> selectedPlayerProfileToVoiceNameMap = new();
-        playerEntryControls.ForEach(entry =>
-        {
-            if (entry.IsSelected.Value)
-            {
-                string voiceName = !entry.VoiceName.IsNullOrEmpty()
-                    ? entry.VoiceName
-                    : Voice.soloVoiceName;
-                selectedPlayerProfileToVoiceNameMap.Add(entry.PlayerProfile, voiceName);
-            }
-        });
-        return selectedPlayerProfileToVoiceNameMap;
+        return playerEntryControls
+            .Where(entry => entry.IsSelected.Value)
+            .ToDictionary(entry => entry.PlayerProfile, entry => entry.VoiceId);
     }
 
     public void ToggleSelectedPlayers()
@@ -236,45 +385,85 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
     private void LoadLastPlayerProfileToMicProfileMap()
     {
-        if (lastPlayerProfileToMicProfileMap.IsNullOrEmpty())
+        if (settings.PlayerProfileNameToLastUsedMicProfile.IsNullOrEmpty())
         {
             return;
         }
 
         // Restore the previously assigned microphones
-        foreach (KeyValuePair<PlayerProfile, MicProfile> playerProfileAndMicProfileEntry in lastPlayerProfileToMicProfileMap)
+        List<MicProfile> availableMicProfiles = SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideCompanionClientManager);
+        foreach (SongSelectPlayerEntryControl playerEntryControl in playerEntryControls)
         {
-            PlayerProfile playerProfile = playerProfileAndMicProfileEntry.Key;
-            MicProfile lastUsedMicProfile = playerProfileAndMicProfileEntry.Value;
-
-            if (!lastUsedMicProfile.IsConnected(serverSideConnectRequestManager)
-                || !lastUsedMicProfile.IsEnabled)
+            if (!playerEntryControl.IsSelected.Value)
             {
-                // Do not use this mic.
+                // Player is not selected for singing at the moment
                 continue;
             }
 
-            playerEntryControls.ForEach(entry =>
+            PlayerProfile playerProfile = playerEntryControl.PlayerProfile;
+            if (!TryGetLastUsedMicProfile(availableMicProfiles, playerProfile.Name, out MicProfile lastUsedMicProfile))
             {
-                if (entry.PlayerProfile == playerProfile)
+                // No mic was assigned to this player yet.
+                continue;
+            }
+
+            if (!lastUsedMicProfile.IsConnected(serverSideCompanionClientManager)
+                || !lastUsedMicProfile.IsEnabled)
+            {
+                // Mic cannot or should not be used at the moment.
+                continue;
+            }
+
+            // Unassign mic from other players
+            playerEntryControls
+                .Except(new List<SongSelectPlayerEntryControl>() { playerEntryControl })
+                .ForEach(otherEntry =>
                 {
-                    // Select the mic for this player
-                    entry.MicProfile = lastUsedMicProfile;
-                }
-                else if (entry.IsSelected.Value
-                         && entry.MicProfile == lastUsedMicProfile)
-                {
-                    // Deselect lastUsedMicProfile from other player.
-                    entry.MicProfile = null;
-                }
-            });
+                    if (otherEntry.IsSelected.Value
+                        && Equals(otherEntry.MicProfile, lastUsedMicProfile))
+                    {
+                        // Deselect lastUsedMicProfile from other player.
+                        otherEntry.MicProfile = null;
+                    }
+                });
+
+            // Assign mic to this player
+            playerEntryControl.MicProfile = lastUsedMicProfile;
+        }
+    }
+
+    private bool TryGetLastUsedMicProfile(List<MicProfile> availableMicProfiles, string playerProfileName, out MicProfile micProfile)
+    {
+        if (settings.PlayerProfileNameToLastUsedMicProfile.TryGetValue(playerProfileName, out MicProfileReference micProfileReference)
+            && micProfileReference != null)
+        {
+            micProfile = availableMicProfiles.FirstOrDefault(availableMicProfile =>
+                micProfileReference.Equals(availableMicProfile));
+            return micProfile != null;
+        }
+
+        micProfile = null;
+        return false;
+    }
+
+    private void UpdatePlayerProfileNameToLastUsedMicProfile()
+    {
+        foreach (SongSelectPlayerEntryControl playerEntryControl in playerEntryControls)
+        {
+            if (playerEntryControl.MicProfile != null
+                && playerEntryControl.CanSelectMic)
+            {
+                string playerProfileName = playerEntryControl.PlayerProfile.Name;
+                MicProfileReference micProfileReference = new(playerEntryControl.MicProfile);
+                settings.PlayerProfileNameToLastUsedMicProfile[playerProfileName] = micProfileReference;
+            }
         }
     }
 
     private void OnDestroy()
     {
         // Remember the currently assigned microphones
-        lastPlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
+        UpdatePlayerProfileNameToLastUsedMicProfile();
         playerEntryControls.ForEach(control => control.Dispose());
     }
 
@@ -292,15 +481,15 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         playerEntryControls.ForEach(entry =>
         {
             entry.ShowVoiceSelection(songMeta, voiceIndex);
-            voiceIndex = (voiceIndex + 1) % songMeta.VoiceNames.Count;
+            voiceIndex = (voiceIndex + 1) % songMeta.VoiceCount;
         });
     }
-    
+
     public void UpdateVoiceSelection()
     {
-        SongMeta selectedSong = songRouletteControl.Selection.Value.SongMeta;
+        SongMeta selectedSong = songSelectSceneControl.SelectedSong;
         bool hasMultipleVoices = selectedSong != null
-            && selectedSong.VoiceNames.Count > 1;
+            && selectedSong.Voices.Count > 1;
         if (hasMultipleVoices)
         {
             ShowVoiceSelection(selectedSong);

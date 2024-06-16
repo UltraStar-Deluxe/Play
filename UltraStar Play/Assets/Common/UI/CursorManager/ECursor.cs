@@ -4,5 +4,7 @@
     Grab,
     ArrowsLeftRight,
     ArrowsUpDown,
-    MusicNote
+    MusicNote,
+    Hand,
+    Pencil,
 }

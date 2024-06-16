@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 // CSS colors as constants for Unity3D.
 // List of CSS colors at W3Schools: https://www.w3schools.com/cssref/css_colors.asp
@@ -19,6 +20,7 @@ public static class Colors
     public static readonly Color32 blanchedAlmond = CreateColor("#FFEBCD");
     public static readonly Color32 blue = CreateColor("#0000FF");
     public static readonly Color32 blueViolet = CreateColor("#8A2BE2");
+    public static readonly Color32 bronze = CreateColor("#8C7853");
     public static readonly Color32 brown = CreateColor("#A52A2A");
     public static readonly Color32 burlyWood = CreateColor("#DEB887");
     public static readonly Color32 cadetBlue = CreateColor("#5F9EA0");
@@ -178,6 +180,14 @@ public static class Colors
         }
     }
 
+    public static Color32 CreateRandomColor(byte alpha = 255)
+    {
+        byte r = (byte)Random.Range(0, 255);
+        byte g = (byte)Random.Range(0, 255);
+        byte b = (byte)Random.Range(0, 255);
+        return new Color32(r, g, b, alpha);
+    }
+    
     /**
      * ColorUtility.TryParseHtmlString cannot be called during serialization.
      * But this function can.

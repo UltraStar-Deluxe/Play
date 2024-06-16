@@ -1,11 +1,12 @@
-﻿using UniInject;
+﻿using System;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectMicEntryControl : IInjectionFinishedListener
+public class SongSelectMicEntryControl : IInjectionFinishedListener, IDisposable, INeedInjection
 {
     private static readonly int displayedSampleCount = 1024;
 
@@ -16,7 +17,7 @@ public class SongSelectMicEntryControl : IInjectionFinishedListener
         {
             return micProfile;
         }
-        
+
         set
         {
             micProfile = value;
@@ -32,11 +33,11 @@ public class SongSelectMicEntryControl : IInjectionFinishedListener
 
     private readonly GameObject gameObject;
     private readonly VisualElement visualElement;
-    private readonly MicPitchTracker micPitchTracker;
+    private readonly NewestSamplesMicPitchTracker micPitchTracker;
 
     private AudioWaveFormVisualization audioWaveFormVisualizer;
 
-    public SongSelectMicEntryControl(GameObject gameObject, VisualElement visualElement, MicPitchTracker micPitchTracker)
+    public SongSelectMicEntryControl(GameObject gameObject, VisualElement visualElement, NewestSamplesMicPitchTracker micPitchTracker)
     {
         this.gameObject = gameObject;
         this.visualElement = visualElement;
@@ -47,7 +48,7 @@ public class SongSelectMicEntryControl : IInjectionFinishedListener
     {
         if (audioWaveFormVisualizer != null)
         {
-            float[] samples = micPitchTracker.MicSampleRecorder.MicSamples;
+            float[] samples = micPitchTracker.MicSamples;
             audioWaveFormVisualizer.DrawWaveFormValues(samples, samples.Length - displayedSampleCount, displayedSampleCount);
         }
     }
@@ -59,15 +60,22 @@ public class SongSelectMicEntryControl : IInjectionFinishedListener
         {
             if (audioWaveForm is Label audioWaveFormLabel)
             {
-                audioWaveFormLabel.text = "";
+                audioWaveFormLabel.SetTranslatedText(Translation.Empty);
             }
-            audioWaveFormVisualizer = new AudioWaveFormVisualization(gameObject, audioWaveForm);
+            int textureWidth = 256;
+            int textureHeight = 128;
+            audioWaveFormVisualizer = new AudioWaveFormVisualization(
+                gameObject,
+                audioWaveForm,
+                textureWidth,
+                textureHeight,
+                $"song select mic audio visualization of '{micProfile.GetDisplayNameWithChannel()}'");
         });
     }
 
-    public void Destroy()
+    public void Dispose()
     {
         visualElement.RemoveFromHierarchy();
-        audioWaveFormVisualizer.Destroy();
+        audioWaveFormVisualizer.Dispose();
     }
 }

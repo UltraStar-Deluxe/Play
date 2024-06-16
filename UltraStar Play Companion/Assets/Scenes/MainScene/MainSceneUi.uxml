@@ -1,32 +1,50 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="MicrophoneUi" src="project://database/Assets/Scenes/MainScene/MicrophoneUi.uxml?fileID=9197481963319205126&amp;guid=14ed27d104da7494192ee6178d33cff0&amp;type=3#MicrophoneUi" />
     <ui:Template name="SongListUi" src="project://database/Assets/Scenes/MainScene/SongListUi.uxml?fileID=9197481963319205126&amp;guid=9b4331b5c150ff542b64295ae2171737&amp;type=3#SongListUi" />
-    <ui:Template name="MenuUi" src="project://database/Assets/Scenes/MainScene/MenuUi.uxml?fileID=9197481963319205126&amp;guid=e209a80ab6b65254998d5b9b11561416&amp;type=3#MenuUi" />
-    <Style src="project://database/Assets/Scenes/MainScene/CompanionStyles.uss?fileID=7433441132597879392&amp;guid=10474d1b67f8481fbb7ed771cc866f3e&amp;type=3#CompanionStyles" />
+    <ui:Template name="SongDetailsUi" src="project://database/Assets/Scenes/MainScene/SongDetailsUi.uxml?fileID=9197481963319205126&amp;guid=3dbba0a02e822b44cb898f512e23a1c2&amp;type=3#SongDetailsUi" />
+    <ui:Template name="InputSimulationUi" src="project://database/Assets/Scenes/MainScene/InputSimulationUi.uxml?fileID=9197481963319205126&amp;guid=8207c240e20c0e546b018010579d8422&amp;type=3#InputSimulationUi" />
+    <ui:Template name="MainSceneMenuUi" src="project://database/Assets/Scenes/MainScene/MenuUi.uxml?fileID=9197481963319205126&amp;guid=e209a80ab6b65254998d5b9b11561416&amp;type=3#MenuUi" />
+    <ui:Template name="GameRoundModifierDialogUi" src="project://database/Packages/playsharedui/Runtime/UI/GameRounds/GameRoundModifierDialogUi.uxml?fileID=9197481963319205126&amp;guid=880dc6db80bf20f4ca31b5dcaf892586&amp;type=3#GameRoundModifierDialogUi" />
     <ui:VisualElement name="background" style="width: 100%; height: 100%; padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px; -unity-background-scale-mode: scale-and-crop;">
         <ui:VisualElement name="titleContainer" style="align-items: center; width: 100%; justify-content: flex-start; top: auto; flex-direction: row; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
             <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center; flex-grow: 1; justify-content: center;">
-                <ui:VisualElement name="titleAndDescription" style="flex-direction: row; align-items: center;">
-                    <ui:VisualElement name="logo" class="mr-2" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/Logos/LogoSmall-512.png?fileID=2800000&amp;guid=f3ab5af68813c5446a5f5403af87b6c7&amp;type=3#LogoSmall-512&apos;); width: 48px; height: 48px; flex-shrink: 0;" />
-                    <ui:Label text="UltraStar Play  Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold; white-space: normal;" />
+                <ui:VisualElement name="titleAndDescription" class="mr-auto" style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement name="logo" class="mr-3 ml-3" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/Logos/LogoSmall-512.png?fileID=2800000&amp;guid=f3ab5af68813c5446a5f5403af87b6c7&amp;type=3#LogoSmall-512&apos;); width: 48px; height: 48px; flex-shrink: 0;" />
+                    <ui:VisualElement name="column" style="flex-grow: 1;">
+                        <ui:Label text="Melody Mania" name="sceneTitle" class="titleText" style="-unity-font-style: bold; white-space: normal;" />
+                        <ui:Label text="Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold; white-space: normal;" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Button display-tooltip-when-elided="true" name="showMenuButton" style="align-items: center; justify-content: center; width: 48px; height: 48px; flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 5px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+            <ui:Button display-tooltip-when-elided="true" name="showMenuButton" class="ml-3 squareButton" style="align-items: center; justify-content: center; flex-grow: 0;">
                 <MaterialIcon icon="settings" name="menuIcon" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:VisualElement name="tabGroup" class="onlyVisibleWhenConnected" style="flex-direction: row; width: 100%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
-            <ui:Button text="Microphone" display-tooltip-when-elided="true" name="showMicViewButton" style="width: 10%; margin-left: 0; margin-right: 1px; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-grow: 1;" />
-            <ui:Button text="Songs" display-tooltip-when-elided="true" name="showSongViewButton" style="width: 10%; margin-left: 1px; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-grow: 1;" />
-        </ui:VisualElement>
+        <ButtonGroup name="tabGroup" direction="Horizontal" class="onlyVisibleWhenConnected" style="flex-direction: row;">
+            <ToggleButton display-tooltip-when-elided="true" name="showMicViewButton">
+                <MaterialIcon tabindex="-1" icon="mic" name="micIcon" />
+            </ToggleButton>
+            <ToggleButton display-tooltip-when-elided="true" name="showSongViewButton">
+                <MaterialIcon tabindex="-1" name="songListIcon" icon="queue_music" />
+            </ToggleButton>
+            <ToggleButton display-tooltip-when-elided="true" name="showInputSimulationButton">
+                <MaterialIcon tabindex="-1" name="simulateInputIcon" icon="keyboard" />
+            </ToggleButton>
+        </ButtonGroup>
         <ui:VisualElement name="tabContentContainer" class="onlyVisibleWhenConnected" style="flex-grow: 4;">
-            <ui:VisualElement name="micViewContainer" style="flex-grow: 1; justify-content: center; position: absolute; width: 100%; height: 100%; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
+            <ui:VisualElement name="micViewContainer" style="flex-grow: 1; justify-content: center; position: absolute; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; width: 100%; height: 100%;">
                 <ui:Instance template="MicrophoneUi" name="MicrophoneUi" style="flex-grow: 1;" />
             </ui:VisualElement>
             <ui:VisualElement name="songViewContainer" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; top: -1px; left: 0; display: none;">
                 <ui:VisualElement name="songListContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                    <ui:Instance template="SongListUi" name="SongListUi" style="flex-grow: 1;" />
+                    <ui:Instance template="SongListUi" name="SongListUi" />
                 </ui:VisualElement>
+                <ui:VisualElement name="songDetailsContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">
+                    <ui:Instance template="SongDetailsUi" name="SongDetailsUi" style="flex-grow: 1;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="inputSimulationContainer" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; top: -1px; left: 0; display: none; align-items: center; justify-content: center;">
+                <ui:Instance template="InputSimulationUi" name="InputSimulationUi" style="width: 100%; height: 100%;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="connectionViewContainer" class="onlyVisibleWhenNotConnected" style="justify-content: center; align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; flex-grow: 1; display: none;">
@@ -34,11 +52,18 @@
             <ui:Label text="Received error" display-tooltip-when-elided="true" name="serverErrorResponseText" style="-unity-text-align: middle-left; color: rgb(255, 0, 0); white-space: normal; width: 100%; margin-bottom: 20px;" />
             <ui:Label text="There are connection issues." display-tooltip-when-elided="true" name="connectionThroubleshootingText" style="-unity-text-align: middle-left; color: rgb(255, 152, 0); white-space: normal; width: 100%; margin-bottom: 20px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="menuOverlay" style="width: 100%; height: 100%; flex-direction: row; display: none;">
+        <ui:VisualElement name="menuOverlay" style="width: 100%; height: 100%; flex-direction: row; position: absolute; display: none;">
             <ui:Button display-tooltip-when-elided="true" name="hiddenCloseMenuButton" class="transparentBackgroundColor" style="flex-grow: 1; height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
-            <ui:VisualElement name="menuOverlayContent" style="background-color: rgba(0, 0, 0, 0.75); width: 80%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
-                <ui:Instance template="MenuUi" name="MenuUi" />
+            <ui:VisualElement name="menuOverlayContent" class="overlayBackground" style="width: 80%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+                <ui:Instance template="MainSceneMenuUi" name="MainSceneMenuUi" style="flex-grow: 1;" />
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="modifierDialogOverlay" class="overlay" style="display: none; background-color: rgba(32, 32, 32, 0.75);">
+            <ui:VisualElement name="modifierDialogOverlayInner" class="overlayBackground p-3" style="max-width: 100%; max-height: 100%; border-top-left-radius: 20px; border-bottom-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; width: 90%;">
+                <ui:Label tabindex="-1" text="Select Game Modifiers" display-tooltip-when-elided="true" name="modifiersDialogOverlayTitle" class="titleText mb-3" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
+                <ui:Instance template="GameRoundModifierDialogUi" name="GameRoundModifierDialogUi" style="width: 100%;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="dialogContainer" class="overlay" style="flex-grow: 1; display: none;" />
     </ui:VisualElement>
 </ui:UXML>

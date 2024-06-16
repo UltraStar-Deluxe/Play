@@ -2,7 +2,6 @@
 using PrimeInputActions;
 using UniInject;
 using UniRx;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 public class ContextMenuPopupManager : AbstractSingletonBehaviour, ISceneInjectionFinishedListener

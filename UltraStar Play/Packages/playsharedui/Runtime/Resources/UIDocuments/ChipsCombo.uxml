@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/playshared/Runtime/StyleSheets/CommonStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#CommonStyles" />
+    <ui:Label name="chipsComboLabel" class="chipsComboLabel" />
+    <ui:VisualElement name="chipsComboContent" class="chipsComponentContainer chipsComboContent">
+        <ui:VisualElement name="chipsComboChipsList" class="chipsComboChipsList" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+        <ui:Button display-tooltip-when-elided="true" name="chipsComboButton" class="chipsComboButton">
+            <MaterialIcon tabindex="-1" name="chipsComboButtonIcon" icon="arrow_drop_down" class="chipsComboButtonIcon" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

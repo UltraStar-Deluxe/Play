@@ -20,7 +20,7 @@ using UnityEngine.UIElements;
  *      });
  * </pre>
  */
-public class DynamicTexture
+public class DynamicTexture : IDisposable
 {
     public Color backgroundColor = new(0, 0, 0, 0);
 
@@ -34,39 +34,70 @@ public class DynamicTexture
     public bool IsInitialized => texture != null;
 
     private readonly GameObject gameObject;
+    private readonly string name;
 
-    public DynamicTexture(GameObject gameObject, VisualElement visualElement)
+    public DynamicTexture(
+        GameObject gameObject,
+        VisualElement visualElement,
+        int textureWidth = -1,
+        int textureHeight = -1,
+        string name = null)
     {
         this.gameObject = gameObject;
+        this.name = !name.IsNullOrEmpty()
+            ? name
+            : $"DynamicTexture on VisualElement '{visualElement.name}', associated with GameObject '{gameObject.name}'";
 
-        if (visualElement.resolvedStyle.width <= 0
-            || visualElement.resolvedStyle.height <= 0)
+        if ((textureWidth <= 0
+             && (visualElement.resolvedStyle.width <= 0 || float.IsNaN(visualElement.resolvedStyle.width)))
+            || (textureHeight <= 0
+                && (visualElement.resolvedStyle.height <= 0 || float.IsNaN(visualElement.resolvedStyle.height))))
         {
-            throw new UnityException("VisualElement has no size. Consider calling Init from GeometryChangedEvent.");
+            throw new UnityException("VisualElement has no size. Specify a size or wait for a GeometryChangedEvent.");
         }
 
-        UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
-        Vector2 visualElementSize = new PanelHelper(uiDocument).PanelToScreen(visualElement.worldBound).size;
-        Init((int)visualElementSize.x, (int)visualElementSize.y);
+        if (textureWidth <= 0
+            || textureHeight <= 0)
+        {
+            // Use the device pixel size of the VisualElement. Note that this size can differ from its size in reference resolution.
+            UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
+            Vector2 visualElementSize = new PanelHelper(uiDocument).PanelToScreen(visualElement.worldBound).size;
+            if (textureWidth <= 0)
+            {
+                textureWidth = (int)visualElementSize.x;
+            }
+            if (textureHeight <= 0)
+            {
+                textureHeight = (int)visualElementSize.y;
+            }
+        }
+
+        SetTextureSize(textureWidth, textureHeight);
         visualElement.style.backgroundImage = new StyleBackground(texture);
     }
 
-    public void Init(int textureWidth, int textureHeight)
+    public void SetTextureSize(int textureWidth, int textureHeight)
     {
-        Destroy();
+        DestroyTexture();
 
         TextureWidth = textureWidth;
         TextureHeight = textureHeight;
         CreateTexture();
     }
 
-    public void Destroy()
+    private void DestroyTexture()
     {
         if (texture != null)
         {
             GameObject.Destroy(texture);
             texture = null;
         }
+    }
+    
+    public void Dispose()
+    {
+        Debug.Log("Dispose DynamicTexture: " + name);
+        DestroyTexture();
     }
 
     private void CreateTexture()
@@ -86,7 +117,13 @@ public class DynamicTexture
 
         // release texture when GameObject is destroyed
         gameObject.OnDestroyAsObservable()
-            .Subscribe(_ => Destroy());
+            .Subscribe(_ =>
+            {
+                // Delay the destruction of the texture to the next frame.
+                // Otherwise ugly white images may be visible during scene transition.
+                MainThreadDispatcher.StartCoroutine(
+                    CoroutineUtils.ExecuteAfterDelayInFrames(1, () => Dispose()));
+            });
 
         // create a 'blank screen' image 
         blank = new Color[TextureWidth * TextureHeight];

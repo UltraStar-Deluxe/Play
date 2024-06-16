@@ -1,0 +1,16 @@
+#TITLE:SomeTitle
+#ARTIST:SomeArtist
+#MP3:TestSong.ogg
+#BPM:200
+P1
+: 4 3 9 Hel
+: 8  3 9 lo
+: 12 3  9  world
+: 16  2  9 ~
+
+P2
+: 4 3 9 Hel
+: 8  3 9 lo 
+: 12 3  9 world
+: 16  2  9 ~
+E

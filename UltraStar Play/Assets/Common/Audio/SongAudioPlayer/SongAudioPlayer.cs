@@ -1,19 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class SongAudioPlayer : MonoBehaviour, INeedInjection
+public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<SongAudioLoadedEvent>
 {
     // The playback position increase in milliseconds from one frame to the next to be counted as "jump".
     // An event is fired when jumping forward in the song.
     private const int MinForwardJumpOffsetInMillis = 500;
 
-    [InjectedInInspector]
-    public AudioSource audioPlayer;
+    [Inject]
+    private Settings settings;
+
+    [Inject]
+    private SceneNavigator sceneNavigator;
+
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
+    private AudioSourceAudioSupportProvider audioSourceAudioSupportProvider;
+
+    [Inject(SearchMethod = SearchMethods.GetComponentsInChildren)]
+    private AbstractAudioSupportProvider[] audioSupportProviders;
+
+    private IAudioSupportProvider currentAudioSupportProvider;
+    public IAudioSupportProvider CurrentAudioSupportProvider => currentAudioSupportProvider;
 
     // The last frame in which the position in the song was calculated
-    private int positionInSongInMillisFrame;
+    private int positionInMillisFrame;
 
     private readonly Subject<double> playbackStoppedEventStream = new();
     public IObservable<double> PlaybackStoppedEventStream => playbackStoppedEventStream;
@@ -21,79 +35,65 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private readonly Subject<double> playbackStartedEventStream = new();
     public IObservable<double> PlaybackStartedEventStream => playbackStartedEventStream;
 
-    private readonly Subject<double> positionInSongEventStream = new();
-    public IObservable<double> PositionInSongEventStream => positionInSongEventStream;
+    private readonly Subject<double> positionEventStream = new();
+    public IObservable<double> PositionEventStream => positionEventStream;
 
-    private readonly Subject<AudioClip> audioClipLoadedEventStream = new();
-    public IObservable<AudioClip> AudioClipLoadedEventStream => audioClipLoadedEventStream;
+    private readonly Subject<double> playbackSpeedChangedEventStream = new();
+    public IObservable<double> PlaybackSpeedChangedEventStream => playbackSpeedChangedEventStream;
 
-    public IObservable<Pair<double>> JumpBackInSongEventStream
-    {
-        get
-        {
-            return positionInSongEventStream.Pairwise().Where(pair => pair.Previous > pair.Current);
-        }
-    }
+    private readonly Subject<SongAudioLoadedEvent> loadedEventStream = new();
+    public IObservable<SongAudioLoadedEvent> LoadedEventStream => loadedEventStream;
 
-    public IObservable<Pair<double>> JumpForwardInSongEventStream
-    {
-        get
-        {
-            // The position will increase in normal playback. A big increase however, can always be considered as "jump".
-            // Furthermore, when not currently playing, then every forward change can be considered as "jump".
-            return positionInSongEventStream.Pairwise().Where(pair =>
-            {
-                return (pair.Previous + MinForwardJumpOffsetInMillis) < pair.Current
-                    || (!IsPlaying && pair.Previous < pair.Current);
-            });
-        }
-    }
+    public IObservable<Pair<double>> JumpBackEventStream
+        => positionEventStream.Pairwise().Where(pair => pair.Previous > pair.Current);
+
+    public IObservable<Pair<double>> JumpForwardEventStream
+        // The position will increase in normal playback. A big increase however, can always be considered as "jump".
+        // Furthermore, when not currently playing, then every forward change can be considered as "jump".
+        => positionEventStream.Pairwise().Where(pair => (pair.Previous + MinForwardJumpOffsetInMillis) < pair.Current
+                                                        || (!IsPlaying && pair.Previous < pair.Current));
 
     // The current position in the song in milliseconds.
-    private double positionInSongInMillis;
-    public double PositionInSongInMillis
+    private double positionInMillis;
+    public double PositionInMillis
     {
         get
         {
-            if (audioPlayer == null || audioPlayer.clip == null)
+            if (!IsFullyLoaded)
             {
                 return 0;
             }
+
             // The samples of an AudioClip change concurrently,
             // even when they are queried in the same frame (e.g. Update() of different scripts).
             // For a given frame, the position in the song should be the same for all scripts,
             // which is why the value is only updated once per frame.
-            if (positionInSongInMillisFrame != Time.frameCount)
+            if (positionInMillisFrame != Time.frameCount)
             {
-                positionInSongInMillisFrame = Time.frameCount;
-                positionInSongInMillis = PositionInSongInMillisExact;
+                positionInMillisFrame = Time.frameCount;
+                positionInMillis = PositionInMillisExact;
             }
-            return positionInSongInMillis;
+            return positionInMillis;
         }
 
         set
         {
-            if (DurationOfSongInMillis <= 0)
+            if (!IsFullyLoaded
+                || double.IsNaN(value))
             {
                 return;
             }
 
-            double newPositionInSongInMillis = value;
-            if (newPositionInSongInMillis < 0)
-            {
-                newPositionInSongInMillis = 0;
-            }
-            else if (newPositionInSongInMillis > DurationOfSongInMillis - 1)
-            {
-                newPositionInSongInMillis = DurationOfSongInMillis - 1;
-            }
-
-            positionInSongInMillis = newPositionInSongInMillis;
-            int newTimeSamples = (int)(audioPlayer.clip.frequency * positionInSongInMillis / 1000.0);
-            audioPlayer.timeSamples = newTimeSamples;
-
-            positionInSongEventStream.OnNext(positionInSongInMillis);
+            currentAudioSupportProvider.PositionInMillis = NumberUtils.Limit(value, 0, DurationInMillis - 1);
+            positionInMillis = PositionInMillisExact;
+            positionEventStream.OnNext(positionInMillis);
         }
+    }
+
+    public double PositionInSeconds
+    {
+        get => positionInMillis / 1000.0;
+        set => PositionInMillis = value * 1000.0;
     }
 
     /**
@@ -101,156 +101,365 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
      * Note that this changes concurrently,
      * such that it can return different values when called multiple times in the same frame.
      */
-    public double PositionInSongInMillisExact => 1000.0f * (double)audioPlayer.timeSamples / (double)audioPlayer.clip.frequency;
-
-    public double DurationOfSongInMillis { get; private set; }
-
-    public double PositionInSongInPercent
+    public double PositionInMillisExact
     {
         get
         {
-            if (DurationOfSongInMillis <= 0)
+            if (!IsFullyLoaded)
+            {
+                return 0;
+            }
+            double rawResult = currentAudioSupportProvider.PositionInMillis;
+            double result = IsPlaying
+                ? rawResult - settings.SystemAudioBackendDelayInMillis
+                : rawResult;
+            return Math.Max(0, result);
+        }
+    }
+
+    public double DurationInMillis { get; private set; }
+    public double DurationInSeconds => DurationInMillis / 1000.0;
+    public double DurationInBeats => SongMetaBpmUtils.MillisToBeats(loadedSongMeta, DurationInMillis);
+
+    /**
+     * Position in the song from 0 (start of song) to 1 (end of song).
+     */
+    public double PositionInPercent
+    {
+        get
+        {
+            if (DurationInMillis <= 0)
             {
                 return 0;
             }
 
-            return PositionInSongInMillis / DurationOfSongInMillis;
+            return PositionInMillis / DurationInMillis;
         }
     }
 
-    public bool IsPlaying
+    private bool isPlaying;
+    public bool IsPlaying => isPlaying;
+    public bool IsPlayingOfAudioProvider => IsFullyLoaded && currentAudioSupportProvider.IsPlaying;
+
+    public bool IsPartiallyLoaded => currentAudioSupportProvider != null;
+    public bool IsFullyLoaded => IsPartiallyLoaded && DurationInMillis > 0 && loadedSongMeta != null;
+
+    private SongMeta loadedSongMeta;
+
+    private float volumeFactor = 1;
+    public float VolumeFactor
     {
         get
         {
-            return audioPlayer.isPlaying;
+            return volumeFactor;
+        }
+
+        set
+        {
+            float oldValue = VolumeFactor;
+            if (Math.Abs(oldValue - value) < 0.001f)
+            {
+                return;
+            }
+            volumeFactor = value;
+
+            if (!IsPartiallyLoaded)
+            {
+                return;
+            }
+            currentAudioSupportProvider.VolumeFactor = value;
         }
     }
 
-    public AudioClip AudioClip
+    /**
+     * The playback speed.
+     * Attempts to change tempo without affecting pitch by making use of AudioMixer effects.
+     */
+    public double PlaybackSpeed
     {
         get
         {
-            return audioPlayer.clip;
+            if (!IsPartiallyLoaded)
+            {
+                return 1;
+            }
+
+            return currentAudioSupportProvider.PlaybackSpeed;
+        }
+
+        set
+        {
+            SetPlaybackSpeed(value, true);
         }
     }
 
-    public bool HasAudioClip
-    {
+    public RenderTexture FfmpegRenderTexture {
         get
         {
-            return audioPlayer.clip != null;
-        }
-    }
-
-    private SongMeta SongMeta { get; set; }
-
-    public float PlaybackSpeed
-    {
-        get
-        {
-            return audioPlayer.pitch;
+            return currentAudioSupportProvider is FfmpegAudioSupportProvider ffmpegAudioSupportProvider
+                ? ffmpegAudioSupportProvider.FfmpegRenderTexture
+                : null;
         }
         set
         {
-            // Playback speed cannot be set randomly. Allowed (and useful) is a range of 0.5 to 1.5.
-            float newPlaybackSpeed = value;
-            if (newPlaybackSpeed < 0.5f)
+            if (currentAudioSupportProvider is FfmpegAudioSupportProvider ffmpegAudioSupportProvider)
             {
-                newPlaybackSpeed = 0.5f;
+                ffmpegAudioSupportProvider.FfmpegRenderTexture = value;
             }
-            else if (newPlaybackSpeed > 1.5f)
-            {
-                newPlaybackSpeed = 1.5f;
-            }
-
-            // Setting the pitch of an AudioPlayer will change tempo and pitch.
-            audioPlayer.pitch = newPlaybackSpeed;
-
-            // A Pitch Shifter effect on an AudioMixerGroup can be used to compensate the pitch change of the AudioPlayer,
-            // such that only the change of the tempo remains.
-            // See here for details: https://answers.unity.com/questions/25139/how-i-can-change-the-speed-of-a-song-or-sound.html
-            // See here for how the pitch value of the Pitch Shifter effect is made available for scripting: https://learn.unity.com/tutorial/audio-mixing#5c7f8528edbc2a002053b506
-            audioPlayer.outputAudioMixerGroup.audioMixer.SetFloat("PitchShifter.Pitch", 1 + (1 - newPlaybackSpeed));
         }
     }
 
-    [Inject]
-    private AudioManager audioManager;
+    private float lastApplyPlaybackStateToAudioProviderTimeInSeconds;
+
+    private void OnDestroy()
+    {
+        UnloadAudio();
+    }
 
     private void Update()
     {
         if (IsPlaying)
         {
-            positionInSongEventStream.OnNext(PositionInSongInMillis);
+            positionEventStream.OnNext(PositionInMillis);
+        }
+
+        // Apply playback state to (sadly buggy) AudioSupportProviders (ffmpeg and vlc).
+        if (TimeUtils.IsDurationAboveThresholdInSeconds(lastApplyPlaybackStateToAudioProviderTimeInSeconds, 1))
+        {
+            lastApplyPlaybackStateToAudioProviderTimeInSeconds = Time.time;
+            if (DurationInMillis > 0
+                && PositionInMillis < DurationInMillis - 100)
+            {
+                ApplyPlaybackStateToAudioProvider();
+            }
+            else
+            {
+                // The audio players stop automatically at the end of the song. This needs to be monitored.
+                isPlaying = IsPlayingOfAudioProvider;
+            }
         }
     }
 
-    public void Init(SongMeta songMeta)
+    public void LoadAndPlay(
+        SongMeta songMeta,
+        double startPositionInMillis = 0,
+        bool streamAudio = true)
     {
-        if (!gameObject.activeInHierarchy)
-        {
-            return;
-        }
+        LoadAndPlayAsObservable(
+                songMeta,
+                startPositionInMillis,
+                streamAudio)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
+            })
+            // Subscribe to trigger observable
+            .Subscribe(evt => Debug.Log($"Loaded audio: {evt.MediaUri}'"));
+    }
+
+    public IObservable<SongAudioLoadedEvent> LoadAndPlayAsObservable(SongMeta songMeta)
+        => LoadAndPlayAsObservable(songMeta, 0);
+
+    public IObservable<SongAudioLoadedEvent> LoadAndPlayAsObservable(
+        SongMeta songMeta,
+        double startPositionInMillis,
+        bool streamAudio = true)
+    {
+        UnloadAudio();
 
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
-            Debug.Log($"Audio file resource does not exist {songMeta.Mp3}");
-            return;
+            return ObservableUtils.LogExceptionThenThrow<SongAudioLoadedEvent>(
+                new SongAudioPlayerException($"Audio resource does not exist: {audioUri}"));
         }
 
-        this.SongMeta = songMeta;
-        AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri);
-        if (audioClip != null)
+        return DoLoadAndPlayAsObservable(audioUri, audioSupportProviders, streamAudio, startPositionInMillis)
+            .Select(evt =>
+            {
+                loadedSongMeta = songMeta;
+                DurationInMillis = currentAudioSupportProvider.DurationInMillis;
+                currentAudioSupportProvider.VolumeFactor = VolumeFactor;
+                if (IsPlaying)
+                {
+                    currentAudioSupportProvider.Play();
+                }
+
+                loadedEventStream.OnNext(new SongAudioLoadedEvent(songMeta, evt.AudioUri));
+                return new SongAudioLoadedEvent(songMeta, evt.AudioUri);
+            });
+    }
+
+    private IObservable<AudioLoadedEvent> DoLoadAndPlayAsObservable(
+        string audioUri,
+        IAudioSupportProvider[] availableAudioSupportProviders,
+        bool streamAudio,
+        double startPositionInMillis)
+    {
+        IAudioSupportProvider audioSupportProvider = availableAudioSupportProviders
+            .FirstOrDefault(it => it.IsSupported(audioUri));
+        if (audioSupportProvider == null)
         {
-            audioPlayer.clip = audioClip;
-            DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
-            audioClipLoadedEventStream.OnNext(audioClip);
+            return ObservableUtils.LogExceptionThenThrow<AudioLoadedEvent>(
+                new SongAudioPlayerException($"Unsupported audio resource '{audioUri}'."));
         }
-        else
+
+        Debug.Log($"Loading audio '{audioUri}' via {audioSupportProvider}");
+
+        return Observable.Create<AudioLoadedEvent>(o =>
         {
-            audioPlayer.clip = null;
-            DurationOfSongInMillis = 0;
-        }
+            audioSupportProvider.LoadAsObservable(audioUri, streamAudio, startPositionInMillis)
+                .CatchIgnore((Exception ex) =>
+                {
+                    Debug.LogException(ex);
+                    IAudioSupportProvider[] remainingAudioSupportProviders = availableAudioSupportProviders
+                        .Except(new List<IAudioSupportProvider>() { audioSupportProvider })
+                        .ToArray();
+                    Debug.LogError($"Failed to load audio '{audioUri}' via {audioSupportProvider}. Using one of {remainingAudioSupportProviders.JoinWith(", ")} as fallback: {ex.Message}");
+
+                    if (remainingAudioSupportProviders.IsNullOrEmpty())
+                    {
+                        o.OnError(new VideoSupportProviderException($"Failed to load audio and no remaining audio support providers: {audioUri}"));
+                        return;
+                    }
+                    DoLoadAndPlayAsObservable(audioUri, remainingAudioSupportProviders, streamAudio, startPositionInMillis)
+                        .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
+                })
+                .Subscribe(evt =>
+                {
+                    currentAudioSupportProvider = audioSupportProvider;
+                    o.OnNext(evt);
+                })
+                .AddTo(gameObject);
+            return Disposable.Empty;
+        });
+    }
+
+    public void UnloadAudio()
+    {
+        StopAllCoroutines();
+        StopAudio();
+
+        currentAudioSupportProvider?.Unload();
+        currentAudioSupportProvider = null;
+        DurationInMillis = 0;
+        loadedSongMeta = null;
+    }
+
+    private void FireLoadedEvent(IObserver<SongAudioLoadedEvent> o, SongMeta songMeta, string audioUri)
+    {
+        o.OnNext(new SongAudioLoadedEvent(songMeta, audioUri));
+        loadedEventStream.OnNext(new SongAudioLoadedEvent(songMeta, audioUri));
     }
 
     public void ReloadAudio()
     {
-        Init(SongMeta);
+        LoadAndPlay(loadedSongMeta);
+    }
+
+    private void StopAudio()
+    {
+        if (!IsPartiallyLoaded)
+        {
+            return;
+        }
+
+        currentAudioSupportProvider.Stop();
+
+        playbackStoppedEventStream.OnNext(PositionInMillis);
     }
 
     public void PauseAudio()
     {
-        if (audioPlayer.isPlaying)
+        if (!IsPartiallyLoaded
+            || !IsPlaying)
         {
-            audioPlayer.Pause();
-            playbackStoppedEventStream.OnNext(PositionInSongInMillis);
+            return;
         }
+
+        isPlaying = false;
+        currentAudioSupportProvider.Pause();
+
+        playbackStoppedEventStream.OnNext(PositionInMillis);
     }
 
     public void PlayAudio()
     {
-        if (HasAudioClip && !audioPlayer.isPlaying)
+        if (!IsPartiallyLoaded
+            || IsPlaying)
         {
-            audioPlayer.Play();
-            playbackStartedEventStream.OnNext(PositionInSongInMillis);
+            return;
+        }
+
+        isPlaying = true;
+        currentAudioSupportProvider.Play();
+
+        playbackStartedEventStream.OnNext(PositionInMillis);
+    }
+
+    private void ApplyPlaybackStateToAudioProvider()
+    {
+        if (!IsFullyLoaded)
+        {
+            return;
+        }
+
+        if (IsPlaying
+            && !currentAudioSupportProvider.IsPlaying)
+        {
+            Debug.Log($"{nameof(SongAudioPlayer)} should be playing, but {currentAudioSupportProvider} is not. Starting its playback now.");
+            currentAudioSupportProvider.Play();
+        }
+        else if (!IsPlaying
+                 && currentAudioSupportProvider.IsPlaying)
+        {
+            Debug.Log($"{nameof(SongAudioPlayer)} should not be playing, but {currentAudioSupportProvider} is. Pausing its playback now.");
+            currentAudioSupportProvider.Pause();
         }
     }
 
     public double GetCurrentBeat(bool allowNegativeResult)
     {
-        if (audioPlayer.clip == null)
+        if (!IsFullyLoaded)
         {
             return 0;
         }
 
-        double millisInSong = PositionInSongInMillis;
-        double result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
+        double millisInSong = PositionInMillis;
+        double result = SongMetaBpmUtils.MillisToBeats(loadedSongMeta, millisInSong);
         if (result < 0
             && !allowNegativeResult)
         {
             result = 0;
         }
         return result;
+    }
+
+    public void SetPlaybackSpeed(double newValue, bool changeTempoButKeepPitch)
+    {
+        if (!IsPartiallyLoaded)
+        {
+            return;
+        }
+
+        double oldPlaybackSpeed = PlaybackSpeed;
+
+        // Limit playback speed. Allowed is a range of 0.5 (half speed) to 2 (double speed).
+        double newPlaybackSpeed = NumberUtils.Limit(newValue, 0.5f, 2f);
+        if (Math.Abs(newValue - oldPlaybackSpeed) < 0.01f)
+        {
+            return;
+        }
+
+        currentAudioSupportProvider.SetPlaybackSpeed(newValue, changeTempoButKeepPitch);
+
+        // Fire event
+        if (Math.Abs(PlaybackSpeed - oldPlaybackSpeed) > 0.01f)
+        {
+            playbackSpeedChangedEventStream.OnNext(newPlaybackSpeed);
+        }
     }
 }

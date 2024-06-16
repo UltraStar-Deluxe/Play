@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class SongEditorEnumLayer : AbstractSongEditorLayer
 {
@@ -54,8 +52,8 @@ public class SongEditorEnumLayer : AbstractSongEditorLayer
         notes.Clear();
     }
 
-    public override string GetDisplayName()
+    public override Translation GetDisplayName()
     {
-        return LayerEnum.ToString();
+        return Translation.Get(LayerEnum);
     }
 }

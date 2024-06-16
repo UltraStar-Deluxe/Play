@@ -1,8 +1,8 @@
-using PrimeInputActions;
-using ProTrans;
+using System;
+using System.Collections.Generic;
 using UniInject;
 using UniRx;
-using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -10,45 +10,70 @@ using UnityEngine.UIElements;
 
 public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
-    [InjectedInInspector]
-    public VisualTreeAsset connectedClientListEntryAsset;
+    [FormerlySerializedAs("companionClientListEntryAsset")] [InjectedInInspector]
+    public VisualTreeAsset companionClientListEntryUi;
 
-    [Inject(UxmlName = R.UxmlNames.connectedClientCountLabel)]
-    private Label connectedClientCountLabel;
+    [Inject(UxmlName = R.UxmlNames.companionClientCountLabel)]
+    private Label companionClientCountLabel;
 
-    [Inject(UxmlName = R.UxmlNames.connectedClientList)]
-    private ScrollView connectedClientList;
+    [Inject(UxmlName = R.UxmlNames.companionClientList)]
+    private ScrollView companionClientList;
+
+    [Inject(UxmlName = R.UxmlNames.noCompanionClientsContainer)]
+    private VisualElement noCompanionClientsContainer;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
+
+    [Inject]
+    private Injector injector;
+
+    [Inject]
+    private UiManager uiManager;
+
+    private readonly List<CompanionClientListEntryControl> companionClientListEntryControls = new();
 
     protected override void Start()
     {
         base.Start();
-        
-        UpdateConnectedClients();
-        serverSideConnectRequestManager.ClientConnectedEventStream
-            .Subscribe(_ => UpdateConnectedClients())
+
+        UpdateCompanionClients();
+        serverSideCompanionClientManager.ClientConnectionChangedEventStream
+            .Subscribe(_ => UpdateCompanionClients())
             .AddTo(gameObject);
     }
 
-    private void UpdateConnectedClients()
+    private void UpdateCompanionClients()
     {
-        connectedClientList.Clear();
-        serverSideConnectRequestManager.GetAllConnectedClientHandlers()
-            .ForEach(clientHandler =>
+        companionClientList.Clear();
+        List<ICompanionClientHandler> allCompanionClientHandlers = serverSideCompanionClientManager.GetAllCompanionClientHandlers();
+        allCompanionClientHandlers.Sort((a, b) => string.Compare(a.ClientName, b.ClientName, StringComparison.InvariantCultureIgnoreCase));
+        allCompanionClientHandlers.ForEach(clientHandler =>
             {
-                connectedClientList.Add(CreateClientEntry(clientHandler));
+                companionClientList.Add(CreateClientEntry(clientHandler));
             });
 
-        connectedClientCountLabel.text = TranslationManager.GetTranslation(R.Messages.options_connectedClientCount,
-            "count", ServerSideConnectRequestManager.ConnectedClientCount);
+        companionClientCountLabel.SetTranslatedText(Translation.Get(R.Messages.options_companionClientCount,
+            "count", serverSideCompanionClientManager.CompanionClientCount));
+
+        bool noCompanionClients = serverSideCompanionClientManager.CompanionClientCount <= 0;
+        noCompanionClientsContainer.SetVisibleByDisplay(noCompanionClients);
+        if (noCompanionClients)
+        {
+            HighlightHelpIcon();
+        }
     }
 
-    private VisualElement CreateClientEntry(IConnectedClientHandler clientHandler)
+    private VisualElement CreateClientEntry(ICompanionClientHandler clientHandler)
     {
-        VisualElement result = connectedClientListEntryAsset.CloneTree();
-        result.Q<Label>(R.UxmlNames.nameLabel).text = clientHandler.ClientName;
-        return result;
+        VisualElement visualElement = companionClientListEntryUi.CloneTreeAndGetFirstChild();
+        CompanionClientListEntryControl control = injector
+            .WithRootVisualElement(visualElement)
+            .WithBindingForInstance(clientHandler)
+            .CreateAndInject<CompanionClientListEntryControl>();
+        companionClientListEntryControls.Add(control);
+        return visualElement;
     }
+
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToCompanionApp);
 }

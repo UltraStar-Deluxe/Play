@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using PrimeInputActions;
 using UniInject;
@@ -40,7 +39,7 @@ public class SongEditorStatusBarControl : INeedInjection, IInjectionFinishedList
 
     [Inject]
     private Settings settings;
-
+    
     private EditorNoteControl editorNoteControlUnderPointer;
     private bool isPointerOverVideoArea;
     private bool IsPointerOverVideoArea
@@ -63,11 +62,10 @@ public class SongEditorStatusBarControl : INeedInjection, IInjectionFinishedList
         statusBarSongInfoLabel.text = $"{songMeta.Artist} - {songMeta.Title}";
         statusBarPositionInfoLabel.text = "";
 
-        songAudioPlayer.PositionInSongEventStream
+        songAudioPlayer.PositionEventStream
             .Subscribe(millis =>
             {
-                TimeSpan timeSpan = new(0, 0, 0, 0, (int)millis);
-                statusBarPositionInfoLabel.text = $"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}";
+                statusBarPositionInfoLabel.text = TimeUtils.GetMinutesAndSecondsDurationString(millis);
             });
 
         videoArea.RegisterCallback<PointerEnterEvent>(evt => IsPointerOverVideoArea = true, TrickleDown.TrickleDown);

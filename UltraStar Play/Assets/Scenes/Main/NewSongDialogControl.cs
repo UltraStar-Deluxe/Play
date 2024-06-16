@@ -1,4 +1,8 @@
-﻿using UniInject;
+﻿using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using SFB;
+using UniInject;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -6,6 +10,15 @@ using UnityEngine.UIElements;
 
 public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinishedListener
 {
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement visualElement;
+
+    [Inject(UxmlName = R.UxmlNames.audioFileTextField)]
+    private TextField audioFileTextField;
+
+    [Inject(UxmlName = R.UxmlNames.selectAudioFileButton)]
+    private Button selectAudioFileButton;
+
     [Inject(UxmlName = R.UxmlNames.artistTextField)]
     private TextField artistTextField;
 
@@ -33,15 +46,22 @@ public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinish
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    private Settings settings;
+
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
-        
+
+        selectAudioFileButton.RegisterCallbackButtonTriggered(_ => OpenSelectAudioFileDialog());
         cancelButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
         okButton.RegisterCallbackButtonTriggered(_ => TryCreateNewSong());
 
+        audioFileTextField.RegisterValueChangedCallback(evt => OnAudioFileTextFieldChanged(evt.newValue));
         artistTextField.value = "";
+        artistTextField.DisableParseEscapeSequences();
         titleTextField.value = "";
+        titleTextField.DisableParseEscapeSequences();
         createCoverToggle.value = true;
         createBackgroundToggle.value = true;
         createVideoToggle.value = false;
@@ -53,6 +73,47 @@ public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinish
         cancelButton.Focus();
     }
 
+    private void OnAudioFileTextFieldChanged(string newValue)
+    {
+        if (!FileUtils.Exists(newValue))
+        {
+            UpdateOkButtonEnabled();
+            return;
+        }
+
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(newValue);
+        // Expected file name: "trackNumber - artist - title", where trackNumber, artist, and separators are optional.
+        Match artistDashTitleMatch = Regex.Match(fileNameWithoutExtension, @"^((?<trackNumber>\d+)(\s?[-|,~]\s?))?((?<artist>[^\-]+)(\s?[-|,~]\s?))?(?<title>[^\-]+)$");
+        if (artistDashTitleMatch.Success)
+        {
+            string title = artistDashTitleMatch.Groups["title"].Value.Trim();
+            string artist = artistDashTitleMatch.Groups["artist"].Value.Trim();
+            if (int.TryParse(artist, out int artistAsInt))
+            {
+                // Ignore artist part when it can be parsed to an int because in this case, it is probably a track number.
+                artist = "";
+                title = fileNameWithoutExtension;
+            }
+            artistTextField.value = artist;
+            titleTextField.value = title;
+        }
+
+        UpdateOkButtonEnabled();
+    }
+
+    private void OpenSelectAudioFileDialog()
+    {
+        string folder = SettingsUtils.GetEnabledSongFolders(settings)
+            .FirstOrDefault()
+            .OrIfNull("./");
+        ExtensionFilter[] audioFileExtensionFilters = new[] { new ExtensionFilter("Files", "*.*") };
+        string path = FileSystemDialogUtils.OpenFileDialog("Select audio file", folder, audioFileExtensionFilters);
+        if (FileUtils.Exists(path))
+        {
+            audioFileTextField.value = path;
+        }
+    }
+
     private void UpdateOkButtonEnabled()
     {
         okButton.SetEnabled(IsInputValid());
@@ -62,11 +123,12 @@ public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinish
     {
         if (!IsInputValid())
         {
-            UiManager.CreateNotification("Please specify the artist and title");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_missingArtistOrTitle));
             return;
         }
 
         createSongFromTemplateControl.CreateNewSongFromTemplateAndContinueToSongEditor(
+            audioFileTextField.value,
             artistTextField.value,
             titleTextField.value,
             createCoverToggle.value,
@@ -78,6 +140,8 @@ public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinish
     private bool IsInputValid()
     {
         return !artistTextField.value.IsNullOrEmpty()
-               && !titleTextField.value.IsNullOrEmpty();
+               && !titleTextField.value.IsNullOrEmpty()
+               && (audioFileTextField.value.IsNullOrEmpty()
+                   || FileUtils.Exists(audioFileTextField.value));
     }
 }

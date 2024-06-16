@@ -1,39 +1,50 @@
 {
     "defaultControl": {
-        "fontColor": "#E5E5E5",
-        "backgroundColor": "#3399D8",
-        "hoverBackgroundColor": "#2E72F0",
-        "focusBackgroundColor": "#2E72F0",
-        "activeBackgroundColor": "#2C3CE6",
-        "focusBorderColor": "#3399D8",
+        "fontColor": "#f0feff",
+        "backgroundColor": "#42a3e7",
+        "hoverBackgroundColor": "#7dc6e9",
+        "focusBackgroundColor": "#7dc6e9",
+        "activeBackgroundColor": "#3c95d1",
+        "focusBorderColor": "#42a3e7",
     },
 
     "transparentButton": {
         "backgroundColor": "#00000100",
-        "hoverBackgroundColor": "#20202030",
-        "focusBackgroundColor": "#20202040",
-        "activeBackgroundColor": "#40404040",
+        "hoverBackgroundColor": "#20202060",
+        "focusBackgroundColor": "#20202080",
+        "activeBackgroundColor": "#40404080",
+        "textShadow": {
+            "color": "#a0a0a0",
+            "offset": {
+                "x": 1,
+                "y": 1
+            }
+        }
     },
 
     "dynamicPanel": {
-        "backgroundColor": "#00000100",
-        "hoverBackgroundColor": "#1D2939",
-        "focusBackgroundColor": "#1D2939",
-        "activeBackgroundColor": "#1D2939"
+        "backgroundColor": "#23304300",
+        "focusBackgroundColor": "#00a07e"
     },
 
     "staticPanel": {
-        "backgroundGradient": "24deg, #233043, #344054",
+        "backgroundGradient": "24deg, #425169, #38465f"
     },
     
-    "primaryFontColor": "#F0F0F0",
+    "primaryFontColor": "#f0feff",
     "secondaryFontColor": "#CCCCCC",
+    "noBackgroundInHierarchyTextShadow": {
+        "color": "#a0a0a0",
+        "offset": {
+            "x": 1,
+            "y": 1
+        }
+    },
     
-    "sceneTransitionAnimationTime": "250ms",
     "dynamicBackground": {
-        "gradientRampFile": "gradients/blue.png",
+        "gradientRampFile": "gradients/classic_blue.png",
         "gradientType": "Radial",
-        "gradientScale": 1.7,
+        "gradientScale": 1.4,
         "gradientSmoothness": 2.0,
         "gradientAngle": 0.0,
         "gradientAnimation": false,
@@ -41,5 +52,18 @@
         "gradientAnimAmplitude": 0.1,
         "particleFile": "particles/star.png",
         "particleOpacity": 0.2
-    }
+    },
+
+    "songRatingIcons": {
+        "toneDeaf": "icons/usdx/[score]rating_0.png",
+        "amateur": "icons/usdx/[score]rating_1.png",
+        "wannabe": "icons/usdx/[score]rating_2.png",
+        "hopeful": "icons/usdx/[score]rating_3.png",
+        "risingStar": "icons/usdx/[score]rating_4.png",
+        "leadSinger": "icons/usdx/[score]rating_5.png",
+        "superstar": "icons/usdx/[score]rating_6.png",
+        "ultrastar": "icons/usdx/[score]rating_7.png"
+    },
+
+    "beforeLyricsIndicatorImage": "icons/usdx/[sing]lyricsHelpBar.png",
 }

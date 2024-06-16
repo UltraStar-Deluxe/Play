@@ -11,8 +11,11 @@ public class UnityStackTraceEnricher : ILogEventEnricher
         if (logEvent.Exception != null)
         {
             string stackTraceIndented = indentation + StackTraceUtility.ExtractStringFromException(logEvent.Exception)
+                .Replace("\n\n", "\n")
                 .Replace("\r\n", "\n")
                 .Replace("\n", "\n" + indentation);
+            // Add additional newline to separate stack trace from next message (making it easier to find in the log file.
+            stackTraceIndented += "\n";
             logEvent.AddOrUpdateProperty(
                 new LogEventProperty("StackTrace", new ScalarValue(stackTraceIndented)));
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -34,6 +33,11 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
     {
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
 
+        songAudioPlayer.LoadedEventStream.Subscribe(_ =>
+        {
+            UpdateNoteOverviewImage();
+        });
+
         overviewAreaNotes.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             dynamicTexture = new DynamicTexture(songEditorSceneControl.gameObject, overviewAreaNotes);
@@ -59,9 +63,9 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
         }
 
         dynamicTexture.ClearTexture();
-        foreach (Voice voice in songMeta.GetVoices())
+        foreach (Voice voice in songMeta.Voices)
         {
-            Color color = songEditorLayerManager.GetVoiceLayerColor(voice.Name);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(voice.Id);
             DrawNotes(voice, color);
         }
         dynamicTexture.ApplyTexture();
@@ -80,7 +84,7 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
             return;
         }
 
-        int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
+        int songDurationInMillis = (int)songAudioPlayer.DurationInMillis;
 
         // constant offset to
         // (a) ensure that midiNoteRange > 0,
@@ -91,13 +95,17 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
         int midiNoteRange = midiNoteMax - midiNoteMin;
         foreach (Note note in notes)
         {
-            double startMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+            double startMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat);
             startMillis = NumberUtils.Limit(startMillis, 0, songDurationInMillis);
-            double endMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat);
+            double endMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.EndBeat);
             startMillis = NumberUtils.Limit(startMillis, 0, songDurationInMillis);
 
             int yStart = dynamicTexture.TextureHeight * (note.MidiNote - midiNoteMin) / midiNoteRange;
             int yLength = dynamicTexture.TextureHeight / midiNoteRange * 2;
+
+            int minHeightInPx = 5;
+            yLength = NumberUtils.Limit(yLength, minHeightInPx, dynamicTexture.TextureHeight);
+
             int yEnd = yStart + yLength;
             int xStart = (int)(dynamicTexture.TextureWidth * startMillis / songDurationInMillis);
             int xEnd = (int)(dynamicTexture.TextureWidth * endMillis / songDurationInMillis);

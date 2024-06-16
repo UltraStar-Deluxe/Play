@@ -6,6 +6,7 @@
     Language,
     Folder,
     Year,
-    CountCanceled,
-    CountFinished
+    LocalHighScore,
+    CreationTime,
+    LastModificationTime,
 }

@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="SongSelectGameRoundUi" src="project://database/Packages/playshared/Runtime/UIDocuments/SongQueueEntryUi.uxml?fileID=9197481963319205126&amp;guid=82a6470c46626074998301d3d1e10698&amp;type=3#SongQueueEntryUi" />
+    <ui:VisualElement name="songQueueUiRoot" style="position: relative; align-items: stretch; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; justify-content: flex-start; flex-grow: 1;">
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songQueueEntriesScrollView" style="flex-grow: 1;">
+            <ui:Instance template="SongSelectGameRoundUi" name="SongQueueEntryUi" style="width: 100%;" />
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

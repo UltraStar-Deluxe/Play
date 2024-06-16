@@ -11,7 +11,7 @@
                     "id": "6380c5aa-aa8e-4142-aa56-2a22bbbdcf16",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": "RepeatedHold",
+                    "interactions": "RepeatedHold(initialPause=1)",
                     "initialStateCheck": true
                 },
                 {
@@ -710,6 +710,60 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "toggleWebViewControl",
+                    "type": "Button",
+                    "id": "a8eb6b2e-96db-4dd4-9623-ac004d3aaeec",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "singSceneOpenContextMenu",
+                    "type": "Button",
+                    "id": "dce2ba3d-29c2-4c62-8de3-91b0066e43b4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "singSceneShowGovernanceOverlay",
+                    "type": "PassThrough",
+                    "id": "4a5740d4-6044-432c-a5bc-5d2afd6d602e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "navigateToParentFolder",
+                    "type": "Value",
+                    "id": "e8cfff54-15d6-475f-9a3b-ca516b2d2897",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "increaseVolume",
+                    "type": "Value",
+                    "id": "c6b329b8-e4ae-4fa6-a277-8ffa72060902",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "decreaseVolume",
+                    "type": "Value",
+                    "id": "d9da46c9-9b9e-45f0-8bb6-a7434175304d",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -924,17 +978,6 @@
                 },
                 {
                     "name": "",
-                    "id": "73145dd7-26f2-4bac-bc26-6eed175586eb",
-                    "path": "<Gamepad>/buttonNorth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "togglePlayers",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "479cc28f-605c-4269-b28b-007ff626e181",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
@@ -1001,17 +1044,6 @@
                 },
                 {
                     "name": "",
-                    "id": "b053835c-a87f-4f67-8d56-4f6884a42357",
-                    "path": "<Keyboard>/anyKey",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "closeContextMenu",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "8323a2e9-14d9-444d-9bf8-0837fa72bb0b",
                     "path": "<Keyboard>/s",
                     "interactions": "",
@@ -1068,7 +1100,7 @@
                 {
                     "name": "",
                     "id": "9ccd4e70-f819-4f2b-918a-b1ca19844790",
-                    "path": "<Gamepad>/buttonWest",
+                    "path": "<Gamepad>/buttonNorth",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -1189,7 +1221,7 @@
                 {
                     "name": "",
                     "id": "e612168f-367f-45fc-a557-9d51142bbee8",
-                    "path": "<Keyboard>/f12",
+                    "path": "<Keyboard>/f10",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -1361,6 +1393,215 @@
                     "action": "anyKeyboardModifierPressedOrReleased",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "Ctrl+B",
+                    "id": "e3b25f68-f286-4a9c-9782-7d8b5c5c92ce",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleWebViewControl",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "412e5ca3-8368-4020-a4db-82298d4aceaf",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleWebViewControl",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "44470238-74b5-433b-867a-a7b5750f1868",
+                    "path": "<Keyboard>/b",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleWebViewControl",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "86ff370e-82c9-4e2b-9f2b-939e21ea3970",
+                    "path": "<Keyboard>/f8",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleWebViewControl",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d8b477ba-d7e2-45ba-a8ef-41d85ffcf131",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneOpenContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fa8062d1-a159-46d6-9988-a6a8dbbd6fc2",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneOpenContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7aabc6a6-7ba7-46e3-bdf8-e5efd9b3ae31",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "108d827d-d8d5-4fd9-9de7-27d7293be15f",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3a3339fb-0782-488b-bc01-19975b76e063",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bd57174a-ddb7-44bd-9688-e94f1fdf94ff",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "abe9f17a-c9bd-4295-bdbe-645703fba678",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2f5fe01b-ffb6-4d21-9b6f-db267bf2517e",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3f447f72-935f-426e-8767-c6169fa1271e",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "834b569e-15ec-4720-a596-6ee5bef672a4",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "daacd881-244c-4cf8-b438-ccd2803ff9ba",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "174b9165-1cc7-49f9-bcb6-040335d62e7c",
+                    "path": "<Keyboard>/backspace",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateToParentFolder",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cb08a2d0-0694-4407-98ea-192d2a5654b7",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateToParentFolder",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c6728fbd-05c8-41a0-b384-da1f583b1db9",
+                    "path": "<Mouse>/scroll",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "increaseVolume",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6c80daeb-e381-475d-8921-63ffed0af0e8",
+                    "path": "<Mouse>/scroll",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "decreaseVolume",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -1477,6 +1718,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "openSearch",
+                    "type": "Button",
+                    "id": "343611d0-e431-4fe5-b1e6-a8eacb9988ba",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "selectNextNote",
                     "type": "Button",
                     "id": "2f18f4c5-9751-42e6-9058-e4d3cb87d882",
@@ -1498,6 +1748,33 @@
                     "name": "editLyrics",
                     "type": "Button",
                     "id": "c50ccc1f-1f32-436b-864c-6c27cdd2606a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "pitchDetection",
+                    "type": "Button",
+                    "id": "e7d9fa4d-9718-4504-8475-e60d7439a703",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "speechRecognition",
+                    "type": "Button",
+                    "id": "98d8ca68-5c1f-45d6-ad56-b8fb143fdf7c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "assignToOwnSentence",
+                    "type": "Button",
+                    "id": "5c364de4-a0da-40db-8abd-407a1e61e3e8",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -1579,6 +1856,24 @@
                     "name": "zoomOutHorizontal",
                     "type": "Button",
                     "id": "1e03d248-658a-4025-93dd-38e61ec0d750",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "navigateForward",
+                    "type": "Button",
+                    "id": "0a54c63c-e83d-407b-8a6b-fefbd1ec8566",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "navigateBackward",
+                    "type": "Button",
+                    "id": "8deb8a5e-6dba-46d2-8447-1ac8ac4987c6",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -2219,6 +2514,138 @@
                     "processors": "",
                     "groups": "",
                     "action": "anyKeyboardKey",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6429a813-4ea5-42db-acf3-7c30e04b3ba7",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "pitchDetection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "18b2c1f7-8bf4-42b4-875b-6bbbb06dfaab",
+                    "path": "<Keyboard>/l",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "speechRecognition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Button With One Modifier",
+                    "id": "4e14feb1-cbd3-4e1a-9d08-67c41c5ffbcc",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openSearch",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "2b7c98c1-24a8-4849-9fe7-a8a0d8af70b0",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openSearch",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "d382ce41-5de7-4c7f-8391-708e2b0080f9",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openSearch",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Button With One Modifier",
+                    "id": "a4b627eb-005a-4bf0-a5f4-feb250ff7ade",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateForward",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "4117cb85-cc80-433f-abf7-7933fc390c0b",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateForward",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "384264ba-4e4c-4404-9996-1a4bcab8b143",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateForward",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Button With One Modifier",
+                    "id": "09204d3d-c9c4-4bc4-908f-1d1a1ced9e51",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateBackward",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "2e41d786-1357-4810-83b5-1bba5f52a420",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateBackward",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "bd9a0196-b11d-4ac5-9e4b-51af33fdb1f1",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateBackward",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "82771815-d326-4d6e-b1cd-627f16f2bc59",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "assignToOwnSentence",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -21,7 +21,7 @@ public class DetectBpmControl
             if (clickCount == 0)
             {
                 startTime = Time.time;
-                label.text = "First clicks";
+                label.SetTranslatedText(Translation.Get(R.Messages.songEditor_clickToFindBpm_firstClicks));
             }
             else
             {
@@ -29,7 +29,7 @@ public class DetectBpmControl
                 if (durationInSeconds > 1)
                 {
                     float bpm = 60 * clickCount / durationInSeconds;
-                    label.text = $"{bpm.ToString("0.00", CultureInfo.InvariantCulture)} BPM";
+                    label.SetTranslatedText(Translation.Of($"{bpm.ToString("0.00", CultureInfo.InvariantCulture)} BPM"));
                 }
             }
 

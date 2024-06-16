@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ProTrans;
@@ -138,8 +139,8 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
 
     private void CheckForNewVersion(string remoteVersionFileContent)
     {
-        Dictionary<string, string> remoteVersionProperties = PropertiesFileParser.ParseText(remoteVersionFileContent);
-        Dictionary<string, string> localVersionProperties = PropertiesFileParser.ParseText(localVersionTextAsset.text);
+        PropertiesFile remoteVersionProperties = PropertiesFileParser.ParseText(remoteVersionFileContent, CultureInfo.InvariantCulture);
+        PropertiesFile localVersionProperties = PropertiesFileParser.ParseText(localVersionTextAsset.text, CultureInfo.InvariantCulture);
 
         remoteVersionProperties.TryGetValue("release", out string remoteRelease);
         if (settings.IgnoredReleases.Contains("all")
@@ -171,7 +172,7 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
         }
     }
 
-    private void OpenNewVersionAvailableDialog(Dictionary<string, string> remoteVersionProperties)
+    private void OpenNewVersionAvailableDialog(PropertiesFile remoteVersionProperties)
     {
         VisualElement dialogRootVisualElement = newVersionDialogUxml.CloneTree().Children().FirstOrDefault();
         dialogRootVisualElement.AddToClassList("overlay");

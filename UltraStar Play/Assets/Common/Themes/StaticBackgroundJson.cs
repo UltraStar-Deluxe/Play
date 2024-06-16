@@ -1,12 +1,15 @@
 ﻿using System;
-using UnityEngine;
 
 [Serializable]
 public class StaticBackgroundJson
 {
-    public string imagePath;
     /**
-     * One of ScaleMode enum values.
+     * Image file path
      */
-    public string scaleMode;
+    public string imagePath;
+    
+    /**
+     * Defines how the image element is scaled to fit the screen. One of ScaleMode enum values.
+     */
+    public string imageScaleMode;
 }

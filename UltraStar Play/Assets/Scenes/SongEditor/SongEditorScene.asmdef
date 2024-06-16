@@ -8,10 +8,15 @@
         "com.achimmihca.uniinject",
         "com.achimmihca.protrans",
         "com.achimmihca.primeinputactions",
+        "com.achimmihca.portaudioforunity",
         "Unity.TextMeshPro",
         "Unity.InputSystem",
         "playshared",
-        "playsharedui"
+        "playsharedui",
+        "SpleeterSharp",
+        "UnityStandaloneFileBrowser",
+        "LiteNetLib",
+        "com.whisper.unity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

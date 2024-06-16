@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using UniInject;
+﻿using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
 
@@ -30,16 +28,20 @@ public class SongEditorSideBarLayerEntryControl : INeedInjection, IInjectionFini
     [Inject(UxmlName = R.UxmlNames.layerVisibleButton)]
     private Button layerVisibleButton;
 
+    [Inject(UxmlName = R.UxmlNames.layerMidiSoundButton)]
+    private Button layerMidiSoundButton;
+
     [Inject(UxmlName = R.UxmlNames.layerEditableButton)]
     private Button layerEditableButton;
 
     private ToogleButtonControl layerVisibleToggleButtonControl;
     private ToogleButtonControl layerEditableToggleButtonControl;
+    private ToogleButtonControl layerMidiSoundToggleButtonControl;
 
     public void OnInjectionFinished()
     {
         layerColorElement.style.backgroundColor = layerManager.GetLayerColor(layer);
-        layerNameLabel.text = layer.GetDisplayName();
+        layerNameLabel.SetTranslatedText(layer.GetDisplayName());
         selectAllNotesOfLayerButton.RegisterCallbackButtonTriggered(
             _ => selectionControl.SetSelection(layerManager.GetLayerNotes(layer)));
 
@@ -50,6 +52,14 @@ public class SongEditorSideBarLayerEntryControl : INeedInjection, IInjectionFini
             layerManager.IsLayerVisible(layer));
         layerVisibleToggleButtonControl.ValueChangedEventStream
             .Subscribe(evt => layerManager.SetLayerVisible(layer, evt.NewValue));
+
+        // Enable/disable MIDI sound playback
+        layerMidiSoundToggleButtonControl = new ToogleButtonControl(layerMidiSoundButton,
+            layerMidiSoundButton.Q<VisualElement>(R.UxmlNames.layerMidiSoundOnIcon),
+            layerMidiSoundButton.Q<VisualElement>(R.UxmlNames.layerMidiSoundOffIcon),
+            layerManager.IsMidiSoundPlayAlongEnabled(layer));
+        layerMidiSoundToggleButtonControl.ValueChangedEventStream
+            .Subscribe(evt => layerManager.SetMidiSoundPlayAlongEnabled(layer, evt.NewValue));
 
         // IsEditable
         layerEditableToggleButtonControl = new ToogleButtonControl(layerEditableButton,

@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
@@ -13,13 +11,19 @@ public class SingingResultsHighscoreControl : INeedInjection
 {
     [Inject(Key = nameof(highscoreEntryUi))]
     private VisualTreeAsset highscoreEntryUi;
-    
-    [Inject(UxmlName = R.UxmlNames.difficultyPicker)]
-    private ItemPicker difficultyPicker;
-    
+
+    [Inject(UxmlName = R.UxmlNames.previousDifficultyButton)]
+    private Button previousDifficultyButton;
+
+    [Inject(UxmlName = R.UxmlNames.currentDifficultyLabel)]
+    private Label currentDifficultyLabel;
+
+    [Inject(UxmlName = R.UxmlNames.nextDifficultyButton)]
+    private Button nextDifficultyButton;
+
     [Inject(UxmlName = R.UxmlNames.highscoreEntryList)]
     private VisualElement highscoreEntryList;
-    
+
     [Inject]
     private Statistics statistics;
 
@@ -28,14 +32,19 @@ public class SingingResultsHighscoreControl : INeedInjection
 
     [Inject]
     private SingingResultsSceneData sceneData;
-    
+
     [Inject]
     private Injector injector;
-    
+
+    [Inject]
+    private Settings settings;
+
     private readonly int highscoreCount = 5;
-    
+
     private bool isInitialized;
-    
+
+    private EDifficulty currentDifficulty;
+
     public void Init()
     {
         if (isInitialized)
@@ -43,45 +52,73 @@ public class SingingResultsHighscoreControl : INeedInjection
             return;
         }
         isInitialized = true;
-        
-        LabeledItemPickerControl<EDifficulty> difficultyPickerControl = new(difficultyPicker, EnumUtils.GetValuesAsList<EDifficulty>());
-        difficultyPickerControl.GetLabelTextFunction = item => item.GetTranslatedName();
-        difficultyPickerControl.Selection.Subscribe(item => ShowHighscores(item));
-        difficultyPickerControl.SelectItem(sceneData.PlayerProfiles.FirstOrDefault().Difficulty);
+
+        currentDifficulty = !sceneData.PlayerProfiles.IsNullOrEmpty()
+            ? sceneData.PlayerProfiles.FirstOrDefault().Difficulty
+            : settings.Difficulty;
+        nextDifficultyButton.RegisterCallbackButtonTriggered(_ => ChangeDifficulty(1));
+        previousDifficultyButton.RegisterCallbackButtonTriggered(_ => ChangeDifficulty(-1));
+        UpdateHighScores();
     }
-    
-    private void ShowHighscores(EDifficulty difficulty)
+
+    private void ChangeDifficulty(int direction)
     {
-        highscoreEntryList.Clear();
-        LocalStatistic localStatistic = statistics.GetLocalStats(sceneData.SongMeta);
-        List<SongStatistic> songStatistics = localStatistic?.StatsEntries?.SongStatistics?
-            .Where(it => it.Difficulty == difficulty).ToList();
-        
-        if (songStatistics.IsNullOrEmpty())
+        List<EDifficulty> difficulties = EnumUtils.GetValuesAsList<EDifficulty>();
+        if (direction < 0)
         {
-            Label noHighscoresLabel = new Label("No highscores yet");
+            currentDifficulty = difficulties.GetElementBefore(currentDifficulty, true);
+        }
+        else if (direction > 0)
+        {
+            currentDifficulty = difficulties.GetElementAfter(currentDifficulty, true);
+        }
+        UpdateHighScores();
+    }
+
+    private void UpdateHighScores()
+    {
+        currentDifficultyLabel.SetTranslatedText(Translation.Get(currentDifficulty));
+
+        highscoreEntryList.Clear();
+
+        SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
+        StatisticsUtils.GetLocalAndRemoteHighScoreEntriesAllAtOnce(statistics, songMeta)
+            .Subscribe(scoreEntries =>
+            {
+                List<HighScoreEntry> scoreEntriesOfCurrentDifficulty = scoreEntries
+                    .Where(entry => entry.Difficulty == currentDifficulty)
+                    .ToList();
+                UpdateHighScores(scoreEntriesOfCurrentDifficulty);
+            });
+    }
+
+    private void UpdateHighScores(List<HighScoreEntry> highScoreEntries)
+    {
+        if (highScoreEntries.IsNullOrEmpty())
+        {
+            Label noHighscoresLabel = new Label("No high scores yet");
             noHighscoresLabel.name = "noHighscoresLabel";
             highscoreEntryList.Add(noHighscoresLabel);
             return;
         }
-        
-        songStatistics.Sort(new CompareBySongScoreDescending());
-        List<SongStatistic> topSongStatistics = songStatistics.Take(highscoreCount).ToList();
-        for (int i = 0; i < topSongStatistics.Count; i++)
+
+        highScoreEntries.Sort(new HighScoreEntry.CompareByScoreDescending());
+        List<HighScoreEntry> topSongEntries = highScoreEntries.Take(highscoreCount).ToList();
+        for (int i = 0; i < topSongEntries.Count; i++)
         {
-            CreateHighscoreEntry(topSongStatistics[i], i);
+            CreateHighscoreEntry(topSongEntries[i], i);
         }
     }
 
-    private void CreateHighscoreEntry(SongStatistic songStatistic, int index)
+    private void CreateHighscoreEntry(HighScoreEntry highScoreEntry, int index)
     {
         VisualElement highscoreEntry = highscoreEntryUi.CloneTree().Children().FirstOrDefault();
         highscoreEntryList.Add(highscoreEntry);
 
         injector
             .WithRootVisualElement(highscoreEntry)
-            .WithBindingForInstance(songStatistic)
-            .WithBinding(new Binding("entryIndex", new ExistingInstanceProvider<int>(index)))
+            .WithBindingForInstance(highScoreEntry)
+            .WithBinding(new UniInjectBinding("entryIndex", new ExistingInstanceProvider<int>(index)))
             .CreateAndInject<SingingResultsHighscoreEntryControl>();
     }
 }

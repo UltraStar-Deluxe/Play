@@ -1,0 +1,7 @@
+name: Coin Collector
+version: 1.0.0
+description: |
+  Game modifier that adds collectable coins to notes.
+  Collect 10 coins for 100 bonus points.
+authors:
+  - email@melodymania.org

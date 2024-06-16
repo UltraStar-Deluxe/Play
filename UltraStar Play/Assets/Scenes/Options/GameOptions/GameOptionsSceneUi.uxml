@@ -1,6 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
-        <ui:DropdownField label="Language" index="-1" choices="a, b, c, d" name="languageDropdownField" class="mb-3" />
-        <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="scoreModePicker" label="Score" />
+        <ui:DropdownField label="Language" index="-1" choices="a, b, c, d" name="languageDropdownField" class="mb-3 noBackgroundInHierarchy" />
+        <Chooser name="passTheMicTimeChooser" label="$options_passTheMicTime" min-value="10" max-value="60" step-value="5" class="noBackgroundInHierarchy" style="margin-bottom: 10px;" />
+        <Chooser name="reduceAudioVolumeChooser" label="$options_reduceAudioVolume" min-value="0" max-value="10" class="noBackgroundInHierarchy" style="margin-bottom: 10px;" />
+        <Chooser name="defaultMedleyTargetDurationChooser" label="$options_defaultMedleyDuration" min-value="10" max-value="60" step-value="5" class="noBackgroundInHierarchy" style="margin-bottom: 10px;" />
     </ui:VisualElement>
 </ui:UXML>

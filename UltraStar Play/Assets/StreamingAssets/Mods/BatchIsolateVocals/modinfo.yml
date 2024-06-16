@@ -1,0 +1,8 @@
+name: Batch Isolate Vocals
+version: 1.0.0
+description: |
+  Isolate vocals of multiple songs.
+  Click the corresponding button in the mod settings
+  to select which songs should be processed.
+authors:
+  - email@melodymania.org

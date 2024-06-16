@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="gameRoundPlayerEntryUiRoot" style="flex-direction: row; align-items: center; margin-left: 2px; margin-right: 2px; margin-top: 2px; margin-bottom: 2px;">
+        <MaterialIcon name="micIcon" icon="mic" class="ignoreTheme" style="font-size: 16px;" />
+        <ui:Label tabindex="-1" text="Player 01" name="nameLabel" class="smallerFont" />
+    </ui:VisualElement>
+</ui:UXML>

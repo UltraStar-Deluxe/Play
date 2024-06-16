@@ -5,69 +5,80 @@ using UniInject;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MoveNoteToAjacentSentenceAction : INeedInjection
+public class MoveNoteToAdjacentSentenceAction : INeedInjection
 {
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
     public bool CanMoveToNextSentence(List<Note> selectedNotes, Note targetNote)
     {
-        if (selectedNotes.Count != 1)
+        if (selectedNotes.IsNullOrEmpty())
         {
             return false;
         }
 
-        Note selectedNote = selectedNotes[0];
-        if (selectedNote != targetNote || selectedNote.Sentence == null)
+        // Check that the selected notes are the last notes in the sentence.
+        Sentence currentSentence = selectedNotes.FirstOrDefault().Sentence;
+        if (currentSentence == null)
         {
             return false;
         }
 
-        // Check that the selected note is the last note in the sentence.
-        List<Note> notesInSentence = new(selectedNote.Sentence.Notes);
-        notesInSentence.Sort(Note.comparerByStartBeat);
-        if (notesInSentence.Last() != selectedNote)
+        int minBeat = selectedNotes.Min(note => note.StartBeat);
+        bool areLastInSentence = currentSentence.Notes.AllMatch(note => note.EndBeat < minBeat || selectedNotes.Contains(note));
+        if (!areLastInSentence)
         {
             return false;
         }
 
         // Check that there exists a following sentence
-        Sentence nextSentence = SongMetaUtils.GetNextSentence(selectedNote.Sentence);
+        Sentence nextSentence = SongMetaUtils.GetNextSentence(currentSentence);
         return (nextSentence != null);
     }
 
     public bool CanMoveToPreviousSentence(List<Note> selectedNotes, Note targetNote)
     {
-        if (selectedNotes.Count != 1)
+        if (selectedNotes.IsNullOrEmpty())
         {
             return false;
         }
 
-        Note selectedNote = selectedNotes[0];
-        if (selectedNote != targetNote || selectedNote.Sentence == null)
+        // Check that the selected notes are the first notes in the sentence.
+        Sentence currentSentence = selectedNotes.FirstOrDefault().Sentence;
+        if (currentSentence == null)
         {
             return false;
         }
 
-        // Check that the selected note is the first note in the sentence.
-        List<Note> notesInSentence = new(selectedNote.Sentence.Notes);
-        notesInSentence.Sort(Note.comparerByStartBeat);
-        if (notesInSentence.First() != selectedNote)
+        int maxBeat = selectedNotes.Max(note => note.EndBeat);
+        bool areFirstInSentence = currentSentence.Notes.AllMatch(note => note.StartBeat > maxBeat || selectedNotes.Contains(note));
+        if (!areFirstInSentence)
         {
             return false;
         }
 
         // Check that there exists a previous sentence
-        Sentence previousSentence = SongMetaUtils.GetPreviousSentence(selectedNote.Sentence);
+        Sentence previousSentence = SongMetaUtils.GetPreviousSentence(currentSentence);
         return (previousSentence != null);
     }
 
-    public void MoveToPreviousSentence(Note targetNote)
+    public void MoveToPreviousSentence(List<Note> notes)
     {
-        Sentence oldSentence = targetNote.Sentence;
+        if (notes.IsNullOrEmpty())
+        {
+            return;
+        }
 
-        Sentence previousSentence = SongMetaUtils.GetPreviousSentence(targetNote.Sentence);
-        targetNote.SetSentence(previousSentence);
+        Sentence oldSentence = notes.FirstOrDefault().Sentence;
+        if (oldSentence == null)
+        {
+            return;
+        }
+
+        Sentence previousSentence = SongMetaUtils.GetPreviousSentence(oldSentence);
+        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(oldSentence);
+        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(previousSentence);
+        notes.ForEach(note => note.SetSentence(previousSentence));
 
         // Remove old sentence if not more notes left
         if (oldSentence.Notes.Count == 0)
@@ -80,18 +91,29 @@ public class MoveNoteToAjacentSentenceAction : INeedInjection
         }
     }
 
-    public void MoveToPreviousSentenceAndNotify(Note targetNote)
+    public void MoveToPreviousSentenceAndNotify(List<Note> notes)
     {
-        MoveToPreviousSentence(targetNote);
+        MoveToPreviousSentence(notes);
         songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
     }
 
-    public void MoveToNextSentence(Note targetNote)
+    public void MoveToNextSentence(List<Note> notes)
     {
-        Sentence oldSentence = targetNote.Sentence;
+        if (notes.IsNullOrEmpty())
+        {
+            return;
+        }
 
-        Sentence nextSentence = SongMetaUtils.GetNextSentence(targetNote.Sentence);
-        targetNote.SetSentence(nextSentence);
+        Sentence oldSentence = notes.FirstOrDefault().Sentence;
+        if (oldSentence == null)
+        {
+            return;
+        }
+
+        Sentence nextSentence = SongMetaUtils.GetNextSentence(oldSentence);
+        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(oldSentence);
+        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(nextSentence);
+        notes.ForEach(note => note.SetSentence(nextSentence));
 
         // Remove old sentence if not more notes left
         if (oldSentence.Notes.Count == 0)
@@ -104,9 +126,9 @@ public class MoveNoteToAjacentSentenceAction : INeedInjection
         }
     }
 
-    public void MoveToNextSentenceAndNotify(Note targetNote)
+    public void MoveToNextSentenceAndNotify(List<Note> notes)
     {
-        MoveToNextSentence(targetNote);
+        MoveToNextSentence(notes);
         songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
     }
 }

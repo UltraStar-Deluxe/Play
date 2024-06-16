@@ -36,7 +36,7 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjection
         }
         mouseEventScrollControl.DoRegisterMouseScrollEvents();
     }
-    
+
     private void DoRegisterMouseScrollEvents()
     {
         VisualElement rootVisualElement = uiDocument.rootVisualElement;
@@ -83,7 +83,7 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjection
         {
             return;
         }
-        
+
         dragging = true;
         dragStartPosition = evt.localMousePosition;
         dragStartScrollOffset = mouseDownScrollView.scrollOffset;
@@ -92,6 +92,11 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjection
     private void OnMouseMoveOnRootVisualElement(MouseMoveEvent evt)
     {
         if (dragging
+            // Some ScrollView must be clicked, otherwise scrolling is not possible
+            && mouseDownScrollView != null
+            // Some mouse button must be pressed, otherwise it is not a drag gesture
+            && evt.pressedButtons != 0
+            // TextField has dedicated scrolling and text selection via mouse drag
             && !(uiDocument.rootVisualElement.focusController.focusedElement is TextField))
         {
             Vector2 dragDelta = dragStartPosition - evt.localMousePosition;

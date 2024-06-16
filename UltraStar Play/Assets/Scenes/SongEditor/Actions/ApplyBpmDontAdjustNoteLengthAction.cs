@@ -16,18 +16,19 @@ public class ApplyBpmDontAdjustNoteLengthAction : INeedInjection
 
     public void Execute(float newBpm)
     {
-        if (newBpm == songMeta.Bpm)
+        if (newBpm == songMeta.BeatsPerMinute)
         {
             return;
         }
 
         if (newBpm <= 60)
         {
-            UiManager.CreateNotification("New BPM is set much too low.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", "value too low"));
             return;
         }
 
-        songMeta.Bpm = newBpm;
+        songMeta.BeatsPerMinute = newBpm;
     }
 
     public void ExecuteAndNotify(float newBpm)

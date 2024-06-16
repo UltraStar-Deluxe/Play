@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _DITHERING
+  - _USE_BASE_TEXTURE
   m_InvalidKeywords:
   - _ANIMATE
   - _GRADIENT_LINEAR
@@ -26,6 +27,18 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _AdditiveLightTex:
+        m_Texture: {fileID: 8400000, guid: 29796eae10b449a4fbae71c0b5f2959f, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseTex:
+        m_Texture: {fileID: 8400000, guid: 5d595c04f16a061448bd02182100a7a3, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BgTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -76,7 +89,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _PatternTex:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 1.7777778, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TransitionTex:
         m_Texture: {fileID: 0}
@@ -110,12 +123,12 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _PatternOpacity: 0
-    - _Scale: 1.7
-    - _Smoothness: 2
+    - _Scale: 1
+    - _Smoothness: 1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _TransitionTime: 1
+    - _TransitionTime: 0.94497985
     - _UVSec: 0
     - _UiShadowOpacity: 0
     - _ZWrite: 1
@@ -134,3 +147,4 @@ Material:
     - _PatternColor: {r: 0, g: 0, b: 0, a: 0}
     - _UiShadowOffset: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

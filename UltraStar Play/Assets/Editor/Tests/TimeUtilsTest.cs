@@ -1,10 +1,9 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 public class TimeUtilsTest
 {
     [Test]
-    public void ParseDurationTest()
+    public void ShouldParseDuration()
     {
         TestDuration(" 0.5 s ", 500);
         TestDuration("0,8s", 800);

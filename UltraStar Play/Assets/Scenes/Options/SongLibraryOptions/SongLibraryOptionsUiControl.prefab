@@ -30,7 +30,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7249361465789638242
 MonoBehaviour:
@@ -44,9 +44,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97fb2502474063b408094e0b03e3106a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  songFolderListEntryAsset: {fileID: 9197481963319205126, guid: 93410e816f6baad4ea324850e317c505,
+  songFolderListEntryUi: {fileID: 9197481963319205126, guid: 93410e816f6baad4ea324850e317c505,
     type: 3}
-  dialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
+  downloadSongArchiveUi: {fileID: 9197481963319205126, guid: 6f8fb1255ae023549a9481afddc45980,
+    type: 3}
+  dialogUi: {fileID: 9197481963319205126, guid: 9dd0037eeddfcb64ab006c7c01edb4e7,
     type: 3}
   songIssueSongEntryUi: {fileID: 9197481963319205126, guid: 33b4d2b81a89e494992915bb6adc668e,
+    type: 3}
+  songArchiveEntryTextAsset: {fileID: 4900000, guid: 1cb54a3a8160c184c813ffe7ada6b8eb,
     type: 3}

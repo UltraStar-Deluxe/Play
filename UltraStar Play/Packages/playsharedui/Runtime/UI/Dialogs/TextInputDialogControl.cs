@@ -31,29 +31,29 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
 
     public Func<string, ValueInputDialogValidationResult> ValidateValueCallback { get; set; } = DefaultValidateValueCallback;
 
-    public string Title
+    public Translation Title
     {
         get
         {
-            return dialogTitle.text;
+            return Translation.Of(dialogTitle.text);
         }
 
         set
         {
-            dialogTitle.text = value;
+            dialogTitle.SetTranslatedText(value);
         }
     }
 
-    public string Message
+    public Translation Message
     {
         get
         {
-            return dialogMessage.text;
+            return Translation.Of(dialogMessage.text);
         }
 
         set
         {
-            dialogMessage.text = value;
+            dialogMessage.SetTranslatedText(value);
         }
     }
 
@@ -89,13 +89,15 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
         }
     }
 
-    public virtual void OnInjectionFinished()
+    public override void OnInjectionFinished()
     {
         okButton.RegisterCallbackButtonTriggered(_ => TrySubmitValue(textField.value));
         cancelButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
         textField.RegisterValueChangedCallback(evt => ValidateValue(evt.newValue, true));
+        textField.RegisterCallback<NavigationSubmitEvent>(evt => TrySubmitValue(textField.value));
+        textField.Focus();
+        textField.DisableParseEscapeSequences();
 
-        cancelButton.Focus();
         InitialValue = "";
         ValidateValue(InitialValue, false);
     }
@@ -137,7 +139,7 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
                 invalidValueLabel.ShowByVisibility();
             }
 
-            invalidValueLabel.text = validationResult.Message;
+            invalidValueLabel.SetTranslatedText(validationResult.Message);
             if (validationResult.Severity == EValueInputDialogValidationResultSeverity.Warning)
             {
                 invalidValueIcon.AddToClassList("warning");
@@ -167,7 +169,7 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
     {
         if (newValue.IsNullOrEmpty())
         {
-            return ValueInputDialogValidationResult.CreateErrorResult("Enter a value please");
+            return ValueInputDialogValidationResult.CreateErrorResult(Translation.Get("validation_missingValue"));
         }
         return ValueInputDialogValidationResult.CreateValidResult();
     }

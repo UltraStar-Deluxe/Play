@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using PrimeInputActions;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
@@ -9,19 +10,8 @@ using UnityEngine.UIElements;
 
 public static class InputLegendControl
 {
-    /**
-     * Adds information how the InputAction can be triggered.
-     * But only if there is a binding for the InputAction on a connected InputDevice (Gamepad, Keyboard, ...).
-     *
-     * Returns the created VisualElement or null.
-     */
-    public static VisualElement TryAddInputActionInfo(string inputActionPath, string actionText, VisualElement targetVisualElement)
+    public static InputActionInfo GetInputActionInfo(string inputActionPath, string actionText)
     {
-        if (targetVisualElement == null)
-        {
-            return null;
-        }
-
         InputDevice inputDevice = (InputManager.Instance as UltraStarPlayInputManager)?.InputDeviceEnum.GetInputDevice();
         InputAction inputAction = InputManager.GetInputAction(inputActionPath).InputAction;
         string bindingDisplayString = GetBindingDisplayString(inputAction, inputDevice);
@@ -30,7 +20,23 @@ public static class InputLegendControl
             return null;
         }
 
-        InputActionInfo inputActionInfo = new(actionText, bindingDisplayString);
+        return new InputActionInfo(actionText, bindingDisplayString);
+    }
+
+    /**
+     * Adds information how the InputAction can be triggered.
+     * But only if there is a binding for the InputAction on a connected InputDevice (Gamepad, Keyboard, ...).
+     *
+     * Returns the created VisualElement or null.
+     */
+    public static VisualElement AddInputActionInfo(string inputActionPath, string actionText, VisualElement targetVisualElement)
+    {
+        if (targetVisualElement == null)
+        {
+            return null;
+        }
+
+        InputActionInfo inputActionInfo = GetInputActionInfo(inputActionPath, actionText);
         VisualElement inputActionInfoUi = CreateInputActionInfoUi(inputActionInfo);
         targetVisualElement.Add(inputActionInfoUi);
         return inputActionInfoUi;
@@ -67,7 +73,8 @@ public static class InputLegendControl
         }
         catch (NotImplementedException e)
         {
-            Log.Logger.Error(e, $"Could not determine BindingDisplayString for InputAction '{inputAction.name}'");
+            Debug.LogException(e);
+            Debug.LogError($"Could not determine BindingDisplayString for InputAction '{inputAction.name}': {e.Message}");
             return "";
         }
     }
@@ -76,7 +83,7 @@ public static class InputLegendControl
     {
         Label label = new();
         label.AddToClassList("inputLegendLabel");
-        label.text = $"{entry.InputText}: {entry.ActionText}";
+        label.text = $"<b>{entry.ActionText}</b>: {entry.InputText}";
         return label;
     }
 

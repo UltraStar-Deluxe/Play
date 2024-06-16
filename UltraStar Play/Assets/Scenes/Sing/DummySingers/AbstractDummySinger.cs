@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UniInject;
 using UnityEngine;
 
@@ -17,7 +16,14 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
 
     [Inject]
     protected SongMeta songMeta;
+    
+    [Inject]
+    protected MicSampleRecorderManager micSampleRecorderManager;
 
+    private readonly HashSet<int> analyzedBeats = new();
+
+    protected virtual int BeatToAnalyze => playerControl.PlayerMicPitchTracker.BeatToAnalyze;
+    
     void Awake()
     {
         if (!Application.isEditor)
@@ -37,18 +43,31 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
                 return;
             }
         }
+        
+        // Disable mic input
+        if (playerControl.PlayerMicPitchTracker != null
+            && playerControl.PlayerMicPitchTracker.IsRecording.Value)
+        {
+            playerControl.PlayerMicPitchTracker.StopRecording();
+        }
 
         int currentBeat = (int)singSceneControl.CurrentBeat;
-        int beatToAnalyze = playerControl.PlayerMicPitchTracker.BeatToAnalyze;
+        int beatToAnalyze = BeatToAnalyze;
         if (currentBeat <= 0
             || beatToAnalyze > currentBeat
-            || playerControl.PlayerMicPitchTracker.RecordingSentence == null)
+            || playerControl.PlayerMicPitchTracker.RecordingSentence == null
+            || analyzedBeats.Contains(beatToAnalyze))
         {
             return;
         }
-
+        
         BeatPitchEvent pitchEvent = GetDummyPitchEvent(beatToAnalyze);
         FirePitchEvent(pitchEvent, beatToAnalyze);
+
+        if (pitchEvent != null)
+        {
+            analyzedBeats.Add(pitchEvent.Beat);
+        }
     }
 
     protected void FirePitchEvent(BeatPitchEvent pitchEvent, int fallbackBeat)
@@ -56,8 +75,8 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         int beat = pitchEvent != null
             ? pitchEvent.Beat
             : fallbackBeat;
-        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, beat);
-        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, beat);
+        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, beat, true, false);
+        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, beat, true, false);
         playerControl.PlayerMicPitchTracker.FirePitchEvent(pitchEvent, beat, noteAtBeat, sentenceAtBeat);
     }
 
@@ -73,23 +92,35 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         return true;
     }
 
-    public void SetPlayerControl(PlayerControl playerControl)
+    public void SetPlayerControl(PlayerControl newPlayerControl)
     {
-        this.playerControl = playerControl;
+        this.playerControl = newPlayerControl;
+        
         // Disable real microphone input for this player
-        playerControl.MicSampleRecorder.enabled = false;
+        if (newPlayerControl == null
+            || newPlayerControl.MicProfile == null)
+        {
+            return;
+        }
+        
+        MicSampleRecorder micSampleRecorder = micSampleRecorderManager.GetOrCreateMicSampleRecorder(this.playerControl.MicProfile);
+        if (micSampleRecorder != null)
+        {
+            micSampleRecorder.StopRecording();
+            micSampleRecorder.enabled = false;
+        }
     }
 
     protected Sentence GetSentenceAtBeat(int beat)
     {
-        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, beat);
+        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, beat, true, false);
         return sentenceAtBeat;
     }
 
-    protected Note GetNoteAtBeat(int beat)
+    protected Note GetNoteAtBeat(int beat, bool inclusiveStartBeat = true, bool inclusiveEndBeat = true)
     {
         Sentence sentenceAtBeat = GetSentenceAtBeat(beat);
-        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, beat);
+        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, beat, inclusiveStartBeat, inclusiveEndBeat);
         return noteAtBeat;
     }
 }

@@ -1,8 +1,30 @@
-// This is an example theme file describing each of the available properties to
-// create custom themes.
-// Each line is preceded by a comment describing its function.
-// When files are linked, PNG and JPG formats are accepted.
+// This is an example theme file describing the available properties to create custom themes.
+// Each property is preceded by a comment describing its function.
+
+// ## Theme File Format
+// A theme file must be properly formatted JSON, file extension .json or .jsonc, line comments are allowed.
+// This example file is named .json.txt such that it is not mistaken for an actual theme file.
+
+// ## File Paths
+// Paths can be absolute or relative. Relative paths are interpreted relative to the theme file.
+// Supported image formats: png, jpg
+// Supported audio formats: ogg, mp3
+
+// ## Example JSON
 {
+    // Name of a theme that should be inherited.
+    // You only need to specify properties that you want to overwrite.
+    // Relative file paths in the parent theme are interpreted relative to the parent theme file.
+    "parentTheme": "vinyl",
+
+    // List of Unity Style Sheets (USS).
+    // See https://docs.unity3d.com/Manual/UIE-about-uss.html
+    // File references in these style sheets are not supported (e.g. referencing an image or font is not supported).
+    // Style sheets should be preferred because they are more stable and flexible than below styling options.
+    "styleSheets": [
+        "stylesheets/my-styles.uss"
+    ]
+
     // See below for the content of control style.
     // Not all controls need to be specified.
     // The defaultControl style will be used as fallback if needed.
@@ -10,20 +32,52 @@
     "defaultControl": {...},
     "transparentButton": {...},
     "textOnlyButton": {...},
-    "lightButton": {...},
     "dangerButton": {...},
     "toggle": {...},
     "staticPanel": {...},
     "dynamicPanel": {...},
-        
+
     // Font (and icon) colors
     "primaryFontColor": "#F0F0F0",
     "secondaryFontColor": "#C0C0C0",
     "warningFontColor":  "#FEC84B",
     "errorFontColor": "#F97066",
 
+    // Lyrics
+    "lyricsContainerGradient": "#000000, #1E232B",
+    "beforeLyricsIndicatorImage": "icons/usdx/[sing]lyricsHelpBar.png",
+    "lyricsShadow": true,
+    "lyricsColor": "#E1E1E1E5",
+    "nextLyricsColor": "#E1E1E1E5",
+    "lyricsOutlineColor": "#00000000",
+    "currentNoteLyricsColor": "#FF0000",
+    "previousNoteLyricsColor": "#00FF00",
+    "goldenColor": "FF00FF",
+
+    // Drop shadow to make elements without a background more readable.
+    "noBackgroundInHierarchyTextShadow": {
+        "color": "#a0a0a0",
+        "offset": {
+            "x": 1,
+            "y": 1
+        }
+    },
+
     // This group defines the dynamic background parameters.
+    // The dynamic background can use
+    // - a (looping) video for its base
+    // - a (looping) video for additive lights
+    // - images for pattern, particle, and gradients that can be animated
     "dynamicBackground": {
+        // Path to the video file.
+        "videoPath": "videos/cool-loop.mp4",
+        // Playback speed of the video where 1 is normal playback speed.
+        "videoPlaybackSpeed": 0.5,
+
+        // Path to the video file that should be used as additive light.
+        "lightVideoPath": "videos/cool-loop.mp4",
+        "lightVideoPlaybackSpeed": 0.5,
+
         // A single-pixel high image that defines the color gradient to use.
         "gradientRampFile": "gradients/green lime.png",
         // The type of gradient to use, accepted values are:
@@ -43,13 +97,13 @@
         "gradientAnimSpeed": 1.0,
         // Amplitude of the sine animation.
         "gradientAnimAmplitude": 0.2,
-        
+
         // The image to use for the background particles (preferably PNG with
         // alpha). Leave empty to hide particles.
         "particleFile": "",
         // The opacity of the background particles.
         "particleOpacity": 0.3
-        
+
         // The pattern file, i.e. a repeated image that will be displayed in the
         // background. PNG with alpha will work, to leave parts of the gradient
         // visible. Leave empty to hide pattern.
@@ -69,12 +123,21 @@
         "uiShadowOffset": { "x": -16, "y": 10 }
     },
 
-    // This group defines the parameters for a static background image
+    // This group defines the parameters for a static background image. The image is placed on top of other background element such as videos.
     "staticBackground": {
-        // Path to the image. Can be absolute or relative to the theme file
+        // Path to the image file.
         "imagePath": "backgrounds/open-sign-1836961_1920.jpg",
-        // Scale mode for the image. Can be one of 'StretchToFill', 'ScaleAndCrop', 'ScaleToFit'
-        "scaleMode": "ScaleAndCrop",
+        // The scale mode defines how to scale the content to the screen. Can be one of 'StretchToFill', 'ScaleAndCrop', 'ScaleToFit'
+        "imageScaleMode": "ScaleAndCrop"
+    },
+
+    // Overwrite the default background for a specific scene.
+    // Available scene names can be found here: https://github.com/UltraStar-Deluxe/Play/blob/master/UltraStar%20Play/Assets/Common/Scene/EScene.cs
+    "sceneSpecificBackgrounds": {
+        "MainScene": {
+            "staticBackground": { ... },
+            "dynamicBackground": { ... },
+        }
     },
 
     // Defines the paths to custom icons for the song rating emojis.
@@ -92,7 +155,10 @@
 
     // Custom background music.
     "backgroundMusic": "music/my-background-music.mp3",
-    
+
+    // Color for the video preview in song select (can also be used to make it transparent).
+    "videoPreviewColor": "#00FF0022",
+
     // Defines the colors for the rating after each phrase.
     "phraseRatingColors": {
       "perfect": "#00FF00",
@@ -108,7 +174,7 @@
         "#00FF00",
         "#0000FF",
     ],
-    
+
     // Defines colors for the song editor
     "songEditorLayerColors": {
       "P1": "#ccbbaa",
@@ -116,7 +182,7 @@
       "MicRecording": "#FF0000",
       "ButtonRecording": "#00FF00",
       "CopyPaste": "#FF00FF",
-      "MidiFile": "#FFFF00",
+      "Import": "#FFFF00",
     }
 }
 
@@ -126,35 +192,59 @@
 // Colors are in the form #RRGGBBAA where AA is optional
 // Gradients are similar to CSS linear-gradient, namely <angle>, <start-color>, <end-color>
 // where <angle> is optional.
-// Paths can be absolute or relative. Relative paths are interpreted relative to the theme file.
 {
-    fontColor: "...",
-    hoverFontColor: "...",
-    focusFontColor: "...",
-    activeFontColor: "...",
-    disabledFontColor: "...",
+    "fontColor": "...",
+    "hoverFontColor": "...",
+    "focusFontColor": "...",
+    "activeFontColor": "...",
+    "hoverFocusFontColor": "...",
+    "hoverActiveFontColor": "...",
+    "disabledFontColor": "...",
 
-    backgroundColor: "..."
-    hoverBackgroundColor: "..."
-    focusBackgroundColor: "..."
-    activeBackgroundColor: "..."
-    disabledBackgroundColor: "..."
-    
-    backgroundGradient: "45deg, #101828, #475467"
-    hoverBackgroundGradient: "..."
-    focusBackgroundGradient: "..."
-    activeBackgroundGradient: "..."
-    disabledBackgroundGradient: "..."
-    
-    borderColor: "..."
-    hoverBorderColor: "..."
-    focusBorderColor: "..."
-    activeBorderColor: "..."
-    disabledBorderColor: "..."
+    "backgroundColor": "..."
+    "hoverBackgroundColor": "..."
+    "focusBackgroundColor": "..."
+    "activeBackgroundColor": "..."
+    "hoverFocusBackgroundColor": "..."
+    "hoverActiveBackgroundColor": "..."
+    "disabledBackgroundColor": "..."
 
-    backgroundImage: "..."
-    hoverBackgroundImage: "..."
-    focusBackgroundImage: "..."
-    activeBackgroundImage: "..."
-    disabledBackgroundImage: "..."
+    "backgroundGradient": "45deg, #101828, #475467"
+    "hoverBackgroundGradient": "..."
+    "focusBackgroundGradient": "..."
+    "activeBackgroundGradient": "..."
+    "hoverFocusBackgroundGradient": "..."
+    "hoverActiveBackgroundGradient": "..."
+    "disabledBackgroundGradient": "..."
+
+    "borderColor": "..."
+    "hoverBorderColor": "..."
+    "focusBorderColor": "..."
+    "activeBorderColor": "..."
+    "hoverFocusBorderColor": "..."
+    "hoverActiveBorderColor": "..."
+    "disabledBorderColor": "..."
+
+    "backgroundImage": "..."
+    "hoverBackgroundImage": "..."
+    "focusBackgroundImage": "..."
+    "activeBackgroundImage": "..."
+    "hoverFocusBackgroundImage": "..."
+    "hoverActiveBackgroundImage": "..."
+    "disabledBackgroundImage": "..."
+
+    "textShadow": : {
+        "color": "#a0a0a0",
+        "offset": {
+            "x": 1,
+            "y": 1
+        },
+        "blurRadius": 0
+    }
+    "hoverTextShadow": "..."
+    "focusTextShadow": "..."
+    "activeTextShadow": "..."
+    "hoverFocusTextShadow": "..."
+    "hoverActiveTextShadow": "..."
+    "disabledTextShadow": "..."
 }

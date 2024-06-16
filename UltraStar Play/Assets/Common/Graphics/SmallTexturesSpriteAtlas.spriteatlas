@@ -38,38 +38,59 @@ SpriteAtlas:
     isAtlasV2: 0
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
-    - 1d183c612f1866943a54609ced7fece7: 21300000
+    - 290c8431fb72bb4438714c4f0a0bfa26: 21300000
+    - 6290868125320414582de0396f2f1222: 21300000
+    - 981d48137f4091546b405baec068a243: 21300000
+    - 67d6ed93b80f13341b57f5ac89680db4: 21300000
     - 5deb6694a398abc4ab780d5d83778900: 21300000
+    - 2a3303f4bcb81fe46afd97bd2538f3b6: 21300000
     - 3406fac525d9a894b9906cb27b4def17: 21300000
     - 83cbc846d56ee8d48b9ba347ed508287: 21300000
+    - d6012347551fd4745ac902d66c144d9f: 21300000
     - f2d31bb76127a7545bb62af37e7e006f: 21300000
+    - 2a2b659882f1296429f136eb2369ef29: 21300000
     - ecea42b89d4de5f42a25fd1a598b26a1: 21300000
     - a6393dfa169b0764d80cb569f918b34c: 21300000
     - bf5c110c09e41cf4dada1e8df10b9e6e: 21300000
     - e66e0c1db7133154d974db00d459e999: 21300000
+    - deebee3f1a996bb46ba5b7be9b709df8: 21300000
     - f58c178fd3c06a743b8244d9281a79ab: 21300000
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
-  - {fileID: 21300000, guid: 1d183c612f1866943a54609ced7fece7, type: 3}
+  - {fileID: 21300000, guid: 290c8431fb72bb4438714c4f0a0bfa26, type: 3}
+  - {fileID: 21300000, guid: 6290868125320414582de0396f2f1222, type: 3}
+  - {fileID: 21300000, guid: 981d48137f4091546b405baec068a243, type: 3}
+  - {fileID: 21300000, guid: 67d6ed93b80f13341b57f5ac89680db4, type: 3}
   - {fileID: 21300000, guid: 5deb6694a398abc4ab780d5d83778900, type: 3}
+  - {fileID: 21300000, guid: 2a3303f4bcb81fe46afd97bd2538f3b6, type: 3}
   - {fileID: 21300000, guid: 3406fac525d9a894b9906cb27b4def17, type: 3}
   - {fileID: 21300000, guid: 83cbc846d56ee8d48b9ba347ed508287, type: 3}
+  - {fileID: 21300000, guid: d6012347551fd4745ac902d66c144d9f, type: 3}
   - {fileID: 21300000, guid: f2d31bb76127a7545bb62af37e7e006f, type: 3}
+  - {fileID: 21300000, guid: 2a2b659882f1296429f136eb2369ef29, type: 3}
   - {fileID: 21300000, guid: ecea42b89d4de5f42a25fd1a598b26a1, type: 3}
   - {fileID: 21300000, guid: a6393dfa169b0764d80cb569f918b34c, type: 3}
   - {fileID: 21300000, guid: bf5c110c09e41cf4dada1e8df10b9e6e, type: 3}
   - {fileID: 21300000, guid: e66e0c1db7133154d974db00d459e999, type: 3}
+  - {fileID: 21300000, guid: deebee3f1a996bb46ba5b7be9b709df8, type: 3}
   - {fileID: 21300000, guid: f58c178fd3c06a743b8244d9281a79ab, type: 3}
   m_PackedSpriteNamesToIndex:
-  - NoCover
+  - '[score]rating_7'
   - '[score]rating_0'
+  - '[score]rating_5'
+  - '[score]rating_1'
+  - '[score]rating_0'
+  - '[score]rating_4'
   - '[score]rating_1'
   - '[score]rating_6'
+  - '[score]rating_3'
+  - '[score]rating_2'
   - '[score]rating_2'
   - DuetIcon
   - '[score]rating_7'
   - '[score]rating_5'
   - '[score]rating_3'
+  - '[score]rating_6'
   - '[score]rating_4'
   m_RenderDataMap: {}
   m_Tag: SmallTexturesSpriteAtlas

@@ -1,24 +1,32 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="SingingResultsPlayerUi" src="project://database/Assets/Scenes/SingingResults/SingingResultsPlayerUi.uxml?fileID=9197481963319205126&amp;guid=0f11bceaf8c280f499a9b5a0ee6b3b3e&amp;type=3#SingingResultsPlayerUi" />
-    <ui:VisualElement name="background" class="p-3" style="width: 100%; height: 100%; padding-left: 6px;">
+    <ui:Template name="TeamResultsUi" src="project://database/Assets/Scenes/SingingResults/TeamResultsUi.uxml?fileID=9197481963319205126&amp;guid=99d712d63d6d9904abe42fb1134e70f6&amp;type=3#TeamResultsUi" />
+    <ui:Template name="NextRoundInfoUi" src="project://database/Assets/Common/GameRounds/NextGameRoundInfoUi.uxml?fileID=9197481963319205126&amp;guid=4b0fc95be5bd7c84abec348087a5d4af&amp;type=3#NextGameRoundInfoUi" />
+    <ui:VisualElement name="background" class="px-4 py-2" style="width: 100%; height: 100%;">
         <ui:VisualElement name="row" style="flex-grow: 1;">
-            <ui:VisualElement name="column" picking-mode="Ignore" class="mr-4 child-mb-3" style="max-width: 33%;">
+            <ui:VisualElement name="column" picking-mode="Ignore" class="mr-4 child-mb-3" style="max-width: 25%;">
                 <ui:VisualElement name="songInfoContainer" style="padding-left: 10px;">
-                    <ui:VisualElement name="coverImage" class="mb-3" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); height: 150px; -unity-background-scale-mode: scale-to-fit; width: 150px;" />
-                    <ui:Label text="Some Title" name="titleLabel" style="-unity-font-style: bold; font-size: 20px; white-space: normal;" />
-                    <ui:Label text="Some Artist" name="artistLabel" class="secondaryFontColor" style="-unity-font-style: normal; font-size: 14px; white-space: normal;" />
+                    <ui:VisualElement name="coverImage" class="mb-3" style="background-image: url(&quot;project://database/Packages/playshared/Runtime/Graphics/NoCover.png?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&quot;); height: 150px; -unity-background-scale-mode: scale-and-crop; width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;" />
+                    <ui:Label text="Some Very Very Very long Title" name="titleLabel" class="ellipsis noBackgroundInHierarchy" style="-unity-font-style: bold; font-size: 20px; white-space: normal; max-height: 55px;" />
+                    <ui:Label text="Some Very Very Very long Artist" name="artistLabel" class="secondaryFontColor ellipsis noBackgroundInHierarchy" style="-unity-font-style: normal; font-size: 14px; white-space: normal; max-height: 50px;" />
                 </ui:VisualElement>
-                <ToggleButton text="Your Results" display-tooltip-when-elided="true" name="showCurrentResultsButton" style="-unity-text-align: middle-left;" />
-                <ToggleButton text="Highscores" display-tooltip-when-elided="true" name="showHighscoreButton" style="-unity-text-align: middle-left;" />
+                <ToggleButton text="$action_showOwnResults" display-tooltip-when-elided="true" name="showCurrentResultsButton" style="-unity-text-align: middle-left;" />
+                <ToggleButton text="$action_showTeamResults" display-tooltip-when-elided="true" name="showTeamResultsButton" style="-unity-text-align: middle-left;" />
+                <ToggleButton text="$action_showHighscores" display-tooltip-when-elided="true" name="showHighscoreButton" style="-unity-text-align: middle-left;" />
             </ui:VisualElement>
             <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                 <ui:VisualElement name="playerResultsRoot" style="flex-grow: 1; justify-content: center; height: 100%;">
-                    <ui:VisualElement name="onePlayerLayout" picking-mode="Ignore" style="display: flex; flex-grow: 1; align-items: center;">
+                    <ui:VisualElement name="onePlayerLayout" picking-mode="Ignore" style="display: none; flex-grow: 1; align-items: center;">
                         <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="p-5" style="flex-grow: 1;" />
                     </ui:VisualElement>
                     <ui:VisualElement name="twoPlayerLayout" picking-mode="Ignore" style="margin-top: 20px; margin-bottom: 20px; flex-direction: row; flex-grow: 1; display: none; justify-content: center;">
-                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="p-5" style="flex-grow: 1;" />
-                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="p-5" style="flex-grow: 1;" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="px-3 py-5" style="flex-grow: 1;" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="px-3 py-5" style="flex-grow: 1;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="threePlayerLayout" picking-mode="Ignore" style="margin-top: 20px; margin-bottom: 20px; flex-direction: row; flex-grow: 1; display: flex; justify-content: center;">
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="py-5" style="flex-grow: 1;" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="py-5 px-2" style="flex-grow: 1;" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="py-5" style="flex-grow: 1;" />
                     </ui:VisualElement>
                     <ui:VisualElement name="nPlayerLayout" picking-mode="Ignore" style="flex-grow: 1; margin-top: 20px; margin-bottom: 20px; display: none; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center;">
                         <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
@@ -40,14 +48,26 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="highscoresRoot" style="flex-grow: 1; justify-content: flex-start; align-items: center; height: 100%; display: none;">
-                    <ItemPicker name="difficultyPicker" style="width: 50%;" />
+                    <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0);">
+                        <ui:Button display-tooltip-when-elided="true" name="previousDifficultyButton" class="squareButton transparentButton">
+                            <MaterialIcon tabindex="-1" name="previousItemIcon" icon="chevron_left" />
+                        </ui:Button>
+                        <ui:Label tabindex="-1" text="Medium" display-tooltip-when-elided="true" name="currentDifficultyLabel" class="titleText mx-2 textShadow" style="-unity-text-align: middle-center; -unity-font-definition: url(&quot;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&quot;); min-width: 150px;" />
+                        <ui:Button display-tooltip-when-elided="true" name="nextDifficultyButton" class="squareButton transparentButton">
+                            <MaterialIcon tabindex="-1" name="nextItemIcon" icon="chevron_right" />
+                        </ui:Button>
+                    </ui:VisualElement>
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="highscoreEntryList" style="width: 100%; flex-grow: 1;" />
                 </ui:VisualElement>
+                <ui:Instance template="TeamResultsUi" name="teamResultsUi" class="overlay" style="align-self: flex-end; width: 90%; display: none;" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="buttonRow" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: center; flex-direction: row; flex-shrink: 0; margin-top: auto; padding-left: 10px;">
-            <ui:Button name="restartButton" value="This is the about text on multiple lines." text="Replay" class="wideControl" style="white-space: nowrap; margin-right: auto;" />
-            <ui:Button name="continueButton" value="This is the about text on multiple lines." text="Continue" class="wideControl" style="white-space: nowrap;" />
+        <ui:VisualElement name="buttonRow" picking-mode="Ignore" style="flex-grow: 0; align-items: center; flex-direction: row; flex-shrink: 0; width: 100%;">
+            <ui:Button name="restartButton" value="This is the about text on multiple lines." text="$action_replay" class="wideControl controlMinWidth" style="white-space: nowrap;" />
+            <ui:Button name="quitButton" value="This is the about text on multiple lines." text="$action_quit" class="wideControl controlMinWidth ml-2" style="white-space: nowrap;" />
+            <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+            <ui:Instance template="NextRoundInfoUi" name="NextRoundInfoUi" class="mr-3" />
+            <ui:Button name="continueButton" value="This is the about text on multiple lines." text="$action_continue" class="wideControl controlMinWidth" style="white-space: nowrap;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

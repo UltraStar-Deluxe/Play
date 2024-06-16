@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: e5595822d14a2ff4d82f00c2ce8f2321
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Noto Sans Thai Looped
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 749346b0d50d79544a84b241dc48b1d3, type: 3}
+  - {fileID: 12800000, guid: f2e0bf5a5166a5542983510137c93ae0, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,84 +1,124 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="SongEditorSideBarSecondaryColumnUi" src="project://database/Assets/Scenes/SongEditor/SongEditorSideBarSecondaryColumnUi.uxml?fileID=9197481963319205126&amp;guid=91ce971b984f18c4fa80c614d2dc32d8&amp;type=3#SongEditorSideBarSecondaryColumnUi" />
     <ui:Template name="SongEditorSideBarMainColumnUi" src="project://database/Assets/Scenes/SongEditor/SongEditorSideBarMainColumnUi.uxml?fileID=9197481963319205126&amp;guid=9015a7e9aa0de9248bb4893d185955a1&amp;type=3#SongEditorSideBarMainColumnUi" />
+    <ui:Template name="SongEditorSideBarSecondaryColumnUi" src="project://database/Assets/Scenes/SongEditor/SongEditorSideBarSecondaryColumnUi.uxml?fileID=9197481963319205126&amp;guid=91ce971b984f18c4fa80c614d2dc32d8&amp;type=3#SongEditorSideBarSecondaryColumnUi" />
+    <ui:Template name="ImportMidiFileDialogUi" src="project://database/Assets/Scenes/SongEditor/ImportMidiFileDialogUi.uxml?fileID=9197481963319205126&amp;guid=12c6b8c6d3c252947b7e6253befb9789&amp;type=3#ImportMidiFileDialogUi" />
+    <ui:Template name="ImportLrcDialogUi" src="project://database/Assets/Scenes/SongEditor/ImportLrcDialogUi.uxml?fileID=9197481963319205126&amp;guid=42c32785af42b57418f728546c04b525&amp;type=3#ImportLrcDialogUi" />
     <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
-    <ui:VisualElement name="songEditorRoot" style="width: 100%; height: 100%; flex-direction: column; align-items: flex-start;">
-        <ui:VisualElement name="row" style="flex-direction: row; flex-grow: 1;">
-            <ui:VisualElement name="leftSideBar" style="flex-direction: row;">
-                <ui:Instance template="SongEditorSideBarMainColumnUi" name="sideBarMainColumnUi" />
-                <ui:Instance template="SongEditorSideBarSecondaryColumnUi" name="sideBarSecondaryColumnUi" style="display: none;" />
-            </ui:VisualElement>
-            <ui:VisualElement name="virtualPiano" style="height: 100%; width: 28px;" />
-            <ui:VisualElement name="noteArea" style="flex-grow: 1; overflow: hidden;">
-                <ui:VisualElement name="horizontalGrid" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0);">
-                    <ui:VisualElement name="horizontalGridLineContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
-                    <ui:VisualElement name="horizontalGridLabelContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
+    <ui:VisualElement name="background">
+        <ui:VisualElement name="songEditorRoot" class="songEditorRoot overlay" style="width: 100%; height: 100%; align-items: flex-start;">
+            <ui:VisualElement name="row" style="flex-direction: row; flex-grow: 1;">
+                <ui:VisualElement name="leftSideBar" style="flex-direction: row;">
+                    <ui:Instance template="SongEditorSideBarMainColumnUi" name="sideBarMainColumnUi" />
+                    <ui:Instance template="SongEditorSideBarSecondaryColumnUi" name="sideBarSecondaryColumnUi" style="display: none;" />
                 </ui:VisualElement>
-                <ui:VisualElement name="verticalGrid" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);">
-                    <ui:VisualElement name="verticalGridLineContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
-                    <ui:VisualElement name="verticalGridLabelContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="sentenceLinesContainer" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
-                <ui:VisualElement name="noteAreaNotesBackground" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
-                <ui:VisualElement name="noteAreaNotes" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
-                <ui:VisualElement name="noteAreaNotesForeground" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
-                <ui:VisualElement name="noteAreaSentences" picking-mode="Ignore" style="width: 100%; height: 10px; position: absolute; background-color: rgba(0, 0, 0, 0); bottom: 0;" />
-                <ui:VisualElement name="noteAreaIssues" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
-                <ui:VisualElement name="noteAreaSelectionFrame" picking-mode="Ignore" style="background-color: rgba(21, 88, 219, 0.5); position: absolute; display: none;" />
-                <ui:VisualElement name="noteAreaPositionInSongIndicator" picking-mode="Ignore" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute; left: 100px;" />
-                <ui:VisualElement name="mitPitchIndicatorContainer" picking-mode="Ignore" style="width: 100%; height: 100%;">
-                    <MaterialIcon name="micPitchOutOfRangeIndicatorTop" icon="mic" class="errorFontColor" style="position: absolute; top: 5px;" />
-                    <MaterialIcon name="micPitchOutOfRangeIndicatorBottom" icon="mic" class="errorFontColor" style="position: absolute; bottom: 5px;" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%; width: auto;">
-                <ui:VisualElement name="lyricsArea" class="panel" style="width: 180px; border-top-width: 0; border-right-width: 0; flex-grow: 1; height: auto;">
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" class="fullMinHeightUnityContentContainer" style="width: 100%; height: auto; flex-grow: 1;">
-                        <ui:TextField multiline="true" name="lyricsAreaTextField" text="Lorem ipsum dolor sit " class="smallFont" style="height: 100%; white-space: normal; width: 100%;" />
-                    </ui:ScrollView>
-                    <ui:VisualElement name="voiceButtonRow" class="smallFont" style="flex-direction: row; flex-shrink: 0;">
-                        <ui:Button text="P1" display-tooltip-when-elided="true" name="lyricsAreaVoice1Button" class="squareButton" style="margin-right: 5px;" />
-                        <ui:Button text="P2" display-tooltip-when-elided="true" name="lyricsAreaVoice2Button" class="squareButton" />
+                <ui:VisualElement name="virtualPiano" style="height: 100%; width: 28px;" />
+                <ui:VisualElement name="noteArea" style="flex-grow: 1; overflow: hidden;">
+                    <ui:VisualElement name="noteAreaWaveform" picking-mode="Ignore" style="width: 100%; height: 50%; position: absolute; background-color: rgba(0, 0, 0, 0); top: 25%;" />
+                    <ui:VisualElement name="horizontalGrid" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0);">
+                        <ui:VisualElement name="horizontalGridLineContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
+                        <ui:VisualElement name="horizontalGridLabelContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="verticalGrid" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);">
+                        <ui:VisualElement name="verticalGridLineContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
+                        <ui:VisualElement name="verticalGridLabelContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="sentenceLinesContainer" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                    <ui:VisualElement name="noteAreaNotesBackground" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                    <ui:VisualElement name="noteAreaNotes" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                    <ui:VisualElement name="noteAreaNotesForeground" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                    <ui:VisualElement name="noteAreaSentences" picking-mode="Ignore" style="width: 100%; height: 10px; position: absolute; background-color: rgba(0, 0, 0, 0); bottom: 0;" />
+                    <ui:VisualElement name="noteAreaIssues" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                    <ui:VisualElement name="noteAreaSelectionFrame" picking-mode="Ignore" style="background-color: rgba(21, 88, 219, 0.5); position: absolute; display: none;" />
+                    <ui:VisualElement name="lastNoteAreaSelectionFrame" picking-mode="Ignore" style="background-color: rgba(21, 88, 219, 0.25); position: absolute; display: none; top: 0; height: 4px; width: 218px;" />
+                    <ui:VisualElement name="noteAreaPositionIndicator" picking-mode="Ignore" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute; left: 100px;" />
+                    <ui:VisualElement name="mitPitchIndicatorContainer" picking-mode="Ignore" style="width: 100%; height: 100%;">
+                        <MaterialIcon name="micPitchOutOfRangeIndicatorTop" icon="mic" class="errorFontColor" style="position: absolute; top: 5px;" />
+                        <MaterialIcon name="micPitchOutOfRangeIndicatorBottom" icon="mic" class="errorFontColor" style="position: absolute; bottom: 5px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; width: 180px; height: 90px; align-items: center; justify-content: center; flex-shrink: 0; flex-direction: row;">
-                    <ui:VisualElement name="videoAreaContent" picking-mode="Ignore" style="flex-grow: 1; width: auto; height: 100%; justify-content: center; align-items: center;">
-                        <MaterialIcon name="noVideoImage" icon="ondemand_video" style="position: absolute; font-size: 75px;" />
-                        <ui:VisualElement name="videoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&apos;); -unity-background-scale-mode: scale-to-fit;" />
-                        <ui:VisualElement name="songBackgroundImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit; display: none;">
-                            <ui:Label text="Background" display-tooltip-when-elided="true" name="songBackgroundLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center;" />
+                <ui:VisualElement name="rightSideBar" style="height: 100%; min-width: 150px; max-width: 450px; width: 25%;">
+                    <ui:VisualElement name="lyricsArea" class="panel" style="border-top-width: 0; border-right-width: 0; flex-grow: 1; height: auto;">
+                        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" class="fullMinHeightUnityContentContainer" style="width: 100%; height: auto; flex-grow: 1;">
+                            <ui:TextField multiline="true" name="lyricsAreaTextField" text="Lorem ipsum dolor sit " value="Lorem ipsum dolor sit " class="smallFont multiline" style="flex-shrink: 1; flex-grow: 1; white-space: normal;" />
+                        </ui:ScrollView>
+                        <ui:VisualElement name="lyricsAreaButtonRow" style="flex-direction: row; flex-shrink: 0;">
+                            <ToggleButton display-tooltip-when-elided="true" name="toggleLyricsAreaEditModeButton" class="squareButton mr-1">
+                                <MaterialIcon tabindex="-1" name="toggleEditModeIcon" icon="edit" picking-mode="Ignore" style="font-size: 14px;" />
+                            </ToggleButton>
+                            <ToggleButton text="P1" display-tooltip-when-elided="true" name="lyricsAreaVoice1Button" class="squareButton smallFont mr-1" />
+                            <ToggleButton text="P2" display-tooltip-when-elided="true" name="lyricsAreaVoice2Button" class="squareButton smallFont" />
+                            <ToggleButton display-tooltip-when-elided="true" name="openImportLrcDialogButton" class="squareButton ml-auto">
+                                <MaterialIcon tabindex="-1" name="lrcImportIcon" icon="cloud_download" picking-mode="Ignore" style="font-size: 14px;" />
+                            </ToggleButton>
                         </ui:VisualElement>
-                        <ui:VisualElement name="songCoverImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit; display: none;">
-                            <ui:Label text="Cover" display-tooltip-when-elided="true" name="songCoverLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; height: 90px; align-items: center; justify-content: center; flex-shrink: 0; flex-direction: row;">
+                        <ui:VisualElement name="videoAreaContent" picking-mode="Ignore" style="flex-grow: 1; width: auto; height: 100%; justify-content: center; align-items: center;">
+                            <MaterialIcon name="noVideoImage" icon="ondemand_video" style="position: absolute; font-size: 75px;" />
+                            <ui:VisualElement name="videoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&apos;); -unity-background-scale-mode: scale-and-crop;" />
+                            <ui:VisualElement name="songBackgroundImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit; display: none;">
+                                <ui:Label text="Background" display-tooltip-when-elided="true" name="songBackgroundLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center; -unity-font-style: normal; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;);" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="songCoverImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit; display: none;">
+                                <ui:Label text="Cover" display-tooltip-when-elided="true" name="songCoverLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;); -unity-font-style: normal;" />
+                            </ui:VisualElement>
+                            <ui:Label text="Video gap: -99" display-tooltip-when-elided="true" name="videoAreaLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center; -unity-font-style: normal; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;);" />
                         </ui:VisualElement>
-                        <ui:Label text="Video gap: -99" display-tooltip-when-elided="true" name="videoAreaLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center;" />
+                        <ui:VisualElement name="buttonContainer" style="flex-direction: column; width: auto; height: 100%;">
+                            <ui:Button display-tooltip-when-elided="true" name="showVideoButton" class="squareButton" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; margin-bottom: 5px;">
+                                <MaterialIcon tabindex="-1" name="showVideoIcon" icon="videocam" picking-mode="Ignore" style="font-size: 24px;" />
+                            </ui:Button>
+                            <ui:Button display-tooltip-when-elided="true" name="showCoverButton" class="squareButton" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; margin-bottom: 5px;">
+                                <MaterialIcon tabindex="-1" name="showCoverIcon" icon="image" picking-mode="Ignore" style="font-size: 24px;" />
+                            </ui:Button>
+                            <ui:Button display-tooltip-when-elided="true" name="showBackgroundButton" class="squareButton" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
+                                <MaterialIcon tabindex="-1" name="showBackgroundIcon" icon="wallpaper" picking-mode="Ignore" style="font-size: 24px;" />
+                            </ui:Button>
+                        </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="buttonContainer" style="flex-direction: column; width: auto; height: 100%;">
-                        <ui:Button text="V" display-tooltip-when-elided="true" name="showVideoButton" class="squareButton" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; margin-bottom: 5px;" />
-                        <ui:Button text="CO" display-tooltip-when-elided="true" name="showCoverButton" class="squareButton" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; margin-bottom: 5px;" />
-                        <ui:Button text="BG" display-tooltip-when-elided="true" name="showBackgroundButton" class="squareButton" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;" />
-                    </ui:VisualElement>
+                    <ui:VisualElement name="dragToChangeWidthArea" style="position: absolute; height: 100%; width: 4px; left: 0; top: 0; background-color: rgba(0, 0, 0, 0);" />
                 </ui:VisualElement>
             </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="overviewArea" class="panel" style="height: 20px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0; flex-shrink: 0;">
-            <ui:VisualElement name="overviewAreaSentences" style="position: absolute; height: 100%; width: 100%; visibility: hidden;" />
-            <ui:VisualElement name="overviewAreaWaveform" style="position: absolute; height: 100%; width: 100%;" />
-            <ui:VisualElement name="overviewAreaNotes" style="position: absolute; height: 100%; width: 100%;" />
-            <ui:VisualElement name="overviewAreaIssues" style="position: absolute; height: 100%; width: 100%;" />
-            <ui:VisualElement name="overviewAreaViewportIndicator" style="position: absolute; height: 100%; width: 30px; background-color: rgba(125, 198, 233, 0.5);" />
-            <ui:VisualElement name="overviewAreaPositionInSongIndicator" style="position: absolute; height: 100%; width: 1px; background-color: rgb(255, 0, 0);" />
-            <ui:Label display-tooltip-when-elided="true" name="overviewAreaLabel" />
-        </ui:VisualElement>
-        <ui:VisualElement name="statusBar" class="panel" style="width: 100%; height: auto; border-bottom-width: 0; border-left-width: 0; border-right-width: 0; padding-left: 5px; padding-right: 5px; padding-top: 1px; padding-bottom: 1px; justify-content: space-between; align-items: center; flex-direction: row; flex-shrink: 0;">
-            <ui:Label text="StatusBar Control Hint" display-tooltip-when-elided="true" name="statusBarControlHintLabel" class="tinyFont" />
-            <ui:VisualElement name="rightSide" style="flex-direction: row;">
-                <ui:Label text="The Artist - The Title" display-tooltip-when-elided="true" name="statusBarSongInfoLabel" class="tinyFont" />
-                <ui:Label text="03:12" display-tooltip-when-elided="true" name="statusBarPositionInfoLabel" class="tinyFont" style="margin-left: 10px;" />
+            <ui:VisualElement name="overviewArea" class="panel" style="height: 20px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0; flex-shrink: 0;">
+                <ui:VisualElement name="overviewAreaSentences" style="position: absolute; height: 100%; width: 100%; visibility: hidden;" />
+                <ui:VisualElement name="overviewAreaWaveform" style="position: absolute; height: 100%; width: 100%;" />
+                <ui:VisualElement name="overviewAreaRecordedAudioWaveform" style="position: absolute; height: 100%; width: 100%;" />
+                <ui:VisualElement name="overviewAreaNotes" style="position: absolute; height: 100%; width: 100%;" />
+                <ui:VisualElement name="overviewAreaIssues" style="position: absolute; height: 100%; width: 100%;" />
+                <ui:VisualElement name="overviewAreaViewportIndicator" style="position: absolute; height: 100%; width: 30px; background-color: rgba(125, 198, 233, 0.5);" />
+                <ui:VisualElement name="overviewAreaPositionIndicator" style="position: absolute; height: 100%; width: 1px; background-color: rgb(255, 0, 0);" />
+                <ui:Label display-tooltip-when-elided="true" name="overviewAreaLabel" />
             </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="editLyricsPopup" class="panel" style="position: absolute; height: 30px; min-width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; justify-content: center; top: -1000px;">
-            <ui:TextField picking-mode="Ignore" value="The lyrics" text="The lyrics" name="editLyricsPopupTextField" style="position: absolute; height: 100%; display: flex; width: 100%; min-height: 20px;" />
+            <ui:VisualElement name="statusBar" class="panel" style="width: 100%; height: auto; border-bottom-width: 0; border-left-width: 0; border-right-width: 0; padding-left: 5px; padding-right: 5px; padding-top: 1px; padding-bottom: 1px; justify-content: space-between; align-items: center; flex-direction: row; flex-shrink: 0;">
+                <ui:Label text="StatusBar Control Hint" display-tooltip-when-elided="true" name="statusBarControlHintLabel" class="tinyFont" />
+                <ui:VisualElement name="rightSide" style="flex-direction: row;">
+                    <ui:Label text="The Artist - The Title" display-tooltip-when-elided="true" name="statusBarSongInfoLabel" class="tinyFont" />
+                    <ui:Label text="03:12" display-tooltip-when-elided="true" name="statusBarPositionInfoLabel" class="tinyFont" style="margin-left: 10px;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="searchOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">
+                <ui:VisualElement name="searchContainer" class="panel p-1" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; top: 80%; position: absolute;">
+                    <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0);">
+                        <ui:TextField picking-mode="Ignore" name="searchTextField" style="width: 150px;" />
+                        <ui:Button display-tooltip-when-elided="true" name="searchPreviousButton" class="squareButton comboBoxButton" style="border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                            <MaterialIcon tabindex="-1" name="searchPreviousIcon" icon="arrow_left" picking-mode="Ignore" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="searchNextButton" class="squareButton comboBoxButton">
+                            <MaterialIcon tabindex="-1" name="searchNextIcon" icon="arrow_right" picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+                    <ui:Label tabindex="-1" text="xx matches" display-tooltip-when-elided="true" name="searchResultLabel" style="align-self: flex-start;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="editLyricsPopup" class="panel" style="position: absolute; height: 30px; min-width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; justify-content: center; top: -1000px;">
+                <ui:TextField picking-mode="Ignore" value="The lyrics" text="The lyrics" name="editLyricsPopupTextField" style="position: absolute; height: 100%; display: flex; width: 100%; min-height: 20px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="importMidiFileDialogOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">
+                <ui:Instance template="ImportMidiFileDialogUi" name="ImportMidiFileDialogUi" class="overlayDialog" style="min-width: 50%;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="importLrcDialogOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">
+                <ui:Instance template="ImportLrcDialogUi" name="ImportLrcDialogUi" class="overlayDialog" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

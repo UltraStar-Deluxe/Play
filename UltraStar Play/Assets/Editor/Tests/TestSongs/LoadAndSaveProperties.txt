@@ -1,0 +1,44 @@
+﻿#VERSION:1.1.0
+#TITLE:SomeTitle
+#ARTIST:SomeArtist
+#AUDIO:SomeAudio.ogg
+#AUDIOURL:https://example.com/audio.ogg
+#INSTRUMENTALAUDIO:SomeInstrumentalAudio.ogg
+#INSTRUMENTALURL:https://example.org/instrumental.ogg
+#VOCALSAUDIO:SomeVocalsAudio.ogg
+#VOCALSURL:https://example.org/vocals.ogg
+#BPM:200
+#GAP:1500
+#GENRE:SomeGenre
+#BACKGROUND:SomeBackground
+#BACKGROUNDURL:https://example.com/background.jpg
+#VIDEO:SomeVideo
+#VIDEOURL:https://example.com/video.webm
+#VIDEOGAP:0.5
+#COVER:SomeCover
+#COVERURL:https://example.com/cover.png
+#WEBSITE:https://SomeWebsite.com
+#EDITION:SomeEdition
+#LANGUAGE:English
+#TAGS:Foo,Bar
+#START:2
+#YEAR:2012
+#END:4
+#PREVIEWSTART:2.1
+#PREVIEWEND:3.1
+#MEDLEYSTARTBEAT:9
+#MEDLEYENDBEAT:11
+#DUETSINGERP1:First Vocals
+#DUETSINGERP2:Second Vocals
+#UNSUPPORTEDFIELD:SomeOtherValue
+#NUMBERWITHCOMMA:42,5
+#NUMBERWITHDOT:43.2
+P1
+: 4 3 9 Hel
+: 8 3 9  lo
+: 12 3 9  P1!
+P2
+: 4 3 9 Hel
+: 8 3 9  lo
+: 12 3 9  P2!
+E

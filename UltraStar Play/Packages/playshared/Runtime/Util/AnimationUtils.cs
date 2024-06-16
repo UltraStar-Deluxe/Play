@@ -21,14 +21,27 @@ public static class AnimationUtils
             .id;
     }
 
-    public static int BounceVisualElementSize(GameObject gameObject, VisualElement visualElement, float animTimeInSeconds)
+    public static int HighlightIconWithBounce(GameObject gameObject, VisualElement visualElement)
     {
-        return LeanTween.value(gameObject, Vector3.one * 0.75f, Vector3.one, animTimeInSeconds)
+        visualElement.style.scale = Vector2.zero;
+        return LeanTween.value(gameObject, 0, 1, 1f)
+            .setOnUpdate(value =>
+            {
+                visualElement.style.scale = new Vector2(value, value);
+            })
             .setEaseSpring()
-            .setOnUpdate(s => visualElement.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))))
             .id;
     }
-    
+
+    public static int BounceVisualElementSize(GameObject gameObject, VisualElement visualElement, float animTimeInSeconds, float delayInSeconds = 0)
+    {
+        return LeanTween.value(gameObject, Vector3.one, Vector3.one * 0.75f, animTimeInSeconds)
+            .setOnUpdate(s => visualElement.style.scale = new StyleScale(new Scale(new Vector2(s, s))))
+            .setDelay(delayInSeconds)
+            .setEasePunch()
+            .id;
+    }
+
     public static IEnumerator FadeOutThenRemoveVisualElementCoroutine(
         VisualElement visualElement,
         float solidTimeInSeconds,
@@ -55,13 +68,13 @@ public static class AnimationUtils
             visualElement.parent.Remove(visualElement);
         }
     }
-    
+
     public static IEnumerator TransitionBackgroundImageGradientCoroutine(VisualElement visualElement, GradientConfig fromGradientConfig, GradientConfig toGradientConfig, float animTimeInSeconds)
     {
         List<GradientConfig> gradientConfigs = GradientManager.GetGradientConfigsForTransition(fromGradientConfig, toGradientConfig, animTimeInSeconds);
         return TransitionBackgroundImageGradientCoroutine(visualElement, gradientConfigs, animTimeInSeconds);
     }
-    
+
     public static IEnumerator TransitionBackgroundImageGradientCoroutine(VisualElement visualElement, List<GradientConfig> gradientConfigs, float animTimeInSeconds)
     {
         foreach (GradientConfig gradientConfig in gradientConfigs)

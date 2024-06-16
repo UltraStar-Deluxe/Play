@@ -1,60 +1,108 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
+using Debug = UnityEngine.Debug;
 
-// Handles loading and caching of AudioClips.
-// Use this over AudioUtils because AudioUtils does not cache AudioClips.
-public class AudioManager : AbstractSingletonBehaviour
+/**
+ * Handles loading and caching of AudioClips.
+ */
+public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        ClearCache();
-    }
-
-    private static readonly int criticalCacheSize = 10;
-    private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
-
     public static AudioManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioManager>();
+
+    private const int CriticalCacheSize = 10;
+    private readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
 
     protected override object GetInstance()
     {
         return Instance;
     }
 
-    public AudioClip LoadAudioClipFromFile(string path, bool streamAudio = true)
+    protected override void OnDestroySingleton()
     {
-        if (!File.Exists(path))
-        {
-            Debug.LogError("Audio file does not exist: " + path);
-            return null;
-        }
-
-        return LoadAudioClipFromUri(path, streamAudio);
+        ClearCache();
     }
 
-    // When streamAudio is false, all audio data is loaded at once in a blocking way.
-    public AudioClip LoadAudioClipFromUri(string uri, bool streamAudio = true)
+    public static AudioClip LoadAudioClipFromUriImmediately(string uri, bool streamAudio = true)
     {
+        AudioClip result = null;
+        // Load with busy waiting
+        Instance.LoadAudioClipFromUri(uri, streamAudio, true)
+            .Subscribe(audioClip => result = audioClip);
+        return result;
+    }
+
+    public static IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio = true)
+    {
+        return Instance.LoadAudioClipFromUri(uri, streamAudio, false);
+    }
+
+    private IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio, bool busyWaiting)
+    {
+        if (uri.IsNullOrEmpty())
+        {
+            return ObservableUtils.LogExceptionThenThrow<AudioClip>(new NullReferenceException("Cannot load AudioClip, URI is null or empty"));
+        }
+
+        if (!ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))
+        {
+            return Observable.Throw<AudioClip>(new IllegalArgumentException($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.JoinWith(", ")}"));
+        }
+
         if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
             && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
         {
             if (streamAudio && cachedAudioClip.StreamedAudioClip != null)
             {
-                return cachedAudioClip.StreamedAudioClip;
+                return Observable.Return<AudioClip>(cachedAudioClip.StreamedAudioClip);
             }
             else if (!streamAudio && cachedAudioClip.FullAudioClip != null)
             {
-                return cachedAudioClip.FullAudioClip;
+                return Observable.Return<AudioClip>(cachedAudioClip.FullAudioClip);
             }
         }
 
-        return LoadAndCacheAudioClip(uri, streamAudio);
+        return Observable.Create<AudioClip>(o =>
+        {
+            // Send web request
+            UnityWebRequest webRequest = AudioUtils.CreateAudioClipRequest(new Uri(uri), streamAudio);
+            webRequest.SendWebRequest();
+
+            // Check web request result in coroutine
+            Instance.StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
+                downloadHandler =>
+                {
+                    if (downloadHandler is DownloadHandlerAudioClip downloadHandlerAudioClip
+                        && downloadHandlerAudioClip.audioClip != null)
+                    {
+                        AudioClip audioClip = downloadHandlerAudioClip.audioClip;
+                        AddAudioClipToCache(uri, audioClip, streamAudio);
+
+                        o.OnNext(audioClip);
+                        o.OnCompleted();
+                    }
+                    else
+                    {
+                        o.OnError(new LoadAudioException($"Failed to load AudioClip from URI: '{uri}'"));
+                    }
+                },
+                ex =>
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to load AudioClip from URI: '{uri}': {ex.Message}");
+                    o.OnError(ex);
+                },
+                busyWaiting));
+
+            return Disposable.Empty;
+        });
     }
 
-    public static void ClearCache()
+    private void ClearCache()
     {
         foreach (CachedAudioClip cachedAudioClip in new List<CachedAudioClip>(audioClipCache.Values))
         {
@@ -63,22 +111,9 @@ public class AudioManager : AbstractSingletonBehaviour
         audioClipCache.Clear();
     }
 
-    private AudioClip LoadAndCacheAudioClip(string uri, bool streamAudio)
+    private void AddAudioClipToCache(string path, AudioClip audioClip, bool streamAudio)
     {
-        AudioClip audioClip = AudioUtils.GetAudioClipUncached(uri, streamAudio);
-        if (audioClip == null)
-        {
-            Debug.LogError("Could not load AudioClip: " + uri);
-            return null;
-        }
-
-        AddAudioClipToCache(uri, audioClip, streamAudio);
-        return audioClip;
-    }
-
-    private static void AddAudioClipToCache(string path, AudioClip audioClip, bool streamAudio)
-    {
-        if (audioClipCache.Count >= criticalCacheSize)
+        if (audioClipCache.Count >= CriticalCacheSize)
         {
             RemoveOldestAudioClipsFromCache();
         }
@@ -88,7 +123,7 @@ public class AudioManager : AbstractSingletonBehaviour
         audioClipCache[path] = cachedAudioClip;
     }
 
-    private static void RemoveOldestAudioClipsFromCache()
+    private void RemoveOldestAudioClipsFromCache()
     {
         CachedAudioClip oldest = null;
         foreach (CachedAudioClip cachedAudioClip in audioClipCache.Values)
@@ -105,7 +140,7 @@ public class AudioManager : AbstractSingletonBehaviour
         }
     }
 
-    private static void RemoveCachedAudioClip(CachedAudioClip cachedAudioClip)
+    private void RemoveCachedAudioClip(CachedAudioClip cachedAudioClip)
     {
         audioClipCache.Remove(cachedAudioClip.Path);
 
@@ -117,41 +152,6 @@ public class AudioManager : AbstractSingletonBehaviour
         if (cachedAudioClip.FullAudioClip != null)
         {
             cachedAudioClip.FullAudioClip.UnloadAudioData();
-        }
-    }
-
-    private class LoadingAudioClip
-    {
-        public string Path { get; private set; }
-        public DownloadHandlerAudioClip DownloadHandler { get; private set; }
-        public List<Action<AudioClip>> Callbacks { get; private set; } = new();
-        public long ElapsedMilliseconds
-        {
-            get
-            {
-                return stopwatch.ElapsedMilliseconds;
-            }
-        }
-
-        private readonly System.Diagnostics.Stopwatch stopwatch;
-
-        public LoadingAudioClip(string path, DownloadHandlerAudioClip downloadHandler, Action<AudioClip> callback)
-        {
-            this.Path = path;
-            this.DownloadHandler = downloadHandler;
-            this.Callbacks.Add(callback);
-
-            stopwatch = new System.Diagnostics.Stopwatch();
-            stopwatch.Start();
-        }
-
-        public void DisposeAndNotifyCallbacks(AudioClip audioClip)
-        {
-            DownloadHandler.Dispose();
-            foreach (Action<AudioClip> callback in Callbacks)
-            {
-                callback(audioClip);
-            }
         }
     }
 

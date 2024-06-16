@@ -2,17 +2,15 @@
     "name": "playshared",
     "version": "1.0.0",
     "displayName": "PlayShared",
-    "description": "Unity package for common assets in UltraStar Play main game and Companion App",
+    "description": "Unity package for common assets of main game and companion app",
     "dependencies": {
     },
    "keywords": [
     ],
     "author": {
-      "name": "UltraStar Play contributors",
-      "email": "ultrastar.play@outlook.com",
-      "url": "https://github.com/UltraStar-Deluxe/Play"
+      "name": "",
+      "email": ""
     },
 	"samples": [
     ]
 }
-  

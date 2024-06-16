@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using UniInject;
+using PortAudioForUnity;
 using UniRx;
 using UnityEngine;
-
-// Disable warning about fields that are never assigned, their values are injected.
-#pragma warning disable CS0649
+using Debug = UnityEngine.Debug;
 
 [RequireComponent(typeof(AudioSource))]
-public class MicSampleRecorder : MonoBehaviour, INeedInjection
+public class MicSampleRecorder : MonoBehaviour
 {
-    private const int DefaultSampleRate = 44100;
-
-    public bool playRecordedAudio;
+    public const int DefaultSampleRate = 44100;
 
     private MicProfile micProfile;
     public MicProfile MicProfile
@@ -45,24 +41,98 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
     }
 
     public ReactiveProperty<bool> IsRecording { get; private set; } = new(false);
-    
+
     // The sample rate is available after a MicProfile has been set.
     public ReactiveProperty<int> FinalSampleRate { get; private set; } = new(0);
     // The MicSamples array has one float value per sample.
     public float[] MicSamples { get; private set; } = new float[DefaultSampleRate];
 
-    private readonly Subject<RecordingEvent> recordingEventStream = new();
+    private bool playRecordedAudio;
+    public bool PlayRecordedAudio
+    {
+        get
+        {
+            return playRecordedAudio;
+        }
+        set
+        {
+            bool wasRecording = IsRecording.Value;
+            playRecordedAudio = value;
+            if (wasRecording)
+            {
+                StopRecording();
+                StartRecording();
+            }
+        }
+    }
+
+    private float outputVolume = 1;
+    public float OutputVolume
+    {
+        get => outputVolume;
+        set
+        {
+            outputVolume = value;
+            audioSource.volume = value;
+        }
+    }
+
+    private readonly CountSubject<RecordingEvent> recordingEventStream = new();
     public IObservable<RecordingEvent> RecordingEventStream => recordingEventStream;
 
-    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private AudioSource audioSource;
     private AudioClip micAudioClip;
 
     private int lastSamplePosition;
 
+    private bool continueRecordingOnAddListener;
+    private bool continueRecordingOnEnable;
+
+    public string PortAudioOutputDeviceName { get; set; }
+
+    private void Awake()
+    {
+        audioSource = GetComponentInChildren<AudioSource>();
+
+        recordingEventStream.Count.Subscribe(subscriberCount =>
+        {
+            if (subscriberCount <= 0
+                && IsRecording.Value)
+            {
+                continueRecordingOnAddListener = true;
+                Debug.Log($"Stopping recording because no subscribers left: {MicProfile.GetDisplayNameWithChannel()}");
+                StopRecording();
+            }
+            else if (subscriberCount > 0
+                     && !IsRecording.Value
+                     && continueRecordingOnAddListener)
+            {
+                continueRecordingOnAddListener = false;
+                Debug.Log($"Continue recording for new subscriber: {MicProfile.GetDisplayNameWithChannel()}");
+                StartRecording();
+            }
+        });
+    }
+
+    private void OnEnable()
+    {
+        if (MicProfile != null
+            && continueRecordingOnEnable)
+        {
+            Debug.Log($"Continue recording on enable: {MicProfile.GetDisplayNameWithChannel()}");
+            StartRecording();
+        }
+    }
+
     private void OnDisable()
     {
-        StopRecording();
+        if (MicProfile != null
+            && IsRecording.Value)
+        {
+            Debug.Log($"Stopping recording on disable: {MicProfile.GetDisplayNameWithChannel()}");
+            continueRecordingOnEnable = true;
+            StopRecording();
+        }
     }
 
     private void Update()
@@ -79,7 +149,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
         if (MicProfile == null)
         {
-            Debug.LogError("missing MicProfile");
+            Debug.LogError("MicSampleRecorder - Failed to start recording, missing MicProfile");
             return;
         }
         if (MicProfile.IsInputFromConnectedClient)
@@ -87,43 +157,65 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             Debug.LogWarning("Cannot record mic samples using connected client");
             return;
         }
-        
+
         IsRecording.Value = true;
 
         // Check for microphone existence.
-        string[] micDevices = Microphone.devices;
+        string[] micDevices = IMicrophoneAdapter.Instance.Devices;
         if (!micDevices.Contains(micProfile.Name))
         {
             IsRecording.Value = false;
-            Debug.LogWarning($"Did not find mic '{micProfile.Name}'. Available mic devices: {micDevices.ToCsv()}");
+            Debug.LogWarning($"Did not find mic '{micProfile.Name}'. Available mic devices: {micDevices.JoinWith(", ")}");
             return;
         }
 
-        Debug.Log($"Starting recording with '{MicProfile.Name}' at {FinalSampleRate} Hz");
+        Debug.Log($"Starting recording with '{MicProfile.GetDisplayNameWithChannel()}' at {FinalSampleRate} Hz");
 
-        // Code for low-latency microphone input taken from
+        string outputDeviceName = playRecordedAudio && IMicrophoneAdapter.Instance.UsePortAudio
+            ? GetFinalPortAudioOutputDeviceName()
+            : "";
+
+        // Code for low-latency Unity microphone input taken from
         // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
-        using DisposableStopwatch d = new("Microphone.Start took <ms>");
+        DestroyAudioClips();
+        using DisposableStopwatch d = new($"IMicrophoneAdapter.Start took <ms> with {MicProfile.GetDisplayNameWithChannel()}");
         {
-            micAudioClip = Microphone.Start(MicProfile.Name, true, 1, FinalSampleRate.Value);
+            micAudioClip = IMicrophoneAdapter.Instance.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName, OutputVolume);
         }
-        System.Diagnostics.Stopwatch stopwatch = new();
-        stopwatch.Start();
-        while (Microphone.GetPosition(MicProfile.Name) <= 0)
+
+        if (!IMicrophoneAdapter.Instance.UsePortAudio)
         {
-            // <Busy waiting>
-            // Emergency exit
-            if (stopwatch.ElapsedMilliseconds > 1000)
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+            while (IMicrophoneAdapter.Instance.GetPosition(MicProfile.Name) <= 0)
             {
-                IsRecording.Value = false;
-                Debug.LogError("Microphone did not provide any samples. Took emergency exit out of busy waiting.");
-                return;
+                // <Busy waiting>
+                // Emergency exit
+                if (stopwatch.ElapsedMilliseconds > 1000)
+                {
+                    IsRecording.Value = false;
+                    Debug.LogError("Microphone did not provide any samples. Took emergency exit out of busy waiting.");
+                    return;
+                }
             }
         }
 
         // Configure audio playback
-        audioSource.clip = micAudioClip;
-        audioSource.loop = true;
+        if (micAudioClip != null)
+        {
+            audioSource.clip = micAudioClip;
+            audioSource.loop = true;
+        }
+    }
+
+    private string GetFinalPortAudioOutputDeviceName()
+    {
+        if (PortAudioOutputDeviceName.IsNullOrEmpty())
+        {
+            return MicrophoneAdapter.DefaultOutputDeviceInfo.Name;
+        }
+
+        return PortAudioOutputDeviceName;
     }
 
     public void StopRecording()
@@ -133,18 +225,26 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             return;
         }
 
-        Debug.Log($"Stopping recording with '{MicProfile.Name}'");
-        if (!MicProfile.IsInputFromConnectedClient)
+        IsRecording.Value = false;
+
+        Debug.Log($"Stopping recording with '{MicProfile.GetDisplayNameWithChannel()}'");
+        if (audioSource.isPlaying)
         {
-            Microphone.End(MicProfile.Name);
+            audioSource.Stop();
+            audioSource.clip = null;
+        }
+        DestroyAudioClips();
+
+        if (!MicProfile.IsInputFromConnectedClient
+            && IMicrophoneAdapter.Instance.Devices.Contains(MicProfile.Name))
+        {
+            IMicrophoneAdapter.Instance.End(MicProfile.Name);
         }
         // Reset mic buffer
         for (int i = 0; i < MicSamples.Length; i++)
         {
             MicSamples[i] = 0;
         }
-        
-        IsRecording.Value = false;
     }
 
     private void UpdateRecording()
@@ -154,25 +254,25 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (micAudioClip == null)
+        if (micAudioClip == null && !IMicrophoneAdapter.Instance.UsePortAudio)
         {
-            Debug.LogError("AudioClip for microphone is null");
+            Debug.LogError("AudioClip from Unity microphone recording is null");
             StopRecording();
             return;
         }
-        
+
         // Fill buffer with raw sample data from microphone
-        int currentSamplePosition = Microphone.GetPosition(MicProfile.Name);
-        micAudioClip.GetData(MicSamples, currentSamplePosition);
+        int currentSamplePosition = IMicrophoneAdapter.Instance.GetPosition(MicProfile.Name);
         if (currentSamplePosition == lastSamplePosition)
         {
             // No new samples yet (or all samples changed, which is unlikely because the buffer has a length of 1 second and FPS should be > 1).
             return;
         }
+        IMicrophoneAdapter.Instance.GetRecordedSamples(MicProfile.Name, MicProfile.ChannelIndex, micAudioClip, currentSamplePosition, MicSamples);
 
         int newSamplesCount = GetNewSampleCountInCircularBuffer(lastSamplePosition, currentSamplePosition, MicSamples.Length);
         NotifyListeners(newSamplesCount);
-        
+
         lastSamplePosition = currentSamplePosition;
     }
 
@@ -191,7 +291,12 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
 
     private void UpdateMicrophoneAudioPlayback()
     {
-        if (playRecordedAudio && !audioSource.isPlaying)
+        if (IMicrophoneAdapter.Instance.UsePortAudio)
+        {
+            return;
+        }
+
+        if (playRecordedAudio && !audioSource.isPlaying && audioSource.clip != null)
         {
             audioSource.Play();
         }
@@ -200,7 +305,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             audioSource.Stop();
         }
     }
-    
+
     private static int GetNewSampleCountInCircularBuffer(int lastSamplePosition, int currentSamplePosition, int bufferLength)
     {
         // Check if the recording re-started from index 0 after reaching the end of the buffer.
@@ -223,8 +328,31 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
 
         // Use best available sample rate
-        Microphone.GetDeviceCaps(deviceName, out int minSampleRate, out int maxSampleRate);
+        if (!IMicrophoneAdapter.Instance.Devices.Contains(deviceName))
+        {
+            return DefaultSampleRate;
+        }
+        IMicrophoneAdapter.Instance.GetDeviceCaps(deviceName, out int minSampleRate, out int maxSampleRate, out int channelCount);
         return GetMaxSampleRate(maxSampleRate);
+    }
+
+    private void OnDestroy()
+    {
+        DestroyAudioClips();
+    }
+
+    private void DestroyAudioClips()
+    {
+        if (micAudioClip != null)
+        {
+            if (audioSource.isPlaying)
+            {
+                audioSource.Stop();
+                audioSource.clip = null;
+            }
+            Destroy(micAudioClip);
+            micAudioClip = null;
+        }
     }
 
     private static int GetMaxSampleRate(int maxSampleRate)

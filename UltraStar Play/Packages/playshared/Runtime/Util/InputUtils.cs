@@ -10,16 +10,51 @@ public static class InputUtils
     public const float DoubleClickThresholdInSeconds = 0.3f;
     public const float DragDistanceThresholdInPx = 5f;
 
+    private static Keyboard lastNonVirtualKeyboard;
+    private static Mouse lastNonVirtualMouse;
+    private static Pointer lastNonVirtualPointer;
+    
+    public static Keyboard GetNonVirtualKeyboard()
+    {
+        Keyboard current = Keyboard.current;
+        if (!current.name.ToLowerInvariant().Contains("virtual"))
+        {
+            lastNonVirtualKeyboard = current;
+        }
+        return lastNonVirtualKeyboard;
+    }
+
+    public static Mouse GetNonVirtualMouse()
+    {
+        Mouse current = Mouse.current;
+        if (!current.name.ToLowerInvariant().Contains("virtual"))
+        {
+            lastNonVirtualMouse = current;
+        }
+        return lastNonVirtualMouse;
+    }
+    
+    public static Pointer GetNonVirtualPointer()
+    {
+        Pointer current = Pointer.current;
+        if (!current.name.ToLowerInvariant().Contains("virtual"))
+        {
+            lastNonVirtualPointer = current;
+        }
+        return lastNonVirtualPointer;
+    }
+    
     public static EKeyboardModifier GetCurrentKeyboardModifier()
     {
-        if (Keyboard.current == null)
+        Keyboard keyboard = GetNonVirtualKeyboard();
+        if (keyboard == null)
         {
             return EKeyboardModifier.None;
         }
         
-        bool ctrl = Keyboard.current.leftCtrlKey.isPressed || Keyboard.current.rightCtrlKey.isPressed;
-        bool shift = Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed;
-        bool alt = Keyboard.current.leftAltKey.isPressed || Keyboard.current.rightAltKey.isPressed;
+        bool ctrl = keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed;
+        bool shift = keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
+        bool alt = keyboard.leftAltKey.isPressed || keyboard.rightAltKey.isPressed;
 
         if (ctrl && !shift && !alt)
         {
@@ -66,16 +101,18 @@ public static class InputUtils
     
     public static bool AnyKeyboardButtonPressed()
     {
-        return Keyboard.current != null
-               && Keyboard.current.anyKey.ReadValue() > 0;
+        Keyboard keyboard = GetNonVirtualKeyboard();
+        return keyboard != null
+               && keyboard.anyKey.ReadValue() > 0;
     }
 
     public static bool AnyMouseButtonPressed()
     {
-        return Mouse.current != null
-               && (Mouse.current.leftButton.isPressed
-                   || Mouse.current.rightButton.isPressed
-                   || Mouse.current.middleButton.isPressed);
+        Mouse mouse = GetNonVirtualMouse();
+        return mouse != null
+               && (mouse.leftButton.isPressed
+                   || mouse.rightButton.isPressed
+                   || mouse.middleButton.isPressed);
     }
     
     public static bool AnyTouchscreenPressed()
@@ -85,16 +122,18 @@ public static class InputUtils
 
     public static bool IsKeyboardShiftPressed()
     {
-        return Keyboard.current != null
-               && (Keyboard.current.leftShiftKey.isPressed
-                   || Keyboard.current.rightShiftKey.isPressed);
+        Keyboard keyboard = GetNonVirtualKeyboard();
+        return keyboard != null
+               && (keyboard.leftShiftKey.isPressed
+                   || keyboard.rightShiftKey.isPressed);
     }
     
     public static bool IsKeyboardControlPressed()
     {
-        return Keyboard.current != null
-               && (Keyboard.current.leftCtrlKey.isPressed
-                   || Keyboard.current.rightCtrlKey.isPressed);
+        Keyboard keyboard = GetNonVirtualKeyboard();
+        return keyboard != null
+               && (keyboard.leftCtrlKey.isPressed
+                   || keyboard.rightCtrlKey.isPressed);
     }
 
     public static bool IsAnyKeyboardModifierPressed()
@@ -104,12 +143,12 @@ public static class InputUtils
                || IsKeyboardAltPressed();
     }
 
-    
     public static bool IsKeyboardAltPressed()
     {
-        return Keyboard.current != null
-               && (Keyboard.current.leftAltKey.isPressed
-                   || Keyboard.current.rightAltKey.isPressed);
+        Keyboard keyboard = GetNonVirtualKeyboard();
+        return keyboard != null
+               && (keyboard.leftAltKey.isPressed
+                   || keyboard.rightAltKey.isPressed);
     }
 
     public static bool WasPressedOrReleasedInThisFrame(ButtonControl buttonControl)
@@ -117,14 +156,29 @@ public static class InputUtils
         return buttonControl.wasPressedThisFrame || buttonControl.wasReleasedThisFrame;
     }
 
-    public static Vector2 GetMousePosition()
+    public static Vector2 GetMousePosition(Mouse mouse)
     {
-        return Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
+        return mouse != null ? mouse.position.ReadValue() : Vector2.zero;
+    }
+    
+    public static Vector2 GetCurrentPointerPosition()
+    {
+        if (Pointer.current == null)
+        {
+            return Vector2.zero;
+        }
+        return Pointer.current.position.value;
     }
 
     public static Vector2 GetPointerPositionInPanelCoordinates(PanelHelper panelHelper, bool invertY = false)
     {
-        Vector2 pointerScreenCoordinates = new(Pointer.current.position.x.ReadValue(), Pointer.current.position.y.ReadValue());
+        Pointer pointer = GetNonVirtualPointer();
+        if (pointer == null)
+        {
+            return Vector2.zero;
+        }
+
+        Vector2 pointerScreenCoordinates = new(pointer.position.x.ReadValue(), pointer.position.y.ReadValue());
         Vector2 pointerPanelCoordinates = panelHelper.ScreenToPanel(pointerScreenCoordinates);
         if (invertY)
         {
@@ -137,7 +191,13 @@ public static class InputUtils
 
     public static bool IsPointerOverVisualElement(VisualElement visualElement, PanelHelper panelHelper)
     {
-        Vector2 pointerPositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
+        Pointer pointer = GetNonVirtualPointer();
+        if (pointer == null)
+        {
+            return false;
+        }
+
+        Vector2 pointerPositionInPanelCoordinates = GetPointerPositionInPanelCoordinates(panelHelper, true);
         pointerPositionInPanelCoordinates = new Vector2(pointerPositionInPanelCoordinates.x,
             pointerPositionInPanelCoordinates.y);
         Rect rect = visualElement.worldBound;
@@ -145,5 +205,15 @@ public static class InputUtils
                && pointerPositionInPanelCoordinates.x <= rect.xMax
                && rect.yMin <= pointerPositionInPanelCoordinates.y
                && pointerPositionInPanelCoordinates.y <= rect.yMax;
+    }
+
+    public static bool IsPointerDown()
+    {
+        if (Pointer.current == null)
+        {
+            return false;
+        }
+
+        return Pointer.current.press.isPressed;
     }
 }

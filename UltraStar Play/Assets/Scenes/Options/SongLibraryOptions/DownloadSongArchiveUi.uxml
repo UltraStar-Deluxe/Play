@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="column" style="margin-left: 5px; margin-right: 5px;">
+        <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+            <ui:VisualElement name="textFieldContainer" style="flex-grow: 1; flex-direction: row;">
+                <ui:TextField picking-mode="Ignore" name="urlTextField" mask-character="*" password="false" value="C:\Songs" style="flex-grow: 1; align-items: center;">
+                    <ui:Label tabindex="-1" text="$options_songArchiveUrl_hint" display-tooltip-when-elided="true" name="urlTextFieldHint" class="textFieldHint secondaryFontColor" />
+                </ui:TextField>
+                <ui:Button name="urlChooserButton" class="squareButton comboBoxButton">
+                    <MaterialIcon name="selectFolderIcon" icon="arrow_drop_down" />
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:Button display-tooltip-when-elided="true" name="toggleStartAndCancelButton" class="squareButton ml-1">
+                <MaterialIcon tabindex="-1" picking-mode="Ignore" icon="play_circle" name="startIcon" />
+                <MaterialIcon tabindex="-1" picking-mode="Ignore" icon="cancel" name="cancelIcon" />
+            </ui:Button>
+            <ui:Button display-tooltip-when-elided="true" name="deleteButton" class="squareButton ml-1">
+                <MaterialIcon tabindex="-1" picking-mode="Ignore" icon="delete" name="deleteIcon" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:Label text="$options_songLibrary_downloadSongArchive_initialStatus" display-tooltip-when-elided="true" name="statusLabel" class="noBackgroundInHierarchy" style="-unity-font-definition: url(&quot;project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/static/RobotoMono-Medium%20SDF.asset?fileID=11400000&amp;guid=9c5ee68429ab94b45a2e23f4a735885c&amp;type=2#RobotoMono-Medium SDF&quot;); white-space: normal;" />
+        <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+    </ui:VisualElement>
+</ui:UXML>

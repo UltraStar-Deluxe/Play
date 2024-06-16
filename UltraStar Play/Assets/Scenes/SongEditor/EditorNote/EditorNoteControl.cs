@@ -92,6 +92,23 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     public bool IsPointerOverLeftHandle { get; private set; }
     public bool IsPointerOverCenter { get; private set; }
 
+    public bool IsEditable
+    {
+        get
+        {
+            return Note != null && Note.IsEditable;
+        }
+        set
+        {
+            if (Note == null)
+            {
+                return;
+            }
+
+            Note.IsEditable = value;
+        }
+    }
+
     private float lastClickTime;
 
     private readonly List<IDisposable> disposables = new();
@@ -133,7 +150,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         pitchLabel.text = MidiUtils.GetAbsoluteName(Note.MidiNote);
         if (Note.Sentence != null && Note.Sentence.Voice != null)
         {
-            Color color = songEditorLayerManager.GetVoiceLayerColor(Note.Sentence.Voice.Name);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(Note.Sentence.Voice.Id);
             SetColor(color);
         }
     }
@@ -280,14 +297,14 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         else if (!InputUtils.IsKeyboardControlPressed())
         {
             // Move the playback position to the start of the note
-            double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
-            songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+            double positionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, Note.StartBeat);
+            songAudioPlayer.PositionInMillis = positionInMillis;
         }
     }
 
     public void SetLyrics(string newText)
     {
-        string visibleWhitespaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(newText);
+        string visibleWhitespaceText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(newText);
         switch (Note.Type)
         {
             case ENoteType.Freestyle:
@@ -322,11 +339,15 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         float margin = 5;
         float width = Mathf.Max(VisualElement.worldBound.width + margin * 2, 150);
         float height = VisualElement.worldBound.height + margin * 2;
+        float left = Mathf.Max(0, VisualElement.worldBound.x - width / 2);
+        float top = Mathf.Max(0, VisualElement.worldBound.y - margin);
         editLyricsPopup.style.position = new StyleEnum<Position>(Position.Absolute);
-        editLyricsPopup.style.left = VisualElement.worldBound.x - width / 2;
-        editLyricsPopup.style.top = VisualElement.worldBound.y - margin;
+        editLyricsPopup.style.left = left;
+        editLyricsPopup.style.top = top;
         editLyricsPopup.style.width = width;
         editLyricsPopup.style.height = height;
+        editLyricsPopup.style.maxWidth = Length.Percent(100);
+        editLyricsPopup.style.maxHeight = Length.Percent(100);
 
         lyricsInputControl = injector
             .WithBindingForInstance(this)

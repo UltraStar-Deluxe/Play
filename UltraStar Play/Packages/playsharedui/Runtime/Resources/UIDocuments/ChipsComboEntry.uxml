@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/playshared/Runtime/StyleSheets/CommonStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#CommonStyles" />
+    <ui:VisualElement name="chipsComboEntryRoot" class="chipsComboEntryRoot">
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="chipsComboEntryLabel" class="chipsComboEntryLabel smallFont" />
+        <ui:Button display-tooltip-when-elided="true" name="chipsComboEntryButton" class="squareButton transparentBackgroundColor chipsComboEntryButton">
+            <MaterialIcon tabindex="-1" icon="close" name="chipsComboEntryButtonIcon" style="font-size: 18px;" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

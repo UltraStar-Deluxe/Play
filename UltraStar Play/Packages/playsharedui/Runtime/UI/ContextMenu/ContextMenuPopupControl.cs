@@ -15,7 +15,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     {
         OpenContextMenuPopups = new List<ContextMenuPopupControl>();
     }
-    
+
     private bool wasNoButtonOrTouchPressed;
 
     public static List<ContextMenuPopupControl> OpenContextMenuPopups { get; private set; } = new();
@@ -30,6 +30,9 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     [Inject]
     private Injector injector;
 
+    private readonly VisualElement targetElement;
+    public VisualElement TargetElement => targetElement;
+
     private PanelHelper panelHelper;
 
     private VisualElement visualElement;
@@ -37,19 +40,32 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     private readonly GameObject gameObject;
     private readonly Vector2 position;
+    public Vector2 Position => position;
 
     private IDisposable closeContextMenuDisposable;
 
     private Vector2 lastSize;
     private Vector2 lastPosition;
-    
-    private readonly Subject<bool> contextMenuClosedEventStream = new();
-    public IObservable<bool> ContextMenuClosedEventStream => contextMenuClosedEventStream;
 
-    public ContextMenuPopupControl(GameObject gameObject, Vector2 position)
+    private readonly Subject<VoidEvent> contextMenuClosedEventStream = new();
+    public IObservable<VoidEvent> ContextMenuClosedEventStream => contextMenuClosedEventStream;
+
+    /**
+     * Optional object to associate data with the popup menu.
+     */
+    private readonly object context;
+    public object Context => context; // Public getter to allow modding
+
+    public ContextMenuPopupControl(
+        GameObject gameObject,
+        VisualElement targetElement,
+        Vector2 position,
+        object context)
     {
         this.gameObject = gameObject;
+        this.targetElement = targetElement;
         this.position = position;
+        this.context = context;
     }
 
     public void OnInjectionFinished()
@@ -58,7 +74,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         visualElement = contextMenuPopupManager.contextMenuUi.CloneTree().Children().First();
         visualElement.style.left = position.x;
         visualElement.style.top = position.y;
-        uiDocument.rootVisualElement.Children().First().Add(visualElement);
+        uiDocument.rootVisualElement.Add(visualElement);
         // Remove dummy items
         visualElement.Clear();
 
@@ -108,25 +124,38 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     {
         wasNoButtonOrTouchPressed = wasNoButtonOrTouchPressed || !InputUtils.AnyKeyboardOrMouseOrTouchPressed();
     }
-    
-    public void AddSeparator()
+
+    public VisualElement AddSeparator()
     {
-        VisualElement contextMenuItemVisualElement = contextMenuPopupManager.contextMenuSeparatorUi.CloneTree().Children().First();
-        visualElement.Add(contextMenuItemVisualElement);
+        VisualElement separator = contextMenuPopupManager.contextMenuSeparatorUi.CloneTree().Children().First();
+        visualElement.Add(separator);
+        return separator;
     }
 
-    public void AddItem(string text, Action action)
-    {
-        VisualElement contextMenuItemVisualElement = contextMenuPopupManager.contextMenuItemUi.CloneTree().Children().First();
-        ContextMenuItemControl contextMenuItem = new(text, action);
-        contextMenuItem.ItemTriggeredEventStream.Subscribe(evt => CloseContextMenu());
-        injector.WithRootVisualElement(contextMenuItemVisualElement).Inject(contextMenuItem);
-        visualElement.Add(contextMenuItemVisualElement);
-    }
-    
-    public void AddVisualElement(VisualElement newVisualElement)
+    public VisualElement AddVisualElement(VisualElement newVisualElement)
     {
         visualElement.Add(newVisualElement);
+        return newVisualElement;
+    }
+
+    public VisualElement AddButton(Translation text, Action action)
+    {
+        return AddButton(text, null, action);
+    }
+
+    public VisualElement AddButton(Translation text, string icon, Action action)
+    {
+        return AddButton(text, icon, "", action);
+    }
+
+    public VisualElement AddButton(Translation text, string icon, string name, Action action)
+    {
+        VisualElement contextMenuItemVisualElement = contextMenuPopupManager.contextMenuItemUi.CloneTree().Children().First();
+        ContextMenuItemControl contextMenuItemControl = new(text, icon, name, action);
+        contextMenuItemControl.ItemTriggeredEventStream.Subscribe(evt => CloseContextMenu());
+        injector.WithRootVisualElement(contextMenuItemVisualElement).Inject(contextMenuItemControl);
+        visualElement.Add(contextMenuItemVisualElement);
+        return contextMenuItemVisualElement;
     }
 
     public void CloseContextMenu()
@@ -134,7 +163,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         closeContextMenuDisposable.Dispose();
         visualElement.RemoveFromHierarchy();
         OpenContextMenuPopups.Remove(this);
-        contextMenuClosedEventStream.OnNext(true);
+        contextMenuClosedEventStream.OnNext(VoidEvent.instance);
     }
 
     private static void CloseAllOpenContextMenus()

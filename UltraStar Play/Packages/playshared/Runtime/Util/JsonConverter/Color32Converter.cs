@@ -1,85 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
-using FullSerializer;
+using Newtonsoft.Json;
 using UnityEngine;
 
-public class Color32Converter : fsConverter
+public class Color32Converter : JsonConverter<Color32>
 {
-    public override bool CanProcess(Type type)
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
     {
-        return type == typeof(Color32);
+        JsonConverter.AddConverter(new Color32Converter());
     }
 
-    public override fsResult TrySerialize(object instance, out fsData serialized, Type storageType)
+    public override void WriteJson(JsonWriter writer, Color32 value, JsonSerializer serializer)
     {
-        if (instance is not Color32 color)
-        {
-            throw new InvalidOperationException("FullSerializer Internal Error -- Unexpected serialization type");
-        }
-
-        serialized = new fsData($"#{Colors.ToHexColor(color)}");
-        return fsResult.Success;
+        writer.WriteValue($"#{Colors.ToHexColor(value)}");
     }
 
-    public override fsResult TryDeserialize(fsData data, ref object instance, Type storageType)
+    public override Color32 ReadJson(JsonReader reader, Type objectType, Color32 existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
-        if (storageType != typeof(Color32))
+        if (reader.TokenType is JsonToken.Null)
         {
-            throw new InvalidOperationException("FullSerializer Internal Error -- Unexpected deserialization type");
+            return default;
         }
 
-        if (data.IsString == false)
+        if (reader.TokenType is JsonToken.String)
         {
-            return ParseColor32FromDataAsDictionary(data, ref instance);
-        }
-
-        return ParseColor32FromDataAsString(data, ref instance);
-    }
-
-    /**
-     * Try parse string object in the form "#RRGGBBAA", where AA is optional.
-     */
-    private fsResult ParseColor32FromDataAsString(fsData data, ref object instance)
-    {
-        string dataAsString = data.AsString;
-        if (Colors.TryParseHexColor(dataAsString, out Color32 outColor))
-        {
-            instance = outColor;
-            return fsResult.Success;
-        }
-        return fsResult.Fail($"Unable to parse {data} into a Color32");
-    }
-
-    /**
-     * Try parse object in the form {"r":255,"g":255,"g":255,"a":255}
-     */
-    private fsResult ParseColor32FromDataAsDictionary(fsData data, ref object instance)
-    {
-        Dictionary<string, fsData> dataAsDictionary = data.AsDictionary;
-
-        byte GetColorFromDataAsDictionary(string key, byte fallbackValue)
-        {
-            if (dataAsDictionary.TryGetValue(key, out fsData colorData))
+            // Try parse string object in the form "#RRGGBBAA", where AA is optional.
+            string dataAsString = (string)reader.Value;
+            if (Colors.TryParseHexColor(dataAsString, out Color32 outColor))
             {
-                return (byte)colorData.AsInt64;
+                return outColor;
             }
-            return fallbackValue;
         }
 
         try
         {
-            byte r = GetColorFromDataAsDictionary("r", 255);
-            byte g = GetColorFromDataAsDictionary("g", 255);
-            byte b = GetColorFromDataAsDictionary("b", 255);
-            byte a = GetColorFromDataAsDictionary("a", 255);
-            instance = new Color32(r, g, b, a);
-            return fsResult.Success;
+            // Try parse object in the form {"r":255,"g":255,"g":255,"a":255}
+            Dictionary<string, byte> dataAsDictionary = serializer.Deserialize<Dictionary<string, byte>>(reader);
+            byte r = GetColorOrFallback(dataAsDictionary, "r", 0);
+            byte g = GetColorOrFallback(dataAsDictionary, "g", 0);
+            byte b = GetColorOrFallback(dataAsDictionary, "b", 0);
+            byte a = GetColorOrFallback(dataAsDictionary, "a", 255);
+            return new Color32(r, g, b, a);
         }
         catch (Exception ex)
         {
-            Debug.LogError(ex);
-            instance = Colors.white;
-            return fsResult.Fail($"Unable to parse {data} into a Color32");
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to parse {nameof(Color32)}: {ex.Message}");
+            return default;
         }
+    }
+
+    private static byte GetColorOrFallback(Dictionary<string, byte> dataAsDictionary, string key, byte fallbackValue)
+    {
+        return dataAsDictionary.TryGetValue(key, out byte colorValue)
+            ? colorValue
+            : fallbackValue;
     }
 }

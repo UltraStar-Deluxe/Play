@@ -11,22 +11,39 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R_PlayShared.UxmlNames.contextMenuButton)]
     private Button button;
 
-    private readonly string text;
+    [Inject(UxmlName = R_PlayShared.UxmlNames.contextMenuButtonIcon)]
+    private MaterialIcon iconElement;
 
+    private readonly Translation text;
+    private readonly string icon;
+    private readonly string buttonName;
     private readonly Action action;
 
-    private readonly Subject<bool> itemTriggeredEventStream = new();
-    public IObservable<bool> ItemTriggeredEventStream => itemTriggeredEventStream;
+    private readonly Subject<VoidEvent> itemTriggeredEventStream = new();
+    public IObservable<VoidEvent> ItemTriggeredEventStream => itemTriggeredEventStream;
 
-    public ContextMenuItemControl(string text, Action action)
+    public ContextMenuItemControl(Translation text, string icon, string buttonName, Action action)
     {
         this.text = text;
+        this.icon = icon;
+        this.buttonName = buttonName;
         this.action = action;
     }
 
     public void OnInjectionFinished()
     {
-        label.text = text;
+        if (icon.IsNullOrEmpty())
+        {
+            iconElement.HideByDisplay();
+        }
+        else
+        {
+            iconElement.ShowByDisplay();
+            iconElement.Icon = icon;
+        }
+
+        label.SetTranslatedText(text);
+        button.name = buttonName;
         button.RegisterCallbackButtonTriggered(_ =>
         {
             if (button.focusController.focusedElement == button)
@@ -36,7 +53,7 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
             }
 
             action();
-            itemTriggeredEventStream.OnNext(true);
+            itemTriggeredEventStream.OnNext(VoidEvent.instance);
         });
     }
 }

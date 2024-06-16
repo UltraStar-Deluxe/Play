@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="NextRoundInfoPlayerEntryUi" src="project://database/Assets/Common/GameRounds/NextGameRoundInfoPlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=1c1764560ee144247ab75c166154b2a3&amp;type=3#NextGameRoundInfoPlayerEntryUi" />
+    <ui:VisualElement name="nextGameRoundInfoUiRoot" style="background-color: rgba(0, 0, 0, 0);">
+        <ui:VisualElement name="nextGameRoundSongInfoContainer" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+            <ui:Label tabindex="-1" text="Next: Some Artist - Some Title" display-tooltip-when-elided="true" name="nextGameRoundSongInfoLabel" class="smallFont" />
+        </ui:VisualElement>
+        <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: flex-start;">
+            <ui:VisualElement name="nextGameRoundPlayerEntryList" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center; flex-wrap: wrap;">
+                <ui:Instance template="NextRoundInfoPlayerEntryUi" name="NextRoundInfoPlayerEntryUi" />
+                <ui:Instance template="NextRoundInfoPlayerEntryUi" name="NextRoundInfoPlayerEntryUi" />
+            </ui:VisualElement>
+            <MaterialIcon tabindex="-1" name="nextGameRoundModifierActiveIcon" icon="videogame_asset" style="font-size: 20px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

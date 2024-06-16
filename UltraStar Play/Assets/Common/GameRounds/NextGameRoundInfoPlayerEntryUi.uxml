@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="nextGameRoundInfoPlayerEntryUiRoot" class="mr-1" style="flex-direction: row; align-items: center;">
+        <MaterialIcon name="nextGameRoundPlayerEntryMicImage" icon="mic" class="ignoreTheme" style="width: 16px; height: 16px; margin-right: 5px; font-size: 20px;" />
+        <ui:Label tabindex="-1" text="Player 01" display-tooltip-when-elided="true" name="nextGameRoundPlayerEntryLabel" class="smallFont" />
+    </ui:VisualElement>
+</ui:UXML>

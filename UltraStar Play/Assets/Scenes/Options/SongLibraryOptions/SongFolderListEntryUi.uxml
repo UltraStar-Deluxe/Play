@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="column" style="margin-left: 5px; margin-right: 5px;">
+        <ui:VisualElement name="row" class="p-1" style="flex-direction: row; width: auto; justify-content: center; align-items: center;">
+            <ui:VisualElement name="textFieldContainer" style="flex-grow: 1; flex-direction: row;">
+                <ui:Button text="Internal Storage" display-tooltip-when-elided="true" name="driveButton" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" />
+                <ui:TextField picking-mode="Ignore" text="C:\Songs" name="pathTextField" mask-character="*" password="false" style="flex-grow: 1; flex-shrink: 1;" />
+                <ui:Button name="selectFolderButton" class="squareButton ml-1">
+                    <MaterialIcon name="selectFolderIcon" icon="folder_open" />
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:Button name="openFolderButton" class="squareButton mr-1 ml-1">
+                <MaterialIcon name="openFolderIcon" icon="open_in_new" />
+            </ui:Button>
+            <ui:Button name="deleteButton" class="squareButton dangerButton mr-1">
+                <MaterialIcon name="deleteIcon" icon="delete" />
+            </ui:Button>
+            <ui:VisualElement name="songFolderInactiveOverlay" picking-mode="Ignore" class="inactiveOverlay overlay roundCorners" style="width: 100%;" />
+            <SlideToggle name="songFolderEnabledToggle" />
+        </ui:VisualElement>
+        <ui:VisualElement name="warningContainer" style="flex-direction: row; align-items: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: center;">
+            <MaterialIcon name="warningIcon" icon="warning" class="rounded warning noBackgroundInHierarchy" style="margin-right: 5px;" />
+            <ui:Label text="Path does not exist" display-tooltip-when-elided="true" name="warningLabel" class="noBackgroundInHierarchy" style="white-space: normal; flex-shrink: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,84 @@
+{
+    "defaultControl": {
+        "name": "vinyl-defaultControl",
+        "fontColor": "#D0D5DD",
+        "backgroundColor": "#475467",
+        "backgroundGradient": "45deg, #101828, #475467",
+        "hoverBackgroundGradient": "45deg, #323232, #4e5b6e",
+        "focusBackgroundGradient": "45deg, #323232, #4e5b6e",
+        "borderColor": "#00000100",
+        "focusBorderColor": "#4F5B6F",
+        "a": "#323232",
+        "b": "#4e5b6e"
+    },
+
+    "transparentButton": {
+        "name": "vinyl-transparentButton",
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#CCCCCC",
+        "focusBackgroundColor": "#FFFFFF",
+        "activeBackgroundColor": "#FFFFFF",
+
+        "fontColor": "#F9FAFB",
+        "hoverFontColor": "#344054",
+        "focusFontColor": "#344054",
+        "activeFontColor": "#344054"
+    },
+
+    "dynamicPanel": {
+        "backgroundColor": "#00000100",
+        "focusBackgroundColor": "#1D2939",
+    },
+
+    "staticPanel": {
+        "backgroundGradient": "26.57deg, #1D2939, #344054",
+    },
+
+    "slideToggleOff": {
+        "name": "slideToggleOff",
+        "backgroundColor": "#475467",
+        "hoverBackgroundColor": "#344054",
+        "focusBackgroundColor": "#344054",
+        "activeBackgroundColor": "#344054",
+    },
+
+    "slideToggleOn": {
+        "name": "slideToggle",
+        "backgroundColor": "#12B76A",
+        "hoverBackgroundColor": "#14C472",
+        "focusBackgroundColor": "#0C7846",
+        "activeBackgroundColor": "#109E5C",
+    },
+
+    "primaryFontColor":  "#F9FAFB",
+    "secondaryFontColor": "#98A2B3",
+    "warningFontColor":  "#FEC84B",
+    "errorFontColor": "#F97066",
+
+    "videoPreviewColor":"#CCCCCC",
+
+    "lyricsOutlineColor": "#00000000",
+    "lyricsContainerGradient": "#000000, #1E232B",
+
+    "dynamicBackground": {
+        "imagePath": "backgrounds/dot-grid-with-vinyl-bottom-right.jpg"
+    },
+
+    "sceneSpecificBackgrounds": {
+        "MainScene": {
+            "dynamicBackground": {
+                "imagePath": "backgrounds/dot-grid-with-vinyl-left.jpg",
+            }
+        },
+        "SongSelectScene": {
+            "dynamicBackground": {
+                "imagePath": "backgrounds/dot-grid-with-vinyl-bottom-right.jpg"
+            }
+        },
+        "SingingResultsScene": {
+            "dynamicBackground": {
+                "imagePath": "backgrounds/dot-grid-with-vinyl-bottom-right.jpg"
+            }
+        }
+    },
+}

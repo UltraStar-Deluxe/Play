@@ -17,6 +17,9 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.targetNote)]
     private VisualElement targetNoteVisualElement;
 
+    [Inject(UxmlName = R.UxmlNames.targetNoteLabel)]
+    private VisualElement targetNoteLabel;
+
     [Inject(UxmlName = R.UxmlNames.recordedNote)]
     private VisualElement recordedNoteVisualElement;
 
@@ -25,9 +28,6 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.recordedNoteLabel)]
     public Label Label { get; private set; }
-
-    [Inject(Optional = true)]
-    private MicProfile micProfile;
 
     [Inject]
     public RecordedNote RecordedNote { get; private set; }
@@ -55,15 +55,34 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
     public int TargetEndBeat { get; set; }
     public float LifeTimeInSeconds { get; set; }
 
+    public Color32 Color
+    {
+        set
+        {
+            Color color = value;
+            // If no target note, then remove saturation from color and make transparent
+            bool isTransparent = RecordedNote != null
+                                 && (RecordedNote.TargetNote == null
+                                     || RecordedNote.TargetNote.IsFreestyle);
+            Color finalColor = isTransparent
+                ? color
+                    // Remove saturation
+                    .RgbToHsv()
+                    .WithGreen(0)
+                    .HsvToRgb()
+                    // Make transparent
+                    .WithAlpha(0.25f)
+                : color;
+            image.style.unityBackgroundImageTintColor = finalColor;
+            image.style.backgroundColor = finalColor;
+        }
+    }
+
     public void OnInjectionFinished()
     {
         targetNoteVisualElement.HideByDisplay();
+        targetNoteLabel.HideByDisplay();
         recordedNoteVisualElement.ShowByDisplay();
-
-        if (micProfile != null)
-        {
-            SetStyleByMicProfile(micProfile);
-        }
     }
 
     public void Update()
@@ -139,17 +158,6 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
     {
         starParticleControl.VisualElement.RemoveFromHierarchy();
         starParticleControls.Remove(starParticleControl);
-    }
-
-    private void SetStyleByMicProfile(MicProfile micProfile)
-    {
-        // If no target note, then remove saturation from color and make transparent
-        Color color = micProfile.Color;
-        Color finalColor = (RecordedNote != null && RecordedNote.TargetNote == null)
-            ? color.RgbToHsv().WithGreen(0).HsvToRgb().WithAlpha(0.25f)
-            : color;
-        image.style.unityBackgroundImageTintColor = finalColor;
-        image.style.backgroundColor = finalColor;
     }
 
     public void Dispose()

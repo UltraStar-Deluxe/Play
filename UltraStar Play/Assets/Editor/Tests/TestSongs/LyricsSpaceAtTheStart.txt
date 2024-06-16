@@ -1,0 +1,8 @@
+#TITLE:SomeTitle
+#ARTIST:SomeArtist
+#MP3:TestSong.ogg
+#BPM:200
+: 4 3 9 Hel
+: 8  3 9 lo
+: 12 3  9  world!
+E

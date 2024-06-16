@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UniInject;
-using UniRx;
-using ProTrans;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -23,31 +17,43 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
 
     public void InitWebcam()
     {
-        webcamTexture = new WebCamTexture(settings.WebcamSettings.CurrentDeviceName);
+        webcamTexture = new WebCamTexture(settings.CurrentWebcamDeviceName);
         webcamRenderContainer.image = webcamTexture;
         if (WebcamsAvailable())
         {
-            if (settings.WebcamSettings.UseAsBackgroundInSingScene)
+            if (settings.UseWebcamAsBackgroundInSingScene)
             {
                 webcamTexture.Play();
             }
 
-            webcamRenderContainer.SetVisibleByDisplay(settings.WebcamSettings.UseAsBackgroundInSingScene);
+            webcamRenderContainer.SetVisibleByDisplay(settings.UseWebcamAsBackgroundInSingScene);
         }
     }
 
     public void Play()
     {
+        if (webcamTexture == null)
+        {
+            return;
+        }
         webcamTexture.Play();
     }
 
     public void Stop()
     {
+        if (webcamTexture == null)
+        {
+            return;
+        }
         webcamTexture.Stop();
     }
 
     public string CurrentDeviceName()
     {
+        if (webcamTexture == null)
+        {
+            return "";
+        }
         return webcamTexture.deviceName;
     }
 
@@ -56,28 +62,30 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
         return WebCamTexture.devices.Length > 0;
     }
 
-    public void AddToContextMenu(ContextMenuPopupControl contextMenuPopup)
+    public void SetUseAsBackgroundInSingScene(bool newValue)
     {
-        if (WebcamsAvailable())
+        if (settings.UseWebcamAsBackgroundInSingScene == newValue)
         {
-            contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_webcamOnOff),
-                () =>
-                {
-                    bool displayWebcam = !webcamRenderContainer.IsVisibleByDisplay();
-                    if (displayWebcam)
-                    {
-                        Log.Logger.Information("Webcam activated: {webcamname}", webcamTexture.deviceName);
-                        Play();
-                    }
-                    else
-                    {
-                        Log.Logger.Information("Webcam deactivated: {webcamname}", webcamTexture.deviceName);
-                        Stop();
-                    }
-
-                    webcamRenderContainer.SetVisibleByDisplay(displayWebcam);
-                    settings.WebcamSettings.UseAsBackgroundInSingScene = displayWebcam;
-                });
+            return;
         }
+
+        settings.UseWebcamAsBackgroundInSingScene = newValue;
+        if (newValue)
+        {
+            Play();
+            Debug.Log("Webcam activated: {webcamTexture.deviceName}");
+            webcamRenderContainer.ShowByDisplay();
+        }
+        else
+        {
+            Stop();
+            Debug.Log($"Webcam deactivated: {webcamTexture.deviceName}");
+            webcamRenderContainer.HideByDisplay();
+        }
+    }
+    
+    public void ToggleUseAsBackgroundInSingScene()
+    {
+        SetUseAsBackgroundInSingScene(!settings.UseWebcamAsBackgroundInSingScene);
     }
 }

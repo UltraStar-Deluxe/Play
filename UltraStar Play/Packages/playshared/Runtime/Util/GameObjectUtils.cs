@@ -3,6 +3,14 @@ using UnityEngine.SceneManagement;
 
 public static class GameObjectUtils
 {
+    public static T CreateGameObjectWithComponent<T>() where T : Component
+    {
+        GameObject gameObject = new();
+        gameObject.name = typeof(T).Name;
+        T component = gameObject.AddComponent<T>();
+        return component;
+    }
+
     /// Looks in the GameObject with the given tag
     /// for the component that is specified by the generic type parameter.
     public static T FindComponentWithTag<T>(string tag)
@@ -74,11 +82,11 @@ public static class GameObjectUtils
             GameObject.Destroy(obj);
         }
     }
-    
+
     public static void SetTopLevelGameObjectAndDontDestroyOnLoad(GameObject gameObject)
     {
         // Move object to top level in scene hierarchy.
-        // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used. 
+        // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used.
         gameObject.transform.SetParent(null);
         GameObject.DontDestroyOnLoad(gameObject);
     }
@@ -111,5 +119,10 @@ public static class GameObjectUtils
     {
         // Every GameObject has a Transform component.
         return GameObject.FindObjectOfType<Transform>().gameObject;
+    }
+
+    public static bool IsDestroyed(MonoBehaviour monoBehaviour)
+    {
+        return monoBehaviour == null;
     }
 }

@@ -1,8 +1,6 @@
-﻿using System;
-using UniInject;
+﻿using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class ShowFpsControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
@@ -98,7 +96,7 @@ public class ShowFpsControl : MonoBehaviour, INeedInjection, IInjectionFinishedL
 
             if (fpsLabel != null)
             {
-                fpsLabel.text = "FPS: " + fps;
+                fpsLabel.SetTranslatedText(Translation.Get("common_fps", "value", fps));
             }
         }
     }

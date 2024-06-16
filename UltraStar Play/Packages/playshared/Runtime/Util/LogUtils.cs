@@ -23,7 +23,7 @@ public class LogUtils
         if (logData.LastLogTimeInSeconds + periodInSeconds < Time.time)
         {
             string dataPointsCsv = string.Join(", ", logData.DataPointQueue);
-            Debug.Log($"{messagePrefix} [{dataPointsCsv}]");
+            Log.Debug(() => $"{messagePrefix} [{dataPointsCsv}]");
             logData.DataPointQueue.Clear();
             logData.LastLogTimeInSeconds = Time.time;
         }

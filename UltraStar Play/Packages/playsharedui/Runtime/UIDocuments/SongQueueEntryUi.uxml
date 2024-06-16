@@ -1,0 +1,25 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="SongSelectGameRoundPlayerEntryUi" src="project://database/Packages/playsharedui/Runtime/UIDocuments/SongQueuePlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=ccb6fef294a278444a611bf2cff48729&amp;type=3#SongQueuePlayerEntryUi" />
+    <ui:VisualElement name="songQueueEntryUiRoot" class="fontColorBorder" style="flex-direction: column; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; width: 100%;">
+        <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+            <ui:Button display-tooltip-when-elided="true" name="deleteButton" class="squareButton transparentButton" style="margin-right: 5px;">
+                <MaterialIcon tabindex="-1" icon="delete" name="deleteIcon" picking-mode="Ignore" class="noTextShadow" />
+            </ui:Button>
+            <ui:VisualElement name="songInfo" picking-mode="Ignore" style="justify-content: flex-start; flex-direction: column; align-items: flex-start; flex-grow: 1;">
+                <ui:Label text="Some very very long artist name" display-tooltip-when-elided="true" name="songArtist" picking-mode="Ignore" class="ellipsis smallerFont" style="flex-shrink: 1; white-space: normal; min-width: 33%; -unity-font-style: bold;" />
+                <ui:Label text="Some very very long song title" display-tooltip-when-elided="true" name="songTitle" picking-mode="Ignore" class="ellipsis smallerFont" style="flex-shrink: 1; white-space: normal; min-width: 33%;" />
+            </ui:VisualElement>
+            <ui:Button display-tooltip-when-elided="true" name="toggleMedleyButton" class="squareButton transparentButton" style="top: -20px; margin-left: auto; overflow: visible;">
+                <MaterialIcon tabindex="-1" name="isMedleyIcon" icon="link" picking-mode="Ignore" class="noTextShadow" />
+                <MaterialIcon tabindex="-1" name="isNoMedleyIcon" icon="link_off" picking-mode="Ignore" class="noTextShadow" style="position: absolute;" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; margin-top: 5px; align-items: center;">
+            <ui:VisualElement name="playerEntryList" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; flex-wrap: wrap;">
+                <ui:Instance template="SongSelectGameRoundPlayerEntryUi" name="SongQueuePlayerEntryUi" />
+                <ui:Instance template="SongSelectGameRoundPlayerEntryUi" name="SongQueuePlayerEntryUi" />
+            </ui:VisualElement>
+            <MaterialIcon name="songQueueEntryModifierActiveIcon" icon="videogame_asset" class="ml-1" style="font-size: 16px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

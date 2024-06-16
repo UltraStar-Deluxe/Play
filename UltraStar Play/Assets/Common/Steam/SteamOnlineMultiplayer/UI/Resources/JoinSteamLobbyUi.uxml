@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="joinSteamLobbyUiRoot" class="child-mb-2">
+        <ui:VisualElement name="row" style="flex-grow: 1; justify-content: center;" />
+        <ui:Label tabindex="-1" text="$onlineGame_lobby_list_title" name="hostedGameListTitle" class="m-1 borderBottom" style="-unity-text-align: upper-center;" />
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="hostedGameListScrollView" style="max-height: 400px;">
+            <ui:VisualElement name="hostedGameList" class="child-mb-2" style="flex-grow: 1;">
+                <ui:Button text="Join &quot;Player01&apos;s Game&quot;" parse-escape-sequences="true" display-tooltip-when-elided="true" name="joinHostedGameButton" />
+                <ui:Button text="Join &quot;Player02&apos;s Game&quot;" parse-escape-sequences="true" display-tooltip-when-elided="true" name="joinHostedGameButton" />
+            </ui:VisualElement>
+        </ui:ScrollView>
+        <ui:VisualElement name="row">
+            <ui:TextField picking-mode="Ignore" label="$onlineGame_lobby_password" name="joinHiddenGamePasswordField" style="flex-grow: 1;" />
+            <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="searchHostedGamesButton" class="squareButton comboBoxButton">
+                <MaterialIcon tabindex="-1" name="searchLobbiesIcon" icon="search" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

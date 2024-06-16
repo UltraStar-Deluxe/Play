@@ -1,5 +1,6 @@
 ﻿using System;
 using UniInject;
+using UniRx;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
@@ -29,6 +30,9 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private SongVideoPlayer songVideoPlayer;
+
     [Inject(UxmlName = R.UxmlNames.videoAreaLabel)]
     private Label videoAreaLabel;
 
@@ -54,37 +58,36 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     private Button showBackgroundButton;
 
     private bool isCanceled;
-    private float videoGapAtDragStart;
+    private double videoGapInMillisAtDragStart;
 
     private GeneralDragControl dragControl;
+    private ContextMenuControl videoImageContextMenuControl;
 
     public void OnInjectionFinished()
     {
         videoAreaLabel.HideByDisplay();
-        if (!songMeta.Video.IsNullOrEmpty())
+        if (SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl))
         {
             ShowVideoImage();
         }
-        else if (!songMeta.Cover.IsNullOrEmpty())
+        else if (SongMetaUtils.CoverResourceExists(songMeta))
         {
             ShowCoverImage();
         }
-        else if (!songMeta.Background.IsNullOrEmpty())
+        else if (SongMetaUtils.BackgroundResourceExists(songMeta))
         {
             ShowBackgroundImage();
         }
 
         // Init cover and background image
-        if (!songMeta.Background.IsNullOrEmpty())
-        {
-            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta), sprite => songBackgroundImage.style.backgroundImage = new StyleBackground(sprite));
-        }
+        UpdateCoverAndBackgroundImage();
 
-        // Init cover and background image
-        if (!songMeta.Cover.IsNullOrEmpty())
-        {
-            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta), sprite => songCoverImage.style.backgroundImage = new StyleBackground(sprite));
-        }
+        // Change cover and background via file dialog
+        RegisterCallbackToSetFilePath(songCoverImage, () => OpenDialogToSetCoverImage());
+        RegisterCallbackToSetFilePath(songBackgroundImage, () => OpenDialogToSetBackgroundImage());
+
+        // Change video via file dialog
+        RegisterCallbackToSetFilePath(noVideoImage, () => OpenDialogToSetVideo());
 
         showVideoButton.RegisterCallbackButtonTriggered(_ => ShowVideoImage());
         showBackgroundButton.RegisterCallbackButtonTriggered(_ => ShowBackgroundImage());
@@ -93,16 +96,102 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         dragControl = injector
             .WithRootVisualElement(videoImage)
             .CreateAndInject<GeneralDragControl>();
+        dragControl.EnableEndlessDrag = true;
         dragControl.AddListener(this);
 
         videoImage.RegisterCallback<PointerEnterEvent>(evt => cursorManager.SetCursorHorizontal());
         videoImage.RegisterCallback<PointerLeaveEvent>(evt => cursorManager.SetDefaultCursor());
+
+        videoImageContextMenuControl = injector
+            .WithRootVisualElement(videoImage)
+            .CreateAndInject<ContextMenuControl>();
+        videoImageContextMenuControl.FillContextMenuAction = FillVideoImageContextMenu;
+    }
+
+    private void OpenDialogToSetCoverImage()
+    {
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
+            "Select Cover Image",
+            SongMetaUtils.GetDirectoryPath(songMeta),
+            FileSystemDialogUtils.CreateExtensionFilters("Image Files", ApplicationUtils.supportedImageFiles),
+            () => songMeta.Cover,
+            newValue =>
+            {
+                songMeta.Cover = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                UpdateCoverAndBackgroundImage();
+            });
+    }
+
+    private void OpenDialogToSetBackgroundImage()
+    {
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
+            "Select Background Image",
+            SongMetaUtils.GetDirectoryPath(songMeta),
+            FileSystemDialogUtils.CreateExtensionFilters("Image Files", ApplicationUtils.supportedImageFiles),
+            () => songMeta.Background,
+            newValue =>
+            {
+                songMeta.Background = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                UpdateCoverAndBackgroundImage();
+            });
+    }
+
+    private void OpenDialogToSetVideo()
+    {
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
+            "Select Video",
+            SongMetaUtils.GetDirectoryPath(songMeta),
+            FileSystemDialogUtils.CreateExtensionFilters("Video Files", ApplicationUtils.supportedVideoFiles),
+            () => songMeta.Video,
+            newValue =>
+            {
+                songMeta.Video = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                UpdateVideo();
+                ShowVideoImage();
+            });
+    }
+
+    private void UpdateVideo()
+    {
+        songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(songMeta);
+    }
+
+    private void UpdateCoverAndBackgroundImage()
+    {
+        if (SongMetaUtils.BackgroundResourceExists(songMeta))
+        {
+            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta))
+                .Subscribe(sprite => songBackgroundImage.style.backgroundImage = new StyleBackground(sprite));
+        }
+
+        if (SongMetaUtils.CoverResourceExists(songMeta))
+        {
+            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta))
+                .Subscribe(sprite => songCoverImage.style.backgroundImage = new StyleBackground(sprite));
+        }
+    }
+
+    private void RegisterCallbackToSetFilePath(VisualElement visualElement, Action callback)
+    {
+        if (!PlatformUtils.IsStandalone)
+        {
+            return;
+        }
+
+        visualElement.RegisterCallback<PointerDownEvent>(_ => callback());
+        CursorManager.SetCursorForVisualElement(visualElement, ECursor.Hand);
+    }
+
+    private void FillVideoImageContextMenu(ContextMenuPopupControl contextMenu)
+    {
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_resetVideoGap), () => setVideoGapAction.ExecuteAndNotify(0));
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_changeVideo), () => OpenDialogToSetVideo());
     }
 
     private void ShowVideoImage()
     {
-        noVideoImage.ShowByDisplay();
-        videoImage.ShowByDisplay();
+        videoImage.SetVisibleByDisplay(SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl));
+        noVideoImage.SetVisibleByDisplay(!SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl));
         songBackgroundImage.HideByDisplay();
         songCoverImage.HideByDisplay();
     }
@@ -142,14 +231,15 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
             return;
         }
 
-        videoGapAtDragStart = songMeta.VideoGap;
+        videoGapInMillisAtDragStart = songMeta.VideoGapInMillis;
     }
 
     public void OnDrag(GeneralDragEvent dragEvent)
     {
         setVideoGapAction.Execute(GetNewVideoGap(dragEvent));
         videoAreaLabel.ShowByDisplay();
-        videoAreaLabel.text = $"VideoGap: {songMeta.VideoGap}";
+        videoAreaLabel.SetTranslatedText(Translation.Get(R.Messages.songEditor_videoArea_videoGapWithValue,
+            "value", songMeta.VideoGapInMillis));
     }
 
     public void OnEndDrag(GeneralDragEvent dragEvent)
@@ -160,11 +250,12 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private float GetNewVideoGap(GeneralDragEvent dragEvent)
     {
-        float videoGapDistance = dragEvent.ScreenCoordinateInPercent.Distance.x * 2f;
+        // Screen width corresponds to a video gap of 2 seconds.
+        float videoGapInMillisDistance = dragEvent.ScreenCoordinateInPercent.Distance.x * 2000f;
 
         // Round to 2 decimal places
-        float newVideoGap = (float)Math.Round(videoGapAtDragStart + videoGapDistance, 2);
-        return newVideoGap;
+        float newVideoGapInMillis = (int)(videoGapInMillisAtDragStart + videoGapInMillisDistance);
+        return newVideoGapInMillis;
     }
 
     public void Dispose()

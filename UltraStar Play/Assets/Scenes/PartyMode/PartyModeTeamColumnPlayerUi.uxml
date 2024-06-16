@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="teamColumnPlayerUiRoot" class="focusableNavigatorPriorityParent" style="justify-content: flex-start; align-items: center; flex-direction: row; margin-top: 5px; margin-bottom: 5px; width: 100%;">
+        <ui:Button display-tooltip-when-elided="true" name="leftButton" class="transparentButton">
+            <MaterialIcon tabindex="-1" icon="chevron_left" name="leftArrow" picking-mode="Ignore" />
+        </ui:Button>
+        <ui:Label tabindex="-1" text="Player 01" display-tooltip-when-elided="true" name="playerNameLabel" style="-unity-text-align: middle-center; min-width: 100px; display: flex; flex-grow: 1; -unity-font-style: bold;" />
+        <ui:TextField picking-mode="Ignore" value="Guest 01" name="guestNameTextField" style="min-width: 100px; flex-grow: 1;" />
+        <ui:Button display-tooltip-when-elided="true" name="deleteGuestButton" class="squareButton" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+            <MaterialIcon tabindex="-1" name="deleteIcon" icon="delete" picking-mode="Ignore" />
+        </ui:Button>
+        <ui:Button display-tooltip-when-elided="true" name="rightButton" class="transparentBackgroundColor transparentButton">
+            <MaterialIcon tabindex="-1" icon="chevron_right" name="rightArrow" picking-mode="Ignore" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

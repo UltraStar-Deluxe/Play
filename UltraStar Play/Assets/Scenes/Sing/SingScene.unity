@@ -152,13 +152,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04e8e8353cf7d75419d03321d0098a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Dare Master
-  defaultSongNamePasteBin: 'Summer Wine
+  isMedley: 0
+  playerCount: 1
+  defaultSongName: Kick Back
+  defaultSongNamePasteBin: 'Sonic Rainboom VIP
 
-    Me And My Broken Heart
+    Summer Wine
 
-    Somewhere
-    Over The Rainbow (Wonderful World)
+    Me And My Broken
+    Heart
+
+    Somewhere Over The Rainbow (Wonderful World)
 
     Marry You
 
@@ -182,13 +186,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 242235908}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 512.0799, y: 274.07208, z: -458.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &560061546
 GameObject:
@@ -231,13 +235,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 560061546}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!850595691 &657693439
 LightingSettings:
@@ -303,6 +307,74 @@ LightingSettings:
   m_PVRTiledBaking: 0
   m_NumRaysToShootPerTexel: -1
   m_RespectSceneVisibilityWhenBakingGI: 0
+--- !u!1001 &1520625103
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3481021831759652217, guid: d8bca520d744da542953fa988fbe7472,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3481021831759652217, guid: d8bca520d744da542953fa988fbe7472,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3481021831759652217, guid: d8bca520d744da542953fa988fbe7472,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3481021831759652217, guid: d8bca520d744da542953fa988fbe7472,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3481021831759652217, guid: d8bca520d744da542953fa988fbe7472,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3481021831759652217, guid: d8bca520d744da542953fa988fbe7472,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3481021831759652217, guid: d8bca520d744da542953fa988fbe7472,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3481021831759652217, guid: d8bca520d744da542953fa988fbe7472,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3481021831759652217, guid: d8bca520d744da542953fa988fbe7472,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3481021831759652217, guid: d8bca520d744da542953fa988fbe7472,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8695616358685915127, guid: d8bca520d744da542953fa988fbe7472,
+        type: 3}
+      propertyPath: m_Name
+      value: NetworkManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d8bca520d744da542953fa988fbe7472, type: 3}
 --- !u!1001 &1832391154
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -484,7 +556,7 @@ PrefabInstance:
     - target: {fileID: 6394043851129678520, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000061035156
+      value: 0.000061035156
       objectReference: {fileID: 0}
     - target: {fileID: 6602900608042437802, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
@@ -614,16 +686,46 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1084258562426466081, guid: 0f35eb07433348d4abddb4095d2d1e17,
+    - target: {fileID: 1101090804076471399, guid: 0f35eb07433348d4abddb4095d2d1e17,
         type: 3}
-      propertyPath: m_TargetCamera
-      value: 
+      propertyPath: m_RootOrder
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3706478735755504748, guid: 0f35eb07433348d4abddb4095d2d1e17,
         type: 3}
       propertyPath: m_Name
       value: SingSceneControlsContainer
       objectReference: {fileID: 0}
+    - target: {fileID: 6266340837699803124, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7215375562649057914, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: url
+      value: https://www.youtube.com/watch?v=tEOZjZZmlAI
+      objectReference: {fileID: 0}
+    - target: {fileID: 7215375562649057914, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: html
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7215375562649057914, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: videoId
+      value: https://www.youtube.com/watch?v=tEOZjZZmlAI
+      objectReference: {fileID: 0}
+    - target: {fileID: 7215375562649057914, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: videoUrl
+      value: https://www.youtube.com/watch?v=tEOZjZZmlAI
+      objectReference: {fileID: 0}
+    - target: {fileID: 7215375562649057914, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: htmlTextAsset
+      value: 
+      objectReference: {fileID: 4900000, guid: e8bd1ec1f114aec47bbe70ef7bab9aeb, type: 3}
     - target: {fileID: 7508707485095029509, guid: 0f35eb07433348d4abddb4095d2d1e17,
         type: 3}
       propertyPath: m_RootOrder
@@ -679,8 +781,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9028838522266562842, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0f35eb07433348d4abddb4095d2d1e17, type: 3}
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 1832391154}
+  - {fileID: 1520625103}
+  - {fileID: 1084258560396290233}
+  - {fileID: 560061548}
+  - {fileID: 242235910}

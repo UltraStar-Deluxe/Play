@@ -15,11 +15,12 @@ public class SongEditorActionBinder : MonoBehaviour, IBinder
         bb.BindTypeToNewInstances(typeof(MergeNotesAction));
         bb.BindTypeToNewInstances(typeof(SetNoteTypeAction));
         bb.BindTypeToNewInstances(typeof(AddNoteAction));
-        bb.BindTypeToNewInstances(typeof(MoveNoteToAjacentSentenceAction));
+        bb.BindTypeToNewInstances(typeof(MoveNoteToAdjacentSentenceAction));
         bb.BindTypeToNewInstances(typeof(MoveNotesToOtherVoiceAction));
         bb.BindTypeToNewInstances(typeof(MoveNoteToOwnSentenceAction));
         bb.BindTypeToNewInstances(typeof(MoveNotesAction));
         bb.BindTypeToNewInstances(typeof(ExtendNotesAction));
+        bb.BindTypeToNewInstances(typeof(HyphenateNotesAction));
 
         bb.BindTypeToNewInstances(typeof(ToggleNoteTypeAction));
 
@@ -28,11 +29,16 @@ public class SongEditorActionBinder : MonoBehaviour, IBinder
         bb.BindTypeToNewInstances(typeof(SentenceFitToNoteAction));
 
         bb.BindTypeToNewInstances(typeof(SetMusicGapAction));
+        bb.BindTypeToNewInstances(typeof(SetSongPropertyAction));
         bb.BindTypeToNewInstances(typeof(SetVideoGapAction));
         bb.BindTypeToNewInstances(typeof(ChangeBpmAction));
         bb.BindTypeToNewInstances(typeof(ApplyBpmAndAdjustNoteLengthAction));
         bb.BindTypeToNewInstances(typeof(ApplyBpmDontAdjustNoteLengthAction));
         bb.BindTypeToNewInstances(typeof(SpaceBetweenNotesAction));
+        bb.BindTypeToNewInstances(typeof(PitchDetectionAction));
+        bb.BindTypeToNewInstances(typeof(SpeechRecognitionAction));
+        
+        bb.BindTypeToNewInstances(typeof(SongEditorMidiFileImporter));
         return bb.GetBindings();
     }
 }

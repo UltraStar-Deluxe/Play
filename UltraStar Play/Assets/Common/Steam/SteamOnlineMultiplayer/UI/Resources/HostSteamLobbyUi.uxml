@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="hostSteamLobbyUiRoot" class="child-mb-2">
+        <ui:TextField picking-mode="Ignore" label="$onlineGame_lobby_name" name="hostGameNameField" />
+        <ui:Toggle label="$onlineGame_lobby_hidden" name="hostHiddenGameToggle" />
+        <ui:TextField picking-mode="Ignore" label="$onlineGame_lobby_password" name="hostHiddenGamePasswordField" />
+        <ui:Button text="$onlineGame_lobby_host" name="hostOnlineGameButton" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -11,6 +11,7 @@ public static class MidiUtils
     public const int SingableNoteMax = 84;
     public const int SingableNoteRange = 49;
     public const int MaxMidiNote = 127;
+    public const int NoteCountInAnOctave = 12;
 
     // Concert pitch A4 (440 Hz)
     public const int MidiNoteConcertPitch = 69;
@@ -24,6 +25,9 @@ public static class MidiUtils
     private static Dictionary<int, string> midiNoteToAbsoluteName = CreateMidiNoteToAbsoluteNameMap();
     private static readonly Dictionary<string, int> absoluteNameToMidiNote = CreateAbsoluteNameToMidiNoteMap();
 
+    private static readonly float[] singableHalftoneFrequencies = PrecalculateHalftoneFrequencies(SingableNoteMin, SingableNoteRange);
+    private static float log10Of2 = Mathf.Log10(2);
+    
     private static Dictionary<int, string> CreateMidiNoteToAbsoluteNameMap()
     {
         Dictionary<int, string> result = new();
@@ -60,7 +64,7 @@ public static class MidiUtils
 
     public static string GetRelativeName(int midiNote)
     {
-        midiNote = GetRelativePitch(midiNote);
+        midiNote = (int)GetRelativePitch(midiNote);
 
         switch (midiNote)
         {
@@ -81,47 +85,39 @@ public static class MidiUtils
         }
     }
 
-    public static int GetRelativePitch(int midiNote)
+    public static float GetRelativePitch(float midiNote)
     {
         return midiNote % 12;
     }
 
-    public static int GetRoundedMidiNote(int midiNote, int midiCents, int resolution)
+    public static float GetRelativePitchDistance(float fromMidiNote, float toMidiNote)
     {
-        int accurateMidiNote = (midiNote * 100) + midiCents;
-        int accurateRoundedMidiNote = accurateMidiNote % resolution;
-        int roundedMidiNote = accurateRoundedMidiNote / 100;
-        return roundedMidiNote;
-    }
-
-    public static int GetRelativePitchDistance(int fromMidiNote, int toMidiNote)
-    {
-        int fromRelativeMidiNote = GetRelativePitch(fromMidiNote);
-        int toRelativeMidiNote = GetRelativePitch(toMidiNote);
+        float fromRelativeMidiNote = GetRelativePitch(fromMidiNote);
+        float toRelativeMidiNote = GetRelativePitch(toMidiNote);
 
         // Distance when going from 2 to 10 via 3, 4, 5...
-        int distanceUnwrapped = Math.Abs(toRelativeMidiNote - fromRelativeMidiNote);
+        float distanceUnwrapped = Mathf.Abs(toRelativeMidiNote - fromRelativeMidiNote);
         // Distance when going from 2 to 10 via 1, 11, 10
-        int distanceWrapped = 12 - distanceUnwrapped;
+        float distanceWrapped = 12 - distanceUnwrapped;
         // Note that (distanceUnwrapped + distanceWrapped) == 12, which is going a full circle in any direction.
 
         // Distance in shortest direction is result distance
-        return Math.Min(distanceUnwrapped, distanceWrapped);
+        return Mathf.Min(distanceUnwrapped, distanceWrapped);
     }
 
-    public static int GetRelativePitchDistanceSigned(int fromMidiNote, int toMidiNote)
+    public static float GetRelativePitchDistanceSigned(int fromMidiNote, int toMidiNote)
     {
-        int toRelativeMidiNote = MidiUtils.GetRelativePitch(toMidiNote);
-        int fromRelativeMidiNote = MidiUtils.GetRelativePitch(fromMidiNote);
+        float toRelativeMidiNote = GetRelativePitch(toMidiNote);
+        float fromRelativeMidiNote = GetRelativePitch(fromMidiNote);
         // Distance when going from 2 to 10 via 3, 4, 5... -> (8)
         // Distance when going from 10 to 2 via 9, 8, 7... -> (-8)
-        int distanceUnwrapped = toRelativeMidiNote - fromRelativeMidiNote;
+        float distanceUnwrapped = toRelativeMidiNote - fromRelativeMidiNote;
         // Distance when going from 2 to 10 via 1, 0, 11, 10 -> (-4)
         // Distance when going from 10 to 2 via 11, 0, 1, 2 -> (4)
-        int distanceWrapped = distanceUnwrapped >= 0
+        float distanceWrapped = distanceUnwrapped >= 0
             ? distanceUnwrapped - 12
             : distanceUnwrapped + 12;
-        int distance = Math.Abs(distanceUnwrapped) < Math.Abs(distanceWrapped)
+        float distance = Mathf.Abs(distanceUnwrapped) < Mathf.Abs(distanceWrapped)
             ? distanceUnwrapped
             : distanceWrapped;
         return distance;
@@ -129,12 +125,12 @@ public static class MidiUtils
 
     public static bool IsBlackPianoKey(int midiNote)
     {
-        return blackKeyRelativeMidiNotes.Contains(GetRelativePitch(midiNote));
+        return blackKeyRelativeMidiNotes.Contains((int)GetRelativePitch(midiNote));
     }
 
     public static bool IsWhitePianoKey(int midiNote)
     {
-        return whiteKeyRelativeMidiNotes.Contains(GetRelativePitch(midiNote));
+        return whiteKeyRelativeMidiNotes.Contains((int)GetRelativePitch(midiNote));
     }
 
     public static float[] PrecalculateHalftoneFrequencies(int noteMin, int noteRange)
@@ -160,7 +156,7 @@ public static class MidiUtils
 
     public static int GetMidiNoteOnOctaveOfTargetMidiNote(int midiNote, int targetMidiNote)
     {
-        int relativeSignedDistance = GetRelativePitchDistanceSigned(targetMidiNote, midiNote);
+        int relativeSignedDistance = (int)GetRelativePitchDistanceSigned(targetMidiNote, midiNote);
         int midiNoteOnOctaveOfTargetNote = targetMidiNote + relativeSignedDistance;
         if (GetRelativePitch(midiNote) != GetRelativePitch(midiNoteOnOctaveOfTargetNote))
         {
@@ -190,5 +186,31 @@ public static class MidiUtils
     public static int GetMidiNotePitch(int ultraStarTxtPitch)
     {
         return ultraStarTxtPitch + 60;
+    }
+    
+    public static int GetMidiNoteForFrequency(float frequency)
+    {
+        int bestHalftoneIndex = -1;
+        float bestFrequencyDifference = float.MaxValue;
+        for (int i = 0; i < singableHalftoneFrequencies.Length; i++)
+        {
+            float frequencyDifference = Mathf.Abs(singableHalftoneFrequencies[i] - frequency);
+            if (frequencyDifference < bestFrequencyDifference)
+            {
+                bestFrequencyDifference = frequencyDifference;
+                bestHalftoneIndex = i;
+            }
+        }
+        return MidiUtils.SingableNoteMin + bestHalftoneIndex;
+    }
+    
+    public static float CalculateFrequency(int midiNote)
+    {
+        return 440 * Mathf.Pow(2, (midiNote - 69) / 12f);
+    }
+    
+    public static float CalculateMidiNote(float frequency)
+    {
+        return 12 * (Mathf.Log10(frequency / 220f) / log10Of2) + 57;
     }
 }

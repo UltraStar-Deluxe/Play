@@ -30,13 +30,13 @@ EditorBuildSettings:
     path: Assets/Scenes/Options/PlayerProfileOptions/PlayerProfileOptionsScene.unity
     guid: f509dae09ad85ac4e9c41ff79fa95d6d
   - enabled: 1
-    path: Assets/Scenes/Highscore/HighscoreScene.unity
+    path: Assets/Scenes/UnusedScenes/UnusedScene-1.unity
     guid: 4aae204a79a088d488888b1ce72c2dda
   - enabled: 1
     path: Assets/Scenes/SingingResults/SingingResultsScene.unity
     guid: 9647cd7b9dee4b44fb9a7e98c6c4b234
   - enabled: 1
-    path: Assets/Scenes/Statistics/StatisticsScene.unity
+    path: Assets/Scenes/UnusedScenes/UnusedScene-2.unity
     guid: e1ab09ef6a75a0d4c8833df9dfc6f69e
   - enabled: 1
     path: Assets/Scenes/Sing/SingScene.unity
@@ -51,13 +51,13 @@ EditorBuildSettings:
     path: Assets/Scenes/Options/RecordingOptions/RecordingOptionsScene.unity
     guid: 1d45d77c510b46a4b84e3f412e45766d
   - enabled: 1
-    path: Assets/Scenes/Options/ContentDownload/ContentDownloadScene.unity
+    path: Assets/Scenes/Options/UnusedScene/UnusedScene.unity
     guid: 10cb82cf2be19ee46b443c17c2efc000
   - enabled: 1
     path: Assets/Scenes/Options/DesignOptions/DesignOptionsScene.unity
     guid: 00e91542d7928d24b92cafbbda62b290
   - enabled: 1
-    path: Assets/Scenes/Options/NetworkOptions/NetworkOptionsScene.unity
+    path: Assets/Scenes/UnusedScenes/UnusedScene-3.unity
     guid: 2c3c687e37cd4174c99cb45b42bacc69
   - enabled: 1
     path: Assets/Scenes/Options/DevelopmentOptions/DevelopmentOptionsScene.unity
@@ -74,6 +74,18 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Options/WebcamOptions/WebcamOptionsScene.unity
     guid: 2eb5d7822501fa14c8d3a6fea4149df4
+  - enabled: 1
+    path: Assets/Scenes/PartyMode/PartyModeScene.unity
+    guid: 01b85e9ec2579374cbe4dca6e7c9ca46
+  - enabled: 1
+    path: Assets/PlayModeTests/MediaFileFormatTests/MediaFileFormatTestScene.unity
+    guid: 06c1affc9019c404d977d3d60a26fd37
+  - enabled: 1
+    path: Assets/PlayModeTests/CommonTestScene.unity
+    guid: 66fc6d4da1adfef4088faf459cb96a44
+  - enabled: 1
+    path: Assets/Scenes/Options/ModOptions/ModOptionsScene.unity
+    guid: d6bc9d8165e73974d96c7856d7de748b
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 14252c98bd239904da98289cb5928ea0,
       type: 2}

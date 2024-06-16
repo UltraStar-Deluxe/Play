@@ -7,20 +7,25 @@ public static class ByteSizeUtils
     private static readonly string[] sizeSuffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
     private const long ByteConversion = 1000;
 
-    public static string GetHumanReadableByteSize(long value)
+    public static bool TryGetHumanReadableByteSize(long value, out double size, out string unit)
     {
-        if (value < 0)
-        {
-            return "-" + GetHumanReadableByteSize(-value);
-        }
-        
         if (value == 0)
         {
-            return "0 B";
+            size = 0;
+            unit = "B";
+            return true;
+        }
+        
+        if (value < 0)
+        {
+            TryGetHumanReadableByteSize(-value, out double negatedSize, out unit);
+            size = -negatedSize;
+            return true;
         }
 
         int mag = (int)Math.Log(value, ByteConversion);
-        double adjustedSize = value / Math.Pow(1000, mag);
-        return $"{adjustedSize:n2} {sizeSuffixes[mag]}";
+        size = value / Math.Pow(1000, mag);
+        unit = sizeSuffixes[mag];
+        return true;
     }
 }

@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="modInfoDialogUiRoot">
+        <ui:Label tabindex="-1" text="Lorem ipsum dolor met" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modDescriptionLabel" class="wordWrap mb-3" />
+        <ui:VisualElement name="modInfoBottomContainer" class="child-mb-2" style="flex-grow: 1;">
+            <ui:Label tabindex="-1" text="Version: x.y.z" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modVersionLabel" />
+            <ui:Label tabindex="-1" text="Website: example.com" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modWebsiteLabel" />
+            <ui:Label tabindex="-1" text="Authors: a, b, c" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modAuthorsLabel" />
+        </ui:VisualElement>
+        <AccordionItem name="modDependenciesAccordionItem" label="Requires" style="display: none;">
+            <ui:VisualElement name="modDependenciesContainer" class="child-mb-2" style="flex-grow: 1;">
+                <ui:Label tabindex="-1" text="UnityEngine.AudioModule" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modDependencyLabel" />
+                <ui:Label tabindex="-1" text="UnityEngine.AudioModule" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modDependencyLabel" />
+                <ui:Label tabindex="-1" text="UnityEngine.AudioModule" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modDependencyLabel" />
+                <ui:Label tabindex="-1" text="UnityEngine.AudioModule" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modDependencyLabel" />
+                <ui:Label tabindex="-1" text="UnityEngine.AudioModule" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modDependencyLabel" />
+            </ui:VisualElement>
+        </AccordionItem>
+    </ui:VisualElement>
+</ui:UXML>

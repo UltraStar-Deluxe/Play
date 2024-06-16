@@ -29,7 +29,7 @@ public class EditorIssueDisplayer : MonoBehaviour, INeedInjection, IInjectionFin
     private VisualElement noteAreaIssues;
 
     private ViewportEvent lastViewportEvent;
-    private float lastSongMetaBpm;
+    private double lastSongMetaBpm;
 
     private IReadOnlyCollection<SongIssue> lastIssues;
 
@@ -44,9 +44,9 @@ public class EditorIssueDisplayer : MonoBehaviour, INeedInjection, IInjectionFin
         if (lastViewportEvent == null
             || lastViewportEvent.X != viewportEvent.X
             || lastViewportEvent.Width != viewportEvent.Width
-            || !songMeta.Bpm.NearlyEquals(lastSongMetaBpm, 0.01f))
+            || !songMeta.BeatsPerMinute.Equals(lastSongMetaBpm, 0.01f))
         {
-            lastSongMetaBpm = songMeta.Bpm;
+            lastSongMetaBpm = songMeta.BeatsPerMinute;
             DrawIssues(lastIssues);
         }
         lastViewportEvent = viewportEvent;

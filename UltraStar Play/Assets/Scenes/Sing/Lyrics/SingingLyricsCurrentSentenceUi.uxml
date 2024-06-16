@@ -1,11 +1,22 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Packages/playsharedui/Runtime/StyleSheets/CommonStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#CommonStyles" />
-    <ui:VisualElement name="currentSentenceContainer" style="flex-direction: row; width: 100%; align-items: center; justify-content: center;">
+    <ui:VisualElement name="currentSentenceContainer" class="singingLyricsSentenceUi" style="flex-direction: row; width: 100%; align-items: center; justify-content: center;">
         <MaterialIcon icon="forward" name="positionBeforeLyricsIndicator" />
-        <ui:Label text="Lo" display-tooltip-when-elided="true" name="lo" class="currentLyrics singingLyrics previousNoteLyrics" />
-        <ui:Label text="rem" display-tooltip-when-elided="true" name="rem" class="currentLyrics singingLyrics previousNoteLyrics" />
-        <ui:Label text=" " display-tooltip-when-elided="true" name="space" class="currentLyrics singingLyrics previousNoteLyrics" style="width: 10px;" />
-        <ui:Label text="ip" display-tooltip-when-elided="true" name="ip" class="currentLyrics singingLyrics currentNoteLyrics" />
-        <ui:Label text="sum" display-tooltip-when-elided="true" name="sum" class="currentLyrics singingLyrics" />
+        <ui:VisualElement name="centerContainer" style="max-width: 100%; justify-content: center;">
+            <ui:VisualElement name="plainLabelContainer" style="flex-direction: row; max-width: 100%; align-items: center; flex-shrink: 0;">
+                <ui:Label text="Lo" display-tooltip-when-elided="true" name="lo" class="currentLyrics singingLyrics" />
+                <ui:Label text="rem" display-tooltip-when-elided="true" name="rem" class="currentLyrics singingLyrics" />
+                <ui:Label text=" " display-tooltip-when-elided="true" name="space" class="currentLyrics singingLyrics singingLyricsSpace" />
+                <ui:Label text="ip" display-tooltip-when-elided="true" name="ip" class="currentLyrics singingLyrics" />
+                <ui:Label text="sum" display-tooltip-when-elided="true" name="sum" class="currentLyrics singingLyrics" />
+            </ui:VisualElement>
+            <ui:VisualElement name="highlightLabelContainer" style="position: absolute; overflow: hidden; flex-direction: row; width: 124px; max-width: 100%; align-items: center; flex-shrink: 0;">
+                <ui:Label text="Lo" display-tooltip-when-elided="true" name="lo" class="currentLyrics singingLyrics previousNoteLyrics" />
+                <ui:Label text="rem" display-tooltip-when-elided="true" name="rem" class="currentLyrics singingLyrics previousNoteLyrics" />
+                <ui:Label text=" " display-tooltip-when-elided="true" name="space" class="currentLyrics singingLyrics previousNoteLyrics singingLyricsSpace" />
+                <ui:Label text="ip" display-tooltip-when-elided="true" name="ip" class="currentLyrics singingLyrics currentNoteLyrics" />
+                <ui:Label text="sum" display-tooltip-when-elided="true" name="sum" class="currentLyrics singingLyrics previousNoteLyrics" />
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

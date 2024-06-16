@@ -1,5 +1,4 @@
 ﻿using UniInject;
-using UniRx;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -14,9 +13,6 @@ public class SongEditorMicPitchIndicatorControl : INeedInjection, IInjectionFini
     private VisualElement micPitchOutOfRangeIndicatorBottom;
 
     [Inject]
-    private SongEditorMicPitchTracker micPitchTracker;
-
-    [Inject]
     private Settings settings;
 
     [Inject]
@@ -26,18 +22,5 @@ public class SongEditorMicPitchIndicatorControl : INeedInjection, IInjectionFini
     {
         micPitchOutOfRangeIndicatorTop.HideByDisplay();
         micPitchOutOfRangeIndicatorBottom.HideByDisplay();
-
-        micPitchTracker.PitchEventStream.Subscribe(pitchEvent =>
-        {
-            if (pitchEvent == null)
-            {
-                micPitchOutOfRangeIndicatorTop.HideByDisplay();
-                micPitchOutOfRangeIndicatorBottom.HideByDisplay();
-                return;
-            }
-
-            micPitchOutOfRangeIndicatorTop.SetVisibleByDisplay(pitchEvent.MidiNote > noteAreaControl.MaxMidiNoteInCurrentViewport);
-            micPitchOutOfRangeIndicatorBottom.SetVisibleByDisplay(pitchEvent.MidiNote < noteAreaControl.MinMidiNoteInCurrentViewport);
-        });
     }
 }

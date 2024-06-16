@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="teamUiRoot" class="mt-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center;">
+        <ui:VisualElement name="labelContainer" style="flex-grow: 1; flex-direction: row; border-top-left-radius: 12px; border-top-right-radius: 12px; padding-left: 20px; padding-right: 20px; padding-top: 5px; padding-bottom: 10px; align-items: flex-end; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+            <ui:Label tabindex="-1" text="Team 01, Team 02, Team 03, Team 04, Team 05" display-tooltip-when-elided="true" name="teamNameLabel" class="ellipsis teamResultLabel noBackgroundInHierarchy" style="margin-right: 20px; flex-shrink: 1; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-SemiBold%20SDF.asset?fileID=11400000&amp;guid=6cb258cf0288ca64ab8adfdbedfa429b&amp;type=2#Inter-SemiBold SDF&apos;);" />
+            <ui:VisualElement name="spacer" style="flex-grow: 1; width: 20px; height: 100%; flex-shrink: 0;" />
+            <ui:Label tabindex="-1" text="99" display-tooltip-when-elided="true" name="teamScoreLabel" class="teamResultLabel noBackgroundInHierarchy" style="-unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-SemiBold%20SDF.asset?fileID=11400000&amp;guid=6cb258cf0288ca64ab8adfdbedfa429b&amp;type=2#Inter-SemiBold SDF&apos;);" />
+        </ui:VisualElement>
+        <ui:VisualElement name="knockOutLabelOverlay" class="overlay" style="background-color: rgba(0, 0, 0, 0); display: flex;">
+            <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="knockOutLabel" text="K.O." class="textShadow ignoreTheme" style="-unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;);" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

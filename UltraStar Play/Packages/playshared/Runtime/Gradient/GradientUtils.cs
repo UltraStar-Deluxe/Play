@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public static class TextureUtils
+public static class GradientUtils
 {
     /**
      * Creates a small texture to be filled with a gradient.
@@ -24,7 +23,7 @@ public static class TextureUtils
         Vector2 textureSize = new(texture2D.width, texture2D.height);
         Vector2 centerPos = textureSize * 0.5f;
         Rect textureRect = new(0, 0, texture2D.width, texture2D.height);
-        
+
         // To be more similar to CSS background linear-gradient, rotate given angle.
         // See https://www.w3schools.com/css/tryit.asp?filename=trycss3_gradient-linear_angles
         float angleRadians = Mathf.Deg2Rad * (-angleDegrees + 90);
@@ -35,10 +34,10 @@ public static class TextureUtils
 
         Vector2 positionOutsideTextureInOppositeDirection = centerPos + (direction * textureSize * 2);
         LineUtils.TryGetIntersection(centerPos, positionOutsideTextureInOppositeDirection, textureRect, out Vector2 endPos);
-        
+
         FillTextureWithGradient(texture2D, startColor, endColor, startPos, endPos);
     }
-    
+
     // See StackOverflow: https://stackoverflow.com/questions/521493/creating-a-linear-gradient-in-2d-array
     // Answer: https://stackoverflow.com/a/528001/4412885
     public static void FillTextureWithGradient(
@@ -69,7 +68,7 @@ public static class TextureUtils
                 : 0.0f;
             return Color.Lerp(startColor, endColor, mag);
         }
-    
+
         for (int y = 0; y < texture2D.height; y++)
         {
             for (int x = 0; x < texture2D.width; x++)

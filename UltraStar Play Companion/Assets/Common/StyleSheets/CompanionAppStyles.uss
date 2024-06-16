@@ -1,0 +1,49 @@
+#menuOverlay {
+    position: absolute;
+    transition: left 0.5s;
+}
+
+.unity-toggle__label {
+    flex-shrink: 0;
+    margin-right: auto;
+}
+
+.overlayBackground {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.stopRecordingButton {
+    background-color: #dc3545;
+}
+
+.stopRecordingButton:hover {
+    background-color: #F2452E;
+}
+
+.stopRecordingButton:focus {
+    background-color: #F2452E;
+}
+
+.stopRecordingButton:focus:enabled {
+    background-color: #F2452E;
+}
+
+#background {
+    background-image: url('project://database/Assets/Common/Graphics/Backgrounds/CompanionAppBg.jpg');
+}
+
+#songListEntryButton {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#songListEntryLabel {
+    white-space: normal;
+    -unity-text-align: middle-left;
+}
+
+.gameRoundModifierToggle{
+    margin-bottom: 8px;
+}

@@ -1,0 +1,7 @@
+﻿{
+    "parentTheme": "base_theme",
+
+    "staticBackground": {
+        "imagePath": "some/path_relative_to/theme_in_other_folder.png"
+    }
+}

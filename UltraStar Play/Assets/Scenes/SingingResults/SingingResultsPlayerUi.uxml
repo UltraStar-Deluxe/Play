@@ -4,28 +4,35 @@
             <ui:VisualElement name="topContainer" style="flex-grow: 1; align-items: center;">
                 <ui:VisualElement name="playerInfoContainer" style="justify-content: center; align-items: center; flex-grow: 1; width: 100%; min-height: 50%;">
                     <AspectRatioPanel aspect-ratio-x="1" aspect-ratio-y="1" style="flex-grow: 1; align-items: center; justify-content: center; height: 100%; width: 100%;">
-                        <RadialProgressBar progress="80" name="playerScoreProgressBar" show-label="false" class="overlay singingResults" style="width: 100%; height: 100%;" />
-                        <ui:VisualElement name="playerImage" class="circle" style="background-image: url(&apos;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&apos;); align-items: center; -unity-background-scale-mode: scale-to-fit; width: 80%; height: 80%;" />
+                        <RadialProgressBar progress="80" name="playerScoreProgressBar" show-label="false" class="overlay singingResults" />
+                        <ui:VisualElement name="playerImage" class="circle singingResults" style="background-image: url(&quot;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&quot;); -unity-background-scale-mode: scale-to-fit;" />
+                        <RadialChildLayouter name="starIcons" angle-offset="20" angle-high-value="180" class="overlay" style="background-color: rgba(0, 0, 0, 0); display: none;">
+                            <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" style="font-size: 14px;" />
+                            <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" style="font-size: 14px;" />
+                            <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" style="font-size: 14px;" />
+                            <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" style="font-size: 14px;" />
+                            <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" style="font-size: 14px;" />
+                        </RadialChildLayouter>
                         <ui:VisualElement picking-mode="Ignore" name="ratingIconAndText" style="position: absolute; height: 100%; left: 50%; bottom: 33%; width: 100%; align-items: center;">
-                            <ui:Label text="Tone Deaf" display-tooltip-when-elided="true" name="ratingLabel" picking-mode="Ignore" style="-unity-text-align: upper-center;" />
-                            <ui:VisualElement name="ratingImage" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ScoreRatingIcons/[score]rating_0.png?fileID=21300000&amp;guid=5deb6694a398abc4ab780d5d83778900&amp;type=3#[score]rating_0&apos;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; width: 50%; height: 50%;" />
+                            <ui:Label text="Tone Deaf" display-tooltip-when-elided="true" name="ratingLabel" picking-mode="Ignore" class="smallFont secondaryFontColor textShadowThemed" style="-unity-text-align: upper-center;" />
+                            <ui:VisualElement name="ratingImage" picking-mode="Ignore" style="background-image: url(&quot;project://database/Assets/Common/Graphics/Icons/ScoreRatingIcons/[score]rating_0.png?fileID=21300000&amp;guid=5deb6694a398abc4ab780d5d83778900&amp;type=3#[score]rating_0&quot;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; width: 50%; height: 50%;" />
                         </ui:VisualElement>
                     </AspectRatioPanel>
                 </ui:VisualElement>
                 <ui:VisualElement name="playerNameAndTotalScoreContainer" style="background-color: rgba(0, 0, 0, 0);">
-                    <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" picking-mode="Ignore" style="-unity-text-align: upper-center;" />
-                    <ui:Label text="99999" display-tooltip-when-elided="true" name="totalScoreLabel" picking-mode="Ignore" class="largerFont" style="-unity-text-align: upper-center; -unity-font-style: bold; min-width: 85px;" />
+                    <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
+                    <ui:Label text="99999" display-tooltip-when-elided="true" name="totalScoreLabel" picking-mode="Ignore" class="largerFont textShadowThemed noBackgroundInHierarchy" style="-unity-text-align: upper-center; -unity-font-style: bold; min-width: 85px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="bottomContainer" style="flex-shrink: 2;">
                 <ui:VisualElement name="singingResultsScoresContainer" picking-mode="Ignore" style="height: auto;">
-                    <ui:VisualElement name="normalNoteScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
+                    <ui:VisualElement name="normalNoteScore" picking-mode="Ignore" class="scoreRow">
                         <ui:VisualElement name="scoreIcon" picking-mode="Ignore" class="iconImage" style="align-items: center; justify-content: center;">
                             <FeatherIcon tabindex="-1" icon="music" name="musicNoteIcon" />
                         </ui:VisualElement>
-                        <ui:VisualElement name="labels" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap; padding-bottom: 2px;">
-                            <ui:Label text="Notes" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" style="height: 100%;" />
-                            <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" />
+                        <ui:VisualElement name="labels" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap; align-items: center;">
+                            <ui:Label text="$singingResultsScene_scores_notes" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" style="height: 100%;" />
+                            <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="goldenNoteScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
@@ -33,8 +40,8 @@
                             <FeatherIcon tabindex="-1" icon="music" name="musicNoteIcon" />
                         </ui:VisualElement>
                         <ui:VisualElement name="labels" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap;">
-                            <ui:Label text="Golden Notes" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" />
-                            <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" />
+                            <ui:Label text="$singingResultsScene_scores_goldenNotes" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
+                            <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="phraseBonusScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
@@ -42,16 +49,28 @@
                             <FeatherIcon tabindex="-1" icon="music" name="musicNoteIcon" />
                         </ui:VisualElement>
                         <ui:VisualElement name="labels" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap;">
-                            <ui:Label text="Phrase Bonus" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" />
-                            <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" />
+                            <ui:Label text="$singingResultsScene_scores_perfectSentencesBonus" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
+                            <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="modBonusScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
+                        <ui:VisualElement name="scoreIcon" picking-mode="Ignore" class="iconImage" style="align-items: center; justify-content: center;">
+                            <FeatherIcon tabindex="-1" icon="music" name="musicNoteIcon" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="labels" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap;">
+                            <ui:Label text="$singingResultsScene_scores_modBonus" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
+                            <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="newHighscoreContainer" style="align-items: center;">
-                        <MaterialIcon tabindex="-1" icon="star_outline" name="newHighscoreIcon" class="mr-2 ignoreTheme" style="font-size: 28px;" />
-                        <ui:Label tabindex="-1" text="New High Score" display-tooltip-when-elided="true" name="newHighscoreLabel" class="ignoreTheme" />
+                        <MaterialIcon tabindex="-1" icon="star_outline" name="newHighscoreIcon" class="mr-2 ignoreTheme" style="font-size: 22px;" />
+                        <ui:Label tabindex="-1" text="$singingResultsScene_newHighScore" display-tooltip-when-elided="true" name="newHighscoreLabel" class="ignoreTheme" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="knockOutLabelOverlay" class="overlay" style="background-color: rgba(0, 0, 0, 0); display: none;">
+            <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="knockOutLabel" text="K.O." />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
