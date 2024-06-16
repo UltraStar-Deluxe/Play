@@ -6,6 +6,7 @@ sh download-text-mesh-pro-resources.sh
 sh download-serilog.sh
 sh download-jokenizer.sh
 sh download-dynamicqueryable.sh
+sh download-spleetermsvcexe.sh
 sh download-spleetersharp.sh
 sh download-unitystandalonefilebrowser.sh
 sh download-lrcparser.sh
