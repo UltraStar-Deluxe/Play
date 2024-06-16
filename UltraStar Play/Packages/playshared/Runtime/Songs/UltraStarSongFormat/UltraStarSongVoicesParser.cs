@@ -218,7 +218,7 @@ public class UltraStarSongVoicesParser
 
     private Note CreateNote(string line)
     {
-        List<string> data = ParseNoteSegments(line);
+        List<string> data = ParseNoteSegments(line.TrimStart());
         if (data.Count < 5)
         {
             throw new UltraStarSongParserException(GetIncompleteNoteErrorMessage(line));
@@ -260,9 +260,14 @@ public class UltraStarSongVoicesParser
             return new List<string>();
         }
 
+        // NoteType is known to be exactly one character long
+        List<StringBuilder> stringBuilders = new();
+        stringBuilders.Add(new StringBuilder().Append(line[0]));
+
         StringBuilder currentStringBuilder = new StringBuilder();
-        List<StringBuilder> stringBuilders = new() { currentStringBuilder };
-        for (int i = 0; i < line.Length; i++)
+        stringBuilders.Add(currentStringBuilder);
+        // Start at index 1 because 0 was the NoteType
+        for (int i = 1; i < line.Length; i++)
         {
             char c = line[i];
             switch (c)

@@ -393,6 +393,21 @@ public abstract class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         }
     }
 
+    public override string GetVoiceDisplayName(EVoiceId voiceId)
+    {
+        LoadSongIfNotDoneYet();
+        return base.GetVoiceDisplayName(voiceId);
+    }
+
+    public override int VoiceCount
+    {
+        get
+        {
+            LoadSongIfNotDoneYet();
+            return base.VoiceCount;
+        }
+    }
+
     private bool hasSetAdditionalHeaderEntries;
     public override IReadOnlyDictionary<string, string> AdditionalHeaderEntries
     {

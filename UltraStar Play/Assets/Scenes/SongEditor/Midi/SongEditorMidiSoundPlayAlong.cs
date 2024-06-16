@@ -104,7 +104,7 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
         List<Note> allVisibleNotes = songEditorSceneControl.GetAllVisibleNotes();
         List<Note> followingNotes = allVisibleNotes
             .Where(note => note.StartBeat > currentPositionInBeats
-                           && layerManager.IsMidiSoundPlayAlongEnabled(layerManager.GetLayerOfNote(note)))
+                           && layerManager.IsMidiSoundPlayAlongEnabled(layerManager.GetLayer(note)))
             .ToList();
         if (followingNotes.IsNullOrEmpty())
         {

@@ -1,5 +1,5 @@
 {
-    "name": "Tests",
+    "name": "PlayModeTests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
@@ -10,12 +10,14 @@
         "UniRx",
         "Responsible",
         "com.achimmihca.uniinject",
+        "com.achimmihca.primeinputactions",
         "playshared",
         "playsharedui",
         "Common",
         "Scenes",
         "SongEditorScene",
-        "Unity.InputSystem.IntegrationTests"
+        "Unity.InputSystem.IntegrationTests",
+        "EditorTests"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

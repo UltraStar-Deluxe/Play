@@ -5,7 +5,7 @@ using UniInject;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MoveNoteToAjacentSentenceAction : INeedInjection
+public class MoveNoteToAdjacentSentenceAction : INeedInjection
 {
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
@@ -23,7 +23,7 @@ public class MoveNoteToAjacentSentenceAction : INeedInjection
         {
             return false;
         }
-        
+
         int minBeat = selectedNotes.Min(note => note.StartBeat);
         bool areLastInSentence = currentSentence.Notes.AllMatch(note => note.EndBeat < minBeat || selectedNotes.Contains(note));
         if (!areLastInSentence)
@@ -49,7 +49,7 @@ public class MoveNoteToAjacentSentenceAction : INeedInjection
         {
             return false;
         }
-        
+
         int maxBeat = selectedNotes.Max(note => note.EndBeat);
         bool areFirstInSentence = currentSentence.Notes.AllMatch(note => note.StartBeat > maxBeat || selectedNotes.Contains(note));
         if (!areFirstInSentence)
@@ -68,13 +68,13 @@ public class MoveNoteToAjacentSentenceAction : INeedInjection
         {
             return;
         }
-        
+
         Sentence oldSentence = notes.FirstOrDefault().Sentence;
         if (oldSentence == null)
         {
             return;
         }
-        
+
         Sentence previousSentence = SongMetaUtils.GetPreviousSentence(oldSentence);
         SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(oldSentence);
         SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(previousSentence);
@@ -103,13 +103,13 @@ public class MoveNoteToAjacentSentenceAction : INeedInjection
         {
             return;
         }
-        
+
         Sentence oldSentence = notes.FirstOrDefault().Sentence;
         if (oldSentence == null)
         {
             return;
         }
-        
+
         Sentence nextSentence = SongMetaUtils.GetNextSentence(oldSentence);
         SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(oldSentence);
         SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(nextSentence);

@@ -29,7 +29,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     private SetNoteTypeAction setNoteTypeAction;
 
     [Inject]
-    private MoveNoteToAjacentSentenceAction moveNoteToAdjacentSentenceAction;
+    private MoveNoteToAdjacentSentenceAction moveNoteToAdjacentSentenceAction;
 
     [Inject]
     private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;

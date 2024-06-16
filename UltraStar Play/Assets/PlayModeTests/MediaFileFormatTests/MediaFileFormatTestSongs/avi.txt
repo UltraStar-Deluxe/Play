@@ -1,0 +1,10 @@
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
+#MP3:avi.avi
+#VIDEO:avi.avi
+#BPM:200
+- 0
+: 4 3 9 Hel
+: 8 3 9  lo
+: 12 3 9  world!
+E

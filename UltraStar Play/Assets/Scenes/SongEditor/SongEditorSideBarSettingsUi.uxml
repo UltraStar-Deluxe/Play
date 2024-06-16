@@ -16,6 +16,8 @@
             <ui:Slider picking-mode="Ignore" value="42" high-value="1.5" name="musicPlaybackSpeedSlider" low-value="0.5" label="$songEditor_options_playbackSpeed" style="flex-direction: column;" />
             <ui:Button text="$songEditor_options_playbackSpeed_reset" display-tooltip-when-elided="true" name="resetMusicPlaybackSpeedButton" />
             <Chooser name="playbackAudioChooser" no-previous-button="true" wrapAround="true" label="$songEditor_options_playbackAudio" class="controlWithLabelVertical" />
+            <ui:IntegerField picking-mode="Ignore" value="100" text="300" name="playbackPreBeginTimeInMillisTextField" label="$songEditor_options_playbackPreBegin_duration" is-delayed="true" style="flex-direction: column;" />
+            <ui:IntegerField picking-mode="Ignore" value="100" text="300" name="playbackPostEndTimeInMillisTextField" label="$songEditor_options_playbackPostEnd_duration" is-delayed="true" style="flex-direction: column;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="micRecordingGroup" label="$songEditor_options_microphone_title">
             <Chooser no-previous-button="true" name="micDeviceChooser" wrap-around="true" label="$songEditor_options_microphone" class="controlWithLabelVertical mb-2" style="flex-direction: column;" />

@@ -9,7 +9,7 @@ public class ComputeSongIdTest
     [Test]
     public void ScoreRelevantSongHashDidNotChange()
     {
-        string originalFilePath = $"{folderPath}/ScoreRelevantSongHash-TestSong.txt";
+        string originalFilePath = $"{folderPath}/ScoreRelevantSongHash.txt";
         UltraStarSongMeta songMeta = LoadSong(originalFilePath);
         string computeScoreRelevantSongHash = SongMetaUtils.ComputeScoreRelevantSongHash(songMeta);
 

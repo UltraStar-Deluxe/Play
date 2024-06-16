@@ -401,7 +401,7 @@ public static class MidiToSongMetaUtils
 
         noteGroups.ForEach(notesGroup =>
         {
-            MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, notesGroup, voiceId, false);
+            MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, notesGroup, voiceId);
         });
     }
 

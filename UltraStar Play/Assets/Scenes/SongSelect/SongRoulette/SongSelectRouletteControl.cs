@@ -82,6 +82,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     private readonly Subject<SongSelectEntryControl> createdSongSelectEntryControlEventStream = new();
     public IObservable<SongSelectEntryControl> CreatedSongSelectEntryControlEventStream => createdSongSelectEntryControlEventStream;
+    public IReadOnlyList<SongSelectSongEntry> SongEntries => entries.OfType<SongSelectSongEntry>().ToList();
 
     private bool isInitialized;
 

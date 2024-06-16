@@ -137,41 +137,51 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         Debug.Log($"Scanning playlists in folder '{folder}'");
         using DisposableStopwatch d2 = new($"Scanning playlists in folder '{folder}' took <ms> ms");
 
-        ScanUltraStarPlaylistsInFolder(folder);
-        ScanM3UPlaylistsInFolder(folder);
+        await ScanUltraStarPlaylistsInFolder(folder);
+        await ScanM3UPlaylistsInFolder(folder);
     }
 
-    private void ScanM3UPlaylistsInFolder(string folder)
+    private async Task ScanM3UPlaylistsInFolder(string folder)
     {
         FileScanner scanner = new($"*.{ApplicationUtils.m3uPlaylistFileExtension}", true, true);
         List<string> playlistFilePaths = scanner.GetFiles(folder, true);
         foreach (string filePath in playlistFilePaths)
         {
-            M3UPlaylist playlist = M3UPlaylistParser.ParseFile(filePath);
-            AddPlaylist(playlist, filePath);
+            try
+            {
+                M3UPlaylist playlist = M3UPlaylistParser.ParseFile(filePath);
+                AddPlaylist(playlist, filePath);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to scan playlist '{filePath}': {ex.Message}");
+            }
         }
     }
 
-    private void ScanUltraStarPlaylistsInFolder(string folder)
+    private async Task ScanUltraStarPlaylistsInFolder(string folder)
     {
         string ultraStarPlaylistFileExtensionPattern = $"*.{ApplicationUtils.ultraStarPlaylistFileExtension}";
         FileScanner scanner = new(ultraStarPlaylistFileExtensionPattern, true, true);
         List<string> playlistFilePaths = scanner.GetFiles(folder, true);
         foreach (string filePath in playlistFilePaths)
         {
-            UltraStarPlaylist playlist = UltraStarPlaylistParser.ParseFile(filePath);
-            AddPlaylist(playlist, filePath);
+            try
+            {
+                UltraStarPlaylist playlist = UltraStarPlaylistParser.ParseFile(filePath);
+                AddPlaylist(playlist, filePath);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to scan playlist '{filePath}': {ex.Message}");
+            }
         }
     }
 
     private void AddPlaylist(IPlaylist playlist, string filePath)
     {
-        if (!File.Exists(filePath))
-        {
-            Debug.LogError($"Cannot add playlist because its file does not exist: '{filePath}'");
-            return;
-        }
-
         playlists.Add(playlist);
 
         if (playlist is UltraStarPlaylist
@@ -347,7 +357,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
         // Create playlist file
         File.WriteAllText(newPlaylistPath, "# UltraStar playlist");
-        FileUtils.SleepUntilFileExists(newPlaylistPath, 100);
+        FileUtils.SleepUntilFileExists(newPlaylistPath, 500);
 
         // Create playlist object
         UltraStarPlaylist newPlaylist = new(newPlaylistPath);
@@ -375,6 +385,11 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         return newPlaylistName;
+    }
+
+    public bool HasPlaylist(string playlistName)
+    {
+        return GetPlaylistByName(playlistName) != null;
     }
 
     public bool HasSongEntry(IPlaylist playlist, SongMeta songMeta)

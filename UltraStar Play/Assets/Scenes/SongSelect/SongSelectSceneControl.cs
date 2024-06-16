@@ -312,7 +312,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         songSelectSceneInputControl.FuzzySearchText
             .Subscribe(newValue => fuzzySearchTextLabel.SetTranslatedText(Translation.Of(newValue)));
 
-        songRouletteControl.SubmitEventStream.Subscribe(_ => AttemptStartSelectedEntry());
+        songRouletteControl.SubmitEventStream.Subscribe(_ => OnSubmitSongRoulette());
         songRouletteControl.Focus();
 
         quitSceneButton.RegisterCallbackButtonTriggered(_ => QuitSongSelect());
@@ -1519,7 +1519,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
     }
 
-    public void OnSubmitSearch()
+    private void OnSubmitSongRoulette()
+    {
+        AttemptStartSelectedEntry();
+    }
+
+    private void OnSubmitSearch()
     {
         // Continue browsing songs from the currently selected entry.
         selectedEntryBeforeSearch = songRouletteControl.SelectedEntry;

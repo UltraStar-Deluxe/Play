@@ -602,6 +602,8 @@ public static partial class R
         public static readonly string songEditor_options_pitchDetection_title = "songEditor_options_pitchDetection_title";
         public static readonly string songEditor_options_playback_title = "songEditor_options_playback_title";
         public static readonly string songEditor_options_playbackAudio = "songEditor_options_playbackAudio";
+        public static readonly string songEditor_options_playbackPostEnd_duration = "songEditor_options_playbackPostEnd_duration";
+        public static readonly string songEditor_options_playbackPreBegin_duration = "songEditor_options_playbackPreBegin_duration";
         public static readonly string songEditor_options_playbackSpeed = "songEditor_options_playbackSpeed";
         public static readonly string songEditor_options_playbackSpeed_reset = "songEditor_options_playbackSpeed_reset";
         public static readonly string songEditor_options_sentenceLineSize = "songEditor_options_sentenceLineSize";

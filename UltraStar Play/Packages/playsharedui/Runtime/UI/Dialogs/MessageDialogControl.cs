@@ -70,7 +70,13 @@ public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinish
 
     public Button AddButton(Translation text, EventCallback<EventBase> callback)
     {
+        return AddButton(text, "", callback);
+    }
+
+    public Button AddButton(Translation text, string name, EventCallback<EventBase> callback)
+    {
         Button button = new();
+        button.name = name;
 
         button.SetTranslatedText(text);
         button.RegisterCallbackButtonTriggered(callback);

@@ -318,20 +318,22 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         positionInMillisWhenPlaybackStarted = positionInMillis;
     }
 
+    public List<Note> GetAllNotes()
+    {
+        return SongMeta.Voices
+                // Second voice is drawn on top of first voice. Thus, start with second voice.
+                .Reverse()
+                .SelectMany(voice => voice.Sentences)
+                .SelectMany(sentence => sentence.Notes)
+                .Union(songEditorLayerManager.GetAllEnumLayerNotes())
+                .ToList();
+    }
+
     public List<Note> GetAllVisibleNotes()
     {
-        List<Note> result = new();
-        List<Note> notesInVoices = SongMeta.Voices
-            // Second voice is drawn on top of first voice. Thus, start with second voice.
-            .Reverse()
-            .SelectMany(voice => voice.Sentences)
-            .SelectMany(sentence => sentence.Notes)
-            .Where(note => songEditorLayerManager.IsNoteVisible(note))
-            .ToList();
-        List<Note> notesInLayers = songEditorLayerManager.GetAllEnumLayerNotes();
-        result.AddRange(notesInLayers);
-        result.AddRange(notesInVoices);
-        return result;
+        return GetAllNotes()
+                .Where(note => songEditorLayerManager.IsNoteVisible(note))
+                .ToList();
     }
 
     private void DoAutoSaveIfEnabled()
