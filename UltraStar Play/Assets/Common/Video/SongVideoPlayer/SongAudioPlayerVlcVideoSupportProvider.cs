@@ -7,11 +7,21 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
+    private MediaPlayer SongAudioPlayerVlcMediaPlayer
+    {
+        get
+        {
+            return songAudioPlayer.CurrentAudioSupportProvider is VlcAudioSupportProvider vlcAudioSupportProvider
+                ? vlcAudioSupportProvider.VlcMediaPlayer
+                : null;
+        }
+    }
+
     public override bool IsSupported(string videoUri, bool videoEqualsAudio)
     {
         return base.IsSupported(videoUri, videoEqualsAudio)
             && videoEqualsAudio
-            && songAudioPlayer.VlcMediaPlayer != null;
+            && SongAudioPlayerVlcMediaPlayer != null;
     }
 
     public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
@@ -19,12 +29,12 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
         return Observable.Create<VideoLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => songAudioPlayer.VlcMediaPlayer != null
-                      && songAudioPlayer.VlcMediaPlayer.Media != null
-                      && songAudioPlayer.VlcMediaPlayer.Media.Duration > 0,
+                () => SongAudioPlayerVlcMediaPlayer != null
+                      && SongAudioPlayerVlcMediaPlayer.Media != null
+                      && SongAudioPlayerVlcMediaPlayer.Media.Duration > 0,
                 () =>
                 {
-                    mediaPlayer = songAudioPlayer.VlcMediaPlayer;
+                    mediaPlayer = SongAudioPlayerVlcMediaPlayer;
                     o.OnNext(new VideoLoadedEvent(videoUri));
                 }));
             return Disposable.Empty;
