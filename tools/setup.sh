@@ -17,3 +17,4 @@ cd "$old_dir"
 
 echo "Create empty VERSION.txt file if it does not exist"
 touch "../UltraStar Play/Assets/VERSION.txt"
+touch "../UltraStar Play Companion/Assets/VERSION.txt"

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using OneJS.CustomStyleSheets;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -341,7 +340,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             uiDocument.rootVisualElement.styleSheets.Remove(styleSheet);
 
             string styleSheetContent = File.ReadAllText(styleSheetFile);
-            new CustomStyleSheetImporterImpl().BuildStyleSheet(styleSheet, styleSheetContent);
+            StyleSheetUtils.BuildStyleSheet(styleSheet, styleSheetContent);
 
             if (wasAdded)
             {

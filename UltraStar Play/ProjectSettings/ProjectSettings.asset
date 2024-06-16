@@ -822,7 +822,7 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   scriptingDefineSymbols:
     Android: OS_MUTEX;VUPLEX_STANDALONE
-    Standalone: OS_MUTEX;VUPLEX_STANDALONE
+    Standalone: OS_MUTEX;VUPLEX_STANDALONE;HAS_ONEJS;HAS_VUPLEX_WEBVIEW;HAS_VLCUNITY
     WebGL: OS_MUTEX
     iPhone: OS_MUTEX
   additionalCompilerArguments: {}
