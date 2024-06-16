@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if HAS_VLC_UNITY
+#else
+
+using System;
 
 namespace LibVLCSharp
 {
@@ -13,3 +16,5 @@ namespace LibVLCSharp
         }
     }
 }
+
+#endif

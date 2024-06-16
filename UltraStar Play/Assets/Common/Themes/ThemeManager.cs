@@ -340,7 +340,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             uiDocument.rootVisualElement.styleSheets.Remove(styleSheet);
 
             string styleSheetContent = File.ReadAllText(styleSheetFile);
-            StyleSheetUtils.CreateStyleSheet(styleSheet, styleSheetContent);
+            StyleSheetUtils.BuildStyleSheet(styleSheet, styleSheetContent);
 
             if (wasAdded)
             {

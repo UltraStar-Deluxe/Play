@@ -1,4 +1,7 @@
-﻿namespace LibVLCSharp
+﻿#if HAS_VLC_UNITY
+#else
+
+namespace LibVLCSharp
 {
     public static class Core
     {
@@ -8,3 +11,5 @@
         }
     }
 }
+
+#endif
