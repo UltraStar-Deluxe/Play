@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LibVLCSharp;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -207,16 +206,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
             {
                 ffmpegAudioSupportProvider.FfmpegRenderTexture = value;
             }
-        }
-    }
-
-    public MediaPlayer VlcMediaPlayer
-    {
-        get
-        {
-            return currentAudioSupportProvider is VlcAudioSupportProvider vlcAudioSupportProvider
-                ? vlcAudioSupportProvider.VlcMediaPlayer
-                : null;
         }
     }
 

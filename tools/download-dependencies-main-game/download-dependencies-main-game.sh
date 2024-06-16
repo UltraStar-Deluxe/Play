@@ -6,12 +6,10 @@ sh download-text-mesh-pro-resources.sh
 sh download-serilog.sh
 sh download-jokenizer.sh
 sh download-dynamicqueryable.sh
-sh download-spleetermsvcexe.sh
 sh download-spleetersharp.sh
 sh download-unitystandalonefilebrowser.sh
 sh download-lrcparser.sh
 sh download-litenetlib.sh
 sh download-nhyphenator.sh
-sh download-third-party-assets.sh
 sh download-jsonnet-contractresolvers.sh
 

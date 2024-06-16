@@ -10,10 +10,13 @@ public static class StyleSheetUtils
         return CreateStyleSheet(styleSheetContent);
     }
 
+    public static StyleSheet CreateStyleSheet(StyleSheet styleSheet, string styleSheetContent)
+    {
+        return new CustomStyleSheetImporterImpl().BuildStyleSheet(styleSheet, styleSheetContent);
+    }
+
     public static StyleSheet CreateStyleSheet(string styleSheetContent)
     {
-        StyleSheet styleSheet = new();
-        new CustomStyleSheetImporterImpl().BuildStyleSheet(styleSheet, styleSheetContent);
-        return styleSheet;
+        return CreateStyleSheet(new StyleSheet(), styleSheetContent);
     }
 }
