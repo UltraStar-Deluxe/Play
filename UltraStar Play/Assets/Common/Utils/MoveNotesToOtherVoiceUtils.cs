@@ -7,8 +7,7 @@ public static class MoveNotesToOtherVoiceUtils
     public static MoveNotesToVoiceResult MoveNotesToVoice(
         SongMeta songMeta,
         List<Note> selectedNotes,
-        EVoiceId voiceId,
-        bool preventMergingIntoSingleWord)
+        EVoiceId voiceId)
     {
         Voice targetVoice = SongMetaUtils.GetOrCreateVoice(songMeta, voiceId);
         List<Sentence> changedSentences = new();
@@ -23,12 +22,6 @@ public static class MoveNotesToOtherVoiceUtils
         selectedNotes.Sort(Note.comparerByStartBeat);
         selectedNotes.ForEach(note =>
         {
-            // Prevent notes from merging into a single word
-            if (preventMergingIntoSingleWord)
-            {
-                SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(note);
-            }
-
             Sentence oldSentence = note.Sentence;
 
             // Find or create a sentence in the target voice for the note
@@ -74,12 +67,6 @@ public static class MoveNotesToOtherVoiceUtils
                 createdSentencesWithRange.Add(new SentenceWithRange(createdSentence, newSentenceFromBeat, newSentenceUntilBeat));
 
                 targetSentence = createdSentence;
-            }
-
-            // Prevent notes from merging into a single word
-            if (preventMergingIntoSingleWord)
-            {
-                SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(targetSentence.Notes.LastOrDefault());
             }
 
             targetSentence.AddNote(note);

@@ -755,14 +755,12 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (!applyThemeSpecificStyles
             // Settings can be null when running a specific scene in the Unity editor
             // and injection did not finish yet.
-            || settings == null
-            || alreadyProcessedVisualElements.Contains(root))
+            || settings == null)
         {
             return;
         }
-        alreadyProcessedVisualElements.Add(root);
 
-        // using DisposableStopwatch d = new($"Apply styles to '{root.name}' in frame {Time.frameCount}");
+        // using DisposableStopwatch d = new($"Apply styles to '{root.name}' in frame {Time.frameCount}", ELogEventLevel.Verbose);
 
         if (!settings.EnableDynamicThemes)
         {

@@ -46,7 +46,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
     private MicSampleRecorderManager micSampleRecorderManager;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
@@ -418,7 +418,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         bool shouldBeRecoding = nonPersistentSettings.IsSongEditorRecordingEnabled.Value
                                 && songAudioPlayer.IsPlaying
                                 && settings.SongEditorSettings.MicProfile != null
-                                && settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager);
+                                && settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideCompanionClientManager);
 
         if (!shouldBeRecoding && MicSampleRecorder.IsRecording.Value)
         {

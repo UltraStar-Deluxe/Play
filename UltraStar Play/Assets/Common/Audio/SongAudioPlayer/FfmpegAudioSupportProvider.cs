@@ -28,7 +28,7 @@ public class FfmpegAudioSupportProvider : AbstractAudioSupportProvider
         }
     }
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio)
+    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         DestroyFfmpegPlayer();
 
@@ -43,13 +43,21 @@ public class FfmpegAudioSupportProvider : AbstractAudioSupportProvider
 
         // Play to trigger loading
         ffplayCommand.Play();
+        PositionInMillis = startPositionInMillis;
 
         return Observable.Create<AudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => ffplayCommand == null || ffplayCommand.Duration > 0,
+                () => this == null || DurationInMillis > 0,
                 () =>
                 {
+                    if (this == null)
+                    {
+                        string errorMessage = $"Failed to load audio clip '{audioUri}': {nameof(FfmpegAudioSupportProvider)} has been destroyed already.";
+                        Debug.LogError(errorMessage);
+                        throw new AudioSupportProviderException(errorMessage);
+                    }
+
                     if (ffplayCommand == null)
                     {
                         o.OnError(new SongAudioPlayerException("Failed to load file with ffmpeg. FfplayCommand is null"));
@@ -146,7 +154,9 @@ public class FfmpegAudioSupportProvider : AbstractAudioSupportProvider
         set => ffplayCommand.SeekTime(value / 1000.0);
     }
 
-    public override double DurationInMillis => ffplayCommand.Duration * 1000.0;
+    public override double DurationInMillis => ffplayCommand != null
+        ? ffplayCommand.Duration * 1000.0
+        : 0;
 
     public override double VolumeFactor
     {

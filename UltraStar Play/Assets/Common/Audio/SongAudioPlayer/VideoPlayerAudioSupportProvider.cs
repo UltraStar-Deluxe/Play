@@ -26,7 +26,7 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
         videoPlayer.errorReceived -= OnVideoPlayerErrorReceived;
     }
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio)
+    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         videoPlayer.url = audioUri;
         if (videoPlayer.url.IsNullOrEmpty())
@@ -38,14 +38,24 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
 
         // Must play the video to trigger loading.
         videoPlayer.Play();
+        PositionInMillis = startPositionInMillis;
 
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
         return Observable.Create<AudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => videoPlayer.length > 0 || videoPlayerErrorMessages.Count > 0,
+                () => this == null
+                      || videoPlayer.length > 0
+                      || videoPlayerErrorMessages.Count > 0,
                 () =>
                 {
+                    if (this == null)
+                    {
+                        string errorMessage = $"Failed to load audio clip '{audioUri}': {nameof(VideoPlayerAudioSupportProvider)} has been destroyed already.";
+                        Debug.LogError(errorMessage);
+                        throw new AudioSupportProviderException(errorMessage);
+                    }
+
                     if (videoPlayerErrorMessages.Count > 0)
                     {
                         Unload();

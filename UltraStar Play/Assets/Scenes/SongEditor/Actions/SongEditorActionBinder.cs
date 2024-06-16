@@ -15,7 +15,7 @@ public class SongEditorActionBinder : MonoBehaviour, IBinder
         bb.BindTypeToNewInstances(typeof(MergeNotesAction));
         bb.BindTypeToNewInstances(typeof(SetNoteTypeAction));
         bb.BindTypeToNewInstances(typeof(AddNoteAction));
-        bb.BindTypeToNewInstances(typeof(MoveNoteToAjacentSentenceAction));
+        bb.BindTypeToNewInstances(typeof(MoveNoteToAdjacentSentenceAction));
         bb.BindTypeToNewInstances(typeof(MoveNotesToOtherVoiceAction));
         bb.BindTypeToNewInstances(typeof(MoveNoteToOwnSentenceAction));
         bb.BindTypeToNewInstances(typeof(MoveNotesAction));

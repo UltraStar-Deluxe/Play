@@ -1,11 +1,11 @@
 ﻿public class ClientConnectionChangedEvent
 {
     public bool IsConnected { get; private set; }
-    public IConnectedClientHandler ConnectedClientHandler { get; private set; }
+    public ICompanionClientHandler CompanionClientHandler { get; private set; }
 
-    public ClientConnectionChangedEvent(IConnectedClientHandler connectedClientHandler, bool isConnected)
+    public ClientConnectionChangedEvent(ICompanionClientHandler companionClientHandler, bool isConnected)
     {
-        this.ConnectedClientHandler = connectedClientHandler;
+        this.CompanionClientHandler = companionClientHandler;
         this.IsConnected = isConnected;
     }
 }

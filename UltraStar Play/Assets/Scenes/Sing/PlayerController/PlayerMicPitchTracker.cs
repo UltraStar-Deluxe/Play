@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
-using Unity.Collections;
-using Unity.Netcode;
 using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -15,7 +12,7 @@ using UnityEngine;
  * Analyzes each beat of a player in the sing scene.
  * Thereby, it applies some additional rounding an joker rules.
  */
-public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, IInjectionFinishedListener
+public class PlayerMicPitchTracker : AbstractMicPitchTracker
 {
     private const int SendPositionIntervalInMillis = 2000;
 
@@ -32,16 +29,13 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     private PlayerProfile playerProfile;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private SingSceneMedleyControl medleyControl;
 
     [Inject]
     private Settings mainGameSettings;
-
-    [Inject]
-    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     [Inject]
     private Injector injector;
@@ -77,28 +71,13 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     public IObservable<SentenceAnalyzedEvent> SentenceAnalyzedEventStream => sentenceAnalyzedEventStream
         .ObserveOnMainThread();
 
-    private int lastAnalyzedBeatFromConnectedClient;
+    private int lastAnalyzedBeatFromCompanionClient;
 
     private long lastUnixTimeMillisecondsWhenSentPositionToClient = TimeUtils.GetUnixTimeMilliseconds();
 
-    private readonly Queue<BeatPitchEventAndTime> beatPitchEventsFromConnectedClientQueue = new();
+    private readonly Queue<BeatPitchEventAndTime> beatPitchEventsFromCompanionClientQueue = new();
 
-    private readonly List<IDisposable> disposables = new();
-
-    protected override MicSampleRecorder MicSampleRecorder
-    {
-        get
-        {
-            if (playerProfile is LobbyMemberPlayerProfile
-                && playerProfile != onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
-            {
-                // Cannot record mic samples for other lobby members
-                return null;
-            }
-
-            return base.MicSampleRecorder;
-        }
-    }
+    public bool RecordNotes { get; set; } = true;
 
     public override void OnInjectionFinished()
     {
@@ -107,83 +86,26 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         // Find first sentence to analyze
         SetRecordingSentence(recordingSentenceIndex);
 
-        roundingDistance = playerProfile.Difficulty.GetRoundingDistanceInMidiNotes();
+        roundingDistance = GetRoundingDistanceInMidiNotes(playerProfile.Difficulty);
         BeatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
-
-        InitOnlineMultiplayer();
-    }
-
-    private void InitOnlineMultiplayer()
-    {
-        if (onlineMultiplayerManager.IsOnlineGame)
-        {
-            disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
-                GetBeatAnalyzedEventMessageName(),
-                message => OnBeatAnalyzedEventMessage(message)));
-        }
-    }
-
-    private string GetBeatAnalyzedEventMessageName()
-    {
-        if (playerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
-        {
-            throw new IllegalStateException("Failed to construct online multiplayer message name because player is not a lobby member.");
-        }
-
-        return $"{nameof(BeatAnalyzedEvent)}-{lobbyMemberPlayerProfile.Name}-{lobbyMemberPlayerProfile.UnityNetcodeClientId}";
-    }
-
-    private void OnBeatAnalyzedEventMessage(NamedMessage message)
-    {
-        if (playerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
-        {
-            Log.Verbose(() => $"Ignoring BeatAnalyzedEventNetcodeRequestDto from Netcode client {message.SenderNetcodeClientId} because this PlayerMicPitchTracker handles a local player");
-            return;
-        }
-
-        if (message.SenderNetcodeClientId != lobbyMemberPlayerProfile.UnityNetcodeClientId)
-        {
-            Log.Verbose(() => $"Ignoring BeatAnalyzedEventNetcodeRequestDto from Netcode client {message.SenderNetcodeClientId} because this PlayerMicPitchTracker handles client {lobbyMemberPlayerProfile.UnityNetcodeClientId} with name '{playerProfile.Name}'");
-            return;
-        }
-
-        ReadBeatAnalyzedEventFastBufferReader(
-            message.MessagePayload,
-            out int midiNote,
-            out float frequency,
-            out int beat,
-            out int recordedMidiNote,
-            out int roundedRecordedMidiNote);
-
-        FireBeatAnalyzedEventFromRemote(
-            message.SenderNetcodeClientId,
-            midiNote > 0 ? midiNote : 0,
-            frequency > 0 ? frequency : 0,
-            beat,
-            recordedMidiNote,
-            roundedRecordedMidiNote);
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        disposables.ForEach(it => it.Dispose());
     }
 
     public void InitPitchDetection()
     {
-        if (micProfile == null
-            || MicSampleRecorder == null
-            || (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
-                && playerProfile != onlineMultiplayerManager.OwnLobbyMemberPlayerProfile))
+        if (micProfile == null)
+        {
+            RecordNotes = false;
+        }
+
+        if (!RecordNotes)
         {
             return;
         }
 
         if (micProfile.IsInputFromConnectedClient)
         {
-            InitPitchDetectionFromConnectedClient();
-            serverSideConnectRequestManager.ClientConnectionChangedEventStream
+            InitPitchDetectionFromCompanionClient();
+            serverSideCompanionClientManager.ClientConnectionChangedEventStream
                 .Where(evt => evt.IsConnected)
                 .Subscribe(_ => OnClientConnectionChanged())
                 .AddTo(gameObject);
@@ -196,91 +118,84 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private void OnClientConnectionChanged()
     {
-        InitPitchDetectionFromConnectedClient();
+        InitPitchDetectionFromCompanionClient();
     }
 
     private void InitPitchDetectionFromLocalMicrophone()
     {
-        if (micProfile == null
-            || MicSampleRecorder == null)
-        {
-            return;
-        }
-
         MicSampleRecorder.StartRecording();
 
         // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
         audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(mainGameSettings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
     }
 
-    private void InitPitchDetectionFromConnectedClient()
+    private void InitPitchDetectionFromCompanionClient()
     {
-        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
-        if (connectedClientHandler == null)
+        ICompanionClientHandler companionClientHandler = GetCompanionClientHandler();
+        if (companionClientHandler == null)
         {
             Debug.LogWarning($"Did not find connected client handler for player {playerProfile.Name}. Not recording player notes.");
             return;
         }
 
-        connectedClientHandler.ReceivedMessageStream
+        companionClientHandler.ReceivedMessageStream
             .Subscribe(dto =>
             {
                 if (dto is BeatPitchEventDto beatPitchEventDto)
                 {
-                    EnqueuePitchEventFromConnectedClient(beatPitchEventDto);
+                    EnqueuePitchEventFromCompanionClient(beatPitchEventDto);
                 }
                 else if (dto is BeatPitchEventsDto beatPitchEventsDto)
                 {
-                    EnqueuePitchEventsFromConnectedClient(beatPitchEventsDto);
+                    EnqueuePitchEventsFromCompanionClient(beatPitchEventsDto);
                 }
             })
             .AddTo(gameObject);
 
-        SendMicProfileToConnectedClient();
-        SendStartRecordingMessageToConnectedClient();
+        SendMicProfileToCompanionClient();
+        SendStartRecordingMessageToCompanionClient();
         SendPositionToClientRapidly();
     }
 
-    private void EnqueuePitchEventsFromConnectedClient(BeatPitchEventsDto beatPitchEventsDto)
+    private void EnqueuePitchEventsFromCompanionClient(BeatPitchEventsDto beatPitchEventsDto)
     {
         beatPitchEventsDto.BeatPitchEvents.ForEach(beatPitchEventDto =>
-            EnqueuePitchEventFromConnectedClient(beatPitchEventDto));
+            EnqueuePitchEventFromCompanionClient(beatPitchEventDto));
     }
 
-    private void EnqueuePitchEventFromConnectedClient(BeatPitchEventDto beatPitchEventDto)
+    private void EnqueuePitchEventFromCompanionClient(BeatPitchEventDto beatPitchEventDto)
     {
-        beatPitchEventsFromConnectedClientQueue.Enqueue(new BeatPitchEventAndTime()
+        beatPitchEventsFromCompanionClientQueue.Enqueue(new BeatPitchEventAndTime()
         {
             beatPitchEvent = new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat, beatPitchEventDto.Frequency),
             unixTimeInMillis = TimeUtils.GetUnixTimeMilliseconds(),
         });
     }
 
-    private IConnectedClientHandler GetConnectedClientHandler()
+    private ICompanionClientHandler GetCompanionClientHandler()
     {
-        if (micProfile == null
+        if (!RecordNotes
             || !micProfile.IsInputFromConnectedClient)
         {
             return null;
         }
 
-        serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler);
-        return connectedClientHandler;
+        serverSideCompanionClientManager.TryGet(micProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler);
+        return companionClientHandler;
     }
 
     protected override void Update()
     {
         base.Update();
 
-        if (micProfile == null
-            || MicSampleRecorder == null)
+        if (!RecordNotes)
         {
             return;
         }
 
         if (micProfile.IsInputFromConnectedClient)
         {
-            UpdatePitchDetectionFromConnectedClient();
+            UpdatePitchDetectionFromCompanionClient();
         }
         else if (MicSampleRecorder.IsRecording.Value)
         {
@@ -315,17 +230,17 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         FirePitchEvent(pitchEvent, BeatToAnalyze, noteAtBeat, RecordingSentence);
     }
 
-    private void UpdatePitchDetectionFromConnectedClient()
+    private void UpdatePitchDetectionFromCompanionClient()
     {
-        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
-        if (connectedClientHandler == null)
+        ICompanionClientHandler companionClientHandler = GetCompanionClientHandler();
+        if (companionClientHandler == null)
         {
             // Disconnected
             return;
         }
 
         // Read messages from client since last time the reader thread was active.
-        // connectedClientHandler.ReadMessagesFromClient();
+        // companionClientHandler.ReadMessagesFromClient();
 
         if (lastUnixTimeMillisecondsWhenSentPositionToClient + SendPositionIntervalInMillis < TimeUtils.GetUnixTimeMilliseconds())
         {
@@ -334,23 +249,23 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         }
 
         // Handle received messages after buffer time.
-        if (!beatPitchEventsFromConnectedClientQueue.IsNullOrEmpty())
+        if (!beatPitchEventsFromCompanionClientQueue.IsNullOrEmpty())
         {
-            long connectedClientMessageBufferTime = (long)Mathf.Max(mainGameSettings.ConnectedClientMessageBufferTimeInMillis, connectedClientHandler.JitterInMillis * 1.5f);
-            int beatBufferTime = Mathf.Max(1, (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, connectedClientMessageBufferTime * 1.5f));
-            DequeuePitchEventsFromConnectedClient(connectedClientMessageBufferTime, beatBufferTime);
+            long companionClientMessageBufferTime = (long)Mathf.Max(mainGameSettings.CompanionClientMessageBufferTimeInMillis, companionClientHandler.JitterInMillis * 1.5f);
+            int beatBufferTime = Mathf.Max(1, (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, companionClientMessageBufferTime * 1.5f));
+            DequeuePitchEventsFromCompanionClient(companionClientMessageBufferTime, beatBufferTime);
         }
     }
 
-    private void DequeuePitchEventsFromConnectedClient(long messageBufferTimeInMillis, int eventBufferTimeInBeats)
+    private void DequeuePitchEventsFromCompanionClient(long messageBufferTimeInMillis, int eventBufferTimeInBeats)
     {
         int positionInMillisConsideringMicDelay = (int)(songAudioPlayer.PositionInMillis - micProfile.DelayInMillis);
         int currentBeatConsideringMicDelay = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInMillisConsideringMicDelay);
         long unixTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         int maxIterations = 100;
-        for (int i = 0; i < maxIterations && !beatPitchEventsFromConnectedClientQueue.IsNullOrEmpty(); i++)
+        for (int i = 0; i < maxIterations && !beatPitchEventsFromCompanionClientQueue.IsNullOrEmpty(); i++)
         {
-            BeatPitchEventAndTime beatPitchEventAndTime = beatPitchEventsFromConnectedClientQueue.Peek();
+            BeatPitchEventAndTime beatPitchEventAndTime = beatPitchEventsFromCompanionClientQueue.Peek();
             BeatPitchEvent beatPitchEvent = beatPitchEventAndTime.beatPitchEvent;
             // Handle the event when this was for an old message
             long messageAgeInMillis = Math.Abs(unixTimeInMillis - beatPitchEventAndTime.unixTimeInMillis);
@@ -372,8 +287,8 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
                 || handleBecauseOfEventBufferTime)
             {
                 // Remove from queue and handle
-                beatPitchEventsFromConnectedClientQueue.Dequeue();
-                HandlePitchEventFromConnectedClient(beatPitchEvent);
+                beatPitchEventsFromCompanionClientQueue.Dequeue();
+                HandlePitchEventFromCompanionClient(beatPitchEvent);
             }
             else
             {
@@ -381,7 +296,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             }
         }
 
-        // Log.Verbose(() => "DequeuePitchEventsFromConnectedClient: Remaining events: " + beatPitchEventsFromConnectedClientQueue.Count);
+        // Log.Verbose(() => "DequeuePitchEventsFromCompanionClient: Remaining events: " + beatPitchEventsFromCompanionClientQueue.Count);
     }
 
     private int ApplyJokerRule(PitchEvent pitchEvent, int roundedMidiNote, Note noteAtBeat)
@@ -416,10 +331,10 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         return roundedMidiNote;
     }
 
-    private void HandlePitchEventFromConnectedClient(BeatPitchEvent pitchEvent)
+    private void HandlePitchEventFromCompanionClient(BeatPitchEvent pitchEvent)
     {
         if (pitchEvent.Beat < 0
-            || pitchEvent.Beat < lastAnalyzedBeatFromConnectedClient)
+            || pitchEvent.Beat < lastAnalyzedBeatFromCompanionClient)
         {
             // Looks like the companion app does not know the current position in the song. Send it this info again.
             // Log.Verbose($"Received invalid beat from connected client: beat {pitchEvent.Beat}");
@@ -437,13 +352,13 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             return;
         }
 
-        lastAnalyzedBeatFromConnectedClient = pitchEvent.Beat;
-        FirePitchEventFromConnectedClient(pitchEvent);
+        lastAnalyzedBeatFromCompanionClient = pitchEvent.Beat;
+        FirePitchEventFromCompanionClient(pitchEvent);
     }
 
     public void SendPositionToClientRapidly()
     {
-        if (micProfile == null
+        if (!RecordNotes
             || !micProfile.IsInputFromConnectedClient)
         {
             return;
@@ -469,14 +384,14 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     {
         lastUnixTimeMillisecondsWhenSentPositionToClient = TimeUtils.GetUnixTimeMilliseconds();
 
-        if (micProfile == null
+        if (!RecordNotes
             || !micProfile.IsInputFromConnectedClient)
         {
             return;
         }
 
-        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
-        if (connectedClientHandler == null)
+        ICompanionClientHandler companionClientHandler = GetCompanionClientHandler();
+        if (companionClientHandler == null)
         {
             // Disconnected
             return;
@@ -489,10 +404,10 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             PositionInSongInMillis = songAudioPlayer.PositionInMillisExact,
         };
         Log.Verbose(() => $"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
-        connectedClientHandler.SendMessageToClient(positionInSongDto);
+        companionClientHandler.SendMessageToClient(positionInSongDto);
     }
 
-    private void FirePitchEventFromConnectedClient(BeatPitchEvent pitchEvent)
+    private void FirePitchEventFromCompanionClient(BeatPitchEvent pitchEvent)
     {
         if (pitchEvent.Beat < 0)
         {
@@ -537,72 +452,6 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             sentenceAtBeat,
             recordedMidiNote,
             roundedMidiNoteAfterJoker);
-        beatAnalyzedEventStream.OnNext(beatAnalyzedEvent);
-
-        if (onlineMultiplayerManager.IsOnlineGame
-            && playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
-        {
-            onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
-                GetBeatAnalyzedEventMessageName(),
-                CreateBeatAnalyzedEventFastBufferWriter(beatAnalyzedEvent),
-                onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds,
-                mainGameSettings.BeatAnalyzedEventNetworkDelivery.ToUnityNetworkDelivery());
-        }
-    }
-
-    private FastBufferWriter CreateBeatAnalyzedEventFastBufferWriter(BeatAnalyzedEvent beatAnalyzedEvent)
-    {
-        // The BeatAnalyzedEvent is fired often (multiple times per second) such that a fast (de)serialization is mandatory.
-        // This is why a compact representation is created here instead of JSON.
-        int size = FastBufferWriter.GetWriteSize<int>() // midiNote
-                       + FastBufferWriter.GetWriteSize<float>() // frequency
-                       + FastBufferWriter.GetWriteSize<int>() // beat
-                       + FastBufferWriter.GetWriteSize<int>() // recordedMidiNote
-                       + FastBufferWriter.GetWriteSize<int>(); // roundedRecordedMidiNote
-        FastBufferWriter fastBufferWriter = new(size, Allocator.Temp);
-        fastBufferWriter.WriteValueSafe(beatAnalyzedEvent.PitchEvent?.MidiNote ?? -1);
-        fastBufferWriter.WriteValueSafe(beatAnalyzedEvent.PitchEvent?.Frequency ?? -1);
-        fastBufferWriter.WriteValueSafe(beatAnalyzedEvent.Beat);
-        fastBufferWriter.WriteValueSafe(beatAnalyzedEvent.RecordedMidiNote);
-        fastBufferWriter.WriteValueSafe(beatAnalyzedEvent.RoundedRecordedMidiNote);
-        return fastBufferWriter;
-    }
-
-    private void ReadBeatAnalyzedEventFastBufferReader(
-        FastBufferReader fastBufferReader,
-        out int midiNote,
-        out float frequency,
-        out int beat,
-        out int recordedMidiNote,
-        out int roundedRecordedMidiNote)
-    {
-        // The BeatAnalyzedEvent is fired often (multiple times per second) such that a fast (de)serialization is mandatory.
-        // This is why a compact representation is read here instead of JSON.
-        fastBufferReader.ReadValueSafe(out midiNote);
-        fastBufferReader.ReadValueSafe(out frequency);
-        fastBufferReader.ReadValueSafe(out beat);
-        fastBufferReader.ReadValueSafe(out recordedMidiNote);
-        fastBufferReader.ReadValueSafe(out roundedRecordedMidiNote);
-    }
-
-    private void FireBeatAnalyzedEventFromRemote(ulong senderNetcodeClientId, int midiNote, float frequency, int beat, int recordedMidiNote, int roundedRecordedMidiNote)
-    {
-        Log.Verbose(() => $"Fire BeatAnalyzedEvent from Netcode client {senderNetcodeClientId} (beat: {beat}, midiNote: {midiNote})");
-
-        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(playerControl.GetSortedNotesInVoice(), beat);
-        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.GetSortedSentencesInVoice(), beat);
-
-        PitchEvent pitchEvent = midiNote > 0
-            ? new PitchEvent(midiNote, frequency)
-            : null;
-
-        BeatAnalyzedEvent beatAnalyzedEvent = new(
-            pitchEvent,
-            beat,
-            noteAtBeat,
-            sentenceAtBeat,
-            recordedMidiNote,
-            roundedRecordedMidiNote);
         beatAnalyzedEventStream.OnNext(beatAnalyzedEvent);
     }
 
@@ -674,8 +523,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private int GetMicSampleBufferIndexForBeat(int beat)
     {
-        if (micProfile == null
-            || MicSampleRecorder == null)
+        if (!RecordNotes)
         {
             return 0;
         }
@@ -829,8 +677,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private PitchEvent GetPitchEventOfSamples(int startSampleBufferIndex, int endSampleBufferIndex)
     {
-        if (micProfile == null
-            || MicSampleRecorder == null)
+        if (!RecordNotes)
         {
             return null;
         }
@@ -853,32 +700,32 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         return pitchEvent;
     }
 
-    private void SendMicProfileToConnectedClient()
+    private void SendMicProfileToCompanionClient()
     {
-        GetConnectedClientHandler()?.SendMessageToClient(new MicProfileMessageDto(micProfile));
+        GetCompanionClientHandler()?.SendMessageToClient(new MicProfileMessageDto(micProfile));
     }
 
-    public void SendStopRecordingMessageToConnectedClient()
+    public void SendStopRecordingMessageToCompanionClient()
     {
-        GetConnectedClientHandler()?.SendMessageToClient(new StopRecordingMessageDto());
+        GetCompanionClientHandler()?.SendMessageToClient(new StopRecordingMessageDto());
     }
 
-    public void SendStartRecordingMessageToConnectedClient()
+    public void SendStartRecordingMessageToCompanionClient()
     {
-        GetConnectedClientHandler()?.SendMessageToClient(new StartRecordingMessageDto());
+        GetCompanionClientHandler()?.SendMessageToClient(new StartRecordingMessageDto());
         SendPositionToClientRapidly();
     }
 
     public override void StartRecording()
     {
-        if (micProfile == null)
+        if (!RecordNotes)
         {
             return;
         }
 
         if (micProfile.IsInputFromConnectedClient)
         {
-            SendStartRecordingMessageToConnectedClient();
+            SendStartRecordingMessageToCompanionClient();
         }
         else
         {
@@ -888,18 +735,30 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     public override void StopRecording()
     {
-        if (micProfile == null)
+        if (!RecordNotes)
         {
             return;
         }
 
         if (micProfile.IsInputFromConnectedClient)
         {
-            SendStopRecordingMessageToConnectedClient();
+            SendStopRecordingMessageToCompanionClient();
         }
         else
         {
             base.StopRecording();
+        }
+    }
+
+    private static float GetRoundingDistanceInMidiNotes(EDifficulty difficulty)
+    {
+        switch (difficulty)
+        {
+            case EDifficulty.Easy: return 2;
+            case EDifficulty.Medium: return 1;
+            case EDifficulty.Hard: return 0.5f;
+            default:
+                throw new UnityException("Unhandled difficulty: " + difficulty);
         }
     }
 

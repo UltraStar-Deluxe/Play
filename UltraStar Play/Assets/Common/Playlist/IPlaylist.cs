@@ -4,5 +4,6 @@
     string FileName { get; }
     string FilePath { get; }
     bool IsEmpty { get; }
+    int Count { get; }
     bool HasSongEntry(SongMeta songMeta);
 }

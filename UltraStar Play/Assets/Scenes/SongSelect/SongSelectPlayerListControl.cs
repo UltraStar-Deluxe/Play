@@ -22,16 +22,13 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     public IReadOnlyList<SongSelectPlayerEntryControl> PlayerEntryControls => playerEntryControls;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private MicSampleRecorderManager micSampleRecorderManager;
 
     [Inject]
     private Settings settings;
-
-    [Inject]
-    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     [Inject]
     private ThemeManager themeManager;
@@ -54,7 +51,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         LoadLastPlayerProfileToMicProfileMap();
 
         // Remove/add MicProfile when Client (dis)connects.
-        serverSideConnectRequestManager.ClientConnectionChangedEventStream
+        serverSideCompanionClientManager.ClientConnectionChangedEventStream
             .ObserveOnMainThread()
             .Subscribe(OnClientConnectionChanged)
             .AddTo(gameObject);
@@ -85,10 +82,10 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private void OnClientConnectionChanged(ClientConnectionChangedEvent evt)
     {
         // Find existing or create new MicProfile for the newly connected device
-        MicProfile connectedMicProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == evt.ConnectedClientHandler.ClientId);
+        MicProfile connectedMicProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == evt.CompanionClientHandler.ClientId);
         if (connectedMicProfile == null)
         {
-            connectedMicProfile = new MicProfile(evt.ConnectedClientHandler.ClientName, 0, evt.ConnectedClientHandler.ClientId);
+            connectedMicProfile = new MicProfile(evt.CompanionClientHandler.ClientName, 0, evt.CompanionClientHandler.ClientId);
             settings.MicProfiles.Add(connectedMicProfile);
         }
 
@@ -145,7 +142,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
     private List<MicProfile> GetAvailableMicProfiles()
     {
-        return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);
+        return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideCompanionClientManager);
     }
 
     private void UpdateListEntries()
@@ -282,8 +279,8 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     {
         List<MicProfile> unusedMicProfiles = FindUnusedMicProfiles();
         if (unusedMicProfiles.IsNullOrEmpty()
-            || (playerProfile is LobbyMemberPlayerProfile
-                && playerProfile != onlineMultiplayerManager.OwnLobbyMemberPlayerProfile))
+            || (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+                && lobbyMemberPlayerProfile.IsRemote))
         {
             return null;
         }
@@ -324,7 +321,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             .Select(it => it.MicProfile)
             .ToList();
         List<MicProfile> enabledAndConnectedMicProfiles = settings.MicProfiles
-            .Where(it => it.IsEnabled && it.IsConnected(serverSideConnectRequestManager))
+            .Where(it => it.IsEnabled && it.IsConnected(serverSideCompanionClientManager))
             .ToList();
         List<MicProfile> unusedMicProfiles = enabledAndConnectedMicProfiles
             .Where(it => !usedMicProfiles.Contains(it))
@@ -394,7 +391,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         }
 
         // Restore the previously assigned microphones
-        List<MicProfile> availableMicProfiles = SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);
+        List<MicProfile> availableMicProfiles = SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideCompanionClientManager);
         foreach (SongSelectPlayerEntryControl playerEntryControl in playerEntryControls)
         {
             if (!playerEntryControl.IsSelected.Value)
@@ -410,7 +407,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
                 continue;
             }
 
-            if (!lastUsedMicProfile.IsConnected(serverSideConnectRequestManager)
+            if (!lastUsedMicProfile.IsConnected(serverSideCompanionClientManager)
                 || !lastUsedMicProfile.IsEnabled)
             {
                 // Mic cannot or should not be used at the moment.

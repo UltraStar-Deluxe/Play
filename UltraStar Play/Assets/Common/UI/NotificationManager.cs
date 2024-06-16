@@ -23,7 +23,7 @@ public class NotificationManager : AbstractSingletonBehaviour, INeedInjection
         return Instance;
     }
 
-    private Label DoCreateNotification(Translation text)
+    private void DoCreateNotification(VisualElement content)
     {
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
@@ -36,14 +36,26 @@ public class NotificationManager : AbstractSingletonBehaviour, INeedInjection
 
         TemplateContainer templateContainer = notificationUi.CloneTree();
         VisualElement notification = templateContainer.Children().First();
-        Label notificationLabel = notification.Q<Label>("notificationLabel");
-        notificationLabel.SetTranslatedText(text);
+        notification.Clear();
+        notification.Add(content);
         notificationOverlay.Add(notification);
 
         // Fade out then remove
         StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, NotificationFadeOutDelayInSeconds, NotificationFadeOutDurationInSeconds));
+    }
 
-        return notificationLabel;
+    public static void CreateNotification(VisualElement content)
+    {
+        ThreadUtils.RunOnMainThread(() =>
+        {
+            NotificationManager notificationManager = Instance;
+            if (notificationManager == null)
+            {
+                return;
+            }
+
+            notificationManager.DoCreateNotification(content);
+        });
     }
 
     public static void CreateNotification(Translation text)
@@ -56,7 +68,10 @@ public class NotificationManager : AbstractSingletonBehaviour, INeedInjection
                 return;
             }
 
-            notificationManager.DoCreateNotification(text);
+            Label label = new Label();
+            label.name = "notificationLabel";
+            label.SetTranslatedText(text);
+            notificationManager.DoCreateNotification(label);
         });
     }
 }

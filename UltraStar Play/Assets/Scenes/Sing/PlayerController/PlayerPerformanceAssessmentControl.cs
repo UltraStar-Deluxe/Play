@@ -71,7 +71,8 @@ public class PlayerPerformanceAssessmentControl : MonoBehaviour, INeedInjection,
         }
 
         Note noteAtBeat = beatAnalyzedEvent.NoteAtBeat;
-        if (noteAtBeat == null)
+        if (noteAtBeat == null
+            || !SongMetaUtils.IsBeatInNote(noteAtBeat, beat, true, false))
         {
             return;
         }

@@ -1,13 +1,14 @@
 ﻿using System;
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
 {
     [Inject]
     private WebViewManager webViewManager;
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio)
+    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         bool success = webViewManager.LoadUrl(audioUri);
         if (!success)
@@ -22,16 +23,25 @@ public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
         return Observable.Create<AudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => webViewManager.DurationInMillis > 0
+                () => this == null
+                      || DurationInMillis > 0
                       || TimeUtils.IsDurationAboveThresholdInMillis(startTime, timeoutInMillis),
                 () =>
                 {
+                    if (this == null)
+                    {
+                        string errorMessage = $"Failed to load audio clip '{audioUri}': {nameof(WebViewAudioSupportProvider)} has been destroyed already.";
+                        Debug.LogError(errorMessage);
+                        throw new AudioSupportProviderException(errorMessage);
+                    }
+
                     if (TimeUtils.IsDurationAboveThresholdInMillis(startTime, timeoutInMillis))
                     {
                         o.OnError(new AudioSupportProviderException("Loading audio using WebView timed out."));
                         return;
                     }
 
+                    PositionInMillis = startPositionInMillis;
                     o.OnNext(new AudioLoadedEvent(audioUri));
                 }));
 

@@ -1,46 +1,47 @@
 ﻿using System;
 using LibVLCSharp;
+using UniInject;
 using UniRx;
 
 public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 {
+    [Inject]
     private VlcManager vlcManager;
-    private MediaPlayer vlcMediaPlayer;
 
     public override bool IsSupported(string videoUri, bool videoEqualsAudio)
     {
         return base.IsSupported(videoUri, videoEqualsAudio)
-               // The SongAudioPlayer's vlcMediaPlayer should be used when video and audio are equal
+               // The SongAudioPlayer's mediaPlayer should be used when video and audio are equal
                && !videoEqualsAudio;
     }
 
     public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
     {
         // Instantiate new vlc player
-        if (vlcMediaPlayer == null)
+        if (mediaPlayer == null)
         {
-            vlcMediaPlayer = vlcManager.CreateMediaPlayer();
-            vlcManager.DisableMediaPlayerAudioOutput(vlcMediaPlayer);
+            mediaPlayer = vlcManager.CreateMediaPlayer();
+            vlcManager.DisableMediaPlayerAudioOutput(mediaPlayer);
         }
         else
         {
-            vlcMediaPlayer.Stop();
+            mediaPlayer.Stop();
         }
 
-        if (vlcMediaPlayer.Media != null)
+        if (mediaPlayer.Media != null)
         {
-            vlcMediaPlayer.Media.Dispose();
+            mediaPlayer.Media.Dispose();
         }
 
-        vlcMediaPlayer.Media = new Media(new Uri(videoUri));
-        vlcMediaPlayer.PlayAsync();
+        mediaPlayer.Media = new Media(new Uri(videoUri));
+        mediaPlayer.Play();
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
         return Observable.Create<VideoLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => vlcMediaPlayer.Media != null && vlcMediaPlayer.Media.Duration > 0,
+                () => mediaPlayer.Media != null && mediaPlayer.Media.Duration > 0,
                 () => o.OnNext(new VideoLoadedEvent(videoUri))));
             return Disposable.Empty;
         });
@@ -54,22 +55,22 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
     public override void Play()
     {
-        vlcMediaPlayer?.Play();
+        mediaPlayer?.Play();
     }
 
     public override void Pause()
     {
-        vlcMediaPlayer?.Pause();
+        mediaPlayer?.Pause();
     }
 
     public override void Stop()
     {
-        vlcMediaPlayer?.Stop();
+        mediaPlayer?.Stop();
     }
 
     public override bool IsPlaying
     {
-        get => vlcMediaPlayer?.IsPlaying ?? false;
+        get => mediaPlayer?.IsPlaying ?? false;
         set
         {
             if (value)
@@ -95,26 +96,26 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         set
         {
             // TODO: Using MediaPlayer.SetRate makes the video stutter
-            // vlcMediaPlayer?.SetRate(playbackSpeed);
+            // mediaPlayer?.SetRate(playbackSpeed);
         }
     }
 
     public override double PositionInMillis
     {
-        get => vlcMediaPlayer?.Time ?? 0;
-        set => vlcMediaPlayer?.SetTime((long)value);
+        get => mediaPlayer?.Time ?? 0;
+        set => mediaPlayer?.SetTime((long)value);
     }
 
-    public override double DurationInMillis => vlcMediaPlayer.Length;
+    public override double DurationInMillis => mediaPlayer.Length;
 
     private void DestroyVlcMediaPlayer()
     {
-        if (vlcMediaPlayer == null)
+        if (mediaPlayer == null)
         {
             return;
         }
 
-        VlcManager.DestroyMediaPlayer(vlcMediaPlayer);
-        vlcMediaPlayer = null;
+        VlcManager.DestroyMediaPlayer(mediaPlayer);
+        mediaPlayer = null;
     }
 }

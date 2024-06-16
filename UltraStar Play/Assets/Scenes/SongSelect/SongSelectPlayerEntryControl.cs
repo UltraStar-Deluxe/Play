@@ -54,16 +54,13 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     private Injector injector;
 
     [Inject]
-    private OnlineMultiplayerManager onlineMultiplayerManager;
-
-    [Inject]
     private Settings settings;
 
     [Inject]
     private ThemeManager themeManager;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
@@ -144,8 +141,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     private int lastUpdateAllMicPitchTrackersFrameCount;
 
-    public bool CanSelectMic => PlayerProfile is not LobbyMemberPlayerProfile
-                                || PlayerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile;
+    public bool CanSelectMic => PlayerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+                                || lobbyMemberPlayerProfile.IsLocal;
 
     public void OnInjectionFinished()
     {
@@ -325,7 +322,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             }
         }
 
-        SendStartRecordingMessageToAllConnectedClients();
+        SendStartRecordingMessageToAllCompanionClients();
     }
 
     private void StopRecordingWithAllMicrophones()
@@ -342,53 +339,53 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             }
         }
 
-        SendStopRecordingMessageToAllConnectedClients();
+        SendStopRecordingMessageToAllCompanionClients();
     }
 
     private List<MicProfile> GetAvailableMicProfiles()
     {
-        return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);
+        return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideCompanionClientManager);
     }
 
-    private List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers()
+    private List<CompanionClientHandlerAndMicProfile> GetCompanionClientHandlers()
     {
-        return serverSideConnectRequestManager.GetConnectedClientHandlers(GetAvailableMicProfiles());
+        return serverSideCompanionClientManager.GetCompanionClientHandlers(GetAvailableMicProfiles());
     }
 
-    private void SendStopRecordingMessageToAllConnectedClients()
+    private void SendStopRecordingMessageToAllCompanionClients()
     {
-        GetConnectedClientHandlers().ForEach(it => it.ConnectedClientHandler.SendMessageToClient(new StopRecordingMessageDto()));
+        GetCompanionClientHandlers().ForEach(it => it.CompanionClientHandler.SendMessageToClient(new StopRecordingMessageDto()));
     }
 
-    private void SendStartRecordingMessageToAllConnectedClients()
+    private void SendStartRecordingMessageToAllCompanionClients()
     {
-        GetConnectedClientHandlers().ForEach(it => it.ConnectedClientHandler.SendMessageToClient(new StartRecordingMessageDto()));
+        GetCompanionClientHandlers().ForEach(it => it.CompanionClientHandler.SendMessageToClient(new StartRecordingMessageDto()));
     }
 
-    private ConnectedClientHandlerAndMicProfile GetConnectedClientHandler()
+    private CompanionClientHandlerAndMicProfile GetCompanionClientHandler()
     {
         if (micProfile == null)
         {
             return null;
         }
-        return serverSideConnectRequestManager.GetConnectedClientHandlers(new List<MicProfile> { micProfile }).FirstOrDefault();
+        return serverSideCompanionClientManager.GetCompanionClientHandlers(new List<MicProfile> { micProfile }).FirstOrDefault();
     }
 
-    private void SendStopRecordingMessageToConnectedClient()
+    private void SendStopRecordingMessageToCompanionClient()
     {
         if (micProfile != null
             && micProfile.IsInputFromConnectedClient)
         {
-            GetConnectedClientHandler()?.ConnectedClientHandler.SendMessageToClient(new StopRecordingMessageDto());
+            GetCompanionClientHandler()?.CompanionClientHandler.SendMessageToClient(new StopRecordingMessageDto());
         }
     }
 
-    private void SendStartRecordingMessageToConnectedClient()
+    private void SendStartRecordingMessageToCompanionClient()
     {
         if (micProfile != null
             && micProfile.IsInputFromConnectedClient)
         {
-            GetConnectedClientHandler()?.ConnectedClientHandler.SendMessageToClient(new StartRecordingMessageDto());
+            GetCompanionClientHandler()?.CompanionClientHandler.SendMessageToClient(new StartRecordingMessageDto());
         }
     }
 
@@ -458,7 +455,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         {
             if (micProfile.IsInputFromConnectedClient)
             {
-                SendStartRecordingMessageToConnectedClient();
+                SendStartRecordingMessageToCompanionClient();
             }
             else if (!micPitchTracker.IsRecording.Value)
             {
@@ -469,7 +466,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         {
             if (micProfile.IsInputFromConnectedClient)
             {
-                SendStopRecordingMessageToConnectedClient();
+                SendStopRecordingMessageToCompanionClient();
             }
             else if (micPitchTracker.IsRecording.Value)
             {

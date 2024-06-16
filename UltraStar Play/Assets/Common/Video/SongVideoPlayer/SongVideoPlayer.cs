@@ -4,13 +4,14 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 using UnityEngine.Video;
 
-public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener, ISongMediaPlayer<SongVideoLoadedEvent>
 {
     private static readonly HashSet<string> ignoredVideoFiles = new();
+
+    private const int ImmediatePlaybackPositionSyncThresholdInMillis = 400;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -95,13 +96,13 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public double PositionInVideoInSeconds
+    public double PositionInSeconds
     {
-        get => PositionInVideoInMillis / 1000.0;
-        set => PositionInVideoInMillis = value * 1000.0;
+        get => PositionInMillis / 1000.0;
+        set => PositionInMillis = value * 1000.0;
     }
 
-    public double PositionInVideoInMillis
+    public double PositionInMillis
     {
         get
         {
@@ -125,13 +126,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    private readonly Subject<SongVideoLoadedEvent> loadedEventStream = new();
-    public IObservable<SongVideoLoadedEvent> LoadedEventStream => loadedEventStream;
-
     private float nextSyncTimeInSeconds;
-
-    private IDisposable jumpBackEventStreamDisposable;
-    private IDisposable jumpForwardEventStreamDisposable;
 
     private bool freezeVideo;
     public bool FreezeVideo
@@ -169,12 +164,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public void OnInjectionFinished()
     {
-        currentVideoSupportProvider = videoSupportProviders.FirstOrDefault();
-
-        HasLoadedBackgroundImage = false;
-        InitEventSubscriber();
-        UnloadVideo();
-
         settings.ObserveEveryValueChanged(it => it.SongBackgroundScaleMode)
             .Subscribe(_ => UpdateBackgroundScaleMode())
             .AddTo(gameObject);
@@ -182,42 +171,26 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         sceneNavigator.BeforeSceneChangeEventStream
             .Subscribe(_ => UnloadVideo())
             .AddTo(gameObject);
-    }
 
-    private void InitEventSubscriber()
-    {
-        // Jump backward in song
-        if (jumpBackEventStreamDisposable != null)
+        // Synchronize playback position with SongAudioPlayer
+        songAudioPlayer.JumpBackEventStream.Subscribe(evt =>
         {
-            jumpBackEventStreamDisposable.Dispose();
-        }
-        jumpBackEventStreamDisposable = songAudioPlayer.JumpBackEventStream
-            .Subscribe(evt =>
+            if (Math.Abs(evt.Previous - evt.Current) > ImmediatePlaybackPositionSyncThresholdInMillis)
             {
-                if (Math.Abs(evt.Previous - evt.Current) > 400)
-                {
-                    SyncVideoWithMusic(true);
-                }
-            })
-            .AddTo(gameObject);
+                SyncVideoWithMusic(true);
+            }
+        })
+        .AddTo(gameObject);
 
-        // Jump forward in song
-        if (jumpForwardEventStreamDisposable != null)
+        songAudioPlayer.JumpForwardEventStream
+        .Subscribe(evt =>
         {
-            jumpForwardEventStreamDisposable.Dispose();
-        }
-        if (ForceSyncOnForwardJump)
-        {
-            jumpForwardEventStreamDisposable = songAudioPlayer.JumpForwardEventStream
-                .Subscribe(evt =>
-                {
-                    if (Math.Abs(evt.Previous - evt.Current) > 400)
-                    {
-                        SyncVideoWithMusic(true);
-                    }
-                })
-                .AddTo(gameObject);
-        }
+            if (Math.Abs(evt.Previous - evt.Current) > ImmediatePlaybackPositionSyncThresholdInMillis)
+            {
+                SyncVideoWithMusic(true);
+            }
+        })
+        .AddTo(gameObject);
     }
 
     private void Update()
@@ -240,7 +213,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             lastApplyPlaybackStateToVideoProviderTimeInSeconds = Time.time;
             if (DurationInMillis > 0
-                && PositionInVideoInMillis < DurationInMillis - 100)
+                && PositionInMillis < DurationInMillis - 100)
             {
                 ApplyPlaybackStateToVideoProvider();
             }
@@ -264,7 +237,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         if (videoSupportProvider == null)
         {
             return ObservableUtils.LogExceptionThenThrow<VideoLoadedEvent>(
-                    new SongAudioPlayerException($"Unsupported video resource '{videoUri}'."));
+                    new SongVideoPlayerException($"Unsupported video resource '{videoUri}'."));
         }
 
         Debug.Log($"Loading video '{videoUri}' via {videoSupportProvider}");
@@ -378,12 +351,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         // Both, the smooth sync and immediate sync need some time.
         nextSyncTimeInSeconds = Time.time + 1;
 
-        double targetPositionInVideoInMillis = (loadedSongMeta.VideoGapInMillis) + positionInAudioInMillis;
+        double targetPositionInMillis = (loadedSongMeta.VideoGapInMillis) + positionInAudioInMillis;
         if (IsLooping)
         {
-            targetPositionInVideoInMillis %= DurationInMillis;
+            targetPositionInMillis %= DurationInMillis;
         }
-        double timeDifferenceInMillis = targetPositionInVideoInMillis - PositionInVideoInMillis;
+        double timeDifferenceInMillis = targetPositionInMillis - PositionInMillis;
 
         if (FreezeVideo)
         {
@@ -396,7 +369,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             if (forceImmediateSync || Math.Abs(timeDifferenceInMillis) > 3000)
             {
                 // Correct the mismatch immediately.
-                PositionInVideoInMillis = targetPositionInVideoInMillis;
+                PositionInMillis = targetPositionInMillis;
                 PlaybackSpeed = 1f;
             }
             else
@@ -456,14 +429,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     public void ReloadVideo()
     {
         // This method is used in the SongEditor. But only on Standalone platform when the video file changed.
-        LoadAndPlayVideoAsObservable(loadedSongMeta)
+        LoadAndPlayAsObservable(loadedSongMeta)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to reload video: {ex.Message}");
             })
             // Subscribe to trigger the observable
-            .Subscribe(evt => Debug.Log($"Loaded video: {evt.VideoUri}"));
+            .Subscribe(evt => Debug.Log($"Loaded video: {evt.MediaUri}"));
     }
 
     public void LoadAndPlayVideoOrShowBackgroundImage(SongMeta songMeta)
@@ -475,11 +448,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        LoadAndPlayVideoAsObservable(songMeta)
+        LoadAndPlayAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to load video of '{songMeta.GetArtistDashTitle()}': {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason",
+                    ex.Message));
                 ShowBackgroundImage(songMeta);
             })
             // Subscribe to trigger observable
@@ -490,7 +466,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 if (loadedSongMeta.VideoGapInMillis > 0)
                 {
                     // Positive VideoGap, thus skip the start of the video
-                    PositionInVideoInMillis = loadedSongMeta.VideoGapInMillis;
+                    PositionInMillis = loadedSongMeta.VideoGapInMillis;
                 }
 
                 ShowVideoImageVisualElement();
@@ -512,7 +488,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public IObservable<SongVideoLoadedEvent> LoadAndPlayVideoAsObservable(SongMeta songMeta)
+    public IObservable<SongVideoLoadedEvent> LoadAndPlayAsObservable(SongMeta songMeta)
     {
         UnloadVideo();
 
@@ -537,7 +513,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 new SongVideoPlayerException($"Video resource does not exist: {videoUri}"));
         }
 
-        return DoLoadAndPlayVideoAsObservable(videoUri, videoSupportProviders, songMeta.Video == songMeta.Audio)
+        return DoLoadAndPlayVideoAsObservable(
+                videoUri,
+                videoSupportProviders,
+                songMeta.Video == songMeta.Audio)
             .Select(evt =>
             {
                 loadedSongMeta = songMeta;
@@ -546,7 +525,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 currentVideoSupportProvider.SetTargetTexture(videoPlayer.targetTexture);
                 PlayVideo();
 
-                loadedEventStream.OnNext(new SongVideoLoadedEvent(songMeta, evt.VideoUri));
                 return new SongVideoLoadedEvent(songMeta, evt.VideoUri);
             });
     }

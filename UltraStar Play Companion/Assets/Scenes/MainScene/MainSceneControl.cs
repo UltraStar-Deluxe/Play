@@ -34,7 +34,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     private UIDocument uiDocument;
 
     [Inject]
-    private ClientSideConnectRequestManager clientSideConnectRequestManager;
+    private ClientSideCompanionClientManager clientSideCompanionClientManager;
 
     [Inject]
     private Settings settings;
@@ -213,7 +213,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             settings.ShowAudioWaveForm = changeEvent.newValue;
         });
 
-        clientSideConnectRequestManager.ConnectEventStream
+        clientSideCompanionClientManager.ConnectEventStream
             .Subscribe(UpdateConnectionStatus);
 
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
@@ -427,7 +427,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             // Apply new ClientName
             settings.ClientName = clientNameTextField.value;
             // Reconnect to let the main know about the new clientName.
-            clientSideConnectRequestManager.DisconnectFromServer();
+            clientSideCompanionClientManager.DisconnectFromServer();
         }
     }
 

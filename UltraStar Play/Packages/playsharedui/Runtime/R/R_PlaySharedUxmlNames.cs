@@ -43,6 +43,7 @@ public static partial class R_PlayShared
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string dialogTitleMaterialIcon = "dialogTitleMaterialIcon";
         public const string dummyButton = "dummyButton";
+        public const string dummyNotificationLabel = "dummyNotificationLabel";
         public const string gameRoundPlayerEntryUiRoot = "gameRoundPlayerEntryUiRoot";
         public const string invalidValueIcon = "invalidValueIcon";
         public const string invalidValueLabel = "invalidValueLabel";
@@ -61,7 +62,6 @@ public static partial class R_PlayShared
         public const string nameLabel = "nameLabel";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
-        public const string notificationLabel = "notificationLabel";
         public const string notificationOverlay = "notificationOverlay";
         public const string okButton = "okButton";
         public const string overlay = "overlay";

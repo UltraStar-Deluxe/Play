@@ -13,6 +13,5 @@ sh download-lrcparser.sh
 sh download-litenetlib.sh
 sh download-nhyphenator.sh
 sh download-third-party-assets.sh
+sh download-jsonnet-contractresolvers.sh
 
-# Optionally download demo song package
-sh download-songs.sh

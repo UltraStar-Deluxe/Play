@@ -1,15 +1,11 @@
 ﻿using UniInject;
 using UniRx;
-using Unity.Netcode;
 
 namespace CommonOnlineMultiplayer
 {
-    public class HasSongRequestManager : AbstractSingletonBehaviour, INeedInjection
+    public class HasSongRequestManager : AbstractOnlineMultiplayerRequestManager
     {
         public static HasSongRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<HasSongRequestManager>();
-
-        [Inject]
-        private OnlineMultiplayerManager onlineMultiplayerManager;
 
         [Inject]
         private SongMetaManager songMetaManager;
@@ -19,13 +15,7 @@ namespace CommonOnlineMultiplayer
             return Instance;
         }
 
-        protected override void StartSingleton()
-        {
-            onlineMultiplayerManager.OwnNetcodeClientStartedEventStream
-                .Subscribe(_ => InitOnlineMultiplayerRequestHandlers());
-        }
-
-        private void InitOnlineMultiplayerRequestHandlers()
+        protected override void InitOnlineMultiplayerRequestHandlers()
         {
             onlineMultiplayerManager.ObservableMessagingControl.RegisterObservedMessageHandler(
                 nameof(HasSongRequestDto),
@@ -38,7 +28,8 @@ namespace CommonOnlineMultiplayer
                     onlineMultiplayerManager.ObservableMessagingControl.SendResponseMessage(
                         observedMessage,
                         FastBufferWriterUtils.WriteJsonValuePacked(responseDto));
-                });
+                })
+                .AddTo(gameObject);
         }
     }
 }

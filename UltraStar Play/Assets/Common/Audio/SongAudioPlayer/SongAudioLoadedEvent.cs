@@ -1,11 +1,7 @@
-﻿public class SongAudioLoadedEvent
+﻿public class SongAudioLoadedEvent : AbstractSongMediaLoadedEvent
 {
-    public SongMeta SongMeta { get; private set; }
-    public string AudioUri { get; private set; }
-
-    public SongAudioLoadedEvent(SongMeta songMeta, string audioUri)
+    public SongAudioLoadedEvent(SongMeta songMeta, string mediaUri)
+        : base(songMeta, mediaUri)
     {
-        SongMeta = songMeta;
-        AudioUri = audioUri;
     }
 }

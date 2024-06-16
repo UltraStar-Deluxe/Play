@@ -96,10 +96,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Jump to start / end of song
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToStartOfSong).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => songAudioPlayer.PositionInMillis = 0);
+            .Subscribe(_ => JumpToStartOfSong());
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToEndOfSong).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => songAudioPlayer.PositionInMillis = songAudioPlayer.DurationInMillis - 1);
+            .Subscribe(_ => JumpToEndOfSong());
 
         // Play / pause
         InputManager.GetInputAction(R.InputActions.songEditor_togglePause).PerformedAsObservable()
@@ -135,7 +135,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Delete notes
         InputManager.GetInputAction(R.InputActions.songEditor_delete).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => deleteNotesAction.ExecuteAndNotify(selectionControl.GetSelectedNotes()));
+            .Subscribe(_ => DeleteSelectedNotes());
 
         // Undo
         InputManager.GetInputAction(R.InputActions.songEditor_undo).PerformedAsObservable()
@@ -239,6 +239,37 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_zoomOutVertical).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(context => noteAreaControl.ZoomVertical(-1));
+    }
+
+    private void JumpToEndOfSong()
+    {
+        int endInBeats = SongMetaUtils.MaxBeat(songEditorSceneControl.GetAllNotes());
+        double endInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, endInBeats);
+        JumpToPosition(endInMillis, songAudioPlayer.DurationInMillis - 1);
+    }
+
+    private void JumpToStartOfSong()
+    {
+        int startInBeats = SongMetaUtils.MinBeat(songEditorSceneControl.GetAllNotes());
+        double startInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, startInBeats);
+        JumpToPosition(startInMillis, 0);
+    }
+
+    private void JumpToPosition(double primaryPosition, double secondaryPosition)
+    {
+        if (primaryPosition > 0
+            && Math.Abs(songAudioPlayer.PositionInMillis - primaryPosition) > 1)
+        {
+            songAudioPlayer.PositionInMillis = primaryPosition;
+            return;
+        }
+
+        songAudioPlayer.PositionInMillis = secondaryPosition;
+    }
+
+    public void DeleteSelectedNotes()
+    {
+        deleteNotesAction.ExecuteAndNotify(selectionControl.GetSelectedNotes());
     }
 
     private void AssignSelectedNotesToOwnSentence()
@@ -629,8 +660,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         int maxBeat = notes.Select(it => it.EndBeat).Max();
         double maxMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, maxBeat);
         double minMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, minBeat);
-        songEditorSceneControl.StopPlaybackAfterPositionInMillis = maxMillis;
-        songAudioPlayer.PositionInMillis = minMillis;
+        songEditorSceneControl.StopPlaybackAfterPositionInMillis = maxMillis + settings.SongEditorSettings.PlaybackPostEndInMillis;
+        songAudioPlayer.PositionInMillis = Math.Max(0, minMillis - settings.SongEditorSettings.PlaybackPreBeginInMillis);
         songAudioPlayer.PlayAudio();
     }
 

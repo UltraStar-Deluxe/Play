@@ -86,7 +86,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         // The video has an additional delay to load.
         // As long as no frame is ready yet, the VideoPlayer.time is 0.
         if (!songVideoPlayer.IsPartiallyLoaded
-            || (songVideoPlayer.PositionInVideoInMillis <= 0
+            || (songVideoPlayer.PositionInMillis <= 0
                 // WebView must be visible to see controls, even when audio is not ready yet.
                 && songVideoPlayer.CurrentVideoSupportProvider is not WebViewVideoSupportProvider))
         {
@@ -226,7 +226,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        songAudioPlayer.LoadAndPlayAudioAsObservable(songMeta)
+        songAudioPlayer.LoadAndPlayAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);

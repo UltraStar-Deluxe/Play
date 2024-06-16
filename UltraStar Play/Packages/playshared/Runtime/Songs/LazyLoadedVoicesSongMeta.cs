@@ -25,10 +25,7 @@ public abstract class LazyLoadedVoicesSongMeta : SongMeta
 
     public override string GetVoiceDisplayName(EVoiceId voiceId)
     {
-        if (voiceIdToDisplayName.IsNullOrEmpty())
-        {
-            LoadVoicesIfNotDoneYet();
-        }
+        LoadVoicesIfNotDoneYet();
         return base.GetVoiceDisplayName(voiceId);
     }
 

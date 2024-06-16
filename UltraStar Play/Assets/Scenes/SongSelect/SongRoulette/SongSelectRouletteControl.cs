@@ -80,6 +80,10 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     public SongSelectEntryControl SelectedEntryControl => entryControls
         .FirstOrDefault(it => it.SongSelectEntry == SelectedEntry);
 
+    private readonly Subject<SongSelectEntryControl> createdSongSelectEntryControlEventStream = new();
+    public IObservable<SongSelectEntryControl> CreatedSongSelectEntryControlEventStream => createdSongSelectEntryControlEventStream;
+    public IReadOnlyList<SongSelectSongEntry> SongEntries => entries.OfType<SongSelectSongEntry>().ToList();
+
     private bool isInitialized;
 
     private bool isPointerDownOnListView;
@@ -410,6 +414,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         item.ClickOnSongImageEventStream.Subscribe(_ => OnEntryClicked(entry));
 
         entryControls.Add(item);
+
+        createdSongSelectEntryControlEventStream.OnNext(item);
     }
 
     public void SetEntries(IReadOnlyCollection<SongSelectEntry> newEntries)

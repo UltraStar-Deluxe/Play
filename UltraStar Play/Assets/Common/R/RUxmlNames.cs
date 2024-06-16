@@ -103,10 +103,10 @@ public static partial class R
         public const string commitHashLabel = "commitHashLabel";
         public const string commonScoreIcon = "commonScoreIcon";
         public const string commonScoreSentenceRatingContainer = "commonScoreSentenceRatingContainer";
+        public const string companionClientCountLabel = "companionClientCountLabel";
+        public const string companionClientList = "companionClientList";
+        public const string companionClientListEntryUiRoot = "companionClientListEntryUiRoot";
         public const string confirmDeletePlaylistButton = "confirmDeletePlaylistButton";
-        public const string connectedClientCountLabel = "connectedClientCountLabel";
-        public const string connectedClientList = "connectedClientList";
-        public const string connectedClientListEntryUiRoot = "connectedClientListEntryUiRoot";
         public const string connectedClientsListScrollView = "connectedClientsListScrollView";
         public const string connectedClientsListTitle = "connectedClientsListTitle";
         public const string connectionEndpointLabel = "connectionEndpointLabel";
@@ -470,9 +470,9 @@ public static partial class R
         public const string nextSentenceContainer = "nextSentenceContainer";
         public const string nextSentenceLabel = "nextSentenceLabel";
         public const string nicknameCharacterContainer = "nicknameCharacterContainer";
-        public const string noConnectedClientsContainer = "noConnectedClientsContainer";
-        public const string noConnectedClientsIcon = "noConnectedClientsIcon";
-        public const string noConnectedClientsLabel = "noConnectedClientsLabel";
+        public const string noCompanionClientsContainer = "noCompanionClientsContainer";
+        public const string noCompanionClientsIcon = "noCompanionClientsIcon";
+        public const string noCompanionClientsLabel = "noCompanionClientsLabel";
         public const string noConnectedMicsContainer = "noConnectedMicsContainer";
         public const string noConnectedMicsIcon = "noConnectedMicsIcon";
         public const string noConnectedMicsLabel = "noConnectedMicsLabel";
@@ -566,6 +566,8 @@ public static partial class R
         public const string pitchLabelFormatChooser = "pitchLabelFormatChooser";
         public const string plainLabelContainer = "plainLabelContainer";
         public const string playbackAudioChooser = "playbackAudioChooser";
+        public const string playbackPostEndTimeInMillisTextField = "playbackPostEndTimeInMillisTextField";
+        public const string playbackPreBeginTimeInMillisTextField = "playbackPreBeginTimeInMillisTextField";
         public const string player = "player";
         public const string playerEntry = "playerEntry";
         public const string playerImage = "playerImage";
@@ -758,6 +760,7 @@ public static partial class R
         public const string sideBarSecondaryColumnUi = "sideBarSecondaryColumnUi";
         public const string sideBarSettingsUi = "sideBarSettingsUi";
         public const string sideBarSongPropertiesUi = "sideBarSongPropertiesUi";
+        public const string simulateJitterInMillisField = "simulateJitterInMillisField";
         public const string SingingLyricsCurrentSentenceUi = "SingingLyricsCurrentSentenceUi";
         public const string SingingLyricsNextSentenceUi = "SingingLyricsNextSentenceUi";
         public const string SingingLyricsTopUi = "SingingLyricsTopUi";
@@ -817,6 +820,7 @@ public static partial class R
         public const string songScanInProgressIcon = "songScanInProgressIcon";
         public const string songScanInProgressLabel = "songScanInProgressLabel";
         public const string songScanInProgressProgressLabel = "songScanInProgressProgressLabel";
+        public const string songScanMaxBatchCountChooser = "songScanMaxBatchCountChooser";
         public const string SongSelectEditPlaylistDialogUi = "SongSelectEditPlaylistDialogUi";
         public const string songSelectionChooser = "songSelectionChooser";
         public const string songSelectionJokerCountChooser = "songSelectionJokerCountChooser";

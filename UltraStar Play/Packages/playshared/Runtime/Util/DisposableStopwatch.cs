@@ -2,29 +2,31 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-// A stopwatch that performs an action when it is disposed.
+/**
+ * A stopwatch that performs an action when it is disposed.
+ */
 public class DisposableStopwatch : IDisposable
 {
     private static readonly List<string> placeholders = new() { "<millis>", "<ms>" };
-    private Stopwatch stopwatch;
+    private readonly Stopwatch stopwatch;
     private readonly Action<Stopwatch> action;
 
     public double ElapsedMilliseconds => stopwatch.ElapsedMilliseconds;
     public TimeSpan Elapsed => stopwatch.Elapsed;
     public long ElapsedTicks => stopwatch.ElapsedTicks;
-    
-    public DisposableStopwatch(Action<Stopwatch> action, bool startStopwatch = true)
+
+    public DisposableStopwatch(Action<Stopwatch> action)
     {
         this.action = action;
-        CreateStopwatch(startStopwatch);
+        stopwatch = new Stopwatch();
+        stopwatch.Start();
     }
 
     // Logs the given text when the stopwatch is disposed.
     // Thereby, the placeholder <millis> will be replaced with the elapsed milliseconds.
-    public DisposableStopwatch(string textWithPlaceholders, bool startStopwatch = true, float logPeriodInSeconds = 0)
+    public DisposableStopwatch(string textWithPlaceholders, ELogEventLevel logEventLevel = ELogEventLevel.Debug)
+        : this((sw) => LogTextWithPlaceholders(sw, textWithPlaceholders, logEventLevel))
     {
-        action = (sw) => LogTextWithPlaceholders(sw, textWithPlaceholders, logPeriodInSeconds);
-        CreateStopwatch(startStopwatch);
     }
 
     public void Dispose()
@@ -33,16 +35,7 @@ public class DisposableStopwatch : IDisposable
         action.Invoke(stopwatch);
     }
 
-    private void CreateStopwatch(bool startStopwatch)
-    {
-        stopwatch = new Stopwatch();
-        if (startStopwatch)
-        {
-            stopwatch.Start();
-        }
-    }
-
-    private void LogTextWithPlaceholders(Stopwatch sw, string textWithPlaceholders, float logPeriodInSeconds)
+    private static void LogTextWithPlaceholders(Stopwatch sw, string textWithPlaceholders, ELogEventLevel logEventLevel)
     {
         string millis = sw.ElapsedMilliseconds.ToString();
         string logText = textWithPlaceholders;
@@ -57,20 +50,11 @@ public class DisposableStopwatch : IDisposable
         {
             logText = $"{logText}: {millis} ms";
         }
-        
-        if (logPeriodInSeconds <= 0)
-        {
-            // Log immediately
-            Log.Debug(() => logText);
-        }
-        else
-        {
-            // Log every now and then the measured durations
-            LogUtils.LogFrequently(textWithPlaceholders, millis, logPeriodInSeconds);
-        }
+
+        Log.WithLevel(logEventLevel.ToSerilogLogEventLevel(), () => logText);
     }
 
-    private bool ContainsPlaceholder(string logText)
+    private static bool ContainsPlaceholder(string logText)
     {
         foreach (string placeholder in placeholders)
         {

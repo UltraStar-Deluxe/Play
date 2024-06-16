@@ -10,7 +10,7 @@ cd UnityStandaloneFileBrowser
 
 echo "Cloning UnityStandaloneFileBrowser from remote..."
 git init
-git remote add origin https://github.com/achimmihca/UnityStandaloneFileBrowser.git.git
+git remote add origin https://github.com/achimmihca/UnityStandaloneFileBrowser.git
 git config core.sparsecheckout true
 echo "Assets/*" >> .git/info/sparse-checkout
 git pull --depth=100 origin master

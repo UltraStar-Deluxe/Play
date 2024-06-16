@@ -73,17 +73,17 @@ public class NoteAreaContextMenuControl : ContextMenuControl
         }
 
         if (selectedNotes.Count > 0
-            || songEditorCopyPasteManager.HasCopiedNotes)
+            || songEditorCopyPasteManager.HasCopy)
         {
             contextMenu.AddSeparator();
             if (selectedNotes.Count > 0)
             {
-                contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_copyNotes), () => songEditorCopyPasteManager.CopySelectedNotes());
+                contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_copyNotes), () => songEditorCopyPasteManager.CopySelection());
             }
 
-            if (songEditorCopyPasteManager.HasCopiedNotes)
+            if (songEditorCopyPasteManager.HasCopy)
             {
-                contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_pasteNotes), () => songEditorCopyPasteManager.PasteCopiedNotes());
+                contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_pasteNotes), () => songEditorCopyPasteManager.Paste());
             }
         }
 

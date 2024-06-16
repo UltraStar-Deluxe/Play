@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using CommonOnlineMultiplayer;
 
@@ -73,6 +72,7 @@ public class Settings : ISettings
     public string GeneratedFolderPath { get; set; } = "";
     public bool SaveVocalsAndInstrumentalAudioInFolderOfSong { get; set; }
     public EFetchType SongDataFetchType { get; set; } = EFetchType.Upfront;
+    public int SongScanMaxBatchCount { get; set; } = 1;
 
     /**
      * The UltraStar song format version that is used to save a song when otherwise none is specified or unknown.
@@ -143,7 +143,7 @@ public class Settings : ISettings
     public int HttpServerPort { get; set; } = 6789;
     public string HttpServerHost { get; set; } = new("");
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
-    public int ConnectedClientMessageBufferTimeInMillis { get; set; } = 150;
+    public int CompanionClientMessageBufferTimeInMillis { get; set; } = 150;
 
     // WebView settings
     public List<string> AcceptedWebViewHosts { get; set; } = new();
@@ -195,4 +195,5 @@ public class Settings : ISettings
     public string UnityTransportIpAddress { get; set; } = "127.0.0.1";
     public ushort UnityTransportPort { get; set; } = 7777;
     public ENetworkDelivery BeatAnalyzedEventNetworkDelivery { get; set; } = ENetworkDelivery.ReliableSequenced;
+    public int OnlineMultiplayerSimulatedJitterInMillis { get; set; }
 }

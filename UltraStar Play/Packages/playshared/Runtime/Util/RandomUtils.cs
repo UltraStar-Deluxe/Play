@@ -4,6 +4,8 @@ using UnityEngine;
 
 public static class RandomUtils
 {
+    private static System.Random random = new();
+
     public static T RandomOfItems<T>(params T[] values)
     {
         if (values.IsNullOrEmpty())
@@ -53,5 +55,13 @@ public static class RandomUtils
         int g = Random.Range(0, 255);
         int b = Random.Range(0, 255);
         return new Color32((byte)r, (byte)g, (byte)b, 255);
+    }
+
+    /**
+     * Generate random number. In contrast to Unity's method, this works also on other threads than the main thread.
+     */
+    public static int Range(int minValue, int maxValueExclusive)
+    {
+        return random.Next(minValue, maxValueExclusive);
     }
 }

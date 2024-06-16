@@ -39,10 +39,14 @@ public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, IS
         {
             return;
         }
+        translationManager.DoApplyTranslations(root);
+    }
 
-        root ??= translationManager.uiDocument.rootVisualElement;
+    private void DoApplyTranslations(VisualElement root = null)
+    {
+        root ??= uiDocument.rootVisualElement;
 
-        // using DisposableStopwatch d = new($"Apply translations to '{root.name}' in frame {Time.frameCount}");
+        // using DisposableStopwatch d = new($"Apply translations to '{root.name}' in frame {Time.frameCount}", ELogEventLevel.Verbose);
 
         root.Query<Label>().ForEach(label => ApplyTranslation(
             () => label.text,
@@ -51,10 +55,6 @@ public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, IS
         root.Query<Button>().ForEach(button => ApplyTranslation(
             () => button.text,
             newValue => button.SetTranslatedText(newValue)));
-
-        root.Query<BaseField<object>>().ForEach(field => ApplyTranslation(
-            () => field.label,
-            newValue => field.SetTranslatedLabel(newValue)));
 
         root.Query<Chooser>().ForEach(chooser => ApplyTranslation(
             () => chooser.Label,

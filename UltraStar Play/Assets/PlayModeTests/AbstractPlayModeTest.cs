@@ -4,15 +4,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using PrimeInputActions;
+using Responsible;
 using Responsible.Unity;
+using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using static Responsible.Responsibly;
 
-public abstract class AbstractPlayModeTest : AbstractResponsibleTest
+public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjection
 {
     protected virtual string TestSceneName => "CommonTestScene";
+
+    private IDisposable sceneInjectionFinishedSubscription;
 
     [UnitySetUp]
     public IEnumerator UnitySetUp()
@@ -25,11 +32,21 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         yield return new WaitForEndOfFrame();
     }
 
+    [UnityTearDown]
+    public IEnumerator UnityTearDown()
+    {
+        yield return TearDownTestFixture();
+    }
+
     private IEnumerator SetUpTestFixture()
     {
         SettingsManager.SettingsLoaderSaver = new TestSettingsLoaderSaver();
         StatisticsManager.StatisticsLoaderSaver = new TestStatisticsLoaderSaver();
         IMicrophoneAdapter.Instance = new SimulatedMicrophoneAdapter();
+
+        sceneInjectionFinishedSubscription = UltraStarPlaySceneInjectionManager
+            .SceneInjectionFinishedEventStream
+            .Subscribe(evt => evt.SceneInjector.Inject(this));
 
         yield return LoadSceneByName("CommonTestScene");
 
@@ -47,6 +64,15 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         Keyboard = InputSystem.GetDevice<Keyboard>();
 
         Executor = new UnityTestInstructionExecutor();
+    }
+
+    private IEnumerator TearDownTestFixture()
+    {
+        SettingsManager.SettingsLoaderSaver = null;
+        StatisticsManager.StatisticsLoaderSaver = null;
+        IMicrophoneAdapter.Instance = new PortAudioForUnityMicrophoneAdapter();
+        sceneInjectionFinishedSubscription?.Dispose();
+        yield return null;
     }
 
     private void AssertMicSampleRecorderIsSimulated()
@@ -136,7 +162,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
 
     protected virtual List<string> GetRelativeTestSongFilePaths()
     {
-        return new List<string>();
+        return new List<string>() { "SingingTestSongs/ThreeQuartersA4OneQuarterC5.txt" };
     }
 
     protected virtual void ConfigureTestStatistics(TestStatistics statistics)
@@ -145,6 +171,27 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
 
     protected virtual void ConfigureTestSettings(TestSettings settings)
     {
+        PlayerProfile playerProfile = new PlayerProfile("TestPlayer1", EDifficulty.Medium);
+        settings.PlayerProfiles = new List<PlayerProfile>()
+        {
+            playerProfile,
+        };
+
+        MicProfile micProfile = new MicProfile("TestMic1");
+        settings.MicProfiles = new List<MicProfile>()
+        {
+            micProfile,
+        };
+
+        // Song select should automatically assign the last used mic to the player.
+        settings.PlayerProfileNameToLastUsedMicProfile.Add(playerProfile.Name, new MicProfileReference(micProfile));
+
+        // Simulate connected mic with A4 pitch frequency
+        SimulatedMicrophoneAdapter.SetSimulatedDevices(new List<string>()
+        {
+            micProfile.Name,
+        });
+        SimulatedMicrophoneAdapter.SetSimulatedDevicePitchInHz(playerProfile.Name, 440);
     }
 
     private IEnumerator LoadTestScene()

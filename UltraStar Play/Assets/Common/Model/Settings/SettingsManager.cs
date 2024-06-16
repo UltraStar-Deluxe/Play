@@ -12,7 +12,23 @@ public class SettingsManager : AbstractSingletonBehaviour
 
     public static SettingsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SettingsManager>();
 
-    public static ISettingsLoaderSaver SettingsLoaderSaver { get; set; }
+    public static ISettingsLoaderSaver settingsLoaderSaver;
+    public static ISettingsLoaderSaver SettingsLoaderSaver
+    {
+        get => settingsLoaderSaver;
+        set
+        {
+            settingsLoaderSaver = value;
+
+            // Reset already loaded settings.
+            if (DontDestroyOnLoadManager.Instance != null
+                && Instance != null)
+            {
+                Instance.settings = null;
+                Instance.LoadSettings();
+            }
+        }
+    }
 
     private Settings settings;
     public Settings Settings

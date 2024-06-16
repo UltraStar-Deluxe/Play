@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
-    public class StartSongRequestManager : AbstractSingletonBehaviour, INeedInjection
+    public class StartSongRequestManager : AbstractOnlineMultiplayerRequestManager
     {
         public static StartSongRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StartSongRequestManager>();
 
@@ -15,9 +15,6 @@ namespace CommonOnlineMultiplayer
 
         [Inject]
         private SongMetaManager songMetaManager;
-
-        [Inject]
-        private OnlineMultiplayerManager onlineMultiplayerManager;
 
         [Inject]
         private Settings settings;
@@ -29,20 +26,14 @@ namespace CommonOnlineMultiplayer
         private ThemeManager themeManager;
 
         [Inject]
-        private ServerSideConnectRequestManager serverSideConnectRequestManager;
+        private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
         protected override object GetInstance()
         {
             return Instance;
         }
 
-        protected override void StartSingleton()
-        {
-            onlineMultiplayerManager.OwnNetcodeClientStartedEventStream
-                .Subscribe(_ => InitOnlineMultiplayerRequestHandlers());
-        }
-
-        private void InitOnlineMultiplayerRequestHandlers()
+        protected override void InitOnlineMultiplayerRequestHandlers()
         {
             onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
                 nameof(StartSingSceneRequestDto),
@@ -75,7 +66,8 @@ namespace CommonOnlineMultiplayer
                         },
                     };
                     sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
-                });
+                })
+                .AddTo(gameObject);
         }
 
         private MicProfile GetOwnLobbyMemberMicProfile()
@@ -98,7 +90,7 @@ namespace CommonOnlineMultiplayer
 
         private List<MicProfile> GetAvailableMicProfiles()
         {
-            return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);
+            return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideCompanionClientManager);
         }
     }
 }

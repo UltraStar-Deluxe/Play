@@ -89,13 +89,13 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             return;
         }
 
-        int timeBeforeEndOfSongInMillis = 1000;
-        if (songAudioPlayer.PositionInSongInMillis >= songAudioPlayer.DurationOfSongInMillis - timeBeforeEndOfSongInMillis)
+        int timeBeforeEndInMillis = 1000;
+        if (songAudioPlayer.PositionInMillis >= songAudioPlayer.DurationInMillis - timeBeforeEndInMillis)
         {
             Debug.Log($"{nameof(JukeboxAndSingControl)} - End of song detected. Starting next song soon.");
             isFinishing = true;
-            float timeBeforeEndOfSongInSeconds = timeBeforeEndOfSongInMillis / 1000f;
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(timeBeforeEndOfSongInSeconds, StartNextSong));
+            float timeBeforeEndInSeconds = timeBeforeEndInMillis / 1000f;
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(timeBeforeEndInSeconds, StartNextSong));
             return;
         }
     }

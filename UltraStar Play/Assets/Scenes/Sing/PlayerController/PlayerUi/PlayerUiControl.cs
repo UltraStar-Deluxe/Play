@@ -75,7 +75,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     public Injector Injector => injector;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private SingSceneControl singSceneControl;
@@ -153,7 +153,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         if (micProfile != null
             && micProfile.IsInputFromConnectedClient)
         {
-            serverSideConnectRequestManager.ClientConnectionChangedEventStream
+            serverSideCompanionClientManager.ClientConnectionChangedEventStream
                 .Subscribe(OnClientConnectionChanged)
                 .AddTo(singSceneControl);
         }
@@ -253,7 +253,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private void OnClientConnectionChanged(ClientConnectionChangedEvent connectionChangedEvent)
     {
         if (micProfile == null
-            || connectionChangedEvent.ConnectedClientHandler.ClientId != micProfile.ConnectedClientId)
+            || connectionChangedEvent.CompanionClientHandler.ClientId != micProfile.ConnectedClientId)
         {
             return;
         }
@@ -267,7 +267,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             ShowMicDisconnectedInfo();
 
             // Trigger achievement
-            achievementEventStream.OnNext(AchievementId.disconnectCompanionAppWhenSinging);
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.disconnectCompanionAppWhenSinging, playerProfile));
         }
     }
 

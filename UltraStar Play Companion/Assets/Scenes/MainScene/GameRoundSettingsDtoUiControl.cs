@@ -22,7 +22,7 @@ public class GameRoundSettingsDtoUiControl : INeedInjection, IInjectionFinishedL
     private Injector injector;
 
     [Inject]
-    private ClientSideConnectRequestManager clientSideConnectRequestManager;
+    private ClientSideCompanionClientManager clientSideCompanionClientManager;
 
     private readonly GameRoundModifierDtoDialogControl modifierDtoDialogControl = new();
     private GameRoundModifierChipsComboControl modifierChipsComboControl;
@@ -43,7 +43,7 @@ public class GameRoundSettingsDtoUiControl : INeedInjection, IInjectionFinishedL
         injector.WithRootVisualElement(modifierDialogOverlay)
             .Inject(modifierDtoDialogControl);
 
-        clientSideConnectRequestManager.ConnectEventStream
+        clientSideCompanionClientManager.ConnectEventStream
             .Subscribe(evt =>
             {
                 if (evt.IsSuccess)

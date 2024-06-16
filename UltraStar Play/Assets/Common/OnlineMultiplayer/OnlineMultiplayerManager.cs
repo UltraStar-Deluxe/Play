@@ -8,12 +8,15 @@ using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
-    public class OnlineMultiplayerManager : AbstractSingletonBehaviour, INeedInjection
+    public class OnlineMultiplayerManager : AbstractSingletonBehaviour, INeedInjection, IInjectionFinishedListener
     {
         public static OnlineMultiplayerManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<OnlineMultiplayerManager>();
 
         [Inject]
         private NetworkManager networkManager;
+
+        [Inject]
+        private Settings settings;
 
         [Inject]
         private NonPersistentSettings nonPersistentSettings;
@@ -39,14 +42,16 @@ namespace CommonOnlineMultiplayer
         /**
          * Each connected Netcode peer has a client, but only one of them is the host and server.
          */
-        public bool IsOnlineGame => networkManager.IsClient;
+        public bool IsOnlineGame => networkManager != null && networkManager.IsClient;
 
         /**
          * The host is the Netcode server that adds a client for itself automatically.
          */
-        public bool IsHost => networkManager.IsHost;
+        public bool IsHost => networkManager != null && networkManager.IsHost;
 
-        public LobbyMember OwnLobbyMember => LobbyMemberManager.GetLobbyMember(networkManager.LocalClientId);
+        public LobbyMember OwnLobbyMember => networkManager != null
+            ? LobbyMemberManager.GetLobbyMember(networkManager.LocalClientId)
+            : null;
         public PlayerProfile OwnLobbyMemberPlayerProfile
         {
             get
@@ -60,8 +65,12 @@ namespace CommonOnlineMultiplayer
                     .FirstOrDefault(it => it.UnityNetcodeClientId == ownLobbyMember.UnityNetcodeClientId);
             }
         }
-        public NetworkObject OwnLobbyMemberNetworkObject => networkManager.SpawnManager.GetLocalPlayerObject();
-        public UnityNetcodeClientId OwnLobbyMemberUnityNetcodeClientId => networkManager.LocalClientId;
+        public NetworkObject OwnLobbyMemberNetworkObject => networkManager != null
+            ? networkManager.SpawnManager.GetLocalPlayerObject()
+            : null;
+        public UnityNetcodeClientId OwnLobbyMemberUnityNetcodeClientId => networkManager != null
+            ? networkManager.LocalClientId
+            : 0;
 
         public IReadOnlyList<ulong> OtherLobbyMembersUnityNetcodeClientIds
         {
@@ -83,18 +92,21 @@ namespace CommonOnlineMultiplayer
             }
         }
 
-        public MessagingControl MessagingControl { get; private set; }
+        private DelayedMessagingControl messagingControl;
+        public IMessagingControl MessagingControl => messagingControl;
         public ObservableMessagingControl ObservableMessagingControl { get; private set; }
+
+        private bool isInitialized;
 
         protected override object GetInstance()
         {
             return Instance;
         }
 
-        protected override void AwakeSingleton()
+        public void OnInjectionFinished()
         {
-            MessagingControl = new MessagingControl();
-            ObservableMessagingControl = new ObservableMessagingControl(MessagingControl);
+            // Injection is done per-scene, but initialization should be done only once and before Start is called in other scripts.
+            Init();
         }
 
         protected override void StartSingleton()
@@ -111,6 +123,9 @@ namespace CommonOnlineMultiplayer
 
             LobbyMemberConnectionChangedEventSteam
                 .Subscribe(evt => UpdateLobbyMemberPlayerProfiles());
+
+            settings.ObserveEveryValueChanged(it => it.OnlineMultiplayerSimulatedJitterInMillis)
+                .Subscribe(newValue => messagingControl.DelayInMillis = newValue);
         }
 
         protected override void OnDestroySingleton()
@@ -134,15 +149,7 @@ namespace CommonOnlineMultiplayer
         private void OnNetcodeLocalServerStarted()
         {
             Debug.Log($"OnNetcodeLocalServerStarted");
-            MessagingControl.RegisterNamedMessageHandlersToForwardMessagesIfNeeded();
-        }
-
-        private void UpdateLobbyMemberPlayerProfiles()
-        {
-            IReadOnlyList<LobbyMember> lobbyMembers = LobbyMemberManager.GetLobbyMembers();
-            nonPersistentSettings.LobbyMemberPlayerProfiles = lobbyMembers
-                .Select(it => new LobbyMemberPlayerProfile(it.DisplayName, it.UnityNetcodeClientId))
-                .ToList();
+            MessagingControl.RegisterNamedMessageHandlersToForwardMessages();
         }
 
         private void OnNetcodeLocalClientStarted()
@@ -154,6 +161,7 @@ namespace CommonOnlineMultiplayer
         private void OnNetcodeLocalClientStopped(bool wasHostMode)
         {
             Debug.Log($"OnNetcodeLocalClientStopped(wasHostMode: {wasHostMode})");
+            MessagingControl.ClearNamedMessageHandlers();
             NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_disconnected));
 
             if (LobbyManager.CurrentLobby != null)
@@ -228,38 +236,25 @@ namespace CommonOnlineMultiplayer
             LobbyMemberManager.OnNetcodeClientConnectionApproval(connectionApprovalRequest, response);
         }
 
-        // public T GetNetworkBehaviour<T>(UnityNetcodeClientId netcodeClientId)
-        //     where T : NetworkBehaviour
-        // {
-        //     GameObject lobbyMemberGameObject = networkManager.SpawnManager.GetPlayerNetworkObject(netcodeClientId).gameObject;
-        //     return lobbyMemberGameObject.GetComponentInChildren<T>();
-        // }
-        //
-        // public T GetNetworkBehaviourOfOwnLobbyMember<T>()
-        //     where T : NetworkBehaviour
-        // {
-        //     return GetNetworkBehaviour<T>(OwnLobbyMemberNetworkObject.OwnerClientId);
-        // }
-        //
-        // public T AddNetworkBehaviourIfMissing<T>(UnityNetcodeClientId netcodeClientId)
-        //     where T : NetworkBehaviour
-        // {
-        //     NetworkObject networkObject = networkManager.SpawnManager.GetPlayerNetworkObject(netcodeClientId);
-        //     if (networkObject == null)
-        //     {
-        //         throw new OnlineMultiplayerException($"Cannot add component of type {typeof(T)} because no lobby member found with Netcode id {netcodeClientId}");
-        //     }
-        //
-        //     T existingComponent = networkObject.GetComponentInChildren<T>();
-        //     if (existingComponent)
-        //     {
-        //         return existingComponent;
-        //     }
-        //
-        //     GameObject newGameObject = new();
-        //     newGameObject.name = typeof(T).Name;
-        //     newGameObject.transform.parent = networkObject.transform;
-        //     return newGameObject.AddComponent<T>();
-        // }
+        private void Init()
+        {
+            if (isInitialized)
+            {
+                return;
+            }
+            isInitialized = true;
+
+            MessagingControl regularMessagingControl = new MessagingControl(networkManager);
+            messagingControl = new DelayedMessagingControl(regularMessagingControl);
+            ObservableMessagingControl = new ObservableMessagingControl(messagingControl);
+        }
+
+        private void UpdateLobbyMemberPlayerProfiles()
+        {
+            IReadOnlyList<LobbyMember> lobbyMembers = LobbyMemberManager.GetLobbyMembers();
+            nonPersistentSettings.LobbyMemberPlayerProfiles = lobbyMembers
+                .Select(it => new LobbyMemberPlayerProfile(it.DisplayName, it.UnityNetcodeClientId))
+                .ToList();
+        }
     }
 }

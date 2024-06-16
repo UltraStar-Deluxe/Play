@@ -24,7 +24,7 @@ public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
 
         DoLoadSong = () =>
         {
-            using IDisposable d = new DisposableStopwatch($"Loading '{fileInfo.Name}' took <ms> ms");
+            using IDisposable d = new DisposableStopwatch($"Loading '{fileInfo.Name}' took <ms> ms", ELogEventLevel.Verbose);
             UltraStarSongMeta loadedSongMeta = UltraStarSongParser.ParseFile(fileInfo.FullName, out List<SongIssue> songIssues, FileEncoding);
             CopyValues(loadedSongMeta);
 
@@ -33,7 +33,7 @@ public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
 
         DoLoadVoices = () =>
         {
-            using IDisposable d = new DisposableStopwatch($"Loading voices of '{fileInfo.Name}' took <ms> ms");
+            using IDisposable d = new DisposableStopwatch($"Loading voices of '{fileInfo.Name}' took <ms> ms", ELogEventLevel.Verbose);
             List<Voice> voices = UltraStarSongVoicesParser.ParseFile(
                 FileInfo.FullName,
                 FileEncoding,

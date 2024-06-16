@@ -16,15 +16,17 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
 
     private readonly Translation text;
     private readonly string icon;
+    private readonly string buttonName;
     private readonly Action action;
 
     private readonly Subject<VoidEvent> itemTriggeredEventStream = new();
     public IObservable<VoidEvent> ItemTriggeredEventStream => itemTriggeredEventStream;
 
-    public ContextMenuItemControl(Translation text, string icon, Action action)
+    public ContextMenuItemControl(Translation text, string icon, string buttonName, Action action)
     {
         this.text = text;
         this.icon = icon;
+        this.buttonName = buttonName;
         this.action = action;
     }
 
@@ -41,6 +43,7 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
         }
 
         label.SetTranslatedText(text);
+        button.name = buttonName;
         button.RegisterCallbackButtonTriggered(_ =>
         {
             if (button.focusController.focusedElement == button)

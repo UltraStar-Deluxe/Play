@@ -155,6 +155,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.splitSyllablesInSelectionButton)]
     private Button splitSyllablesInSelectionButton;
 
+    [Inject(UxmlName = R.UxmlNames.playbackPreBeginTimeInMillisTextField)]
+    private IntegerField playbackPreBeginTimeInMillisTextField;
+
+    [Inject(UxmlName = R.UxmlNames.playbackPostEndTimeInMillisTextField)]
+    private IntegerField playbackPostEndTimeInMillisTextField;
+
     [Inject]
     private SongMeta songMeta;
 
@@ -174,7 +180,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private AudioSeparationManager audioSeparationManager;
@@ -259,12 +265,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         // Mic recording settings
         List<MicProfile> micProfiles = settings.MicProfiles;
         List<MicProfile> enabledAndConnectedMicProfiles = micProfiles
-            .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
+            .Where(it => it.IsEnabledAndConnected(serverSideCompanionClientManager))
             .ToList();
         micDeviceChooserControl = new(micDeviceChooser, enabledAndConnectedMicProfiles,
             micProfile => micProfile != null ? Translation.Of(micProfile.GetDisplayNameWithChannel()) : Translation.Empty);
         if (settings.SongEditorSettings.MicProfile == null
-            || !settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager))
+            || !settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideCompanionClientManager))
         {
             settings.SongEditorSettings.MicProfile = enabledAndConnectedMicProfiles.FirstOrDefault();
         }
@@ -485,6 +491,14 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         new EnumChooserControl<ESongEditorPitchLabelFormat>(pitchLabelFormatChooser)
             .Bind(() => settings.SongEditorSettings.PitchLabelFormat,
                 newValue => settings.SongEditorSettings.PitchLabelFormat = newValue);
+
+        Bind(playbackPreBeginTimeInMillisTextField,
+            () => settings.SongEditorSettings.PlaybackPreBeginInMillis,
+            newValue => settings.SongEditorSettings.PlaybackPreBeginInMillis = newValue);
+
+        Bind(playbackPostEndTimeInMillisTextField,
+            () => settings.SongEditorSettings.PlaybackPostEndInMillis,
+            newValue => settings.SongEditorSettings.PlaybackPostEndInMillis = newValue);
     }
 
     private void SplitSyllablesInSelection()

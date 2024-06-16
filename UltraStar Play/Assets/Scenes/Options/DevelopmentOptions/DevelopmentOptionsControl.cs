@@ -8,7 +8,6 @@ using Serilog.Events;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -87,6 +86,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.messageBufferTimeTextField)]
     private IntegerField messageBufferTimeTextField;
 
+    [Inject(UxmlName = R.UxmlNames.songScanMaxBatchCountChooser)]
+    private IntegerField songScanMaxBatchCountChooser;
+
+    [Inject(UxmlName = R.UxmlNames.simulateJitterInMillisField)]
+    private IntegerField simulateJitterInMillisField;
+
     [Inject]
     private ThemeManager themeManager;
 
@@ -103,7 +108,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     private UltraStarPlayHttpServer httpServer;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private InGameDebugConsoleManager inGameDebugConsoleManager;
@@ -258,6 +263,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.CustomUserAgent,
             newValue => settings.CustomUserAgent = newValue);
 
+        FieldBindingUtils.Bind(songScanMaxBatchCountChooser,
+            () => settings.SongScanMaxBatchCount,
+            newValue => settings.SongScanMaxBatchCount = newValue);
+
         FieldBindingUtils.Bind(useUniversalCharsetDetectorToggle,
             () => settings.UseUniversalCharsetDetector,
             newValue => settings.UseUniversalCharsetDetector = newValue);
@@ -274,7 +283,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 }
             });
 
-        connectionEndpointLabel.text = $"Connection endpoint: {serverSideConnectRequestManager.GetConnectionEndpoint()}";
+        connectionEndpointLabel.text = $"Connection endpoint: {serverSideCompanionClientManager.GetConnectionEndpoint()}";
 
         if (HttpServer.IsSupported)
         {
@@ -315,8 +324,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
         // Message delay
         FieldBindingUtils.Bind(messageBufferTimeTextField,
-            () => settings.ConnectedClientMessageBufferTimeInMillis,
-            newValue => settings.ConnectedClientMessageBufferTimeInMillis = newValue);
+            () => settings.CompanionClientMessageBufferTimeInMillis,
+            newValue => settings.CompanionClientMessageBufferTimeInMillis = newValue);
         messageBufferTimeTextField.DisableChangeValueByDragging();
 
         // Spleeter command (audio separation)
@@ -451,6 +460,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new EnumChooserControl<ENetworkDelivery>(beatAnalyzedEventNetworkDeliveryChooser)
             .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,
                 newValue => settings.BeatAnalyzedEventNetworkDelivery = newValue);
+
+        FieldBindingUtils.Bind(simulateJitterInMillisField,
+            () => settings.OnlineMultiplayerSimulatedJitterInMillis,
+            newValue => settings.OnlineMultiplayerSimulatedJitterInMillis = newValue);
 
         // Mods
         uploadWorkshopItemButton.RegisterCallbackButtonTriggered(evt => ShowUploadNewModDialog());

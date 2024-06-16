@@ -158,7 +158,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
                 // Trigger achievement for watching the credits without skipping
                 if (!wasSkipButtonClicked)
                 {
-                    achievementEventStream.OnNext(AchievementId.watchCreditsWithoutSkipping);
+                    achievementEventStream.OnNext(new AchievementEvent(AchievementId.watchCreditsWithoutSkipping));
                 }
             }
         }

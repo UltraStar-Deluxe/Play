@@ -19,7 +19,8 @@ public class UltraStarPlaylist : IPlaylist
             return FileName;
         }
     }
-    public virtual bool IsEmpty => songHashes.Count == 0;
+    public virtual bool IsEmpty => Count == 0;
+    public virtual int Count => songHashes.Count;
 
     private readonly List<UltraStartPlaylistLineEntry> lineEntries = new();
     private readonly HashSet<string> songHashes = new();

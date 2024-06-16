@@ -11,13 +11,13 @@ namespace CommonOnlineMultiplayer
     {
         private const long DefaultMessageTimeoutInMillis = 5000;
 
-        private readonly MessagingControl messagingControl;
+        private readonly IMessagingControl messagingControl;
 
         private readonly List<RunningRequestData> runningRequestDatas = new();
         private readonly object runningRequestDatasLock = new();
 
         public ObservableMessagingControl(
-            MessagingControl messagingControl)
+            IMessagingControl messagingControl)
         {
             this.messagingControl = messagingControl;
         }
@@ -240,7 +240,7 @@ namespace CommonOnlineMultiplayer
                 request =>
                 {
                     // Read responseMessageName,
-                    // such that the response can be send directly to the corresponding recipient code
+                    // such that the response can be send directly to the corresponding recipient
                     FastBufferReader fastBufferReader = request.MessagePayload;
                     fastBufferReader.ReadValueSafe(out string responseMessageName);
 

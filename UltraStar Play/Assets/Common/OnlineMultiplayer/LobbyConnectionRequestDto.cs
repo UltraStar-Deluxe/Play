@@ -5,7 +5,6 @@
      */
     public class LobbyConnectionRequestDto : JsonSerializable
     {
-        public string OnlineMultiplayerBackend {get; private set; }
         public string DisplayName {get; private set; }
 
         public LobbyConnectionRequestDto()

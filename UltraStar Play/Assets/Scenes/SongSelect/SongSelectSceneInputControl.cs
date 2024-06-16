@@ -33,6 +33,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.inputLegend, Optional = true)]
     private VisualElement inputLegendContainer;
 
+    [Inject(UxmlName = R.UxmlNames.searchTextField)]
+    private TextField searchTextField;
+
     [Inject]
     private UIDocument uiDocument;
 
@@ -85,7 +88,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
         // Toggle song menu
         InputManager.GetInputAction(R.InputActions.usplay_toggleSongMenu).PerformedAsObservable()
-            .Where(_ => !songSearchControl.IsSearchTextFieldFocused() && fuzzySearchText.Value.IsNullOrEmpty())
+            .Where(_ => !IsTextFieldFocused() && fuzzySearchText.Value.IsNullOrEmpty())
             .Subscribe(_ => songRouletteControl.OpenSelectedEntryContextMenu());
 
         // Open the sing scene
@@ -102,7 +105,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
         // Navigate to parent folder
         InputManager.GetInputAction(R.InputActions.usplay_navigateToParentFolder).PerformedAsObservable()
-            .Where(_ => !songSearchControl.IsSearchTextFieldFocused() && fuzzySearchText.Value.IsNullOrEmpty())
+            .Where(_ => !IsTextFieldFocused() && fuzzySearchText.Value.IsNullOrEmpty())
             .Subscribe(ctx => songSelectSceneControl.TryNavigateToParentFolder());
 
         // Navigate to parent folder with right click on song list
@@ -124,6 +127,17 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
                 songSelectSceneControl.TryNavigateToParentFolder();
             }
         });
+    }
+
+    private bool IsTextFieldFocused()
+    {
+        return uiDocument.rootVisualElement.focusController.focusedElement is TextField;
+    }
+
+    private bool IsSearchTextFieldFocused()
+    {
+        return searchTextField.focusController.focusedElement == searchTextField
+               || !searchTextField.value.IsNullOrEmpty();
     }
 
     private bool OnBeforeNavigationInListView(NavigationParameters navigationParameters)
@@ -209,7 +223,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSearchControl.HideSearchPropertyDropdownOverlay();
         }
-        else if (songSearchControl.IsSearchTextFieldFocused())
+        else if (IsSearchTextFieldFocused())
         {
             songSelectSceneControl.OnCancelSearch();
         }
@@ -284,7 +298,8 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private bool IsFuzzySearchActive()
     {
         return !InputUtils.AnyKeyboardModifierPressed()
-               && !songSearchControl.IsSearchTextFieldFocused();
+               && !IsSearchTextFieldFocused()
+               && !IsTextFieldFocused();
     }
 
     private void OnDestroy()

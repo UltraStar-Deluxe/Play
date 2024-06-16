@@ -319,7 +319,7 @@ public static partial class R
         public static readonly string options_companionApp_noConnectedApps = "options_companionApp_noConnectedApps";
         public static readonly string options_companionApp_noConnectedApps_hint = "options_companionApp_noConnectedApps_hint";
         public static readonly string options_companionApp_title = "options_companionApp_title";
-        public static readonly string options_connectedClientCount = "options_connectedClientCount";
+        public static readonly string options_companionClientCount = "options_companionClientCount";
         public static readonly string options_defaultMedleyDuration = "options_defaultMedleyDuration";
         public static readonly string options_delay = "options_delay";
         public static readonly string options_delay_calibrate = "options_delay_calibrate";
@@ -602,6 +602,8 @@ public static partial class R
         public static readonly string songEditor_options_pitchDetection_title = "songEditor_options_pitchDetection_title";
         public static readonly string songEditor_options_playback_title = "songEditor_options_playback_title";
         public static readonly string songEditor_options_playbackAudio = "songEditor_options_playbackAudio";
+        public static readonly string songEditor_options_playbackPostEnd_duration = "songEditor_options_playbackPostEnd_duration";
+        public static readonly string songEditor_options_playbackPreBegin_duration = "songEditor_options_playbackPreBegin_duration";
         public static readonly string songEditor_options_playbackSpeed = "songEditor_options_playbackSpeed";
         public static readonly string songEditor_options_playbackSpeed_reset = "songEditor_options_playbackSpeed_reset";
         public static readonly string songEditor_options_sentenceLineSize = "songEditor_options_sentenceLineSize";

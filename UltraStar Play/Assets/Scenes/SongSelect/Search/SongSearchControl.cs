@@ -368,12 +368,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         searchTextField.Focus();
     }
 
-    public bool IsSearchTextFieldFocused()
-    {
-        return searchTextField.focusController.focusedElement == searchTextField
-               || !searchTextField.value.IsNullOrEmpty();
-    }
-
     public void AddSearchProperty(ESearchProperty searchProperty)
     {
         searchProperties.Add(searchProperty);

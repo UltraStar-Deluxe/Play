@@ -356,7 +356,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
         contextMenuPopup.AddButton(Translation.Get(R.Messages.singScene_action_openAttributionSubmenu), "info_outline", () =>
         {
-            singSceneControl.Pause(true);
+            singSceneControl.Pause();
             ShowSongInfoDialog();
         });
 
@@ -367,7 +367,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         }
 
         contextMenuPopup.AddButton(Translation.Get(R.Messages.action_exitSong), "logout",
-            () => singSceneControl.FinishScene(false, false, true));
+            () => singSceneControl.FinishScene(false, false));
 
         contextMenuPopup.AddSeparator();
 

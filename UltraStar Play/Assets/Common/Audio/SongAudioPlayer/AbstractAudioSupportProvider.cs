@@ -11,7 +11,7 @@ public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjecti
     [Inject]
     protected SceneNavigator sceneNavigator;
 
-    public abstract IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio);
+    public abstract IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis);
     public abstract bool IsSupported(string audioUri);
     public abstract void Unload();
     public abstract void Play();

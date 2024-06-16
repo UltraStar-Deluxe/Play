@@ -50,7 +50,12 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    private Injector injector;
+
     private IPlaylist currentPlaylist;
+
+    private MessageDialogControl createPlaylistDialogControl;
 
     private void Start()
     {
@@ -58,7 +63,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
             .Subscribe(newValue => currentPlaylist = newValue);
 
         editPlaylistButton.RegisterCallbackButtonTriggered(_ => ShowEditCurrentPlaylistDialog());
-        createPlaylistButton.RegisterCallbackButtonTriggered(_ => CreateThenEditNewPlaylist());
+        createPlaylistButton.RegisterCallbackButtonTriggered(_ => OpenCreatePlaylistDialog());
         submitEditPlaylistButton.RegisterCallbackButtonTriggered(_ => SubmitEditPlaylistDialog());
         playlistNameTextField.RegisterValueChangedCallback(evt => OnPlaylistNameTextFieldChanged(evt.newValue));
         playlistNameTextField.DisableParseEscapeSequences();
@@ -85,11 +90,40 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
         });
     }
 
-    private void CreateThenEditNewPlaylist()
+    private void OpenCreatePlaylistDialog()
     {
-        UltraStarPlaylist newPlaylist = playlistManager.CreateNewPlaylist("New Playlist");
-        songSelectSceneControl.SongSelectionPlaylistChooserControl.Selection.Value = newPlaylist;
-        ShowEditCurrentPlaylistDialog();
+        if (createPlaylistDialogControl != null)
+        {
+            return;
+        }
+
+        createPlaylistDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_editPlaylistDialog_title));
+        createPlaylistDialogControl.DialogClosedEventStream.Subscribe(_ => createPlaylistDialogControl = null);
+
+        TextField newPlaylistNameTextField = new();
+        newPlaylistNameTextField.name = "newPlaylistNameTextField";
+        newPlaylistNameTextField.value = "New Playlist";
+        createPlaylistDialogControl.AddVisualElement(newPlaylistNameTextField);
+
+        createPlaylistDialogControl.AddButton(Translation.Get(R.Messages.action_cancel), R.Messages.action_cancel, _ => createPlaylistDialogControl.CloseDialog());
+        createPlaylistDialogControl.AddButton(Translation.Get(R.Messages.common_ok), R.Messages.common_ok, _ =>
+        {
+            if (newPlaylistNameTextField.value.IsNullOrEmpty())
+            {
+                createPlaylistDialogControl.CloseDialog();
+                return;
+            }
+
+            string newPlaylistName = newPlaylistNameTextField.value;
+            if (playlistManager.HasPlaylist(newPlaylistName))
+            {
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_editPlaylistDialog_error_duplicateName));
+                return;
+            }
+
+            createPlaylistDialogControl.CloseDialog();
+            playlistManager.CreateNewPlaylist(newPlaylistName);
+        });
     }
 
     private void OnPlaylistNameTextFieldChanged(string newPlaylistName)

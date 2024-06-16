@@ -1,0 +1,36 @@
+#TITLE:SomeTitle
+#ARTIST:SomeArtist
+#MP3:ogg.ogg
+#INSTRUMENTALAUDIO:SomeInstrumentalAudio.ogg
+#VOCALSAUDIO:SomeVocalsAudio.ogg
+#BPM:200
+#GAP:1500
+#GENRE:SomeGenre
+#BACKGROUND:SomeBackground.jpg
+#VIDEO:SomeVideo.mp4
+#VIDEOGAP:0.5
+#COVER:SomeCover.jpg
+#WEBSITE:https://SomeWebsite.com
+#EDITION:SomeEdition
+#LANGUAGE:English
+#START:2
+#YEAR:2012
+#END:4
+#PREVIEWSTART:2.1
+#PREVIEWEND:3.1
+#MEDLEYSTARTBEAT:10
+#MEDLEYENDBEAT:12
+#DUETSINGERP1:First Vocals
+#DUETSINGERP2:Second Vocals
+#UNSUPPORTEDFIELD:SomeOtherValue
+#NUMBERWITHCOMMA:42,5
+#NUMBERWITHDOT:43.2
+P1
+: 4 3 9 Hel
+: 8 3 9  lo-
+: 12 3 9  P1!
+P2
+: 4 3 9 Hel
+: 8 3 9  lo-
+: 12 3 9  P2!
+E

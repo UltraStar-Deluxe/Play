@@ -31,7 +31,7 @@ public static class UltraStarSongParser
             // Lazy load voices
             songMeta.DoLoadVoices = () =>
             {
-                using IDisposable d = new DisposableStopwatch($"Loading voices of '{filePath}' took <ms> ms");
+                using IDisposable d = new DisposableStopwatch($"Loading voices of '{filePath}' took <ms> ms", ELogEventLevel.Verbose);
                 List<Voice> voices = UltraStarSongVoicesParser.ParseFile(
                     songMeta.FileInfo.FullName,
                     songMeta.FileEncoding,
