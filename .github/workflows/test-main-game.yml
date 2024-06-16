@@ -31,14 +31,14 @@ jobs:
         with:
           fetch-depth: 0
           lfs: true
-      - uses: actions/cache@v2
-        with:
-          path: ${{ env.PROJECT_PATH }}/Library
-          key: Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-${{ hashFiles(env.PROJECT_PATH) }}
-          restore-keys: |
-            Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-
-            Library-${{ env.PROJECT_PATH }}-
-            Library-
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: ${{ env.PROJECT_PATH }}/Library
+      #     key: Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-${{ hashFiles(env.PROJECT_PATH) }}
+      #     restore-keys: |
+      #       Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-
+      #       Library-${{ env.PROJECT_PATH }}-
+      #       Library-
       
       # Run setup script
       - name: Setup Script
