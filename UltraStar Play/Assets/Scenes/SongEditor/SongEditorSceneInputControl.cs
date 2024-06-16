@@ -96,10 +96,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Jump to start / end of song
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToStartOfSong).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => songAudioPlayer.PositionInMillis = 0);
+            .Subscribe(_ => JumpToStartOfSong());
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToEndOfSong).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => songAudioPlayer.PositionInMillis = songAudioPlayer.DurationInMillis - 1);
+            .Subscribe(_ => JumpToEndOfSong());
 
         // Play / pause
         InputManager.GetInputAction(R.InputActions.songEditor_togglePause).PerformedAsObservable()
@@ -239,6 +239,32 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_zoomOutVertical).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(context => noteAreaControl.ZoomVertical(-1));
+    }
+
+    private void JumpToEndOfSong()
+    {
+        int endInBeats = SongMetaUtils.MaxBeat(songEditorSceneControl.GetAllNotes());
+        double endInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, endInBeats);
+        JumpToPosition(endInMillis, songAudioPlayer.DurationInMillis - 1);
+    }
+
+    private void JumpToStartOfSong()
+    {
+        int startInBeats = SongMetaUtils.MinBeat(songEditorSceneControl.GetAllNotes());
+        double startInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, startInBeats);
+        JumpToPosition(startInMillis, 0);
+    }
+
+    private void JumpToPosition(double primaryPosition, double secondaryPosition)
+    {
+        if (primaryPosition > 0
+            && Math.Abs(songAudioPlayer.PositionInMillis - primaryPosition) > 1)
+        {
+            songAudioPlayer.PositionInMillis = primaryPosition;
+            return;
+        }
+
+        songAudioPlayer.PositionInMillis = secondaryPosition;
     }
 
     public void DeleteSelectedNotes()
