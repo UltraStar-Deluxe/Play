@@ -1,4 +1,7 @@
-﻿namespace LibVLCSharp
+﻿#if HAS_VLC_UNITY
+#else
+
+namespace LibVLCSharp
 {
     public class MediaTrackList
     {
@@ -29,3 +32,5 @@
         public VideoOrientation Orientation { get; set; }
     }
 }
+
+#endif
