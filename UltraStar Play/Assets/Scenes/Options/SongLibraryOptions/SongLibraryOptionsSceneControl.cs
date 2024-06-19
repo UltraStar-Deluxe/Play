@@ -15,7 +15,7 @@ using UnityEngine.UIElements;
 
 public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection
 {
-    private static readonly string songArchiveInfoJsonUrl = "https://melodymania.org/downloads/song-archives-info.json";
+    private static readonly string songArchiveInfoJsonUrl = "https://ultrastar-play.com/downloads/song-archives-info.json";
 
     [InjectedInInspector]
     public VisualTreeAsset songFolderListEntryUi;

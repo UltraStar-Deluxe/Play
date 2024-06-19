@@ -19,7 +19,7 @@ public class BuildInfoGenerator : IPreprocessBuildWithReport
     public static readonly string websiteLinkPropertyName = "website_link";
     public static readonly string versionFile = "Assets/VERSION.txt";
 
-    private static readonly string websiteLinkPropertyValue = "https://melodymania.org/get";
+    private static readonly string websiteLinkPropertyValue = "https://ultrastar-play.com/get";
 
     public int callbackOrder => 0;
 
