@@ -6,7 +6,7 @@ public static class AndroidUtils
     /**
      * Returns the path where this app can store data.
      *
-     * Example return value: /storage/emulated/0/Android/data/com.MelodyMania.MelodyMania/files
+     * Example return value: /storage/emulated/0/Android/data/com.UltraStarPlay.UltraStarPlay/files
      *
      * @param sdCard if true, the path on the SD card is returned. Otherwise the path on non-removable memory hardware is returned.
      */
@@ -63,7 +63,7 @@ public static class AndroidUtils
      * Returns the path of the storage folder relative to the root path.
      * This is the path when browsing the device for example on Windows.
      *
-     * Example return value: Android/data/com.MelodyMania.MelodyMania/files
+     * Example return value: Android/data/com.UltraStarPlay.UltraStarPlay/files
      */
     public static string GetAppSpecificStorageRelativePath(bool sdCard)
     {
