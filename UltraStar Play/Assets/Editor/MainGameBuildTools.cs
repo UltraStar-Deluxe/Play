@@ -2,7 +2,7 @@ using UnityEditor;
 
 public static class MainGameBuildTools
 {
-    private static readonly string appName = "Melody Mania";
+    private static readonly string appName = "UltraStar Play";
 
     [MenuItem("Tools/Build/Build for release (Windows, macOS, Linux, signed apk, signed app bundle)")]
     public static void BuildAllForRelease()

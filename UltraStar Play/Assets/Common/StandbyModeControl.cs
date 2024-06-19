@@ -45,7 +45,7 @@ public class StandbyModeControl : AbstractSingletonBehaviour, INeedInjection
     {
         if (standby)
         {
-            if (GUI.Button(new Rect(10, 10, 200, 100), "Exit standby mode of \nMelody Mania"))
+            if (GUI.Button(new Rect(10, 10, 200, 100), "Exit standby mode of \nthe game"))
             {
                 DisableStandbyMode();
             }

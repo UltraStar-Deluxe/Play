@@ -361,7 +361,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     {
         string modNameNoSpaces = modName.Replace(" ", "");
         string dataPath = Application.isEditor
-            ? new DirectoryInfo(Application.dataPath + "/../../Build/Windows/Melody Mania_Data").FullName
+            ? new DirectoryInfo(Application.dataPath + "/../../Build/Windows/UltraStar Play_Data").FullName
             : Application.dataPath;
         return text
             .Replace(TemplateModNamePlaceholder, modNameNoSpaces)

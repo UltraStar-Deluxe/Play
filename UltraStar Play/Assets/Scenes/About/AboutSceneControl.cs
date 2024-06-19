@@ -16,7 +16,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
 {
     private static readonly InsertionOrderedDictionary<string, string> aboutTextFilesInStreamingAssets = new()
     {
-        { "Melody Mania", "InfoAndLegalTexts/Melody-Mania.txt" },
+        { "UltraStar Play", "InfoAndLegalTexts/UltraStar-Play.txt" },
         { "Licenses", "InfoAndLegalTexts/License-Overview.txt" },
         { "MIT License", "InfoAndLegalTexts/MIT-License.txt" },
         { "APL 2.0", "InfoAndLegalTexts/APL-2.0.txt" },

@@ -1,8 +1,8 @@
-Melody Mania uses third-party assets, code and libraries under various licenses.
+This software uses third-party assets, code and libraries under various licenses.
 
 This includes the Unity platform and related assets under the terms of Unity Technologies (https://unity3d.com/legal).
 
-Further, Melody Mania includes code and assets of the following projects, without claim on completeness:
+Further, this software includes code and assets of the following projects, without claim on completeness:
 
 
 MIT License
@@ -110,7 +110,7 @@ See https://assetstore.unity.com/packages/tools/video/vlc-for-unity-windows-1339
 
 VLC for Unity makes use of the following libraries,
 which are loaded at runtime from DLL files.
-To swap their implementation, replace the related DLL files in `Melody Mania_Data/Managed` or `Melody Mania_Data/Plugins`.
+To swap their implementation, replace the related DLL files in `UltraStar Play_Data/Managed` or `UltraStar Play_Data/Plugins`.
 
 A. LibVLC [LGPL 2.1+, Copyright © VLC authors and VideoLAN]
 B. LibVLCSharp [LGPL 2.1+, Copyright © VLC authors and VideoLAN]
@@ -123,7 +123,7 @@ See https://assetstore.unity.com/packages/tools/video/ffmpeg-for-unity-199811
 
 ffmpeg for Unity makes use of the following libraries,
 which are loaded at runtime from DLL files.
-To swap their implementation, replace the related DLL files in `Melody Mania_Data/Managed` or `Melody Mania_Data/Plugins`.
+To swap their implementation, replace the related DLL files in `UltraStar Play_Data/Managed` or `UltraStar Play_Data/Plugins`.
 
 ---
 ffmpeg: LGPLv2.1
