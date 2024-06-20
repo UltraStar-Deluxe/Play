@@ -1,7 +1,7 @@
 ﻿typeFullName,methodDeclaringTypeName,methodName
 TranslationExtensions, *, *
-ItemPicker, *, *
-ItemPicker+UxmlTraits, *, *
+Chooser, *, *
+Chooser+UxmlTraits, *, *
 AccordionItem, *, *
 AccordionItem+UxmlTraits, *, *
 ChipsCombo, *, *
@@ -9,7 +9,8 @@ FontIcon, *, *
 RadialProgressBar, *, *
 BaseListViewH, *, *
 NumberPickerControl, *, *
-PicturedItemPickerControl`1, *, *
+PicturedChooserControl`1, *, *
+NumberChooserControl, *, *
 MicWithNameControl, *, *
 SongQueueEntryUiControl, *, *
 ListViewHController, *, *
