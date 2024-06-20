@@ -129,7 +129,7 @@ public class SongSelectSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjec
 
         Button confirmButton = new();
         confirmButton.name = nameof(confirmButton);
-        confirmButton.text = Translation.Get(R.Messages.common_ok);
+        confirmButton.SetTranslatedText(Translation.Get(R.Messages.common_ok));
         confirmButton.AddToClassList(R.UssClasses.transparentButton);
         confirmButton.RegisterCallbackButtonTriggered(_ => songRouletteControl.SelectEntryBySongMeta(songMeta));
 

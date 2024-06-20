@@ -40,7 +40,6 @@ public class ArchUnitTranslationTest
     [TestCase("Common")]  // Common takes long to run (few minutes).
     [TestCase("Scenes")]
     [TestCase("SongEditorScene")]
-    // [Ignore("Not all label assignments refactored yet to use a translation object via custom extension method")]
     public void UiLabelAssignmentsAreTranslated(string assemblyName)
     {
         LoadIgnoredUntranslatedAssignments();
