@@ -9,8 +9,8 @@ CompanionClientListEntryUi.uxml, *, dummyPermissionToggle
 ContextMenuItemUi.uxml, *, *
 CreditsEntryUi.uxml, *, *
 CreditsSceneUi.uxml, *, *
-CurrentNetcodeLobbyUi.uxml, *, companionClientsListTitle
-CurrentSteamLobbyUi.uxml, *, companionClientsListTitle
+CurrentNetcodeLobbyUi.uxml, *, connectedClientsListTitle
+CurrentSteamLobbyUi.uxml, *, connectedClientsListTitle
 CurrentSteamLobbyUi.uxml, *, lobbyInfoLabel
 DevelopmentOptionsSceneUi.uxml, *, *
 DownloadSongArchiveUi.uxml, *, *
