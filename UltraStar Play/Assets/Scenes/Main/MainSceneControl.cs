@@ -5,7 +5,7 @@ using SteamOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -18,8 +18,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     static void StaticInit()
     {
         hasLoggedVersionInfo = false;
+        lastSupportTheProjectIconHighlightTimeInSeconds = 0;
     }
     private static bool hasLoggedVersionInfo;
+
+    private const float SupportTheProjectIconHighlightThresholdTimeInSeconds = 60 * 15;
+    private static float lastSupportTheProjectIconHighlightTimeInSeconds;
 
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
@@ -93,6 +97,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     [Inject(UxmlName = R.UxmlNames.onlineGameButton)]
     private Button onlineGameButton;
 
+    [Inject(UxmlName = R.UxmlNames.supportTheProjectButton)]
+    private Button supportTheProjectButton;
+
+    [Inject(UxmlName = R.UxmlNames.supportTheProjectIcon)]
+    private VisualElement supportTheProjectIcon;
+
     [Inject]
     private Settings settings;
 
@@ -117,6 +127,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     private MessageDialogControl quitGameDialogControl;
     private NewSongDialogControl newSongDialogControl;
     private OnlineMultiplayerConnectionDialogControl onlineMultiplayerConnectionDialogControl;
+    private MessageDialogControl supportTheProjectDialogControl;
     private SettingsProblemHintControl settingsProblemHintControl;
     private readonly BuildInfoUiControl buildInfoUiControl = new();
 
@@ -144,6 +155,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         creditsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.CreditsScene));
         quitButton.RegisterCallbackButtonTriggered(_ => OpenQuitGameDialog());
         createSongButton.RegisterCallbackButtonTriggered(_ => OpenNewSongDialog());
+        supportTheProjectButton.RegisterCallbackButtonTriggered(_ => OpenSupportTheProjectDialog());
+        HighlightSupportTheProjectButton();
 
         LeanTween.value(gameObject, 0, 1, 1f)
             .setOnUpdate(value =>
@@ -169,6 +182,41 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         micSampleRecorderManager.ConnectedMicDevicesChangesStream
             .Subscribe(_ => UpdateSettingsProblemHint())
             .AddTo(gameObject);
+    }
+
+    private void Update()
+    {
+        if (Keyboard.current.leftAltKey.wasPressedThisFrame)
+        {
+            AnimationUtils.HighlightIconWithBounce(gameObject, supportTheProjectIcon);
+        }
+    }
+
+    private void HighlightSupportTheProjectButton()
+    {
+        if (lastSupportTheProjectIconHighlightTimeInSeconds == 0
+            || TimeUtils.IsDurationAboveThresholdInSeconds(lastSupportTheProjectIconHighlightTimeInSeconds, SupportTheProjectIconHighlightThresholdTimeInSeconds))
+        {
+            lastSupportTheProjectIconHighlightTimeInSeconds = Time.time;
+            AnimationUtils.HighlightIconWithBounce(gameObject, supportTheProjectIcon);
+        }
+    }
+
+    private void OpenSupportTheProjectDialog()
+    {
+        if (supportTheProjectDialogControl != null)
+        {
+            return;
+        }
+
+        supportTheProjectDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_supportTheProjectDialog_title));
+        supportTheProjectDialogControl.Message = Translation.Get(R.Messages.mainScene_supportTheProjectDialog_message);
+        supportTheProjectDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
+            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_melodyMania)));
+        supportTheProjectDialogControl.AddButton(Translation.Get(R.Messages.action_buyOnSteam),
+            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_melodyMania_onSteam)));
+        supportTheProjectDialogControl.DialogClosedEventStream
+            .Subscribe(_ => supportTheProjectDialogControl = null);
     }
 
     private void OpenOnlineMultiplayerConnectionDialog()

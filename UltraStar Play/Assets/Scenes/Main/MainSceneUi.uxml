@@ -15,6 +15,9 @@
                     <ui:Label text="Build timestamp: yyMMddHHmm" name="buildTimeStampLabel" style="font-size: 12px; -unity-text-align: middle-left;" />
                 </ui:VisualElement>
             </ui:Button>
+            <ui:Button name="supportTheProjectButton" class="transparentButton circleButton">
+                <MaterialIcon name="supportTheProjectIcon" icon="favorite" class="errorFontColor" />
+            </ui:Button>
             <ui:Button name="createSongButton" class="transparentButton circleButton">
                 <MaterialIcon name="createSongIcon" icon="handyman" />
             </ui:Button>
