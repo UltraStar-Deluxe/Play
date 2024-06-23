@@ -12,7 +12,10 @@ using UnityEngine;
 public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    public PlayerMicPitchTracker PlayerMicPitchTracker { get; private set; }
+    private PlayerMicPitchTracker PlayerMicPitchTracker { get; set; }
+
+    [Inject]
+    private SingSceneMedleyControl medleyControl;
 
     private RecordedNote lastRecordedNote;
     private BeatAnalyzedEvent lastBeatAnalyzedEvent;
@@ -35,7 +38,6 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-
     public void OnInjectionFinished()
     {
         PlayerMicPitchTracker.BeatAnalyzedEventStream
@@ -44,6 +46,11 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)
     {
+        if (!medleyControl.IsBeatInMedleyRange(beatAnalyzedEvent.Beat))
+        {
+            return;
+        }
+
         Note analyzedNote = beatAnalyzedEvent.NoteAtBeat;
         if (lastRecordedNote != null
             && lastBeatAnalyzedEvent != null
@@ -73,7 +80,12 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void ContinueLastRecordedNote(int analyzedBeat, int targetNoteEndBeat)
     {
-        lastRecordedNote.EndBeat = analyzedBeat + 1;
+        int newEndBeat = analyzedBeat + 1;
+        if (lastRecordedNote.EndBeat < newEndBeat)
+        {
+            lastRecordedNote.EndBeat = newEndBeat;
+        }
+        
         if (targetNoteEndBeat >= 0
             && lastRecordedNote.EndBeat > targetNoteEndBeat)
         {

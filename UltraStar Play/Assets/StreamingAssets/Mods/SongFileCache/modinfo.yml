@@ -1,0 +1,13 @@
+name: Song File Cache
+version: 1.0.0
+description: |
+  Load large song collections faster
+  by caching references to found UltraStar txt files.
+  Therefor, use this mod's settings instead of a regular song folder.
+
+  The mod searches for UltraStar song files (*.txt files)
+  and stores the found files in a cache file.
+  Following executions can read the cache file
+  instead of searching through the file system again.
+authors:
+  - email@melodymania.com

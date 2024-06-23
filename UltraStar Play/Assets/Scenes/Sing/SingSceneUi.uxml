@@ -1,12 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="SingingLyricsTopUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsTopUi.uxml?fileID=9197481963319205126&amp;guid=e18d38c5ebc9c0e479d9ee9fa4ee4481&amp;type=3#SingingLyricsTopUi" />
     <ui:Template name="PlayerInfoUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/PlayerInfoUi.uxml?fileID=9197481963319205126&amp;guid=063c379bdb2070f438a6d361949a732d&amp;type=3#PlayerInfoUi" />
-    <ui:Template name="PlayerUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/PlayerUi.uxml?fileID=9197481963319205126&amp;guid=9b1872cb139c5e34f94035c97230fb5b&amp;type=3#PlayerUi" />
     <ui:Template name="SingingLyricsUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsBottomUi.uxml?fileID=9197481963319205126&amp;guid=3b914bf71af2e4748a4d38d046a11420&amp;type=3#SingingLyricsBottomUi" />
-    <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/UIDocuments/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
-    <ui:VisualElement name="background">
-        <ui:VisualElement name="songVideoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/Sing/SingSceneVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=d8b963bb121871f40acbd4b66020fbc2&amp;type=2#SingSceneVideoRenderTexture&apos;);" />
-        <ui:VisualElement name="songImage" style="width: 100%; height: 100%; position: absolute; display: none;" />
+    <ui:Template name="PlayerUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/PlayerUi.uxml?fileID=9197481963319205126&amp;guid=9b1872cb139c5e34f94035c97230fb5b&amp;type=3#PlayerUi" />
+    <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/Input/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
+    <ui:VisualElement name="background" style="justify-content: center;">
+        <ui:VisualElement name="songVideoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/Sing/SingSceneVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=d8b963bb121871f40acbd4b66020fbc2&amp;type=2#SingSceneVideoRenderTexture&apos;); -unity-background-scale-mode: scale-and-crop; background-color: rgb(0, 0, 0); opacity: 0;" />
+        <ui:VisualElement name="songImage" style="width: 100%; height: 100%; position: absolute; display: none; -unity-background-scale-mode: scale-and-crop; background-color: rgb(0, 0, 0);" />
         <ui:VisualElement name="webcamRenderContainerParent" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; height: 100%; position: absolute;">
             <ui:Image name="webcamRenderContainer" style="flex-grow: 1; background-color: rgb(0, 0, 0); display: none;" />
         </ui:VisualElement>
@@ -20,11 +20,8 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:Instance>
-        <ui:VisualElement name="playerUiContainer" style="width: 100%; flex-grow: 1;">
-            <ui:VisualElement name="spacer" style="flex-grow: 1;" />
-            <ui:Instance template="PlayerUi" name="playerUi" style="flex-grow: 1;" />
-        </ui:VisualElement>
-        <ui:Instance template="SingingLyricsUi" name="bottomLyricsContainer" style="border-top-left-radius: 10px; border-top-right-radius: 10px;">
+        <ui:VisualElement name="playerUiContainerPlaceholder" style="flex-grow: 1;" />
+        <ui:Instance template="SingingLyricsUi" name="bottomLyricsContainer" class="mt-auto" style="border-top-left-radius: 10px; border-top-right-radius: 10px;">
             <ui:VisualElement name="commonScoreSentenceRatingContainer" class="overlay" style="height: 50px; bottom: 100%; align-items: center;" />
             <ui:VisualElement name="playerInfoUiListParentBottom" style="width: 100%; padding-bottom: 2px; padding-left: 40px; flex-direction: row; padding-right: 20px;">
                 <ui:VisualElement name="playerInfoUiListBottomLeft" class="playerInfoUiList" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-start; align-items: flex-end; max-height: 1px;">
@@ -35,9 +32,21 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:Instance>
+        <ui:VisualElement name="playerUiContainer" style="width: 100%; position: absolute; flex-grow: 1; height: 50%;">
+            <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+            <ui:Instance template="PlayerUi" name="playerUi" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="bottomBarsOverlay" style="background-color: rgba(0, 0, 0, 0); position: absolute; bottom: 0; left: 0; width: 100%;">
+            <ui:ProgressBar value="80" name="passTheMicProgressBar" class="singSceneOverlayProgressBar" />
+            <ui:ProgressBar value="40" name="songTimeProgressBar" high-value="100" class="singSceneOverlayProgressBar" />
+            <ui:VisualElement name="detailedTimeBar" style="justify-content: center; height: 3px;">
+                <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
+                <ui:VisualElement name="timeBarPositionIndicator" style="position: absolute; width: 4px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="governanceOverlay" style="position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: flex-start;">
             <ui:VisualElement name="centerControls" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; justify-content: center; align-items: center;">
-                <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" class="circle overlay" style="width: 70px; height: 70px;">
+                <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" class="circle overlay ignoreTheme singSceneOverlayButton" style="width: 70px; height: 70px;">
                     <MaterialIcon tabindex="-1" icon="pause" name="pauseIcon" picking-mode="Ignore" style="font-size: 48px;" />
                     <MaterialIcon tabindex="-1" icon="play_arrow" name="playIcon" picking-mode="Ignore" style="font-size: 48px; display: none;" />
                 </ui:Button>
@@ -51,16 +60,19 @@
                     <ui:Instance template="InputDeviceIconContainer" name="inputDeviceIconTemplate" style="position: absolute; left: 10px; height: 100%;" />
                     <ui:Label text="Back: Escape" display-tooltip-when-elided="true" name="inputLegendLabel" class="inputLegendLabel" />
                 </ui:VisualElement>
-                <ui:VisualElement name="row" class="p-1" style="background-color: rgba(0, 0, 0, 0); width: 100%;">
-                    <ui:Button display-tooltip-when-elided="true" name="toggleMuteButton" class="transparentBackgroundColor">
-                        <MaterialIcon tabindex="-1" icon="volume_off" name="muteIcon" picking-mode="Ignore" />
-                        <MaterialIcon tabindex="-1" icon="volume_up" name="unmuteIcon" picking-mode="Ignore" style="display: none;" />
-                    </ui:Button>
-                    <ui:VisualElement name="timeBar" class="tinyFont timeBar" style="flex-direction: row; display: flex; flex-grow: 1; align-items: center;">
+                <ui:VisualElement name="row" class="p-1" style="background-color: rgba(0, 0, 0, 0); width: 100%; align-items: center;">
+                    <MaterialIcon tabindex="-1" icon="volume_up" name="volumeIcon" picking-mode="Ignore" class="mr-1" />
+                    <ui:VisualElement name="volumeSliderContainer" style="background-color: rgba(0, 0, 0, 0); width: 64px; justify-content: center;">
+                        <ui:SliderInt picking-mode="Ignore" value="42" high-value="100" name="volumeSlider" style="width: 100%;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="verticalSeparator" class="fontColor mx-2" style="background-color: rgb(188, 188, 188); width: 2px; height: 75%; opacity: 0.5; color: rgb(255, 255, 255); flex-shrink: 0;" />
+                    <ui:VisualElement name="timeBarAndLabelContainer" class="tinyFont timeBar" style="flex-direction: row; display: flex; flex-grow: 1; align-items: center; justify-content: space-around;">
                         <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" class="mr-1" style="min-width: 30px;" />
-                        <ui:VisualElement name="innerTimeBar" style="flex-grow: 1; justify-content: center; height: 5px;">
-                            <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
-                            <ui:VisualElement name="timeBarPositionIndicator" style="position: absolute; width: 4px;" />
+                        <ui:VisualElement name="timeBarsContainer" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; justify-content: center;">
+                            <ui:VisualElement name="governanceOverlayDetailedTimeBar" style="justify-content: center; height: 5px;">
+                                <ui:VisualElement name="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
+                                <ui:VisualElement name="timeBarPositionIndicator" style="position: absolute; width: 4px;" />
+                            </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:Button display-tooltip-when-elided="true" name="openControlsMenuButton" class="transparentBackgroundColor">
@@ -69,5 +81,6 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:Label tabindex="-1" text="9" display-tooltip-when-elided="true" name="countdownLabel" picking-mode="Ignore" class="errorFontColor" style="position: absolute; display: none;" />
     </ui:VisualElement>
 </ui:UXML>

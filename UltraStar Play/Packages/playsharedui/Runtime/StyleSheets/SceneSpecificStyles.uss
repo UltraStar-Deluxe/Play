@@ -1,15 +1,77 @@
 /**************************************************/
-/* MAIN SCENE */
-/**************************************************/
-
-.mainSceneButton {
-    width: 150px;
-    height: 60px;
-}
-
-/**************************************************/
 /* SONG SELECT SCENE */
 /**************************************************/
+.songSelectSongEntryIcon {
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(32, 32, 32, 0.35);
+    font-size: var(--font-size-l);
+}
+
+#jokerList {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#togglePlayerSelectedButton {
+    width: 120%;
+    height: 120%;
+}
+
+#songListView .unity-scroller--horizontal {
+    bottom: 20px;
+    left: 0;
+}
+
+#songListView .unity-base-slider__tracker {
+    visibility: hidden;
+}
+
+#songEntryUiRoot {
+    width: 150px;
+    padding-top: 60px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 2px;
+}
+
+#innerSongEntryUi {
+    transition: top 0.3s, width 0.3s, height 0.3s;
+    top: 0;
+    width: 142px;
+    height: 142px;
+}
+
+#innerSongEntryUi #songImageOuter {
+    width: 142px;
+    height: 142px;
+}
+
+.unity-collection-view__item--selected #innerSongEntryUi {
+    top: -20px;
+    /*width: 150px;*/
+    /*height: 150px;*/
+}
+
+#songEntryDarkOverlay {
+    background-color: rgba(0, 0, 0, 0.2);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.unity-collection-view__item--selected #songEntryDarkOverlay {
+    opacity: 0;
+}
+
+.searchFilterLabel {
+    align-self: flex-end;
+}
+
 .songSelectLyricsPreview {
     width: 100%;
     white-space: normal;
@@ -17,7 +79,7 @@
 }
 
 #playerImage {
-    transition: -unity-background-image-tint-color 0.5s;
+    transition: -unity-background-image-tint-color 0.5s, background-color 0.3s;
 }
 
 #searchTextField #unity-text-input {
@@ -92,8 +154,7 @@
 
 #searchErrorIcon {
     position: absolute;
-    top: auto;
-    bottom: 100%;
+    top: 100%;
 }
 
 #toggleFavoriteButton MaterialIcon {
@@ -106,6 +167,72 @@
 /**************************************************/
 /* SING SCENE */
 /**************************************************/
+#countdownLabel
+{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -unity-text-align: middle-center;
+    font-size: 120;
+    color: var(--control-color);
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset');
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+#innerTimeBar {
+    overflow: hidden;
+}
+
+#playerPitchIndicator {
+    width: 20px;
+    height: 20px;
+}
+
+.singSceneOverlayButton {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.singSceneOverlayButton:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.singSceneOverlayButton:focus {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.singSceneOverlayProgressBar {
+    opacity: 0.5;
+}
+
+.singSceneOverlayProgressBar .unity-progress-bar__container {
+    height: 2px;
+    min-height: auto;
+    max-height: none;
+}
+
+.singSceneOverlayProgressBar .unity-progress-bar__background {
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.singSceneOverlayProgressBar .unity-progress-bar__progress {
+    margin: 0;
+}
+
+.scrollingNoteStreamSentenceSeparator {
+    display: none;
+}
+
+#targetNoteImage {
+    background-image: url('project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/NoteUi/NoteBackground.png');
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#noteUiRoot.goldenNote #targetNoteImage {
+    background-image: url('project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/NoteUi/GoldenNoteBackground.png');
+    background-color: rgba(255, 215, 0, 0.4);
+}
+
 .singSceneContextMenu {
     background-color: rgba(0, 0, 0, 0.8);
     border-width: 0;
@@ -139,19 +266,20 @@
 }
 
 #playerScoreProgressBar {
-    width: 140%;
-    height: 140%;
-    --track-color: #f2f4f7;
+    width: 125%;
+    height: 125%;
+    --track-color: rgba(242, 244, 247, 0);
     --progress-color: #2e8418;
-    --border-size: 8;
+    --border-size: 10;
     border-radius: 50%;
 }
 
 #playerImageBorder {
+    display: none;
     border-radius: 50%;
     border-color: #2e8418;
-    border-width: 3%;
-    /* for perfect circle: width and height = 100% + (4 * border-width%) */ 
+    border-width: 5%;
+    /* for perfect circle: width and height = 100% + (4 * border-width%) */
     width: 112%;
     height: 112%;
 }
@@ -163,10 +291,11 @@
 }
 
 .singingLyrics {
-    /*-unity-font-style: bold;*/
+    font-size: 14px;
     -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset');
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(32, 32, 32, 0.5);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    /*-unity-text-outline-width: 1px;*/
+    /*-unity-text-outline-color: rgba(32, 32, 32, 0.5);*/
 }
 
 .lyricsContainer #playerNameLabel {
@@ -189,6 +318,10 @@
     font-size: var(--font-size);
 }
 
+.singingLyricsSpace{
+    width: 8px;
+}
+
 .currentNoteLyrics {
     color: var(--control-color);
 }
@@ -207,16 +340,26 @@
     margin-right: 0;
     margin-top: 0;
     margin-bottom: 0;
+    -unity-text-align: middle-left;
 }
 
 #timeBar {
     padding: 0;
 }
 
-.innerTimeBarSentenceEntryContainer {
+#innerTimeBarSentenceEntryContainer {
     background-color: #344054;
     border-radius: 4px;
+    overflow: hidden;
 }
+
+#detailedTimeBar #timeBarPositionIndicator {
+    background-color: #737372;
+}
+
+/*#detailedTimeBar #innerTimeBarSentenceEntryContainer {*/
+/*    background-color: rgba(0, 0, 0, 0);*/
+/*}*/
 
 #timeBarPositionIndicator {
     background-color: var(--font-color);
@@ -244,10 +387,20 @@
     padding-bottom: 0;
 }
 
+#playerInfoContainer {
+    align-items: stretch;
+}
+
+#playerInfoContainer #playerNameContainer {
+    justify-content: center;
+}
+
 #playerInfoContainer #playerImage {
     flex-shrink: 0;
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
+    border-width: 0.5px;
+    border-color: rgba(32, 32, 32, 0.25);
 }
 
 .singScenePlayerUi.singScenePlayerUiSmall #playerInfoContainer #playerImage {
@@ -276,17 +429,37 @@
     background-color: rgba(92, 92, 92, 0.5);
 }
 
-#targetNoteImage {
-    background-color: rgba(0, 0, 0, 0);
-}
-
-#targetNoteImage.goldenNote {
-    background-color: rgba(255, 215, 0, 0.4);
-}
-
 /**************************************************/
 /* SINGING RESULTS SCENE */
 /**************************************************/
+#knockOutLabel {
+    font-size: 32px;
+    rotate: 24deg;
+    color: #dc143c;
+    -unity-font-style: bold;
+}
+
+.teamResultLabel {
+    font-size: 32px;
+}
+
+#otherTeamsScrollView .teamResultLabel {
+    font-size: 18px;
+}
+
+#otherTeamsScrollView
+{
+    width: 60%;
+}
+
+#otherTeamsScrollView.intermediateTeamResults {
+    width: 80%;
+}
+
+#scoreName {
+    -unity-text-align: middle-left;
+}
+
 #scoreValue {
     min-width: 45px;
     -unity-text-align: middle-right;
@@ -341,11 +514,18 @@
     background-color: #F04438;
 }
 
+#modBonusScore > #scoreIcon {
+    background-color: #ed68f2;
+}
+
+
 #totalScore > #scoreIcon {
     visibility: hidden;
 }
 
 .scoreRow {
+    flex-grow: 1;
+    flex-direction: row;
     padding: 5px;
 }
 
@@ -357,13 +537,26 @@
 
 #singingResultsPlayerUiRoot {
     max-width: 250px;
-    max-height: 250px;
+    max-height: 280px;
+}
+
+#onePlayerLayout #singingResultsPlayerUiRoot {
+    max-height: 300px;
 }
 
 #playerScoreProgressBar.singingResults {
     min-width: 30px;
     min-height: 30px;
-    --border-size: 24;
+    width: 100%;
+    height: 100%;
+    --border-size: 18;
+}
+
+#singingResultsPlayerUiRoot #playerImage.singingResults {
+    width: 80%;
+    height: 80%;
+    border-width: 0.5px;
+    border-color: rgba(32, 32, 32, 0.25);
 }
 
 #singingResultsPlayerUiRoot AspectRatioPanel {
@@ -429,20 +622,33 @@
 /**************************************************/
 /* OPTIONS SCENES */
 /**************************************************/
+.deviceInfoLabel {
+    margin-bottom: 16px;
+}
+
+#permissionsContainer .unity-toggle__label {
+    min-width: 50;
+    margin-right: 8px;
+}
 
 .inactiveOverlay {
+    background-color: rgba(0, 0, 0, 0.5);
     transition: background-color 0.5s;
+}
+
+.inactiveOverlay.hidden {
+    background-color: rgba(0, 0, 0, 0);
 }
 
 #playerProfileEntryContent {
     border-color: var(--font-color);
 }
 
-#playerProfileImagePicker #previousItemButton {
+#playerProfileImageChooser #previousItemButton {
     width: 25px;
 }
 
-#playerProfileImagePicker #nextItemButton {
+#playerProfileImageChooser #nextItemButton {
     width: 25px;
 }
 
@@ -466,30 +672,15 @@
     min-width: 40px;
 }
 
-.optionsLabelAndItemPicker {
+.optionsLabelAndChooser {
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
     margin-bottom: 20px;
 }
 
-.optionsLabelAndItemPicker ItemPicker {
+.optionsLabelAndChooser Chooser {
     flex-grow: 1;
-}
-
-.optionsSceneMainContainer {
-    flex-grow: 1;
-    align-items: center;
-    justify-content: flex-start;
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    padding-left: 50px;
-    padding-right: 50px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    width: 100%;
 }
 
 .optionsSceneTopRow {
@@ -546,6 +737,12 @@
 .songIssueMessage {
     font-size: var(--font-size-s);
     white-space: normal;
+    margin-bottom: 4px;
+}
+
+.quickFixButton {
+    align-self: flex-start;
+    margin-bottom: 16px;
 }
 
 #loadedSceneTitle {
@@ -556,12 +753,46 @@
     width: 300px;
 }
 
-#loadedOptionsRoot > ItemPicker {
+#loadedOptionsRoot > Chooser {
     margin-bottom: 16px;
     height: auto;
 }
 
-#loadedOptionsRoot > ScrollView > ItemPicker {
+#loadedOptionsRoot > TextField {
+    margin-bottom: 16px;
+}
+
+#loadedOptionsRoot > IntegerField {
+    margin-bottom: 16px;
+}
+
+#loadedOptionsRoot > TextField > .unity-base-field__label {
+    width: 300px;
+}
+
+#loadedOptionsRoot > IntegerField > .unity-base-field__label {
+    width: 300px;
+}
+
+#loadedOptionsRoot > ScrollView > TextField > .unity-base-field__label {
+    width: 300px;
+}
+
+#loadedOptionsRoot > ScrollView > IntegerField > .unity-base-field__label {
+    width: 300px;
+}
+
+#loadedOptionsRoot > ScrollView > Chooser {
+    margin-bottom: 16px;
+    height: auto;
+}
+
+#loadedOptionsRoot > ScrollView > Button {
+    margin-bottom: 16px;
+    height: auto;
+}
+
+#loadedOptionsRoot > ScrollView > Toggle {
     margin-bottom: 16px;
     height: auto;
 }
@@ -569,6 +800,12 @@
 /**************************************************/
 /* ABOUT SCENE */
 /**************************************************/
+.aboutTextField {
+    font-size: var(--font-size-s);
+    white-space: normal;
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/RobotoMono-VariableFont_wght%20SDF.asset');
+}
+
 #aboutTextsScrollView ToggleButton {
     justify-content: flex-start;
     -unity-text-align: middle-left;
@@ -596,4 +833,19 @@
     padding-right: 50px;
     padding-top: 20px;
     padding-bottom: 40px;
+}
+
+/**************************************************/
+/* PARTY MODE SCENES */
+/**************************************************/
+
+.playerProfilePlaceholder {
+    height: var(--control-height);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#volumeSlider .unity-base-slider__dragger
+{
+    min-width: 12px;
 }

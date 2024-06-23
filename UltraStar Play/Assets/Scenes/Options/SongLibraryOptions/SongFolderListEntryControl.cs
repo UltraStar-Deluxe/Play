@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
@@ -29,11 +27,20 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
     [Inject(UxmlName = R.UxmlNames.deleteButton)]
     private Button deleteButton;
 
+    [Inject(UxmlName = R.UxmlNames.selectFolderButton)]
+    private Button selectFolderButton;
+
     [Inject(UxmlName = R.UxmlNames.openFolderButton)]
     private Button openSongFolderButton;
 
     [Inject(UxmlName = R.UxmlNames.driveButton)]
     private Button driveButton;
+
+    [Inject(UxmlName = R.UxmlNames.songFolderEnabledToggle)]
+    private SlideToggle songFolderEnabledToggle;
+
+    [Inject(UxmlName = R.UxmlNames.songFolderInactiveOverlay)]
+    private VisualElement songFolderInactiveOverlay;
 
     private readonly string androidSdCardPath;
     private readonly string androidInternalStoragePath;
@@ -45,8 +52,14 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
     private readonly Subject<string> valueChangedEventStream = new();
     public IObservable<string> ValueChangedEventStream => valueChangedEventStream;
 
-    private readonly Subject<bool> deleteEventStream = new();
-    public IObservable<bool> DeleteEventStream => deleteEventStream;
+    private readonly Subject<VoidEvent> deleteEventStream = new();
+    public IObservable<VoidEvent> DeleteEventStream => deleteEventStream;
+
+    private readonly Subject<bool> songFolderEnabledChangedEventStream = new();
+    public IObservable<bool> SongFolderEnabledChangedEventStream => songFolderEnabledChangedEventStream;
+
+    public bool IsSongFolderEnabled { get; private set; }
+    public string SongFolderPath => FullPath;
 
     public SongFolderListEntryControl()
     {
@@ -92,21 +105,58 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
 
         if (PlatformUtils.IsStandalone)
         {
+            selectFolderButton.RegisterCallbackButtonTriggered(_ => OpenSelectFolderDialog());
             openSongFolderButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(FullPath));
         }
         else
         {
+            selectFolderButton.HideByDisplay();
             openSongFolderButton.HideByDisplay();
         }
 
-        deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(true));
+        deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(VoidEvent.instance));
+        textField.DisableParseEscapeSequences();
         textField.RegisterValueChangedCallback(evt =>
         {
+            UpdateButtons();
             CheckPathIsValid();
             valueChangedEventStream.OnNext(FullPath);
         });
         androidDrivePath.Subscribe(_ => valueChangedEventStream.OnNext(FullPath));
+        UpdateButtons();
         CheckPathIsValid();
+
+        IsSongFolderEnabled = !settings.DisabledSongFolders.Contains(initialPath);
+        songFolderEnabledToggle.value = IsSongFolderEnabled;
+        songFolderEnabledToggle.RegisterValueChangedCallback(evt =>
+        {
+            IsSongFolderEnabled = evt.newValue;
+            UpdateInactiveOverlay();
+            songFolderEnabledChangedEventStream.OnNext(evt.newValue);
+        });
+        UpdateInactiveOverlay();
+    }
+
+    private void UpdateButtons()
+    {
+        openSongFolderButton.SetEnabled(!FullPath.IsNullOrEmpty()
+                                        && DirectoryUtils.Exists(FullPath));
+    }
+
+    private void UpdateInactiveOverlay()
+    {
+        songFolderInactiveOverlay.SetInClassList("hidden", IsSongFolderEnabled);
+    }
+
+    private void OpenSelectFolderDialog()
+    {
+        string selectedFolder = FileSystemDialogUtils.OpenFolderDialog("Open song folder", FullPath);
+        if (selectedFolder.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        textField.value = selectedFolder;
     }
 
     private void UpdateDriveButton()
@@ -121,16 +171,16 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         if (!androidInternalStoragePath.IsNullOrEmpty()
             && androidDrivePath.Value == androidInternalStoragePath)
         {
-            driveButton.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_androidInternalStorage);
+            driveButton.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_androidInternalStorage));
         }
         else if (!androidSdCardPath.IsNullOrEmpty()
                  && androidDrivePath.Value == androidSdCardPath)
         {
-            driveButton.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_androidSdCardStorage);
+            driveButton.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_androidSdCardStorage));
         }
         else
         {
-            driveButton.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_androidOtherStorage);
+            driveButton.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_androidOtherStorage));
         }
     }
 
@@ -179,13 +229,13 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
     private void HideWarning()
     {
         warningContainer.HideByDisplay();
-        warningLabel.text = "";
+        warningLabel.SetTranslatedText(Translation.Empty);
     }
 
-    private void ShowWarning(string message)
+    private void ShowWarning(Translation message)
     {
         warningContainer.ShowByDisplay();
-        warningLabel.text = message;
+        warningLabel.SetTranslatedText(message);
     }
 
     public void CheckPathIsValid()
@@ -193,13 +243,13 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         if (Directory.Exists(FullPath))
         {
             // Check this song folder is not already added, either directly or indirectly as subfolder.
-            if (SettingsProblemHintControl.IsDuplicateFolder(FullPath, settings.GameSettings.songDirs))
+            if (SettingsProblemHintControl.IsDuplicateFolder(FullPath, settings.SongDirs))
             {
-                ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_duplicate));
+                ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_duplicate));
             }
-            else if (SettingsProblemHintControl.IsSubfolderOfAnyOtherFolder(FullPath, settings.GameSettings.songDirs, out string parentFolder))
+            else if (SettingsProblemHintControl.IsSubfolderOfAnyOtherFolder(FullPath, settings.SongDirs, out string parentFolder))
             {
-                ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_subfolderOfOtherFolder,
+                ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_subfolderOfOtherFolder,
                     "parentFolder", parentFolder));
             }
             else
@@ -209,15 +259,15 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         }
         else if (FullPath.IsNullOrEmpty())
         {
-            ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_missingValue));
+            ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_missingValue));
         }
         else if (File.Exists(FullPath))
         {
-            ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_noFolder));
+            ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_noFolder));
         }
         else
         {
-            ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_doesNotExist));
+            ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_notFound));
         }
     }
 }

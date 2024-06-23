@@ -1,0 +1,37 @@
+{
+    "name": "PlayModeTests",
+    "rootNamespace": "",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "Unity.InputSystem",
+        "Unity.InputSystem.TestFramework",
+        "Serilog",
+        "UniRx",
+        "Responsible",
+        "com.achimmihca.uniinject",
+        "com.achimmihca.primeinputactions",
+        "playshared",
+        "playsharedui",
+        "Common",
+        "Scenes",
+        "SongEditorScene",
+        "Unity.InputSystem.IntegrationTests",
+        "EditorTests"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "Moq.dll",
+        "Facepunch.Steamworks.Win64.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

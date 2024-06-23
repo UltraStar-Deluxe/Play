@@ -1,16 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="background">
         <ui:VisualElement name="logoContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center;">
-            <ui:VisualElement name="logo" style="width: 50%; height: 50%; background-image: url(&apos;project://database/Assets/Scenes/Loading/UltraStarPlayLogo_2023_02.png?fileID=2800000&amp;guid=09b1a89e71bf9c447b3ecae7f999395e&amp;type=3#UltraStarPlayLogo_2023_02&apos;); -unity-background-scale-mode: scale-to-fit;" />
+            <ui:VisualElement name="logo" style="width: 50%; height: 50%;" />
         </ui:VisualElement>
-        <ui:VisualElement name="padding" class="optionsSceneMainContainer">
-            <ui:VisualElement name="labelContainer" style="width: 100%; flex-grow: 1; flex-direction: column-reverse;">
-                <ui:Label text="Loading..." name="loadingLabel" style="font-size: 25px; -unity-font-style: bold;" />
-            </ui:VisualElement>
+        <ui:VisualElement name="labelContainer" class="p-4" style="width: 100%; flex-grow: 1; flex-direction: column-reverse;">
+            <ui:Label text="Loading..." name="loadingLabel" style="font-size: 25px; -unity-font-style: bold;" />
         </ui:VisualElement>
         <ui:Button display-tooltip-when-elided="true" name="hiddenContinueButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%;" />
-        <ui:VisualElement name="unexpectedErrorContainer" picking-mode="Ignore" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); padding-left: 20px; padding-right: 20px; padding-top: 20px; padding-bottom: 20px; position: absolute; left: 0; top: 0; align-items: flex-start; display: none;">
-            <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="unexpectedErrorLabel" text="Oops! Something went wrong. See the log file for details about the issue." picking-mode="Ignore" style="margin-bottom: 10px;" />
+        <ui:VisualElement name="unexpectedErrorContainer" picking-mode="Ignore" class="p-4" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); padding-left: 20px; padding-right: 20px; padding-top: 20px; padding-bottom: 20px; position: absolute; left: 0; top: 0; align-items: flex-start; display: flex;">
+            <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="unexpectedErrorLabel" text="Oops! Something went wrong. See the log file for details about the issue." picking-mode="Ignore" style="margin-bottom: 10px; white-space: normal;" />
             <ui:VisualElement name="buttonRow" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row;">
                 <ui:Button text="View More" display-tooltip-when-elided="true" name="viewMoreButton" style="margin-right: 5px;" />
                 <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" />

@@ -71,7 +71,7 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
 
         if (Sentence.Voice != null)
         {
-            Color color = songEditorLayerManager.GetVoiceLayerColor(Sentence.Voice.Name);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(Sentence.Voice.Id);
             SetColor(color);
         }
 
@@ -111,12 +111,16 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
         float margin = 5;
         float width = Mathf.Max(VisualElement.worldBound.width + margin * 2, 400);
         float height = VisualElement.worldBound.height + margin * 2;
+        float left = Mathf.Max(0, VisualElement.worldBound.x);
+        float top = Mathf.Max(0, VisualElement.worldBound.y - margin);
         editLyricsPopup.style.position = new StyleEnum<Position>(Position.Absolute);
-        editLyricsPopup.style.left = VisualElement.worldBound.x;
-        editLyricsPopup.style.top = VisualElement.worldBound.y - margin;
+        editLyricsPopup.style.left = left;
+        editLyricsPopup.style.top = top;
         editLyricsPopup.style.width = width;
         editLyricsPopup.style.height = height;
-
+        editLyricsPopup.style.maxWidth = Length.Percent(100);
+        editLyricsPopup.style.maxHeight = Length.Percent(100);
+        
         lyricsInputControl = injector
             .WithBindingForInstance(this)
             .CreateAndInject<EditorSentenceLyricsInputControl>();

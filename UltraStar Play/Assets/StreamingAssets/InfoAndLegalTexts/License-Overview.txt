@@ -1,0 +1,255 @@
+This software uses third-party assets, code and libraries under various licenses.
+
+This includes the Unity platform and related assets under the terms of Unity Technologies (https://unity3d.com/legal).
+
+Further, this software includes code and assets of the following projects, without claim on completeness:
+
+
+MIT License
+-----------
+See https://opensource.org/license/MIT/
+
+- UltraStar Play
+    - https://github.com/UltraStar-Deluxe/Play
+
+- CSharpSynthForUnity2.0
+    - https://github.com/KNCarnage/CSharpSynthForUnity2.0
+
+- DynamicQueryable
+    - https://github.com/umutozel/DynamicQueryable
+
+- FullSerializer
+    - https://github.com/jacobdufault/fullserializer
+
+- Jokenizer.Net
+    - https://github.com/umutozel/Jokenizer.Net
+
+- LeanTween
+    - https://github.com/UltraStar-Deluxe/LeanTween
+
+- SharpZipLib
+    - https://github.com/icsharpcode/SharpZipLib
+
+- UniRX
+    - https://github.com/neuecc/UniRx
+
+- Bootstrap icons
+    - https://github.com/twbs/icons
+
+- Unity Builder (GitHub Actions, not included in build)
+    - https://github.com/game-ci/unity-builder
+
+- Unity Test Runner (GitHub Actions, not included in build)
+    - https://github.com/game-ci/unity-test-runner
+
+- Flurl
+    - https://github.com/tmenier/Flurl
+
+- HtmlAgilityPack
+    - https://github.com/zzzprojects/html-agility-pack
+
+- Facepunch.Steamworks
+    - https://github.com/Facepunch/Facepunch.Steamworks
+
+- Newtonsoft.Json
+    - https://github.com/JamesNK/Newtonsoft.Json
+
+- Spleeter
+    - https://github.com/deezer/spleeter/
+
+- UnityStandaloneFileBrowser
+    - https://github.com/gkngkc/UnityStandaloneFileBrowser
+
+- LiteNetLib
+    - https://github.com/RevenantX/LiteNetLib
+
+
+Apache License 2.0
+------------------
+See https://www.apache.org/licenses/LICENSE-2.0.html
+
+- NHyphenator
+    - https://github.com/alkozko/NHyphenator
+
+- Material Design Icons
+    - https://fonts.google.com/icons
+
+- Serilog
+    - https://github.com/serilog/serilog
+
+- Whisper Automatic Speech Recognition (ASR)
+    - https://github.com/openai/whisper
+    - https://github.com/ggerganov/whisper.cpp
+    - https://github.com/Macoron/whisper.unity
+
+- Opportunity.LrcParser
+    - https://github.com/OpportunityLiu/LrcParser
+
+- Basic Pitch
+    - https://github.com/spotify/basic-pitch
+
+
+Mozilla Public License
+----------------------
+See https://www.mozilla.org/en-US/MPL/1.1 respectively https://www.mozilla.org/en-US/MPL/2.0
+
+- UTF-Unknown, based on Mozilla Universal Charset Detector
+    - https://github.com/achimmihca/UTF-Unknown-Unity (MPL 2.0)
+    - https://github.com/CharsetDetector/UTF-unknown  (MPL 1.1)
+    - https://github.com/errepi/ude (MPL 1.1)
+
+
+Chromium Embedded Framework (CEF) License
+-----------------------------------------
+See https://github.com/chromiumembedded/cef/blob/master/LICENSE.txt
+
+
+VLC for Unity
+-------------
+See https://assetstore.unity.com/packages/tools/video/vlc-for-unity-windows-133979
+
+VLC for Unity makes use of the following libraries,
+which are loaded at runtime from DLL files.
+To swap their implementation, replace the related DLL files in `UltraStar Play_Data/Managed` or `UltraStar Play_Data/Plugins`.
+
+A. LibVLC [LGPL 2.1+, Copyright © VLC authors and VideoLAN]
+B. LibVLCSharp [LGPL 2.1+, Copyright © VLC authors and VideoLAN]
+C. LiberationSans Fonts [SIL Open Font License, Copyright © SIL International]
+
+
+ffmpeg for Unity
+----------------
+See https://assetstore.unity.com/packages/tools/video/ffmpeg-for-unity-199811
+
+ffmpeg for Unity makes use of the following libraries,
+which are loaded at runtime from DLL files.
+To swap their implementation, replace the related DLL files in `UltraStar Play_Data/Managed` or `UltraStar Play_Data/Plugins`.
+
+---
+ffmpeg: LGPLv2.1
+Copyright (c) 2000-2021 the FFmpeg developers
+
+ffmpeg-kit: LGPLv3 (for Android/iOS/Mac)
+
+SmartException: BSD 3-Clause (for Android)
+Copyright (c) 2019-2020, Taner Sener
+
+openh264: BSD 2-Clause / openh264 Binary License
+Copyright © 2014 Cisco Systems, Inc.
+
+libvpx: BSD 3-Clause
+Copyright (c) 2010, The WebM Project authors. All rights reserved.
+
+aom: BSD 2-Clause
+Copyright (c) 2016, Alliance for Open Media. All rights reserved.
+
+opus: BSD 3-Clause
+Copyright 2001-2011 Xiph.Org, Skype Limited, Octasic,
+Jean-Marc Valin, Timothy B. Terriberry,
+CSIRO, Gregory Maxwell, Mark Borgerding,
+Erik de Castro Lopo
+
+vorbis: BSD 3-Clause
+Copyright (c) 2002-2020 Xiph.org Foundation
+
+theora: BSD 3-Clause
+Copyright (C) 2002-2009 Xiph.org Foundation
+
+libwebp: BSD 3-Clause
+Copyright (c) 2010, Google Inc. All rights reserved.
+
+giflib: MIT License
+The GIFLIB distribution is Copyright (c) 1997 Eric S. Raymond
+
+libjpeg_turbo: BSD 3-Clause
+Copyright (C)2009-2020 D. R. Commander. All Rights Reserved.
+Copyright (C)2015 Viktor Szathmáry. All Rights Reserved.
+
+libogg: BSD 3-Clause
+Copyright (c) 2002, Xiph.org Foundation
+
+libpng: PNG Reference Library License version 2
+* Copyright (c) 1995-2019 The PNG Reference Library Authors.
+* Copyright (c) 2018-2019 Cosmin Truta.
+* Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson.
+* Copyright (c) 1996-1997 Andreas Dilger.
+* Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
+
+libtiff: libtiff License
+Copyright (c) 1988-1997 Sam Leffler
+Copyright (c) 1991-1997 Silicon Graphics, Inc.
+
+gmp: LGPLv3
+Copyright 1991, 1996, 1999, 2000, 2007 Free Software Foundation, Inc.
+
+nettle: LGPLv3
+Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+
+gnutls: LGPLv2.1
+Copyright (C) 1991, 1999 Free Software Foundation, Inc.
+
+winpthreads: MIT License & BSD 3-Clause
+Copyright (c) 2011 mingw-w64 project (MIT)
+* (C) 2010 Lockless Inc.
+* All rights reserved. (BSD)
+
+lame: LGPLv2
+Copyright (C) 1991 Free Software Foundation, Inc.
+59 Temple Place, Suite 330,
+Boston, MA 02111-1307 USA
+(www.mp3dev.org)
+
+sdl: zlib License
+Copyright (C) 1997-2022 Sam Lantinga
+<slouken@libsdl.org>
+
+libxml2: MIT License
+Copyright (C) 1998-2012 Daniel Veillard. All Rights Reserved.
+
+
+GeneralUser GS Soundfont License
+--------------------------------
+See http://www.schristiancollins.com/generaluser.php
+
+
+Pixabay Content License
+-----------------------
+See https://pixabay.com/service/terms
+
+Content from Pixabay has been used among other things for
+player profile images, background images, video loops, and sound effects.
+
+
+Unity Asset Store Terms of Service and EULA
+-------------------------------------------
+See https://unity.com/legal/as-terms
+
+Content from the Unity Asset Store has been used among other things for
+visual effects and sound effects.
+
+
+Sonniss - Game Audio Bundle
+---------------------------------
+See https://sonniss.com/gameaudiogdc
+
+This project includes sound effects from https://sonniss.com.
+
+Each year Sonniss give away sounds for free in celebration of the Game Developers Conference.
+All of the sound effects are royalty free and commercially usable with no attribution required.
+You can use the sound effects on an unlimited number of projects.
+
+
+Creative Commons
+----------------
+See https://creativecommons.org/licenses/by/3.0/
+See https://creativecommons.org/licenses/by-sa/3.0/
+
+- "Well Done" Copyright 2013 by Iwan Gabovitch <qubodup.net> multi-licensed under Creative Commons Attribution 3.0 license <http://creativecommons.org/licenses/by/3.0/legalcode>
+  and/or GPLv3+ <http://www.gnu.org/licenses/gpl.html>
+    - https://opengameart.org/content/well-done
+
+
+Free Music Archive
+------------------
+This project includes demo songs from Free Music Archive ( https://freemusicarchive.org ).
+Details about each song's license can be found in accompanying files next to the song.

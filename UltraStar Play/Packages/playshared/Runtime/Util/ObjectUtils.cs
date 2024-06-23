@@ -1,3 +1,5 @@
+using System;
+
 public static class ObjectUtils
 {
     // Swaps the values of a and b.
@@ -20,5 +22,25 @@ public static class ObjectUtils
         }
 
         return default(T);
+    }
+    
+    public static void AssertNotNull(object nullableReference, string paramName)
+    {
+        if (nullableReference == null)
+        {
+            throw new ArgumentNullException(paramName);
+        }
+    }
+
+    public static string NullableToString(object obj, string nullValueResult)
+    {
+        if (obj == null)
+        {
+            return nullValueResult;
+        }
+        else
+        {
+            return obj.ToString();
+        }
     }
 }

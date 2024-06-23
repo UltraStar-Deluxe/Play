@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="songListEntryUiRoot" style="flex-grow: 1;">
+        <ui:Button display-tooltip-when-elided="true" name="songListEntryButton" class="transparentBackgroundColor" style="align-items: flex-start; height: auto;">
+            <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="column" picking-mode="Ignore" style="background-color: rgba(0, 0, 0, 0); align-items: flex-start; flex-grow: 1;">
+                    <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="songListEntryTitleLabel" picking-mode="Ignore" text="Some Very Very Long Title" class="ellipsis largeFont" />
+                    <ui:Label tabindex="-1" text="Some Very Very Long Artist Name" display-tooltip-when-elided="true" name="songListEntryArtistLabel" picking-mode="Ignore" class="ellipsis smallFont" style="-unity-font-style: normal;" />
+                </ui:VisualElement>
+                <MaterialIcon name="hamburgerMenuIcon" icon="more_vert" picking-mode="Ignore" class="ml-auto" style="display: none;" />
+            </ui:VisualElement>
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

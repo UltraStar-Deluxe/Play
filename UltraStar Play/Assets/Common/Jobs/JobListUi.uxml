@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="JobListEntryUi" src="project://database/Assets/Common/Jobs/JobListEntryUi.uxml?fileID=9197481963319205126&amp;guid=3a751748bd1033043a8a84a4ea699582&amp;type=3#JobListEntryUi" />
+    <ui:ScrollView name="jobList" horizontal-scroller-visibility="Hidden" class="roundCorners">
+        <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center; border-left-color: rgb(240, 240, 240); border-right-color: rgb(240, 240, 240); border-top-color: rgb(240, 240, 240); border-bottom-color: rgb(240, 240, 240); border-bottom-width: 1px; width: 100%; flex-shrink: 0;">
+            <ui:Button display-tooltip-when-elided="true" name="toggleJobListButton" class="transparentBackgroundColor" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+                <MaterialIcon tabindex="-1" icon="south_east" name="toggleJobListIcon" />
+            </ui:Button>
+            <ui:Label tabindex="-1" text="Running Tasks" display-tooltip-when-elided="true" name="jobListTitle" style="-unity-font-style: bold; margin-left: auto; margin-right: auto;" />
+        </ui:VisualElement>
+        <ui:Instance template="JobListEntryUi" name="JobListEntryUi" />
+        <ui:Instance template="JobListEntryUi" name="JobListEntryUi" />
+        <ui:Instance template="JobListEntryUi" name="JobListEntryUi" />
+        <ui:Instance template="JobListEntryUi" name="JobListEntryUi" />
+    </ui:ScrollView>
+</ui:UXML>

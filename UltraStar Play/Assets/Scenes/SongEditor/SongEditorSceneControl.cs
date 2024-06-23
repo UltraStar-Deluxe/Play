@@ -33,16 +33,10 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public SongVideoPlayer songVideoPlayer;
 
     [InjectedInInspector]
-    public SongEditorNoteRecorder songEditorNoteRecorder;
-
-    [InjectedInInspector]
     public SongEditorSelectionControl selectionControl;
 
     [InjectedInInspector]
     public EditorNoteDisplayer editorNoteDisplayer;
-
-    [InjectedInInspector]
-    public SongEditorMicPitchTracker songEditorMicPitchTracker;
 
     [InjectedInInspector]
     public SongEditorHistoryManager historyManager;
@@ -55,6 +49,15 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [InjectedInInspector]
     public SongEditorSceneInputControl songEditorSceneInputControl;
+
+    [InjectedInInspector]
+    public SongEditorAlternativeAudioPlayer songEditorAlternativeAudioPlayer;
+
+    [InjectedInInspector]
+    public SongEditorMicSampleRecorder songEditorMicSampleRecorder;
+
+    [InjectedInInspector]
+    public StyleSheet songEditorSmallScreenStyleSheet;
 
     [Inject]
     private Injector injector;
@@ -69,25 +72,35 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private Settings settings;
 
     [Inject]
+    private SongMetaManager songMetaManager;
+
+    [Inject]
     private SceneNavigator sceneNavigator;
 
     [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
     private VisualElement editLyricsPopup;
 
+    [Inject(UxmlName = R.UxmlNames.rightSideBar)]
+    private VisualElement rightSideBar;
+
     [Inject]
     private ApplicationManager applicationManager;
+
+    [Inject]
+    private CursorManager cursorManager;
+
+    [Inject]
+    private AchievementEventStream achievementEventStream;
 
     private IDisposable autoSaveDisposable;
 
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new();
 
-    private double positionInSongInMillisWhenPlaybackStarted;
-
-    private readonly Dictionary<string, Color> voiceNameToColorMap = new();
+    private double positionInMillisWhenPlaybackStarted;
 
     private bool audioWaveFormInitialized;
 
-    public double StopPlaybackAfterPositionInSongInMillis { get; set; }
+    public double StopPlaybackAfterPositionInMillis { get; set; }
 
     private readonly OverviewAreaControl overviewAreaControl = new();
     private readonly VideoAreaControl videoAreaControl = new();
@@ -97,10 +110,14 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorSideBarControl sideBarControl = new();
     private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new();
     private readonly SongEditorStatusBarControl statusBarControl = new();
+    private readonly SongEditorBackgroundAudioWaveFormControl songEditorBackgroundAudioWaveFormControl = new();
+    private readonly SongEditorSearchControl songEditorSearchControl = new();
+    private readonly ImportLrcDialogControl importLrcDialogControl = new();
+    private readonly SongEditorPositionHistoryNavigationControl positionHistoryNavigationControl = new();
 
     [Inject]
     private SongEditorSceneData sceneData;
-    private SongMeta SongMeta => sceneData.SelectedSongMeta;
+    private SongMeta SongMeta => sceneData.SongMeta;
 
     private readonly List<IDialogControl> openDialogControls = new();
     public bool IsAnyDialogOpen => openDialogControls.Count > 0;
@@ -115,19 +132,43 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(sideBarControl);
         injector.Inject(issueAnalyzerControl);
         injector.Inject(statusBarControl);
+        injector.Inject(songEditorBackgroundAudioWaveFormControl);
+        injector.Inject(songEditorSearchControl);
+        injector.Inject(importLrcDialogControl);
+        injector.Inject(positionHistoryNavigationControl);
+        injector
+            .WithRootVisualElement(rightSideBar)
+            .CreateAndInject<DragToChangeRightSideBarWidthControl>();
     }
 
     private void Start()
     {
-        Debug.Log($"Start editing of '{sceneData.SelectedSongMeta.Title}' at {sceneData.PositionInSongInMillis} ms.");
-        songAudioPlayer.Init(SongMeta);
-        songVideoPlayer.SongMeta = SongMeta;
-        songAudioPlayer.PositionInSongInMillis = sceneData.PositionInSongInMillis;
+        Debug.Log($"Start editing of '{SongMeta.Title}' at {sceneData.PositionInMillis} ms.");
+
+        InitSongEditorStyleSheet();
+
+        songAudioPlayer.LoadAndPlayAsObservable(SongMeta, sceneData.PositionInMillis, false)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to load audio: {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
+            })
+            // Subscribe to trigger the (cold) observable.
+            .Subscribe(_ =>
+            {
+                songAudioPlayer.PauseAudio();
+            })
+            .AddTo(gameObject);
 
         songAudioPlayer.PlaybackStartedEventStream
-            .Subscribe(positionInSongInMillis => OnAudioPlaybackStarted(positionInSongInMillis));
+            .Subscribe(positionInMillis => OnAudioPlaybackStarted(positionInMillis));
         songAudioPlayer.PlaybackStoppedEventStream
             .Subscribe(_ => OnAudioPlaybackStopped());
+
+        songVideoPlayer.ForceSyncOnForwardJump = true;
+        songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
 
         HideEditLyricsPopup();
 
@@ -137,11 +178,56 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
 
         InitAutoSave();
+
+        InitSteamAchievement();
+
+        if (sceneData.CreateSingAlongDataViaAiTools)
+        {
+            CreateSingAlongDataViaAiTools();
+        }
+    }
+
+    private void CreateSingAlongDataViaAiTools()
+    {
+        CreateSingAlongSongControl createSingAlongSongControl = injector
+            .CreateAndInject<CreateSingAlongSongControl>();
+        createSingAlongSongControl.CreateSingAlongSongAsObservable(SongMeta, true)
+            .Subscribe(evt =>
+            {
+                Debug.Log($"Created sing-along data for song '{SongMeta.GetArtistDashTitle()}'");
+                editorNoteDisplayer.ClearNoteControls();
+                songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+            });
+    }
+
+    private void InitSongEditorStyleSheet()
+    {
+        uiDocument.rootVisualElement.AddToClassList(R.UssClasses.songEditorRoot);
+
+        if (ApplicationUtils.IsSmallScreen()
+            && songEditorSmallScreenStyleSheet != null)
+        {
+            uiDocument.rootVisualElement.styleSheets.Add(songEditorSmallScreenStyleSheet);
+        }
+    }
+
+    private void InitSteamAchievement()
+    {
+        songMetaChangeEventStream
+            .Subscribe(evt =>
+            {
+                if (evt is NotesChangedEvent)
+                {
+                    achievementEventStream.OnNext(new AchievementEvent(AchievementId.editNotesInSongEditor));
+                }
+            })
+            .AddTo(gameObject);
     }
 
     private void OnDestroy()
     {
         videoAreaControl.Dispose();
+        cursorManager.SetDefaultCursor();
     }
 
     private void InitAutoSave()
@@ -201,11 +287,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     {
         // Automatically stop playback after a given threshold (e.g. only play the selected notes)
         if (songAudioPlayer.IsPlaying
-            && StopPlaybackAfterPositionInSongInMillis > 0
-            && songAudioPlayer.PositionInSongInMillis > StopPlaybackAfterPositionInSongInMillis)
+            && StopPlaybackAfterPositionInMillis > 0
+            && songAudioPlayer.PositionInMillis > StopPlaybackAfterPositionInMillis)
         {
             songAudioPlayer.PauseAudio();
-            StopPlaybackAfterPositionInSongInMillis = 0;
+            StopPlaybackAfterPositionInMillis = 0;
         }
 
         lyricsAreaControl.Update();
@@ -223,45 +309,31 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
                                             invertedGoToLastPlaybackPositionBehavior);
         if (goToLastPlaybackPosition)
         {
-            songAudioPlayer.PositionInSongInMillis = positionInSongInMillisWhenPlaybackStarted;
+            songAudioPlayer.PositionInMillis = positionInMillisWhenPlaybackStarted;
         }
     }
 
-    private void OnAudioPlaybackStarted(double positionInSongInMillis)
+    private void OnAudioPlaybackStarted(double positionInMillis)
     {
-        positionInSongInMillisWhenPlaybackStarted = positionInSongInMillis;
+        positionInMillisWhenPlaybackStarted = positionInMillis;
+    }
+
+    public List<Note> GetAllNotes()
+    {
+        return SongMeta.Voices
+                // Second voice is drawn on top of first voice. Thus, start with second voice.
+                .Reverse()
+                .SelectMany(voice => voice.Sentences)
+                .SelectMany(sentence => sentence.Notes)
+                .Union(songEditorLayerManager.GetAllEnumLayerNotes())
+                .ToList();
     }
 
     public List<Note> GetAllVisibleNotes()
     {
-        List<Note> result = new();
-        List<Note> notesInVoices = SongMeta.GetVoices()
-            // Second voice is drawn on top of first voice. Thus, start with second voice.
-            .Reverse()
-            .SelectMany(voice => voice.Sentences)
-            .SelectMany(sentence => sentence.Notes)
-            .Where(note => songEditorLayerManager.IsNoteVisible(note))
-            .ToList();
-        List<Note> notesInLayers = songEditorLayerManager.GetAllEnumLayerNotes();
-        result.AddRange(notesInLayers);
-        result.AddRange(notesInVoices);
-        return result;
-    }
-
-    private void CreateVoiceToColorMap()
-    {
-        List<Color> colors = new()
-        {
-            Colors.CreateColor("#"),
-            Colors.CreateColor("#"),
-        };
-        int index = 0;
-        foreach (Color color in colors)
-        {
-            string voiceName = "P" + (index + 1);
-            voiceNameToColorMap[voiceName] = colors[index];
-            index++;
-        }
+        return GetAllNotes()
+                .Where(note => songEditorLayerManager.IsNoteVisible(note))
+                .ToList();
     }
 
     private void DoAutoSaveIfEnabled()
@@ -271,29 +343,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             return;
         }
 
-        SaveSong(true);
-    }
-
-    public void SaveSong(bool isAutoSave=false)
-    {
-        string songFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;
-
-        try
-        {
-            // Write the song data structure to the file.
-            UltraStarSongFileWriter.WriteFile(songFile, SongMeta);
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            UiManager.CreateNotification("Saving the file failed:\n" + e.Message);
-            return;
-        }
-
-        if (!isAutoSave)
-        {
-            UiManager.CreateNotification("Saved file");
-        }
+        songMetaManager.SaveSong(SongMeta, settings.SongEditorSettings.AutoSave);
     }
 
     public void ContinueToSingScene()
@@ -306,12 +356,12 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         else
         {
             singSceneData = new SingSceneData();
-            singSceneData.SelectedSongMeta = sceneData.SelectedSongMeta;
-            singSceneData.SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles;
-            singSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
+            singSceneData.SongMetas = new List<SongMeta> { sceneData.SongMeta };
+            singSceneData.SingScenePlayerData.SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles;
+            singSceneData.SingScenePlayerData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
         }
-        singSceneData.PositionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
-        sceneNavigator.LoadScene(EScene.SingScene, sceneData.PreviousSceneData);
+        singSceneData.PositionInMillis = songAudioPlayer.PositionInMillis;
+        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 
     public void ContinueToSongSelectScene()
@@ -325,7 +375,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         {
             songSelectSceneData = new SongSelectSceneData();
         }
-        songSelectSceneData.SongMeta = sceneData.SelectedSongMeta;
+        songSelectSceneData.SongMeta = sceneData.SongMeta;
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 
@@ -338,7 +388,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
         ContinueToSongSelectScene();
     }
-    
+
     public void ToggleAudioPlayPause()
     {
         if (songAudioPlayer.IsPlaying)
@@ -350,7 +400,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             songAudioPlayer.PlayAudio();
         }
     }
-    
+
     public void StartEditingSelectedNoteText()
     {
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
@@ -365,7 +415,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
     }
 
-    public void CreateNumberInputDialog(string title, string message, Action<float> useNumberCallback)
+    public void CreateNumberInputDialog(Translation title, Translation message, Action<float> useNumberCallback)
     {
         void UseValueCallback(string text)
         {
@@ -394,42 +444,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             .Subscribe(_ => openDialogControls.Remove(dialogControl));
     }
 
-    public void CreatePathInputDialog(
-        string title,
-        string message,
-        string initialValue,
-        Action<string> usePathCallback)
-    {
-        void UseValueCallback(string path)
-        {
-            path = path.Trim();
-            if (!File.Exists(path))
-            {
-                Debug.Log($"File does not exist: {path}");
-                UiManager.CreateNotification($"File does not exist");
-            }
-            usePathCallback(path);
-        }
-
-        VisualElement visualElement = valueInputDialogUi.CloneTree();
-        visualElement.AddToClassList("overlay");
-        uiDocument.rootVisualElement.Add(visualElement);
-
-        PathInputDialogControl dialogControl = injector
-            .WithRootVisualElement(visualElement)
-            .CreateAndInject<PathInputDialogControl>();
-        dialogControl.Title = title;
-        dialogControl.Message = message;
-        dialogControl.InitialValue = initialValue;
-
-        dialogControl.SubmitValueEventStream
-            .Subscribe(newValue => UseValueCallback(newValue));
-
-        openDialogControls.Add(dialogControl);
-        dialogControl.DialogClosedEventStream
-            .Subscribe(_ => openDialogControls.Remove(dialogControl));
-    }
-
     public void CloseAllOpenDialogs()
     {
         openDialogControls
@@ -446,14 +460,16 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(songEditorSceneData);
-        bb.BindExistingInstance(songEditorSceneData.SelectedSongMeta);
+        bb.BindExistingInstance(songEditorSceneData.SongMeta);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteAreaControl);
         bb.BindExistingInstance(songEditorLayerManager);
-        bb.BindExistingInstance(songEditorMicPitchTracker);
-        bb.BindExistingInstance(songEditorNoteRecorder);
+        bb.BindExistingInstance(songEditorMicSampleRecorder);
+        bb.BindExistingInstance(importLrcDialogControl);
+        bb.BindExistingInstance(songEditorAlternativeAudioPlayer);
         bb.BindExistingInstance(selectionControl);
+        bb.BindExistingInstance(songEditorSearchControl);
         bb.BindExistingInstance(lyricsAreaControl);
         bb.BindExistingInstance(editorNoteDisplayer);
         bb.BindExistingInstance(sideBarControl);

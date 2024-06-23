@@ -1,12 +1,7 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
-using UnityEngine.SceneManagement;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -30,7 +25,7 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
     {
         get
         {
-            if (settings.AudioSettings.BackgroundMusicVolumePercent <= 0)
+            if (settings.BackgroundMusicVolumePercent <= 0)
             {
                 return false;
             }
@@ -42,24 +37,22 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSource backgroundMusicAudioSource;
+    public AudioSource BackgroundMusicAudioSource => backgroundMusicAudioSource;
 
     [Inject]
     private Settings settings;
 
     [Inject]
     private SceneRecipeManager sceneRecipeManager;
-    
+
     [Inject]
     private ThemeManager themeManager;
 
     [Inject]
-    private AudioManager audioManager;
-    
-    [Inject]
     private SceneNavigator sceneNavigator;
 
     private float lastPauseTimeInSeconds;
-    
+
     private AudioClip defaultBackgroundMusicAudioClip;
 
     protected override object GetInstance()
@@ -70,10 +63,10 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
     protected override void StartSingleton()
     {
         defaultBackgroundMusicAudioClip = backgroundMusicAudioSource.clip;
-        settings.ObserveEveryValueChanged(it => it.AudioSettings.BackgroundMusicVolumePercent)
+        settings.ObserveEveryValueChanged(it => it.BackgroundMusicVolumePercent)
             .Subscribe(_ => UpdateBackgroundMusic())
             .AddTo(gameObject);
-        settings.ObserveEveryValueChanged(it => it.GraphicSettings.themeName)
+        settings.ObserveEveryValueChanged(it => it.ThemeName)
             .Subscribe(_ => UpdateBackgroundMusic())
             .AddTo(gameObject);
         sceneNavigator.SceneChangedEventStream
@@ -86,7 +79,7 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
         UpdateAudioClip();
 
         // Update volume
-        backgroundMusicAudioSource.volume = settings.AudioSettings.BackgroundMusicVolumePercent / 100f;
+        backgroundMusicAudioSource.volume = settings.BackgroundMusicVolumePercent / 100f;
 
         // Play or pause the music
         if (ShouldPlayBackgroundMusic
@@ -100,6 +93,8 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
                 Debug.Log($"Did not play background music for {timeInSecondsWithoutBackgroundMusic} seconds. Restarting it from the beginning.");
                 backgroundMusicAudioSource.Stop();
             }
+
+            backgroundMusicAudioSource.loop = true;
             backgroundMusicAudioSource.Play();
         }
         else if (!ShouldPlayBackgroundMusic
@@ -112,24 +107,25 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 
     private void UpdateAudioClip()
     {
-        AudioClip loadedAudioClip = null;
         ThemeMeta currentTheme = themeManager.GetCurrentTheme();
         string backgroundMusicPath = currentTheme?.ThemeJson?.backgroundMusic;
         if (!backgroundMusicPath.IsNullOrEmpty())
         {
             string absolutePath = ThemeMetaUtils.GetAbsoluteFilePath(currentTheme, backgroundMusicPath);
-            loadedAudioClip = audioManager.LoadAudioClipFromUri(absolutePath);
-        }
-
-        if (loadedAudioClip != null
-            && backgroundMusicAudioSource.clip != loadedAudioClip)
-        {
-            backgroundMusicAudioSource.clip = loadedAudioClip;
-        }
-        else if (loadedAudioClip == null
-                 && backgroundMusicAudioSource.clip != defaultBackgroundMusicAudioClip)
-        {
-            backgroundMusicAudioSource.clip = defaultBackgroundMusicAudioClip;
+            AudioManager.LoadAudioClipFromUri(absolutePath)
+                .Subscribe(loadedAudioClip =>
+                {
+                    if (loadedAudioClip != null
+                        && backgroundMusicAudioSource.clip != loadedAudioClip)
+                    {
+                        backgroundMusicAudioSource.clip = loadedAudioClip;
+                    }
+                    else if (loadedAudioClip == null
+                             && backgroundMusicAudioSource.clip != defaultBackgroundMusicAudioClip)
+                    {
+                        backgroundMusicAudioSource.clip = defaultBackgroundMusicAudioClip;
+                    }
+                });
         }
     }
 }

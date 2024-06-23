@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="songSelectionUi">
+        <Chooser name="roundCountChooser" label="$partyModeScene_rounds" wrap-around="true" min-value="1" max-value="12" class="controlWithLabelHorizontal noBackgroundInHierarchy" style="align-items: center; margin-bottom: 5px;" />
+        <Chooser name="songSelectionChooser" label="$partyModeScene_songSelection" wrap-around="true" class="controlWithLabelHorizontal noBackgroundInHierarchy" style="align-items: center; margin-bottom: 5px;" />
+        <Chooser name="songSelectionPlaylistChooser" label="$partyModeScene_playlist" wrap-around="true" class="controlWithLabelHorizontal noBackgroundInHierarchy" style="margin-bottom: 5px;" />
+        <Chooser name="songSelectionJokerCountChooser" label="$partyModeScene_jokerCount" wrap-around="true" class="controlWithLabelHorizontal mb-2 noBackgroundInHierarchy" style="margin-bottom: 5px;" />
+        <ui:Toggle name="knockOutTournamentItemToggle" label="$partyModeScene_knockOutTournament" class="controlWithLabelHorizontal mb-2 noBackgroundInHierarchy" style="margin-bottom: 5px;" />
+        <ui:Toggle name="freeForAllItemToggle" label="$partyModeScene_freeForAll" class="controlWithLabelHorizontal mb-2 noBackgroundInHierarchy" style="margin-bottom: 5px;" />
+    </ui:VisualElement>
+</ui:UXML>

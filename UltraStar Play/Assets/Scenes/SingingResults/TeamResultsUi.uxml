@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="TeamResultsTeamUi" src="project://database/Assets/Scenes/SingingResults/TeamResultsTeamUi.uxml?fileID=9197481963319205126&amp;guid=714ec31c3ce3711439bf40d845ea1e51&amp;type=3#TeamResultsTeamUi" />
+    <ui:VisualElement name="teamResultsUiRoot" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: column; align-items: flex-end; justify-content: center;">
+        <ui:VisualElement name="topThreeContainer" style="background-color: rgba(0, 0, 0, 0); width: 100%; align-items: flex-end;">
+            <ui:VisualElement name="firstTeamUi" class="mb-3" style="background-color: rgba(0, 0, 0, 0); flex-direction: row-reverse; align-items: center; width: 98%; right: 10px;">
+                <ui:Instance template="TeamResultsTeamUi" />
+                <ui:VisualElement name="firstPlaceTrophyImage" style="height: 120%; width: 80px; background-image: url(&apos;project://database/Assets/Common/Graphics/TrophyAndMedals/emoji_u1f3c6.png?fileID=2800000&amp;guid=0dd302e1c119b924c957327f63f76d94&amp;type=3#emoji_u1f3c6&apos;); -unity-background-scale-mode: scale-to-fit;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="secondTeamUi" class="mb-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 90%; margin-right: 20px; flex-direction: row-reverse;">
+                <ui:Instance template="TeamResultsTeamUi" />
+                <ui:VisualElement name="secondPlaceTrophyImage" style="height: 120%; width: 64px; background-image: url(&apos;project://database/Assets/Common/Graphics/TrophyAndMedals/silver-medal.png?fileID=2800000&amp;guid=f452f0017b6ba5141a90466a20bac487&amp;type=3#silver-medal&apos;); -unity-background-scale-mode: scale-to-fit; flex-shrink: 0;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="thirdTeamUi" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 80%; margin-right: 40px; flex-direction: row-reverse;">
+                <ui:Instance template="TeamResultsTeamUi" />
+                <ui:VisualElement name="secondPlaceTrophyImage" style="height: 120%; width: 64px; background-image: url(&apos;project://database/Assets/Common/Graphics/TrophyAndMedals/bronze-medal.png?fileID=2800000&amp;guid=a92c7bfe3e6017f4382b6ac0816c6298&amp;type=3#bronze-medal&apos;); -unity-background-scale-mode: scale-to-fit; flex-shrink: 0;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="otherTeamsScrollView" class="mt-4" style="margin-right: 60px; margin-bottom: 10px; flex-grow: 1;">
+            <ui:Instance template="TeamResultsTeamUi" name="TeamResultTeamUi" />
+            <ui:Instance template="TeamResultsTeamUi" name="TeamResultTeamUi" />
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

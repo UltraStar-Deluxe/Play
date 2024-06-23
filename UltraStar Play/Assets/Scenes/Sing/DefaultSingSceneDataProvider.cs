@@ -7,6 +7,11 @@ using UnityEngine;
 // when starting the SingScene from within the Unity editor.
 public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider, INeedInjection
 {
+    public bool isMedley;
+
+    [Range(1, 16)]
+    public int playerCount = 1;
+    
     public string defaultSongName;
 
     [TextArea(10, 20)]
@@ -16,30 +21,46 @@ public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProv
     public SceneData GetDefaultSceneData()
     {
         SingSceneData defaultSceneData = new();
-        defaultSceneData.SelectedSongMeta = GetDefaultSongMeta();
+        defaultSceneData.SongMetas = new List<SongMeta> { GetDefaultSongMeta() };
+        defaultSceneData.MedleySongIndex = isMedley ? 0 : -1;
 
-        PlayerProfile playerProfile = GetDefaultPlayerProfile();
-        defaultSceneData.SelectedPlayerProfiles.Add(playerProfile);
-        defaultSceneData.PlayerProfileToMicProfileMap[playerProfile] = GetDefaultMicProfile();
+        for (int i = 0; i < playerCount; i++)
+        {
+            PlayerProfile playerProfile = GetPlayerProfile(i);
+            if (playerProfile == null)
+            {
+                break;
+            }
+            
+            defaultSceneData.SingScenePlayerData.SelectedPlayerProfiles.Add(playerProfile);
+            defaultSceneData.SingScenePlayerData.PlayerProfileToMicProfileMap[playerProfile] = GetMicProfile(i);
+        }
 
         return defaultSceneData;
     }
 
-    private PlayerProfile GetDefaultPlayerProfile()
+    private PlayerProfile GetPlayerProfile(int index)
     {
         List<PlayerProfile> allPlayerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
-        if (allPlayerProfiles.IsNullOrEmpty())
+        if (index >= allPlayerProfiles.Count)
         {
-            throw new UnityException("No player profiles found.");
+            return null;
         }
-        PlayerProfile result = allPlayerProfiles[0];
-        return result;
+        
+        return allPlayerProfiles[index];
     }
 
-    private MicProfile GetDefaultMicProfile()
+    private MicProfile GetMicProfile(int index)
     {
-        return SettingsManager.Instance.Settings.MicProfiles
-            .FirstOrDefault(it => it.IsEnabled && it.IsConnected(ServerSideConnectRequestManager.Instance));
+        List<MicProfile> micProfiles = SettingsManager.Instance.Settings.MicProfiles
+            .Where(it => it.IsEnabled && it.IsConnected(ServerSideCompanionClientManager.Instance))
+            .ToList();
+        if (index >= micProfiles.Count)
+        {
+            return null;
+        }
+
+        return micProfiles[index];
     }
 
     private SongMeta GetDefaultSongMeta()

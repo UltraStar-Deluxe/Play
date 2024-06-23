@@ -2,6 +2,8 @@
 {
     public CompanionAppMessageType MessageType { get; set; }
 
+    public long UnixTimeMilliseconds { get; set; }  
+
     public CompanionAppMessageDto()
     {
     }

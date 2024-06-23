@@ -7,7 +7,7 @@ public static class CompanionAppMessageUtils
     {
         try
         {
-            HasMessageType hasMessageType = JsonConverter.FromJson<HasMessageType>(json, false);
+            HasMessageType hasMessageType = JsonConverter.FromJson<HasMessageType>(json);
             if (Enum.TryParse(hasMessageType.MessageType, out messageType))
             {
                 // OK. MessageType is valid.
@@ -26,7 +26,7 @@ public static class CompanionAppMessageUtils
             return false;
         }
     }
-    
+
     private class HasMessageType
     {
         public string MessageType { get; set; }

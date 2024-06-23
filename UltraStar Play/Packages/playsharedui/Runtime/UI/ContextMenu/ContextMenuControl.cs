@@ -12,7 +12,14 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
 {
     private static readonly Vector2 popupOffset = new(2, 2);
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        anyContextMenuOpenedEventStream = new();
+    }
+
     public Action<ContextMenuPopupControl> FillContextMenuAction { get; set; }
+    public Func<bool> ShouldOpenContextMenuFunction { get; set; }
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     protected VisualElement targetVisualElement;
@@ -33,12 +40,17 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
     private Vector2 pointerDownPosition;
 
     private readonly List<IDisposable> disposables = new();
-    
+
+    private static Subject<ContextMenuPopupControl> anyContextMenuOpenedEventStream = new();
+    public static Subject<ContextMenuPopupControl> AnyContextMenuOpenedEventStream => anyContextMenuOpenedEventStream;
+
     private readonly Subject<ContextMenuPopupControl> contextMenuOpenedEventStream = new();
     public IObservable<ContextMenuPopupControl> ContextMenuOpenedEventStream => contextMenuOpenedEventStream;
-    
+
     private readonly Subject<ContextMenuPopupControl> contextMenuClosedEventStream = new();
     public IObservable<ContextMenuPopupControl> ContextMenuClosedEventStream => contextMenuClosedEventStream;
+
+    private VisualElement focusedVisualElementOnOpen;
 
     public virtual void OnInjectionFinished()
     {
@@ -89,27 +101,50 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
             return;
         }
 
+        // Do not open context menu via long press on standalone platform (only with right click)
+        if (PlatformUtils.IsStandalone
+            && context.control.path == "/Mouse/press")
+        {
+            return;
+        }
+
         Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
         if (!targetVisualElement.worldBound.Contains(pointerPosition))
         {
             return;
         }
-        OpenContextMenu(pointerPosition + popupOffset);
+        OpenContextMenu(pointerPosition + popupOffset, null);
     }
 
-    public void OpenContextMenu(Vector2 position)
+    public ContextMenuPopupControl OpenContextMenu(Vector2 position, object context)
     {
-        if (FillContextMenuAction == null)
+        if (FillContextMenuAction == null
+            || (ShouldOpenContextMenuFunction != null && !ShouldOpenContextMenuFunction()))
         {
-            return;
+            return null;
         }
 
-        ContextMenuPopupControl contextMenuPopup = new(gameObject, position);
-        injector.Inject(contextMenuPopup);
-        FillContextMenuAction(contextMenuPopup);
+        focusedVisualElementOnOpen = targetVisualElement.focusController?.focusedElement as VisualElement;
 
-        contextMenuPopup.ContextMenuClosedEventStream.Subscribe(_ => contextMenuClosedEventStream.OnNext(contextMenuPopup));
-        contextMenuOpenedEventStream.OnNext(contextMenuPopup);
+        ContextMenuPopupControl contextMenuPopupControl = new(gameObject, targetVisualElement, position, context);
+        injector.Inject(contextMenuPopupControl);
+        FillContextMenuAction(contextMenuPopupControl);
+
+        contextMenuPopupControl.ContextMenuClosedEventStream.Subscribe(_ => OnContextMenuClose(contextMenuPopupControl));
+        contextMenuOpenedEventStream.OnNext(contextMenuPopupControl);
+        anyContextMenuOpenedEventStream.OnNext(contextMenuPopupControl);
+        return contextMenuPopupControl;
+    }
+
+    private void OnContextMenuClose(ContextMenuPopupControl contextMenuPopupControl)
+    {
+        contextMenuClosedEventStream.OnNext(contextMenuPopupControl);
+
+        // Focus last element
+        if (focusedVisualElementOnOpen != null)
+        {
+            focusedVisualElementOnOpen.Focus();
+        }
     }
 
     public void Dispose()

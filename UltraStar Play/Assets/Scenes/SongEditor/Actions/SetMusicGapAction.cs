@@ -15,15 +15,20 @@ public class SetMusicGapAction : INeedInjection
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
-    public void Execute()
+    [Inject]
+    private NoteAreaControl noteAreaControl;
+
+    [Inject]
+    private PanelHelper panelHelper;
+
+    public void Execute(double positionInMillis)
     {
-        double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
-        songMeta.Gap = (float)positionInSongInMillis;
+        songMeta.GapInMillis = (float)positionInMillis;
     }
 
-    public void ExecuteAndNotify()
+    public void ExecuteAndNotify(double positionInMillis)
     {
-        Execute();
+        Execute(positionInMillis);
         songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Gap));
     }
 }

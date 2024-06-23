@@ -11,7 +11,6 @@
         "com.achimmihca.Editor.protrans",
         "com.achimmihca.primeinputactions",
         "com.achimmihca.Editor.primeinputactions",
-        "com.achimmihca.simplehttpserverforunity",
         "Unity.InputSystem"
     ],
     "includePlatforms": [
@@ -19,8 +18,10 @@
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "ICSharpCode.SharpZipLib.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],

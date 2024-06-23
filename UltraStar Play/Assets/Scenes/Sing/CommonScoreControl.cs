@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -14,11 +13,19 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SingSceneControl singSceneControl;
 
+    [Inject]
+    private GameObject gameObject;
+
     [Inject(UxmlName = R.UxmlNames.commonScoreSentenceRatingContainer)]
     private VisualElement commonScoreSentenceRatingContainer;
 
     private IEnumerable<PlayerScoreControl> ScoreControls => singSceneControl.PlayerControls
-        .Select(playerControl => playerControl.PlayerScoreControl);
+        .Select(playerControl => playerControl.PlayerScoreControl)
+        .Where(scoreControl => scoreControl != null);
+
+    private IEnumerable<PlayerPerformanceAssessmentControl> PerformanceAssessmentControls => singSceneControl.PlayerControls
+        .Select(playerControl => playerControl.PlayerPerformanceAssessmentControl)
+        .Where(control => control != null);
 
     private int totalScoreAnimationId;
 
@@ -29,7 +36,15 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
         commonScoreSentenceRatingContainer.Clear();
         if (singSceneControl.IsCommonScore)
         {
-            InitCommonScore();
+            if (singSceneControl.PlayerControls.IsNullOrEmpty())
+            {
+                MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+                    () => InitCommonScore()));
+            }
+            else
+            {
+                InitCommonScore();
+            }
         }
     }
 
@@ -37,27 +52,27 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
     {
         ScoreControls.ForEach(scoreControl =>
         {
-            scoreControl.SentenceScoreEventStream
+            scoreControl.ScoreChangedEventStream
                 .Subscribe(_ => UpdateCommonScoreLabel())
-                .AddTo(singSceneControl.gameObject);
+                .AddTo(gameObject);
         });
 
         // Show only "friendly" sentence ratings.
-        ScoreControls.Select(scoreControl => scoreControl.SentenceScoreEventStream)
+        PerformanceAssessmentControls.Select(scoreControl => scoreControl.SentenceAssessedEventStream)
             .Merge()
             .Subscribe(sentenceScoreEvent =>
             {
-                if (ratedSentences.Contains(sentenceScoreEvent.SentenceScore.Sentence)
-                    || sentenceScoreEvent.SentenceRating.PercentageThreshold <= 0.5)
+                if (ratedSentences.Contains(sentenceScoreEvent.Sentence)
+                    || sentenceScoreEvent.SentenceRating.PercentageThreshold < 0.25)
                 {
                     return;
                 }
 
-                ratedSentences.Add(sentenceScoreEvent.SentenceScore.Sentence);
+                ratedSentences.Add(sentenceScoreEvent.Sentence);
                 ShowSentenceRating(sentenceScoreEvent.SentenceRating);
             })
             .AddTo(singSceneControl.gameObject);
-        
+
         UpdateCommonScoreLabel(false);
     }
 
@@ -78,7 +93,13 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateCommonScoreLabel(bool animate = true)
     {
-        double commonScore = ScoreControls.Select(scoreControl => scoreControl.TotalScore).Average();
+        double commonScore = 0;
+        List<int> scores = ScoreControls.Select(scoreControl => scoreControl.TotalScore).ToList();
+        if (!scores.IsNullOrEmpty())
+        {
+            commonScore = scores.Average();
+        }
+
         singSceneControl.PlayerControls.ForEach(playerControl => playerControl.PlayerUiControl.ShowTotalScore((int)commonScore, animate));
     }
 }

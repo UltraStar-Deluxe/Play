@@ -1,0 +1,5 @@
+name: Search Song Images in Folder
+version: 1.0.0
+description : Search for missing cover and background images in the folder of the song.
+authors: 
+  - email@melodymania.org

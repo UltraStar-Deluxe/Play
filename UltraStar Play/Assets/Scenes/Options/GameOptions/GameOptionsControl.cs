@@ -1,6 +1,5 @@
 using System;
-using System.Linq;
-using PrimeInputActions;
+using System.Globalization;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -10,56 +9,68 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
+public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
-    [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
-    private ItemPicker scoreModePicker;
+    [Inject(UxmlName = R.UxmlNames.reduceAudioVolumeChooser)]
+    private Chooser reduceAudioVolumeChooser;
+
+    [Inject(UxmlName = R.UxmlNames.passTheMicTimeChooser)]
+    private Chooser passTheMicTimeChooser;
 
     [Inject(UxmlName = R.UxmlNames.languageDropdownField)]
     private DropdownField languageDropdownField;
-    
+
+    [Inject(UxmlName = R.UxmlNames.defaultMedleyTargetDurationChooser)]
+    private Chooser defaultMedleyTargetDurationChooser;
+
     protected override void Start()
     {
         base.Start();
-        
-        new ScoreModeItemPickerControl(scoreModePicker)
-            .Bind(() => settings.GameSettings.ScoreMode,
-                  newValue => settings.GameSettings.ScoreMode = newValue);
 
-        InitLanguageChooser();
+        NumberChooserControl passTheMicTimeChooserControl = new NumberChooserControl(passTheMicTimeChooser, 20);
+        passTheMicTimeChooserControl.GetLabelTextFunction = newValue => $"{newValue} s";
+        passTheMicTimeChooserControl.Bind(
+            () => settings.PassTheMicTimeInSeconds,
+            newValue => settings.PassTheMicTimeInSeconds = (int)newValue);
+
+        NumberChooserControl reduceAudioVolumeChooserControl = new PercentNumberChooserControl(reduceAudioVolumeChooser, 2);
+        reduceAudioVolumeChooserControl.Bind(
+            () => settings.ReducedAudioVolumePercent,
+            newValue => settings.ReducedAudioVolumePercent = (int)newValue);
+
+        NumberChooserControl defaultMedleyDurationChooserControl = new NumberChooserControl(defaultMedleyTargetDurationChooser, 30);
+        defaultMedleyDurationChooserControl.GetLabelTextFunction = newValue => $"{newValue} s";
+        defaultMedleyDurationChooserControl.Bind(
+            () => settings.DefaultMedleyTargetDurationInSeconds,
+            newValue => settings.DefaultMedleyTargetDurationInSeconds = (int)newValue);
+
+        LanguageChooserControl languageChooserControl = new LanguageChooserControl(languageDropdownField);
+        languageChooserControl.SelectionAsObservable.Subscribe(newValue => OnLanguageChanged(newValue));
     }
 
-    public void UpdateTranslation()
+    private void OnLanguageChanged(CultureInfo newValue)
     {
-        scoreModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
-    }
-    
-    private void InitLanguageChooser()
-    {
-        languageDropdownField.choices = translationManager.GetTranslatedLanguages()
-            .Select(languageEnum => languageEnum.ToString())
-            .ToList();
-        languageDropdownField.value = translationManager.currentLanguage.ToString();
-
-        languageDropdownField.RegisterValueChangedCallback(evt =>
-        {
-            if (Enum.TryParse(evt.newValue, out SystemLanguage newValue))
-            {
-                SetLanguage(newValue);
-            }
-        });
-    }
-
-    private void SetLanguage(SystemLanguage newValue)
-    {
-        if (settings.GameSettings.language == newValue
-            && translationManager.currentLanguage == newValue)
+        if (Equals(newValue, TranslationConfig.Singleton.CurrentCultureInfo))
         {
             return;
         }
+        SetCurrentLanguage(newValue);
 
-        settings.GameSettings.language = newValue;
-        translationManager.currentLanguage = settings.GameSettings.language;
-        translationManager.ReloadTranslationsAndUpdateScene();
+        // Reload scene to update translations
+        sceneNavigator.LoadScene(EScene.OptionsScene);
+    }
+
+    private void SetCurrentLanguage(CultureInfo cultureInfo)
+    {
+        try
+        {
+            TranslationConfig.Singleton.CurrentCultureInfo = cultureInfo;
+            settings.CultureInfoName = cultureInfo.ToString();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to set current CultureInfo to '{cultureInfo}': {ex.Message}");
+        }
     }
 }

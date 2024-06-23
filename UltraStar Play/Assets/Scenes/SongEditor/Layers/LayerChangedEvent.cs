@@ -1,16 +1,18 @@
 ﻿public class LayerChangedEvent
 {
     public ESongEditorLayer LayerEnum { get; private set; }
-    public string VoiceName { get; private set; }
-    public bool IsVoiceLayerEvent => !VoiceName.IsNullOrEmpty();
+    public EVoiceId VoiceId { get; private set; }
+
+    public bool IsVoiceLayerEvent { get; private set; }
 
     public LayerChangedEvent(ESongEditorLayer layerEnum)
     {
         LayerEnum = layerEnum;
     }
 
-    public LayerChangedEvent(string voiceName)
+    public LayerChangedEvent(EVoiceId voiceId)
     {
-        VoiceName = voiceName;
+        VoiceId = voiceId;
+        IsVoiceLayerEvent = true;
     }
 }

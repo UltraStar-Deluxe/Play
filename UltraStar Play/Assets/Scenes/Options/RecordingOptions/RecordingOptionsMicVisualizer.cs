@@ -1,20 +1,21 @@
-﻿using System;
-using ProTrans;
-using UniInject;
+﻿using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 {
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private MicSampleRecorder micSampleRecorder;
+    [Inject]
+    private NewestSamplesMicPitchTracker micPitchTracker;
 
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private MicPitchTracker micPitchTracker;
+    [Inject]
+    private Settings settings;
 
     [Inject(UxmlName = R.UxmlNames.noteLabel)]
-    private Label currentNoteLabel;
+    private Label noteLabel;
+
+    [Inject(UxmlName = R.UxmlNames.pitchIndicator)]
+    private VisualElement pitchIndicator;
 
     [Inject(UxmlName = R.UxmlNames.audioWaveForm)]
     private VisualElement audioWaveForm;
@@ -24,19 +25,26 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
-    private readonly float[] emptySamplesArray = new float[2];
-    
+    private readonly float[] emptySamplesArray = new float[16000];
+
     private void Start()
     {
         micPitchTracker.PitchEventStream
             .Subscribe(OnPitchDetected)
             .AddTo(gameObject);
-        recordingOptionsSceneControl.ConnectedClientBeatPitchEventStream
+        recordingOptionsSceneControl.CompanionClientBeatPitchEventStream
             .Subscribe(OnPitchDetected)
             .AddTo(gameObject);
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
-            audioWaveFormVisualization = new AudioWaveFormVisualization(this.gameObject, audioWaveForm);
+            int textureWidth = 256;
+            int textureHeight = 128;
+            audioWaveFormVisualization = new AudioWaveFormVisualization(
+                gameObject,
+                audioWaveForm,
+                textureWidth,
+                textureHeight,
+                "recording options audio visualization");
         });
     }
 
@@ -58,7 +66,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
             return;
         }
 
-        float[] micData = micPitchTracker.MicSampleRecorder.MicSamples;
+        float[] micData = micPitchTracker.MicSamples;
 
         // Consider amplification
         AbstractAudioSamplesAnalyzer.ApplyAmplification(micData, 0, micData.Length, micProfile.AmplificationMultiplier);
@@ -74,11 +82,14 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 
     public void SetMicProfile(MicProfile micProfile)
     {
+        micPitchTracker.StopRecording();
+
         micPitchTracker.MicProfile = micProfile;
         if (!micProfile.Name.IsNullOrEmpty()
-            && !micProfile.IsInputFromConnectedClient)
+            && !micProfile.IsInputFromConnectedClient
+            && micProfile.IsEnabledAndConnected(ServerSideCompanionClientManager.Instance))
         {
-            micPitchTracker.MicSampleRecorder.StartRecording();
+            micPitchTracker.StartRecording();
         }
     }
 
@@ -87,13 +98,16 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         // Show the note that has been detected
         if (pitchEvent != null && pitchEvent.MidiNote > 0)
         {
-            currentNoteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note,
-                "value", MidiUtils.GetAbsoluteName(pitchEvent.MidiNote));
+            noteLabel.SetTranslatedText(Translation.Get(R.Messages.options_note,
+                "value", MidiUtils.GetAbsoluteName(pitchEvent.MidiNote)));
+
+            float midiNoteFactor = ((float)pitchEvent.MidiNote - MidiUtils.SingableNoteMin) / (MidiUtils.SingableNoteRange);
+            pitchIndicator.style.top = new StyleLength(Length.Percent(100 - (100 * midiNoteFactor)));
         }
         else
         {
-            currentNoteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note,
-                "value", "?");
+            noteLabel.SetTranslatedText(Translation.Get(R.Messages.options_note,
+                "value", "?"));
         }
     }
 }

@@ -1,5 +1,5 @@
-using UnityEngine;
 using UniInject;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 
@@ -33,7 +33,7 @@ public class EventSystemOptInOnAndroid : MonoBehaviour, INeedInjection
     private void Start()
     {
         if (!PlatformUtils.IsAndroid
-            || settings.DeveloperSettings.enableEventSystemOnAndroid)
+            || settings.EnableEventSystemOnAndroid)
         {
             return;
         }

@@ -1,5 +1,4 @@
 using UniInject;
-using UniRx;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -13,7 +12,7 @@ public class InGameDebugConsoleManager : AbstractInGameDebugConsoleManager, INee
         return Instance;
     }
 
-    protected override void StartSingleton()
+    protected override void AwakeSingleton()
     {
         base.Init();
     }

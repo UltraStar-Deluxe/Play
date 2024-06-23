@@ -1,11 +1,24 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Scenes/MainScene/CompanionStyles.uss?fileID=7433441132597879392&amp;guid=10474d1b67f8481fbb7ed771cc866f3e&amp;type=3#CompanionStyles" />
-    <ui:VisualElement name="songListUiRoot" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; top: -1px; left: 0;">
-        <ui:TextField picking-mode="Ignore" name="songSearchTextField" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 8px;">
-            <ui:Label text="What do you want to sing today?" display-tooltip-when-elided="true" name="songSearchHint" style="position: absolute; height: 100%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; -unity-font-style: italic; font-size: 14px; color: rgb(127, 127, 127); -unity-text-align: middle-left;" />
-        </ui:TextField>
-        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songListView" style="width: 100%; height: auto; flex-grow: 1;">
-            <ui:Label text="Loading song list..." display-tooltip-when-elided="true" />
-        </ui:ScrollView>
+    <ui:Template name="SongQueueOverlayUi" src="project://database/Packages/playsharedui/Runtime/UIDocuments/SongQueueUi.uxml?fileID=9197481963319205126&amp;guid=7e90fb1f4cdd0044a978248fba705341&amp;type=3#SongQueueUi" />
+    <ui:VisualElement name="songListUiRoot" style="flex-grow: 1;">
+        <ButtonGroup name="songListTabGroup" direction="Horizontal" style="flex-direction: row; padding-left: 5px; padding-right: 5px; padding-bottom: 5px; margin-bottom: 10px; width: 100%; flex-shrink: 0;">
+            <ToggleButton display-tooltip-when-elided="true" name="showSongSearchButton">
+                <MaterialIcon tabindex="-1" icon="search" name="searchIcon" />
+            </ToggleButton>
+            <ToggleButton display-tooltip-when-elided="true" name="showSongQueueButton">
+                <MaterialIcon tabindex="-1" name="songQueueIcon" icon="list" />
+            </ToggleButton>
+        </ButtonGroup>
+        <ui:VisualElement name="songSearchContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+            <ui:TextField picking-mode="Ignore" name="songSearchTextField">
+                <ui:Label text="Search artist, title" display-tooltip-when-elided="true" name="songSearchHint" style="position: absolute; height: 100%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; -unity-font-style: italic; font-size: 14px; color: rgb(127, 127, 127);" />
+            </ui:TextField>
+            <ui:Label tabindex="-1" text="Loading songs..." display-tooltip-when-elided="true" name="songListStatusLabel" class="wordWrap" />
+            <ui:ListView name="songListView" fixed-item-height="64" style="width: 100%; flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="songQueueContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+            <ui:Label tabindex="-1" text="Song Queue" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center;" />
+            <ui:Instance template="SongQueueOverlayUi" name="SongQueueUi" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

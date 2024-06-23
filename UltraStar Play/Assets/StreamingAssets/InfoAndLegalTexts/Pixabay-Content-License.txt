@@ -1,0 +1,126 @@
+Pixabay Terms of Service
+
+Last updated: April 4, 2023
+
+1.The basics.
+
+Welcome to Pixabay! Pixabay is a vibrant community of creatives sharing royalty-free content. These Terms of Service ("Terms") apply to the pixabay.com website, related websites, software, mobile apps, plug-ins and other Pixabay-operated services (collectively, the "Service(s)").
+
+These Terms govern the relationship between Pixabay GmbH ("we", "our" or "Pixabay") and any user of the Services ("you", "your" or "User"), including in certain circumstances, the relationship between Users. By using the Services (including by downloading and using Content from the Services, or contributing Content to the Services):
+    you agree that you are entering into these Terms with us which will become a legally binding agreement between you and us; and
+    you represent and warrant that you have the full right, power and authority to agree to and be bound by these Terms and to fully perform all of your obligations listed in these Terms.
+
+If you don’t agree to these Terms, please don’t use the Services.
+
+Children may not access or use the Services unless their use is directly authorized by their parent, guardian or another authorized adult who agrees to be bound by these Terms. For the purposes of these Terms, a child is a person under the age of 13 (or the minimum legal age required to provide consent for processing of personal data in the country where the child is located, noting 16 is the minimum legal age in Germany).
+
+We reserve the right, at our sole discretion, to change or modify portions of these Terms at any time, including the right to cancel or change the licenses granted by these Terms. If we do this, we will post the most current version of these Terms on this page. We will seek to provide you with reasonable advance notice of any change to the Terms that, in our sole determination, materially adversely affect your rights or your use of the Services. We may provide you with this notice by direct message on the Services and/or by posting on Pixabay’s public forum. Any such changes will become effective on the date listed in our notification to you. Your continued use of the Services after such date constitutes your acceptance of the changed or modified Terms.
+2.Content.
+
+In these Terms when we refer to "Content" we are referring to the content which is available on the Services. Content includes, but isn’t limited to the following items:
+    "Images", which means photographs, vector graphics, drawings and illustrations.
+    "Videos", which means moving images, animations, film footage and other audio-visual representations and content.
+    "Audio", which means music, sounds, sound effects and other audio representations and content.
+    "Other Media", which means any other media or content which is visual or audio in nature, or a combination of these.
+3.CC0 License
+
+Some of the Content made available for download on the Service is subject to and licensed under the Creative Commons Zero (CC0) license ("CC0 Content"). CC0 Content on the Service is any content which lists a "Published date" prior to January 9, 2019. This means that to the greatest extent permitted by applicable law, the authors of that work have dedicated the work to the public domain by waiving all of his or her rights to the CC0 Content worldwide under copyright law, including all related and neighboring rights. Subject to the CC0 License Terms, the CC0 Content can be used for all personal and commercial purposes without attributing the author/ content owner of the CC0 Content or Pixabay.
+4.Content License granted to you for Content (other than CC0 Content).
+
+Subject to the Prohibited Uses described below (which you agree and acknowledge you are not entitled to engage in), when you download any Content that is not CC0 Content from the Services, we grant you an irrevocable, worldwide, non-exclusive and royalty-free right to download, use, copy, modify or adapt the Content for commercial or non-commercial purposes (Content License). The rights granted are non-exclusive, meaning that we may also grant other users the same rights in the same Content.
+
+You agree and acknowledge that the following items are "Prohibited Uses" and the Content License which we grant to you is conditional on you not engaging in any of the Prohibited Uses.
+
+    You cannot sell or distribute the Content (either in digital or physical form) on a Standalone basis. This includes selling or distributing Content on a Standalone basis as an image, audio, video, NFT or other digital file (including through a stock media platform), as well as a print, wallpaper, poster or on merchandise or on other physical products.
+
+    When we refer to "Standalone" we mean where no creative effort has been applied to the Content and it remains in substantially the same form as it exists on the Services. To help illustrate this, here are some examples:
+        using the Content in its original form or solely using a filter, changing colors, resizing or cropping the Content remains Standalone use.
+        using the Content with a combination of images, videos, audio files, other media, text, illustrations, background features and editing techniques is not Standalone use, so long as the combined effect is to make a "new" creative work.
+    If Content depicts any trademarks, logos or brands (whether two- or three-dimensional), you cannot use that Content for commercial purposes in relation to goods and services, in particular not print that Content on merchandise or other physical products for sale.
+    You cannot use Content in any immoral or illegal way, especially Content which features a recognisable person. You cannot use any Content on or in conjunction with anything pornographic, obscene, offensive, illegal, immoral, infringing, defamatory, hateful, threatening or libellous in nature, or in breach of any law, regulation or industry code, or in any way which infringes the rights of any person or entity.
+    You cannot use Content in a misleading or deceptive way. You cannot use Content in a way that is misleading or deceptive, including without limit:
+        by suggesting that any depicted person, brand, organization or other third party endorses or is affiliated with you or your goods or services, unless permission has been granted; or
+        by giving the impression that Content was created by you, or a person other than the intellectual property rights holder of the Content (including without limitation, by claiming or giving the impression that you hold ownership of, or exclusive rights to, the Content).
+
+In addition to the Prohibited Uses, please be aware that certain Content (including CC0 Content) may be subject to additional intellectual property rights (such as copyrights, trademarks, design rights), moral rights, proprietary rights, property rights, privacy rights or similar. This includes but is not limited to identifiable people, logos, brands of all kinds (whether two- or three- dimensional), goods or services, buildings and architecture, audio or video samples and organisations.
+
+Before using any Content (including CC0 Content), you must consider whether you require the consent of a third party or a license to use the Content. If your use of the Content is for commercial purposes (e.g. in conjunction with the sale or promotion of a product or service) then it is likely that you will need consent or a license. Responsibility for determining whether permissions are needed always rests solely and exclusively with you. We do not warrant that any consents or licenses have been obtained in relation to any Content, and we expressly disclaim any and all responsibility and liability in relation to such matters.
+5.Attribution.
+
+You do not need to credit Pixabay or the contributor of Content when you use it, but it is certainly appreciated when you do so - especially when the use is of an editorial nature, where photo credits are more customary. You can provide credit in the following format: "by [Contributor] via Pixabay".
+6.Uploading Content.
+
+We are always grateful when you choose to contribute Content to our Services. For us to be able to make the Content available for other users, it is important that we receive specific rights and promises from you as a contributor. You are responsible for the Content you upload to the Services and you do so subject to the following terms and conditions:
+    When you upload any Content to the Services you grant Pixabay an irrevocable, perpetual, worldwide, non-exclusive, royalty-free license (with the right to sub-license) to use, market, reproduce, display, exhibit, broadcast, publicly perform, enhance, alter, adapt, modify or download the Content (in whole or in part) for any purpose whether now known or created in the future, including both commercial and non-commercial purposes. This includes the right to redistribute the Content under the Content License, or any other license or terms offered by Pixabay now or in the future, including via an API.
+    You expressly represent and warrant that:
+        you and you alone own all rights, title and interest in and to the Content you upload to the Services;
+        the Content does not, and use of the Content in accordance with these Terms will not, infringe the intellectual property rights, moral rights, proprietary rights, property rights, privacy rights or similar of any person or entity; and
+        you have obtained any and all releases, permissions or licenses necessary to enable the use of the Content in accordance with these Terms. This includes non-exclusive, perpetual, irrevocable, worldwide, and royalty-free model and/or property releases, and/or any other permissions necessary concerning the use of the Content for any purpose, without any conditions, unless such conditions are required by law.
+    You acknowledge and agree that your Content will be made available to the public on and through the Services for personal and commercial use of third parties subject to these Terms, without providing you attribution or compensation.
+    You agree not to upload Content that is:
+        sexually explicit or pornographic;
+        offensive, defamatory or discriminatory;
+        promotes or creates a risk of physical or mental harm.
+
+We reserve the right to remove any Content from the Service at any time and for any reason, at our discretion. This applies in particular to defective files, inferior quality content, content which is in violation of these Terms and for any reason relating to potential legal issues.
+6B.Uploading Content created with generative AI technology.
+
+You may upload Content you have created with generative AI technology (i.e. machine learning tools that generate content from text prompts or other inputs) to the Services. If you do, the following specific conditions apply, in addition to section 6.
+    You are responsible for ensuring that the terms of the generative AI technology you have used permit you to grant the license under section 6(a) and give the warranties outlined in section 6(b).
+    You must clearly label any Content which is AI-generated by selecting the "AI-generated" checkbox on the upload page.
+    You must not tag any Content which is AI-generated with the names of any real people, artists, trademarks or brands.
+    You must not upload any Content which is AI-generated that mimics the style of another artist or attempts to reproduce copyright or trademark protected material, or the image of a real person.
+7.Use of the Service.
+
+You may be required to register with us to access and use certain features of the Service. If you choose to register for the Services, you agree to provide and maintain true, accurate, and current information as prompted by the Services’ registration form. Registration data and other information you provide through the Services is subject to our Privacy Policy.
+
+In using the Services, you acknowledge and agree that:
+    Data mining, extraction, scraping and the use of programs or robots for automatic data collection and/or extraction of digital data on the Services and/or the content available therein is strictly prohibited for all purposes, including without limitation for machine learning purposes.
+    The technology and software underlying or distributed in connection with the Service is owned by us and our licensors, affiliates and partners. We do not grant any rights in such software to you. You must not copy, modify, create a derivative work from, reverse engineer, reverse assemble or otherwise attempt to discover any source code, sell, assign, sublicense, or otherwise transfer any right in such technology or software, unless we grant our express permission in advance.
+    Bulk, large-scale or systematic copying of Content is strictly prohibited unless explicit permission has been granted by us.
+    The compilation of the Content is copyrighted as a collective work and/or compilation in accordance with copyright laws, international conventions and other intellectual property laws.
+8.Termination.
+
+We reserve the right to terminate your access to the Services at any time, for any reason and without giving reasons and to prohibit further use of the Services as we may see fit. Upon termination, your right to use the Services will immediately cease.
+
+Pixabay has adopted a policy of terminating, in appropriate circumstances, users who are deemed to be repeat infringers. The Services may not be accessed to any users previously removed from the Services by us.
+9.Reporting and takedown policies.
+
+Pixabay respects the rights of creatives. If you believe that your intellectual property rights have been infringed by Content accessible through the Services, please email us at info@pixabay.com and include the following information:
+    Identification of the intellectual property right you believe has been infringed.
+    Identification of the Content that you believe is infringing your rights, including a URL link to where that Content appears on the Services.
+    Your contact information, such as your email address.
+    A statement that you have a good faith belief that use of the Content in the manner complained of is not authorized by the intellectual property rights owner, its agent, or the law.
+    A declaration that the above information is accurate and that you are (or are authorized to act on behalf of) the intellectual property rights owner.
+
+Nothing in this section constitutes legal advice. We suggest you consult an attorney regarding your rights and obligations under applicable laws.
+10.Infringement claims.
+
+If you find out – from Pixabay or somewhere else – that there is a claim relating to any Content and Pixabay might be liable, you have to stop using the Content immediately, at your own expense. This applies whether the claim is threatened, potential or actual. You also have to immediately delete or remove the Content from your premises, computer systems and storage (electronic or physical); ensure that your clients, printers or ISPs do likewise; and let Pixabay know as soon as possible by emailing info@pixabay.com.
+11.Indemnification.
+
+You agree to indemnify, release and hold harmless Pixabay and its affiliates from and against any and all loss, expenses, damages, and costs, including without limitation reasonable attorneys fees, resulting from:
+    your violation of the Terms (whether directly or indirectly); and
+    claims brought by any third parties arising out of your use of the Services.
+
+If a claim is brought by any third party, you must immediately provide us with all information that is necessary for an examination of the claim and defence. Any further claims for damages by us against you remain unaffected.
+12.Dispute resolution and applicable law. https://ec.europa.eu/consumers/odr/.
+
+Pixabay is neither obliged nor willing to participate in an arbitration procedure within the meaning of the VSBG. Pixabay will endeavour to resolve any disagreements amicably. Our email address is info@pixabay.com.
+
+The law of the Federal Republic of Germany applies to the contractual relationship between the users and Pixabay. As far as permissible, Berlin is agreed as the place of jurisdiction.
+13.Warranty and liability.
+
+THE SERVICES AND CONTENT ARE PROVIDED "AS IS". WE OFFER NO WARRANTY, EXPLICIT OR IMPLIED, REGARDING ANY CONTENT, THE SERVICES, THE ACCURACY OF ANY INFORMATION, OR ANY RIGHTS OR LICENSES UNDER THIS AGREEMENT INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+PIXABAY DOES NOT REPRESENT OR WARRANT THAT THE SERVICES OR ANY CONTENT WILL MEET YOUR REQUIREMENTS OR THAT THEIR USE WILL BE UNINTERRUPTED OR ERROR FREE.
+
+ALTHOUGH PIXABAY DOES ITS BEST TO ENSURE THAT UPLOADED CONTENT IS NOT MISUSED OR USED CONTRARY TO THE TERMS, PIXABAY CANNOT BE HELD RESPONSIBLE FOR THE ACTS OR OMISSIONS OF ITS USERS, INCLUDING ANY MISUSE OR ABUSE OF ANY CONTENT YOU UPLOAD.
+
+PIXABAY SHALL NOT BE LIABLE TO YOU OR TO ANY OTHER PERSON OR ENTITY FOR ANY GENERAL, PUNITIVE, SPECIAL, INDIRECT, CONSEQUENTIAL OR INCIDENTAL DAMAGES, OR LOST PROFITS OR ANY OTHER DAMAGES, COSTS OR LOSSES ARISING OUT OF YOUR USE OF THE SERVICES OR ANY CONTENT.
+14.Severability.
+
+If one or more of the provisions in this agreement is found to be invalid, illegal or unenforceable in any respect, the validity, legality and enforceability of the remaining provisions should not be affected. Such provisions should be revised only to the extent necessary to make them enforceable.
+15.EU Monthly Active Users.
+
+In accordance with requirements under the EU Digital Services Act, the average number of EU monthly active users of the Service between August 2022 - January 2023 was 4,295,724.

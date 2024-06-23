@@ -1,0 +1,11 @@
+name: Gap Quick Fixer
+version: 1.0.0
+description: |
+  Set the GAP (aka. 'time to first lyrics') to the current playback position
+  by pressing Ctrl+G in the singing game.
+  
+authors:
+  - email@melodymania.org
+# Additional assemblies from the app domain that need to be accessed by your mod.
+requiredAssemblies:
+  - Unity.InputSystem

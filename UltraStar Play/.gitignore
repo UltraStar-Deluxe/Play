@@ -1,2 +1,6 @@
+IgnoredAssetsOfMobileBuild/
 Database.json
 persistentDataPath.lnk
+
+# OneJS (sample) TypeScript project
+OneJS/

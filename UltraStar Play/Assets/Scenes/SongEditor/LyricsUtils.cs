@@ -1,19 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 public static class LyricsUtils
 {
     public static readonly char syllableSeparator = ';';
     public static readonly char sentenceSeparator = '\n';
     public static readonly char spaceCharacter = ' ';
-    private static readonly Regex whitespaceRegex = new(@"^\s+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-    public static bool IsOnlyWhitespace(string newText)
-    {
-        return string.IsNullOrEmpty(newText) || whitespaceRegex.IsMatch(newText);
-    }
 
     public static string GetViewModeText(Voice voice)
     {

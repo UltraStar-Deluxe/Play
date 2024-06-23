@@ -1,13 +1,13 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="entryContainer" style="flex-direction: column; align-items: center; position: absolute;">
-        <ui:VisualElement name="banner" class="creditsRegularBanner" style="background-image: url(&apos;project://database/Assets/Scenes/Credits/Images/banners-1640595-2.svg?fileID=7388822144124034973&amp;guid=f9666f569beb0914d819c02d3ac68422&amp;type=3#banners-1640595-2&apos;); align-items: center; justify-content: center; flex-direction: column;">
-            <ui:VisualElement name="nameCharacterContainer" style="flex-direction: row; flex-shrink: 0;">
-                <ui:Label text="Full Name Here" display-tooltip-when-elided="true" class="creditsEntryCharacter" />
+    <ui:VisualElement name="entryContainer" picking-mode="Ignore" style="flex-direction: column; align-items: center; position: absolute;">
+        <ui:VisualElement name="banner" picking-mode="Ignore" class="creditsRegularBanner" style="background-image: url(&apos;project://database/Assets/Scenes/Credits/Images/banners-1640595-2.svg?fileID=7388822144124034973&amp;guid=f9666f569beb0914d819c02d3ac68422&amp;type=3#banners-1640595-2&apos;); align-items: center; justify-content: center; flex-direction: column;">
+            <ui:VisualElement name="nameCharacterContainer" picking-mode="Ignore" style="flex-direction: row; flex-shrink: 0;">
+                <ui:Label text="Full Name Here" display-tooltip-when-elided="true" picking-mode="Ignore" class="creditsEntryCharacter" />
             </ui:VisualElement>
-            <ui:VisualElement name="nicknameCharacterContainer" style="flex-direction: row;">
-                <ui:Label text="Nickname Here" display-tooltip-when-elided="true" class="creditsEntryCharacter" />
+            <ui:VisualElement name="nicknameCharacterContainer" picking-mode="Ignore" style="flex-direction: row;">
+                <ui:Label text="Nickname Here" display-tooltip-when-elided="true" picking-mode="Ignore" class="creditsEntryCharacter" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label text="Special thanks comment that needs to be wrapped to the next line" display-tooltip-when-elided="true" name="commentLabel" class="creditsEntryCharacter smallFont" style="white-space: normal; flex-shrink: 1; height: 200px;" />
+        <ui:Label text="Special thanks comment that needs to be wrapped to the next line" display-tooltip-when-elided="true" name="commentLabel" picking-mode="Ignore" class="creditsEntryCharacter smallFont" style="white-space: normal; flex-shrink: 1; height: 200px;" />
     </ui:VisualElement>
 </ui:UXML>

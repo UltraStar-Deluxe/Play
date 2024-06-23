@@ -11,8 +11,8 @@ public class DoubleClickControl
 {
     private const float DoubleClickMaxDistanceInPx = 5f;
 
-    private readonly Subject<bool> doublePointerDownEventStream = new();
-    public IObservable<bool> DoublePointerDownEventStream => doublePointerDownEventStream;
+    private readonly Subject<VoidEvent> doublePointerDownEventStream = new();
+    public IObservable<VoidEvent> DoublePointerDownEventStream => doublePointerDownEventStream;
 
     private readonly Dictionary<int, float> buttonToLastPointerDownTime = new();
     private readonly Dictionary<int, Vector3> buttonToLastPointerDownPosition = new();
@@ -46,7 +46,7 @@ public class DoubleClickControl
             bool isNearLastPosition = Vector3.Distance(evt.position, lastPointerDownPosition) < DoubleClickMaxDistanceInPx;
             if (isDoubleClick && isNearLastPosition)
             {
-                doublePointerDownEventStream.OnNext(true);
+                doublePointerDownEventStream.OnNext(VoidEvent.instance);
             }
         }
         buttonToLastPointerDownTime[evt.button] = Time.time;

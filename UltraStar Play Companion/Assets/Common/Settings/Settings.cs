@@ -1,30 +1,40 @@
 ﻿using System;
-using System.Linq;
-using UnityEngine;
+using System.Collections.Generic;
+using LiteNetLib;
 
 [Serializable]
 public class Settings : ISettings
 {
-    public string ClientName { get; set; } = "MyCompanionApp";
     /**
      * UUID that is generated on first start and identifies this device.
      */
     public string ClientId { get; private set; }
 
+    public string ClientName { get; set; } = "MyCompanionApp";
+
+    public string CultureInfoName { get; set; } = "en";
     public MicProfile MicProfile { get; set; } = new MicProfile();
-
-    public int TargetFps { get; set; } = 30;
-    public bool ShowFps => IsDevModeEnabled;
+    public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; }
+    public int TargetFps { get; set; } = 60;
     public bool ShowAudioWaveForm { get; set; } = true;
-
-    public GameSettings GameSettings { get; set; } = new GameSettings();
-    public AudioSettings AudioSettings { get; set; } = new AudioSettings();
-
+    public float MousePadSensitivity { get; set; } = 1f;
     public bool IsDevModeEnabled { get; set; }
+    public ELogEventLevel MinimumLogLevel { get; set; } = ELogEventLevel.Information;
 
-    public int UdpPortOnServer { get; set; } = 34567;
-    public int UdpPortOnClient { get; set; } = 34568;
-    public string OwnHost { get; set; }
+    public bool PlayRecordedAudio { get; set; }
+    public int MicrophonePlaybackVolumePercent { get; set; } = 100;
+    public PortAudioHostApi PortAudioHostApi { get; set; } = PortAudioHostApi.Default;
+    public string PortAudioOutputDeviceName { get; set; } = "";
+
+    // The settings use a list of deselected player such that players are selected by default.
+    public List<string> DeselectedPlayerProfiles { get; private set; } = new();
+    public Dictionary<string, MicProfileReference> PlayerProfileNameToLastUsedMicProfile { get; private set; } = new();
+
+    public int ConnectionServerPort { get; set; } = 34567;
+    public string ConnectionServerAddress { get; set; } = "";
+    public DeliveryMethod MicDataDeliveryMethod { get; set; } = DeliveryMethod.ReliableOrdered;
+
+    public GameRoundSettingsDto GameRoundSettingsDto { get; set; } = new();
 
     public void CreateAndSetClientId()
     {
@@ -38,16 +48,9 @@ public class Settings : ISettings
         MicProfile = newMicProfile;
     }
 
-    // TODO: flatten settings?
-    public SystemLanguage Language
+    public bool ShowFps
     {
-        get { return GameSettings.language; }
-        set { GameSettings.language = value; }
-    }
-
-    public EPitchDetectionAlgorithm PitchDetectionAlgorithm
-    {
-        get { return AudioSettings.pitchDetectionAlgorithm; }
-        set { AudioSettings.pitchDetectionAlgorithm = value; }
+        get => IsDevModeEnabled;
+        set => IsDevModeEnabled = value;
     }
 }

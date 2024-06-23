@@ -5,6 +5,7 @@ using PrimeInputActions;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -12,6 +13,8 @@ using UnityEngine.UIElements;
 
 public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFinishedListener, IDisposable
 {
+    private const float EndlessDragBorderThresholdInPx = 4;
+
     private readonly List<IDragListener<EVENT>> dragListeners = new();
 
     public bool IsDragging => DragState.Value == EDragState.Dragging;
@@ -34,13 +37,26 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
     protected PanelHelper panelHelper;
 
+    protected bool IsPointerOver { get; private set; }
+    protected bool IsPointerDown { get; private set; }
+    
     private readonly List<IDisposable> disposables = new();
 
     public IReadOnlyCollection<int> ButtonFilter { get; set; } = new List<int> { 0, 1, 2 };
-
+    
+    public bool RequirePointerDirectlyOnTargetElement { get; set; }
+    
+    /**
+     * Jump back with the pointer to the other end of the VisualElement when reaching a side to enable endless dragging.
+     */
+    public bool EnableEndlessDrag { get; set; }
+    private Vector2 endlessDragOffset = Vector2.zero;
+    
     public virtual void OnInjectionFinished()
     {
         this.panelHelper = new PanelHelper(uiDocument);
+        targetVisualElement.RegisterCallback<PointerEnterEvent>(OnPointerEnter, TrickleDown.TrickleDown);
+        targetVisualElement.RegisterCallback<PointerLeaveEvent>(OnPointerLeave, TrickleDown.TrickleDown);
         targetVisualElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         // Drag gesture may leave the target visual element. Thus, listen on the rootVisualElement for the pointer events.
         uiDocument.rootVisualElement.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
@@ -55,6 +71,16 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
                 InputManager.GetInputAction("usplay/back").CancelNotifyForThisFrame();
             })
             .AddTo(gameObject));
+    }
+
+    private void OnPointerEnter(PointerEnterEvent evt)
+    {
+        IsPointerOver = true;
+    }
+    
+    private void OnPointerLeave(PointerLeaveEvent evt)
+    {
+        IsPointerOver = false;
     }
 
     protected abstract EVENT CreateDragEventStart(DragControlPointerEvent eventData);
@@ -78,8 +104,20 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
             return;
         }
 
-        dragControlPointerDownEvent = new DragControlPointerEvent(evt);
+        if (RequirePointerDirectlyOnTargetElement)
+        {
+            if (evt is not PointerDownEvent pointerDownEvent
+                || pointerDownEvent.target is not VisualElement visualElement
+                || visualElement != targetVisualElement)
+            {
+                return;
+            }
+        }
+
+        endlessDragOffset = Vector2.zero;
+        dragControlPointerDownEvent = new DragControlPointerEvent(evt, endlessDragOffset);
         DragState.Value = EDragState.WaitingForDistanceThreshold;
+        IsPointerDown = true;
     }
 
     protected virtual void OnPointerMove(IPointerEvent evt)
@@ -94,8 +132,70 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         }
         else if (DragState.Value == EDragState.Dragging)
         {
-            OnDrag(new DragControlPointerEvent(evt));
+            if (EnableEndlessDrag)
+            {
+                UpdateEndlessDrag(evt);
+            }
+
+            OnDrag(new DragControlPointerEvent(evt, endlessDragOffset));
         }
+    }
+
+    private void UpdateEndlessDrag(IPointerEvent evt)
+    {
+        Rect worldBound = targetVisualElement.worldBound;
+        float width = worldBound.width;
+        float height = worldBound.height;
+        float jumpFactor = 0.9f;
+        float localPositionX = evt.position.x - worldBound.xMin;
+        float localPositionY = evt.position.y - worldBound.yMin;
+        
+        if (localPositionX >= width - EndlessDragBorderThresholdInPx)
+        {
+            // Jump to left side
+            float jumpDistance = width * jumpFactor;
+            MoveMousePointer(new Vector2(-jumpDistance, 0));
+            endlessDragOffset.x += jumpDistance;
+        }
+        else if (localPositionX < EndlessDragBorderThresholdInPx)
+        {
+            // Jump to right side
+            float jumpDistance = width * jumpFactor;
+            MoveMousePointer(new Vector2(jumpDistance, 0));
+            endlessDragOffset.x -= jumpDistance;
+        }
+        
+        if (localPositionY < EndlessDragBorderThresholdInPx)
+        {
+            // Jump to bottom side
+            float jumpDistance = height * jumpFactor;
+            MoveMousePointer(new Vector2(0, -jumpDistance));
+            endlessDragOffset.y -= jumpDistance;
+        }
+        else if (localPositionY > height - EndlessDragBorderThresholdInPx)
+        {
+            // Jump to top side
+            float jumpDistance = height * jumpFactor;
+            MoveMousePointer(new Vector2(0, jumpDistance));
+            endlessDragOffset.y += jumpDistance;
+        }
+    }
+
+    private void MoveMousePointerDelayed(Vector2 delta)
+    {
+        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+            () => MoveMousePointer(delta)));
+    }
+    
+    private void MoveMousePointer(Vector2 delta)
+    {
+        if (Mouse.current == null)
+        {
+            return;
+        }
+
+        Vector2 newMousePosition = Mouse.current.position.value + delta;
+        Mouse.current.WarpCursorPosition(newMousePosition);
     }
 
     protected virtual void OnPointerUp(IPointerEvent evt)
@@ -108,10 +208,11 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
         if (DragState.Value == EDragState.Dragging)
         {
-            OnEndDrag(new DragControlPointerEvent(evt));
+            OnEndDrag(new DragControlPointerEvent(evt, endlessDragOffset));
         }
 
         DragState.Value = EDragState.WaitingForPointerDown;
+        IsPointerDown = false;
     }
 
     protected virtual void OnBeginDrag(DragControlPointerEvent eventData)

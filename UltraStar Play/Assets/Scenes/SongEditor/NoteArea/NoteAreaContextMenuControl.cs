@@ -29,15 +29,24 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     private SetMusicGapAction setMusicGapAction;
 
     [Inject]
+    private SetSongPropertyAction setSongPropertyAction;
+
+    [Inject]
     private SongEditorCopyPasteManager songEditorCopyPasteManager;
-    
+
     [Inject]
     private NoteAreaDragControl noteAreaDragControl;
+
+    [Inject]
+    private EditorNoteDisplayer editorNoteDisplayer;
 
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
         FillContextMenuAction = FillContextMenu;
+        ShouldOpenContextMenuFunction = () =>
+            editorNoteDisplayer.EditorNoteControls.AllMatch(noteControl => !noteControl.IsPointerOver)
+            && editorNoteDisplayer.EditorSentenceControls.AllMatch(sentenceControl => !sentenceControl.IsPointerOver);
     }
 
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
@@ -45,14 +54,14 @@ public class NoteAreaContextMenuControl : ContextMenuControl
         int beat = (int)noteAreaControl.GetHorizontalMousePositionInBeats();
         int midiNote = noteAreaControl.GetVerticalMousePositionInMidiNote();
 
-        contextMenu.AddItem("Fit vertical", () => noteAreaControl.FitViewportVerticalToNotes());
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_fitViewVertically), () => noteAreaControl.FitViewportVerticalToNotes());
 
         Sentence sentenceAtBeat = SongMetaUtils.GetSentencesAtBeat(songMeta, beat).FirstOrDefault();
         if (sentenceAtBeat != null)
         {
             int minBeat = sentenceAtBeat.MinBeat - 1;
             int maxBeat = sentenceAtBeat.ExtendedMaxBeat + 1;
-            contextMenu.AddItem("Fit horizontal to sentence ", () => noteAreaControl.FitViewportHorizontal(minBeat, maxBeat));
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_fitViewHorizontallyToSentence), () => noteAreaControl.FitViewportHorizontal(minBeat, maxBeat));
         }
 
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
@@ -60,31 +69,32 @@ public class NoteAreaContextMenuControl : ContextMenuControl
         {
             int minBeat = selectedNotes.Select(it => it.StartBeat).Min() - 1;
             int maxBeat = selectedNotes.Select(it => it.EndBeat).Max() + 1;
-            contextMenu.AddItem("Fit horizontal to selection", () => noteAreaControl.FitViewportHorizontal(minBeat, maxBeat));
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_fitViewHorizontallyToSelection), () => noteAreaControl.FitViewportHorizontal(minBeat, maxBeat));
         }
 
         if (selectedNotes.Count > 0
-            || songEditorCopyPasteManager.CopiedNotes.Count > 0)
+            || songEditorCopyPasteManager.HasCopy)
         {
             contextMenu.AddSeparator();
             if (selectedNotes.Count > 0)
             {
-                contextMenu.AddItem("Copy notes", () => songEditorCopyPasteManager.CopySelectedNotes());
+                contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_copyNotes), () => songEditorCopyPasteManager.CopySelection());
             }
 
-            if (songEditorCopyPasteManager.CopiedNotes.Count > 0)
+            if (songEditorCopyPasteManager.HasCopy)
             {
-                contextMenu.AddItem("Paste notes", () => songEditorCopyPasteManager.PasteCopiedNotes());
+                contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_pasteNotes), () => songEditorCopyPasteManager.Paste());
             }
         }
-        
-        contextMenu.AddSeparator();
-        contextMenu.AddItem("Add note", () => addNoteAction.ExecuteAndNotify(songMeta, beat, midiNote));
 
         if (selectedNotes.Count == 0)
         {
+            double positionInMillis = noteAreaControl.ScreenPixelPositionToMillis(contextMenu.Position.x);
+
             contextMenu.AddSeparator();
-            contextMenu.AddItem("Set Gap to playback position", () => setMusicGapAction.ExecuteAndNotify());
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setGap), () => setMusicGapAction.ExecuteAndNotify(positionInMillis));
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyStart), () => setSongPropertyAction.SetMedleyStartAndNotify(positionInMillis));
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyEnd), () => setSongPropertyAction.SetMedleyEndAndNotify(positionInMillis));
         }
     }
 }

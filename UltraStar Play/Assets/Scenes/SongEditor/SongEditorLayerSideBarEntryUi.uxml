@@ -10,6 +10,10 @@
                 <MaterialIcon name="layerVisibleIcon" icon="visibility" style="position: absolute;" />
                 <MaterialIcon name="layerInvisibleIcon" icon="visibility_off" style="position: absolute; display: none;" />
             </ui:Button>
+            <ui:Button display-tooltip-when-elided="true" name="layerMidiSoundButton" class="squareButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; overflow: visible; margin-left: 0; margin-right: 5px; margin-top: 0; margin-bottom: 0;">
+                <MaterialIcon name="layerMidiSoundOnIcon" icon="volume_up" style="position: absolute;" />
+                <MaterialIcon name="layerMidiSoundOffIcon" icon="volume_off" style="position: absolute; display: none;" />
+            </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="layerEditableButton" class="squareButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; overflow: visible; margin-left: 0; margin-right: 5px; margin-top: 0; margin-bottom: 0;">
                 <MaterialIcon name="layerEditableIcon" icon="lock_open" style="position: absolute;" />
                 <MaterialIcon name="layerNotEditableIcon" icon="lock" style="position: absolute; display: none;" />

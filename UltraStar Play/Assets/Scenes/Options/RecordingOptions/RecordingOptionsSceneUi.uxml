@@ -1,30 +1,52 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
-        <ui:VisualElement name="row">
-            <ItemPicker name="devicePicker" wrap-around="false" min-value="0" max-value="100" step-value="10" class="multiline mr-2" style="width: 100%;" />
-            <SlideToggle name="enabledToggle" style="-unity-text-align: upper-center;" />
+        <ui:VisualElement name="noConnectedMicsContainer" style="align-items: center;">
+            <MaterialIcon tabindex="-1" name="noConnectedMicsIcon" icon="mic_off" class="noBackgroundInHierarchy" style="font-size: 64px;" />
+            <ui:Label text="$options_recording_noConnectedMic" display-tooltip-when-elided="true" name="noConnectedMicsLabel" class="largerFont noBackgroundInHierarchy" style="white-space: normal; display: flex; -unity-text-align: middle-left; -unity-font-style: bold;" />
+            <ui:Label text="$options_recording_noConnectedMic_hint" name="tryConnectMicLabel" class="secondaryFontColor mt-2 mb-1 noBackgroundInHierarchy" style="white-space: normal; -unity-text-align: middle-left;" />
         </ui:VisualElement>
-        <ui:VisualElement name="micVisualizationContainer" class="my-2" style="border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; align-items: flex-start; justify-content: center; flex-direction: row; height: 60px;">
-            <ui:Label text="Note: ???" display-tooltip-when-elided="true" name="noteLabel" style="margin-right: 20px; -unity-text-align: middle-left; height: 100%; margin-left: 5px; width: 90px;" />
-            <ui:VisualElement name="audioWaveForm" style="flex-grow: 1; height: 100%; flex-direction: row; width: auto;" />
-        </ui:VisualElement>
-        <ui:ScrollView vertical-scroller-visibility="AlwaysVisible" style="width: 100%; height: 10%; margin-bottom: 20px; flex-grow: 1;">
-            <ui:VisualElement name="column" class="child-mb-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                <ItemPicker name="colorPicker" label="Color" wrap-around="false" min-value="0" max-value="100" step-value="10" />
-                <ItemPicker name="delayPicker" label="Delay" wrap-around="true" min-value="0" max-value="1000" step-value="10" />
-                <ui:Button text="Calibrate Delay" display-tooltip-when-elided="true" name="calibrateDelayButton" class="controlMinWidth ellipsis ml-auto mb-3" />
-                <ItemPicker name="amplificationPicker" label="Amplification" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-                <ItemPicker name="noiseSuppressionPicker" label="Noise Suppression" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-                <ItemPicker name="sampleRatePicker" label="Sample Rate" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-                <ui:VisualElement name="recordingDeviceInactiveOverlay" picking-mode="Ignore" class="overlay inactiveOverlay roundCorners" style="background-color: rgba(0, 0, 0, 0.5);" />
+        <ui:VisualElement name="micConfigurationContainer" style="flex-grow: 1;">
+            <ui:VisualElement name="row">
+                <Chooser name="deviceChooser" wrap-around="false" min-value="0" max-value="100" step-value="10" class="multiline mr-2" style="width: 100%;" />
+                <SlideToggle name="enabledToggle" style="-unity-text-align: upper-center;" />
             </ui:VisualElement>
-        </ui:ScrollView>
-        <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row;">
-            <ui:VisualElement name="notConnectedContainer" picking-mode="Ignore" style="width: 100%; flex-direction: row; align-items: center; position: absolute; justify-content: center;">
-                <MaterialIcon name="warningIcon" icon="warning" class="rounded warningFontColor" />
-                <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warningFontColor" />
+            <ui:VisualElement name="micVisualizationContainer" class="my-2" style="border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; align-items: flex-start; justify-content: center; flex-direction: row; height: 60px;">
+                <ui:Label text="Note: ???" name="noteLabel" class="ml-2" style="-unity-text-align: middle-left; height: 100%; min-width: 80px;" />
+                <ui:VisualElement name="pitchIndicator" style="background-color: rgba(0, 0, 0, 0); width: 16px; height: 16px; top: 50%;">
+                    <ui:VisualElement name="pitchIndicatorIcon" style="background-image: url(&quot;project://database/Assets/JMO%20Assets/Cartoon%20FX%20Remaster/Demo%20Assets/UI/CFXR%20Demo%20Btn%20Arrow.png?fileID=2800000&amp;guid=b0394665e16ef504bb922274dd606020&amp;type=3#CFXR Demo Btn Arrow&quot;); width: 100%; height: 100%; -unity-background-scale-mode: scale-to-fit; position: absolute; top: -8px;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="audioWaveForm" style="flex-grow: 1; height: 100%; flex-direction: row; width: auto;" />
             </ui:VisualElement>
-            <ui:Button text="Delete" name="deleteButton" class="controlMinWidth ml-auto" style="visibility: visible; display: flex;" />
+            <ui:ScrollView vertical-scroller-visibility="AlwaysVisible" style="width: 100%; height: 10%; margin-bottom: 20px; flex-grow: 1;">
+                <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                    <ui:VisualElement name="selectedRecordingDeviceOptionsContainer" class="child-mb-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                        <Chooser name="colorChooser" label="$options_color" wrap-around="false" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                        <Chooser name="delayChooser" label="$options_delay" wrap-around="true" min-value="0" max-value="1000" step-value="10" class="noBackgroundInHierarchy" />
+                        <ui:Button text="$options_delay_calibrate" display-tooltip-when-elided="true" name="calibrateDelayButton" class="controlMinWidth ellipsis ml-auto mb-3" />
+                        <Chooser name="amplificationChooser" label="$options_amplification" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                        <Chooser name="noiseSuppressionChooser" label="$options_noiseSuppression" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                        <Chooser name="sampleRateChooser" label="$options_sampleRate" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                        <ui:VisualElement name="recordingDeviceInactiveOverlay" picking-mode="Ignore" class="overlay inactiveOverlay roundCorners" style="background-color: rgba(0, 0, 0, 0.5); display: none;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="globalSettingsContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                        <ui:Label tabindex="-1" text="$options_globalSettings" display-tooltip-when-elided="true" name="globalSettingsLabel" class="noBackgroundInHierarchy" style="width: 100%; -unity-text-align: upper-center; -unity-font-style: bold; margin-top: 10px; margin-bottom: 10px;" />
+                        <ui:Toggle name="usePortAudioToggle" label="$options_usePortAudio" class="noBackgroundInHierarchy mt-3 mb-3" />
+                        <ui:Toggle name="playRecordedAudioToggle" label="$options_playRecordedAudio" style="margin-bottom: 0;" />
+                        <ui:VisualElement name="playRecordedAudioInfoContainer" style="flex-direction: row; align-items: center;">
+                            <MaterialIcon tabindex="-1" name="infoIcon" icon="info_outline" class="smallFont mr-1 nBackgroundInHierarchy" />
+                            <ui:Label tabindex="-1" text="$options_playRecordedAudioInfo" name="playRecordedAudioInfoLabel" class="smallFont playRecordedAudioInfoContainer" />
+                        </ui:VisualElement>
+                        <Chooser name="micPlaybackVolumeChooser" label="$options_micPlaybackVolume" wrap-around="true" min-value="0" max-value="1000" step-value="10" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:ScrollView>
+            <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row;">
+                <ui:VisualElement name="notConnectedContainer" picking-mode="Ignore" style="width: 100%; flex-direction: row; align-items: center; position: absolute; justify-content: center;">
+                    <MaterialIcon name="warningIcon" icon="warning" class="rounded warningFontColor noBackgroundInHierarchy" />
+                    <ui:Label text="$options_micNotConnected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warningFontColor noBackgroundInHierarchy" />
+                </ui:VisualElement>
+                <ui:Button text="$action_delete" name="deleteButton" class="controlMinWidth ml-auto" style="visibility: visible; display: flex;" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

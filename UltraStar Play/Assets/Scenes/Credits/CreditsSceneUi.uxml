@@ -1,47 +1,34 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="CreditsEntryUi" src="project://database/Assets/Scenes/Credits/CreditsEntryUi.uxml?fileID=9197481963319205126&amp;guid=a2add421bc81d5149acdf8c9c252ea51&amp;type=3#CreditsEntryUi" />
     <ui:VisualElement name="root" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1;">
-        <ui:VisualElement name="secondBackground" style="position: absolute; width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Scenes/Credits/Images/thank-you-publicdomainvectors.org.svg?fileID=7388822144124034973&amp;guid=f99e8bfaffb8a3245aef58acff1c9979&amp;type=3#thank-you-publicdomainvectors.org&apos;); -unity-background-scale-mode: scale-and-crop;">
+        <ui:VisualElement name="secondBackground" style="position: absolute; width: 100%; height: 100%; background-image: url(&quot;project://database/Assets/Scenes/Credits/Images/thank-you-publicdomainvectors.org.svg?fileID=7388822144124034973&amp;guid=f99e8bfaffb8a3245aef58acff1c9979&amp;type=3#thank-you-publicdomainvectors.org&quot;); -unity-background-scale-mode: scale-and-crop; -unity-background-image-tint-color: rgb(200, 200, 200);">
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="ScrollView" style="margin-left: 20px; margin-right: 20px; margin-top: 20px;">
-                <ui:Label text="Credits summary" display-tooltip-when-elided="true" name="creditsSummaryLabel" style="width: 100%; -unity-text-align: upper-center;" />
+                <ui:Label text="Credits summary&#10;&#10;Lorem Ipsum&#10;Dolor Met" display-tooltip-when-elided="true" name="creditsSummaryLabel" picking-mode="Ignore" class="textShadow largeFont" style="width: 100%; -unity-text-align: upper-center; -unity-font-style: bold;" />
             </ui:ScrollView>
         </ui:VisualElement>
-        <ui:VisualElement name="background" picking-mode="Ignore" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Scenes/Credits/Images/brown-g145e3ab49_1920.jpg?fileID=21300000&amp;guid=e304a20c525dcbd4bae9249350c5f566&amp;type=3#brown-g145e3ab49_1920&apos;); position: absolute; -unity-background-scale-mode: scale-and-crop;">
-            <ui:VisualElement picking-mode="Ignore" style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; width: 100%;">
-                <ui:VisualElement name="categoryNameContainer" picking-mode="Ignore" style="width: 100%; align-items: center; position: absolute; height: 100%;">
-                    <ui:Label text="Credits Category" display-tooltip-when-elided="true" name="categoryNameLabel" class="xxlFont" style="position: absolute; text-shadow: 1px 1px 0 rgb(0, 0, 0); -unity-font-style: bold; border-bottom-width: 2px; border-bottom-color: rgba(255, 255, 255, 0.5); padding-left: 10px; padding-right: 10px; padding-bottom: 5px;" />
+        <ui:VisualElement name="background" picking-mode="Ignore" style="width: 100%; height: 100%; background-image: url(&quot;project://database/Assets/Scenes/Credits/Images/brown-g145e3ab49_1920.jpg?fileID=21300000&amp;guid=e304a20c525dcbd4bae9249350c5f566&amp;type=3#brown-g145e3ab49_1920&quot;); position: absolute; -unity-background-scale-mode: scale-and-crop;">
+            <ui:VisualElement name="categoryNameContainer" picking-mode="Ignore" style="width: 100%; align-items: center; position: absolute; height: 100%;">
+                <ui:Label text="Credits Category" display-tooltip-when-elided="true" name="categoryNameLabel" picking-mode="Ignore" class="xxlFont" style="position: absolute; text-shadow: 1px 1px 0 rgb(0, 0, 0); -unity-font-style: bold; border-bottom-width: 2px; border-bottom-color: rgba(255, 255, 255, 0.5); padding-left: 10px; padding-right: 10px; padding-bottom: 5px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="centerContent" picking-mode="Ignore" style="width: 100%; flex-grow: 1; align-items: flex-start;">
+                <ui:VisualElement name="entriesContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;">
+                    <ui:Instance template="CreditsEntryUi" name="CreditsEntryUi" />
                 </ui:VisualElement>
-                <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px; display: none;">
-                    <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 40%;">
-                        <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
-                            <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ultrastardx-icon-contour.svg?fileID=7388822144124034973&amp;guid=2784df2e61772dc448202fc152a4fcfc&amp;type=3#ultrastardx-icon-contour&apos;);" />
-                            <ui:VisualElement name="titleAndDescription">
-                                <ui:Label text="Credits" name="sceneTitle" class="titleText" />
-                                <ui:Label text="UltraStar Play" name="sceneTitle" class="titleSubText" style="width: auto;" />
-                            </ui:VisualElement>
-                        </ui:VisualElement>
-                    </ui:VisualElement>
+                <ui:VisualElement name="allCharactersContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
+                <ui:VisualElement name="player" picking-mode="Ignore" style="position: absolute; top: 90%; left: 50%;">
+                    <ui:VisualElement name="playerImage" picking-mode="Ignore" style="background-image: url(&quot;project://database/Assets/Scenes/Credits/Images/CreditsMiniGameCharacter.png?fileID=2800000&amp;guid=48b8b371d62e3ff48a05f82d79d80db3&amp;type=3#CreditsMiniGameCharacter&quot;); width: 80px; height: 80px; -unity-background-scale-mode: scale-to-fit; position: relative; left: -45px; top: -45px;" />
                 </ui:VisualElement>
-                <ui:VisualElement name="centerContent" picking-mode="Ignore" style="width: 100%; flex-grow: 1; align-items: flex-start;">
-                    <ui:VisualElement name="entriesContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;">
-                        <ui:Instance template="CreditsEntryUi" name="CreditsEntryUi" />
-                    </ui:VisualElement>
-                    <ui:VisualElement name="allCharactersContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
-                    <ui:VisualElement name="player" style="position: absolute; top: 90%; left: 50%;">
-                        <ui:VisualElement name="playerImage" style="background-image: url(&apos;project://database/Packages/playsharedui/Runtime/Graphics/Icons/ultrastardx-icon.svg?fileID=7388822144124034973&amp;guid=15d395ee39b856f4c84be1537a1d4137&amp;type=3#ultrastardx-icon&apos;); width: 80px; height: 80px; -unity-background-scale-mode: scale-to-fit; position: relative; left: -45px; top: -45px;" />
-                    </ui:VisualElement>
-                    <ui:VisualElement name="scoreContainer" style="position: absolute; align-items: center; justify-content: center; width: 100%; top: 100%;">
-                        <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreLabel" class="largeFont" style="-unity-font-style: bold; text-shadow: 1px 1px 0 rgb(0, 0, 0); color: rgb(241, 241, 241); -unity-text-align: upper-center;" />
-                        <ui:Label text="Chain +1" display-tooltip-when-elided="true" name="bonusLabel" class="smallFont" style="-unity-font-style: bold; text-shadow: 1px 1px 0 rgb(0, 0, 0); color: rgb(15, 255, 0); -unity-text-align: upper-center; position: absolute; top: -100%;" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; align-items: flex-end; flex-direction: row;">
-                    <ui:Button name="backButton" value="This is the about text on multiple lines." class="transparentButton circle squareButton">
-                        <MaterialIcon tabindex="-1" name="backIcon" icon="arrow_back" />
-                    </ui:Button>
-                    <ui:Button name="skipButton" value="This is the about text on multiple lines." text="Skip" class="transparentButton circle squareButton smallFont" />
+                <ui:VisualElement name="scoreContainer" picking-mode="Ignore" style="position: absolute; align-items: center; justify-content: center; width: 100%; bottom: 0;">
+                    <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreLabel" picking-mode="Ignore" class="largeFont" style="-unity-font-style: bold; text-shadow: 1px 1px 0 rgb(0, 0, 0); color: rgb(241, 241, 241); -unity-text-align: upper-center;" />
+                    <ui:Label text="Chain +1" display-tooltip-when-elided="true" name="bonusLabel" picking-mode="Ignore" class="smallFont" style="-unity-font-style: bold; text-shadow: 1px 1px 0 rgb(0, 0, 0); color: rgb(15, 255, 0); -unity-text-align: upper-center; position: absolute; top: -100%;" />
                 </ui:VisualElement>
             </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="buttonRow" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); position: absolute; bottom: 0;">
+            <ui:Button name="backButton" value="This is the about text on multiple lines." class="transparentButton circle squareButton">
+                <MaterialIcon tabindex="-1" name="backIcon" icon="arrow_back" />
+            </ui:Button>
+            <ui:Button name="skipButton" value="This is the about text on multiple lines." text="$action_skip" class="transparentButton circle squareButton smallFont" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

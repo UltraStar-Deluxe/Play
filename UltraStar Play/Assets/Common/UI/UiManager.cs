@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using ProTrans;
+using BsiGame.UI.UIElements;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class UiManager : AbstractSingletonBehaviour, INeedInjection
+public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -22,20 +23,35 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
 
     private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
 
-    [InjectedInInspector]
-    public VisualTreeAsset notificationOverlayUi;
+    private readonly Subject<ChildrenChangedEvent> childrenChangedEventStream = new();
+    public IObservable<ChildrenChangedEvent> ChildrenChangedEventStream => childrenChangedEventStream;
 
     [InjectedInInspector]
-    public VisualTreeAsset notificationUi;
+    public VisualTreeAsset messageDialogUi;
 
     [InjectedInInspector]
-    public VisualTreeAsset dialogUi;
-
-    [InjectedInInspector]
-    public VisualTreeAsset accordionUi;
+    public VisualTreeAsset micWithNameUi;
 
     [InjectedInInspector]
     public Sprite fallbackPlayerProfileImage;
+
+    [InjectedInInspector]
+    public VisualTreeAsset nextGameRoundInfoUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset nextGameRoundInfoPlayerEntryUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset songQueueEntryUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset songQueuePlayerEntryUi;
+
+    [InjectedInInspector]
+    public Sprite defaultSongImage;
+
+    [InjectedInInspector]
+    public Sprite defaultFolderImage;
 
     [Inject]
     private Injector injector;
@@ -49,6 +65,8 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    private readonly HashSet<VisualElement> visualElementsWithChildChangeManipulator = new();
+
     protected override object GetInstance()
     {
         return Instance;
@@ -57,7 +75,34 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     protected override void AwakeSingleton()
     {
         LeanTween.init(10000);
+    }
+
+    protected override void StartSingleton()
+    {
         UpdatePlayerProfileImagePaths();
+    }
+
+    public void OnInjectionFinished()
+    {
+        // The UIDocument can change when the scene changes. Thus, registering events must be done in OnInjectionFinished.
+        RegisterChildrenChangedEvent();
+    }
+
+    private void RegisterChildrenChangedEvent()
+    {
+        if (visualElementsWithChildChangeManipulator.Contains(uiDocument.rootVisualElement))
+        {
+            return;
+        }
+        visualElementsWithChildChangeManipulator.Add(uiDocument.rootVisualElement);
+        uiDocument.rootVisualElement.AddManipulator(new ChildChangeManipulator());
+        uiDocument.rootVisualElement.RegisterCallback<ChildChangeEvent>(evt => childrenChangedEventStream.OnNext(new ChildrenChangedEvent()
+        {
+            targetParent = evt.targetParent,
+            targetChild = evt.targetChild,
+            newChildCount = evt.newChildCount,
+            previousChildCount = evt.previousChildCount,
+        }));
     }
 
     private void Update()
@@ -66,71 +111,20 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
             .ForEach(contextMenuPopupControl => contextMenuPopupControl.Update());
     }
 
-    private Label DoCreateNotification(
-        string text)
+    public void ReloadPlayerProfileImages()
     {
-        VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
-        if (notificationOverlay == null)
-        {
-            notificationOverlay = notificationOverlayUi.CloneTree()
-                .Children()
-                .First();
-            uiDocument.rootVisualElement.Children().First().Add(notificationOverlay);
-        }
-
-        TemplateContainer templateContainer = notificationUi.CloneTree();
-        VisualElement notification = templateContainer.Children().First();
-        Label notificationLabel = notification.Q<Label>("notificationLabel");
-        notificationLabel.text = text;
-        notificationOverlay.Add(notification);
-
-        // Fade out then remove
-        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, 2, 1));
-
-        return notificationLabel;
+        UpdatePlayerProfileImagePaths();
     }
 
     public void UpdatePlayerProfileImagePaths()
     {
-        relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages();
+        List<string> folders = PlayerProfileUtils.GetPlayerProfileImageFolders();
+        relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages(folders);
     }
 
-    public static Label CreateNotification(
-        string text)
+    public MessageDialogControl CreateDialogControl(Translation dialogTitle)
     {
-        return Instance.DoCreateNotification(text);
-    }
-
-    public static IEnumerator FadeOutVisualElement(
-        VisualElement visualElement,
-        float solidTimeInSeconds,
-        float fadeOutTimeInSeconds)
-    {
-        yield return new WaitForSeconds(solidTimeInSeconds);
-        float startOpacity = visualElement.resolvedStyle.opacity;
-        float startTime = Time.time;
-        while (visualElement.resolvedStyle.opacity > 0)
-        {
-            float newOpacity = Mathf.Lerp(startOpacity, 0, (Time.time - startTime) / fadeOutTimeInSeconds);
-            if (newOpacity < 0)
-            {
-                newOpacity = 0;
-            }
-
-            visualElement.style.opacity = newOpacity;
-            yield return null;
-        }
-
-        // Remove VisualElement
-        if (visualElement.parent != null)
-        {
-            visualElement.parent.Remove(visualElement);
-        }
-    }
-
-    public MessageDialogControl CreateDialogControl(string dialogTitle)
-    {
-        VisualElement dialogVisualElement = dialogUi.CloneTree().Children().FirstOrDefault();
+        VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(dialogVisualElement);
         dialogVisualElement.AddToClassList("wordWrap");
 
@@ -141,15 +135,85 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
 
         return dialogControl;
     }
-    
+
+    public MessageDialogControl CreateErrorInfoDialogControl(
+        Translation dialogTitle,
+        Translation dialogMessage,
+        Translation errorMessage,
+        Translation closeButtonText = default)
+    {
+        MessageDialogControl messageDialogControl = CreateInfoDialogControl(dialogTitle, dialogMessage, closeButtonText);
+
+        // Add accordion item to show error message.
+        if (errorMessage.Value.IsNullOrEmpty())
+        {
+            return messageDialogControl;
+        }
+
+        AccordionItem accordionItem = new AccordionItem();
+        accordionItem.SetTranslatedTitle(Translation.Get(R.Messages.common_details));
+        Label errorMessageLabel = new();
+        errorMessageLabel.SetTranslatedText(errorMessage);
+        accordionItem.Add(errorMessageLabel);
+        accordionItem.HideAccordionContent();
+        messageDialogControl.AddVisualElement(accordionItem);
+
+        return messageDialogControl;
+    }
+
+    public MessageDialogControl CreateInfoDialogControl(
+        Translation dialogTitle,
+        Translation dialogMessage,
+        Translation closeButtonText = default)
+    {
+        MessageDialogControl messageDialogControl = CreateDialogControl(dialogTitle);
+        messageDialogControl.Message = dialogMessage;
+
+        closeButtonText = !closeButtonText.Value.IsNullOrEmpty()
+            ? closeButtonText
+            : Translation.Get(R.Messages.action_close);
+        messageDialogControl.AddButton(closeButtonText, evt =>
+        {
+            messageDialogControl.CloseDialog();
+        });
+        return messageDialogControl;
+    }
+
+    public MessageDialogControl CreateConfirmationDialogControl(
+        Translation dialogTitle,
+        Translation dialogMessage,
+        Translation confirmButtonText,
+        Action<EventBase> onConfirm,
+        Translation cancelButtonText = default,
+        Action<EventBase> onCancel = null)
+    {
+        MessageDialogControl messageDialogControl = CreateDialogControl(dialogTitle);
+        messageDialogControl.Message = dialogMessage;
+        messageDialogControl.AddButton(confirmButtonText, evt =>
+        {
+            messageDialogControl.CloseDialog();
+            onConfirm?.Invoke(evt);
+        });
+
+        cancelButtonText = !cancelButtonText.Value.IsNullOrEmpty()
+            ? cancelButtonText
+            : Translation.Get(R.Messages.action_cancel);
+        messageDialogControl.AddButton(cancelButtonText, evt =>
+        {
+            messageDialogControl.CloseDialog();
+            onCancel?.Invoke(evt);
+        });
+        return messageDialogControl;
+    }
+
     public MessageDialogControl CreateHelpDialogControl(
-        string dialogTitle,
+        Translation dialogTitle,
         Dictionary<string, string> titleToContentMap)
     {
-        VisualElement dialogVisualElement = dialogUi.CloneTree().Children().FirstOrDefault();
+        VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(dialogVisualElement);
         dialogVisualElement.AddToClassList("wordWrap");
-        
+
         MessageDialogControl dialogControl = injector
             .WithRootVisualElement(dialogVisualElement)
             .CreateAndInject<MessageDialogControl>();
@@ -157,11 +221,10 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
 
         AccordionGroup accordionGroup = new();
         dialogControl.AddVisualElement(accordionGroup);
-            
+
         void AddChapter(string title, string content)
         {
             AccordionItem accordionItem = new(title);
-            accordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
             accordionItem.Add(new Label(content));
             accordionGroup.Add(accordionItem);
         }
@@ -171,12 +234,25 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         return dialogControl;
     }
 
-    public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)
+    public string GetFinalPlayerProfileImagePath(PlayerProfile playerProfile)
+    {
+        if (playerProfile.ImagePath == PlayerProfile.WebcamImagePath)
+        {
+            int playerProfileIndex = settings.PlayerProfiles.IndexOf(playerProfile);
+            string webCamImagePath = PlayerProfileUtils.GetAbsoluteWebCamImagePath(playerProfileIndex);
+            return webCamImagePath;
+        }
+        else
+        {
+            return playerProfile.ImagePath;
+        }
+    }
+
+    public IObservable<Sprite> LoadPlayerProfileImage(string imagePath)
     {
         if (imagePath.IsNullOrEmpty())
         {
-            onSuccess(fallbackPlayerProfileImage);
-            return;
+            return Observable.Return<Sprite>(fallbackPlayerProfileImage);
         }
 
         string relativePathNormalized = PathUtils.NormalizePath(imagePath);
@@ -185,14 +261,14 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
             string absolutePathNormalized = PathUtils.NormalizePath(absolutePath);
             return absolutePathNormalized.EndsWith(relativePathNormalized);
         });
+
         if (matchingFullPath.IsNullOrEmpty())
         {
             Debug.LogWarning($"Cannot load player profile image with path '{imagePath}' (normalized: '{relativePathNormalized}'), no corresponding image file found.");
-            onSuccess(fallbackPlayerProfileImage);
-            return;
+            return Observable.Return(fallbackPlayerProfileImage);
         }
 
-        ImageManager.LoadSpriteFromUri(matchingFullPath, onSuccess);
+        return ImageManager.LoadSpriteFromUri(matchingFullPath);
     }
 
     public List<string> GetAbsolutePlayerProfileImagePaths()
@@ -213,5 +289,17 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
                 .ToList();
         }
 
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new();
+        bb.Bind(nameof(messageDialogUi)).ToExistingInstance(messageDialogUi);
+        bb.Bind(nameof(nextGameRoundInfoUi)).ToExistingInstance(nextGameRoundInfoUi);
+        bb.Bind(nameof(nextGameRoundInfoPlayerEntryUi)).ToExistingInstance(nextGameRoundInfoPlayerEntryUi);
+        bb.Bind(nameof(micWithNameUi)).ToExistingInstance(micWithNameUi);
+        bb.Bind(nameof(songQueueEntryUi)).ToExistingInstance(songQueueEntryUi);
+        bb.Bind(nameof(songQueuePlayerEntryUi)).ToExistingInstance(songQueuePlayerEntryUi);
+        return bb.GetBindings();
     }
 }

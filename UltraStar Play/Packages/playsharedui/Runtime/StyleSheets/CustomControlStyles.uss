@@ -1,4 +1,30 @@
 /**************************************************/
+/* SEPARATOR */
+/**************************************************/
+.horizontalSeparatorLine {
+    width: 100%;
+    border-color: var(--font-color);
+    border-bottom-width: 1px;
+    height: 10px;
+    margin-bottom: 4px;
+}
+
+/**************************************************/
+/* INLINE HELP BUTTON */
+/**************************************************/
+.inlineHelpButton {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    padding: 0;
+    margin: 5px 5px 1px 1px;
+}
+
+.inlineHelpButton > .materialIcon {
+    font-size: 18px;
+}
+
+/**************************************************/
 /* BUTTONS */
 /**************************************************/
 ToggleButton {
@@ -6,6 +32,18 @@ ToggleButton {
 }
 
 ToggleButton.active {
+    background-color: var(--control-color-accent2);
+}
+
+ToggleButton.active:focus {
+    background-color: var(--control-color-accent2);
+}
+
+ToggleButton.active:hover {
+    background-color: var(--control-color-accent2);
+}
+
+ToggleButton.active:hover:focus {
     background-color: var(--control-color-accent2);
 }
 
@@ -29,37 +67,15 @@ ToggleButton.active {
     background-color: rgba(92, 92, 92, 0.3);
 }
 
-.lightButton .unity-label {
-    color: rgb(16, 24, 40);
-}
-
-.lightButton {
-    background-color: rgb(249, 245, 255);
-    color: rgb(16, 24, 40);
-}
-
-.lightButton:hover {
-    background-color: rgba(249, 245, 255, 0.5);
-}
-
-.lightButton:focus {
-    background-color: rgba(249, 245, 255, 0.5);
-}
 /**************************************************/
-/* ITEM PICKER */
+/* ITEM CHOOSER */
 /**************************************************/
 
-ItemPicker {
+Chooser {
     height: var(--control-height);
     min-width: var(--control-height-small);
     flex-direction: row;
-    align-items: center;
-}
-
-.itemPickerContent {
-    flex-direction: row;
-    flex-grow: 1;
-    height: 100%;
+    align-items: stretch;
 }
 
 .controlWithLabelHorizontal .controlLabel {
@@ -68,6 +84,7 @@ ItemPicker {
 }
 
 .controlWithLabelVertical {
+    flex-direction: column;
     height: auto;
     align-items: stretch;
 }
@@ -76,28 +93,32 @@ ItemPicker {
     height: var(--control-height);
 }
 
-.itemPickerControlsRow {
+.chooserControlsRow {
     border-radius: 5px;
     background-color: var(--control-color);
+    align-items: stretch;
+    justify-content: center;
+    flex-grow: 1;
 }
 
-.itemPickerItemLabel {
+.chooserItemLabel {
     -unity-background-scale-mode: scale-to-fit;
     white-space: normal;
     flex-grow: 1;
-    flex-shrink: 1;
-    height: 100%;
+    height: auto;
     min-width: var(--control-height-small);
     min-height: var(--control-height-small);
-    max-width: 100%;
-    max-height: 100%;
     margin: 0;
     padding-top: 0;
     padding-bottom: 0;
     -unity-text-align: middle-center;
 }
 
-.itemPickerButton {
+.chooserItemImage {
+    flex-grow: 1;
+}
+
+.chooserButton {
     flex-grow: 0;
     flex-shrink: 0;
     width: 40px;
@@ -110,14 +131,82 @@ ItemPicker {
     padding: 0;
 }
 
-.itemPickerPreviousItemButton {
+.chooserPreviousItemButton {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-.itemPickerNextItemButton {
+.chooserNextItemButton {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+}
+
+/**************************************************/
+/* CHIPS COMBO */
+/**************************************************/
+ChipsCombo {
+    flex-direction: row;
+    align-items: center;
+}
+
+.chipsComboContent {
+    background-color: var(--control-color-accent2);
+    flex-direction: row;
+    border-radius: 5px;
+    min-width: 200px;
+    flex-grow: 1;
+}
+
+.chipsComboChipsList {
+    flex-direction: row;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.chipsComboButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    width: 60px;
+    height: 100%;
+    min-height: var(--control-height);
+    padding: 0;
+}
+
+.chipsComboEntryRoot {
+    flex-direction: row;
+    align-items: center;
+    border-radius: 20px;
+    background-color: var(--control-color);
+    margin-bottom: 5px;
+    margin-right: 5px;
+}
+
+.chipsComboEntryLabel {
+    padding-left: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    flex-grow: 0;
+}
+
+.chipsComboEntryButton {
+}
+
+.chipsDialogToggle {
+    margin-bottom: 5px;
+}
+
+.chipsComboListSeparator {
+    width: 100%;
+    border-color: var(--font-color);
+    border-bottom-width: 1px;
+    padding-top: 2px;
+    margin-bottom: 2px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 /**************************************************/
@@ -197,6 +286,8 @@ ItemPicker {
 
 .contextMenuSeparator {
     height: 1px;
+    margin-top: 3px;
+    margin-bottom: 3px;
     background-color: rgb(92, 92, 92);
 }
 
@@ -205,7 +296,38 @@ ItemPicker {
     padding: 2px;
 }
 
+.contextMenu > Toggle {
+    margin-bottom: 4px;
+}
+
+.contextMenu > Label {
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: var(--font-size-s);
+}
+
+.contextMenu > Chooser {
+    flex-direction: column;
+    width: auto;
+    height: auto;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-bottom: 4px;
+}
+
+.contextMenu > Chooser > #chooserLabel {
+    width: auto;
+}
+
+.contextMenu .unity-base-field {
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: var(--font-size-s);
+}
+
 .contextMenu Button {
+    padding-left: 0px;
+    padding-right: 0px;
     background-color: rgb(64, 64, 64);
 }
 
@@ -228,6 +350,9 @@ ItemPicker {
     background-color: rgb(60, 63, 65);
     border-color: rgb(50, 50, 50);
     border-width: 1px;
+    max-width: 792px; /* full screen width minus margin */
+    max-height: 592px; /* full screen height minus margin */
+    white-space: normal;
 }
 
 /**************************************************/
@@ -299,6 +424,7 @@ AccordionGroup > AccordionItem.lastChild {
 #accordionItemRoot {
     width: 100%;
     border-width: 0;
+    margin-bottom: 0;
 }
 
 #accordionItemContent {
@@ -362,18 +488,6 @@ AccordionItem.expanded #toggleAccordionItemContentIcon {
 }
 
 /**************************************************/
-/* TEXT FIELD PLACEHOLDER */
-/**************************************************/
-
-TextField.placeholderVisible {
-    -unity-font-style: italic;
-}
-
-TextField.placeholderVisible #unity-text-input {
-    font-size: var(--font-size-xs);
-}
-
-/**************************************************/
 /* INPUT LEGEND */
 /**************************************************/
 
@@ -410,16 +524,22 @@ TextField.placeholderVisible #unity-text-input {
 /* SLIDE TOGGLE */
 /**************************************************/
 .slide-toggle {
-    width: var(--control-height-double);
-    height: var(--control-height);
     margin: 0;
     padding: 0;
 }
 
+.slide-toggle > Label {
+    flex-grow: 1;
+}
+
 .slide-toggle__input {
+    width: var(--control-height-double);
+    height: var(--control-height);
+    max-width: var(--control-height-double);
+    max-height: var(--control-height);
+    min-width: var(--control-height-double);
+    min-height: var(--control-height);
     background-color: var(--control-color);
-    width: 100%;
-    height: 100%;
     border-radius: 16px;
     overflow: visible;
     border-width: 1px;
@@ -446,6 +566,90 @@ TextField.placeholderVisible #unity-text-input {
 }
 
 /**************************************************/
+/* SONG QUEUE */
+/**************************************************/
+
+#songQueueEntryUiRoot {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+}
+
+#songQueueEntryUiRoot.medleyWithNext {
+    /*border-bottom-width: 0;*/
+    border-bottom-left-radius: 0;
+    border-left-width: 1px;
+    margin-bottom: 0;
+}
+
+#songQueueEntryUiRoot.medleyWithPrevious {
+    /*border-top-width: 0;*/
+    border-top-left-radius: 0;
+    border-left-width: 1px;
+    margin-top: 0;
+}
+
+/**************************************************/
+/* JOB LIST */
+/**************************************************/
+
+#jobList {
+    position: absolute;
+    padding-bottom: 6px;
+    padding-right: 6px;
+    padding-left: 6px;
+    background-color: rgba(32, 32, 32, 0.88);
+    max-height: 100%;
+    transition: bottom 0.5s, top 0.5s, left 0.5s, right 0.5s;
+}
+
+#jobList Button .fontIcon {
+    transition: rotate 0.3s;
+}
+
+#jobList.minimized Button .fontIcon {
+    rotate: -180deg;
+}
+
+#jobListEntry {
+    padding: 2px;
+}
+
+#jobListEntry.childJob {
+    margin-left: 20px;
+}
+
+#toggleJobListIcon {
+    font-size: 22px;
+}
+
+#jobList.minimized #toggleJobListIcon {
+    font-size: 8px;
+    transition: font-size 0.5s;
+}
+
+#jobList.minimized #toggleJobListIcon:hover {
+    font-size: 22px;
+}
+
+#toggleJobListButton {
+    width: 30px;
+    height: 30px;
+}
+
+#jobList.minimized #toggleJobListButton {
+    width: 15px;
+    height: 15px;
+    transition: width 0.5s, height 0.5s;
+}
+
+#jobList.minimized #toggleJobListButton:hover {
+    width: 30px;
+    height: 30px;
+}
+
+/**************************************************/
  */
 /* RADIAL PROGRESS BAR */
 /**************************************************/
@@ -455,11 +659,20 @@ TextField.placeholderVisible #unity-text-input {
     --track-color: #f2f4f7;
     --progress-color: #2e8418;
     --border-size: 6;
+    --round-line-cap: true;
 }
 
 .radial-progress-bar__label {
     -unity-text-align: middle-left;
     color: var(--percentage-color);
+}
+
+/**************************************************/
+/* Radial Layouter */
+/**************************************************/
+RadialChildLayouter > *
+{
+    position: absolute;
 }
 
 /**************************************************/
@@ -473,4 +686,7 @@ TextField.placeholderVisible #unity-text-input {
     font-size: var(--font-size-xs);
     -unity-text-align: middle-center;
     padding: 10px;
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/static/RobotoMono-Medium%20SDF.asset');
+    -unity-font-style: bold;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }

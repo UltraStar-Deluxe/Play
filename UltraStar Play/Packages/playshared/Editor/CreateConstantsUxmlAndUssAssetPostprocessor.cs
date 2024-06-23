@@ -1,21 +1,15 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ProTrans;
-using UnityEngine;
-using UnityEngine.UIElements;
-using UniInject;
-using UniRx;
 using UnityEditor;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class CreateConstantsUxmlAndUssAssetPostprocessor : AssetPostprocessor
 {
-    private static readonly bool createConstansOnFileChange = true;
+    private static readonly bool createConstantsOnFileChange = false;
 
     private static void OnPostprocessAllAssets(
         string[] importedAssets,
@@ -23,7 +17,7 @@ public class CreateConstantsUxmlAndUssAssetPostprocessor : AssetPostprocessor
         string[] movedAssets,
         string[] movedFromAssetPaths)
     {
-        if (!createConstansOnFileChange)
+        if (!createConstantsOnFileChange)
         {
             return;
         }
@@ -50,7 +44,7 @@ public class CreateConstantsUxmlAndUssAssetPostprocessor : AssetPostprocessor
             List<string> changedFiles = changedUxmlFiles
                 .Union(changedUssFiles)
                 .ToList();
-            string changedFileNamesCsv = changedFiles.Select(path => Path.GetFileName(path)).ToCsv();
+            string changedFileNamesCsv = changedFiles.Select(path => Path.GetFileName(path)).JoinWith(", ");
             Debug.Log($"Creating UXML and USS constants because of changed files: {changedFileNamesCsv}");
             CreateConstantsMenuItems.CreateConstantsForUxmlNames();
             CreateConstantsMenuItems.CreateConstantsForUssClasses();

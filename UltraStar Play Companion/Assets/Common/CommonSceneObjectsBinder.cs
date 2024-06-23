@@ -12,13 +12,16 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
     {
         BindingBuilder bb = new();
         bb.BindExistingInstance(ApplicationManager.Instance);
+        bb.BindExistingInstance(MicSampleRecorderManager.Instance);
         bb.BindExistingInstance(SettingsManager.Instance);
-        bb.BindExistingInstance(ClientSideConnectRequestManager.Instance);
+        bb.BindExistingInstance(ClientSideCompanionClientManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);
         bb.BindExistingInstance(TranslationManager.Instance);
+        bb.BindExistingInstance(MainGameHttpClient.Instance);
         bb.BindExistingInstance(UiManager.Instance);
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
         bb.BindExistingInstance(GetUiDocument());
+        bb.BindExistingInstance(new PanelHelper(GetUiDocument()));
 
         bb.BindExistingInstance(SettingsManager.Instance.Settings);
         bb.Bind(typeof(ISettings)).ToExistingInstance(SettingsManager.Instance.Settings);

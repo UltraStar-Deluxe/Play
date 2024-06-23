@@ -16,10 +16,13 @@ public class InGameDebugConsoleManager : AbstractInGameDebugConsoleManager, INee
         return Instance;
     }
 
-    protected override void StartSingleton()
+    protected override void AwakeSingleton()
     {
         base.Init();
+    }
 
+    protected override void StartSingleton()
+    {
         sceneNavigator.SceneChangedEventStream.Subscribe(_ =>
             {
                 // The EventSystem may be disabled afterwards because of EventSystemOptInOnAndroid. Thus, update after a frame.

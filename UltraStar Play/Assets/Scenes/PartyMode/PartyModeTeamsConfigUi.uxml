@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="PartyModeTeamColumnUi" src="project://database/Assets/Scenes/PartyMode/PartyModeTeamColumnUi.uxml?fileID=9197481963319205126&amp;guid=1372ae0a2e4e4904d907d6afc58462ff&amp;type=3#PartyModeTeamColumnUi" />
+    <ui:VisualElement name="teamConfigUiRoot">
+        <ui:VisualElement name="topRow" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; width: 100%; flex-shrink: 0; align-items: center;">
+            <ui:Button text="$action_addTeam" name="addTeamButton" style="margin-right: 5px;" />
+            <ui:Button text="$action_addGuest" name="addGuestButton" />
+            <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+        </ui:VisualElement>
+        <ui:VisualElement name="centerContent" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; align-items: stretch; margin-bottom: 5px; margin-top: 5px;">
+            <ui:VisualElement scroll-deceleration-rate="0,135" elasticity="0,1" name="teamList" mode="VerticalAndHorizontal" class="roundCorners" style="min-height: 0; min-width: 50%; flex-grow: 1; flex-direction: column; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; background-color: rgba(32, 32, 32, 0.25);">
+                <ui:VisualElement name="teamColumnsContainer" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+                    <ui:Instance template="PartyModeTeamColumnUi" name="PartyModeTeamColumnUi" style="flex-grow: 1;" />
+                    <ui:Instance template="PartyModeTeamColumnUi" name="PartyModeTeamColumnUi" style="flex-grow: 1;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

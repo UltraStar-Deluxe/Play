@@ -55,7 +55,7 @@ public class WebCamManager : AbstractSingletonBehaviour, INeedInjection
 
     public WebCamDevice GetSelectedWebCamDevice()
     {
-        return GetWebCamDevices().FirstOrDefault(device => device.name == settings.WebcamSettings.CurrentDeviceName);
+        return GetWebCamDevices().FirstOrDefault(device => device.name == settings.CurrentWebcamDeviceName);
     }
 
     private void StopWebCam()
@@ -70,7 +70,8 @@ public class WebCamManager : AbstractSingletonBehaviour, INeedInjection
 
     public void SaveSnapshot(string filePath)
     {
-        if (webCamTexture == null)
+        if (webCamTexture == null
+            || !webCamTexture.isPlaying)
         {
             return;
         }

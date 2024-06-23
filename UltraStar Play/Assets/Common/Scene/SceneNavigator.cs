@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -15,13 +16,14 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
-        staticSceneDatas.Clear();
+        sceneEnumToSceneData.Clear();
     }
 
     public static SceneNavigator Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SceneNavigator>();
 
     /// Static map to store and load SceneData instances across scenes.
-    private static readonly Dictionary<System.Type, SceneData> staticSceneDatas = new();
+    private static readonly Dictionary<Type, SceneData> sceneDataTypeToSceneData = new();
+    private static readonly Dictionary<EScene, SceneData> sceneEnumToSceneData = new();
 
     private readonly Subject<BeforeSceneChangeEvent> beforeSceneChangeEventStream = new();
     public IObservable<BeforeSceneChangeEvent> BeforeSceneChangeEventStream => beforeSceneChangeEventStream;
@@ -37,8 +39,13 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private SceneRecipeManager sceneRecipeManager;
-    
+
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
+
     public bool logSceneChangeDuration;
+
+    public EScene CurrentScene => sceneRecipeManager.GetCurrentScene();
 
     protected override object GetInstance()
     {
@@ -58,33 +65,42 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
             stopwatch.Stop();
             if (logSceneChangeDuration)
             {
-                Debug.Log($"Changing scenes took {stopwatch.ElapsedMilliseconds} ms");
+                Debug.Log($"Changing scenes took {stopwatch.ElapsedMilliseconds} ms (including animation if fade in/out transition is used)");
             }
         }).AddTo(gameObject);
-    }
 
-    protected override void OnEnableSingleton()
-    {
+        // Cannot register this in OnEnable because injection may not have finished yet in OnEnable.
         SceneManager.sceneLoaded += OnSceneLoaded;
+
+        // Fire initial sceneChangedEvent
+        sceneChangedEventStream.OnNext(new SceneChangedEvent(ESceneUtils.GetSceneByBuildIndex(SceneManager.GetActiveScene().buildIndex)));
     }
 
-    protected override void OnDisableSingleton()
+    protected override void OnDestroySingleton()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
-        sceneChangedEventStream.OnNext(new SceneChangedEvent());
+        sceneChangedEventStream.OnNext(new SceneChangedEvent(sceneRecipeManager.GetCurrentScene()));
     }
 
-    public void LoadScene(EScene scene)
+    public void LoadScene(EScene scene, bool skipAnimation=false)
     {
+        if (onlineMultiplayerManager.IsOnlineGame
+            && (scene is EScene.PartyModeScene or EScene.SongEditorScene))
+        {
+            Debug.Log($"Cannot open {scene} when connected to online game");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_notAvailable));
+            return;
+        }
+
         EScene currentScene = sceneRecipeManager.GetCurrentScene();
 
-        beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));
+        beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene, GetSceneData(scene)));
 
-        if (settings.GraphicSettings.AnimateSceneChange)
+        if (SettingsUtils.ShouldAnimateSceneChange(settings))
         {
             sceneChangeAnimationControl.AnimateChangeToScene(
                 () => DoChangeScene(currentScene, scene),
@@ -99,13 +115,13 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     private void DoChangeScene(EScene currentScene, EScene targetScene)
     {
         sceneRecipeManager.UnloadScene();
-        
+
         SceneRecipe sceneRecipe = sceneRecipeManager.GetSceneRecipe(targetScene);
         if (sceneRecipe != null
             && currentScene != EScene.SongEditorScene)
         {
             sceneRecipeManager.LoadSceneFromRecipe(sceneRecipe);
-            sceneChangedEventStream.OnNext(new SceneChangedEvent());
+            sceneChangedEventStream.OnNext(new SceneChangedEvent(targetScene));
         }
         else
         {
@@ -113,19 +129,20 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private void AddSceneData(SceneData sceneData)
+    private void AddSceneData(EScene scene, SceneData sceneData)
     {
-        staticSceneDatas[sceneData.GetType()] = sceneData;
+        sceneDataTypeToSceneData[sceneData.GetType()] = sceneData;
+        sceneEnumToSceneData[scene] = sceneData;
     }
 
-    public void LoadScene(EScene scene, SceneData sceneData)
+    public void LoadScene(EScene scene, SceneData sceneData, bool skipAnimation=false)
     {
         if (sceneData == null)
         {
             throw new Exception("SceneData cannot be null. Use LoadScene(EScene) if no SceneData is required.");
         }
-        AddSceneData(sceneData);
-        LoadScene(scene);
+        AddSceneData(scene, sceneData);
+        LoadScene(scene, skipAnimation);
     }
 
     public static T GetSceneDataOrThrow<T>() where T : SceneData
@@ -138,9 +155,21 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
         return GetSceneData<T>(null);
     }
 
+    public static SceneData GetSceneData(EScene scene)
+    {
+        if (sceneEnumToSceneData.TryGetValue(scene, out SceneData sceneData))
+        {
+            return sceneData;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public static T GetSceneData<T>(T defaultValue) where T : SceneData
     {
-        if (staticSceneDatas.TryGetValue(typeof(T), out SceneData sceneData))
+        if (sceneDataTypeToSceneData.TryGetValue(typeof(T), out SceneData sceneData))
         {
             if (sceneData is T)
             {

@@ -6,9 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using PrimeInputActions;
-using ProTrans;
 using UnityEditor;
-using UnityEngine;
 
 public static class CreateConstantsMenuItems
 {
@@ -52,7 +50,7 @@ public static class CreateConstantsMenuItems
         string className = "R";
         string subClassName = "UxmlNames";
         string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
-        List<string> uxmlFiles = GetFilesInFolder("Assets", "*.uxml")
+        List<string> uxmlFiles = GetFilesInFolderRecursive("Assets", "*.uxml")
             .ToList();
 
         HashSet<string> uxmlNames = new();
@@ -76,7 +74,7 @@ public static class CreateConstantsMenuItems
             return;
         }
 
-        List<string> uxmlFiles = GetFilesInFolder("Packages/playsharedui/Runtime", "*.uxml")
+        List<string> uxmlFiles = GetFilesInFolderRecursive("Packages/playsharedui/Runtime", "*.uxml")
             .ToList();
 
         HashSet<string> uxmlNames = new();
@@ -87,7 +85,7 @@ public static class CreateConstantsMenuItems
         string classCode = CreateClassCode(className, subClassName, uxmlNamesList, null, true);
         FileUtils.WriteAllTextIfChanged(targetPath, classCode);
     }
-    
+
     public static void CreateConstantsForUssClasses()
     {
         CreateConstantsForUssClassesInPlayShared();
@@ -100,9 +98,9 @@ public static class CreateConstantsMenuItems
         string subClassName = "UssClasses";
         string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
 
-        List<string> uxmlFiles = GetFilesInFolder("Assets", "*.uxml")
+        List<string> uxmlFiles = GetFilesInFolderRecursive("Assets", "*.uxml")
             .ToList();
-        List<string> ussFiles = GetFilesInFolder("Assets", "*.uss")
+        List<string> ussFiles = GetFilesInFolderRecursive("Assets", "*.uss")
             .ToList();
 
         HashSet<string> ussClassesHashSet = new();
@@ -114,7 +112,7 @@ public static class CreateConstantsMenuItems
         string classCode = CreateClassCode(className, subClassName, ussClassesList, null, true);
         FileUtils.WriteAllTextIfChanged(targetPath, classCode);
     }
-    
+
     public static void CreateConstantsForUssClassesInPlayShared()
     {
         string className = "R_PlayShared";
@@ -127,9 +125,9 @@ public static class CreateConstantsMenuItems
             return;
         }
 
-        List<string> uxmlFiles = GetFilesInFolder("Packages/playsharedui/Runtime", "*.uxml")
+        List<string> uxmlFiles = GetFilesInFolderRecursive("Packages/playsharedui/Runtime", "*.uxml")
             .ToList();
-        List<string> ussFiles = GetFilesInFolder("Packages/playsharedui/Runtime", "*.uss")
+        List<string> ussFiles = GetFilesInFolderRecursive("Packages/playsharedui/Runtime", "*.uss")
             .ToList();
 
         HashSet<string> ussClassesHashSet = new();
@@ -141,7 +139,7 @@ public static class CreateConstantsMenuItems
         string classCode = CreateClassCode(className, subClassName, ussClassesList, null, true);
         FileUtils.WriteAllTextIfChanged(targetPath, classCode);
     }
-    
+
     private static IEnumerable<string> FindUxmlNames(string uxmlFile)
     {
         HashSet<string> result = new();
@@ -193,9 +191,9 @@ public static class CreateConstantsMenuItems
         return result;
     }
 
-    private static List<string> GetFilesInFolder(string folderPath, params string[] fileExtensions)
+    private static List<string> GetFilesInFolderRecursive(string folderPath, params string[] fileExtensions)
     {
-        return DirectoryUtils.GetFilesInFolder(folderPath, fileExtensions)
+        return DirectoryUtils.GetFiles(folderPath, true, fileExtensions)
             .Where(file => !IsFileIgnored(file))
             .ToList();
     }

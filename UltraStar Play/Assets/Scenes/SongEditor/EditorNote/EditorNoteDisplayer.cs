@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
@@ -112,9 +110,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         ReloadSentences();
 
         songEditorLayerToParentElement.Add(ESongEditorLayer.ButtonRecording, noteAreaNotesBackground);
-        songEditorLayerToParentElement.Add(ESongEditorLayer.MicRecording, noteAreaNotesBackground);
-        songEditorLayerToParentElement.Add(ESongEditorLayer.MidiFile, noteAreaNotesBackground);
-        songEditorLayerToParentElement.Add(ESongEditorLayer.CopyPaste, noteAreaNotesForeground);
+        songEditorLayerToParentElement.Add(ESongEditorLayer.Import, noteAreaNotesBackground);
+        songEditorLayerToParentElement.Add(ESongEditorLayer.PitchDetection, noteAreaNotesBackground);
+        songEditorLayerToParentElement.Add(ESongEditorLayer.SpeechRecognition, noteAreaNotesBackground);
 
         UpdateNotesAndSentences();
         noteAreaControl.ViewportEventStream
@@ -176,7 +174,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             .AddTo(gameObject);
 
         settings.SongEditorSettings
-            .ObserveEveryValueChanged(it => it.ShowNotePitchLabel)
+            .ObserveEveryValueChanged(it => it.TimeLabelFormat)
             .Subscribe(_ => UpdateNotesAndSentences())
             .AddTo(gameObject);
 
@@ -213,13 +211,13 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     {
         // Remove notes of hidden voices
         List<Note> notVisibleNotes = noteToControlMap.Keys
-            .Where(note => !songEditorLayerManager.IsVoiceLayerVisible(note.Sentence?.Voice.Name))
+            .Where(note => !songEditorLayerManager.IsVoiceLayerVisible(note.Sentence.Voice))
             .ToList();
         notVisibleNotes.ForEach(note => RemoveNoteControl(note));
 
         // Remove sentences of hidden voices
         List<Sentence> notVisibleSentences = sentenceToControlMap.Keys
-            .Where(sentence => !songEditorLayerManager.IsVoiceLayerVisible(sentence.Voice.Name))
+            .Where(sentence => !songEditorLayerManager.IsVoiceLayerVisible(sentence.Voice))
             .ToList();
         notVisibleSentences.ForEach(sentence => RemoveSentence(sentence));
 
@@ -239,7 +237,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     public void ReloadSentences()
     {
         voiceToSortedSentencesMap.Clear();
-        IEnumerable<Voice> voices = songMeta.GetVoices();
+        IEnumerable<Voice> voices = songMeta.Voices;
         foreach (Voice voice in voices)
         {
             List<Sentence> sortedSentences = new(voice.Sentences);
@@ -267,8 +265,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void UpdateSentenceControls()
     {
-        List<Voice> visibleVoices = songMeta.GetVoices()
-            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Name))
+        List<Voice> visibleVoices = songMeta.Voices
+            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice))
             .ToList();
 
         visibleVoices.ForEach(voice => CreateSentenceControlForVoice(voice));
@@ -296,8 +294,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             return;
         }
 
-        List<Voice> visibleVoices = songMeta.GetVoices()
-            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Name))
+        List<Voice> visibleVoices = songMeta.Voices
+            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice))
             .ToList();
 
         sentenceLinesContainer.Clear();
@@ -465,8 +463,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawNotesInSongFile()
     {
-        IEnumerable<Voice> visibleVoices = songMeta.GetVoices()
-            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Name))
+        IEnumerable<Voice> visibleVoices = songMeta.Voices
+            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice))
             .ToList();
         visibleVoices.ForEach(voice => DrawNotesInVoice(voice));
     }
@@ -508,14 +506,14 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         // Update color
         if (sentence.Voice != null)
         {
-            Color color = songEditorLayerManager.GetVoiceLayerColor(sentence.Voice.Name);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(sentence.Voice.Id);
             editorSentenceControl.SetColor(color);
 
             // Make sentence rectangles alternating light/dark
             bool isDark = (sentenceIndex % 2) == 0;
             if (isDark)
             {
-                Color darkColor = songEditorLayerManager.GetVoiceLayerColor(sentence.Voice.Name).Multiply(0.66f);
+                Color darkColor = songEditorLayerManager.GetVoiceLayerColor(sentence.Voice.Id).Multiply(0.66f);
                 editorSentenceControl.SetColor(darkColor);
             }
         }
@@ -568,11 +566,13 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     {
         if (!noteToControlMap.TryGetValue(note, out EditorNoteControl editorNoteControl))
         {
+            DisposableStopwatch stopwatchA = new("");
             VisualElement noteVisualElement = editorNoteUi.CloneTree().Children().First();
             editorNoteControl = injector
                 .WithRootVisualElement(noteVisualElement)
                 .WithBindingForInstance(note)
                 .CreateAndInject<EditorNoteControl>();
+            noteVisualElement.userData = editorNoteControl;
             noteToControlMap.Add(note, editorNoteControl);
             VisualElement parentElement = layer != null
                 ? songEditorLayerToParentElement[layer.LayerEnum]
@@ -592,7 +592,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         if (noteAreaControl.ViewportWidth < HideElementThresholdInMillis)
         {
-            if (settings.SongEditorSettings.ShowNotePitchLabel)
+            if (settings.SongEditorSettings.ShowNotePitchLabel
+                && (!songEditorLayerManager.TryGetEnumLayer(editorNoteControl.Note, out SongEditorEnumLayer enumLayer)
+                    || enumLayer.LayerEnum is not ESongEditorLayer.PitchDetection))
             {
                 editorNoteControl.ShowPitchLabel();
             }

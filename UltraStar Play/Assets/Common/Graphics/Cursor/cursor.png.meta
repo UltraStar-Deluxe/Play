@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 21b89c5b005b2324d96976212a0b264d
+guid: 48eae99967b958c409b1582a3012d48b
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -21,7 +21,11 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
+<<<<<<<< HEAD:UltraStar Play/Assets/Common/Graphics/Cursor/cursor.png.meta
   isReadable: 1
+========
+  isReadable: 0
+>>>>>>>> anst/reintegrate:UltraStar Play/Packages/playshared/Runtime/Graphics/Logos/LogoLarge.png.meta
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -54,7 +58,7 @@ TextureImporter:
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
-  textureType: 7
+  textureType: 8
   textureShape: 1
   singleChannelComponent: 0
   flipbookRows: 1
@@ -63,6 +67,7 @@ TextureImporter:
   compressionQualitySet: 0
   textureFormatSet: 0
   ignorePngGamma: 0
+<<<<<<<< HEAD:UltraStar Play/Assets/Common/Graphics/Cursor/cursor.png.meta
   applyGammaDecoding: 1
   swizzle: 50462976
   cookieLightType: 1
@@ -70,6 +75,27 @@ TextureImporter:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 32
+========
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 1024
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+>>>>>>>> anst/reintegrate:UltraStar Play/Packages/playshared/Runtime/Graphics/Logos/LogoLarge.png.meta
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -80,7 +106,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Standalone
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1

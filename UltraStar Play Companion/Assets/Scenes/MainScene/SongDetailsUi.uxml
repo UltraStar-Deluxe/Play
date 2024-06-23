@@ -1,0 +1,47 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="EnqueueSongUi" src="project://database/Assets/Scenes/MainScene/GameRoundConfigUi.uxml?fileID=9197481963319205126&amp;guid=5ed35cbf4cb5630438ec376c25172cf1&amp;type=3#GameRoundConfigUi" />
+    <ui:VisualElement name="songDetailsUiRoot" style="flex-grow: 1;">
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="flex-grow: 1; display: flex; margin-bottom: 10px;">
+            <ui:VisualElement name="songInfoContainer" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="songCoverAndTitleContainer" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center;">
+                    <ui:VisualElement name="songImage" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Common/Graphics/NoCover.jpg?fileID=2800000&amp;guid=5a310ce561ea18a46b1aff6d3d93d9ce&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-to-fit; min-height: 100px; min-width: 100px; margin-right: 5px;" />
+                    <ui:VisualElement name="songInfoLabelContainer" style="background-color: rgba(0, 0, 0, 0);">
+                        <ui:Label tabindex="-1" text="Some Artist" display-tooltip-when-elided="true" name="songArtistLabel" style="-unity-font-style: bold; white-space: normal;" />
+                        <ui:Label tabindex="-1" text="Some Title" display-tooltip-when-elided="true" name="songTitleLabel" style="white-space: normal;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <AccordionGroup>
+                <AccordionItem label="Lyrics" name="lyricsAccordionItem" style="flex-grow: 1;">
+                    <ui:Label tabindex="-1" text="Lorem ipsum dolor sit&#10;amet, ex eum mandamus volutpat, eos at dicunt antiopam, at tibique molestie forensibus nam. Duo atqui oblique et, vim et mucius detracto dignissim, eros impetus sadipscing has no. Populo labore utroque mei ne, ne elitr suscipit vituperata mel. Omnium eleifend id duo, in numquam apeirian mea, te duo novum&#10;singulis disputationi.&#10;" display-tooltip-when-elided="true" name="lyricsLabel" class="smallFont" style="-unity-font-style: normal; white-space: normal; -unity-text-align: upper-left;" />
+                </AccordionItem>
+                <AccordionItem label="Enqueue Settings" name="enqueueSettingsAccordionItem" style="flex-grow: 1;">
+                    <ui:Instance template="EnqueueSongUi" name="GameRoundConfigUi" />
+                </AccordionItem>
+            </AccordionGroup>
+        </ui:ScrollView>
+        <ui:VisualElement name="buttonRow" style="background-color: rgba(0, 0, 0, 0); flex-shrink: 0; width: 100%; flex-direction: row; justify-content: space-between;">
+            <ui:Button display-tooltip-when-elided="true" name="backButton" style="height: auto;">
+                <MaterialIcon tabindex="-1" name="backIcon" icon="arrow_back" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:VisualElement name="enqueueButtonContainer" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+                <ui:Button display-tooltip-when-elided="true" name="enqueueButton" style="height: auto;">
+                    <MaterialIcon tabindex="-1" icon="playlist_add" name="enqueueIcon" picking-mode="Ignore" />
+                    <ui:Label tabindex="-1" text="Enqueue" display-tooltip-when-elided="true" name="enqueueButtonLabel" class="smallerFont" style="-unity-font-style: normal;" />
+                </ui:Button>
+                <ui:Button display-tooltip-when-elided="true" name="enqueueMedleyButton" class="ml-2" style="height: auto;">
+                    <ui:VisualElement name="enqueueAsMedleyIcons" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+                        <MaterialIcon tabindex="-1" icon="playlist_add" name="enqueueIcon" picking-mode="Ignore" />
+                        <MaterialIcon tabindex="-1" icon="link" name="medleyIcon" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:Label tabindex="-1" text="Enqueue Medley" display-tooltip-when-elided="true" name="enqueueButtonLabel" class="smallerFont" style="-unity-font-style: normal;" />
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:Button display-tooltip-when-elided="true" name="favoriteButton" style="height: auto;">
+                <MaterialIcon tabindex="-1" name="hiddenFavoriteIcon" icon="favorite" picking-mode="Ignore" style="visibility: hidden;" />
+                <MaterialIcon tabindex="-1" name="favoriteIcon" icon="favorite" picking-mode="Ignore" style="position: absolute;" />
+                <MaterialIcon tabindex="-1" name="noFavoriteIcon" icon="favorite_border" picking-mode="Ignore" style="position: absolute;" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

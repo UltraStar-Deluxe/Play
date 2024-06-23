@@ -2,10 +2,12 @@ Shader "UltraStar Play/Background Shader"
 {
     Properties
     {
-        [NoScaleOffset][HideInInspector] _ParticleTex ("Particle Texture", 2D) = "white" {}
         [NoScaleOffset][HideInInspector] _UiTex ("UI Texture", 2D) = "white" {}
+        [NoScaleOffset][HideInInspector] _BaseTex ("Base Texture", 2D) = "white" {}
+        [NoScaleOffset][HideInInspector] _AdditiveLightTex ("Additive Light Texture", 2D) = "white" {}
+        [NoScaleOffset][HideInInspector] _ParticleTex ("Particle Texture", 2D) = "white" {}
         [NoScaleOffset][HideInInspector] _TransitionTex ("Transition Texture", 2D) = "white" {}
-        [NoScaleOffset] _ColorRampTex ("Gradient Ramp", 2D) = "gray" {}
+        [NoScaleOffset] _ColorRampTex ("Gradient Ramp", 2D) = "black" {}
         _ColorRampScrolling ("Gradient Scrolling", Float) = 0
         [Space]
         [Header(Pattern)]
@@ -48,12 +50,17 @@ Shader "UltraStar Play/Background Shader"
             #pragma multi_compile_fragment _ _DITHERING
             #pragma multi_compile_fragment _ _UI_SHADOW
             #pragma multi_compile_fragment _ _UI_TRANSITION_ANIM
+            #pragma multi_compile_fragment _ _USE_SIMPLE_BACKGROUND
+            #pragma multi_compile_fragment _ _USE_BASE_TEXTURE
 
             half _Gradient;
             half _EnableGradientAnimation;
+            half _UseSimpleBackground;
 
             sampler2D _ParticleTex;
             sampler2D _UiTex;
+            sampler2D _BaseTex;
+            sampler2D _AdditiveLightTex;
             sampler2D _TransitionTex;
             sampler2D _ColorRampTex;
             sampler2D _PatternTex;
@@ -125,86 +132,101 @@ Shader "UltraStar Play/Background Shader"
 
             half4 frag (Varyings input) : SV_Target
             {
-                // Sine animation
-                if (_EnableGradientAnimation > 0)
-                {
-                    half time = _TimeApplication * _GradientAnimSpeed;
-                    input.texcoord0.z += sin(input.texcoord0.w * 3.2 + time * 0.2)
-                            * sin(input.texcoord0.w * 0.7 + time * 0.7)
-                            * sin(input.texcoord0.w * 2.1 + time * 0.5)
-                            * _GradientAnimAmp;
-                }
+                half3 color;
 
-                half gradient;
-                switch (_Gradient)
-                {
-                    // Radial
-                    default:
-                    case 0:
+                #if defined(_USE_SIMPLE_BACKGROUND)
+                    color = half3(0,0,0);
+                #else
+                    // Sine animation
+                    if (_EnableGradientAnimation > 0)
                     {
-                        half2 offsetUv = (input.texcoord0.zw - 0.5);
-                        // offsetUv.x *= _ScreenParams.x / _ScreenParams.y;
-                        gradient = saturate(dot(offsetUv, offsetUv));
-                        break;
+                        half time = _TimeApplication * _GradientAnimSpeed;
+                        input.texcoord0.z += sin(input.texcoord0.w * 3.2 + time * 0.2)
+                                * sin(input.texcoord0.w * 0.7 + time * 0.7)
+                                * sin(input.texcoord0.w * 2.1 + time * 0.5)
+                                * _GradientAnimAmp;
                     }
 
-                    // Radial Repeated
-                    case 1:
+                    half gradient;
+                    switch (_Gradient)
                     {
-                        half2 offsetUv = (input.texcoord0.zw - 0.5);
-                        // offsetUv.x *= _ScreenParams.x / _ScreenParams.y;
-                        gradient = abs(frac(dot(offsetUv, offsetUv)) * 2.0 - 1.0);
-                        break;
+                        // Radial
+                        default:
+                        case 0:
+                        {
+                            half2 offsetUv = (input.texcoord0.zw - 0.5);
+                            // offsetUv.x *= _ScreenParams.x / _ScreenParams.y;
+                            gradient = saturate(dot(offsetUv, offsetUv));
+                            break;
+                        }
+
+                        // Radial Repeated
+                        case 1:
+                        {
+                            half2 offsetUv = (input.texcoord0.zw - 0.5);
+                            // offsetUv.x *= _ScreenParams.x / _ScreenParams.y;
+                            gradient = abs(frac(dot(offsetUv, offsetUv)) * 2.0 - 1.0);
+                            break;
+                        }
+
+                        // Linear
+                        case 2:
+                            gradient = input.texcoord0.zw;
+                            break;
+
+                        // Reflected
+                        case 3:
+                            gradient = abs(input.texcoord0.zw * 2.0 - 1.0);
+                            break;
+
+                        // Repeated
+                        case 4:
+                            gradient = abs(frac(input.texcoord0.zw) * 2.0 - 1.0);
+                            break;
                     }
 
+                    half smooth = _Smoothness / 2.0;
+                    if (_Smoothness <= 0)
+                    {
+                        // make sure the line is antialiased if 0
+                        smooth = fwidth(input.texcoord0.x) * 10.0;
+                    }
+                    gradient = smoothstep(0.5 - smooth, 0.5 + smooth, gradient);
 
-                    // Linear
-                    case 2:
-                        gradient = input.texcoord0.zw;
-                        break;
+                    // If not radial (radial looks better in gamma empirically)
+                    if (_Gradient > 1)
+                    {
+                        gradient = GammaToLinearSpaceExact(gradient);
+                    }
+                    gradient = smoothstep(0.0, 1.0, 1.0 - gradient);
 
-                    // Reflected
-                    case 3:
-                        gradient = abs(input.texcoord0.zw * 2.0 - 1.0);
-                        break;
+                    #ifdef _DITHERING
+                        // Dithering
+                        float2 screenCoords = input.screenCoord.xy / input.screenCoord.w * _ScreenParams.xy * _NoiseTex_TexelSize.xy;
+                        half ditheringNoise = tex2D(_NoiseTex, screenCoords).r * 2.0 - 1.0;
+                        gradient += ditheringNoise * 0.03;
+                    #endif
 
-                    // Repeated
-                    case 4:
-                        gradient = abs(frac(input.texcoord0.zw) * 2.0 - 1.0);
-                        break;
-                }
+                    // Gather the grayscale version of the background scene with particles, etc.
+                    half sceneGrayscale = tex2D(_ParticleTex, input.texcoord0.xy).r;
+                    // and remap colors using the selected gradient texture
+                    half coords =  lerp(gradient, 1 - gradient, sceneGrayscale);
+                    color = tex2Dgrad(_ColorRampTex, coords.xx + frac(_TimeApplication.xx * _ColorRampScrolling), 0, 0).rgb;
+                    
+                    // Base texture
+                    #if defined(_USE_BASE_TEXTURE)
+                        half4 baseTexture = tex2D(_BaseTex, input.texcoord0.xy);
+                        color.rgb = lerp(color.rgb, baseTexture.rgb, baseTexture.a);
+                    #endif
+                
+                    // Pattern
+                    half4 pattern = tex2D(_PatternTex, input.patternTexcoord.xy) * _PatternColor;
+                    color.rgb = lerp(color.rgb, pattern.rgb, pattern.a);
 
-                half smooth = _Smoothness / 2.0;
-                if (_Smoothness <= 0)
-                {
-                    // make sure the line is antialiased if 0
-                    smooth = fwidth(input.texcoord0.x) * 10.0;
-                }
-                gradient = smoothstep(0.5 - smooth, 0.5 + smooth, gradient);
-
-                // If not radial (radial looks better in gamma empirically)
-                if (_Gradient > 1)
-                {
-                    gradient = GammaToLinearSpaceExact(gradient);
-                }
-                gradient = smoothstep(0.0, 1.0, 1.0 - gradient);
-
-                #ifdef _DITHERING
-                    // Dithering
-                    float2 screenCoords = input.screenCoord.xy / input.screenCoord.w * _ScreenParams.xy * _NoiseTex_TexelSize.xy;
-                    half ditheringNoise = tex2D(_NoiseTex, screenCoords).r * 2.0 - 1.0;
-                    gradient += ditheringNoise * 0.03;
+                    // Additive light texture
+                    half4 lightTexture = tex2D(_AdditiveLightTex, input.texcoord0.xy);
+                    color.rgb = color.rgb + lightTexture.rgb;
                 #endif
-
-                // Gather the grayscale version of the background scene with particles, etc.
-                half sceneGrayscale = tex2D(_ParticleTex, input.texcoord0.xy).r;
-                // and remap colors using the selected gradient texture
-                half coords =  lerp(gradient, 1 - gradient, sceneGrayscale);
-                half3 color = tex2Dgrad(_ColorRampTex, coords.xx + frac(_TimeApplication.xx * _ColorRampScrolling), 0, 0).rgb;
-
-                // Pattern
-                half4 pattern = tex2D(_PatternTex, input.patternTexcoord.xy) * _PatternColor;
-                color.rgb = lerp(color.rgb, pattern.rgb, pattern.a);
 
                 half4 uiColors = half4(0, 0, 0, 0);
 

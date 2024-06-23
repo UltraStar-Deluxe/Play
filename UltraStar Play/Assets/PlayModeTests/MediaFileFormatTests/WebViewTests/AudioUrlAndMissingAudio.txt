@@ -1,0 +1,10 @@
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
+#AUDIO:missing-audio.ogg
+#AUDIOURL:https://www.youtube.com/watch?v=tEOZjZZmlAI
+#BPM:200
+- 0
+: 4 3 9 Hel
+: 8 3 9  lo
+: 12 3 9  world!
+E

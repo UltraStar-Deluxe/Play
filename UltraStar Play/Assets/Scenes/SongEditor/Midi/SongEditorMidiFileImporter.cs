@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using CSharpSynth.Midi;
+using AudioSynthesis.Midi;
+using AudioSynthesis.Midi.Event;
 using UniInject;
 using UnityEngine;
 
@@ -21,10 +21,10 @@ public class SongEditorMidiFileImporter : INeedInjection
     private SongEditorLayerManager layerManager;
 
     [Inject]
-    private Settings settings;
+    private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
-    private EditorNoteDisplayer editorNoteDisplayer;
+    private Settings settings;
 
     [Inject]
     private UiManager uiManager;
@@ -32,130 +32,102 @@ public class SongEditorMidiFileImporter : INeedInjection
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    public void ImportMidiFile(string midiFilePath)
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+
+    public void ImportMidiFile(
+        string midiFilePath,
+        int trackIndex,
+        int channelIndex,
+        bool importLyrics,
+        bool importNotes,
+        EVoiceId? voiceId,
+        bool shiftNotesToPlaybackPosition,
+        ESongEditorLayer layer)
     {
-        if (!File.Exists(midiFilePath))
+        if (!importLyrics
+            && !importNotes)
         {
-            Debug.Log($"File does not exist: {midiFilePath}");
-            UiManager.CreateNotification("File does not exist");
             return;
         }
 
-        try
+        if (!File.Exists(midiFilePath))
         {
-            List<Note> loadedNotes = LoadNotesFromMidiFile(midiFilePath);
-            // Shift notes such that the first note starts at the current playback position
-            loadedNotes = ShiftNotesToPlaybackPosition(loadedNotes);
-
-            editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.MidiFile);
-            layerManager.ClearEnumLayer(ESongEditorLayer.MidiFile);
-            loadedNotes.ForEach(loadedNote => layerManager.AddNoteToEnumLayer(ESongEditorLayer.MidiFile, loadedNote));
-            editorNoteDisplayer.UpdateNotes();
-            UiManager.CreateNotification("Loaded MIDI file successfully");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e);
-            UiManager.CreateNotification($"Loading MIDI file failed: {e.Message}");
-        }
-    }
-
-    private List<Note> ShiftNotesToPlaybackPosition(List<Note> notes)
-    {
-        Note firstNote = notes.FindMinElement(note => note.StartBeat);
-        int playbackPositionInBeats = (int)Math.Round(songAudioPlayer.GetCurrentBeat(true));
-        int difference = playbackPositionInBeats - firstNote.StartBeat;
-        if (difference == 0)
-        {
-            return notes;
+            Debug.Log($"File does not exist: {midiFilePath}");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_fileNotFound));
+            return;
         }
 
-        return notes
-            .Select(note => new Note(
-                note.Type,
-                note.StartBeat + difference,
-                note.Length,
-                note.TxtPitch,
-                note.Text))
-            .ToList();
-    }
+        // Remove old notes
+        editorNoteDisplayer.ClearNotesInLayer(layer);
+        layerManager.ClearEnumLayer(layer);
 
-    private List<Note> LoadNotesFromMidiFile(string midiFilePath)
-    {
-        List<Note> loadedNotes = new();
-
-        MidiFile midiFile = midiManager.LoadMidiFile(midiFilePath);
+        MidiFile midiFile = MidiFileUtils.LoadMidiFile(midiFilePath);
         if (midiFile == null)
         {
             throw new UnityException("Loading midi file failed.");
         }
 
-        Dictionary<int, Note> midiPitchToNoteUnderConstruction = new();
-        midiFile.Tracks.ForEach(track =>
+        try
         {
-            midiPitchToNoteUnderConstruction.Clear();
-            track.MidiEvents.ForEach(midiEvent =>
-            {
-                if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_On)
-                {
-                    HandleStartOfNote(midiEvent, midiPitchToNoteUnderConstruction);
-                }
+            MidiFileUtils.CalculateMidiEventTimesInMillis(
+                midiFile,
+                out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
+                out Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis);
 
-                if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_Off)
+            List<Note> loadedNotes = MidiToSongMetaUtils.LoadNotesFromMidiFile(songMeta, midiFile, trackIndex, channelIndex, importLyrics, importNotes, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
+
+            if (voiceId == null)
+            {
+                // Add all notes to dedicated layer
+                layerManager.ClearEnumLayer(layer);
+                loadedNotes.ForEach(loadedNote =>
                 {
-                    HandleEndOfNote(midiEvent, midiPitchToNoteUnderConstruction, loadedNotes);
-                }
-            });
+                    layerManager.AddNoteToEnumLayer(layer, loadedNote);
+                    loadedNote.IsEditable = layerManager.IsLayerEditable(layerManager.GetEnumLayer(layer));
+                });
+            }
+            else if (voiceId is { } nonNullVoiceId)
+            {
+                // Assign notes to player
+                MidiTrack track = midiFile.Tracks[trackIndex];
+                MidiToSongMetaUtils.AssignNotesToVoice(songMeta, loadedNotes, nonNullVoiceId, track, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
+            }
+
+            if (shiftNotesToPlaybackPosition)
+            {
+                // Shift notes such that the first note starts at the current playback position
+                ShiftNotesToPlaybackPosition(loadedNotes);
+            }
+
+            songMetaChangeEventStream.OnNext(new ImportedMidiFileEvent());
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", ex.Message));
+        }
+    }
+
+    private void ShiftNotesToPlaybackPosition(List<Note> notes)
+    {
+        if (notes.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        Note firstNote = notes.FindMinElement(note => note.StartBeat);
+        int playbackPositionInBeats = (int)Math.Round(songAudioPlayer.GetCurrentBeat(true));
+        int difference = playbackPositionInBeats - firstNote.StartBeat;
+        if (difference == 0)
+        {
+            return;
+        }
+
+        notes.ForEach(note =>
+        {
+            note.SetStartAndEndBeat(note.StartBeat + difference, note.EndBeat + difference);
         });
-        Debug.Log("Loaded notes from midi file: " + loadedNotes.Count);
-        return loadedNotes;
-    }
-
-    private void HandleEndOfNote(MidiEvent midiEvent, Dictionary<int, Note> midiPitchToNoteUnderConstruction, List<Note> loadedNotes)
-    {
-        int midiPitch = midiEvent.parameter1;
-        int deltaTimeInMillis = GetDeltaTimeInMillis(midiEvent);
-        int endBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
-        if (midiPitchToNoteUnderConstruction.TryGetValue(midiPitch, out Note existingNote))
-        {
-            if (endBeat > existingNote.StartBeat)
-            {
-                existingNote.SetEndBeat(endBeat);
-                loadedNotes.Add(existingNote);
-            }
-            else
-            {
-                Debug.LogWarning($"End beat {endBeat} is not after start beat {existingNote.StartBeat}. Skipping this note.");
-            }
-            midiPitchToNoteUnderConstruction.Remove(midiPitch);
-        }
-        else
-        {
-            Debug.LogWarning($"No Note for pitch {MidiUtils.GetAbsoluteName(midiPitch)} is being constructed. Ignoring this Note_Off event at {deltaTimeInMillis} ms.");
-        }
-    }
-
-    private void HandleStartOfNote(MidiEvent midiEvent, Dictionary<int, Note> midiPitchToNoteUnderConstruction)
-    {
-        int midiPitch = midiEvent.parameter1;
-        int deltaTimeInMillis = GetDeltaTimeInMillis(midiEvent);
-        Note newNote = new();
-        int startBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
-        newNote.SetStartAndEndBeat(startBeat, startBeat);
-        newNote.SetMidiNote(midiPitch);
-
-        if (midiPitchToNoteUnderConstruction.ContainsKey(midiPitch))
-        {
-            Debug.LogWarning($"A Note with pitch {midiPitch} started but did not end before the next. The note will be ignored.");
-        }
-
-        midiPitchToNoteUnderConstruction[midiPitch] = newNote;
-    }
-
-    private static int GetDeltaTimeInMillis(MidiEvent midiEvent)
-    {
-        uint deltaTimeInSamples = midiEvent.deltaTime;
-        int deltaTimeInMillis = (int)Math.Round(deltaTimeInSamples / (MidiManager.midiStreamSampleRateHz / 1000.0));
-        return deltaTimeInMillis;
     }
 }

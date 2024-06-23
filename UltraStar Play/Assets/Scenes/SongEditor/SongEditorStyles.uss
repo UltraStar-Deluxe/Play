@@ -1,25 +1,27 @@
-#songEditorRoot {
+.songEditorRoot {
     --font-color: rgb(208, 208, 208);
-    --font-color-secondary: #A8A8A8;
+    --font-color-secondary: rgb(168, 168, 168);
     --font-color-inverted: rgb(64, 64, 64);
     --control-color: rgb(88, 88, 88);
     --control-color-accent1: rgb(103, 103, 103);
     --control-color-accent2: rgb(70, 96, 124);
     --selection-color-transparent: rgba(21, 88, 219, 0.5);
     --recording-button-color: rgb(200, 32, 32);
-    --font-size-xxs: 8px;
-    --font-size-xs: 10px;
-    --font-size-s: 11px;
-    --font-size: 14px;
-    --font-size-l: 18px;
-    --font-size-xl: 20px;
-    --font-size-xxl: 24px;
-    --control-height: 25px;
-    --control-width: 80px;
-    --control-width-half: 40px;
-    --control-width-large: 100px;
+    --font-size-xxs: 7px;
+    --font-size-xs: 8px;
+    --font-size-s: 9px;
+    --font-size: 11px;
+    --font-size-l: 14px;
+    --font-size-xl: 18px;
+    --font-size-xxl: 20px;
+    --font-icon-size: 18px;
+    --control-height: 20px;
+    --control-width: 50px;
+    --control-width-half: 25px;
+    --control-width-large: 80px;
     --control-height-large: 40px;
     --control-height-small: 20px;
+    --secondary-side-bar-panel-width: 160px;
     --panel-background-color: rgb(60, 63, 65);
     --note-area-background-color: rgb(43, 43, 43);
     background-color: rgb(50, 50, 50);
@@ -98,34 +100,28 @@ Button.selected:hover {
     background-color: rgb(60, 63, 65);
     border-color: rgb(50, 50, 50);
     border-width: 1px;
+    white-space: normal;
 }
 
-.leftSideBar {
-    width: 80px;
+#leftSideBarMainColumn {
     height: 100%;
-    transition: width 0.5s;
+    align-items: flex-start;
 }
 
-.leftSideBar Button {
+#leftSideBarMainColumn Button {
     padding: 6px;
     margin-bottom: 5px;
     width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
 }
 
-.leftSideBar Label {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -unity-text-align: middle-center;
+#leftSideBarMainColumn Label {
+    -unity-text-align: middle-left;
     -unity-background-scale-mode: scale-to-fit;
     -unity-background-image-tint-color: var(--font-color);
-}
-
-.leftSideBar MaterialIcon {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -unity-background-scale-mode: scale-to-fit;
+    white-space: normal;
 }
 
 #leftSideBarMainColumn.small {
@@ -137,7 +133,7 @@ Button.selected:hover {
 }
 
 #leftSideBarMainColumn MaterialIcon {
-    font-size: 24px;
+    font-size: var(--font-size-xl);
     width: auto;
     height: auto;
 }
@@ -146,29 +142,33 @@ Button.selected:hover {
     display: none;
 }
 
-#leftSideBarMainColumn.wide Label {
+#leftSideBarMainColumn.small #smallIcon {
     display: flex;
 }
 
-#leftSideBarMainColumn.small MaterialIcon#wideIcon {
+#leftSideBarMainColumn.wide #smallIcon {
     display: none;
 }
 
-#leftSideBarMainColumn.wide MaterialIcon#wideIcon {
-    display: flex;
-}
-
-#leftSideBarMainColumn.small MaterialIcon {
-    display: flex;
-}
-
-#leftSideBarMainColumn.wide MaterialIcon {
+#leftSideBarMainColumn.small #wideIcon {
     display: none;
+}
+
+#leftSideBarMainColumn.wide #wideIcon {
+    display: flex;
+}
+
+.unity-toggle {
+    justify-content: space-between;
+}
+
+.unity-base-field:focus .unity-base-field__label {
+    color: var(--font-color);
 }
 
 .secondarySideBarPanel {
     display: none;
-    width: 200px;
+    width: var(--secondary-side-bar-panel-width);
     height: 100%;
     padding-left: 2px;
     padding-right: 0;
@@ -184,30 +184,15 @@ Button.selected:hover {
     font-size: var(--font-size-s);
     -unity-font-style: bold;
     -unity-text-align: middle-center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .inputLegendLabel {
     width: 100%;
     -unity-text-align: middle-left;
     white-space: normal;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     font-size: var(--font-size-xs);
-}
-
-.songEditorSettingsGroup {
-    border-color: var(--font-color);
-    border-top-width: 1px;
-    width: 100%;
-    min-height: 50px;
-    border-radius: 5px;
-    padding: 2px;
-    margin-bottom: 10px;
-}
-
-.songEditorSettingsGroupTitle {
-    -unity-text-align: upper-center;
-    -unity-font-style: bold;
 }
 
 ScrollView #unity-content-container {
@@ -246,15 +231,35 @@ ScrollView #unity-content-container {
     height: 100%;
 }
 
+SongEditorSideBarGroup {
+    flex-shrink: 0;
+}
+
+SongEditorSideBarGroup .unity-toggle {
+    margin-bottom: 8px;
+}
+
+SongEditorSideBarGroup .unity-text-field {
+    margin-bottom: 8px;
+}
+
+SongEditorSideBarGroup .unity-base-slider {
+    margin-bottom: 8px;
+}
+
 SongEditorSideBarGroup > .unity-base-field {
     margin-bottom: 8px;
 }
 
 SongEditorSideBarGroup > .unity-button {
     margin-bottom: 8px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
-SongEditorSideBarGroup > ItemPicker {
+SongEditorSideBarGroup > Chooser {
     margin-bottom: 8px;
 }
 

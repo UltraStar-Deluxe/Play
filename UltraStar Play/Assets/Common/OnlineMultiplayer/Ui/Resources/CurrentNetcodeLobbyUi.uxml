@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="PlayerProfileListEntryUi" src="project://database/Assets/Common/UI/PlayerProfileListEntryUi.uxml?fileID=9197481963319205126&amp;guid=02348618f8cffba42864c8979a4bd8ba&amp;type=3#PlayerProfileListEntryUi" />
+    <ui:VisualElement name="currentNetcodeLobbyUiRoot" class="child-mb-2">
+        <ui:VisualElement name="row" style="flex-grow: 1; justify-content: center;">
+            <ui:Label tabindex="-1" text="Members of &quot;Player01&apos;s Game&quot;" parse-escape-sequences="true" display-tooltip-when-elided="true" name="connectedClientsListTitle" class="borderBottom" />
+        </ui:VisualElement>
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="connectedClientsListScrollView" class="flexWrapScrollView">
+            <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
+            <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
+            <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
+        </ui:ScrollView>
+        <ui:Button text="$onlineGame_lobby_leave" parse-escape-sequences="true" display-tooltip-when-elided="true" name="disconnectOnlineGameButton" />
+    </ui:VisualElement>
+</ui:UXML>

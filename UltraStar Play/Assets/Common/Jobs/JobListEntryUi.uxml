@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="jobListEntry" style="background-color: rgba(0, 0, 0, 0); flex-direction: column; align-items: flex-start; justify-content: flex-start; align-self: flex-start; flex-shrink: 0;">
+        <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center; justify-content: flex-start; width: 100%;">
+            <ui:VisualElement name="jobStatusIconContainer" style="background-color: rgba(0, 0, 0, 0); align-items: center; justify-content: center; margin-right: 5px;">
+                <MaterialIcon tabindex="-1" name="jobPendingIcon" icon="pending" class="iconImage largestFont" style="display: none;" />
+                <ui:VisualElement name="jobRunningIcon" class="textColorTint iconImage largestFont" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/Icons/CirclesLoaderIcon.svg?fileID=7388822144124034973&amp;guid=ba20d424f287ccf43a211bbb25a7cbaf&amp;type=3#CirclesLoaderIcon&apos;); display: flex;" />
+                <MaterialIcon tabindex="-1" name="jobFinishedIcon" icon="check_circle" class="iconImage largestFont" style="display: none;" />
+                <MaterialIcon tabindex="-1" name="jobErrorIcon" icon="cancel" class="iconImage largestFont" style="display: none;" />
+            </ui:VisualElement>
+            <ui:Button display-tooltip-when-elided="true" name="cancelJobButton" class="squareButton" style="margin-left: 5px; margin-right: 5px;">
+                <MaterialIcon tabindex="-1" icon="delete" name="cancelJobIcon" />
+            </ui:Button>
+            <ui:VisualElement name="labelContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: space-between; align-items: center;">
+                <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="jobNameLabel" class="smallFont" />
+                <ui:Label tabindex="-1" text="99:99" display-tooltip-when-elided="true" name="jobDurationLabel" class="tinyFont" style="min-width: 50px; -unity-text-align: upper-right;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:ProgressBar value="50" name="jobProgressBar" style="margin-top: 2px; margin-bottom: 5px; width: 90%; margin-left: auto;" />
+    </ui:VisualElement>
+</ui:UXML>

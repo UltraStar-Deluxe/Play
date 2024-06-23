@@ -23,7 +23,7 @@ public class ChangeBpmAction : INeedInjection
 
     public static void ReduceBpm(SongMeta songMeta)
     {
-        int greatestCommonDivisor = songMeta.GetVoices()
+        int greatestCommonDivisor = songMeta.Voices
             .SelectMany(voice => voice.Sentences)
             .SelectMany(sentence => sentence.Notes)
             .SelectMany(note => new int[] { note.StartBeat, note.EndBeat })
@@ -42,12 +42,12 @@ public class ChangeBpmAction : INeedInjection
             throw new ArgumentException("Factor must be greater than 1");
         }
 
-        foreach (Voice voice in songMeta.GetVoices())
+        foreach (Voice voice in songMeta.Voices)
         {
             DivideBpm(voice, factor);
         }
-        float newBpm = songMeta.Bpm / factor;
-        songMeta.Bpm = newBpm;
+        double newBpm = songMeta.BeatsPerMinute / factor;
+        songMeta.BeatsPerMinute = newBpm;
     }
 
     private static void DivideBpm(Voice voice, int factor)
@@ -82,12 +82,12 @@ public class ChangeBpmAction : INeedInjection
             throw new ArgumentException("Factor must be greater than 1");
         }
 
-        foreach (Voice voice in songMeta.GetVoices())
+        foreach (Voice voice in songMeta.Voices)
         {
             MultiplyBpm(voice, factor);
         }
-        float newBpm = songMeta.Bpm * factor;
-        songMeta.Bpm = newBpm;
+        double newBpm = songMeta.BeatsPerMinute * factor;
+        songMeta.BeatsPerMinute = newBpm;
     }
 
     private static void MultiplyBpm(Voice voice, int factor)

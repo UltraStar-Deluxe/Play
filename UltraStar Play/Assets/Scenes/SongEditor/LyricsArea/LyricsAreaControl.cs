@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -16,13 +16,16 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     private VisualElement lyricsArea;
 
     [Inject(UxmlName = R.UxmlNames.lyricsAreaVoice1Button)]
-    private Button lyricsAreaVoice1Button;
+    private ToggleButton lyricsAreaVoice1Button;
 
     [Inject(UxmlName = R.UxmlNames.lyricsAreaVoice2Button)]
-    private Button lyricsAreaVoice2Button;
+    private ToggleButton lyricsAreaVoice2Button;
 
     [Inject(UxmlName = R.UxmlNames.syncLyricsAreaToggle)]
     private Toggle syncLyricsAreaToggle;
+
+    [Inject(UxmlName = R.UxmlNames.toggleLyricsAreaEditModeButton)]
+    private ToggleButton toggleLyricsAreaEditModeButton;
 
     [Inject]
     private SongMeta songMeta;
@@ -59,19 +62,20 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-        voice = songMeta.GetVoices()[0];
-        UpdateLyrics();
-        textField.RegisterCallback<FocusEvent>(evt =>
-        {
-            OnBeginEdit();
-        });
+        voice = songMeta.Voices.FirstOrDefault();
+        EnterViewMode();
+
+        textField.DisableParseEscapeSequences();
+        textField.selectAllOnMouseUp = false;
+        textField.selectAllOnFocus = false;
         textField.RegisterCallback<BlurEvent>(evt =>
         {
             if (lyricsAreaMode == LyricsAreaMode.EditMode)
             {
-                OnEndEdit(textField.text);
+                ApplyEditModeText(textField.value, true);
             }
         });
+        toggleLyricsAreaEditModeButton.RegisterCallbackButtonTriggered(_ => ToggleEditMode());
 
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
 
@@ -79,6 +83,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         textField.tripleClickSelectsLine = true;
 
         // Check when a newline has been added. This requires adding an additional character to show white space.
+        bool pasted = false;
         bool addedNewline = false;
         bool removeCharacter = false;
         textField.RegisterCallback<KeyDownEvent>(evt =>
@@ -92,6 +97,13 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             {
                 removeCharacter = true;
             }
+            else if (evt.keyCode == KeyCode.V
+                     && evt.ctrlKey
+                     && !evt.shiftKey
+                     && !evt.altKey)
+            {
+                pasted = true;
+            }
         });
 
         // Replace white space with visible characters when in edit mode
@@ -103,32 +115,61 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             }
 
             string newText = evt.newValue;
-            if (addedNewline)
+            if (addedNewline
+                || pasted)
             {
                 addedNewline = false;
+                pasted = false;
                 // Add whitespace character for newly added newline character
-                newText = newText.Replace(ShowWhiteSpaceText.newlineReplacement, "⌇")
+                newText = newText.Replace(ShowWhiteSpaceUtils.newlineReplacement, "⌇")
                     .Replace("\n", "⌇")
-                    .Replace("⌇", ShowWhiteSpaceText.newlineReplacement);
+                    .Replace("⌇", ShowWhiteSpaceUtils.newlineReplacement);
             }
             else if (removeCharacter)
             {
                 removeCharacter = false;
                 // Remove whitespace character or newline character where the counterpart is missing
-                newText = newText.Replace(ShowWhiteSpaceText.newlineReplacement, "⌇")
+                newText = newText.Replace(ShowWhiteSpaceUtils.newlineReplacement, "⌇")
                     .Replace("\n", "")
-                    .Replace(ShowWhiteSpaceText.newlineVisibleWhiteSpaceCharacter, "")
-                    .Replace("⌇", ShowWhiteSpaceText.newlineReplacement);
+                    .Replace(ShowWhiteSpaceUtils.newlineVisibleWhiteSpaceCharacter, "")
+                    .Replace("⌇", ShowWhiteSpaceUtils.newlineReplacement);
             }
-            string normalText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
-            string visibleWhiteSpaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(normalText);
+            string normalText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(newText);
+            string visibleWhiteSpaceText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(normalText);
             textField.SetValueWithoutNotify(visibleWhiteSpaceText);
         });
 
-        lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(_ => Voice = songMeta.GetVoice(Voice.firstVoiceName));
-        lyricsAreaVoice2Button.RegisterCallbackButtonTriggered(_ => Voice = songMeta.GetVoice(Voice.secondVoiceName));
-
+        lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(_ => TrySetVoice(EVoiceId.P1));
+        lyricsAreaVoice2Button.RegisterCallbackButtonTriggered(_ => TrySetVoice(EVoiceId.P2));
         UpdateVoiceButtons();
+    }
+
+    private void TrySetVoice(EVoiceId voiceId)
+    {
+        Voice newVoice = SongMetaUtils.GetVoiceById(songMeta, voiceId);
+        if (newVoice == null)
+        {
+            return;
+        }
+        Voice = newVoice;
+    }
+
+    private void ToggleEditMode()
+    {
+        LyricsAreaMode newLyricsAreaMode = lyricsAreaMode == LyricsAreaMode.EditMode
+            ? LyricsAreaMode.ViewMode
+            : LyricsAreaMode.EditMode;
+
+        toggleLyricsAreaEditModeButton.SetActive(newLyricsAreaMode == LyricsAreaMode.EditMode);
+
+        if (newLyricsAreaMode == LyricsAreaMode.EditMode)
+        {
+            EnterEditMode();
+        }
+        else
+        {
+            EnterViewMode();
+        }
     }
 
     public void Update()
@@ -136,13 +177,13 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         if (lyricsAreaMode == LyricsAreaMode.EditMode)
         {
             // Immediately apply changed lyrics to notes, but do not record it in the history.
-            if (lastEditModeText != textField.text)
+            if (lastEditModeText != textField.value)
             {
                 if (lastEditModeText != null)
                 {
-                    ApplyEditModeText(textField.text, false);
+                    ApplyEditModeText(textField.value, false);
                 }
-                lastEditModeText = textField.text;
+                lastEditModeText = textField.value;
             }
         }
 
@@ -152,7 +193,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             lastCaretPosition = textField.cursorIndex;
             if (syncLyricsAreaToggle.value)
             {
-                SyncPositionInSongWithSelectedText();
+                SyncPositionWithSelectedText();
             }
         }
     }
@@ -167,12 +208,18 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
                 or NotesSplitEvent
                 or NotesDeletedEvent
                 or SentencesDeletedEvent
-                or NotesPastedEvent)
+                or NotesPastedEvent
+                or NotesAddedEvent
+                or SentencesChangedEvent
+                or ImportedNotesEvent
+                or NotesChangedEvent)
         {
             UpdateLyrics();
         }
 
-        if (changeEvent is MovedNotesToVoiceEvent)
+        if (changeEvent
+            is MovedNotesToVoiceEvent
+            or NotesAddedEvent)
         {
             UpdateVoiceButtons();
         }
@@ -180,81 +227,63 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateVoiceButtons()
     {
-        if (voice == null
-            || songMeta.GetVoices().Count <= 1)
-        {
-           lyricsAreaVoice1Button.HideByDisplay();
-           lyricsAreaVoice2Button.HideByDisplay();
-        }
-        else
-        {
-            lyricsAreaVoice1Button.ShowByDisplay();
-            lyricsAreaVoice2Button.ShowByDisplay();
-
-            if (voice.Name == Voice.soloVoiceName
-                || voice.Name == Voice.firstVoiceName)
-            {
-                lyricsAreaVoice1Button.AddToClassList("selected");
-                lyricsAreaVoice2Button.RemoveFromClassList("selected");
-            }
-            else if (voice.Name == Voice.secondVoiceName)
-            {
-                lyricsAreaVoice1Button.RemoveFromClassList("selected");
-                lyricsAreaVoice2Button.AddToClassList("selected");
-            }
-        }
+        lyricsAreaVoice1Button.SetEnabled(songMeta.VoiceCount >= 1);
+        lyricsAreaVoice2Button.SetEnabled(songMeta.VoiceCount >= 2);
+        lyricsAreaVoice1Button.SetActive(voice == SongMetaUtils.GetVoiceById(songMeta, EVoiceId.P1));
+        lyricsAreaVoice2Button.SetActive(voice == SongMetaUtils.GetVoiceById(songMeta, EVoiceId.P2));
     }
 
     public void UpdateLyrics()
     {
-        string text = (lyricsAreaMode == LyricsAreaMode.ViewMode)
+        string text = lyricsAreaMode == LyricsAreaMode.ViewMode
             ? LyricsUtils.GetViewModeText(Voice)
             : LyricsUtils.GetEditModeText(Voice);
-        string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(text);
-        SetInputFieldText(newInputFieldText);
+        SetInputFieldText(text);
     }
 
-    private void OnBeginEdit()
+    private void EnterEditMode()
     {
-        // Map lyrics of notes to edit-mode text.
         lastEditModeText = null;
         string editModeText = LyricsUtils.GetEditModeText(Voice);
-        string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editModeText);
+        string newInputFieldText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(editModeText);
         SetInputFieldText(newInputFieldText);
 
         lyricsAreaMode = LyricsAreaMode.EditMode;
+        textField.isReadOnly = false;
     }
 
-    private void OnEndEdit(string newText)
+    private void EnterViewMode()
     {
-        ApplyEditModeText(newText, true);
-
-        string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(LyricsUtils.GetViewModeText(Voice));
-        SetInputFieldText(newInputFieldText);
+        string viewModeText = LyricsUtils.GetViewModeText(Voice);
+        SetInputFieldText(viewModeText);
 
         lyricsAreaMode = LyricsAreaMode.ViewMode;
+        textField.isReadOnly = true;
     }
 
     private void ApplyEditModeText(string editModeText, bool undoable)
     {
         // Map edit-mode text to lyrics of notes
-        string text = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
+        string text = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
         LyricsUtils.MapEditModeTextToNotes(text, Voice.Sentences);
         songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }
 
     private void SetInputFieldText(string text)
     {
+        bool wasReadOnly = textField.isReadOnly;
+        textField.isReadOnly = false;
         textField.value = text;
+        textField.isReadOnly = wasReadOnly;
     }
 
-    private void SyncPositionInSongWithSelectedText()
+    private void SyncPositionWithSelectedText()
     {
-        Note note = GetNoteForCaretPosition(textField.text, textField.cursorIndex);
+        Note note = GetNoteForCaretPosition(textField.value, textField.cursorIndex);
         if (note != null)
         {
-            double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
-            songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+            double positionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat);
+            songAudioPlayer.PositionInMillis = positionInMillis;
         }
     }
 
@@ -287,7 +316,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         {
             char c = text[i];
             if (c == LyricsUtils.spaceCharacter
-                || c == ShowWhiteSpaceText.spaceReplacement[0]
+                || c == ShowWhiteSpaceUtils.spaceReplacement[0]
                 || c == LyricsUtils.syllableSeparator)
             {
                 noteIndex++;
@@ -301,10 +330,5 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             return null;
         }
         return sortedNotes[noteIndex];
-    }
-
-    public bool InputFieldHasFocus()
-    {
-        return textField.focusController.focusedElement == textField;
     }
 }

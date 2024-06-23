@@ -1,5 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
-    <ui:Label text="Group Title" name="groupTitle" class="songEditorSettingsGroupTitle" />
-    <ui:VisualElement name="groupContainer" class="songEditorSettingsGroup" />
+    <AccordionItem name="groupAccordionItem">
+        <ui:VisualElement name="groupContainer" />
+    </AccordionItem>
 </ui:UXML>

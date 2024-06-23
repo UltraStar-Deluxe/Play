@@ -9,6 +9,7 @@
     },
 
     "transparentButton": {
+        "fontColor": "#E1E1E1E5",
         "backgroundColor": "#00000100",
         "hoverBackgroundColor": "#20202060",
         "focusBackgroundColor": "#20202080",
@@ -17,16 +18,15 @@
 
     "dynamicPanel": {
         "backgroundColor": "#00000100",
-        "hoverBackgroundColor": "#1D2939",
-        "focusBackgroundColor": "#1D2939",
-        "activeBackgroundColor": "#1D2939"
+        "focusBackgroundColor": "#24124d",
     },
 
     "staticPanel": {
-        "backgroundGradient": "24deg, #233043, #344054",
+        "backgroundColor": "#24124d",
     },
 
-    "primaryFontColor": "#B299E5",
+    "primaryFontColor": "#E1E1E1E5",
+    "lyricsColor": "#E1E1E1E5",
     "secondaryFontColor": "#9580BF",
     
     "dynamicBackground": {
@@ -46,6 +46,7 @@
         "uiShadowOpacity": 0.33,
         "uiShadowOffset": { "x": -16, "y": 10 }
     },
+
     "songRatingIcons": {
         "toneDeaf": "icons/pumpkins/rating_0.png",
         "amateur": "icons/pumpkins/rating_1.png",

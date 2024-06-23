@@ -15,6 +15,9 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
     private SongMeta songMeta;
 
     [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+
+    [Inject]
     private NoteAreaControl noteAreaControl;
 
     [Inject]
@@ -37,7 +40,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     private ViewportEvent lastViewportEvent;
 
-    private float lastSongMetaBpm;
+    private double lastSongMetaBpm;
 
     private readonly VisualElementPool<Label> labelPool = new();
 
@@ -54,6 +57,39 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInPx)
             .Subscribe(_ => UpdateLines())
             .AddTo(gameObject);
+
+        settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.TimeLabelFormat)
+            .Subscribe(_ => UpdateLabelTexts())
+            .AddTo(gameObject);
+
+        songMetaChangeEventStream.Subscribe(evt =>
+        {
+            if (evt is SongPropertyChangedEvent songPropertyChangedEvent
+                && songPropertyChangedEvent.SongProperty == ESongProperty.Gap)
+            {
+                UpdateLines();
+                UpdateLabels();
+            }
+        });
+    }
+
+    private void UpdateLabelTexts()
+    {
+        if (labelPool.Count <= 0)
+        {
+            return;
+        }
+
+        labelPool.ForEach(label =>
+        {
+            if (label == null)
+            {
+                return;
+            }
+            int beat = (int)label.userData;
+            double beatPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
+            label.SetTranslatedText(GetLabelText(beat, beatPosInMillis));
+        });
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
@@ -66,9 +102,9 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         if (lastViewportEvent == null
             || lastViewportEvent.X != viewportEvent.X
             || lastViewportEvent.Width != viewportEvent.Width
-            || songMeta.Bpm != lastSongMetaBpm)
+            || songMeta.BeatsPerMinute != lastSongMetaBpm)
         {
-            lastSongMetaBpm = songMeta.Bpm;
+            lastSongMetaBpm = songMeta.BeatsPerMinute;
 
             if (settings.SongEditorSettings.GridSizeInPx > 0)
             {
@@ -111,7 +147,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
         for (int beat = viewportStartBeat; beat < viewportEndBeat; beat++)
         {
-            double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+            double beatPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
 
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)
@@ -146,12 +182,12 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             drawStepRough = 4;
         }
 
-        double millisPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
+        double millisPerBeat = SongMetaBpmUtils.MillisPerBeat(songMeta);
         double labelWidthInMillis = millisPerBeat * drawStepRough;
 
         for (int beat = viewportStartBeat; beat < viewportEndBeat; beat++)
         {
-            double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+            double beatPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
 
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)
@@ -164,8 +200,26 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
                 UpdateLabelPosition(label, beatPosInMillis, labelWidthInMillis);
                 label.style.top = 0;
-                label.text = beat.ToString();
+                label.SetTranslatedText(GetLabelText(beat, beatPosInMillis));
+                label.userData = beat;
             }
+        }
+    }
+
+    private Translation GetLabelText(int beat, double beatPosInMillis)
+    {
+        switch (settings.SongEditorSettings.TimeLabelFormat)
+        {
+            case ESongEditorTimeLabelFormat.Beats:
+                return Translation.Of(beat.ToString());
+            case ESongEditorTimeLabelFormat.Seconds:
+                TimeSpan timeSpan = new(0, 0, 0, 0, (int)beatPosInMillis);
+                double millisFraction = timeSpan.Milliseconds / 1000.0;
+                return timeSpan.TotalMinutes > 0
+                    ? Translation.Of($"{timeSpan.Seconds}{millisFraction.ToStringInvariantCulture(".0")}")
+                    : Translation.Of($"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}{millisFraction.ToStringInvariantCulture(".0")}");
+            default:
+                return Translation.Empty;
         }
     }
 

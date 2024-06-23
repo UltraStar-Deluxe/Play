@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -14,10 +15,13 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private PlayerScoreControl playerScoreControl;
-    
+
+    [Inject]
+    private PlayerPerformanceAssessmentControl playerPerformanceAssessmentControl;
+
     [Inject]
     private ThemeManager themeManager;
-    
+
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement RootVisualElement { get; private set; }
 
@@ -42,9 +46,12 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.playerImage)]
     private VisualElement playerImage;
 
+    [Inject(UxmlName = R.UxmlNames.playerImageContainer)]
+    private VisualElement playerImageContainer;
+
     [Inject(UxmlName = R.UxmlNames.playerImageBorder)]
     private VisualElement playerImageBorder;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerNameLabel)]
     private Label playerNameLabel;
 
@@ -53,15 +60,22 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.playerScoreProgressBar)]
     private RadialProgressBar playerScoreProgressBar;
-    
+
+    [Inject(UxmlName = R.UxmlNames.nextPlayerNameLabel)]
+    private Label nextPlayerNameLabel;
+
+    [Inject(UxmlName = R.UxmlNames.noteContainer)]
+    private VisualElement noteContainer;
+
     [Inject]
     private Settings settings;
 
     [Inject]
     private Injector injector;
+    public Injector Injector => injector;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private SingSceneControl singSceneControl;
@@ -69,36 +83,68 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SingSceneData sceneData;
 
+    [Inject]
+    private GameObject gameObject;
+
+    [Inject]
+    private AchievementEventStream achievementEventStream;
+
+    private Color32 PlayerColor => CommonOnlineMultiplayerUtils.GetPlayerColor(playerProfile, micProfile);
+
     private AbstractSingSceneNoteDisplayer noteDisplayer;
+    public AbstractSingSceneNoteDisplayer NoteDisplayer => noteDisplayer;
+
+    private PlayerProfile nextPlayerProfile;
+    private float displayNextPlayerProfileTimeInSeconds;
 
     private int totalScoreAnimationId;
     private int micDisconnectedAnimationId;
     private int leadingPlayerIconAnimationId;
+    private int fadeOutNotesAnimationId;
+
     private Dictionary<ESentenceRating, Color32> sentenceRatingColors;
-    
+
+    private readonly PlayerProfileImageControl playerProfileImageControl = new();
+    private readonly PlayerPitchIndicatorControl playerPitchIndicatorControl = new();
+
+    private float setNextPlayerProfileAnimTimeInSeconds = 1.5f;
+    private int lastDisplayedScore;
+
     public void OnInjectionFinished()
     {
         InitPlayerNameAndImage();
         InitNoteDisplayer(LineCount);
 
+        injector
+            .WithBindingForInstance(noteDisplayer)
+            .Inject(playerPitchIndicatorControl);
+
         // Show rating and score after each sentence
+        playerScoreLabel.SetTranslatedText(Translation.Empty);
+
         if (singSceneControl.IsIndividualScore)
         {
-            playerScoreLabel.text = "";
             ShowTotalScore(playerScoreControl.TotalScore);
-            playerScoreControl.SentenceScoreEventStream.Subscribe(sentenceScoreEvent =>
+            playerPerformanceAssessmentControl.SentenceAssessedEventStream.Subscribe(evt =>
             {
-                ShowTotalScore(playerScoreControl.TotalScore);
-                ShowSentenceRating(sentenceScoreEvent.SentenceRating, sentenceRatingContainer);
+                ShowSentenceRating(evt.SentenceRating, sentenceRatingContainer);
             });
+            playerScoreControl.ScoreChangedEventStream.Subscribe(evt =>
+            {
+                ShowTotalScore(evt.TotalScore);
+            });
+        }
+        else if (settings.ScoreMode is EScoreMode.None)
+        {
+            playerScoreProgressBar.HideByDisplay();
         }
 
         // Show an effect for perfectly sung notes
-        playerScoreControl.NoteScoreEventStream.Subscribe(noteScoreEvent =>
+        playerPerformanceAssessmentControl.NoteAssessedEventStream.Subscribe(evt =>
         {
-            if (noteScoreEvent.NoteScore.IsPerfect)
+            if (evt.IsPerfect)
             {
-                CreatePerfectNoteEffect(noteScoreEvent.NoteScore.Note);
+                CreatePerfectNoteEffect(evt.Note);
             }
         });
 
@@ -107,18 +153,22 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         if (micProfile != null
             && micProfile.IsInputFromConnectedClient)
         {
-            serverSideConnectRequestManager.ClientConnectedEventStream
-                .Subscribe(HandleClientConnectedEvent)
+            serverSideCompanionClientManager.ClientConnectionChangedEventStream
+                .Subscribe(OnClientConnectionChanged)
                 .AddTo(singSceneControl);
         }
 
+        nextPlayerNameLabel.HideByDisplay();
+
+        // Single perfect sentence effect
+        playerPerformanceAssessmentControl.SentenceAssessedEventStream
+            .Where(evt => evt.IsPerfect)
+            .Subscribe(xs => CreateSinglePerfectSentenceEffect());
+
         // Create effect when there are at least two perfect sentences in a row.
-        // Therefor, consider the currently finished sentence and its predecessor.
-        playerScoreControl.SentenceScoreEventStream.Buffer(2, 1)
-            // All elements (i.e. the currently finished and its predecessor) must have been "perfect"
-            .Where(xs => xs.AllMatch(x => x.SentenceRating == SentenceRating.perfect))
-            // Create an effect for these.
-            .Subscribe(xs => CreatePerfectSentenceEffect());
+        playerPerformanceAssessmentControl.SentenceAssessedEventStream.Buffer(2, 1)
+            .Where(events => events.AllMatch(evt => evt.IsPerfect))
+            .Subscribe(evt => CreateMultiplePerfectSentenceEffect());
 
         ChangeLayoutByPlayerCount();
 
@@ -129,47 +179,46 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     {
         HideLeadingPlayerIcon();
 
-        if (settings.GameSettings.ScoreMode == EScoreMode.None
-            && (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.None
-                || settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.SentenceBySentence))
+        if (settings.ScoreMode == EScoreMode.None
+            && (settings.NoteDisplayMode == ENoteDisplayMode.None
+                || settings.NoteDisplayMode == ENoteDisplayMode.SentenceBySentence))
         {
             // No need to show a player image and name
             // because it is neither associated with a score nor with lyrics.
-            playerNameLabel.HideByDisplay();
-            playerImage.HideByDisplay();
-            playerScoreProgressBar.HideByDisplay();
+            playerImageContainer.HideByDisplay();
             return;
         }
 
-        playerNameLabel.text = playerProfile.Name;
+        playerNameLabel.SetTranslatedText(Translation.Of(playerProfile.Name));
         injector.WithRootVisualElement(playerImage)
-            .CreateAndInject<PlayerProfileImageControl>();
-        if (micProfile != null)
+            .Inject(playerProfileImageControl);
+        if (micProfile != null
+            || playerProfile is LobbyMemberPlayerProfile)
         {
             playerScoreProgressBar.ShowByDisplay();
             playerScoreProgressBar.ShowByVisibility();
-            playerScoreProgressBar.progressColor = micProfile.Color;
-            playerImageBorder.SetBorderColor(micProfile.Color);
+            playerScoreProgressBar.ProgressColor = PlayerColor;
+            playerScoreProgressBar.ProgressInPercent = 0;
+            playerImageBorder.SetBorderColor(PlayerColor);
         }
         else
         {
             playerScoreProgressBar.HideByVisibility();
             playerImageBorder.HideByVisibility();
+            // Do not show border because it looks bad without a fill color
+            playerImage.SetBorderWidth(0);
         }
 
-        if (!settings.GraphicSettings.showPlayerNames)
-        {
-            playerNameLabel.HideByDisplay();
-        }
-        if (!settings.GraphicSettings.showScoreNumbers)
-        {
-            playerScoreLabel.HideByDisplay();
-        }
+        settings.ObserveEveryValueChanged(it => it.ShowPlayerNames)
+            .Subscribe(newValue => playerNameLabel.SetVisibleByDisplay(newValue));
+
+        settings.ObserveEveryValueChanged(it => it.ShowScoreNumbers)
+            .Subscribe(newValue => playerScoreLabel.SetVisibleByDisplay(newValue));
     }
 
     private void ChangeLayoutByPlayerCount()
     {
-        if (sceneData.SelectedPlayerProfiles.Count >= 5)
+        if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 5)
         {
             RootVisualElement.AddToClassList("singScenePlayerUiSmall");
         }
@@ -178,23 +227,47 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     public void Update()
     {
         noteDisplayer.Update();
+        playerPitchIndicatorControl.Update();
+        UpdateNextPlayerProfileLabel();
     }
 
-    private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
+    private void UpdateNextPlayerProfileLabel()
+    {
+        if (nextPlayerProfile == null)
+        {
+            nextPlayerNameLabel.HideByDisplay();
+            return;
+        }
+
+        nextPlayerNameLabel.ShowByDisplay();
+        Translation newText = Translation.Get(R.Messages.songQueue_nextEntry,
+            "value", nextPlayerProfile.Name);
+        if (newText.Value != nextPlayerNameLabel.text)
+        {
+            nextPlayerNameLabel.style.color = new StyleColor(PlayerColor);
+            nextPlayerNameLabel.SetTranslatedText(newText);
+            AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, nextPlayerNameLabel, setNextPlayerProfileAnimTimeInSeconds);
+        }
+    }
+
+    private void OnClientConnectionChanged(ClientConnectionChangedEvent connectionChangedEvent)
     {
         if (micProfile == null
-            || connectionEvent.ConnectedClientHandler.ClientId != micProfile.ConnectedClientId)
+            || connectionChangedEvent.CompanionClientHandler.ClientId != micProfile.ConnectedClientId)
         {
             return;
         }
-        
-        if (connectionEvent.IsConnected)
+
+        if (connectionChangedEvent.IsConnected)
         {
             HideMicDisconnectedInfo();
         }
         else
         {
             ShowMicDisconnectedInfo();
+
+            // Trigger achievement
+            achievementEventStream.OnNext(new AchievementEvent(AchievementId.disconnectCompanionAppWhenSinging, playerProfile));
         }
     }
 
@@ -213,46 +286,44 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             LeanTween.cancel(singSceneControl.gameObject, micDisconnectedAnimationId);
         }
 
-        Vector3 from = Vector3.one * 0.5f;
+        Vector2 from = Vector2.one * 0.5f;
         micDisconnectedIcon.style.scale = new StyleScale(new Scale(from));
-        micDisconnectedAnimationId = LeanTween.value(singSceneControl.gameObject, from, Vector3.one, 0.5f)
+        micDisconnectedAnimationId = LeanTween.value(singSceneControl.gameObject, from, Vector2.one, 0.5f)
             .setEaseSpring()
-            .setOnUpdate(s => micDisconnectedIcon.style.scale = new StyleScale(new Scale(new Vector3(s, s, s))))
+            .setOnUpdate(s => micDisconnectedIcon.style.scale = new StyleScale(new Scale(new Vector2(s, s))))
             .id;
     }
 
     public VisualElement ShowSentenceRating(SentenceRating sentenceRating, VisualElement parentContainer)
     {
-        if (settings.GameSettings.ScoreMode == EScoreMode.None
-            || sentenceRating == SentenceRating.bad)
+        if (settings.ScoreMode == EScoreMode.None
+            || sentenceRating.PercentageThreshold <= SentenceRating.notBad.PercentageThreshold)
         {
             return null;
         }
 
         VisualElement visualElement = sentenceRatingUi.CloneTree().Children().First();
-        visualElement.Q<Label>().text = sentenceRating.Text;
-        visualElement.style.unityBackgroundImageTintColor = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
+        Label label = visualElement.Q<Label>();
+        label.SetTranslatedText(sentenceRating.Translation);
+        label.style.color = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
+        // visualElement.style.unityBackgroundImageTintColor = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
         parentContainer.Add(visualElement);
 
-        // Animate movement, then destroy
-        void SetPosition(float value)
-        {
-            visualElement.style.bottom = new StyleLength(new Length(value, LengthUnit.Percent));
-        }
-        
-        float fromValue = 100;
-        float untilValue = 0;
-        SetPosition(fromValue);
-        LeanTween.value(singSceneControl.gameObject, fromValue, untilValue, 1f)
-            .setEaseInSine()
-            .setOnUpdate(interpolatedValue => SetPosition(interpolatedValue))
+        visualElement.style.scale = Vector2.zero;
+        LeanTween.value(singSceneControl.gameObject, 0, 1, 0.5f)
+            .setEaseSpring()
+            .setOnUpdate(interpolatedValue => visualElement.style.scale = new Vector2(interpolatedValue, interpolatedValue));
+
+        LeanTween.value(singSceneControl.gameObject, 0, 120, 1.5f)
+            .setOnUpdate(interpolatedValue => visualElement.style.bottom = new StyleLength(Length.Percent(interpolatedValue)))
             .setOnComplete(visualElement.RemoveFromHierarchy);
         return visualElement;
     }
 
     public void ShowTotalScore(int score, bool animate = true)
     {
-        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        if (settings.ScoreMode == EScoreMode.None
+            || score == lastDisplayedScore)
         {
             return;
         }
@@ -262,11 +333,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             LeanTween.cancel(singSceneControl.gameObject, totalScoreAnimationId);
         }
 
-        if (!int.TryParse(playerScoreLabel.text, out int lastDisplayedScore)
-            || lastDisplayedScore < 0)
-        {
-            lastDisplayedScore = 0;
-        }
         if (score < 0)
         {
             score = 0;
@@ -277,21 +343,53 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             totalScoreAnimationId = LeanTween.value(singSceneControl.gameObject, lastDisplayedScore, score, 1f)
                 .setOnUpdate((float interpolatedScoreValue) =>
                 {
-                    playerScoreLabel.text = interpolatedScoreValue.ToString("0");
-                    playerScoreProgressBar.progress = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
+                    playerScoreLabel.SetTranslatedText(Translation.Of(interpolatedScoreValue.ToString("0")));
+                    float progressInPercent = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
+                    playerScoreProgressBar.ProgressInPercent = progressInPercent;
                 })
                 .id;
         }
         else
         {
-            playerScoreLabel.text = score.ToString("0");
-            playerScoreProgressBar.progress = (float)(100.0 * score / PlayerScoreControl.maxScore);
+            playerScoreLabel.SetTranslatedText(Translation.Of(score.ToString("0")));
+            float progressInPercent = (float)(100.0 * score / PlayerScoreControl.maxScore);
+            playerScoreProgressBar.ProgressInPercent = progressInPercent;
         }
+
+        lastDisplayedScore = score;
     }
 
-    private void CreatePerfectSentenceEffect()
+    private void CreateMultiplePerfectSentenceEffect()
     {
-        noteDisplayer.CreatePerfectSentenceEffect();
+        if (settings.ScoreMode is EScoreMode.None)
+        {
+            return;
+        }
+
+        EParticleEffect noteAreaEffect = RandomUtils.RandomOfItems(
+            EParticleEffect.FireworksEffect2D_Firework5_BlueStar,
+            EParticleEffect.FireworksEffect2D_Firework6_YellowStar);
+        VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+        {
+            particleEffect = noteAreaEffect,
+            panelPos = noteContainer.worldBound.center,
+            scale = 0.4f,
+        });
+    }
+
+    private void CreateSinglePerfectSentenceEffect()
+    {
+        if (settings.ScoreMode is EScoreMode.None)
+        {
+            return;
+        }
+
+        VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+        {
+            particleEffect = EParticleEffect.ShinyItemLoop,
+            panelPos = playerImage.worldBound.center,
+            scale = 0.2f,
+        });
     }
 
     private void CreatePerfectNoteEffect(Note perfectNote)
@@ -302,7 +400,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private void InitNoteDisplayer(int localLineCount)
     {
         // Find a suited note displayer
-        switch (settings.GraphicSettings.noteDisplayMode)
+        switch (settings.NoteDisplayMode)
         {
             case ENoteDisplayMode.SentenceBySentence:
                 noteDisplayer = new SentenceDisplayer();
@@ -314,7 +412,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 noteDisplayer = new NoNoteSingSceneDisplayer();
                 break;
             default:
-                throw new UnityException("Did not find a suited NoteDisplayer for ENoteDisplayMode " + settings.GraphicSettings.noteDisplayMode);
+                throw new UnityException("Did not find a suited NoteDisplayer for ENoteDisplayMode " + settings.NoteDisplayMode);
         }
 
         // Enable and initialize the selected note displayer
@@ -330,10 +428,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         leadingPlayerIcon.ShowByVisibility();
-        if (micProfile != null)
-        {
-            leadingPlayerIcon.style.color = new StyleColor(micProfile.Color);
-        }
 
         // Bouncy size animation
         if (leadingPlayerIconAnimationId > 0)
@@ -353,5 +447,58 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     public void HideLeadingPlayerIcon()
     {
         leadingPlayerIcon.HideByVisibility();
+    }
+
+
+    public void FadeOutNotes(float animTimeInSeconds)
+    {
+        noteDisplayer.FadeOut(animTimeInSeconds);
+    }
+
+    public void FadeInNotes(float animTimeInSeconds)
+    {
+        noteDisplayer.FadeIn(animTimeInSeconds);
+    }
+
+    // public void FadeOut(float animTimeInSeconds)
+    // {
+    //     LeanTween.cancel(fadeOutAnimationId);
+    //     fadeOutAnimationId = AnimationUtils.FadeOutVisualElement(singSceneControl.gameObject, playerScoreContainer, animTimeInSeconds);
+    // }
+    //
+    // public void FadeIn(float animTimeInSeconds)
+    // {
+    //     LeanTween.cancel(fadeOutAnimationId);
+    //     fadeOutAnimationId = AnimationUtils.FadeInVisualElement(singSceneControl.gameObject, playerScoreContainer, animTimeInSeconds);
+    // }
+
+    public void SetPlayerProfile(PlayerProfile newCurrentPlayerProfile)
+    {
+        if (playerProfile == newCurrentPlayerProfile)
+        {
+            return;
+        }
+
+        playerProfile = newCurrentPlayerProfile;
+        playerNameLabel.SetTranslatedText(Translation.Of(newCurrentPlayerProfile.Name));
+        playerProfileImageControl.PlayerProfile = newCurrentPlayerProfile;
+
+        // Highlight the change with an animation
+        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerScoreLabel, setNextPlayerProfileAnimTimeInSeconds);
+        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerNameLabel, setNextPlayerProfileAnimTimeInSeconds);
+        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerImageContainer, setNextPlayerProfileAnimTimeInSeconds);
+    }
+
+    public void SetNextPlayerProfile(PlayerProfile newNextPlayerProfile)
+    {
+        if (newNextPlayerProfile == playerProfile)
+        {
+            // Will keep the current player.
+            nextPlayerProfile = null;
+        }
+        else
+        {
+            nextPlayerProfile = newNextPlayerProfile;
+        }
     }
 }

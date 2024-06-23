@@ -1,19 +1,22 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="playerEntry" class="mr-3 mb-3">
+    <ui:VisualElement name="playerEntry" class="mt-2 ml-1 mb-1 mr-1">
         <ui:VisualElement name="row" style="flex-direction: row; align-items: flex-end; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
             <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); align-items: center;">
-                <ui:VisualElement name="playerImageContainer" style="justify-content: center; align-items: center; flex-shrink: 0; width: 48px; height: 48px;">
-                    <ui:Button display-tooltip-when-elided="true" name="togglePlayerSelectedButton" class="overlay transparentButton circle" style="width: 110%; height: 110%;" />
+                <ui:VisualElement name="playerImageContainer" style="justify-content: center; align-items: center; flex-shrink: 0; width: 64px; height: 64px;">
+                    <ui:Button display-tooltip-when-elided="true" name="togglePlayerSelectedButton" class="overlay transparentButton circle" />
                     <ui:VisualElement name="playerImage" picking-mode="Ignore" class="circle overlay" style="background-image: url(&apos;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&apos;); align-items: center; -unity-background-scale-mode: scale-to-fit;" />
                 </ui:VisualElement>
-                <ui:Label text="Player01" display-tooltip-when-elided="true" name="nameLabel" style="flex-grow: 1; display: none;" />
+                <ui:Label text="Player01" display-tooltip-when-elided="true" name="nameLabel" class="ellipsis" style="flex-grow: 1; display: none; max-width: 100%;" />
+                <ui:Label tabindex="-1" text="Team Red" display-tooltip-when-elided="true" name="teamLabel" focusable="false" picking-mode="Ignore" class="textShadow ellipsis smallerFont" style="-unity-text-align: upper-center; position: absolute; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;); bottom: 46px; max-width: 100%;" />
+                <ui:Button display-tooltip-when-elided="true" name="changeVoiceButton" class="transparentButton smallerFont secondaryFontColor textShadow" style="height: auto; position: absolute; bottom: 0; width: 100%; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;); overflow: visible; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0;">
+                    <ui:Label text="First Vocals" name="voiceIdLabel" min-font-size="8" max-font-size="14" class="textShadow ellipsis" />
+                </ui:Button>
             </ui:VisualElement>
-            <ui:Button display-tooltip-when-elided="true" name="micButton" class="squareButton transparentButton" style="margin-left: 1px;">
+            <ui:Button display-tooltip-when-elided="true" name="micButton" class="squareButton transparentButton">
                 <RadialProgressBar show-label="false" name="micProgressBar" progress="80" style="position: absolute; width: 100%; height: 100%;" />
                 <MaterialIcon tabindex="-1" name="micIcon" icon="mic" class="textOutline ignoreTheme" />
                 <MaterialIcon tabindex="-1" name="noMicIcon" icon="mic_off" class="secondaryFontColor textOutline" style="display: none;" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:Button text="P1" display-tooltip-when-elided="true" name="toggleVoiceButton" class="transparentButton smallerFont" style="height: auto;" />
     </ui:VisualElement>
 </ui:UXML>

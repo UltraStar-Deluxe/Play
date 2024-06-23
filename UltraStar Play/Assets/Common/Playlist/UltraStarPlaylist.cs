@@ -2,11 +2,12 @@
 using System.IO;
 using System.Linq;
 
-public class UltraStarPlaylist
+public class UltraStarPlaylist : IPlaylist
 {
     public string FilePath { get; private set; }
+
     public string FileName => Path.GetFileNameWithoutExtension(FilePath);
-    public string Name
+    public virtual string Name
     {
         get
         {
@@ -18,6 +19,8 @@ public class UltraStarPlaylist
             return FileName;
         }
     }
+    public virtual bool IsEmpty => Count == 0;
+    public virtual int Count => songHashes.Count;
 
     private readonly List<UltraStartPlaylistLineEntry> lineEntries = new();
     private readonly HashSet<string> songHashes = new();
@@ -41,7 +44,7 @@ public class UltraStarPlaylist
     public void SetFileName(string newValue)
     {
         string directoryPath = Path.GetDirectoryName(FilePath);
-        FilePath = directoryPath + $"/{newValue}{PlaylistManager.ultraStarPlaylistFileExtension}";
+        FilePath = directoryPath + $"/{newValue}.{ApplicationUtils.ultraStarPlaylistFileExtension}";
         headerFields.Remove("NAME");
     }
 
@@ -86,6 +89,16 @@ public class UltraStarPlaylist
     public virtual bool HasSongEntry(string artist, string title)
     {
         return songHashes.Contains(GetHash(artist, title));
+    }
+
+    public bool HasSongEntry(SongMeta songMeta)
+    {
+        if (songMeta == null)
+        {
+            return false;
+        }
+
+        return HasSongEntry(songMeta.Artist, songMeta.Title);
     }
 
     private string GetHash(string artist, string title)

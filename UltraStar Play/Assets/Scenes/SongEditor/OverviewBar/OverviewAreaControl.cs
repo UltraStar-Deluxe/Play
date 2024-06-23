@@ -1,10 +1,12 @@
-﻿using UniInject;
+﻿using System.IO;
+using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
 
-public class OverviewAreaControl : IInjectionFinishedListener
+public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private SongMeta songMeta;
@@ -31,71 +33,95 @@ public class OverviewAreaControl : IInjectionFinishedListener
     private Injector injector;
 
     [Inject]
-    private AudioManager audioManager;
+    private Settings settings;
 
-    private OverviewAreaPositionInSongIndicatorControl positionInSongIndicatorControl;
-    private OverviewAreaViewportIndicatorControl viewportIndicatorControl;
-    private OverviewAreaNoteVisualizer noteVisualizer;
-    private OverviewAreaIssueVisualizer issueVisualizer;
+    [Inject]
+    private GameObject gameObject;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
+    private ContextMenuControl contextMenuControl;
 
     public void OnInjectionFinished()
     {
         RegisterPointerEvents();
-        positionInSongIndicatorControl = injector
+        injector
             .WithRootVisualElement(overviewArea)
-            .CreateAndInject<OverviewAreaPositionInSongIndicatorControl>();
+            .CreateAndInject<OverviewAreaPositionIndicatorControl>();
 
-        viewportIndicatorControl = injector
+        injector
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<OverviewAreaViewportIndicatorControl>();
 
-        noteVisualizer = injector
+        injector
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<OverviewAreaNoteVisualizer>();
 
-        issueVisualizer = injector
+        injector
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<OverviewAreaIssueVisualizer>();
 
-        // Create the audio waveform image.
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource)
+            .Subscribe(_ => UpdateAudioWaveForm())
+            .AddTo(gameObject);
+
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.AudioWaveformSamplesSource)
+            .Subscribe(_ => UpdateAudioWaveForm())
+            .AddTo(gameObject);
+
+        songAudioPlayer.LoadedEventStream.Subscribe(_ =>
+        {
+            UpdateAudioWaveForm();
+        });
+
         overviewArea.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             UpdateAudioWaveForm();
         });
+
+        contextMenuControl = injector
+            .WithRootVisualElement(overviewArea)
+            .CreateAndInject<ContextMenuControl>();
+        contextMenuControl.FillContextMenuAction = FillContextMenu;
+    }
+
+    private void FillContextMenu(ContextMenuPopupControl popupControl)
+    {
+        popupControl.AddButton(Translation.Get(R.Messages.songEditor_action_showOriginalAudio),
+            () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.OriginalMusic);
+        popupControl.AddButton(Translation.Get(R.Messages.songEditor_action_showVocalsAudio),
+            () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.Vocals);
+        popupControl.AddButton(Translation.Get(R.Messages.songEditor_action_showInstrumentalAudio),
+            () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.Instrumental);
+        popupControl.AddButton(Translation.Get(R.Messages.songEditor_action_showPlaybackAudio),
+            () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.SameAsPlayback);
     }
 
     public void UpdateAudioWaveForm()
     {
-        if (!songAudioPlayer.HasAudioClip
-            || songAudioPlayer.AudioClip.samples <= 0)
+        if (!songAudioPlayer.IsFullyLoaded
+            // Must be an audio format. Getting all the samples does not work with video files.
+            || !ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Audio))
+            || !VisualElementUtils.HasGeometry(overviewArea))
         {
             return;
         }
 
         if (audioWaveFormVisualization == null)
         {
-            audioWaveFormVisualization = new AudioWaveFormVisualization(songEditorSceneControl.gameObject, overviewAreaWaveform)
-            {
-                // Waveform color is same as text color
-                WaveformColor = overviewAreaLabel.resolvedStyle.color
-            };
+            int textureWidth = 1024;
+            int textureHeight = 128;
+            audioWaveFormVisualization = new AudioWaveFormVisualization(
+                songEditorSceneControl.gameObject,
+                overviewAreaWaveform,
+                textureWidth,
+                textureHeight,
+                "song editor overview area audio visualization");
+            // Waveform color is same as text color
+            audioWaveFormVisualization.WaveformColor = overviewAreaLabel.resolvedStyle.color;
         }
 
-        using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
-        {
-            string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-            if (!SongMetaUtils.AudioResourceExists(songMeta))
-            {
-                Debug.Log($"Audio file resource does not exist {audioUri}");
-                return;
-            }
-
-            // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-            AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri, false);
-            audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(audioClip);
-        }
+        AudioClip audioClip = SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
+        SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioClip);
     }
 
     private void RegisterPointerEvents()
@@ -121,7 +147,7 @@ public class OverviewAreaControl : IInjectionFinishedListener
     private void ScrollToPointer(IPointerEvent evt)
     {
         double xPercent = evt.localPosition.x / overviewArea.contentRect.width;
-        double positionInSongInMillis = songAudioPlayer.DurationOfSongInMillis * xPercent;
-        songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+        double positionInMillis = songAudioPlayer.DurationInMillis * xPercent;
+        songAudioPlayer.PositionInMillis = positionInMillis;
     }
 }

@@ -1,31 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using ProTrans;
+using CommonOnlineMultiplayer;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjectionFinishedListener, IDisposable
+public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
     [Inject]
     private SingingResultsSceneControl singingResultsSceneControl;
 
     [Inject]
-    private PlayerProfile playerProfile;
+    public PlayerProfile PlayerProfile { get; private set; }
 
     [Inject(Optional = true)]
     private MicProfile micProfile;
 
     [Inject]
-    private PlayerScoreControlData playerScoreData;
+    private ISingingResultsPlayerScore singingResultsPlayerScore;
 
     [Inject]
     private Statistics statistics;
-    
+
     [Inject]
     private SingingResultsSceneData sceneData;
-    
+
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement visualElement;
+
     [Inject(UxmlName = R.UxmlNames.normalNoteScore)]
     private VisualElement normalNoteScoreContainer;
 
@@ -34,6 +39,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     [Inject(UxmlName = R.UxmlNames.phraseBonusScore)]
     private VisualElement phraseBonusScoreContainer;
+
+    [Inject(UxmlName = R.UxmlNames.modBonusScore)]
+    private VisualElement modBonusScoreContainer;
 
     [Inject(UxmlName = R.UxmlNames.totalScoreLabel)]
     private Label totalScoreLabel;
@@ -55,7 +63,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     [Inject(UxmlName = R.UxmlNames.newHighscoreContainer)]
     private VisualElement newHighscoreContainer;
-    
+
+    [Inject(UxmlName = R.UxmlNames.songRatingStarIcon)]
+    private List<VisualElement> songRatingStarIcons;
+
     [Inject]
     private SongRating songRating;
 
@@ -68,103 +79,199 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     [Inject]
     private ThemeManager themeManager;
 
-    private readonly float animationTimeInSeconds = 1f;
+    private readonly float bounceAnimTimeInSeconds = 1f;
+    private readonly float maxScoreAnimationTimeInSeconds = 5f;
+    private float NormalNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)singingResultsPlayerScore.NormalNotesTotalScore / PlayerScoreControl.maxScore);
+    private float GoldenNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)singingResultsPlayerScore.GoldenNotesTotalScore / PlayerScoreControl.maxScore);
+    private float PerfectSentenceBonusAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)singingResultsPlayerScore.PerfectSentenceBonusTotalScore / PlayerScoreControl.maxScore);
+    private float ModBonusAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)Math.Abs(singingResultsPlayerScore.ModTotalScore) / PlayerScoreControl.maxScore);
+    private float TotalScoreAnimTimeInSeconds => NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds + PerfectSentenceBonusAnimTimeInSeconds + ModBonusAnimTimeInSeconds;
 
-    private int animationId;
-    
+    private readonly List<int> animationIds = new();
+
     public void OnInjectionFinished()
     {
         // Player name and image
-        playerNameLabel.text = playerProfile.Name;
+        playerNameLabel.SetTranslatedText(Translation.Of(ShouldShowTeamName()
+            ? GetTeamName()
+            : PlayerProfile.Name));
         injector.WithRootVisualElement(playerImage)
             .CreateAndInject<PlayerProfileImageControl>();
 
+        newHighscoreContainer.HideByVisibility();
         if (IsNewHighscore())
         {
-            newHighscoreContainer.ShowByDisplay();
             // Bouncy size animation
-            LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, animationTimeInSeconds)
+            LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, bounceAnimTimeInSeconds)
                 .setEaseSpring()
-                .setOnUpdate(s => newHighscoreContainer.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
+                .setOnStart(() => newHighscoreContainer.ShowByVisibility())
+                .setOnUpdate(s => newHighscoreContainer.style.scale = new StyleScale(new Scale(new Vector2(s, s))))
+                .setDelay(TotalScoreAnimTimeInSeconds);
         }
-        else
-        {
-            newHighscoreContainer.HideByDisplay();
-        }
-        
-        // Song rating
-        LoadSongRatingSprite(songRating.EnumValue, songRatingSprite =>
-        {
-            if (songRatingSprite == null)
-            {
-                return;
-            }
 
-            ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
+        // Song rating
+        LoadSongRatingSprite(songRating.EnumValue)
+            .Subscribe(songRatingSprite =>
+            {
+                if (songRatingSprite == null)
+                {
+                    return;
+                }
+
+                ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
                 // Bouncy size animation
-                LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, animationTimeInSeconds)
-                    .setEaseSpring()
-                    .setOnUpdate(s => ratingImage.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
-        });
-        ratingLabel.text = songRating.Text;
+                ratingLabel.style.scale = new StyleScale(new Scale(Vector2.zero));
+                ratingImage.style.scale = new StyleScale(new Scale(Vector2.zero));
+                LeanTween.value(singingResultsSceneControl.gameObject, Vector2.one, Vector2.one * 0.5f, bounceAnimTimeInSeconds)
+                    .setEasePunch()
+                    .setOnStart(() =>
+                    {
+                        if (TotalScoreAnimTimeInSeconds > 0)
+                        {
+                            PlaySingingResultsRatingPopupSound();
+                        }
+                    })
+                    .setOnUpdate(s =>
+                    {
+                        Vector2 scale = new Vector2(s, s);
+                        ratingLabel.style.scale = new StyleScale(new Scale(scale));
+                        ratingImage.style.scale = new StyleScale(new Scale(scale));
+                    })
+                    .setDelay(TotalScoreAnimTimeInSeconds);
+            });
+        ratingLabel.SetTranslatedText(songRating.Translation);
 
         // Score texts (animated)
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.NormalNotesTotalScore, animationTimeInSeconds)
+        ResetScoreRowLabelTexts();
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, singingResultsPlayerScore.NormalNotesTotalScore, NormalNoteAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreRowLabelText(normalNoteScoreContainer, interpolatedValue));
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.GoldenNotesTotalScore, animationTimeInSeconds)
-            .setOnUpdate(interpolatedValue => SetScoreRowLabelText(goldenNoteScoreContainer, interpolatedValue));
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.PerfectSentenceBonusTotalScore, animationTimeInSeconds)
-            .setOnUpdate(interpolatedValue => SetScoreRowLabelText(phraseBonusScoreContainer, interpolatedValue));
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.TotalScore, animationTimeInSeconds)
-            .setOnUpdate(interpolatedValue => totalScoreLabel.text = interpolatedValue.ToStringInvariantCulture("0"));
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, singingResultsPlayerScore.GoldenNotesTotalScore, GoldenNoteAnimTimeInSeconds)
+            .setOnUpdate(interpolatedValue => SetScoreRowLabelText(goldenNoteScoreContainer, interpolatedValue))
+            .setDelay(NormalNoteAnimTimeInSeconds);
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, singingResultsPlayerScore.PerfectSentenceBonusTotalScore, PerfectSentenceBonusAnimTimeInSeconds)
+            .setOnUpdate(interpolatedValue => SetScoreRowLabelText(phraseBonusScoreContainer, interpolatedValue))
+            .setDelay(NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds);
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, singingResultsPlayerScore.ModTotalScore, ModBonusAnimTimeInSeconds)
+            .setOnUpdate(interpolatedValue => SetScoreRowLabelText(modBonusScoreContainer, interpolatedValue))
+            .setDelay(NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds + PerfectSentenceBonusAnimTimeInSeconds);
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, singingResultsPlayerScore.TotalScore, TotalScoreAnimTimeInSeconds)
+            .setOnUpdate(interpolatedValue => totalScoreLabel.SetTranslatedText(Translation.Of(interpolatedValue.ToStringInvariantCulture("0"))));
 
         // Score bar (animated)
-        if (micProfile != null)
+        Color32 scoreBarColor = CommonOnlineMultiplayerUtils.GetPlayerColor(PlayerProfile, micProfile);
+        playerScoreProgressBar.ProgressColor = scoreBarColor;
+        if (scoreBarColor == Color.clear)
         {
-            playerScoreProgressBar.progressColor = micProfile.Color;
+            // Do not show border because it looks bad without a fill color
+            playerImage.SetBorderWidth(0);
         }
 
-        float playerScoreFactor = (float)playerScoreData.TotalScore / PlayerScoreControl.maxScore;
-        animationId = LeanTween.value(singingResultsSceneControl.gameObject, 0, 100f * playerScoreFactor, animationTimeInSeconds)
-            .setOnUpdate(interpolatedValue => playerScoreProgressBar.progress = interpolatedValue)
+        float playerScoreFactor = (float)singingResultsPlayerScore.TotalScore / PlayerScoreControl.maxScore;
+        animationIds.Add(LeanTween.value(singingResultsSceneControl.gameObject, 0, 100f * playerScoreFactor, TotalScoreAnimTimeInSeconds)
+            .setOnUpdate(interpolatedValue => playerScoreProgressBar.ProgressInPercent = interpolatedValue)
             .setEaseOutSine()
-            .id;
+            .id);
+
+        // Stars (animated)
+        // AnimateStarRatingIcons();
 
         UpdateTranslation();
     }
 
+    private void PlaySingingResultsRatingPopupSound()
+    {
+        SfxManager.PlaySingingResultsRatingPopupSound();
+    }
+
+    private void ResetScoreRowLabelTexts()
+    {
+        SetScoreRowLabelText(normalNoteScoreContainer, 0);
+        SetScoreRowLabelText(goldenNoteScoreContainer, 0);
+        SetScoreRowLabelText(phraseBonusScoreContainer, 0);
+        SetScoreRowLabelText(modBonusScoreContainer, 0);
+    }
+
+    private void AnimateStarRatingIcons()
+    {
+        songRatingStarIcons.ForEach(it => it.style.scale = Vector2.zero);
+        int starCount = SongSelectSongRatingIconControl.GetStarCount(singingResultsPlayerScore.TotalScore);
+
+        // Skip the center star if even number of stars visible
+        List<VisualElement> visibleStarIcons = starCount % 2 == 1
+            ? songRatingStarIcons.Take(starCount).ToList()
+            : songRatingStarIcons.Skip(1).Take(starCount).ToList();
+
+        float starIconAnimationTimeInSeconds = TotalScoreAnimTimeInSeconds;
+        for (int i = 0; i < visibleStarIcons.Count; i++)
+        {
+            VisualElement visibleStarIcon = visibleStarIcons[i];
+            animationIds.Add(LeanTween.value(singingResultsSceneControl.gameObject, 0, 1, starIconAnimationTimeInSeconds)
+                .setDelay(i * starIconAnimationTimeInSeconds / 2)
+                .setOnUpdate(interpolatedValue => visibleStarIcon.style.scale = new Vector2(interpolatedValue, interpolatedValue))
+                .setEasePunch()
+                .id);
+        }
+    }
+
     private bool IsNewHighscore()
     {
-        if (playerScoreData.TotalScore <= 0)
+        if (singingResultsPlayerScore.TotalScore <= 0
+            || sceneData.GameRoundSettings == null
+            || sceneData.GameRoundSettings.AnyModifierActive)
         {
             return false;
         }
-        
-        LocalStatistic localStatistic = statistics.GetLocalStats(sceneData.SongMeta);
-        if (localStatistic == null
-            || localStatistic.StatsEntries == null
-            || localStatistic.StatsEntries.SongStatistics.IsNullOrEmpty())
+
+        SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
+        SongStatistics songStatistics = StatisticsUtils.GetLocalSongStatistics(statistics, songMeta);
+        if (songStatistics == null
+            || songStatistics.HighScoreRecord == null
+            || songStatistics.HighScoreRecord.HighScoreEntries.IsNullOrEmpty())
         {
             return false;
         }
-        
-        return localStatistic.StatsEntries
-            .GetTopScores(1, playerProfile.Difficulty)
-            .FirstOrDefault().Score == playerScoreData.TotalScore;
+
+        HighScoreEntry highScoreEntry = StatisticsUtils.GetTopScores(
+                songStatistics.HighScoreRecord.HighScoreEntries,
+                1,
+                PlayerProfile.Difficulty)
+            .FirstOrDefault();
+        if (highScoreEntry == null)
+        {
+            return false;
+        }
+
+        return highScoreEntry.Score == singingResultsPlayerScore.TotalScore;
     }
 
-    private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private IObservable<Sprite> LoadSongRatingSprite(ESongRating songRatingEnumValue)
     {
-        if (settings.DeveloperSettings.disableDynamicThemes
+        if (!settings.EnableDynamicThemes
             || themeManager.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
         {
-            LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
-            return;
+            return LoadDefaultSongRatingSprite(songRatingEnumValue);
         }
-        LoadSongRatingSpriteFromTheme(songRatingEnumValue, onSuccess);
+        return LoadSongRatingSpriteFromTheme(songRatingEnumValue);
     }
 
-    private void LoadSongRatingSpriteFromTheme(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private string GetTeamName()
+    {
+        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSceneData, PlayerProfile);
+        return teamSettings.name;
+    }
+
+    private bool ShouldShowTeamName()
+    {
+        if (singingResultsSceneControl.HasPartyModeSceneData
+            && singingResultsSceneControl.PartyModeSettings.TeamSettings.IsFreeForAll)
+        {
+            return false;
+        }
+        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSceneData, PlayerProfile);
+        return teamSettings != null;
+    }
+
+    private IObservable<Sprite> LoadSongRatingSpriteFromTheme(ESongRating songRatingEnumValue)
     {
         try
         {
@@ -172,41 +279,65 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             string valueForSongRating = themeMeta.ThemeJson.songRatingIcons.GetValueForSongRating(songRatingEnumValue);
             if (valueForSongRating.IsNullOrEmpty())
             {
-                LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
-                return;
+                return LoadDefaultSongRatingSprite(songRatingEnumValue);
             }
 
             string imagePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, valueForSongRating);
-            ImageManager.LoadSpriteFromUri(imagePath, onSuccess);
+            return ImageManager.LoadSpriteFromUri(imagePath);
         }
         catch (Exception ex)
         {
-            Debug.LogError(ex);
-            LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
+            Debug.LogException(ex);
+            Debug.LogError($"Load song rating sprite from theme failed: {ex.Message}");
+            return LoadDefaultSongRatingSprite(songRatingEnumValue);
         }
     }
 
-    private void LoadDefaultSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private IObservable<Sprite> LoadDefaultSongRatingSprite(ESongRating songRatingEnumValue)
     {
         SongRatingImageReference songRatingImageReference = singingResultsSceneControl.songRatingImageReferences
             .FirstOrDefault(it => it.songRating == songRatingEnumValue);
-        onSuccess(songRatingImageReference?.sprite);
+        return Observable.Return<Sprite>(songRatingImageReference?.sprite);
     }
 
     public void UpdateTranslation()
     {
-        normalNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = TranslationManager.GetTranslation(R.Messages.score_notes);
-        goldenNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = TranslationManager.GetTranslation(R.Messages.score_goldenNotes);
-        phraseBonusScoreContainer.Q<Label>(R.UxmlNames.scoreName).text = TranslationManager.GetTranslation(R.Messages.score_phraseBonus);
+        normalNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).SetTranslatedText(Translation.Get(R.Messages.score_notes));
+        goldenNoteScoreContainer.Q<Label>(R.UxmlNames.scoreName).SetTranslatedText(Translation.Get(R.Messages.score_goldenNotes));
+        phraseBonusScoreContainer.Q<Label>(R.UxmlNames.scoreName).SetTranslatedText(Translation.Get(R.Messages.score_perfectSentenceBonus));
     }
 
     private void SetScoreRowLabelText(VisualElement container, float interpolatedValue)
     {
-        container.Q<Label>(R.UxmlNames.scoreValue).text = interpolatedValue.ToString("0", CultureInfo.InvariantCulture);
+        container.Q<Label>(R.UxmlNames.scoreValue).SetTranslatedText(
+            Translation.Of(interpolatedValue.ToString("0", CultureInfo.InvariantCulture)));
     }
 
     public void Dispose()
     {
-        LeanTween.cancel(animationId);
+        LeanTweenUtils.CancelAndClear(animationIds);
+    }
+
+    public void InitTopScoreVfx()
+    {
+        singingResultsSceneControl.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(TotalScoreAnimTimeInSeconds,
+            () =>
+            {
+                VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+                {
+                    particleEffect = EParticleEffect.LightGlowALoop,
+                    panelPos = playerImage.worldBound.center,
+                    scale = 0.4f,
+                    loop = true,
+                    isBackground = true,
+                    target = playerImage,
+                    hideAndShowWithTarget = true,
+                });
+            }));
+    }
+
+    public void SetModScoreVisible(bool isVisible)
+    {
+        modBonusScoreContainer.SetVisibleByDisplay(isVisible);
     }
 }

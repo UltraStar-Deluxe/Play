@@ -40,20 +40,31 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
     private UiManager uiManager;
 
     public void CreateNewSongFromTemplateAndContinueToSongEditor(
+        string audioFile,
         string artist,
         string title,
         bool createCover,
         bool createBackground,
         bool createVideo)
     {
-        string songsPath = ApplicationManager.PersistentSongsPath();
-
         string artistAndTitle = $"{artist} - {title}";
-        string newSongFolderName = GetUniqueFolderName(artistAndTitle, songsPath);
-        string newSongFolderAbsolutePath = songsPath + "/" + newSongFolderName;
-        if (!Directory.Exists(newSongFolderAbsolutePath))
+
+        bool audioFileExists = FileUtils.Exists(audioFile);
+        string persistentDataPathSongsFolder = ApplicationUtils.GetPersistentDataPath("Songs");
+        string outputFolder;
+        if (audioFileExists)
         {
-            Directory.CreateDirectory(newSongFolderAbsolutePath);
+            outputFolder = Path.GetDirectoryName(audioFile);
+        }
+        else
+        {
+            string newSongFolderName = GetUniqueFolderName(artistAndTitle, persistentDataPathSongsFolder);
+            outputFolder = $"{persistentDataPathSongsFolder}/{newSongFolderName}";
+        }
+
+        if (!Directory.Exists(outputFolder))
+        {
+            Directory.CreateDirectory(outputFolder);
         }
 
         string txtFileContent = songTemplateTxtFile.text
@@ -63,16 +74,27 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
             .Replace("\r", "");
 
         // Fill folder with template files
-        string audioFileName = $"{artistAndTitle}.ogg";
-        string audioFilePath = newSongFolderAbsolutePath + $"/{audioFileName}";
-        File.WriteAllBytes(audioFilePath, songTemplateAudio.bytes);
+        string audioFileName;
+        if (audioFileExists)
+        {
+            audioFileName = Path.GetFileName(audioFile);
+        }
+        else
+        {
+            audioFileName = $"{artistAndTitle}.ogg";
+            string audioFilePath = $"{outputFolder}/{audioFileName}";
+            File.WriteAllBytes(audioFilePath, songTemplateAudio.bytes);
+        }
         txtFileContent = txtFileContent.Replace("${audioTag}", $"#MP3:{audioFileName}");
 
         if (createCover)
         {
             string coverFileName = $"{artistAndTitle} [CO].jpg";
-            string coverFilePath = newSongFolderAbsolutePath + $"/{coverFileName}";
-            File.WriteAllBytes(coverFilePath, songTemplateCover.bytes);
+            string coverFilePath = outputFolder + $"/{coverFileName}";
+            if (!FileUtils.Exists(coverFilePath))
+            {
+                File.WriteAllBytes(coverFilePath, songTemplateCover.bytes);
+            }
             txtFileContent = txtFileContent.Replace("${coverTag}", $"#COVER:{coverFileName}");
         }
         else
@@ -83,8 +105,11 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
         if (createBackground)
         {
             string backgroundFileName = $"{artistAndTitle} [BG].jpg";
-            string backgroundFilePath = newSongFolderAbsolutePath + $"/{backgroundFileName}";
-            File.WriteAllBytes(backgroundFilePath, songTemplateBackground.bytes);
+            string backgroundFilePath = outputFolder + $"/{backgroundFileName}";
+            if (!FileUtils.Exists(backgroundFilePath))
+            {
+                File.WriteAllBytes(backgroundFilePath, songTemplateBackground.bytes);
+            }
             txtFileContent = txtFileContent.Replace("${backgroundTag}", $"#BACKGROUND:{backgroundFileName}");
         }
         else
@@ -95,8 +120,11 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
         if (createVideo)
         {
             string videoFileName = $"{artistAndTitle}.webm";
-            string videoFilePath = newSongFolderAbsolutePath + $"/{videoFileName}";
-            File.WriteAllBytes(videoFilePath, songTemplateVideo.bytes);
+            string videoFilePath = outputFolder + $"/{videoFileName}";
+            if (!FileUtils.Exists(videoFilePath))
+            {
+                File.WriteAllBytes(videoFilePath, songTemplateVideo.bytes);
+            }
             txtFileContent = txtFileContent.Replace("${videoTag}", $"#VIDEO:{videoFileName}");
         }
         else
@@ -104,42 +132,45 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
             txtFileContent = txtFileContent.Replace("${videoTag}\n", "");
         }
 
-        string newSongTxtFile = newSongFolderAbsolutePath + $"/{artistAndTitle}.txt";
-        File.WriteAllText(newSongTxtFile, txtFileContent);
+        string newSongTxtFile = outputFolder + $"/{artistAndTitle}.txt";
+        File.WriteAllText(newSongTxtFile, txtFileContent, SettingsUtils.GetEncodingForWritingUltraStarTxtFile(settings));
 
         // Add song folder to settings if not done yet
-        List<string> songDirs = settings.GameSettings.songDirs;
-        if (!songDirs.Contains(songsPath))
+        List<string> songDirs = settings.SongDirs;
+        if (!audioFileExists
+            && !songDirs.Contains(persistentDataPathSongsFolder))
         {
-            songDirs.Add(songsPath);
-            settingsManager.Save();
+            songDirs.Add(persistentDataPathSongsFolder);
+            settingsManager.SaveSettings();
         }
 
         if (PlatformUtils.IsStandalone)
         {
-            // Open newly created song folder in file system browser
-            Application.OpenURL("file://" + newSongFolderAbsolutePath);
+            ApplicationUtils.OpenDirectory(outputFolder);
         }
 
-        string message = $"Created new song from template in: \n{newSongFolderAbsolutePath}";
-        Debug.Log(message);
-        UiManager.CreateNotification(message);
+        Debug.Log($"Created new song from template in: {outputFolder}");
+        NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_createdNewSong,
+        "path", outputFolder));
 
         // Reload songs, now with the newly added song.
-        songMetaManager.TryLoadAndAddSongMetasFromFolder(newSongFolderAbsolutePath, out List<SongMeta> newSongMetas, out List<SongIssue> _);
-        SongMeta newSongMeta = newSongMetas.FirstOrDefault();
-        if (newSongMeta != null)
+        string txtFile = FileScannerUtils.ScanForFiles(new List<string> { outputFolder }, new List<string>() { "*.txt" })
+            .FirstOrDefault();
+        if (txtFile != null)
         {
-            OpenSongEditorScene(newSongMeta);
+            SongMeta newSongMeta = new LazyLoadedFromFileSongMeta(txtFile);
+            songMetaManager.AddSongMeta(newSongMeta);
+            OpenSongEditorScene(newSongMeta, audioFileExists);
         }
     }
 
-    private void OpenSongEditorScene(SongMeta songMeta)
+    private void OpenSongEditorScene(SongMeta songMeta, bool createSingAlongDataViaAiTools)
     {
         sceneNavigator.LoadScene(EScene.SongEditorScene, new SongEditorSceneData
         {
             PreviousScene = EScene.MainScene,
-            SelectedSongMeta = songMeta,
+            SongMeta = songMeta,
+            CreateSingAlongDataViaAiTools = createSingAlongDataViaAiTools,
         });
     }
 

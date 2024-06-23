@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PrimeInputActions;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -12,25 +10,25 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITranslator, IBinder
+public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 {
     private static readonly List<int> amplificationItems = new() { 0, 3, 6, 9, 12, 15, 18 };
-    private static readonly List<int> noiseSuppressionItems= new() { 0, 5, 10, 15, 20, 25, 30 };
+    private static readonly List<int> noiseSuppressionItems= new() { 0, 1, 3, 5, 10, 15, 20, 25, 30 };
 
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private RecordingOptionsMicVisualizer micVisualizer;
+    [InjectedInInspector]
+    public RecordingOptionsMicVisualizer micVisualizer;
 
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private CalibrateMicDelayControl calibrateMicDelayControl;
+    [InjectedInInspector]
+    public CalibrateMicDelayControl calibrateMicDelayControl;
 
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private MicPitchTracker micPitchTracker;
+    [InjectedInInspector]
+    public NewestSamplesMicPitchTracker micPitchTracker;
 
     [Inject]
     private UiManager uiManager;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private ServerSideCompanionClientManager serverSideCompanionClientManager;
 
     [Inject]
     private UIDocument uiDocument;
@@ -41,26 +39,32 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     [Inject]
     private ThemeManager themeManager;
 
-    [Inject(UxmlName = R.UxmlNames.devicePicker)]
-    private ItemPicker devicePicker;
+    [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
 
-    [Inject(UxmlName = R.UxmlNames.amplificationPicker)]
-    private ItemPicker amplificationPicker;
+    [Inject(UxmlName = R.UxmlNames.deviceChooser)]
+    private Chooser deviceChooser;
 
-    [Inject(UxmlName = R.UxmlNames.noiseSuppressionPicker)]
-    private ItemPicker noiseSuppressionPicker;
+    [Inject(UxmlName = R.UxmlNames.amplificationChooser)]
+    private Chooser amplificationChooser;
 
-    [Inject(UxmlName = R.UxmlNames.delayPicker)]
-    private ItemPicker delayPicker;
+    [Inject(UxmlName = R.UxmlNames.noiseSuppressionChooser)]
+    private Chooser noiseSuppressionChooser;
 
-    [Inject(UxmlName = R.UxmlNames.colorPicker)]
-    private ItemPicker colorPicker;
+    [Inject(UxmlName = R.UxmlNames.delayChooser)]
+    private Chooser delayChooser;
 
-    [Inject(UxmlName = R.UxmlNames.sampleRatePicker)]
-    private ItemPicker sampleRatePicker;
+    [Inject(UxmlName = R.UxmlNames.colorChooser)]
+    private Chooser colorChooser;
+
+    [Inject(UxmlName = R.UxmlNames.sampleRateChooser)]
+    private Chooser sampleRateChooser;
 
     [Inject(UxmlName = R.UxmlNames.enabledToggle)]
     private SlideToggle enabledToggle;
+
+    [Inject(UxmlName = R.UxmlNames.usePortAudioToggle)]
+    private Toggle usePortAudioToggle;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedContainer)]
     private VisualElement notConnectedContainer;
@@ -82,134 +86,279 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     [Inject(UxmlName = R.UxmlNames.recordingDeviceInactiveOverlay)]
     private VisualElement recordingDeviceInactiveOverlay;
-    
-    private SampleRatePickerControl sampleRatePickerControl;
-    private LabeledItemPickerControl<MicProfile> devicePickerControl;
-    private LabeledItemPickerControl<int> amplificationPickerControl;
-    private LabeledItemPickerControl<int> noiseSuppressionPickerControl;
-    private NumberPickerControl delayPickerControl;
-    private ColorPickerControl colorPickerControl;
 
-    private MicProfile SelectedMicProfile => devicePickerControl.SelectedItem;
+    [Inject(UxmlName = R.UxmlNames.noConnectedMicsContainer)]
+    private VisualElement noConnectedMicsContainer;
 
-    private IDisposable connectedClientReceivedMessageStreamDisposable;
+    [Inject(UxmlName = R.UxmlNames.micConfigurationContainer)]
+    private VisualElement micConfigurationContainer;
 
-    private readonly Subject<BeatPitchEvent> connectedClientBeatPitchEventStream = new();
-    public IObservable<BeatPitchEvent> ConnectedClientBeatPitchEventStream => connectedClientBeatPitchEventStream;
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
+    private Toggle playRecordedAudioToggle;
+
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioInfoContainer)]
+    private VisualElement playRecordedAudioInfoContainer;
+
+    [Inject(UxmlName = R.UxmlNames.micPlaybackVolumeChooser)]
+    private Chooser micPlaybackVolumeChooser;
+
+    private SampleRateChooserControl sampleRateChooserControl;
+    private LabeledChooserControl<MicProfile> deviceChooserControl;
+    private LabeledChooserControl<int> amplificationChooserControl;
+    private LabeledChooserControl<int> noiseSuppressionChooserControl;
+    private NumberChooserControl delayChooserControl;
+    private ColorChooserControl colorChooserControl;
+
+    private MicProfile SelectedMicProfile => deviceChooserControl.Selection;
+
+    private IDisposable companionClientReceivedMessageStreamDisposable;
+
+    private readonly Subject<BeatPitchEvent> companionClientBeatPitchEventStream = new();
+    public IObservable<BeatPitchEvent> CompanionClientBeatPitchEventStream => companionClientBeatPitchEventStream;
 
     protected override void Start()
     {
         base.Start();
-        
-        new AutoFitLabelControl(devicePicker.ItemLabel, 10, 15);
-        
-        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, CreateMicProfiles());
-        devicePickerControl.AutoSmallFont = false;
-        devicePickerControl.GetLabelTextFunction = item => item != null ? item.Name : "";
-        if (!TryReSelectLastMicProfile())
-        {
-            devicePickerControl.Selection.Value = devicePickerControl.Items[0];
-        }
-        devicePickerControl.Selection
-            .Subscribe(micProfile => settings.LastMicProfileNameInRecordingOptionsScene = micProfile?.Name);
 
-        amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationPicker, amplificationItems);
-        amplificationPickerControl.GetLabelTextFunction = item => item + " %";
-        noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionPicker, noiseSuppressionItems);
-        noiseSuppressionPickerControl.GetLabelTextFunction = item => item + " %";
-        delayPickerControl = new NumberPickerControl(delayPicker);
-        delayPickerControl.GetLabelTextFunction = item => item + " ms";
-        colorPickerControl = new ColorPickerControl(colorPicker, themeManager.GetMicrophoneColors());
-        sampleRatePickerControl = new SampleRatePickerControl(sampleRatePicker);
-        sampleRatePickerControl.GetLabelTextFunction = _ => GetSampleRateLabel();
+        List<MicProfile> micProfiles = CreateAndPersistMicProfiles();
+        UpdateNoConnectedMicsContainer(micProfiles);
+
+        new AutoFitLabelControl(deviceChooser.ItemLabel, 10, 15);
+
+        deviceChooserControl = new LabeledChooserControl<MicProfile>(deviceChooser, micProfiles,
+            item => item != null ? Translation.Of(item.GetDisplayNameWithChannel()) : Translation.Empty);
+        deviceChooserControl.AutoSmallFont = false;
+        if (!TryReSelectLastMicProfile()
+            && !deviceChooserControl.Items.IsNullOrEmpty())
+        {
+            deviceChooserControl.Selection = deviceChooserControl.Items[0];
+        }
+        deviceChooserControl.SelectionAsObservable.Subscribe(micProfile =>
+            {
+                if (micProfile == null)
+                {
+                    return;
+                }
+
+                settings.LastMicProfileNameInRecordingOptionsScene = micProfile.Name;
+                settings.LastMicProfileChannelIndexInRecordingOptionsScene = micProfile.ChannelIndex;
+            });
+
+        amplificationChooserControl = new LabeledChooserControl<int>(amplificationChooser, amplificationItems, item => Translation.Of(item + " %"));
+        noiseSuppressionChooserControl = new LabeledChooserControl<int>(noiseSuppressionChooser, noiseSuppressionItems, item => Translation.Of(item + " %"));
+        delayChooserControl = new NumberChooserControl(delayChooser);
+        delayChooserControl.GetLabelTextFunction = item => item + " ms";
+        colorChooserControl = new ColorChooserControl(colorChooser, themeManager.GetMicrophoneColors());
+        sampleRateChooserControl = new SampleRateChooserControl(sampleRateChooser, item => GetSampleRateLabel(item));
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(_ => DeleteSelectedRecordingDevice());
-        
-        devicePickerControl.Selection.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
-        amplificationPickerControl.Selection.Subscribe(newValue =>
+
+        // Select random color via context menu
+        VisualElement colorChooserColorElement = colorChooser.Q<VisualElement>(null, R_PlayShared.UssClasses.chooserItemLabel);
+        if (colorChooserColorElement != null)
         {
+            ContextMenuControl contextMenuControl = injector
+                .WithRootVisualElement(colorChooserColorElement)
+                .CreateAndInject<ContextMenuControl>();
+            contextMenuControl.FillContextMenuAction = contextMenuPopupControl =>
+            {
+                contextMenuPopupControl.AddButton(Translation.Get(R.Messages.options_recording_action_selectRandomColor),
+                    () => colorChooserControl.Selection = Colors.CreateRandomColor());
+            };
+        }
+
+        deviceChooserControl.SelectionAsObservable.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
+        amplificationChooserControl.SelectionAsObservable.Subscribe(newValue =>
+        {
+            if (SelectedMicProfile == null)
+            {
+                return;
+            }
             SelectedMicProfile.Amplification = newValue;
-            SendSelectedMicProfileToConnectedClient();
+            SendSelectedMicProfileToCompanionClient();
         });
-        noiseSuppressionPickerControl.Selection.Subscribe(newValue =>
+        noiseSuppressionChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
+            if (SelectedMicProfile == null)
+            {
+                return;
+            }
             SelectedMicProfile.NoiseSuppression = newValue;
-            SendSelectedMicProfileToConnectedClient();
+            SendSelectedMicProfileToCompanionClient();
         });
-        delayPickerControl.Selection.Subscribe(newValue =>
+        delayChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
+            if (SelectedMicProfile == null)
+            {
+                return;
+            }
             SelectedMicProfile.DelayInMillis = (int)newValue;
-            SendSelectedMicProfileToConnectedClient();
+            SendSelectedMicProfileToCompanionClient();
         });
-        colorPickerControl.Selection.Subscribe(newValue =>
+        colorChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
+            if (SelectedMicProfile == null)
+            {
+                return;
+            }
             SelectedMicProfile.Color = newValue;
-            SendSelectedMicProfileToConnectedClient();
+            SendSelectedMicProfileToCompanionClient();
         });
-        sampleRatePickerControl.Selection.Subscribe(newValue =>
+        sampleRateChooserControl.SelectionAsObservable.Subscribe(newValue =>
         {
+            if (SelectedMicProfile == null)
+            {
+                return;
+            }
             SelectedMicProfile.SampleRate = newValue;
-            SendSelectedMicProfileToConnectedClient();
+            SendSelectedMicProfileToCompanionClient();
         });
-        micPitchTracker.MicSampleRecorder.FinalSampleRate
+        micPitchTracker.FinalSampleRate
             .Subscribe(_ => UpdateSampleRateLabel())
             .AddTo(gameObject);
-        micPitchTracker.MicSampleRecorder.IsRecording
+        micPitchTracker.IsRecording
             .Subscribe(_ => UpdateSampleRateLabel())
             .AddTo(gameObject);
 
-        // Reselect recording device of connected client, when the client has now connected
-        serverSideConnectRequestManager.ClientConnectedEventStream
-            .Where(clientConnectedEvent => devicePickerControl.SelectedItem?.ConnectedClientId == clientConnectedEvent.ConnectedClientHandler.ClientId)
-            .Subscribe(newValue => OnRecordingDeviceSelected(devicePickerControl.SelectedItem))
+        // Update recording device of connected client, when the client (dis)connects
+        serverSideCompanionClientManager.ClientConnectionChangedEventStream
+            .Where(clientConnectedEvent => deviceChooserControl.Selection?.ConnectedClientId == clientConnectedEvent.CompanionClientHandler.ClientId)
+            .Subscribe(newValue => OnRecordingDeviceSelected(deviceChooserControl.Selection))
             .AddTo(gameObject);
 
-        serverSideConnectRequestManager.ClientConnectedEventStream
-            .Subscribe(UpdateMicProfileNames)
+        serverSideCompanionClientManager.CompanionClientMicProfileChangedEventStream
+            .Subscribe(OnCompanionClientMicProfileChanged)
+            .AddTo(gameObject);
+
+        micSampleRecorderManager.ConnectedMicDevicesChangesStream
+            .Subscribe(evt => OnConnectedMicDevicesChanged())
             .AddTo(gameObject);
 
         calibrateDelayButton.RegisterCallbackButtonTriggered(_ => calibrateMicDelayControl.StartCalibration());
         calibrateMicDelayControl.CalibrationResultEventStream
+            .ObserveOnMainThread()
             .Subscribe(calibrationResult =>
             {
                 if (calibrationResult.IsSuccess)
                 {
                     double medianValue = calibrationResult.DelaysInMilliseconds[calibrationResult.DelaysInMilliseconds.Count / 2];
-                    double roundedMedianValue = ((int)(medianValue / delayPickerControl.StepValue)) * delayPickerControl.StepValue;
-                    delayPickerControl.SelectItem(roundedMedianValue);
+                    double roundedMedianValue = ((int)(medianValue / delayChooserControl.StepValue)) * delayChooserControl.StepValue;
+                    delayChooserControl.Selection = roundedMedianValue;
                 }
                 else
                 {
-                    UiManager.CreateNotification(
-                        TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout));
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.options_delay_calibrate_timeout));
                 }
             });
+
+        // Use PortAudio
+        if (ApplicationUtils.CanUsePortAudio())
+        {
+            FieldBindingUtils.Bind(gameObject, usePortAudioToggle,
+                () => settings.PreferPortAudio,
+                preferPortAudio =>
+                {
+                    micPitchTracker.StopRecording();
+
+                    settings.PreferPortAudio = preferPortAudio;
+                    ApplicationUtils.SetUsePortAudio(preferPortAudio);
+
+                    Debug.Log($"UsePortAudio: {IMicrophoneAdapter.Instance.UsePortAudio}");
+
+                    UpdateRecordingDevices();
+                });
+        }
+        else
+        {
+            usePortAudioToggle.HideByDisplay();
+        }
+
+        // Play recorded audio
+        FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
+            () => settings.PlayRecordedAudio,
+            newValue => settings.PlayRecordedAudio = newValue);
+
+        PercentNumberChooserControl micPlaybackVolumeChooserControl = new(micPlaybackVolumeChooser);
+        micPlaybackVolumeChooserControl.Bind(
+            () => settings.MicrophonePlaybackVolumePercent,
+            newValue => settings.MicrophonePlaybackVolumePercent = (int)newValue);
+
+        settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
+            .Subscribe(newValue => micPlaybackVolumeChooser.SetVisibleByDisplay(newValue))
+            .AddTo(gameObject);
     }
 
-    private void Update()
+    private void OnConnectedMicDevicesChanged()
     {
-        // Read messages from client since last time the reader thread was active.
-        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
-        connectedClientHandler?.ReadMessagesFromClient();
+        UpdateRecordingDevices();
+    }
+
+    private void UpdateRecordingDevices()
+    {
+        micPitchTracker.StopRecording();
+
+        List<MicProfile> micProfiles = CreateAndPersistMicProfiles();
+        MicProfile lastMicProfile = SelectedMicProfile;
+        deviceChooserControl.Items = micProfiles;
+        Debug.Log($"MicProfiles: {deviceChooserControl.Items.JoinWith(", ")}");
+        if (deviceChooserControl.Items.Count > 0)
+        {
+            MicProfile nextSelectedMicProfile = deviceChooserControl.Items[0];
+
+            // Try to restore selection
+            if (lastMicProfile != null)
+            {
+                MicProfile matchingMicProfile = deviceChooserControl.Items.FirstOrDefault(micProfile =>
+                    micProfile.Name == lastMicProfile.Name
+                    && micProfile.ChannelIndex == lastMicProfile.ChannelIndex);
+                if (matchingMicProfile != null)
+                {
+                    nextSelectedMicProfile = matchingMicProfile;
+                }
+            }
+
+            deviceChooserControl.Selection = nextSelectedMicProfile;
+            deviceChooserControl.UpdateLabelText();
+
+            OnRecordingDeviceSelected(nextSelectedMicProfile);
+        }
+
+        UpdateNoConnectedMicsContainer(micProfiles);
+    }
+
+    private void UpdateNoConnectedMicsContainer(List<MicProfile> micProfiles)
+    {
+        bool noMics = micProfiles.IsNullOrEmpty();
+        noConnectedMicsContainer.SetVisibleByDisplay(noMics);
+        micConfigurationContainer.SetVisibleByDisplay(!noMics);
+
+        if (noMics)
+        {
+            HighlightHelpIcon();
+        }
     }
 
     private void UpdateSampleRateLabel()
     {
-        sampleRatePickerControl.UpdateLabelText();
+        sampleRateChooserControl.UpdateLabelText();
     }
 
-    private string GetSampleRateLabel()
+    private Translation GetSampleRateLabel(int item)
     {
-        int item = sampleRatePickerControl.SelectedItem;
+        if (SelectedMicProfile == null)
+        {
+            return Translation.Empty;
+        }
+
         if (item <= 0)
         {
             // When "auto" is selected, then also show the automatically used sample rate.
-            string sampleRateText = SelectedMicProfile.IsInputFromConnectedClient
+            string sampleRateSuffix = SelectedMicProfile.IsInputFromConnectedClient
                 ? ""
-                : $"\n({micPitchTracker.MicSampleRecorder.FinalSampleRate.Value} Hz)";
-            return TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto) + sampleRateText;
+                : $"\n({micPitchTracker.FinalSampleRate.Value} Hz)";
+            return Translation.Of(Translation.Get(R.Messages.options_sampleRate_auto) + sampleRateSuffix);
         }
-        return $"{item} Hz";
+        return Translation.Of($"{item} Hz");
     }
 
     private bool TryReSelectLastMicProfile()
@@ -219,14 +368,15 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             return false;
         }
 
-        MicProfile lastMicProfile = devicePickerControl.Items
-            .FirstOrDefault(micProfile => micProfile.Name == settings.LastMicProfileNameInRecordingOptionsScene);
+        MicProfile lastMicProfile = deviceChooserControl.Items
+            .FirstOrDefault(micProfile => micProfile.Name == settings.LastMicProfileNameInRecordingOptionsScene
+                                          && micProfile.ChannelIndex == settings.LastMicProfileChannelIndexInRecordingOptionsScene);
         if (lastMicProfile == null)
         {
             return false;
         }
 
-        devicePickerControl.SelectItem(lastMicProfile);
+        deviceChooserControl.Selection = lastMicProfile;
         return true;
     }
 
@@ -240,27 +390,38 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         if (isEnabled)
         {
             settings.MicProfiles.AddIfNotContains(SelectedMicProfile);
+            if (!micPitchTracker.IsRecording.Value)
+            {
+                micPitchTracker.StartRecording();
+            }
         }
-        
+        else
+        {
+            if (micPitchTracker.IsRecording.Value)
+            {
+                micPitchTracker.StopRecording();
+            }
+        }
+
         UpdateRecordingDeviceInactiveOverlay();
     }
 
-    private IConnectedClientHandler GetConnectedClientHandler()
+    private ICompanionClientHandler GetCompanionClientHandler()
     {
         if (SelectedMicProfile == null
             || SelectedMicProfile.ConnectedClientId.IsNullOrEmpty()
-            || !serverSideConnectRequestManager.TryGetConnectedClientHandler(SelectedMicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
+            || !serverSideCompanionClientManager.TryGet(SelectedMicProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
         {
             return null;
         }
 
-        return connectedClientHandler;
+        return companionClientHandler;
     }
 
-    private void SendSelectedMicProfileToConnectedClient()
+    private void SendSelectedMicProfileToCompanionClient()
     {
-        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
-        connectedClientHandler?.SendMessageToClient(new MicProfileMessageDto(SelectedMicProfile));
+        ICompanionClientHandler companionClientHandler = GetCompanionClientHandler();
+        companionClientHandler?.SendMessageToClient(new MicProfileMessageDto(SelectedMicProfile));
     }
 
     private void OnRecordingDeviceSelected(MicProfile micProfile)
@@ -270,29 +431,35 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             return;
         }
 
-        amplificationPickerControl.TrySelectItem(micProfile.Amplification);
-        noiseSuppressionPickerControl.TrySelectItem(micProfile.NoiseSuppression);
-        delayPickerControl.SelectItem(micProfile.DelayInMillis);
-        colorPickerControl.TrySelectItem(micProfile.Color);
-        sampleRatePickerControl.TrySelectItem(micProfile.SampleRate);
+        micPitchTracker.MicProfile = micProfile;
+        amplificationChooserControl.TrySetSelection(micProfile.Amplification);
+        noiseSuppressionChooserControl.TrySetSelection(micProfile.NoiseSuppression);
+        delayChooserControl.Selection = micProfile.DelayInMillis;
 
-        enabledToggle.value = micProfile.IsEnabled;
-        UpdateRecordingDeviceInactiveOverlay();
-        
-        if (micProfile.IsConnected(serverSideConnectRequestManager))
+        Color32 micProfileColor = micProfile.Color
+            .OrIfDefault(colorChooserControl.Items.FirstOrDefault());
+        if (colorChooserControl.Items.Contains(micProfileColor))
         {
-            notConnectedContainer.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
-            deleteButton.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
+            colorChooserControl.TrySetSelection(micProfileColor);
         }
         else
         {
-            notConnectedContainer.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
-            deleteButton.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
+            colorChooserControl.Selection = micProfile.Color;
         }
 
+        sampleRateChooserControl.TrySetSelection(micProfile.SampleRate);
+
+        enabledToggle.value = micProfile.IsEnabled;
+        UpdateRecordingDeviceInactiveOverlay();
+
+        bool isConnected = micProfile.IsConnected(serverSideCompanionClientManager);
+        notConnectedContainer.SetVisibleByDisplay(!isConnected);
+        deleteButton.SetVisibleByDisplay(!isConnected);
+
         micVisualizer.SetMicProfile(micProfile);
-        calibrateMicDelayControl.MicProfile = micProfile;
-        noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
+        noteLabel.SetTranslatedText(Translation.Get(R.Messages.options_note, "value", "?"));
+
+        // playRecordedAudioInfoContainer.SetVisibleByDisplay(micProfile.IsInputFromConnectedClient);
 
         UpdateSampleRateLabel();
         InitPitchDetectionFromConnectionClient();
@@ -300,6 +467,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     private void UpdateRecordingDeviceInactiveOverlay()
     {
+        recordingDeviceInactiveOverlay.ShowByDisplay();
         recordingDeviceInactiveOverlay.style.backgroundColor = enabledToggle.value
             ? new StyleColor(Color.clear)
             : new StyleColor(new Color(0, 0, 0, 0.5f));
@@ -312,138 +480,64 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             return;
         }
 
-        if (!SelectedMicProfile.IsConnected(serverSideConnectRequestManager))
+        if (!SelectedMicProfile.IsConnected(serverSideCompanionClientManager))
         {
             settings.MicProfiles.Remove(SelectedMicProfile);
-            devicePickerControl.Items = CreateMicProfiles();
-            if (devicePickerControl.Items.Count > 0)
-            {
-                devicePickerControl.Selection.Value = devicePickerControl.Items[0];
-            }
+            UpdateRecordingDevices();
         }
     }
 
-    public void UpdateTranslation()
+    private List<MicProfile> CreateAndPersistMicProfiles()
     {
-        deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
-        colorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_color);
-        delayPicker.Label = TranslationManager.GetTranslation(R.Messages.options_delay);
-        amplificationPicker.Label = TranslationManager.GetTranslation(R.Messages.options_amplification);
-        noiseSuppressionPicker.Label = TranslationManager.GetTranslation(R.Messages.options_noiseSuppression);
-        sampleRatePicker.Label = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
-        noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
-        calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate);
-        notConnectedLabel.text = TranslationManager.GetTranslation(R.Messages.options_deviceNotConnected);
+        return MicProfileUtils.CreateAndPersistMicProfiles(
+            settings,
+            themeManager,
+            serverSideCompanionClientManager);
     }
 
-    private List<MicProfile> CreateMicProfiles()
+    private void OnCompanionClientMicProfileChanged(MicProfile micProfile)
     {
-        // Create list of connected and loaded microphones without duplicates.
-        // A loaded microphone might have been created with hardware that is not connected now.
-        List<string> connectedMicNames = Microphone.devices.ToList();
-        List<MicProfile> loadedMicProfiles = settings.MicProfiles;
-        List<MicProfile> micProfiles = new(loadedMicProfiles);
-        List<IConnectedClientHandler> connectedClientHandlers = serverSideConnectRequestManager.GetAllConnectedClientHandlers();
-
-        // Create mic profiles for connected microphones that are not yet in the list
-        foreach (string connectedMicName in connectedMicNames)
+        if (deviceChooserControl.Selection == micProfile)
         {
-            bool alreadyInList = micProfiles.AnyMatch(it => it.Name == connectedMicName && !it.IsInputFromConnectedClient);
-            if (!alreadyInList)
-            {
-                MicProfile micProfile = new(connectedMicName);
-                micProfiles.Add(micProfile);
-            }
-        }
-
-        // Create mic profiles for connected companion apps that are not yet in the list
-        foreach (IConnectedClientHandler connectedClientHandler in connectedClientHandlers)
-        {
-            bool alreadyInList = micProfiles.AnyMatch(it => it.ConnectedClientId == connectedClientHandler.ClientId && it.IsInputFromConnectedClient);
-            if (!alreadyInList)
-            {
-                MicProfile micProfile = new(connectedClientHandler.ClientName, connectedClientHandler.ClientId);
-                micProfiles.Add(micProfile);
-            }
-        }
-
-        micProfiles.Sort(MicProfile.compareByName);
-
-        return micProfiles;
-    }
-
-    public void UpdateMicProfileNames(ClientConnectionEvent clientConnectionEvent)
-    {
-        if (clientConnectionEvent.IsConnected)
-        {
-            devicePickerControl.Items.ForEach(micProfile => UpdateMicProfileName(clientConnectionEvent, micProfile));
-        }
-        devicePickerControl.UpdateLabelText();
-    }
-
-    private void UpdateMicProfileName(ClientConnectionEvent clientConnectionEvent, MicProfile micProfile)
-    {
-        if (micProfile.IsInputFromConnectedClient
-            && micProfile.ConnectedClientId == clientConnectionEvent.ConnectedClientHandler.ClientId)
-        {
-            micProfile.Name = clientConnectionEvent.ConnectedClientHandler.ClientName;
-
-            if (devicePickerControl.SelectedItem == micProfile)
-            {
-                devicePickerControl.UpdateLabelText();
-            }
+            deviceChooserControl.UpdateLabelText();
         }
     }
 
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
-    {
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelay_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelay) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelayCalibration_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelayCalibration) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_amplification_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_amplification) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_noiseSuppression_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_noiseSuppression) },
-            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate_title),
-                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate) },
-        };
-        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_title),
-            titleToContentMap);
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToConfigureMicsAndSpeaker)));
-        return helpDialogControl;
-    }
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToConfigureMicsAndSpeaker);
 
     private void InitPitchDetectionFromConnectionClient()
     {
-        if (connectedClientReceivedMessageStreamDisposable != null)
+        if (companionClientReceivedMessageStreamDisposable != null)
         {
-            connectedClientReceivedMessageStreamDisposable.Dispose();
-            connectedClientReceivedMessageStreamDisposable = null;
+            companionClientReceivedMessageStreamDisposable.Dispose();
+            companionClientReceivedMessageStreamDisposable = null;
         }
 
         if (SelectedMicProfile == null
             || !SelectedMicProfile.IsInputFromConnectedClient
-            || !serverSideConnectRequestManager.TryGetConnectedClientHandler(SelectedMicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
+            || !serverSideCompanionClientManager.TryGet(SelectedMicProfile.ConnectedClientId, out ICompanionClientHandler companionClientHandler))
         {
             return;
         }
 
-        connectedClientReceivedMessageStreamDisposable = connectedClientHandler.ReceivedMessageStream
-            .ObserveOnMainThread()
+        companionClientReceivedMessageStreamDisposable = companionClientHandler.ReceivedMessageStream
             .Subscribe(dto =>
             {
                 if (dto is BeatPitchEventDto beatPitchEventDto)
                 {
-                    connectedClientBeatPitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
+                    FireBeatPitchEvent(beatPitchEventDto);
+                }
+                else if (dto is BeatPitchEventsDto beatPitchEventsDto)
+                {
+                    beatPitchEventsDto.BeatPitchEvents.ForEach(beatPitchEventDto => FireBeatPitchEvent(beatPitchEventDto));
                 }
             })
             .AddTo(gameObject);
+    }
+
+    private void FireBeatPitchEvent(BeatPitchEventDto beatPitchEventDto)
+    {
+        companionClientBeatPitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat, beatPitchEventDto.Frequency));
     }
 
     public List<IBinding> GetBindings()
@@ -452,6 +546,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(micVisualizer);
+        bb.BindExistingInstance(micPitchTracker);
         bb.BindExistingInstance(calibrateMicDelayControl);
         return bb.GetBindings();
     }

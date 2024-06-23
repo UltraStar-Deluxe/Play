@@ -1,6 +1,5 @@
-﻿using System.Text.RegularExpressions;
-using UniInject;
-using UnityEngine;
+﻿using UniInject;
+using UniRx;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
@@ -28,6 +27,9 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
 
     public virtual void OnInjectionFinished()
     {
+        textField.DisableParseEscapeSequences();
+        textField.selectAllOnFocus = false;
+        textField.selectAllOnMouseUp = false;
         initialText = GetInitialText();
         textField.value = initialText;
         textField.Focus();
@@ -36,7 +38,7 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
 
     private void OnTextFieldValueChanged(string newInputFieldText)
     {
-        string visibleWhitespaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(newInputFieldText);
+        string visibleWhitespaceText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(newInputFieldText);
         if (textField.value != visibleWhitespaceText)
         {
             textField.value = visibleWhitespaceText;
@@ -52,7 +54,7 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
 
     public void SubmitAndCloseLyricsDialog()
     {
-        string newText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(textField.value);
+        string newText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(textField.value);
         ApplyNewText(newText);
         CloseLyricsDialog();
     }
@@ -63,7 +65,10 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
         songEditorSceneControl.HideEditLyricsPopup();
         if (textField.focusController.focusedElement == textField)
         {
+            // Move focus away
             textField.Blur();
+            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+                () => textField.GetRootVisualElement().Q<Button>().Focus()));
         }
     }
 

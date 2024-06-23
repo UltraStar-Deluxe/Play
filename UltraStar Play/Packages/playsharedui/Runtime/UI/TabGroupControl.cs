@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using UniRx;
 using UnityEngine.UIElements;
 
 /**
@@ -12,6 +14,9 @@ public class TabGroupControl
 
     public bool IsAnyContainerVisible => buttonToContainerMap.Values.AnyMatch(it => it.IsVisibleByDisplay());
     public bool AllowNoContainerVisible { get; set; }
+
+    private readonly Subject<VisualElement> containerBecameVisibleEventStream = new();
+    public IObservable<VisualElement> ContainerBecameVisibleEventStream => containerBecameVisibleEventStream;
 
     public void AddTabGroupButton(Button button, VisualElement controlledContainer)
     {
@@ -58,6 +63,8 @@ public class TabGroupControl
                         toggleButton.SetActive(true);
                     }
                 });
+            
+            containerBecameVisibleEventStream.OnNext(controlledContainer);
         }
 
         // Hide others

@@ -1,123 +1,117 @@
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http.Headers;
-using PrimeInputActions;
-using ProTrans;
 using UniInject;
-using UniRx;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
+public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
     [Inject]
     private ThemeManager themeManager;
 
-    [Inject(UxmlName = R.UxmlNames.themePicker)]
-    private ItemPicker themePicker;
+    [Inject(UxmlName = R.UxmlNames.themeChooser)]
+    private Chooser themeChooser;
 
-    [Inject(UxmlName = R.UxmlNames.noteDisplayModePicker)]
-    private ItemPicker noteDisplayModePicker;
+    [Inject(UxmlName = R.UxmlNames.imageAsCursorToggle)]
+    private Toggle imageAsCursorToggle;
 
-    [Inject(UxmlName = R.UxmlNames.lyricsOnNotesPicker)]
-    private ItemPicker lyricsOnNotesPicker;
+    [Inject(UxmlName = R.UxmlNames.sceneChangeAnimationChooser)]
+    private Chooser sceneChangeAnimationChooser;
 
-    [Inject(UxmlName = R.UxmlNames.staticLyricsPicker)]
-    private ItemPicker staticLyricsPicker;
+    [Inject(UxmlName = R.UxmlNames.sceneChangeDurationChooser)]
+    private Chooser sceneChangeDurationChooser;
 
-    [Inject(UxmlName = R.UxmlNames.pitchIndicatorPicker)]
-    private ItemPicker pitchIndicatorPicker;
+    [Inject(UxmlName = R.UxmlNames.backgroundLightChooser)]
+    private Chooser backgroundLightChooser;
 
-    [Inject(UxmlName = R.UxmlNames.imageAsCursorPicker)]
-    private ItemPicker imageAsCursorPicker;
+    [Inject(UxmlName = R.UxmlNames.showScrollBarInSongSelectToggle)]
+    private Toggle showScrollBarInSongSelectToggle;
 
-    [Inject(UxmlName = R.UxmlNames.animateSceneChangePicker)]
-    private ItemPicker animateSceneChangePicker;
+    [Inject(UxmlName = R.UxmlNames.showSongIndexInSongSelectToggle)]
+    private Toggle showSongIndexInSongSelectToggle;
 
-    [Inject(UxmlName = R.UxmlNames.showPlayerNamePicker)]
-    private ItemPicker showPlayerNamePicker;
-    
-    [Inject(UxmlName = R.UxmlNames.showScoreNumberPicker)]
-    private ItemPicker showScoreNumberPicker;
-    
+    [Inject(UxmlName = R.UxmlNames.navigateFoldersInSongSelectToggle)]
+    private Toggle navigateFoldersInSongSelectToggle;
+
+    [Inject(UxmlName = R.UxmlNames.songBackgroundScaleModeChooser)]
+    private Chooser songBackgroundScaleModeChooser;
+
+    [Inject(UxmlName = R.UxmlNames.previewFadeInDurationChooser)]
+    private Chooser previewFadeInDurationChooser;
+
     [Inject]
     private UiManager uiManager;
+
+    [Inject]
+    private BackgroundLightManager backgroundLightManager;
 
     protected override void Start()
     {
         base.Start();
-        
-        new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
-            .Bind(() => settings.GraphicSettings.noteDisplayMode,
-                newValue => settings.GraphicSettings.noteDisplayMode = newValue);
 
-        new BoolPickerControl(lyricsOnNotesPicker)
-            .Bind(() => settings.GraphicSettings.showLyricsOnNotes,
-                newValue => settings.GraphicSettings.showLyricsOnNotes = newValue);
+        FieldBindingUtils.Bind(imageAsCursorToggle,
+            () => settings.UseImageAsCursor,
+            newValue => settings.UseImageAsCursor = newValue);
 
-        new BoolPickerControl(staticLyricsPicker)
-            .Bind(() => settings.GraphicSettings.showStaticLyrics,
-                newValue => settings.GraphicSettings.showStaticLyrics = newValue);
+        new EnumChooserControl<ESceneChangeAnimation>(sceneChangeAnimationChooser)
+            .Bind(() => settings.SceneChangeAnimation,
+                newValue => settings.SceneChangeAnimation = newValue);
 
-        new BoolPickerControl(pitchIndicatorPicker)
-            .Bind(() => settings.GraphicSettings.showPitchIndicator,
-                newValue => settings.GraphicSettings.showPitchIndicator = newValue);
+        FieldBindingUtils.Bind(showScrollBarInSongSelectToggle,
+            () => settings.ShowScrollBarInSongSelect,
+            newValue => settings.ShowScrollBarInSongSelect = newValue);
 
-        new BoolPickerControl(imageAsCursorPicker)
-            .Bind(() => settings.GraphicSettings.useImageAsCursor,
-                newValue => settings.GraphicSettings.useImageAsCursor = newValue);
+        FieldBindingUtils.Bind(showSongIndexInSongSelectToggle,
+            () => settings.ShowSongIndexInSongSelect,
+            newValue => settings.ShowSongIndexInSongSelect = newValue);
 
-        new BoolPickerControl(animateSceneChangePicker)
-            .Bind(() => settings.GraphicSettings.AnimateSceneChange,
-                newValue => settings.GraphicSettings.AnimateSceneChange = newValue);
+        FieldBindingUtils.Bind(navigateFoldersInSongSelectToggle,
+            () => settings.NavigateByFoldersInSongSelect,
+            newValue => settings.NavigateByFoldersInSongSelect = newValue);
 
-        new BoolPickerControl(showPlayerNamePicker)
-            .Bind(() => settings.GraphicSettings.showPlayerNames,
-                newValue => settings.GraphicSettings.showPlayerNames = newValue);
-        
-        new BoolPickerControl(showScoreNumberPicker)
-            .Bind(() => settings.GraphicSettings.showScoreNumbers,
-                newValue => settings.GraphicSettings.showScoreNumbers = newValue);
-        
+        LabeledChooserControl<float> audioPreviewFadeInDurationChooserControl = new(previewFadeInDurationChooser,
+            NumberUtils.CreateFloatList(0.5f, 5f, 0.5f),
+            newValue => Translation.Of($"{newValue.ToStringInvariantCulture("0.00")} s"));
+        audioPreviewFadeInDurationChooserControl.Bind(() => settings.PreviewFadeInDurationInSeconds,
+            newValue => settings.PreviewFadeInDurationInSeconds = newValue);
+
+        EnumChooserControl<ESongBackgroundScaleMode> songBackgroundScaleModeChooserControl = new(songBackgroundScaleModeChooser);
+        songBackgroundScaleModeChooserControl.Bind(() => settings.SongBackgroundScaleMode,
+            newValue => settings.SongBackgroundScaleMode = newValue);
+
+        LabeledChooserControl<float> sceneChangeDurationChooserControl = new(sceneChangeDurationChooser,
+            NumberUtils.CreateFloatList(0, 0.9f, 0.05f),
+            newValue => Translation.Of($"{newValue.ToStringInvariantCulture("0.00")} s"));
+        sceneChangeDurationChooserControl.Bind(() => settings.SceneChangeDurationInSeconds,
+                newValue => settings.SceneChangeDurationInSeconds = newValue);
+
+        new LabeledChooserControl<int>(backgroundLightChooser,
+                NumberUtils.CreateIntList(0, backgroundLightManager.BackgroundLightInstancesCount),
+                item => Translation.Of(item.ToString()))
+            .Bind(() => settings.BackgroundLightIndex,
+                newValue => settings.BackgroundLightIndex = newValue);
+
         // Load available themes:
         List<ThemeMeta> themeMetas = themeManager.GetThemeMetas();
-        LabeledItemPickerControl<ThemeMeta> themePickerControl = new(themePicker, themeMetas);
-        themePickerControl.GetLabelTextFunction = themeMeta => ThemeMetaUtils.GetDisplayName(themeMeta);
-        themePickerControl.Bind(
+        LabeledChooserControl<ThemeMeta> themeChooserControl = new(themeChooser, themeMetas,
+            themeMeta => Translation.Of(ThemeMetaUtils.GetDisplayName(themeMeta)));
+        themeChooserControl.Bind(
             () => themeManager.GetCurrentTheme(),
-            newValue => themeManager.SetCurrentTheme(newValue));
+            newValue => ChangeTheme(newValue));
     }
 
-    public void UpdateTranslation()
+    private void ChangeTheme(ThemeMeta themeMeta)
     {
-        themePicker.Label = TranslationManager.GetTranslation(R.Messages.options_design_theme);
-        noteDisplayModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
-        staticLyricsPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showStaticLyrics);
-        lyricsOnNotesPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showLyricsOnNotes);
-        pitchIndicatorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showPitchIndicator);
-        imageAsCursorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_useImageAsCursor);
-    }
-
-    public override bool HasHelpDialog => true;
-    public override MessageDialogControl CreateHelpDialogControl()
-    {
-        Dictionary<string, string> titleToContentMap = new()
+        if (themeManager.GetCurrentTheme() == themeMeta)
         {
-            { TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes_title),
-                TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes,
-                    "path", ApplicationUtils.ReplacePathsWithDisplayString(ThemeManager.GetAbsoluteUserDefinedThemesFolder())) },
-        };
-         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_title),
-            titleToContentMap);
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddCustomThemes)));
-        helpDialogControl.AddButton("Themes Folder",
-            _ => ApplicationUtils.OpenDirectory(ThemeManager.GetAbsoluteUserDefinedThemesFolder()));
-        return helpDialogControl;
+            return;
+        }
+        ApplyThemeStyleUtils.ClearCache();
+        themeManager.SetCurrentTheme(themeMeta);
     }
+
+    public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=Theme";
+
+    public override string HelpUri => Translation.Get(R.Messages.uri_howToThemes);
 }

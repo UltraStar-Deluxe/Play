@@ -1,136 +1,133 @@
-﻿using Unity.Collections;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 /**
  * An element that displays progress inside a partially filled circle
  */
-// https://docs.unity3d.com/Manual/UIE-radial-progress.html
 public class RadialProgressBar : VisualElement
 {
+    public new class UxmlFactory : UxmlFactory<RadialProgressBar, UxmlTraits> { }
     public new class UxmlTraits : VisualElement.UxmlTraits
     {
-        // The progress property is exposed to UXML.
-        UxmlFloatAttributeDescription m_ProgressAttribute = new UxmlFloatAttributeDescription() { name = "progress" };
-        UxmlBoolAttributeDescription m_ShowLabelAttribute = new UxmlBoolAttributeDescription() { name = "show-label", defaultValue = true};
+        UxmlFloatAttributeDescription Progress = new UxmlFloatAttributeDescription() { name = "progress", defaultValue = 0 };
+        UxmlBoolAttributeDescription ShowLabel = new UxmlBoolAttributeDescription() { name = "show-label", defaultValue = false };
 
-        // The Init method is used to assign to the C# progress property from the value of the progress UXML
-        // attribute.
         public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
         {
             base.Init(ve, bag, cc);
 
             RadialProgressBar target = ve as RadialProgressBar;
-            target.progress = m_ProgressAttribute.GetValueFromBag(bag, cc);
-            target.showLabel = m_ShowLabelAttribute.GetValueFromBag(bag, cc);
+            target.ProgressInPercent = Progress.GetValueFromBag(bag, cc);
+            target.ShowLabel = ShowLabel.GetValueFromBag(bag, cc);
         }
     }
 
-    // A Factory class is needed to expose this control to UXML.
-    public new class UxmlFactory : UxmlFactory<RadialProgressBar, UxmlTraits> { }
-
     // These are USS class names for the control overall and the label.
-    public static readonly string ussClassName = "radial-progress-bar";
-    public static readonly string ussLabelClassName = "radial-progress-bar__label";
+    private static readonly string ussClassName = "radial-progress-bar";
+    private static readonly string ussLabelClassName = "radial-progress-bar__label";
 
     // These objects allow C# code to access custom USS properties.
-    static CustomStyleProperty<Color> s_TrackColor = new("--track-color");
-    static CustomStyleProperty<Color> s_ProgressColor = new("--progress-color");
-    static CustomStyleProperty<float> s_BorderSize = new("--border-size");
-
-    // These are the meshes this control uses.
-    EllipseMesh m_TrackMesh;
-    EllipseMesh m_ProgressMesh;
+    static readonly CustomStyleProperty<Color> trackColorStyle = new("--track-color");
+    static readonly CustomStyleProperty<Color> progressColorStyle = new("--progress-color");
+    static readonly CustomStyleProperty<float> borderSizeStyle = new("--border-size");
+    static readonly CustomStyleProperty<bool> roundLineCapStyle = new("--round-line-cap");
 
     // This is the label that displays the percentage.
-    Label m_Label;
-
-    // This is the number of outer vertices to generate the circle.
-    const int k_NumSteps = 200;
-
-    // This is the number that the Label displays as a percentage.
-    float m_Progress;
+    private Label labelElement;
 
     /// <summary>
     /// A value between 0 and 100
     /// </summary>
-    public float progress
+    private float progressInPercent;
+    public float ProgressInPercent
     {
         // The progress property is exposed in C#.
-        get => m_Progress;
+        get => progressInPercent;
         set
         {
             // Whenever the progress property changes, MarkDirtyRepaint() is named. This causes a call to the
             // generateVisualContents callback.
-            m_Progress = value;
-            m_Label.text = Mathf.Clamp(Mathf.Round(value), 0, 100) + "%";
+            progressInPercent = value;
+            labelElement.text = Mathf.Clamp(Mathf.Round(value), 0, 100) + "%";
             MarkDirtyRepaint();
         }
     }
 
-    private bool overwriteBorderSize;
-    public float borderSize
+    public float Value
     {
-        get => m_TrackMesh.borderSize;
+        get => ProgressInPercent;
+        set => ProgressInPercent = value;
+    }
+
+    private bool overwriteStrokeWidth;
+    private float strokeWidth;
+    public float StrokeWidth
+    {
+        get => strokeWidth;
         set
         {
-            overwriteBorderSize = true;
-            m_TrackMesh.borderSize = value;
-            m_ProgressMesh.borderSize = value;
+            overwriteStrokeWidth = true;
+            strokeWidth = value;
             MarkDirtyRepaint();
         }
     }
-    
-    public bool showLabel
+
+    public bool ShowLabel
     {
-        get => m_Label.IsVisibleByDisplay();
-        set => m_Label.SetVisibleByDisplay(value);
+        get => labelElement.IsVisibleByDisplay();
+        set => labelElement.SetVisibleByDisplay(value);
     }
 
-    public float value
+    private bool overwriteLineCap;
+    private LineCap lineCap;
+    public LineCap LineCap
     {
-        get => progress;
-        set => progress = value;
+        get => lineCap;
+        set
+        {
+            overwriteLineCap = true;
+            lineCap = value;
+            MarkDirtyRepaint();
+        }
     }
 
     private bool overwriteProgressColor;
-    public Color progressColor
+    private Color progressColor;
+    public Color ProgressColor
     {
-        get => m_ProgressMesh.color;
+        get => progressColor;
         set
         {
             overwriteProgressColor = true;
-            m_ProgressMesh.color = value;
+            progressColor = value;
             MarkDirtyRepaint();
         }
     }
-    
+
     private bool overwriteTrackColor;
-    public Color trackColor
+    private Color trackColor;
+    public Color TrackColor
     {
-        get => m_TrackMesh.color;
+        get => trackColor;
         set
         {
             overwriteTrackColor = true;
-            m_TrackMesh.color = value;
+            trackColor = value;
             MarkDirtyRepaint();
         }
     }
-    
+
     public readonly float highValue = 100;
     public readonly float lowValue = 0;
-    
+
     // This default constructor is RadialProgressBar's only constructor.
     public RadialProgressBar()
     {
         // Create a Label, add a USS class name, and add it to this visual tree.
-        m_Label = new Label();
-        m_Label.AddToClassList(ussLabelClassName);
-        Add(m_Label);
-
-        // Create meshes for the track and the progress.
-        m_ProgressMesh = new EllipseMesh(k_NumSteps);
-        m_TrackMesh = new EllipseMesh(k_NumSteps);
+        labelElement = new Label();
+        labelElement.AddToClassList(ussLabelClassName);
+        Add(labelElement);
 
         // Add the USS class name for the overall control.
         AddToClassList(ussClassName);
@@ -139,9 +136,9 @@ public class RadialProgressBar : VisualElement
         RegisterCallback<CustomStyleResolvedEvent>(evt => CustomStylesResolved(evt));
 
         // Register a callback to generate the visual content of the control.
-        generateVisualContent += context => GenerateVisualContent(context);
+        generateVisualContent = OnGenerateVisualContent;
 
-        progress = 0.0f;
+        ProgressInPercent = 0.0f;
     }
 
     static void CustomStylesResolved(CustomStyleResolvedEvent evt)
@@ -155,92 +152,73 @@ public class RadialProgressBar : VisualElement
     void UpdateCustomStyles()
     {
         if (!overwriteProgressColor
-            && customStyle.TryGetValue(s_ProgressColor, out Color newProgressColor))
+            && customStyle.TryGetValue(progressColorStyle, out Color newProgressColor))
         {
-            m_ProgressMesh.color = newProgressColor;
+            progressColor = newProgressColor;
         }
 
         if (!overwriteTrackColor
-            && customStyle.TryGetValue(s_TrackColor, out Color newTrackColor))
+            && customStyle.TryGetValue(trackColorStyle, out Color newTrackColor))
         {
-            m_TrackMesh.color = newTrackColor;
+            trackColor = newTrackColor;
         }
 
-        if (!overwriteBorderSize
-            && customStyle.TryGetValue(s_BorderSize, out float newBorderSize))
+        if (!overwriteStrokeWidth
+            && customStyle.TryGetValue(borderSizeStyle, out float newBorderSize))
         {
-            m_TrackMesh.borderSize = newBorderSize;
-            m_ProgressMesh.borderSize = newBorderSize;
+            strokeWidth = newBorderSize;
         }
-        
-        if (m_ProgressMesh.isDirty || m_TrackMesh.isDirty)
+
+        if (!overwriteLineCap
+            && customStyle.TryGetValue(roundLineCapStyle, out bool newRoundLineCap))
         {
-            MarkDirtyRepaint();
+            lineCap = newRoundLineCap ? LineCap.Round : LineCap.Butt;
         }
+
+        MarkDirtyRepaint();
     }
 
-    // The GenerateVisualContent() callback method calls DrawMeshes().
-    static void GenerateVisualContent(MeshGenerationContext context)
+    void OnGenerateVisualContent(MeshGenerationContext mgc)
     {
-        RadialProgressBar element = (RadialProgressBar)context.visualElement;
-        element.DrawMeshes(context);
-    }
-
-    // DrawMeshes() uses the EllipseMesh utility class to generate an array of vertices and indices, for both the
-    // "track" ring (in grey) and the progress ring (in green). It then passes the geometry to the MeshWriteData
-    // object, as returned by the MeshGenerationContext.Allocate() method. For the "progress" mesh, only a slice of
-    // the index arrays is used to progressively reveal parts of the mesh.
-    void DrawMeshes(MeshGenerationContext context)
-    {
-        float outerWidth = contentRect.width;
-        float outerHeight = contentRect.height;
-        float halfWidth = outerWidth * 0.5f;
-        float halfHeight = outerHeight * 0.5f;
-
-        if (halfWidth < 2.0f || halfHeight < 2.0f)
+        if (float.IsNaN(contentRect.width)
+            || float.IsNaN(contentRect.height)
+            || float.IsNaN(contentRect.x)
+            || float.IsNaN(contentRect.y)
+            || float.IsNaN(StrokeWidth)
+            || float.IsNaN(ProgressInPercent))
+        {
             return;
+        }
 
-        m_ProgressMesh.width = halfWidth;
-        m_ProgressMesh.height = halfHeight;
-        m_ProgressMesh.borderSize = borderSize;
-        m_ProgressMesh.borderTopWidth = resolvedStyle.borderTopWidth;
-        m_ProgressMesh.borderBottomWidth = resolvedStyle.borderBottomWidth;
-        m_ProgressMesh.borderLeftWidth = resolvedStyle.borderLeftWidth;
-        m_ProgressMesh.borderRightWidth = resolvedStyle.borderRightWidth;
-        m_ProgressMesh.UpdateMesh();
-
-        m_TrackMesh.width = halfWidth;
-        m_TrackMesh.height = halfHeight;
-        m_TrackMesh.borderSize = borderSize;
-        m_TrackMesh.borderTopWidth = resolvedStyle.borderTopWidth;
-        m_TrackMesh.borderBottomWidth = resolvedStyle.borderBottomWidth;
-        m_TrackMesh.borderLeftWidth = resolvedStyle.borderLeftWidth;
-        m_TrackMesh.borderRightWidth = resolvedStyle.borderRightWidth;
-        m_TrackMesh.UpdateMesh();
-
-        // Draw track mesh first
-        var trackMeshWriteData = context.Allocate(m_TrackMesh.vertices.Length, m_TrackMesh.indices.Length);
-        trackMeshWriteData.SetAllVertices(m_TrackMesh.vertices);
-        trackMeshWriteData.SetAllIndices(m_TrackMesh.indices);
-
-        // Keep progress between 0 and 100
-        float clampedProgress = Mathf.Clamp(m_Progress, 0.0f, 100.0f);
-
-        // Determine how many triangles are used to depending on progress, to achieve a partially filled circle
-        int sliceSize = Mathf.FloorToInt((k_NumSteps * clampedProgress) / 100.0f);
-
-        if (sliceSize == 0)
+        float radius = (contentRect.width / 2) - (StrokeWidth / 2);
+        if (radius <= 0)
+        {
             return;
+        }
 
-        // Every step is 6 indices in the corresponding array
-        sliceSize *= 6;
+        float startAngle = -90;
+        float endAngle = startAngle + (359.9999f * ProgressInPercent / 100);
+        Vector2 center = contentRect.center;
 
-        var progressMeshWriteData = context.Allocate(m_ProgressMesh.vertices.Length, sliceSize);
-        progressMeshWriteData.SetAllVertices(m_ProgressMesh.vertices);
+        // Draw Track
+        Painter2D painter = mgc.painter2D;
+        painter.BeginPath();
+        painter.strokeColor = TrackColor;
+        painter.lineWidth = StrokeWidth;
+        painter.lineCap = LineCap;
+        painter.Arc(center, radius, 0, 360);
+        painter.Stroke();
 
-        var tempIndicesArray = new NativeArray<ushort>(m_ProgressMesh.indices, Allocator.Temp);
-        progressMeshWriteData.SetAllIndices(tempIndicesArray.Slice(0, sliceSize));
-        tempIndicesArray.Dispose();
+        // Draw Progress
+        // A Unity crash can happen when the difference between startAngle and endAngle is too small.
+        if (Math.Abs(startAngle - endAngle) > 1f)
+        {
+            painter.BeginPath();
+            painter.strokeColor = ProgressColor;
+            painter.lineWidth = StrokeWidth;
+            painter.lineCap = LineCap;
+            painter.Arc(center, radius, startAngle, endAngle);
+            painter.Stroke();
+        }
     }
-
 }

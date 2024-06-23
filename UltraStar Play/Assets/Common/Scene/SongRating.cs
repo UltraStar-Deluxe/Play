@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using ProTrans;
-using UnityEngine;
 
 public class SongRating
 {
@@ -12,18 +10,12 @@ public class SongRating
     public static readonly SongRating LeadSinger = new(ESongRating.LeadSinger, 7500, R.Messages.rating_song_leadSinger);
     public static readonly SongRating Superstar = new(ESongRating.Superstar, 8500, R.Messages.rating_song_superStar);
     public static readonly SongRating Ultrastar = new(ESongRating.Ultrastar, 9000, R.Messages.rating_song_ultraStar);
-    
-    private readonly string i18nCode;
+
+    private readonly string translationKey;
     public ESongRating EnumValue { get; private set; }
     public double ScoreThreshold { get; private set; }
 
-    public string Text
-    {
-        get
-        {
-            return TranslationManager.GetTranslation(i18nCode);
-        }
-    }
+    public Translation Translation => Translation.Get(translationKey);
 
     private static List<SongRating> values;
     public static List<SongRating> Values
@@ -35,6 +27,7 @@ public class SongRating
                 values = new List<SongRating>();
                 values.Add(Ultrastar);
                 values.Add(Superstar);
+                values.Add(LeadSinger);
                 values.Add(RisingStar);
                 values.Add(Hopeful);
                 values.Add(Wannabe);
@@ -45,11 +38,11 @@ public class SongRating
         }
     }
 
-    private SongRating(ESongRating eSongRating, double scoreThreshold, string i18nCode)
+    private SongRating(ESongRating eSongRating, double scoreThreshold, string translationKey)
     {
         this.EnumValue = eSongRating;
         this.ScoreThreshold = scoreThreshold;
-        this.i18nCode = i18nCode;
+        this.translationKey = translationKey;
     }
 
 }

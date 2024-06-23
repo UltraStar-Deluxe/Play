@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniInject.Extensions;
 using UniRx;
@@ -12,6 +13,9 @@ using UnityEngine.UIElements;
 
 public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectionFinishedListener
 {
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    protected VisualElement rootVisualElement;
+
     [Inject(Key = nameof(perfectEffectStarUi))]
     protected VisualTreeAsset perfectEffectStarUi;
 
@@ -40,7 +44,16 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     protected SingSceneControl singSceneControl;
 
     [Inject]
+    protected GameObject gameObject;
+
+    [Inject]
     protected Injector injector;
+
+    [Inject]
+    protected SingSceneMedleyControl medleyControl;
+
+    [Inject]
+    protected PlayerProfile playerProfile;
 
     [Inject(Optional = true)]
     protected MicProfile micProfile;
@@ -49,6 +62,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     protected double beatsPerSecond;
 
+    protected readonly List<TargetNoteControl> targetNoteControls = new();
     protected readonly Dictionary<Note, TargetNoteControl> noteToTargetNoteControl = new();
     protected readonly Dictionary<RecordedNote, List<RecordedNoteControl>> recordedNoteToRecordedNoteControlsMap = new();
 
@@ -58,7 +72,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     // The number of rows on which notes can be placed.
     protected int noteRowCount;
-    protected float[] noteRowToYPercent;
+    protected Dictionary<int, float> noteRowToYPercent;
 
     protected int maxNoteRowMidiNote;
     protected int minNoteRowMidiNote;
@@ -68,7 +82,33 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     private bool displayRoundedAndActualRecordedNotes;
     private bool showPitchOfNotes;
 
-    protected abstract void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat);
+    private int fadeOutAnimationId;
+    private readonly List<int> fadeOutLyricsOnNotesAnimationIds = new();
+    private readonly ReactiveProperty<float> lyricsOnNotesOpacity = new(1);
+
+    private readonly HashSet<Label> initializedNoteLabelWidth = new();
+
+    private readonly Subject<TargetNoteControlCreatedEvent> targetNoteControlCreatedEventStream = new();
+    public IObservable<TargetNoteControlCreatedEvent> TargetNoteControlCreatedEventStream => targetNoteControlCreatedEventStream;
+
+    private readonly Subject<RecordedNoteControlCreatedEvent> recordedNoteControlCreatedEventStream = new();
+    public IObservable<RecordedNoteControlCreatedEvent> RecordedNoteControlCreatedEventStream => recordedNoteControlCreatedEventStream;
+
+    protected abstract bool TryGetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat, out Rect result);
+
+    protected void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
+    {
+        if (!TryGetNotePositionInPercent(visualElement, midiNote, noteStartBeat, noteEndBeat, out Rect notePositionInPercent))
+        {
+            return;
+        }
+
+        visualElement.style.position = new StyleEnum<Position>(Position.Absolute);
+        visualElement.style.width = new StyleLength(new Length(notePositionInPercent.width, LengthUnit.Percent));
+        visualElement.style.height = new StyleLength(new Length(notePositionInPercent.height, LengthUnit.Percent));
+        visualElement.style.left = new StyleLength(new Length(notePositionInPercent.xMin, LengthUnit.Percent));
+        visualElement.style.top = new StyleLength(new Length(notePositionInPercent.yMin, LengthUnit.Percent));
+    }
 
     public virtual void OnInjectionFinished()
     {
@@ -76,7 +116,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         recordedNoteEntryContainer.Clear();
         effectsContainer.Clear();
 
-        beatsPerSecond = BpmUtils.GetBeatsPerSecond(songMeta);
+        beatsPerSecond = SongMetaBpmUtils.BeatsPerSecond(songMeta);
         playerNoteRecorder.RecordedNoteStartedEventStream.Subscribe(recordedNoteStartedEvent =>
         {
             DisplayRecordedNote(recordedNoteStartedEvent.RecordedNote);
@@ -89,13 +129,21 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         lineDisplayer = new LineDisplayer();
         lineDisplayer.LineColor = Color.grey;
         injector.Inject(lineDisplayer);
+
+        lyricsOnNotesOpacity.Subscribe(newValue =>
+        {
+            targetNoteControls.ForEach(targetNoteControl => targetNoteControl.Label.style.opacity = newValue);
+        });
     }
 
     public virtual void Update()
     {
         // Update notes
-        noteToTargetNoteControl.Values
-            .ForEach(targetNoteControl => UpdateTargetNoteControl(targetNoteControl));
+        for (int i = 0; i < targetNoteControls.Count; i++)
+        {
+            TargetNoteControl targetNoteControl = targetNoteControls[i];
+            UpdateTargetNoteControl(targetNoteControl, i);
+        }
         recordedNoteToRecordedNoteControlsMap.Values
             .ForEach(recordedNoteControls => recordedNoteControls
                 .ForEach(recordedNoteControl => UpdateRecordedNoteControl(recordedNoteControl)));
@@ -104,9 +152,30 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         starControls.ForEach(starControl => starControl.Update());
     }
 
-    protected virtual void UpdateTargetNoteControl(TargetNoteControl targetNoteControl)
+    protected abstract void UpdateTargetNoteControl(TargetNoteControl targetNoteControl, int indexInList);
+
+    protected void UpdateTargetNoteLabelWith(TargetNoteControl targetNoteControl, int indexInList)
     {
-        targetNoteControl.Update();
+        if (initializedNoteLabelWidth.Contains(targetNoteControl.Label))
+        {
+            return;
+        }
+
+        TargetNoteControl nextTargetNoteControl = targetNoteControls.ElementAtOrDefault(indexInList + 1);
+        if (targetNoteControl.Label.IsVisibleByDisplay()
+            && nextTargetNoteControl != null
+            && targetNoteControl.Note.MidiNote == nextTargetNoteControl.Note.MidiNote)
+        {
+            initializedNoteLabelWidth.Add(targetNoteControl.Label);
+
+            // Width of label until start of following note
+            if (!TryGetNotePositionInPercent(targetNoteControl.Label, 60, targetNoteControl.Note.StartBeat, nextTargetNoteControl.Note.StartBeat, out Rect notePositionInPercent))
+            {
+                return;
+            }
+            targetNoteControl.Label.style.width = Length.Percent(notePositionInPercent.width);
+            targetNoteControl.Label.RegisterHasGeometryCallbackOneShot(_ => targetNoteControl.UpdateLabelFontSize());
+        }
     }
 
     protected virtual void UpdateRecordedNoteControl(RecordedNoteControl recordedNoteControl)
@@ -121,7 +190,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         }
     }
 
-    public void SetLineCount(int lineCount)
+    public virtual void SetLineCount(int lineCount)
     {
         if (lineDisplayer == null)
         {
@@ -136,7 +205,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         {
             throw new UnityException(this.GetType() + " must be initialized with a row count >= 12 (one row for each note in an octave)");
         }
-        noteRowToYPercent = new float[noteRowCount];
+        noteRowToYPercent = new Dictionary<int, float>();
 
         float lineHeightPercent = 1.0f / lineCount;
         noteHeightPercent = lineHeightPercent / 2.0f;
@@ -151,7 +220,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
         // Draw every second line.
         List<float> yPercentagesToDrawLinesFor = new();
-        for (int i = 0; i < noteRowToYPercent.Length; i++)
+        for (int i = 0; i < noteRowToYPercent.Count; i++)
         {
             if (i % 2 == 0)
             {
@@ -212,11 +281,11 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
         Label label = targetNoteControl.Label;
         string pitchName = MidiUtils.GetAbsoluteName(note.MidiNote);
-        if (settings.GraphicSettings.showLyricsOnNotes && showPitchOfNotes)
+        if (settings.ShowLyricsOnNotes && showPitchOfNotes)
         {
             label.text = GetDisplayText(note) + " (" + pitchName + ")";
         }
-        else if (settings.GraphicSettings.showLyricsOnNotes)
+        else if (settings.ShowLyricsOnNotes)
         {
             label.text = GetDisplayText(note);
         }
@@ -227,45 +296,44 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         else
         {
             label.text = "";
+            label.HideByDisplay();
         }
-        label.RegisterCallbackOneShot<GeometryChangedEvent>(evt => UpdateNoteLabelFontSize(label));
+        label.style.opacity = lyricsOnNotesOpacity.Value;
 
         targetNoteEntryContainer.Add(visualElement);
-        UpdateNotePosition(visualElement, note.MidiNote, note.StartBeat, note.EndBeat);
+        UpdateTargetNoteControl(targetNoteControl, -1);
 
         noteToTargetNoteControl[note] = targetNoteControl;
+        targetNoteControls.Add(targetNoteControl);
+
+        try
+        {
+            targetNoteControlCreatedEventStream.OnNext(new TargetNoteControlCreatedEvent(targetNoteControl));
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
 
         return targetNoteControl;
     }
 
-    private void UpdateNoteLabelFontSize(Label label)
-    {
-        // Update font size
-        if (label == null
-            || label.text.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        float noteHeightPx = noteHeightPercent * targetNoteEntryContainer.resolvedStyle.height;
-        float textHeight = NumberUtils.Limit(noteHeightPx + 2, 8, 12);
-        label.style.fontSize = new StyleLength(new Length(textHeight, LengthUnit.Pixel));
-        Debug.Log($"text: {label.text}, noteHeightPx: {noteHeightPx}, textHeight: {textHeight}");
-    }
-
     public string GetDisplayText(Note note)
     {
+        // Show underscore as space.
+        // Underscore is used in song editor to show notes with missing lyrics after speech recognition.
+        string displayText = note.Text.Replace("_", " ");
         switch (note.Type)
         {
             case ENoteType.Freestyle:
-                return $"<i><b><color=#c00000>{note.Text}</color></b></i>";
+                return $"<i><b><color=#c00000>{displayText}</color></b></i>";
             case ENoteType.Golden:
-                return $"<b>{note.Text}</b>";
+                return $"<b>{displayText}</b>";
             case ENoteType.Rap:
             case ENoteType.RapGolden:
-                return $"<i><b><color=#ffa500ff>{note.Text}</color></b></i>";
+                return $"<i><b><color=#ffa500ff>{displayText}</color></b></i>";
             default:
-                return note.Text;
+                return displayText;
         }
     }
 
@@ -297,18 +365,19 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         childInjector.AddBindingForInstance(recordedNote);
         childInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, visualElement);
 
-        RecordedNoteControl noteControl = new();
-        childInjector.Inject(noteControl);
+        RecordedNoteControl recordedNoteControl = new();
+        childInjector.Inject(recordedNoteControl);
 
-        noteControl.StartBeat = recordedNote.StartBeat;
-        noteControl.TargetEndBeat = recordedNote.EndBeat;
+        recordedNoteControl.StartBeat = recordedNote.StartBeat;
+        recordedNoteControl.TargetEndBeat = recordedNote.EndBeat;
         // Draw already a portion of the note
-        noteControl.LifeTimeInSeconds = Time.deltaTime;
-        noteControl.EndBeat = recordedNote.StartBeat + (noteControl.LifeTimeInSeconds * beatsPerSecond);
+        recordedNoteControl.LifeTimeInSeconds = Time.deltaTime;
+        recordedNoteControl.EndBeat = recordedNote.StartBeat + (recordedNoteControl.LifeTimeInSeconds * beatsPerSecond);
 
-        noteControl.MidiNote = midiNote;
+        recordedNoteControl.MidiNote = midiNote;
+        recordedNoteControl.Color = CommonOnlineMultiplayerUtils.GetPlayerColor(playerProfile, micProfile);
 
-        Label label = noteControl.Label;
+        Label label = recordedNoteControl.Label;
         if (showPitchOfNotes)
         {
             string pitchName = MidiUtils.GetAbsoluteName(midiNote);
@@ -320,16 +389,17 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         }
 
         recordedNoteEntryContainer.Add(visualElement);
-        UpdateNotePosition(visualElement, midiNote, noteControl.StartBeat, noteControl.EndBeat);
+        UpdateNotePosition(visualElement, midiNote, recordedNoteControl.StartBeat, recordedNoteControl.EndBeat);
 
-        recordedNoteToRecordedNoteControlsMap.AddInsideList(recordedNote, noteControl);
-    }
+        recordedNoteToRecordedNoteControlsMap.AddInsideList(recordedNote, recordedNoteControl);
 
-    public void CreatePerfectSentenceEffect()
-    {
-        for (int i = 0; i < 50; i++)
+        try
         {
-            CreatePerfectSentenceStar();
+            recordedNoteControlCreatedEventStream.OnNext(new RecordedNoteControlCreatedEvent(recordedNoteControl));
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
         }
     }
 
@@ -378,7 +448,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         return new Vector2(UnityEngine.Random.Range(min, max), UnityEngine.Random.Range(min, max));
     }
 
-    protected virtual int CalculateNoteRow(int midiNote)
+    protected virtual int CalculateNoteRow(int midiNote, int beat)
     {
         // Map midiNote to range of noteRows (wrap around).
         int wrappedMidiNote = midiNote;
@@ -400,13 +470,23 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         return noteRow;
     }
 
-    public Vector2 GetYStartAndEndInPercentForMidiNote(int midiNote)
+    public Vector2 GetYStartAndEndInPercentForMidiNote(int midiNote, int beat)
     {
-        int noteRow = CalculateNoteRow(midiNote);
-        float y = noteRowToYPercent[noteRow];
+        int rawNoteRow = CalculateNoteRow(midiNote, beat);
+        int noteRow = NumberUtils.ModNegativeToPositive(rawNoteRow, noteRowCount);
+        if (!noteRowToYPercent.TryGetValue(noteRow, out float y))
+        {
+            Debug.LogWarning($"No vertical position for note row at index {noteRow} (midiNote {midiNote}, beat {beat})");
+            y = noteHeightPercent;
+        }
         float yStart = y - noteHeightPercent;
         float yEnd = y + noteHeightPercent;
         return new Vector2(yStart, yEnd);
+    }
+
+    public virtual float GetXInPercent(double positionInMillis)
+    {
+        return 0;
     }
 
     protected void UpdateRecordedNoteControlEndBeat(RecordedNoteControl recordedNoteControl)
@@ -421,6 +501,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     protected virtual void RemoveTargetNote(TargetNoteControl targetNoteControl)
     {
         noteToTargetNoteControl.Remove(targetNoteControl.Note);
+        targetNoteControls.Remove(targetNoteControl);
         targetNoteControl.Dispose();
     }
 
@@ -443,5 +524,35 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
             .ToList()
             .ForEach(recordedNoteControls => recordedNoteControls
                 .ForEach(recordedNoteControl => RemoveRecordedNote(recordedNoteControl)));
+    }
+
+    public void FadeOut(float animTimeInSeconds)
+    {
+        LeanTween.cancel(fadeOutAnimationId);
+        fadeOutAnimationId = AnimationUtils.FadeOutVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
+    }
+
+    public void FadeIn(float animTimeInSeconds)
+    {
+        LeanTween.cancel(fadeOutAnimationId);
+        fadeOutAnimationId = AnimationUtils.FadeInVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
+    }
+
+    public void FadeOutLyricsOnNotes(float animTimeInSeconds)
+    {
+        LeanTweenUtils.CancelAndClear(fadeOutLyricsOnNotesAnimationIds);
+        fadeOutLyricsOnNotesAnimationIds.Add(LeanTween
+            .value(gameObject, lyricsOnNotesOpacity.Value, 0, animTimeInSeconds)
+            .setOnUpdate(interpolatedValue => lyricsOnNotesOpacity.Value = interpolatedValue)
+            .id);
+    }
+
+    public void FadeInLyricsOnNotes(float animTimeInSeconds)
+    {
+        LeanTweenUtils.CancelAndClear(fadeOutLyricsOnNotesAnimationIds);
+        fadeOutLyricsOnNotesAnimationIds.Add(LeanTween
+            .value(gameObject, lyricsOnNotesOpacity.Value, 1, animTimeInSeconds)
+            .setOnUpdate(interpolatedValue => lyricsOnNotesOpacity.Value = interpolatedValue)
+            .id);
     }
 }

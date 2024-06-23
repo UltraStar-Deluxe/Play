@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using ProTrans;
-using UnityEngine;
 
 public class SentenceRating
 {
@@ -10,17 +8,11 @@ public class SentenceRating
     public static readonly SentenceRating notBad = new(ESentenceRating.NotBad, 0.25, R.Messages.rating_sentence_notBad);
     public static readonly SentenceRating bad = new(ESentenceRating.Bad, 0, R.Messages.rating_sentence_bad);
 
-    private readonly string i18nCode;
+    private readonly string translationKey;
     public ESentenceRating EnumValue { get; private set; }
     public double PercentageThreshold { get; private set; }
 
-    public string Text
-    {
-        get
-        {
-            return TranslationManager.GetTranslation(i18nCode);
-        }
-    }
+    public Translation Translation => Translation.Get(translationKey);
 
     private static List<SentenceRating> values;
     public static List<SentenceRating> Values
@@ -40,11 +32,11 @@ public class SentenceRating
         }
     }
 
-    private SentenceRating(ESentenceRating enumValue, double percentThreshold, string i18nCode)
+    private SentenceRating(ESentenceRating enumValue, double percentThreshold, string translationKey)
     {
         this.EnumValue = enumValue;
         this.PercentageThreshold = percentThreshold;
-        this.i18nCode = i18nCode;
+        this.translationKey = translationKey;
     }
 
     public static SentenceRating GetSentenceRating(double correctNotesPercentage)

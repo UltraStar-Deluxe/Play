@@ -23,6 +23,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 284005702175915694}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 309.66382, y: 354.43085, z: -113.38186}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -30,11 +31,55 @@ Transform:
   m_Children:
   - {fileID: 7174955933986786910}
   - {fileID: 7174955934536027629}
+  - {fileID: 7029245870250727794}
   - {fileID: 702105551859895901}
   - {fileID: 7174955932730434271}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5564464487188351562
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7029245870250727794}
+  - component: {fileID: 4580717115009224621}
+  m_Layer: 0
+  m_Name: SingingResultsSceneOnlineMultiplayerControl
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7029245870250727794
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5564464487188351562}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -309.66382, y: -354.43085, z: 113.38186}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4301509932091042046}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4580717115009224621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5564464487188351562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 360239d2d8cf40eaac2b8facbdf0c4bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7174955932730434270
 GameObject:
   m_ObjectHideFlags: 0
@@ -59,13 +104,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7174955932730434270}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -309.66382, y: -354.43085, z: 113.38186}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4301509932091042046}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7174955932730434268
 MonoBehaviour:
@@ -79,6 +124,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0feda79e08761be4e83d51bf3095f951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  previewDelayInSeconds: 0.5
+  stopOldImmediatelyOnStartNew: 0
 --- !u!1 &7174955933986786880
 GameObject:
   m_ObjectHideFlags: 0
@@ -103,13 +150,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7174955933986786880}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 153.14777, y: -62.663177, z: 84.50686}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4301509932091042046}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7174955933986786881
 MonoBehaviour:
@@ -124,6 +171,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nPlayerUi: {fileID: 9197481963319205126, guid: 0f11bceaf8c280f499a9b5a0ee6b3b3e,
+    type: 3}
+  teamResultUi: {fileID: 9197481963319205126, guid: 714ec31c3ce3711439bf40d845ea1e51,
     type: 3}
   songRatingImageReferences:
   - songRating: 0
@@ -146,6 +195,11 @@ MonoBehaviour:
   songPreviewControl: {fileID: 7174955932730434268}
   highscoreEntryUi: {fileID: 9197481963319205126, guid: 423491fc58834f64fbdba496866fa14f,
     type: 3}
+  teamResultsApplauseAudioClip: {fileID: 8300000, guid: e8af947dfaec6614388675c1e761af8e,
+    type: 3}
+  singingResultsApplauseAudioClip: {fileID: 8300000, guid: d4c9cc76bad3fd94c8abd4bdccfc4990,
+    type: 3}
+  scoreBarAudioClip: {fileID: 8300000, guid: bc7e499f70d719642b1f6130793d76a4, type: 3}
 --- !u!1 &7174955934536027631
 GameObject:
   m_ObjectHideFlags: 0
@@ -170,13 +224,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7174955934536027631}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 153.14777, y: -62.663177, z: 84.50686}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4301509932091042046}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7174955934536027626
 MonoBehaviour:

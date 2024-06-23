@@ -1,34 +1,15 @@
 using System;
+using System.Collections;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour, INeedInjection
 {
     public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
 
-    private RenderTexture uiCopyRenderTexture;
-    public RenderTexture UiCopyRenderTexture
-    {
-        get
-        {
-            if (uiCopyRenderTexture != null
-                && (uiCopyRenderTexture.width != Screen.width
-                    || uiCopyRenderTexture.height != Screen.height))
-            {
-                Debug.Log("Recreate uiCopyRenderTexture because of screen size change.");
-                Destroy(uiCopyRenderTexture);
-                uiCopyRenderTexture = null;
-            }
-            
-            if (uiCopyRenderTexture == null)
-            {
-                uiCopyRenderTexture = new RenderTexture(Screen.width, Screen.height, 24);
-            }
-
-            return uiCopyRenderTexture;
-        }
-    }
+    private const string UiCopyRenderTextureName = "SceneChangeAnimationControl.UiCopyRenderTexture";
 
     private Action animateAction;
 
@@ -44,6 +25,15 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     [Inject]
     private ThemeManager themeManager;
 
+    [Inject]
+    private UIDocument uiDocument;
+    
+    [Inject]
+    private RenderTextureManager renderTextureManager;
+    
+    [Inject]
+    private ApplicationManager applicationManager;
+    
     protected override object GetInstance()
     {
         return Instance;
@@ -52,16 +42,31 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     protected override void StartSingleton()
     {
         sceneNavigator.SceneChangedEventStream
-            .Subscribe(_ => UpdateSceneTexturesAndTransition())
+            .Subscribe(_ => OnSceneChanged())
             .AddTo(gameObject);
         UpdateSceneTexturesAndTransition();
     }
 
+    private void OnSceneChanged()
+    {
+        UpdateSceneTexturesAndTransition();
+
+        if (SettingsUtils.ShouldAnimateSceneChange(settings)
+            && settings.SceneChangeAnimation is ESceneChangeAnimation.Fade)
+        {
+            if (TryGetBackgroundVisualElementOrIsIrrelevant(out VisualElement background))
+            {
+                background.style.opacity = 0;
+            }
+        }
+    }
+    
     private void UpdateSceneTexturesAndTransition()
     {
-        themeManager.UpdateSceneTextures(UiCopyRenderTexture);
+        renderTextureManager.GetOrCreateScreenSizedRenderTexture(UiCopyRenderTextureName,
+            renderTexture => themeManager.UpdateSceneTextures(renderTexture));
 
-        if (settings.GraphicSettings.AnimateSceneChange)
+        if (SettingsUtils.ShouldAnimateSceneChange(settings))
         {
             animateAction?.Invoke();
         }
@@ -69,21 +74,56 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
 
     public void AnimateChangeToScene(Action doLoadSceneAction, Action doAnimateAction)
     {
-        // Take "screenshot" of "old" scene.
-        if (themeManager.UiRenderTexture == null)
-        {
-            Debug.LogWarning($"uiRenderTexture of ThemeManager is null. Not animating scene transition.");
-        }
-        else if (UiCopyRenderTexture == null)
-        {
-            Debug.LogWarning($"UiCopyRenderTexture is null. Not animating scene transition.");
-        }
-        else
-        {
-            Graphics.CopyTexture(themeManager.UiRenderTexture, UiCopyRenderTexture);
-        }
         animateAction = doAnimateAction;
-        doLoadSceneAction();
+        
+        if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        {
+            // Take "screenshot" of "old" scene.
+            RenderTexture uiRenderTexture = renderTextureManager.GetExistingRenderTexture(ThemeManager.UiRenderTextureName);
+            RenderTexture uiCopyRenderTexture = renderTextureManager.GetExistingRenderTexture(UiCopyRenderTextureName);
+            
+            if (uiRenderTexture == null)
+            {
+                Debug.LogWarning($"uiRenderTexture of ThemeManager is null. Not animating scene transition.");
+            }
+            else if (uiCopyRenderTexture == null)
+            {
+                Debug.LogWarning($"UiCopyRenderTexture is null. Not animating scene transition.");
+            }
+            else
+            {
+                Graphics.CopyTexture(uiRenderTexture, uiCopyRenderTexture);
+            }
+        }
+
+        if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        {
+            doLoadSceneAction();
+        }
+        else if (settings.SceneChangeAnimation is ESceneChangeAnimation.Fade)
+        {
+            float animationTimeInSeconds = settings.SceneChangeDurationInSeconds;
+            if (animationTimeInSeconds <= 0)
+            {
+                doLoadSceneAction();
+                return;
+            }
+
+            // Fade-out is done here. It takes half of the total animation time.
+            if (TryGetBackgroundVisualElementOrIsIrrelevant(out VisualElement background))
+            {
+                LeanTween.value(gameObject, 1, 0, animationTimeInSeconds / 2)
+                    .setOnUpdate((float interpolatedValue) =>
+                    {
+                        background.style.opacity = interpolatedValue;
+                    })
+                    .setOnComplete(() => doLoadSceneAction());
+            }
+            else
+            {
+                doLoadSceneAction();
+            }
+        }
     }
 
     public void StartSceneChangeAnimation(EScene currentScene, EScene nextScene)
@@ -95,42 +135,92 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             PlaySceneChangeAnimationSound();
         }
 
-        float sceneChangeAnimationTimeInSeconds = themeManager.GetSceneChangeAnimationTimeInSeconds();
-        if (sceneChangeAnimationTimeInSeconds <= 0)
+        float animationTimeInSeconds = settings.SceneChangeDurationInSeconds;
+        if (animationTimeInSeconds <= 0)
         {
             return;
         }
 
-        LeanTween.value(gameObject, 0, 1, sceneChangeAnimationTimeInSeconds)
-            .setOnStart(() =>
-            {
-                themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(true);
-            })
-            .setOnUpdate((float animTimePercent) =>
+        if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        {
+            // Only the fade-in is done here. Thus, it takes only half of the total animation time.
+            animationTimeInSeconds /= 2;
+        }
+
+        if (TryGetBackgroundVisualElementOrIsIrrelevant(out VisualElement background))
+        {
+            StopAllCoroutines();
+            StartCoroutine(SceneChangeAnimationCoroutine(animationTimeInSeconds, background));
+        }
+    }
+
+    private IEnumerator SceneChangeAnimationCoroutine(
+        float animationTimeInSeconds,
+        VisualElement background,
+        Action onComplete = null)
+    {
+        if (animationTimeInSeconds <= 0)
+        {
+            onComplete?.Invoke();
+            yield break;
+        }
+
+        if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        {
+            themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(true);
+        }   
+        
+        float timeInSeconds = 0;
+        float timeInPercent = 0;
+        while(timeInSeconds < 1
+              && timeInPercent < 1)
+        {
+            float interpolatedValue = LeanTween.easeInSine(0, 1, timeInPercent);
+            
+            if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
             {
                 // Scale and fade out the snapshot of the old UIDocument.
                 // Handled by the background shader to get correct premultiplied
                 // blending and avoid the one-frame flicker issue.
-                themeManager.backgroundShaderControl.SetTransitionAnimationTime(animTimePercent);
-            })
-            .setEaseInSine()
-            .setOnComplete(() =>
+                themeManager.backgroundShaderControl.SetTransitionAnimationTime(interpolatedValue);
+            }
+            else if (settings.SceneChangeAnimation is ESceneChangeAnimation.Fade
+                     && background != null)
             {
-                themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(false);
-            });
+                background.style.opacity = interpolatedValue;
+            }
+
+            // Force a slow animation, even if the FPS is low.
+            float maxDeltaTimeInSeconds = 1f / ApplicationUtils.CurrentFrameRate;
+            float deltaTimeInSeconds = Mathf.Min(Time.deltaTime, maxDeltaTimeInSeconds);
+            timeInSeconds += deltaTimeInSeconds;
+            timeInPercent = timeInSeconds / animationTimeInSeconds;
+            yield return new WaitForEndOfFrame();
+        }
+        
+        if (settings != null
+            && themeManager != null
+            && settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        {
+            themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(false);
+        }
+        
+        onComplete?.Invoke();
     }
 
     private void PlaySceneChangeAnimationSound()
     {
-        audioSource.volume = settings.AudioSettings.SceneChangeSoundVolumePercent / 100f;
+        audioSource.volume = settings.SceneChangeSoundVolumePercent / 100f;
         if (!audioSource.isPlaying)
         {
             audioSource.Play();
         }
     }
 
-    private void OnDestroy()
+    private bool TryGetBackgroundVisualElementOrIsIrrelevant(out VisualElement background)
     {
-        Destroy(uiCopyRenderTexture);
+        background = uiDocument.rootVisualElement.Q(R.UxmlNames.background);
+        return background != null
+               || settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom;
     }
 }

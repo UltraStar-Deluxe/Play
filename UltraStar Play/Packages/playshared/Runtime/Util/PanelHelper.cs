@@ -72,11 +72,21 @@ public class PanelHelper
     {
         cacheFrame = Time.frameCount;
         Vector2 screenSize = new(Screen.width, Screen.height);
-        Vector2 stpMin = RuntimePanelUtils.ScreenToPanel(panel, new Vector2(0, 0));
-        Vector2 stpMax = RuntimePanelUtils.ScreenToPanel(panel, screenSize);
+        Vector2 stpMin = ScreenToPanel(new Vector2(0, 0));
+        Vector2 stpMax = ScreenToPanel(screenSize);
         Vector2 stpSize = stpMax - stpMin;
         screenHeight = screenSize.y;
         panelScreenMin = stpMin;
         scalingRatio = screenSize / stpSize;
+    }
+
+    public Vector2 InvertVertical(Vector2 v)
+    {
+        return new Vector2(v.x, GetScreenSizeInPanelCoordinates().y - v.y);
+    }
+
+    public Vector2 GetScreenSizeInPanelCoordinates()
+    {
+        return ScreenToPanel(new Vector2(Screen.width, Screen.height));
     }
 }

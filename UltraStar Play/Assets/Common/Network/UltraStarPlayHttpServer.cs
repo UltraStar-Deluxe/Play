@@ -1,12 +1,14 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.NetworkInformation;
 using SimpleHttpServerForUnity;
+using UniInject;
 using UnityEngine;
 
-public class UltraStarPlayHttpServer : HttpServer
+public class UltraStarPlayHttpServer : HttpServer, INeedInjection
 {
+    private const int DefaultPort = 6789;
+    
     protected override void Awake()
     {
         if (!Application.isPlaying)
@@ -30,29 +32,33 @@ public class UltraStarPlayHttpServer : HttpServer
         }
 
         Settings settings = SettingsManager.Instance.Settings;
-        host = !settings.OwnHost.IsNullOrEmpty()
-            ? settings.OwnHost
-            : IpAddressUtils.GetIpAddress(AddressFamily.IPv4, NetworkInterfaceType.Wireless80211);
+        host = !settings.HttpServerHost.IsNullOrEmpty()
+            ? settings.HttpServerHost
+            : (IpAddressUtils.GetLocalIpAddress()?.ToString() ?? "localhost");
+        
+        port = settings.HttpServerPort > 0
+            ? settings.HttpServerPort
+            : DefaultPort;
 
         NoEndpointFoundCallback = SendNoEndpointFound;
         StartHttpListener();
 
-        this.On(HttpMethod.Get, "api/rest/endpoints")
-            .WithDescription("Get currently registered endpoints")
-            .UntilDestroy(gameObject)
-            .Do(SendRegisteredEndpoints);
+        this.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Endpoints)
+            .SetDescription("Get currently registered endpoints")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(SendRegisteredEndpoints);
 
-        this.On(HttpMethod.Get, "api/rest/songs")
-            .WithDescription("Get loaded songs")
-            .UntilDestroy(gameObject)
-            .Do(SendLoadedSongs);
-
-        this.On(HttpMethod.Get, "/api/rest/hello/{name}")
-            .WithDescription("Say hello (path-parameter example)")
-            .UntilDestroy(gameObject)
-            .Do(SendHello);
+        this.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Hello)
+            .SetDescription("Say hello (path-parameter example)")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(SendHello);
     }
 
+    public string GetExampleEndpoint()
+    {
+        return $"{host}:{port}/{HttpApiEndpointPaths.Songs}";
+    }
+    
     private void SendHello(EndpointRequestData requestData)
     {
         requestData.Context.Response.SendResponse(new MessageDto
@@ -71,24 +77,6 @@ public class UltraStarPlayHttpServer : HttpServer
                     HttpMethod = endpoint.HttpMethod.Method,
                     UrlPattern = endpoint.PathPattern,
                     Description = endpoint.Description
-                })
-                .ToList()
-        }.ToJson());
-    }
-    
-    private void SendLoadedSongs(EndpointRequestData requestData)
-    {
-        SongMetaManager songMetaManager = SongMetaManager.Instance;
-        requestData.Context.Response.SendResponse(new LoadedSongsDto
-        {
-            IsSongScanFinished = SongMetaManager.IsSongScanFinished,
-            SongCount = songMetaManager.GetSongMetas().Count,
-            SongList = songMetaManager.GetSongMetas()
-                .Select(songMeta => new SongDto
-                {
-                    Artist = songMeta.Artist,
-                    Title = songMeta.Title,
-                    Hash = songMeta.SongHash,
                 })
                 .ToList()
         }.ToJson());

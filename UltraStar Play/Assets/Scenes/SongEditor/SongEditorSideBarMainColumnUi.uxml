@@ -1,59 +1,68 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
-    <ui:VisualElement name="leftSideBarMainColumn" class="panel smallFont leftSideBar" style="border-left-width: 0; border-top-width: 0; border-bottom-width: 0; justify-content: space-between;">
-        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" horizontal-scroller-visibility="Hidden" style="height: 100%;">
-            <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" style="justify-content: center;">
-                <ui:Label text="Play/Pause" display-tooltip-when-elided="true" name="label" />
+    <ui:VisualElement name="leftSideBarMainColumn" class="panel smallFont leftSideBar" style="border-left-width: 0; border-top-width: 0; border-bottom-width: 0;">
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="height: 100%;">
+            <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton">
                 <MaterialIcon name="playIcon" icon="play_arrow" />
                 <MaterialIcon name="pauseIcon" icon="pause" />
+                <ui:Label text="$songEditor_sideBar_togglePlayback" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleRecordingButton">
-                <ui:Label text="Record" display-tooltip-when-elided="true" name="label" />
-                <MaterialIcon name="icon" icon="fiber_manual_record" />
+                <MaterialIcon name="icon" icon="mic" />
+                <ui:Label text="$songEditor_sideBar_record" display-tooltip-when-elided="true" name="label" />
+            </ui:Button>
+            <ui:Button display-tooltip-when-elided="true" name="audioSeparationButton">
+                <MaterialIcon name="icon" icon="call_split" />
+                <ui:Label text="$songEditor_sideBar_splitAudio" display-tooltip-when-elided="true" name="label" />
+            </ui:Button>
+            <ui:Button display-tooltip-when-elided="true" name="pitchDetectionUsingBasicPitchButton">
+                <MaterialIcon name="icon" icon="timeline" />
+                <ui:Label text="$songEditor_sideBar_analyzePitch" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleIssuesButton">
-                <ui:Label text="Issues" display-tooltip-when-elided="true" name="label" />
                 <MaterialIcon name="icon" icon="warning" class="rounded" />
+                <ui:Label text="$songEditor_sideBar_issues" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleSongPropertiesButton">
-                <ui:Label text="Properties" display-tooltip-when-elided="true" name="label" />
                 <MaterialIcon name="icon" icon="queue_music" class="rounded" />
+                <ui:Label text="$songEditor_sideBar_songProperties" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleLayersButton">
-                <ui:Label text="Layers" display-tooltip-when-elided="true" name="label" />
                 <MaterialIcon name="icon" icon="layers" class="rounded" />
+                <ui:Label text="$songEditor_sideBar_layers" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleSettingsButton">
-                <ui:Label text="Settings" display-tooltip-when-elided="true" name="label" />
                 <MaterialIcon name="icon" icon="settings" class="rounded" />
+                <ui:Label text="$songEditor_sideBar_settings" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleHelpButton">
-                <ui:Label text="Help" display-tooltip-when-elided="true" name="label" />
                 <MaterialIcon name="icon" icon="help_outline" class="rounded" />
+                <ui:Label text="$songEditor_sideBar_help" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="openSongFolderButton">
-                <ui:Label text="Folder" display-tooltip-when-elided="true" name="label" />
                 <MaterialIcon name="icon" icon="folder" class="rounded" />
+                <ui:Label text="$songEditor_sideBar_folder" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="undoButton">
-                <ui:Label text="Undo" display-tooltip-when-elided="true" name="label" />
                 <MaterialIcon name="icon" icon="undo" class="rounded" />
+                <ui:Label text="$songEditor_sideBar_undo" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="redoButton">
-                <ui:Label text="Redo" display-tooltip-when-elided="true" name="label" />
                 <MaterialIcon name="icon" icon="redo" class="rounded" />
+                <ui:Label text="$songEditor_sideBar_redo" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="saveButton">
-                <ui:Label text="Save" display-tooltip-when-elided="true" name="label" />
                 <MaterialIcon name="icon" icon="save" class="rounded" />
+                <ui:Label text="$songEditor_sideBar_save" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="exitSceneButton">
-                <ui:Label text="Back" display-tooltip-when-elided="true" name="label" />
                 <MaterialIcon name="icon" icon="arrow_back" class="rounded" />
+                <ui:Label text="$songEditor_sideBar_back" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleSideBarSizeButton">
                 <MaterialIcon name="wideIcon" icon="unfold_less" class="rounded invertedVisibility" style="rotate: 90deg;" />
                 <MaterialIcon name="smallIcon" icon="unfold_more" class="rounded" style="rotate: 90deg;" />
+                <ui:Label text="$songEditor_sideBar_shrink" display-tooltip-when-elided="true" name="label" />
             </ui:Button>
         </ui:ScrollView>
     </ui:VisualElement>

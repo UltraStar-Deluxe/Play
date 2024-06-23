@@ -32,11 +32,12 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private UIDocument uiDocument;
-    
+
     private readonly HashSet<Note> selectedNotes = new();
 
     private readonly Subject<NoteSelectionChangeEvent> noteSelectionChangeEventStream = new();
     public IObservable<NoteSelectionChangeEvent> NoteSelectionChangeEventStream => noteSelectionChangeEventStream;
+    public bool IsSelectionEmpty => selectedNotes.IsNullOrEmpty();
 
     public List<Note> GetSelectedNotes()
     {
@@ -48,7 +49,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         return selectedNotes != null
                && selectedNotes.Count > 0;
     }
-    
+
     public bool IsSelected(Note note)
     {
         return selectedNotes.Contains(note);
@@ -73,6 +74,16 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
     {
         List<Note> allNotes = songEditorSceneControl.GetAllVisibleNotes();
         SetSelection(allNotes);
+
+        // Update selection range for pitch detection and speech recognition
+        int minMidiNote = MidiUtils.SingableNoteMin;
+        int maxMidiNote = MidiUtils.SingableNoteMax;
+        if (!allNotes.IsNullOrEmpty())
+        {
+            minMidiNote = allNotes.Select(note => note.MidiNote).Min();
+            maxMidiNote = allNotes.Select(note => note.MidiNote).Max();
+        }
+        NoteAreaSelectionDragListener.lastSelectionRect.Value = NoteAreaRect.CreateFromMillis(songMeta, 0, (int)songAudioPlayer.DurationInMillis, minMidiNote, maxMidiNote);
     }
 
     public void AddToSelection(List<EditorNoteControl> uiNotes)
@@ -143,6 +154,11 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     private void AddToSelectionWithoutNotify(Note note)
     {
+        if (!note.IsEditable)
+        {
+            return;
+        }
+
         selectedNotes.Add(note);
         EditorNoteControl noteControl = editorNoteDisplayer.GetNoteControl(note);
         if (noteControl != null)
@@ -202,7 +218,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         noteSelectionChangeEventStream.OnNext(new NoteSelectionChangeEvent(selectedNotes));
     }
 
-    public void SelectNextNote(bool updatePositionInSong = true)
+    public void SelectNextNote(bool updatePosition = true)
     {
         EditorNoteControl editorNoteControl = editorNoteDisplayer.EditorNoteControls.FirstOrDefault(it => it.IsEditingLyrics());
         bool wasEditingLyrics = false;
@@ -220,7 +236,9 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        List<Note> notes = songEditorSceneControl.GetAllVisibleNotes();
+        List<Note> notes = songEditorSceneControl.GetAllVisibleNotes()
+            .Where(it => it.IsEditable)
+            .ToList();
         int maxEndBeat = selectedNotes.Select(it => it.EndBeat).Max();
 
         // Find the next note, i.e., the note right of maxEndBeat with the smallest distance to it.
@@ -246,10 +264,10 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         {
             SetSelection(new List<Note> { nextNote });
 
-            if (updatePositionInSong)
+            if (updatePosition)
             {
-                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, nextNote.StartBeat);
-                songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
+                double noteStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, nextNote.StartBeat);
+                songAudioPlayer.PositionInMillis = noteStartInMillis;
             }
 
             if (wasEditingLyrics)
@@ -257,13 +275,13 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
                 songEditorSceneControl.StartEditingSelectedNoteText();
                 // When the newly selected note has not been drawn yet (because it is not in the current viewport),
                 // then the lyric edit mode might not have been started. To fix this, open lyrics edit mode again 1 frame later.
-                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2,
                     () => songEditorSceneControl.StartEditingSelectedNoteText()));
             }
         }
     }
 
-    public void SelectPreviousNote(bool updatePositionInSong = true)
+    public void SelectPreviousNote(bool updatePosition = true)
     {
         bool wasEditingLyrics = false;
         EditorNoteControl editorNoteControl = editorNoteDisplayer.EditorNoteControls.FirstOrDefault(it => it.IsEditingLyrics());
@@ -281,7 +299,9 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        List<Note> notes = songEditorSceneControl.GetAllVisibleNotes();
+        List<Note> notes = songEditorSceneControl.GetAllVisibleNotes()
+            .Where(it => it.IsEditable)
+            .ToList();
         int minStartBeat = selectedNotes.Select(it => it.StartBeat).Min();
 
         // Find the previous note, i.e., the note left of minStartBeat with the smallest distance to it.
@@ -304,10 +324,10 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         {
             SetSelection(new List<Note> { previousNote });
 
-            if (updatePositionInSong)
+            if (updatePosition)
             {
-                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, previousNote.StartBeat);
-                songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
+                double noteStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, previousNote.StartBeat);
+                songAudioPlayer.PositionInMillis = noteStartInMillis;
             }
 
             if (wasEditingLyrics)
@@ -315,7 +335,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
                 songEditorSceneControl.StartEditingSelectedNoteText();
                 // When the newly selected note has not been drawn yet (because it is not in the current viewport),
                 // then the lyric edit mode might not have been started. To fix this, open lyrics edit mode again 1 frame later.
-                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2,
                     () => songEditorSceneControl.StartEditingSelectedNoteText()));
             }
         }
@@ -329,7 +349,8 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        SetSelection(new List<EditorNoteControl> { sortedUiNotes.First() });
+        EditorNoteControl firstEditableUiNote = sortedUiNotes.FirstOrDefault(it => it.IsEditable);
+        SetSelection(new List<EditorNoteControl> { firstEditableUiNote });
     }
 
     private void SelectLastVisibleNote()
@@ -340,7 +361,8 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        SetSelection(new List<EditorNoteControl> { sortedUiNotes.Last() });
+        EditorNoteControl lastEditableUiNote = sortedUiNotes.LastOrDefault(it => it.IsEditable);
+        SetSelection(new List<EditorNoteControl> { lastEditableUiNote });
     }
 
     private List<EditorNoteControl> GetSortedVisibleUiNotes()

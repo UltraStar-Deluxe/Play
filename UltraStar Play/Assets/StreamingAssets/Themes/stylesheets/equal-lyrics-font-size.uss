@@ -1,0 +1,7 @@
+.singingLyrics.currentLyrics {
+    font-size: 20px;
+}
+
+.singingLyrics.nextLyrics {
+    font-size: 20px;
+}

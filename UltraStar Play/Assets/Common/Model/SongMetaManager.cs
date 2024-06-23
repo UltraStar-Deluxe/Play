@@ -1,117 +1,39 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading;
-using UniInject;
 using UniRx;
-using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
 public class SongMetaManager : AbstractSingletonBehaviour
 {
-    private static readonly object scanLock = new();
-
-    // The collection of songs is static to be persisted across scenes.
-    // The collection is filled with song datas from a background thread, thus a thread-safe collection is used.
-    private static ConcurrentBag<SongMeta> allSongMetas = new();
-    private static ConcurrentBag<SongIssue> allSongIssues = new();
-    private static List<SongIssue> SongErrors => allSongIssues.Where(songIssue => songIssue.Severity == ESongIssueSeverity.Error).ToList();
-    private static List<SongIssue> SongWarnings => allSongIssues.Where(songIssue => songIssue.Severity == ESongIssueSeverity.Warning).ToList();
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        ResetSongMetas();
-        lastSongDirs = null;
-    }
-
     public static SongMetaManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongMetaManager>();
 
-    // Static to be persisted across scenes.
-    private static List<string> lastSongDirs;
-    private static bool isSongScanStarted;
-    private static bool isSongScanFinished;
-    public static bool IsSongScanFinished
-    {
-        get
-        {
-            return isSongScanFinished;
-        }
-    }
+    public int LoadedSongsCount => songMetaScanner.LoadedSongsCount;
+    public double LoadedSongsPercent => songMetaScanner.LoadedSongsPercent;
 
-    private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new();
-    public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
+    public bool IsSongScanFinished => songMetaScanner.IsSongScanFinished;
+    public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songMetaScanner.SongScanFinishedEventStream
+        .ObserveOnMainThread();
 
+    public IObservable<SongMeta> AddedSongMetaEventStream => songMetaCollection.AddedSongMetaEventStream
+        .ObserveOnMainThread();
+
+    [InjectedInAwake]
     private Settings settings;
-    private Settings Settings
-    {
-        get
-        {
-            if (settings == null)
-            {
-                settings = SettingsManager.Instance.Settings;
-            }
 
-            return settings;
-        }
-    }
-
-    public static void ResetSongMetas()
-    {
-        lock (scanLock)
-        {
-            allSongMetas = new ConcurrentBag<SongMeta>();
-            allSongIssues = new ConcurrentBag<SongIssue>();
-            isSongScanStarted = false;
-            isSongScanFinished = false;
-        }
-    }
+    private readonly SongMetaCollection songMetaCollection = new();
+    private SongMetaScanner songMetaScanner;
 
     protected override object GetInstance()
     {
         return Instance;
     }
 
-    public void ReloadSongMetas()
+    protected override void AwakeSingleton()
     {
-        ResetSongMetas();
-        ScanFilesIfNotDoneYet();
-    }
-
-    protected override void StartSingleton()
-    {
-        RescanIfSongFoldersChanged();
-    }
-
-    private void RescanIfSongFoldersChanged()
-    {
-        // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
-        // Thus, use the static instance.
-        if (lastSongDirs == null)
-        {
-            lastSongDirs = new List<string>(Settings.GameSettings.songDirs);
-        }
-
-        if (isSongScanFinished
-            && !lastSongDirs.SequenceEqual(Settings.GameSettings.songDirs))
-        {
-            Debug.Log("SongDirs have changed since last scan. Start rescan.");
-            lastSongDirs = new List<string>(Settings.GameSettings.songDirs);
-            ResetSongMetas();
-            ScanFilesIfNotDoneYet();
-        }
-    }
-
-    private void AddSongMeta(SongMeta songMeta)
-    {
-        if (songMeta == null)
-        {
-            throw new ArgumentNullException(nameof(songMeta));
-        }
-
-        allSongMetas.Add(songMeta);
+        settings = SettingsManager.Instance.Settings;
+        songMetaScanner = new(songMetaCollection, settings);
     }
 
     public SongMeta GetFirstSongMeta()
@@ -119,183 +41,140 @@ public class SongMetaManager : AbstractSingletonBehaviour
         return GetSongMetas().FirstOrDefault();
     }
 
+    public void AddSongMeta(SongMeta songMeta)
+    {
+        songMetaCollection.Add(songMeta);
+    }
+
     public IReadOnlyCollection<SongMeta> GetSongMetas()
     {
-        return allSongMetas;
+        return songMetaCollection.SongMetas;
     }
 
-    public IReadOnlyList<SongIssue> GetSongIssues()
+    public void ScanSongsIfNotDoneYet()
     {
-        return allSongIssues.ToList();
+        songMetaScanner.ScanSongsIfNotDoneYet();
     }
 
-    public IReadOnlyList<SongIssue> GetSongErrors()
+    public void RescanSongs()
     {
-        return SongErrors;
-    }
-
-    public IReadOnlyList<SongIssue> GetSongWarnings()
-    {
-        return SongWarnings;
-    }
-
-    public void ScanFilesIfNotDoneYet()
-    {
-        // First check. If the songs have been scanned already,
-        // then this will quickly return and allows multiple threads access.
-        if (!isSongScanStarted)
-        {
-            // The songs have not been scanned. Only one thread must perform the scan action.
-            lock (scanLock)
-            {
-                // From here on, reading and writing the isInitialized flag can be considered atomic.
-                // Second check. If multiple threads attempted to scan for songs (they passed the first check),
-                // then only the first of these threads will start the scan.
-                if (!isSongScanStarted)
-                {
-                    isSongScanStarted = true;
-                    isSongScanFinished = false;
-                    ScanFilesAsynchronously();
-                }
-            }
-        }
-    }
-
-    private void ScanFilesAsynchronously()
-    {
-        Debug.Log("ScanFilesAsynchronously");
-
-        // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
-        // Thus, use the static instance.
-        List<string> txtFiles;
-        lock (scanLock)
-        {
-            FolderScanner txtScanner = new("*.txt");
-
-            // Find all txt files in the song directories
-            txtFiles = ScanForTxtFiles(txtScanner, Settings.GameSettings.songDirs);
-        }
-
-        // Load the txt files in a background thread
-        ThreadPool.QueueUserWorkItem(poolHandle =>
-        {
-            System.Diagnostics.Stopwatch stopwatch = new();
-            stopwatch.Start();
-
-            Debug.Log("Started song-scan-thread.");
-            lock (scanLock)
-            {
-                LoadSongMetasFromTxtFiles(txtFiles, out List<SongMeta> newSongMetas, out List<SongIssue> newSongIssues);
-                allSongMetas.AddRange(newSongMetas);
-                allSongIssues.AddRange(newSongIssues);
-                isSongScanFinished = true;
-            }
-            stopwatch.Stop();
-            Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms. Loaded {allSongMetas.Count} songs. Errors: {SongErrors.Count}, Warnings: {SongWarnings.Count}.");
-            songScanFinishedEventStream.OnNext(new SongScanFinishedEvent());
-        });
-    }
-
-    private void LoadSongMetasFromTxtFiles(List<string> txtFiles, out List<SongMeta> songMetas, out List<SongIssue> songIssues)
-    {
-        songMetas = new();
-        songIssues = new();
-        foreach (string path in txtFiles)
-        {
-            if (TryLoadSongMetaFromFile(path, out SongMeta newSongMeta, out List<SongIssue> newSongIssues))
-            {
-                songMetas.Add(newSongMeta);
-            }
-            songIssues.AddRange(newSongIssues);
-        }
-    }
-
-    private static List<string> ScanForTxtFiles(FolderScanner txtScanner, List<string> songDirs)
-    {
-        List<string> txtFiles = new();
-        foreach (string songDir in songDirs)
-        {
-            try
-            {
-                List<string> txtFilesInSongDir = txtScanner.GetFiles(songDir, true);
-                txtFiles.AddRange(txtFilesInSongDir);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-            }
-        }
-        Debug.Log($"Found {allSongMetas.Count} songs in {songDirs.Count} configured song directories");
-        return txtFiles;
+        songMetaCollection.Clear();
+        songMetaScanner.RescanSongs();
     }
 
     public void WaitUntilSongScanFinished()
     {
-        ScanFilesIfNotDoneYet();
-        float startTimeInSeconds = Time.time;
-        float timeoutInSeconds = 2;
-        while ((startTimeInSeconds + timeoutInSeconds) > Time.time)
-        {
-            if (isSongScanFinished)
-            {
-                return;
-            }
-            Thread.Sleep(100);
-        }
-        Debug.LogError("Song scan did not finish - timeout reached.");
+        songMetaScanner.WaitUntilSongScanFinished();
     }
 
-    public bool TryLoadAndAddSongMetasFromFolder(string songFolder, out List<SongMeta> songMetas, out List<SongIssue> songIssues)
+    public static string GetAbsoluteGeneratedSongMetaFilePathForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
     {
-        songMetas = new List<SongMeta>();
-        songIssues = new List<SongIssue>();
-        if (!Directory.Exists(songFolder))
+        return ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, audioFile) + "/song-info.txt";
+    }
+
+    public void SaveSong(SongMeta songMeta, bool isAutoSave)
+    {
+        if (songMeta == null)
+        {
+            return;
+        }
+
+        SongIdManager.ClearSongIds(songMeta);
+
+        SongMetaUtils.CreateDirectory(songMeta);
+        string songFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
+        try
+        {
+            // Write the song data structure to the file.
+            UltraStarSongFormatVersion version = SettingsUtils.GetUltraStarSongFormatVersionForSave(settings, songMeta.Version);
+            Debug.Log($"Saving song {songFilePath} using UltraStar format version {version.StringValue}");
+            UltraStarFormatWriter.WriteFile(songFilePath, songMeta, version, settings.WriteUltraStarTxtFileWithByteOrderMark);
+
+            // Update creation and modification time
+            songMeta.FileInfo?.Refresh();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_save,
+                "reason", e.Message));
+            return;
+        }
+
+        if (!isAutoSave)
+        {
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_saveSuccess));
+        }
+    }
+
+    public void ReloadSong(SongMeta songMeta)
+    {
+        SongIdManager.ClearSongIds(songMeta);
+
+        string absoluteFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
+        try
+        {
+            SongMeta other = UltraStarSongParser.ParseFile(absoluteFilePath, out List<SongIssue> _, songMeta.FileEncoding, false);
+            songMeta.CopyValues(other);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to reload song {absoluteFilePath}: " + e.Message);
+            Debug.LogException(e);
+        }
+    }
+
+    public SongMeta GetSongMetaByTitle(string title)
+    {
+        return GetSongMetas().FirstOrDefault(songMeta => songMeta.Title == title);
+    }
+
+    public SongMeta GetSongMetaByGloballyUniqueId(string songId)
+    {
+        if (songId.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        if (SongIdManager.TryGetSongMetaByGloballyUniqueId(songId, out SongMeta knownMatchingSongMeta))
+        {
+            return knownMatchingSongMeta;
+        }
+
+        SongMeta matchingSongMeta = GetSongMetas()
+            .FirstOrDefault(songMeta => SongIdManager.SongMetaMatchesGloballyUniqueSongId(songMeta, songId));
+        return matchingSongMeta;
+    }
+
+    public SongMeta GetSongMetaByLocallyUniqueId(string songId)
+    {
+        if (songId.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        if (SongIdManager.TryGetSongMetaByLocallyUniqueId(songId, out SongMeta knownMatchingSongMeta))
+        {
+            return knownMatchingSongMeta;
+        }
+
+        SongMeta matchingSongMeta = GetSongMetas()
+            .FirstOrDefault(songMeta => SongIdManager.SongMetaMatchesLocallyUniqueSongId(songMeta, songId));
+        return matchingSongMeta;
+    }
+
+    protected override void OnDestroySingleton()
+    {
+        songMetaScanner.CancelSongScan();
+    }
+
+    public bool ContainsSongMeta(SongMeta songMeta)
+    {
+        if (songMeta == null)
         {
             return false;
         }
 
-        FolderScanner txtScanner = new("*.txt");
-        List<string> txtFiles = txtScanner.GetFiles(songFolder, true);
-
-        LoadSongMetasFromTxtFiles(txtFiles, out List<SongMeta> newSongMetas, out List<SongIssue> newSongIssues);
-        allSongMetas.AddRange(newSongMetas);
-        allSongIssues.AddRange(newSongIssues);
-
-        songMetas.AddRange(newSongMetas);
-        newSongIssues.AddRange(newSongIssues);
-
-        return true;
-    }
-
-    private bool TryLoadSongMetaFromFile(string path, out SongMeta songMeta, out List<SongIssue> songIssues)
-    {
-        songIssues = new List<SongIssue>();
-        try
-        {
-            SongMeta newSongMeta = SongMetaBuilder.ParseFile(path, out List<SongIssue> parseFileIssues, null, Settings.DeveloperSettings.useUniversalCharsetDetector);
-            songIssues.AddRange(parseFileIssues);
-
-            List<SongIssue> mediaFormatIssues = SongMetaUtils.GetSupportedMediaFormatIssues(newSongMeta);
-            songIssues.AddRange(mediaFormatIssues);
-
-            if (songIssues.AllMatch(songIssue => songIssue.Severity == ESongIssueSeverity.Warning))
-            {
-                // No issues or only warnings, thus ok.
-                songMeta = newSongMeta;
-                return true;
-            }
-        }
-        catch (SongMetaBuilderException e)
-        {
-            Debug.LogError("SongMetaBuilderException: " + path + "\n" + e.Message);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to load {path}");
-        }
-
-        songMeta = null;
-        return false;
+        return GetSongMetas().Contains(songMeta);
     }
 }

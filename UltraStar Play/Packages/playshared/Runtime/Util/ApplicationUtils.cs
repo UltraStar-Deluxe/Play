@@ -1,19 +1,158 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using ProTrans;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public static class ApplicationUtils
 {
+    public static int CurrentFrameRate => Math.Max(1, Application.targetFrameRate > 0
+        // The target frame rate is used
+        ? Application.targetFrameRate
+        // The refresh rate of the monitor is used
+        : (int)Screen.currentResolution.refreshRateRatio.value);
+
+    public const string GeneratedFolderName = "Generated";
+
+    private static bool useFfmpegToPlayMediaFiles;
+    public static bool UseFfmpegToPlayMediaFiles
+    {
+        get => useFfmpegToPlayMediaFiles;
+        set
+        {
+            if (useFfmpegToPlayMediaFiles == value)
+            {
+                return;
+            }
+            Debug.Log($"use ffmpeg to play media files: {value}");
+            useFfmpegToPlayMediaFiles = value;
+            supportedAudioFiles = GetSupportedAudioFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
+            supportedVideoFiles = GetSupportedVideoFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
+        }
+    }
+
+    private static bool useVlcToPlayMediaFiles;
+    public static bool UseVlcToPlayMediaFiles
+    {
+        get => useVlcToPlayMediaFiles;
+        set
+        {
+            if (useVlcToPlayMediaFiles == value)
+            {
+                return;
+            }
+            Debug.Log($"use vlc to play media files: {value}");
+            useVlcToPlayMediaFiles = value;
+            supportedAudioFiles = GetSupportedAudioFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
+            supportedVideoFiles = GetSupportedVideoFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
+        }
+    }
+
+    public static readonly string ultraStarPlaylistFileExtension = "upl";
+    public static readonly string m3uPlaylistFileExtension = "m3u";
+
+    public static readonly IReadOnlyCollection<string> supportedSoundfontFiles = new HashSet<string>
+    {
+        "sf2",
+    };
+
+    public static readonly IReadOnlyCollection<string> supportedImageFiles = new HashSet<string>
+    {
+        "png",
+        "jpg",
+        "jpeg",
+    };
+
+    public static readonly IReadOnlyCollection<string> supportedMidiFiles = new HashSet<string>
+    {
+        "mid",
+        "midi",
+        "kar",
+    };
+
+    public static readonly IReadOnlyCollection<string> audioFileExtensions = ReadAudioFileExtensionsFromFile()
+        .Select(line => line.Trim().TrimStart('.'))
+        .Where(line => !line.IsNullOrEmpty())
+        .ToHashSet();
+
+    // Supported file formats of ffmpeg can be obtained via "ffmpeg -demuxers"
+    // See also https://stackoverflow.com/questions/50069235/what-are-all-of-the-file-extensions-supported-by-ffmpeg
+    // See also http://www.ffmpeg.org/general.html#toc-Supported-File-Formats_002c-Codecs-or-Features
+    public static readonly IReadOnlyCollection<string> ffmpegSupportedFileExtensions = ReadFfmpegSupportedFileExtensionsFromFile()
+        .Select(line => line.Trim().TrimStart('.'))
+        .Where(line => !line.IsNullOrEmpty())
+        .ToHashSet();
+
+    public static readonly IReadOnlyCollection<string> ffmpegSupportedAudioFiles = ffmpegSupportedFileExtensions
+        .Where(fileExtension => audioFileExtensions.Contains(fileExtension))
+        .ToList();
+
+    public static readonly IReadOnlyCollection<string> ffmpegSupportedVideoFiles = ffmpegSupportedFileExtensions
+        .Where(fileExtension => !audioFileExtensions.Contains(fileExtension))
+        .ToList();
+
+    public static readonly IReadOnlyCollection<string> vlcSupportedFileExtensions = ffmpegSupportedFileExtensions;
+    public static readonly IReadOnlyCollection<string> vlcSupportedAudioFiles = ffmpegSupportedAudioFiles;
+    public static readonly IReadOnlyCollection<string> vlcSupportedVideoFiles = ffmpegSupportedVideoFiles;
+
+    public static readonly IReadOnlyCollection<string> unitySupportedAudioFiles = new HashSet<string>
+    {
+        "mp3",
+        "ogg",
+        "wav",
+    }.ToHashSet();
+
+    public static IReadOnlyCollection<string> supportedAudioFiles = GetSupportedAudioFiles(false, false);
+
+    public static readonly IReadOnlyCollection<string> supportedVocalsSeparationAudioFiles = new HashSet<string>
+    {
+        "wav",
+        "mp3",
+        "ogg",
+        "m4a",
+        "wma",
+        "flac",
+    }.ToHashSet();
+
+    public static readonly IReadOnlyCollection<string> supportedBasicPitchDetectionAudioFiles = new HashSet<string>
+    {
+        "wav",
+        "mp3",
+        "ogg",
+    }.ToHashSet();
+
+    public static readonly IReadOnlyCollection<string> unitySupportedVideoFiles = new HashSet<string>
+    {
+        // See https://docs.unity3d.com/Manual/VideoSources-FileCompatibility.html#CompatibilityWithTargetPlatforms
+#if !UNITY_STANDALONE_LINUX
+        "mp4",
+#endif
+        "avi",
+        "mpg",
+
+        // NOTE: webm is only supported by Unity when using VP8.
+        // webm with VP9 is not supported by Unity and will fail, such that ffmpeg or similar should be used as fallback.
+        "webm",
+    };
+
+    public static IReadOnlyCollection<string> supportedVideoFiles = GetSupportedVideoFiles(false, false);
+
     public static void OpenDirectory(string path)
     {
-        Application.OpenURL("file://" + path);
+        OpenUrl("file://" + path);
+    }
+
+    public static void OpenUrl(string url)
+    {
+        Debug.Log($"Open url: {url}");
+        ThreadUtils.RunOnMainThread(() => Application.OpenURL(url));
     }
 
     public static void QuitOrStopPlayMode()
     {
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+        EditorApplication.isPlaying = false;
 #else
         Application.Quit();
 #endif
@@ -28,6 +167,16 @@ public static class ApplicationUtils
 #endif
     }
 
+    public static string GetPersistentDataPath(string pathInPersistentDataFolder)
+    {
+        return Application.persistentDataPath + "/" + pathInPersistentDataFolder;
+    }
+
+    public static Vector2 GetScreenSize()
+    {
+        return new Vector2(Screen.width, Screen.height);
+    }
+
     public static ScreenResolution GetScreenResolution()
     {
         // Screen.currentResolution in window mode returns the size of the desktop, not of the Unity application.
@@ -38,33 +187,79 @@ public static class ApplicationUtils
 
     public static Vector2 GetScreenSizeInPanelCoordinates(PanelHelper panelHelper)
     {
-        return panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
+        return panelHelper.GetScreenSizeInPanelCoordinates();
+    }
+
+    public static bool IsSupportedImageFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return supportedImageFiles.Contains(fileExtension);
+    }
+
+    public static bool IsUnitySupportedAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return unitySupportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsFfmpegSupportedAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return ffmpegSupportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsFfmpegSupportedVideoFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return ffmpegSupportedVideoFiles.Contains(fileExtension);
+    }
+
+    public static bool IsVlcSupportedAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return vlcSupportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsVlcSupportedVideoFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return vlcSupportedVideoFiles.Contains(fileExtension);
     }
 
     public static bool IsSupportedAudioFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
-        return fileExtension
-            is "mp3"
-            or "ogg"
-            or "wav";
+        return supportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsUnitySupportedVideoFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return unitySupportedVideoFiles.Contains(fileExtension);
     }
 
     public static bool IsSupportedVideoFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
-        return fileExtension
-            is "avi"
-            or "mp4"
-            or "mpg"
-            or "mpeg"
-            or "vp8"
-            or "webm"
-            or "m4v"
-            or "mov"
-            or "dv"
-            or "afs"
-            or "wmf";
+        return supportedVideoFiles.Contains(fileExtension);
+    }
+
+    public static bool IsSupportedMidiFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return supportedMidiFiles.Contains(fileExtension);
+    }
+
+    public static bool IsSupportedVocalsSeparationAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return supportedVocalsSeparationAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsSupportedBasicPitchDetectionAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return supportedBasicPitchDetectionAudioFiles.Contains(fileExtension);
     }
 
     private static string NormalizeFileExtension(string fileExtension)
@@ -78,14 +273,6 @@ public static class ApplicationUtils
             fileExtension = fileExtension.Substring(1);
         }
         return fileExtension.ToLowerInvariant();
-    }
-
-    public static int ComparePaths(string path1, string path2)
-    {
-        return string.Compare(
-            Path.GetFullPath(path1).TrimEnd('\\'),
-            Path.GetFullPath(path2).TrimEnd('\\'),
-            StringComparison.InvariantCultureIgnoreCase);
     }
 
     public static bool IsLargeScreen()
@@ -112,14 +299,8 @@ public static class ApplicationUtils
     {
         if (PlatformUtils.IsAndroid)
         {
-            string internalStorageTranslation = "Internal Storage";
-            string sdCardStorageTranslation = "SD Card";
-            if (ThreadUtils.IsMainThread())
-            {
-                // The ProTrans TranslationManager only works on the main thread.
-                internalStorageTranslation = TranslationManager.GetTranslation("androidInternalStorage");
-                sdCardStorageTranslation = TranslationManager.GetTranslation("androidSdCardStorage");
-            }
+            string internalStorageTranslation = Translation.Get("androidInternalStorage");
+            string sdCardStorageTranslation = Translation.Get("androidSdCardStorage");
 
             string internalStorageRoot = AndroidUtils.GetStorageRootPath(false);
             string sdCardStorageRoot = AndroidUtils.GetStorageRootPath(true);
@@ -129,5 +310,107 @@ public static class ApplicationUtils
         }
 
         return text;
+    }
+
+    public static string GetGeneratedOutputFolderForSourceFilePath(string generatedFolderBasePath, string sourceFilePath)
+    {
+        // Include hash code of file path in the generated folder name
+        int sourceFilePathHash = new FileInfo(sourceFilePath).FullName.GetHashCode();
+        string sourceFilePathHashHex = Convert.ToString(sourceFilePathHash, 16);
+        string sourceFileNameWithoutExtension = Path.GetFileNameWithoutExtension(sourceFilePath);
+        string generatedFolderName = $"{sourceFileNameWithoutExtension}__{sourceFilePathHashHex}";
+
+        string generatedOutputFolder = generatedFolderBasePath + $"/{generatedFolderName}";
+        return generatedOutputFolder;
+    }
+
+    public static string GetDemoSongFolderAbsolutePath()
+    {
+        return GetStreamingAssetsPath("DemoSongs");
+    }
+
+    public static bool IsGeneratedAudioFile(string audioFile)
+    {
+        // Audio separation creates files called "vocals.ogg" and "instrumental.ogg"
+        return Path.GetFileName(audioFile) == "vocals"
+               || Path.GetFileName(audioFile) == "instrumental";
+    }
+
+    public static void SetUsePortAudio(bool preferPortAudio)
+    {
+        IMicrophoneAdapter.Instance.UsePortAudio = preferPortAudio && CanUsePortAudio();
+    }
+
+    public static bool CanUsePortAudio()
+    {
+        // TODO: Build PortAudio for Linux and macOS and include the compiled libs in PortAudioForUnity.
+        return PlatformUtils.IsWindows;
+    }
+
+    public static string GetVideoPlayerUri(string uri)
+    {
+        // Unity on Android MUST NOT use the file:// scheme for vp8/webm files.
+        // See https://forum.unity.com/threads/videoplayer-url-issue-with-vp8-webm-on-android-androidvideomedia-error-opening-extractor-10002.1255434/#post-7978743
+#if UNITY_ANDROID
+        if (uri.StartsWith("file://") && (uri.EndsWith(".vp8") || uri.EndsWith(".webm")))
+        {
+            return uri.Substring("file://".Length);
+        }
+#endif
+        return uri;
+    }
+
+    private static IReadOnlyCollection<string> GetSupportedAudioFiles(bool includeFfmpegFormats, bool includeVlcFormats)
+    {
+        return unitySupportedAudioFiles
+            .Union(supportedMidiFiles)
+            .Union(includeFfmpegFormats ? ffmpegSupportedAudioFiles : new List<string>())
+            .Union(includeVlcFormats ? ffmpegSupportedAudioFiles : new List<string>())
+            .ToHashSet();
+    }
+
+    private static IReadOnlyCollection<string> GetSupportedVideoFiles(bool includeFfmpegFormats, bool includeVlcFormats)
+    {
+        return unitySupportedVideoFiles
+            .Union(includeFfmpegFormats ? ffmpegSupportedVideoFiles : new List<string>())
+            .Union(includeVlcFormats ? vlcSupportedVideoFiles : new List<string>())
+            .ToHashSet();
+    }
+
+    public static string GetTemporaryCachePath(string pathInsideTemporaryCachePath)
+    {
+        return $"{Application.temporaryCachePath}/{pathInsideTemporaryCachePath}";
+    }
+
+    private static IReadOnlyCollection<string> ReadAudioFileExtensionsFromFile()
+    {
+        try
+        {
+            return File.ReadAllLines(GetStreamingAssetsPath("audio-file-extensions.txt"), System.Text.Encoding.UTF8);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+
+            List<string> fallbackList = new List<string>() { "ogg", "mp3", "wav" };
+            Debug.LogError($"Failed to load audio file extensions from file. Using fallback list: {fallbackList.JoinWith(", ")}");
+            return fallbackList;
+        }
+    }
+
+    private static IReadOnlyCollection<string> ReadFfmpegSupportedFileExtensionsFromFile()
+    {
+        try
+        {
+            return File.ReadAllLines(GetStreamingAssetsPath("ffmpeg-supported-common-file-extensions.txt"), System.Text.Encoding.UTF8);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+
+            List<string> fallbackList = new List<string>() { "ogg", "mp3", "wav" };
+            Debug.LogError($"Failed to load ffmpeg supported audio file extensions from file. Using fallback list: {fallbackList.JoinWith(", ")}");
+            return fallbackList;
+        }
     }
 }

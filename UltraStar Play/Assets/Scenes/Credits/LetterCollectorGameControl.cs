@@ -1,13 +1,8 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UniInject;
-using UniRx;
-using Random = UnityEngine.Random;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -68,6 +63,9 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private AchievementEventStream achievementEventStream;
+
     private int categoryIndex;
     private List<CreditsCategoryEntry> creditsCategoryEntries;
     private List<CreditsEntry> remainingCreditsEntries;
@@ -83,9 +81,12 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
 
     private Vector2 lastCreatedEntryControlPosition;
 
+    private bool wasSkipButtonClicked;
+
     public void Start()
     {
         // Init UI
+        background.ShowByDisplay();
         creditsSummaryLabel.text = "";
         scoreLabel.text = "0";
         bonusLabel.style.opacity = 0;
@@ -95,7 +96,11 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
         creditsCategoryEntries = JsonConverter.FromJson<List<CreditsCategoryEntry>>(creditsEntriesTextAsset.text);
         SelectNextCategoryEntry();
 
-        skipButton.RegisterCallbackButtonTriggered(_ => forceFadeOut = true);
+        skipButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            wasSkipButtonClicked = true;
+            forceFadeOut = true;
+        });
     }
 
     private void SelectNextCategoryEntry()
@@ -149,6 +154,12 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
             else
             {
                 StartFadeOut();
+
+                // Trigger achievement for watching the credits without skipping
+                if (!wasSkipButtonClicked)
+                {
+                    achievementEventStream.OnNext(new AchievementEvent(AchievementId.watchCreditsWithoutSkipping));
+                }
             }
         }
     }
@@ -160,11 +171,8 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
         LeanTween.value(gameObject, 1, 0, fadeOutTimeInSeconds)
             .setOnUpdate(value =>
             {
-                player.style.opacity = value;
-                categoryNameContainer.style.opacity = value;
-                skipButton.style.opacity = value;
-                background.style.unityBackgroundImageTintColor = new StyleColor(new Color(1, 1, 1, value));
-                secondBackground.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.2f, 0.2f, 0.2f, 1 - value));
+                background.style.opacity = value;
+                secondBackground.style.opacity = 1 - value;
             });
 
         string creditsSummaryText = creditsCategoryEntries
@@ -177,6 +185,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
                     ? ($"<i>{category.Name}</i>" + "\n" + categoryContent)
                     : categoryContent;
             }).JoinWith("\n\n");
+
         // Extra line breaks for continued scroll range
         creditsSummaryLabel.text = creditsSummaryText + "\n\n\n\n\n\n\n\n";
     }

@@ -1,0 +1,240 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
+using UnityEngine;
+
+[Serializable]
+public class Sentence
+{
+    public static readonly IComparer<Sentence> comparerByStartBeat = new SentenceComparerByStartBeat();
+
+    // Breaks the serialization loop with Voice.sentences. The field is restored by the Voice.
+    [JsonIgnore]
+    [NonSerialized]
+    private Voice voice;
+    [JsonIgnore]
+    public Voice Voice { get { return voice; } }
+
+    // LinebreakBeat can be set to extend the duration the sentence is shown.
+    // Must be greater than the MaxBeat and smaller or equal to the MinBeat of the following sentence.
+    public int LinebreakBeat { get; private set; }
+
+    private readonly HashSet<Note> notes = new();
+    public IReadOnlyCollection<Note> Notes { get { return notes; } }
+
+    // The following fields are computed from the list of notes.
+    public int MinBeat { get; private set; }
+    public int MaxBeat { get; private set; }
+
+    // ExtendedMaxBeat is equal to Math.Max(MaxBeat, LinebreakBeat)
+    public int ExtendedMaxBeat { get; private set; }
+
+    public int LengthInBeats => MaxBeat - MinBeat;
+    public int ExtendedLengthInBeats => ExtendedMaxBeat - MinBeat;
+
+    public Sentence()
+    {
+    }
+
+    public Sentence(int minBeat, int maxBeat)
+    {
+        MinBeat = minBeat;
+        MaxBeat = maxBeat;
+        LinebreakBeat = maxBeat;
+        ExtendedMaxBeat = maxBeat;
+    }
+
+    public Sentence(List<Note> notes, int linebreakBeat = 0)
+    {
+        LinebreakBeat = linebreakBeat;
+        ExtendedMaxBeat = linebreakBeat;
+        SetNotes(notes);
+    }
+
+    public void SetVoice(Voice voice)
+    {
+        if (this.voice == voice)
+        {
+            return;
+        }
+
+        if (this.voice != null)
+        {
+            this.voice.RemoveSentence(this);
+        }
+        this.voice = voice;
+        if (this.voice != null)
+        {
+            this.voice.AddSentence(this);
+        }
+    }
+
+    public void UpdateMinAndMaxBeat(bool keepLinebreakBeatOverhang=true)
+    {
+        UpdateMinBeat();
+        UpdateMaxBeat(keepLinebreakBeatOverhang);
+    }
+
+    public void SetNotes(List<Note> newNotes)
+    {
+        if (newNotes == null)
+        {
+            throw new ArgumentNullException("Notes cannot be null!");
+        }
+
+        foreach (Note note in new List<Note>(notes))
+        {
+            RemoveNote(note);
+        }
+
+        foreach (Note note in newNotes)
+        {
+            this.notes.Add(note);
+            note.SetSentence(this);
+        }
+
+        UpdateMinAndMaxBeat(false);
+    }
+
+    public void AddNote(Note note, bool keepLineBreakBeatOverhang = true)
+    {
+        if (note == null)
+        {
+            throw new ArgumentNullException("Note cannot be null");
+        }
+
+        // The check is needed to avoid a recursive loop between Sentence.AddNote and Note.SetSentence.
+        if (notes.Contains(note))
+        {
+            return;
+        }
+        notes.Add(note);
+        note.SetSentence(this);
+
+        UpdateMinAndMaxBeat(keepLineBreakBeatOverhang);
+    }
+
+    public void RemoveNote(Note note)
+    {
+        if (note == null)
+        {
+            throw new UnityException("Note cannot be null");
+        }
+
+        // The check is needed to avoid a recursive loop between Sentence.RemoveNote and Note.SetSentence.
+        if (!notes.Contains(note))
+        {
+            return;
+        }
+        notes.Remove(note);
+        note.SetSentence(null);
+
+        if (MinBeat == note.StartBeat)
+        {
+            UpdateMinBeat();
+        }
+        if (MaxBeat == note.EndBeat)
+        {
+            UpdateMaxBeat();
+        }
+    }
+
+    public void FitToNotes()
+    {
+        UpdateMinAndMaxBeat();
+        SetLinebreakBeat(MaxBeat);
+    }
+
+    public void SetLinebreakBeat(int newBeat)
+    {
+        LinebreakBeat = Math.Max(MaxBeat, newBeat);
+        ExtendedMaxBeat = Math.Max(MaxBeat, LinebreakBeat);
+    }
+
+    public bool ContainsBeatRange(int fromBeat, int untilBeat)
+    {
+        return MinBeat <= fromBeat
+               && untilBeat <= ExtendedMaxBeat;
+    }
+
+    public void UpdateMinBeat()
+    {
+        if (notes.Count > 0)
+        {
+            MinBeat = notes.Select(it => it.StartBeat).Min();
+        }
+    }
+
+    public void UpdateMaxBeat(bool keepLinebreakBeatOverhang=true)
+    {
+        if (notes.Count > 0)
+        {
+            int lastMaxBeat = MaxBeat;
+            int lastLinebreakBeatOverhang = LinebreakBeat - lastMaxBeat;
+            MaxBeat = notes.Select(it => it.EndBeat).Max();
+
+            // Keep distance from MaxBeat to LinebreakBeat when moving notes
+            if (keepLinebreakBeatOverhang
+                && lastMaxBeat != MaxBeat
+                && LinebreakBeat < int.MaxValue - lastLinebreakBeatOverhang)
+            {
+                LinebreakBeat = MaxBeat + lastLinebreakBeatOverhang;
+                ExtendedMaxBeat = LinebreakBeat;
+            }
+
+            if (LinebreakBeat < MaxBeat)
+            {
+                LinebreakBeat = MaxBeat;
+                ExtendedMaxBeat = MaxBeat;
+            }
+        }
+    }
+
+    public void OnAfterDeserialize()
+    {
+        foreach (Note note in notes)
+        {
+            note.SetSentence(this);
+        }
+    }
+
+    public Sentence CloneDeep()
+    {
+        List<Note> notesCopy = new();
+        foreach (Note note in notes)
+        {
+            Note noteCopy = note.Clone();
+            notesCopy.Add(noteCopy);
+        }
+
+        Sentence clone = new(notesCopy, LinebreakBeat);
+        return clone;
+    }
+
+    private class SentenceComparerByStartBeat : IComparer<Sentence>
+    {
+        public int Compare(Sentence x, Sentence y)
+        {
+            if (x == null && y == null)
+            {
+                return 0;
+            }
+            else if (x == null)
+            {
+                return -1;
+            }
+            else if (y == null)
+            {
+                return 1;
+            }
+
+            return x.MinBeat.CompareTo(y.MinBeat);
+        }
+    }
+
+    public override string ToString()
+    {
+        return $"Sentence(MinBeat: {MinBeat}, MaxBeat: {MaxBeat}, Lyrics: {Notes.Select(note => note.Text).JoinWith("")})";
+    }
+}

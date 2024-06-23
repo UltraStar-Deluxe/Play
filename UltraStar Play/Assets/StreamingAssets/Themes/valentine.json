@@ -1,44 +1,54 @@
 {
     "defaultControl": {
-        "fontColor": "#F2D8D8",
+        "fontColor": "#ffe6e6",
         "backgroundColor": "#DB5D77",
-        "hoverBackgroundColor": "#BF5067",
-        "focusBackgroundColor": "#BF5067",
-        "activeBackgroundColor": "#DB5D77",
-        "focusBorderColor": "#DB5D77",
+        "hoverBackgroundColor": "#f26886",
+        "focusBackgroundColor": "#f26886",
+        "focusBorderColor": "#DB5D77"
     },
 
     "transparentButton": {
+        "fontColor": "#ffe6e6",
         "backgroundColor": "#00000100",
         "hoverBackgroundColor": "#20202060",
         "focusBackgroundColor": "#20202080",
         "activeBackgroundColor": "#40404080",
+        "textShadow": {
+            "color": "#bfbfbf",
+            "offset": {
+                "x": 1,
+                "y": 1
+            }
+        }
     },
 
     "dynamicPanel": {
         "backgroundColor": "#00000100",
-        "hoverBackgroundColor": "#1D2939",
-        "focusBackgroundColor": "#1D2939",
-        "activeBackgroundColor": "#1D2939"
+        "focusBackgroundColor": "#1D2939"
     },
 
     "staticPanel": {
-        "backgroundGradient": "24deg, #233043, #344054",
+        "backgroundGradient": "24deg, #233043, #344054"
     },
 
-    "staticBackground": {
-        "imagePath": "backgrounds/black-10percent.png",
-        "scaleMode": "StretchToFill",
-    },
-    "sceneSpecificStaticBackgrounds": {
+    "sceneSpecificBackgrounds": {
         "MainScene": {
-            "imagePath": "backgrounds/fully-transparent.png",
-            "scaleMode": "ScaleAndCrop",
+            "staticBackground": {
+                "imagePath": "backgrounds/fully-transparent.png",
+                "imageScaleMode": "ScaleAndCrop"
+            }
         }
     },
     
-    "primaryFontColor": "#F0F0F0",
-    "secondaryFontColor": "#CCCCCC",
+    "primaryFontColor": "#ffe6e6",
+    "secondaryFontColor": "#d9d9d9",
+    "noBackgroundInHierarchyTextShadow": {
+        "color": "#bfbfbf",
+        "offset": {
+            "x": 1,
+            "y": 1
+        }
+    },
     
     "dynamicBackground": {
         "gradientRampFile": "gradients/yellow pink.png",

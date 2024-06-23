@@ -1,18 +1,14 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class SongEditorVoiceLayer : AbstractSongEditorLayer
 {
-    public string VoiceName { get; private set; }
+    public EVoiceId VoiceId { get; private set; }
 
-    public SongEditorVoiceLayer(string voiceName)
+    public SongEditorVoiceLayer(EVoiceId voiceId)
     {
-        this.VoiceName = voiceName;
+        this.VoiceId = voiceId;
     }
 
-    public override string GetDisplayName()
+    public override Translation GetDisplayName()
     {
-        return VoiceName.Replace("P", "Player ");
+        return Translation.Get(VoiceId);
     }
 }

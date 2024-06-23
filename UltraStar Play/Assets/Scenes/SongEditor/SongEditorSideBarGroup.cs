@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,16 +26,16 @@ public class SongEditorSideBarGroup : VisualElement
 
     public string Label
     {
-        get => labelElement.text;
-        set => labelElement.text = value;
+        get => accordionItem.Title;
+        set => accordionItem.Title = value;
     }
 
-    private readonly Label labelElement;
+    private readonly AccordionItem accordionItem;
 
     public SongEditorSideBarGroup()
     {
         // Load UXML and add as child element
-        const string path = "SongEditorSideBarGroupUi";
+        string path = "SongEditorSideBarGroupUi";
         var visualTreeAsset = Resources.Load<VisualTreeAsset>(path);
         if (visualTreeAsset == null)
         {
@@ -45,10 +44,8 @@ public class SongEditorSideBarGroup : VisualElement
         }
         visualTreeAsset.CloneTree(this);
 
-        VisualElement groupContainer = this.Q<VisualElement>("groupContainer");
-        groupContainer.AddToClassList("songEditorSideBarGroupContentContainer");
-        contentContainer = groupContainer;
-        labelElement = this.Q<Label>("groupTitle");
+        accordionItem = this.Q<AccordionItem>();
+        contentContainer = this.Q<VisualElement>("accordionItemContent");
         Label = "Group Title";
     }
 }

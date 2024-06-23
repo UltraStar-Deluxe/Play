@@ -4,34 +4,29 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - SceneStartupController
-  - SceneNavigator
-  - I18NManager
-  - PlayerProfileManager
-  - SongMetaManager
-  - ApplicationManager
-  - ThemeManager
-  - SettingsManager
+  - UIDocument
+  - InputManager
+  - DontDestroyOnLoadManager
+  - TranslationManager
+  - SceneInjectionManager
   - EventSystem
   - UiManager
-  - StatsManager
-  - Canvas
-  - ContextMenuManager
-  - CursorManager
-  - MidiManager
+  - SceneChangeAnimationControl
   - AudioManager
   - PlaylistManager
-  - CoroutineManager
-  - UIDocument
-  - SceneInjectionManager
-  - InputManager
+  - SceneNavigator
+  - SettingsManager
+  - ThemeManager
   - ServerSideConnectRequestManager
-  - TranslationManager
+  - CursorManager
+  - ApplicationManager
+  - SongMetaManager
+  - MidiManager
+  - StatsManager
   - StyleSheetControl
   - ContextMenuPopupManager
-  - BackgroundMusicManager
-  - SceneChangeAnimationControl
-  - DontDestroyOnLoadManager
+  - FxTemporaire
+  - NetworkManager
   layers:
   - Default
   - TransparentFX
@@ -39,10 +34,10 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - VfxForeground
+  - VfxBackground
+  - BackgroundLight
+  - WebView
   - 
   - 
   - 

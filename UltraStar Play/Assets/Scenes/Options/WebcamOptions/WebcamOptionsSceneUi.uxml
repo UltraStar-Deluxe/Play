@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
-        <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="devicePicker" label="Webcam device" />
-        <ui:Toggle name="useWebcamToggle" label="Use Webcam as background when singing" style="-unity-text-align: upper-center; width: auto;" />
+        <Chooser wrap-around="true" min-value="0" max-value="100" step-value="10" name="deviceChooser" label="$options_webcamDevice" class="noBackgroundInHierarchy" />
+        <ui:Toggle name="useWebcamToggle" label="$options_useWebcamAsBackground" class="noBackgroundInHierarchy" style="-unity-text-align: upper-center; width: auto;" />
         <ui:Image name="webcamRenderContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); -unity-background-image-tint-color: rgb(0, 0, 0); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px;" />
     </ui:VisualElement>
 </ui:UXML>

@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UniInject;
-using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -16,7 +14,7 @@ public class EditorSentenceLyricsInputControl : EditorLyricsInputPopupControl
     protected override string GetInitialText()
     {
         string text = LyricsUtils.GetEditModeText(editorSentenceControl.Sentence);
-        return ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(text);
+        return ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(text);
     }
 
     protected override void PreviewNewText(string newText)
@@ -27,7 +25,7 @@ public class EditorSentenceLyricsInputControl : EditorLyricsInputPopupControl
 
     protected override void ApplyNewText(string newText)
     {
-        if (!LyricsUtils.IsOnlyWhitespace(newText))
+        if (!StringUtils.IsOnlyWhitespace(newText))
         {
             ApplyEditModeText(newText, true);
         }
@@ -36,7 +34,7 @@ public class EditorSentenceLyricsInputControl : EditorLyricsInputPopupControl
     private void ApplyEditModeText(string editModeText, bool undoable)
     {
         // Map edit-mode text to lyrics of notes
-        string visibleWhiteSpaceText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
+        string visibleWhiteSpaceText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
         LyricsUtils.MapEditModeTextToNotes(visibleWhiteSpaceText, new List<Sentence> { editorSentenceControl.Sentence });
         songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }

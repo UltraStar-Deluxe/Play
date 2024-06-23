@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using PortAudioForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -20,6 +21,16 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
+
+    private int lastScreenWidth;
+    private int lastScreenHeight;
+    private readonly Subject<ScreenSizeChangedEvent> screenSizeChangedEventStream = new();
+    public IObservable<ScreenSizeChangedEvent> ScreenSizeChangedEventStream => screenSizeChangedEventStream;
+
+    private int lastTargetFrameRate;
+
     protected override object GetInstance()
     {
         return Instance;
@@ -27,30 +38,72 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
-        targetFrameRate = settings.GraphicSettings.targetFps;
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = targetFrameRate;
+        targetFrameRate = settings.TargetFps;
+        lastTargetFrameRate = targetFrameRate;
+        ApplyTargetFrameRateAndVSync();
+        lastScreenWidth = Screen.width;
+        lastScreenHeight = Screen.height;
 
-        settings.ObserveEveryValueChanged(it => it.GraphicSettings.targetFps)
-            .Subscribe(newValue => targetFrameRate = newValue);
+        settings.ObserveEveryValueChanged(it => it.TargetFps)
+            .Subscribe(newValue => targetFrameRate = newValue)
+            .AddTo(gameObject);
+
+        ApplicationUtils.SetUsePortAudio(settings.PreferPortAudio);
+
+        micSampleRecorderManager.ConnectedMicDevicesChangesStream
+            .Subscribe(_ => OnConnectedMicDevicesChanged())
+            .AddTo(gameObject);
+    }
+
+    private void OnConnectedMicDevicesChanged()
+    {
+        if (IMicrophoneAdapter.Instance.UsePortAudio)
+        {
+            Debug.LogWarning("Connected mic devices changed, but PortAudio is used for multi-channel support. A restart is required to use changed devices.");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_changedMicsRequireRestart));
+        }
+    }
+
+    private void ApplyTargetFrameRateAndVSync()
+    {
+        if (targetFrameRate <= 0)
+        {
+            // Use the frame rate of the monitor
+            Debug.Log("Set target frame rate to -1 (monitor refresh rate, vsync on)");
+            QualitySettings.vSyncCount = 1;
+            Application.targetFrameRate = -1;
+        }
+        else
+        {
+            // Use the target frame rate
+            Debug.Log($"Set target frame rate to {targetFrameRate} (vsync on)");
+            Application.targetFrameRate = targetFrameRate;
+            QualitySettings.vSyncCount = 0;
+        }
     }
 
     private void Update()
     {
-        if (Application.targetFrameRate != targetFrameRate)
+        if (this != Instance)
         {
-            Application.targetFrameRate = targetFrameRate;
+            return;
         }
-    }
 
-    protected override void OnEnableSingleton()
-    {
-        Application.logMessageReceivedThreaded += Log.HandleUnityLog;
-    }
+        if (lastTargetFrameRate != targetFrameRate)
+        {
+            lastTargetFrameRate = targetFrameRate;
+            ApplyTargetFrameRateAndVSync();
+        }
 
-    protected override void OnDisableSingleton()
-    {
-        Application.logMessageReceivedThreaded -= Log.HandleUnityLog;
+        if (lastScreenHeight != Screen.height
+            || lastScreenWidth != Screen.width)
+        {
+            screenSizeChangedEventStream.OnNext(new ScreenSizeChangedEvent(
+                new Vector2Int(lastScreenWidth, lastScreenHeight),
+                new Vector2Int(Screen.width, Screen.height)));
+            lastScreenWidth = Screen.width;
+            lastScreenHeight = Screen.height;
+        }
     }
 
     public bool HasCommandLineArgument(string argumentName)
@@ -89,7 +142,7 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         {
             if (PlatformUtils.IsStandalone)
             {
-                return System.Environment.GetCommandLineArgs();
+                return Environment.GetCommandLineArgs();
             }
             else
             {
@@ -101,17 +154,6 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
     public static string PersistentTempPath()
     {
         string path = Path.Combine(Application.persistentDataPath, "Temp");
-        //Create Directory if it does not exist
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
-        return path;
-    }
-
-    public static string PersistentSongsPath()
-    {
-        string path = Path.Combine(Application.persistentDataPath, "Songs");
         //Create Directory if it does not exist
         if (!Directory.Exists(path))
         {
