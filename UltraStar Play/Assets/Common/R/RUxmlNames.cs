@@ -519,6 +519,8 @@ public static partial class R
         public const string openFolderButton = "openFolderButton";
         public const string openFolderIcon = "openFolderIcon";
         public const string openImportLrcDialogButton = "openImportLrcDialogButton";
+        public const string openLogFolderButton = "openLogFolderButton";
+        public const string openLogFolderLabel = "openLogFolderLabel";
         public const string openModFolderButton = "openModFolderButton";
         public const string openModFolderIcon = "openModFolderIcon";
         public const string openPersistentDataPathButton = "openPersistentDataPathButton";
@@ -737,13 +739,13 @@ public static partial class R
         public const string showAudioWaveformInBackgroundToggle = "showAudioWaveformInBackgroundToggle";
         public const string showBackgroundButton = "showBackgroundButton";
         public const string showBackgroundIcon = "showBackgroundIcon";
+        public const string showConsoleButton = "showConsoleButton";
         public const string showControlHintsToggle = "showControlHintsToggle";
         public const string showCoverButton = "showCoverButton";
         public const string showCoverIcon = "showCoverIcon";
         public const string showCurrentResultsButton = "showCurrentResultsButton";
         public const string showFpsToggle = "showFpsToggle";
         public const string showHighscoreButton = "showHighscoreButton";
-        public const string showLogButton = "showLogButton";
         public const string showNotePitchLabelToggle = "showNotePitchLabelToggle";
         public const string showOnlyDuetsToggle = "showOnlyDuetsToggle";
         public const string showRightSideBarToggle = "showRightSideBarToggle";
