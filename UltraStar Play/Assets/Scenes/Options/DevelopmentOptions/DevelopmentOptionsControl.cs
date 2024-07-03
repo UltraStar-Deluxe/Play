@@ -80,6 +80,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.copyLogButton)]
     private Button copyLogButton;
 
+    [Inject(UxmlName = R.UxmlNames.reportIssueButton)]
+    private Button reportIssueButton;
+
     [Inject(UxmlName = R.UxmlNames.openPersistentDataPathButton)]
     private Button openPersistentDataPathButton;
 
@@ -300,6 +303,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         // View and copy log
         showConsoleButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
         openLogFolderButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(Log.logFileFolder));
+        reportIssueButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToReportIssues)));
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
