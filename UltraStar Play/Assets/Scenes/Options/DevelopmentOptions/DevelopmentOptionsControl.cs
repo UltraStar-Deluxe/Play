@@ -71,8 +71,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.httpEndpointExampleLabel)]
     private Label httpEndpointExampleLabel;
 
-    [Inject(UxmlName = R.UxmlNames.showLogButton)]
-    private Button showLogButton;
+    [Inject(UxmlName = R.UxmlNames.showConsoleButton)]
+    private Button showConsoleButton;
+
+    [Inject(UxmlName = R.UxmlNames.openLogFolderButton)]
+    private Button openLogFolderButton;
 
     [Inject(UxmlName = R.UxmlNames.copyLogButton)]
     private Button copyLogButton;
@@ -295,7 +298,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         }
 
         // View and copy log
-        showLogButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
+        showConsoleButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
+        openLogFolderButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(Log.logFileFolder));
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));

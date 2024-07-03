@@ -220,6 +220,9 @@ public static partial class R
         public static readonly string enum_Sorting_Language = "enum_Sorting_Language";
         public static readonly string enum_Sorting_Title = "enum_Sorting_Title";
         public static readonly string enum_Sorting_Year = "enum_Sorting_Year";
+        public static readonly string enum_StaticLyricsDisplayMode_Bottom = "enum_StaticLyricsDisplayMode_Bottom";
+        public static readonly string enum_StaticLyricsDisplayMode_None = "enum_StaticLyricsDisplayMode_None";
+        public static readonly string enum_StaticLyricsDisplayMode_Top = "enum_StaticLyricsDisplayMode_Top";
         public static readonly string enum_ThirdPartyLibraryUsage_Always = "enum_ThirdPartyLibraryUsage_Always";
         public static readonly string enum_ThirdPartyLibraryUsage_Never = "enum_ThirdPartyLibraryUsage_Never";
         public static readonly string enum_ThirdPartyLibraryUsage_WhenUnsupportedByUnity = "enum_ThirdPartyLibraryUsage_WhenUnsupportedByUnity";
@@ -284,7 +287,6 @@ public static partial class R
         public static readonly string onlineGame_error_failedToCreateLobby = "onlineGame_error_failedToCreateLobby";
         public static readonly string onlineGame_error_failedToJoinLobby = "onlineGame_error_failedToJoinLobby";
         public static readonly string onlineGame_error_failedToStartNetcodeHost = "onlineGame_error_failedToStartNetcodeHost";
-        public static readonly string onlineGame_error_hostMustRestart = "onlineGame_error_hostMustRestart";
         public static readonly string onlineGame_error_notAvailable = "onlineGame_error_notAvailable";
         public static readonly string onlineGame_error_playersDontHaveSongLocally = "onlineGame_error_playersDontHaveSongLocally";
         public static readonly string onlineGame_host = "onlineGame_host";
@@ -695,7 +697,6 @@ public static partial class R
         public static readonly string songSelectScene_noSongsFound_title = "songSelectScene_noSongsFound_title";
         public static readonly string songSelectScene_order = "songSelectScene_order";
         public static readonly string songSelectScene_receivedSongSuggestionDialog_message = "songSelectScene_receivedSongSuggestionDialog_message";
-        public static readonly string songSelectScene_receivedSongSuggestionDialog_title = "songSelectScene_receivedSongSuggestionDialog_title";
         public static readonly string songSelectScene_recreateSongDialog_message = "songSelectScene_recreateSongDialog_message";
         public static readonly string songSelectScene_recreateSongDialog_recreateAndSave = "songSelectScene_recreateSongDialog_recreateAndSave";
         public static readonly string songSelectScene_recreateSongDialog_recreateButDoNotSave = "songSelectScene_recreateSongDialog_recreateButDoNotSave";
@@ -706,8 +707,6 @@ public static partial class R
         public static readonly string songSelectScene_searchProperty_title = "songSelectScene_searchProperty_title";
         public static readonly string songSelectScene_searchTextFieldHint = "songSelectScene_searchTextFieldHint";
         public static readonly string songSelectScene_selectMicDialog_title = "songSelectScene_selectMicDialog_title";
-        public static readonly string songSelectScene_sendSongSuggestionDialog_message = "songSelectScene_sendSongSuggestionDialog_message";
-        public static readonly string songSelectScene_sendSongSuggestionDialog_title = "songSelectScene_sendSongSuggestionDialog_title";
         public static readonly string songSelectScene_title = "songSelectScene_title";
         public static readonly string songSelectScene_useJokerDialog_message = "songSelectScene_useJokerDialog_message";
         public static readonly string songSelectScene_useJokerDialog_title = "songSelectScene_useJokerDialog_title";
