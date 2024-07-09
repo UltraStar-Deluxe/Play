@@ -7,12 +7,12 @@ public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
 {
     public List<SongIssue> SongIssues { get; private set; } = new();
 
-    public LazyLoadedFromFileSongMeta(string filePath, Encoding encoding = null)
-        : this(new FileInfo(filePath), encoding)
+    public LazyLoadedFromFileSongMeta(string filePath, Encoding encoding = null, bool useUniversalCharsetDetector = true)
+        : this(new FileInfo(filePath), encoding, useUniversalCharsetDetector)
     {
     }
 
-    public LazyLoadedFromFileSongMeta(FileInfo fileInfo, Encoding encoding = null)
+    public LazyLoadedFromFileSongMeta(FileInfo fileInfo, Encoding encoding = null, bool useUniversalCharsetDetector = true)
     {
         if (fileInfo == null
             || !fileInfo.Exists)
@@ -25,7 +25,7 @@ public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
         DoLoadSong = () =>
         {
             using IDisposable d = new DisposableStopwatch($"Loading '{fileInfo.Name}' took <ms> ms", ELogEventLevel.Verbose);
-            UltraStarSongMeta loadedSongMeta = UltraStarSongParser.ParseFile(fileInfo.FullName, out List<SongIssue> songIssues, FileEncoding);
+            UltraStarSongMeta loadedSongMeta = UltraStarSongParser.ParseFile(fileInfo.FullName, out List<SongIssue> songIssues, FileEncoding, useUniversalCharsetDetector);
             CopyValues(loadedSongMeta);
 
             SongIssues = songIssues;
@@ -38,7 +38,7 @@ public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
                 FileInfo.FullName,
                 FileEncoding,
                 false,
-                false);
+                useUniversalCharsetDetector);
             voices.ForEach(voice => AddVoice(voice));
         };
 
