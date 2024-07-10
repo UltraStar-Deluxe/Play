@@ -382,6 +382,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnDisableMod(string modName)
     {
+        SaveModSettings(modName);
+
         string modFolder = GetModFolderByModFolderName(modName);
         List<IOnDisableMod> disableModHandlers = DoGetModObjects<IOnDisableMod>(modFolder, false);
         disableModHandlers.ForEach(disableModHandler =>
@@ -957,8 +959,14 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void SaveAllModSettings()
     {
+        GetModFolders().ForEach(modFolder => SaveModSettings(GetModFolderName(modFolder)));
+    }
+
+    private void SaveModSettings(string modName)
+    {
         modObjectToContext
-            .Where(entry => !entry.Value.IsObsolete)
+            .Where(entry => !entry.Value.IsObsolete
+                            && GetModFolderName(entry.Value.ModFolder) == modName)
             .Select(entry => entry.Key)
             .OfType<IModSettings>()
             .ForEach(modSettings => SaveModSettings(modSettings));
