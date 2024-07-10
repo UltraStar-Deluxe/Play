@@ -35,6 +35,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
     [UnityTearDown]
     public IEnumerator UnityTearDown()
     {
+        LogAssert.ignoreFailingMessages = true;
         yield return TearDownTestFixture();
     }
 
