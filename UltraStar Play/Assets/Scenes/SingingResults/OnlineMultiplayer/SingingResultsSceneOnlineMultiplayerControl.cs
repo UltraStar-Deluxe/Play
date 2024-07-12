@@ -1,4 +1,5 @@
-﻿using UniInject;
+﻿using CommonOnlineMultiplayer;
+using UniInject;
 using UniRx;
 using UnityEngine;
 
@@ -8,10 +9,18 @@ using UnityEngine;
 public class SingingResultsSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjection
 {
     [Inject]
-     private SingingResultsSceneControl singingResultsSceneControl;
+    private SingingResultsSceneControl singingResultsSceneControl;
+
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     private void Start()
     {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
         // Cannot restart directly
         singingResultsSceneControl.BeforeRestartEventStream.Subscribe(evt =>
         {
