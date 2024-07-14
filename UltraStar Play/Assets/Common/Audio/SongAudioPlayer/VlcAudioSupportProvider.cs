@@ -17,12 +17,16 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
     private float lastAudioListenerVolume;
     private double lastSetVolumeFactor = 1;
 
+    private bool isPaused;
+
     private void Update()
     {
-        if (IsPlaying)
+        if (!isPaused && IsPlaying)
         {
             lastVlcMediaPlayerTimeInMillisWhenPlaying = vlcMediaPlayer.Time;
         }
+
+        UpdateVlcMediaPlayerPause();
 
         // Update volume when AudioListener.volume changes
         if (Math.Abs(AudioListener.volume - lastAudioListenerVolume) > 0.01f)
@@ -30,6 +34,17 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
             lastAudioListenerVolume = AudioListener.volume;
             // AudioListener.volume is considered as part of the property setter
             VolumeFactor = lastSetVolumeFactor;
+        }
+    }
+
+    private void UpdateVlcMediaPlayerPause()
+    {
+        // TODO: Workaround for unreliable VLC MediaPlayer pause state ( https://code.videolan.org/videolan/vlc/-/issues/28353 )
+        if (isPaused && vlcMediaPlayer != null && vlcMediaPlayer.IsPlaying)
+        {
+            Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing anyway. Set VLC MediaPlayer to pause again.");
+            vlcMediaPlayer.SetPause(true);
+            PositionInMillis = lastVlcMediaPlayerTimeInMillisWhenPlaying;
         }
     }
 
@@ -92,34 +107,20 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
 
     public override void Play()
     {
-        if (vlcMediaPlayer == null
-            || vlcMediaPlayer.IsPlaying)
-        {
-            return;
-        }
-
-        vlcMediaPlayer.PlayAsync();
+        isPaused = false;
+        vlcMediaPlayer?.PlayAsync();
     }
 
     public override void Pause()
     {
-        if (vlcMediaPlayer == null
-            || !vlcMediaPlayer.IsPlaying)
-        {
-            return;
-        }
-
-        vlcMediaPlayer.Pause();
+        isPaused = true;
+        vlcMediaPlayer?.SetPause(true);
     }
 
     public override void Stop()
     {
-        if (vlcMediaPlayer == null)
-        {
-            return;
-        }
-
-        vlcMediaPlayer.Stop();
+        isPaused = false;
+        vlcMediaPlayer?.Stop();
     }
 
     public override bool IsPlaying
@@ -154,7 +155,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         get
         {
             // VLC MediaPlayer continues time even if not playing. Workaround: return old time if not playing.
-            return vlcMediaPlayer.IsPlaying
+            return !isPaused && vlcMediaPlayer.IsPlaying
                 ? vlcMediaPlayer.Time
                 : lastVlcMediaPlayerTimeInMillisWhenPlaying;
         }

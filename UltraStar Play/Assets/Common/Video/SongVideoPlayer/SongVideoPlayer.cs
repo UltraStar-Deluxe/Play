@@ -576,13 +576,13 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         if (IsPlaying
             && !currentVideoSupportProvider.IsPlaying)
         {
-            Debug.Log($"{nameof(SongVideoPlayer)} should be playing, but {currentVideoSupportProvider} is not. Starting its playback now.");
+            Log.Debug(() => $"{nameof(SongVideoPlayer)} should be playing, but {currentVideoSupportProvider} is not. Starting its playback now.");
             currentVideoSupportProvider.Play();
         }
         else if (!IsPlaying
                  && currentVideoSupportProvider.IsPlaying)
         {
-            Debug.Log($"{nameof(SongVideoPlayer)} should not be playing, but {currentVideoSupportProvider} is. Pausing its playback now.");
+            Log.Debug(() => $"{nameof(SongVideoPlayer)} should not be playing, but {currentVideoSupportProvider} is. Pausing its playback now.");
             currentVideoSupportProvider.Pause();
         }
     }

@@ -410,13 +410,13 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         if (IsPlaying
             && !currentAudioSupportProvider.IsPlaying)
         {
-            Debug.Log($"{nameof(SongAudioPlayer)} should be playing, but {currentAudioSupportProvider} is not. Starting its playback now.");
+            Log.Debug(() => $"{nameof(SongAudioPlayer)} should be playing, but {currentAudioSupportProvider} is not. Starting its playback now.");
             currentAudioSupportProvider.Play();
         }
         else if (!IsPlaying
                  && currentAudioSupportProvider.IsPlaying)
         {
-            Debug.Log($"{nameof(SongAudioPlayer)} should not be playing, but {currentAudioSupportProvider} is. Pausing its playback now.");
+            Log.Debug(() => $"{nameof(SongAudioPlayer)} should not be playing, but {currentAudioSupportProvider} is. Pausing its playback now.");
             currentAudioSupportProvider.Pause();
         }
     }
