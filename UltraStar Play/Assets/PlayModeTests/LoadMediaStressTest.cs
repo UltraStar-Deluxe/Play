@@ -31,8 +31,7 @@ public class LoadMediaStressTest : AbstractPlayModeTest
     [Inject]
     private Settings settings;
 
-    protected override List<string> GetRelativeTestSongFilePaths() => new List<string>(){
-    };
+    protected override List<string> GetRelativeTestSongFilePaths() => new();
 
     protected override void ConfigureTestSettings(TestSettings settings)
     {
@@ -42,12 +41,16 @@ public class LoadMediaStressTest : AbstractPlayModeTest
             "D:/UltraStar-Songs-Prod/UltraStar-Songs-Local",
         };
         settings.SongPreviewDelayInMillis = 0;
+        settings.ShowSongIndexInSongSelect = true;
+        settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
     }
 
     [UnityTest]
     [Ignore(reason: "only for manual execution")] // TODO: prepare song folder for unit test
     public IEnumerator ShouldLoadSongsWithoutCrash()
     {
+        LogAssert.ignoreFailingMessages = true;
+
         List<SongMeta> songMetas = songMetaManager.GetSongMetas().ToList();
         for (int i = 0; i < songMetas.Count; i++)
         {
