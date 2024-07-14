@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="sentenceRatingBackground" style="align-items: center; justify-content: center; position: absolute;">
-        <ui:Label text="Test Text" display-tooltip-when-elided="true" name="text" class="textShadow" style="-unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/komika-poster-font/KomikaAxis-djl%20SDF.asset?fileID=11400000&amp;guid=06ccda7ad45ddb248b7d8e30bb4da4d0&amp;type=2#KomikaAxis-djl SDF&apos;);" />
+        <ui:Label text="Test Text" display-tooltip-when-elided="true" name="text" class="textShadow ignoreTheme" style="-unity-font-definition: url(&quot;project://database/Packages/playsharedui/Runtime/Fonts/komika-poster-font/KomikaAxis-djl%20SDF.asset?fileID=11400000&amp;guid=06ccda7ad45ddb248b7d8e30bb4da4d0&amp;type=2#KomikaAxis-djl SDF&quot;);" />
     </ui:VisualElement>
 </ui:UXML>
