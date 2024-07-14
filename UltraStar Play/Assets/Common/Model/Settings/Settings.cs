@@ -120,6 +120,7 @@ public class Settings : ISettings
         ESearchProperty.Title,
     };
     public Dictionary<string, MicProfileReference> PlayerProfileNameToLastUsedMicProfile { get; private set; } = new();
+    public int SongPreviewDelayInMillis { get; set; } = 500;
 
     // Technical settings
     public bool ShowFps { get; set; }

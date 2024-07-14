@@ -833,6 +833,7 @@ public static partial class R
         public const string songSelectionUi = "songSelectionUi";
         public const string SongSelectScenePlayerEntryUi = "SongSelectScenePlayerEntryUi";
         public const string SongSelectSearchPropertyDialogUi = "SongSelectSearchPropertyDialogUi";
+        public const string songSelectSongPreviewDelay = "songSelectSongPreviewDelay";
         public const string songSettingsProblemHintIcon = "songSettingsProblemHintIcon";
         public const string songsOptionsButton = "songsOptionsButton";
         public const string songTimeProgressBar = "songTimeProgressBar";

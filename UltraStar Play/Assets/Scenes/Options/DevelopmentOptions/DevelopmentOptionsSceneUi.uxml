@@ -65,6 +65,7 @@
                 <ui:Toggle name="enableDynamicThemesToggle" label="Enable Themes¹" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="wipeLyricsEffectToggle" label="Wipe Lyrics Effect" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="analyzeBeatsWithoutTargetNoteToggle" label="Analyze Beats Without Target Note" class="noBackgroundInHierarchy" />
+                <ui:IntegerField label="Song Preview Delay (ms)" name="songSelectSongPreviewDelay" value="500" class="noBackgroundInHierarchy mb-3" />
             </AccordionItem>
             <AccordionItem name="clientConnectionGroup" label="Companion Client Connections" class="child-mb-3">
                 <ui:IntegerField label="Connection Port¹&#10;(default 34567)" name="clientDiscoveryPortTextField" value="34567" class="noBackgroundInHierarchy mb-3" />

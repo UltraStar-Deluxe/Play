@@ -98,6 +98,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.simulateJitterInMillisField)]
     private IntegerField simulateJitterInMillisField;
 
+    [Inject(UxmlName = R.UxmlNames.songSelectSongPreviewDelay)]
+    private IntegerField songSelectSongPreviewDelay;
+
     [Inject]
     private ThemeManager themeManager;
 
@@ -458,6 +461,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(wipeLyricsEffectToggle,
             () => settings.WipeLyrics,
             newValue => settings.WipeLyrics = newValue);
+
+        // Song preview delay
+        FieldBindingUtils.Bind(songSelectSongPreviewDelay,
+            () => settings.SongPreviewDelayInMillis,
+            newValue => settings.SongPreviewDelayInMillis = newValue);
 
         // Vfx enabled
         FieldBindingUtils.Bind(vfxEnabledToggle,

@@ -10,11 +10,7 @@ using UnityEngine;
 
 public class SongPreviewControl : MonoBehaviour, INeedInjection
 {
-    [InjectedInInspector]
-    public float previewDelayInSeconds = 0.5f;
-
-    [InjectedInInspector]
-    public bool stopOldImmediatelyOnStartNew;
+    public int PreviewDelayInMillis { get; set; } = -1;
 
     public float AudioFadeInDurationInSeconds { get; set; } = 2;
     public float VideoFadeInDurationInSeconds { get; set; } = 2;
@@ -121,24 +117,27 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (stopOldImmediatelyOnStartNew)
-        {
-            StopSongPreview();
-        }
-        else
-        {
-            StopAllCoroutines();
-        }
+        StopSongPreview();
 
         if (songMeta == currentPreviewSongMeta)
         {
             return;
         }
-
         currentPreviewSongMeta = songMeta;
-        if (songMeta != null)
+
+        int delayInMillis = PreviewDelayInMillis >= 0
+            ? PreviewDelayInMillis
+            : settings.SongPreviewDelayInMillis;
+        if (songMeta != null
+            && delayInMillis > 0)
         {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(previewDelayInSeconds, () => DoStartSongPreview(songMeta)));
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(
+                delayInMillis / 1000f,
+                () => DoStartSongPreview(songMeta)));
+        }
+        else
+        {
+            DoStartSongPreview(songMeta);
         }
     }
 
@@ -171,8 +170,16 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     public virtual void StopSongPreview()
     {
         StopAllCoroutines();
-        songAudioPlayer.UnloadAudio();
-        songVideoPlayer.UnloadVideo();
+        if (songAudioPlayer != null)
+        {
+            songAudioPlayer.UnloadAudio();
+        }
+
+        if (songVideoPlayer != null)
+        {
+            songVideoPlayer.UnloadVideo();
+        }
+
         isFadeInStarted = false;
         stopSongPreviewEventStream.OnNext(currentPreviewSongMeta);
     }
