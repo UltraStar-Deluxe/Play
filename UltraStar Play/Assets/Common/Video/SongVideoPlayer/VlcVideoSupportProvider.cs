@@ -34,7 +34,9 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         }
 
         mediaPlayer.Media = new Media(new Uri(videoUri));
-        mediaPlayer.Play();
+
+        // Play to trigger loading. PlayAsync to not block the main thread and avoid stutter.
+        mediaPlayer.PlayAsync();
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
@@ -55,7 +57,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
     public override void Play()
     {
-        mediaPlayer?.Play();
+        mediaPlayer?.PlayAsync();
     }
 
     public override void Pause()
