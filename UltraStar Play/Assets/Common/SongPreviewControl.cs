@@ -173,6 +173,9 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         if (songAudioPlayer != null)
         {
             songAudioPlayer.UnloadAudio();
+
+            // Set volume to zero to avoid hearing the last bit of the song.
+            songAudioPlayer.VolumeFactor = 0;
         }
 
         if (songVideoPlayer != null)
