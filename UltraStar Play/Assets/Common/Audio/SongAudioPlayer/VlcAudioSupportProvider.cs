@@ -13,7 +13,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
     private MediaPlayer vlcMediaPlayer;
     public MediaPlayer VlcMediaPlayer => vlcMediaPlayer;
 
-    private long lastVlcMediaPlayerTimeWhenPlaying;
+    private long lastVlcMediaPlayerTimeInMillisWhenPlaying;
     private float lastAudioListenerVolume;
     private double lastSetVolumeFactor = 1;
 
@@ -21,7 +21,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
     {
         if (IsPlaying)
         {
-            lastVlcMediaPlayerTimeWhenPlaying = vlcMediaPlayer.Time;
+            lastVlcMediaPlayerTimeInMillisWhenPlaying = vlcMediaPlayer.Time;
         }
 
         // Update volume when AudioListener.volume changes
@@ -156,11 +156,15 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
             // VLC MediaPlayer continues time even if not playing. Workaround: return old time if not playing.
             return vlcMediaPlayer.IsPlaying
                 ? vlcMediaPlayer.Time
-                : lastVlcMediaPlayerTimeWhenPlaying;
+                : lastVlcMediaPlayerTimeInMillisWhenPlaying;
         }
 
         // VLC MediaPlayer jumps to the end of the song when time is 0, so set 1 as minimum.
-        set => vlcMediaPlayer.SetTime((long)Math.Max(1, value));
+        set
+        {
+            lastVlcMediaPlayerTimeInMillisWhenPlaying = (long)value;
+            vlcMediaPlayer.SetTime((long)Math.Max(1, value));
+        }
     }
 
     public override double DurationInMillis => vlcMediaPlayer?.Length ?? 0;
