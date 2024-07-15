@@ -470,6 +470,24 @@ public static class SongMetaUtils
         return $"{artist}{joinWith}{title}";
     }
 
+    public static int GetMinMidiNote(List<Note> notes)
+    {
+        if (notes.IsNullOrEmpty())
+        {
+            return 0;
+        }
+        return notes.Select(note => note.MidiNote).Min();
+    }
+
+    public static int GetMaxMidiNote(List<Note> notes)
+    {
+        if (notes.IsNullOrEmpty())
+        {
+            return 0;
+        }
+        return notes.Select(note => note.MidiNote).Max();
+    }
+
     public static int MinBeat(List<Note> notes)
     {
         if (notes.IsNullOrEmpty())

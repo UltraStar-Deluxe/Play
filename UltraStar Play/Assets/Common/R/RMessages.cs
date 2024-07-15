@@ -492,6 +492,7 @@ public static partial class R
         public static readonly string singScene_action_restart = "singScene_action_restart";
         public static readonly string singScene_missingMicrophones_message = "singScene_missingMicrophones_message";
         public static readonly string singScene_missingMicrophones_title = "singScene_missingMicrophones_title";
+        public static readonly string singScene_options_noteDisplayLineCount = "singScene_options_noteDisplayLineCount";
         public static readonly string singScene_options_noteDisplayMode = "singScene_options_noteDisplayMode";
         public static readonly string singScene_options_showLyricsArea = "singScene_options_showLyricsArea";
         public static readonly string singScene_options_showLyricsOnNotes = "singScene_options_showLyricsOnNotes";

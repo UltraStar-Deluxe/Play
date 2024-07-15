@@ -11,8 +11,6 @@ using UnityEngine.UIElements;
 
 public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 {
-    private const int LineCount = 10;
-
     [Inject]
     private PlayerScoreControl playerScoreControl;
 
@@ -89,6 +87,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private AchievementEventStream achievementEventStream;
 
+    [Inject]
+    private Voice voice;
+
     private Color32 PlayerColor => CommonOnlineMultiplayerUtils.GetPlayerColor(playerProfile, micProfile);
 
     private AbstractSingSceneNoteDisplayer noteDisplayer;
@@ -113,7 +114,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         InitPlayerNameAndImage();
-        InitNoteDisplayer(LineCount);
+        InitNoteDisplayer();
 
         injector
             .WithBindingForInstance(noteDisplayer)
@@ -397,7 +398,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         noteDisplayer.CreatePerfectNoteEffect(perfectNote);
     }
 
-    private void InitNoteDisplayer(int localLineCount)
+    private void InitNoteDisplayer()
     {
         // Find a suited note displayer
         switch (settings.NoteDisplayMode)
@@ -417,7 +418,21 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         // Enable and initialize the selected note displayer
         injector.Inject(noteDisplayer);
-        noteDisplayer.SetLineCount(localLineCount);
+        noteDisplayer.SetLineCount(GetLineCount());
+    }
+
+    private int GetLineCount()
+    {
+        if (settings.NoteDisplayLineCount <= 0)
+        {
+            List<Note> notes = SongMetaUtils.GetAllNotes(voice);
+            int noteRange = SongMetaUtils.GetMaxMidiNote(notes) - SongMetaUtils.GetMinMidiNote(notes);
+            int singableNoteRange = MidiUtils.SingableNoteMax - MidiUtils.SingableNoteMin;
+            int finalNoteRange = NumberUtils.Limit(noteRange, 0, singableNoteRange);
+            return AbstractSingSceneNoteDisplayer.GetLineCount(finalNoteRange + 1);
+        }
+
+        return settings.NoteDisplayLineCount;
     }
 
     public void ShowLeadingPlayerIcon()

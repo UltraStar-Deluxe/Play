@@ -273,6 +273,13 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             .Bind(() => settings.NoteDisplayMode,
                  newValue => settings.NoteDisplayMode = newValue);
 
+        Chooser lineCountChooser = new();
+        lineCountChooser.SetTranslatedLabel(TranslationThatRequiresRestart(R.Messages.singScene_options_noteDisplayLineCount));
+        contextMenuPopup.AddVisualElement(lineCountChooser);
+        new EnumChooserControl<ENoteDisplayLineCount>(lineCountChooser)
+            .Bind(() => ToLineCountEnum(settings.NoteDisplayLineCount),
+                newValue => settings.NoteDisplayLineCount = ToLineCount(newValue));
+
         Chooser showSongProgressBarChooser = new();
         showSongProgressBarChooser.SetTranslatedLabel(Translation.Get(R.Messages.singScene_options_showProgressBar));
         contextMenuPopup.AddVisualElement(showSongProgressBarChooser);
@@ -336,6 +343,38 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         contextMenuPopup.AddVisualElement(new Label(Translation.Get(R.Messages.singScene_action_requiresRestart)));
         contextMenuPopup.AddButton(Translation.Get(R.Messages.singScene_action_restart), "replay",
             () => singSceneControl.Restart());
+    }
+
+    private int ToLineCount(ENoteDisplayLineCount lineCount)
+    {
+        switch (lineCount)
+        {
+            case ENoteDisplayLineCount.Auto: return 0;
+            case ENoteDisplayLineCount.Few: return 7;
+            case ENoteDisplayLineCount.Medium: return 10;
+            case ENoteDisplayLineCount.Many: return 18;
+            default: return 10;
+        }
+    }
+
+    private ENoteDisplayLineCount ToLineCountEnum(int lineCount)
+    {
+        if (lineCount <= 0)
+        {
+            return ENoteDisplayLineCount.Auto;
+        }
+        else if (lineCount < 10)
+        {
+            return ENoteDisplayLineCount.Few;
+        }
+        else if (lineCount == 10)
+        {
+            return ENoteDisplayLineCount.Medium;
+        }
+        else
+        {
+            return ENoteDisplayLineCount.Many;
+        }
     }
 
     private void FillRegularContextMenu(ContextMenuPopupControl contextMenuPopup)
