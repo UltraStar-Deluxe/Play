@@ -64,8 +64,9 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
         songMetaChangeEventStream.Subscribe(evt =>
         {
-            if (evt is SongPropertyChangedEvent songPropertyChangedEvent
-                && songPropertyChangedEvent.SongProperty == ESongProperty.Gap)
+            if (evt
+                is SongPropertyChangedEvent { SongProperty: ESongProperty.Gap }
+                or LoadedMementoEvent)
             {
                 UpdateLines();
                 UpdateLabels();

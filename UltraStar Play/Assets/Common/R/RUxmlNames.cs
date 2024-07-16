@@ -60,6 +60,7 @@ public static partial class R
         public const string bottomLyricsContainer = "bottomLyricsContainer";
         public const string bottomRight = "bottomRight";
         public const string bottomRow = "bottomRow";
+        public const string bpmGroup = "bpmGroup";
         public const string bpmTextField = "bpmTextField";
         public const string btn_cfxr1 = "btn_cfxr1";
         public const string btn_cfxr2 = "btn_cfxr2";
@@ -263,11 +264,11 @@ public static partial class R
         public const string image = "image";
         public const string imageAsCursorToggle = "imageAsCursorToggle";
         public const string img_title = "img_title";
-        public const string importLrcFormatToP1Button = "importLrcFormatToP1Button";
-        public const string importLrcFormatToP2Button = "importLrcFormatToP2Button";
         public const string importLrcDialogOverlay = "importLrcDialogOverlay";
         public const string ImportLrcDialogUi = "ImportLrcDialogUi";
         public const string importLrcFormatButton = "importLrcFormatButton";
+        public const string importLrcFormatToP1Button = "importLrcFormatToP1Button";
+        public const string importLrcFormatToP2Button = "importLrcFormatToP2Button";
         public const string importLrcIssueContainer = "importLrcIssueContainer";
         public const string importLrcIssueLabel = "importLrcIssueLabel";
         public const string importLrcTextField = "importLrcTextField";
