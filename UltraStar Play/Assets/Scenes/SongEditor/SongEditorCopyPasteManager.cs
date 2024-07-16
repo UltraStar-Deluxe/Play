@@ -136,7 +136,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             Note pastedNote = CreateNote(noteCopy);
             pastedNote.IsEditable = true;
 
-            Sentence existingSentence = SongMetaUtils.GetSentenceAtBeat(voice, noteCopy.StartBeat);
+            Sentence existingSentence = SongMetaUtils.GetSentenceAtBeat(voice, noteCopy.StartBeat + distanceInBeats);
             if (existingSentence == null
                 && createdSentence == null)
             {
