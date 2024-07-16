@@ -263,9 +263,11 @@ public static partial class R
         public const string image = "image";
         public const string imageAsCursorToggle = "imageAsCursorToggle";
         public const string img_title = "img_title";
+        public const string importLrcFormatToP1Button = "importLrcFormatToP1Button";
+        public const string importLrcFormatToP2Button = "importLrcFormatToP2Button";
         public const string importLrcDialogOverlay = "importLrcDialogOverlay";
         public const string ImportLrcDialogUi = "ImportLrcDialogUi";
-        public const string importLrcFormatDialogButton = "importLrcFormatDialogButton";
+        public const string importLrcFormatButton = "importLrcFormatButton";
         public const string importLrcIssueContainer = "importLrcIssueContainer";
         public const string importLrcIssueLabel = "importLrcIssueLabel";
         public const string importLrcTextField = "importLrcTextField";

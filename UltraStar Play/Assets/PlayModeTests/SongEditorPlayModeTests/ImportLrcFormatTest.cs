@@ -30,7 +30,7 @@ public class SongEditorLrcFormatImportTest : AbstractPlayModeTest
         .ContinueWith(ExpectScene(EScene.SongEditorScene))
         .ContinueWith(_ => ClickButton(R.UxmlNames.openImportLrcDialogButton))
         .ContinueWith(_ => SetElementValue(R.UxmlNames.importLrcTextField, lrcExample))
-        .ContinueWith(_ => ClickButton(R.UxmlNames.importLrcFormatDialogButton))
+        .ContinueWith(_ => ClickButton(R.UxmlNames.importLrcFormatButton))
         .ContinueWith(_ => WaitForCondition("expect notes have been imported",
             () => ImportedNotes.Count == 30
                   && SongMetaUtils.GetLyrics(ImportedNotes).StartsWith("Freude, schöner Götterfunken"))

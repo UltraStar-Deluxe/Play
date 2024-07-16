@@ -558,6 +558,8 @@ public static partial class R
         public static readonly string songEditor_helpDialog_title = "songEditor_helpDialog_title";
         public static readonly string songEditor_issues_title = "songEditor_issues_title";
         public static readonly string songEditor_layers_title = "songEditor_layers_title";
+        public static readonly string songEditor_lrcImportDialog_importToP1 = "songEditor_lrcImportDialog_importToP1";
+        public static readonly string songEditor_lrcImportDialog_importToP2 = "songEditor_lrcImportDialog_importToP2";
         public static readonly string songEditor_lrcImportDialog_success = "songEditor_lrcImportDialog_success";
         public static readonly string songEditor_lrcImportDialog_title = "songEditor_lrcImportDialog_title";
         public static readonly string songEditor_midiImportDialog_assignToPlayer = "songEditor_midiImportDialog_assignToPlayer";
