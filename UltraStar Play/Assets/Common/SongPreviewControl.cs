@@ -236,7 +236,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        songAudioPlayer.LoadAndPlayAsObservable(songMeta)
+        songAudioPlayer.LoadAndPlayAsObservable(songMeta, previewStartInMillis)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
@@ -246,8 +246,6 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             })
             .Subscribe(_ =>
             {
-                Debug.Log($"Skipping to song preview of {songMeta.Title} at {previewStartInMillis} ms");
-                songAudioPlayer.PositionInMillis = previewStartInMillis;
                 songAudioPlayer.VolumeFactor = 0;
                 songAudioPlayer.PlayAudio();
             });

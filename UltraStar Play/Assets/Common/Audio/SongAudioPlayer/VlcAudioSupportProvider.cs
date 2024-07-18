@@ -41,9 +41,16 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         // TODO: Workaround for unreliable VLC MediaPlayer pause state ( https://code.videolan.org/videolan/vlc/-/issues/28353 )
         if (!shouldBePlaying && vlcMediaPlayer != null && vlcMediaPlayer.IsPlaying)
         {
-            Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing anyway. Set VLC MediaPlayer to pause again.");
-            vlcMediaPlayer.PauseAsync();
+            Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing. Set VLC MediaPlayer to pause again.");
+            vlcMediaPlayer.SetPause(true);
+            vlcMediaPlayer.SetVolume(0);
             PositionInMillis = lastVlcMediaPlayerTimeInMillisWhenPlaying;
+        }
+        else if (shouldBePlaying && vlcMediaPlayer != null && !vlcMediaPlayer.IsPlaying)
+        {
+            Log.Verbose(() => "Should be playing but VLC MediaPlayer is paused. Set VLC MediaPlayer to play again.");
+            vlcMediaPlayer.SetPause(false);
+            VolumeFactor = lastSetVolumeFactor;
         }
     }
 
@@ -55,7 +62,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         }
         else
         {
-            vlcMediaPlayer.Stop();
+            vlcMediaPlayer.StopAsync();
         }
 
         if (vlcMediaPlayer.Media != null)
@@ -85,7 +92,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
                         throw new AudioSupportProviderException(errorMessage);
                     }
 
-                    vlcMediaPlayer?.PauseAsync();
+                    vlcMediaPlayer.SetPause(true);
                     o.OnNext(new AudioLoadedEvent(audioUri));
                 }));
             return Disposable.Empty;
@@ -108,13 +115,13 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
     public override void Play()
     {
         shouldBePlaying = true;
-        vlcMediaPlayer?.PlayAsync();
+        vlcMediaPlayer?.SetPause(false);
     }
 
     public override void Pause()
     {
         shouldBePlaying = false;
-        vlcMediaPlayer?.PauseAsync();
+        vlcMediaPlayer?.SetPause(true);
     }
 
     public override void Stop()

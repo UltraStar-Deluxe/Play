@@ -28,8 +28,14 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         // TODO: Workaround for unreliable VLC MediaPlayer pause state ( https://code.videolan.org/videolan/vlc/-/issues/28353 )
         if (!shouldBePlaying && mediaPlayer != null && mediaPlayer.IsPlaying)
         {
-            Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing anyway. Set VLC MediaPlayer to pause again.");
+            Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing. Set VLC MediaPlayer to pause again.");
             mediaPlayer.SetPause(true);
+            PositionInMillis = lastVlcMediaPlayerTimeInMillisWhenPlaying;
+        }
+        else if (shouldBePlaying && mediaPlayer != null && !mediaPlayer.IsPlaying)
+        {
+            Log.Verbose(() => "Should be playing but VLC MediaPlayer is paused. Set VLC MediaPlayer to play again.");
+            mediaPlayer.SetPause(false);
             PositionInMillis = lastVlcMediaPlayerTimeInMillisWhenPlaying;
         }
     }
@@ -72,7 +78,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
                 () => mediaPlayer.Media != null && mediaPlayer.Media.Duration > 0,
                 () =>
                 {
-                    mediaPlayer?.PauseAsync();
+                    mediaPlayer.SetPause(true);
                     o.OnNext(new VideoLoadedEvent(videoUri));
                 }));
             return Disposable.Empty;
@@ -88,13 +94,13 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     public override void Play()
     {
         shouldBePlaying = true;
-        mediaPlayer?.PlayAsync();
+        mediaPlayer?.SetPause(false);
     }
 
     public override void Pause()
     {
         shouldBePlaying = false;
-        mediaPlayer?.PauseAsync();
+        mediaPlayer?.SetPause(true);
     }
 
     public override void Stop()
