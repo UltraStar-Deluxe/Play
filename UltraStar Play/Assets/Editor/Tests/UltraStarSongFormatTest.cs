@@ -24,6 +24,7 @@ public class UltraStarSongFormatTest
         SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/WithoutPhraseEndBeat.txt", out List<SongIssue> _);
         string txt = UltraStarFormatWriter.ToUltraStarSongFormat(songMeta);
         Assert.IsFalse(Regex.IsMatch(txt, @"- \d"));
+        Assert.IsTrue(txt.Contains("-"));
     }
 
     [Test]

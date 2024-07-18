@@ -82,6 +82,8 @@ public static class UltraStarFormatWriter
         if (sentence.ExtendedMaxBeat > sentence.MaxBeat)
         {
             sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+        } else {
+            sb.AppendLine($"-");
         }
     }
 
