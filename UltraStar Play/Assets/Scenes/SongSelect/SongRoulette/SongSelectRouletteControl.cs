@@ -32,6 +32,10 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    // TODO: searchControl should not be known to this class
+    [Inject]
+    private SongSearchControl songSearchControl;
+
     [Inject(UxmlName = R.UxmlNames.songListView)]
     private ListViewH songListView;
 
@@ -125,6 +129,12 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
         songListView.RegisterCallback<NavigationSubmitEvent>(_ =>
         {
+            if (songSearchControl.IsSearching)
+            {
+                songSearchControl.SubmitSearch();
+                return;
+            }
+
             if (SelectedEntry != null)
             {
                 submitEventStream.OnNext(SelectedEntry);
