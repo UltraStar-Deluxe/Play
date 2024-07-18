@@ -30,7 +30,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         // Update volume when AudioListener.volume changes, which is considered as part of the property setter
         if (shouldBePlaying
             && IsPlaying
-            && Math.Abs(VlcMediaPlayerTargetVolumeFactor - VolumeFactor) > 0.01f)
+            && Math.Abs(VlcMediaPlayerTargetVolumePercent - vlcMediaPlayer.Volume) > 1)
         {
             VolumeFactor = lastSetVolumeFactor;
         }
@@ -178,12 +178,12 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
             lastSetVolumeFactor = value;
             if (shouldBePlaying && IsPlaying)
             {
-                vlcMediaPlayer?.SetVolume((int)VlcMediaPlayerTargetVolumeFactor);
+                vlcMediaPlayer?.SetVolume(VlcMediaPlayerTargetVolumePercent);
             }
         }
     }
 
-    private double VlcMediaPlayerTargetVolumeFactor => lastSetVolumeFactor * 100.0 * AudioListener.volume;
+    private int VlcMediaPlayerTargetVolumePercent => (int)(lastSetVolumeFactor * 100.0 * AudioListener.volume);
 
     private void DestroyVlcMediaPlayer()
     {
