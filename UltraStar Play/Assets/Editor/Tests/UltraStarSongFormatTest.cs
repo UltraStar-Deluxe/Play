@@ -11,6 +11,22 @@ public class UltraStarSongFormatTest
     private static readonly string folderPath = Application.dataPath + "/Editor/Tests/TestSongs";
 
     [Test]
+    public void ShouldAddPhraseEndBeatIfNotSameAsMaxBeat()
+    {
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/WithPhraseEndBeat.txt", out List<SongIssue> _);
+        string txt = UltraStarFormatWriter.ToUltraStarSongFormat(songMeta);
+        Assert.IsTrue(Regex.IsMatch(txt, @"- \d"));
+    }
+
+    [Test]
+    public void ShouldNotAddPhraseEndBeatIfSameAsMaxBeat()
+    {
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/WithoutPhraseEndBeat.txt", out List<SongIssue> _);
+        string txt = UltraStarFormatWriter.ToUltraStarSongFormat(songMeta);
+        Assert.IsFalse(Regex.IsMatch(txt, @"- \d"));
+    }
+
+    [Test]
     public void ShouldNotContainP1InSoloSong()
     {
         SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/Solo.txt", out List<SongIssue> _);

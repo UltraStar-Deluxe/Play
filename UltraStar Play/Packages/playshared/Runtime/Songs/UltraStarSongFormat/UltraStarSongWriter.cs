@@ -78,7 +78,11 @@ public static class UltraStarFormatWriter
         {
             AppendNote(sb, note);
         }
-        sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+
+        if (sentence.ExtendedMaxBeat > sentence.MaxBeat)
+        {
+            sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+        }
     }
 
     private static bool IsNotEmpty(Voice voice)
