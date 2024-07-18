@@ -9,13 +9,13 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     private VlcManager vlcManager;
 
     private long lastVlcMediaPlayerTimeInMillisWhenPlaying;
-    private bool isPaused;
+    private bool shouldBePlaying;
 
     protected override void Update()
     {
         base.Update();
 
-        if (!isPaused && IsPlaying)
+        if (shouldBePlaying && IsPlaying)
         {
             lastVlcMediaPlayerTimeInMillisWhenPlaying = mediaPlayer.Time;
         }
@@ -26,7 +26,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     private void UpdateVlcMediaPlayerPause()
     {
         // TODO: Workaround for unreliable VLC MediaPlayer pause state ( https://code.videolan.org/videolan/vlc/-/issues/28353 )
-        if (isPaused && mediaPlayer != null && mediaPlayer.IsPlaying)
+        if (!shouldBePlaying && mediaPlayer != null && mediaPlayer.IsPlaying)
         {
             Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing anyway. Set VLC MediaPlayer to pause again.");
             mediaPlayer.SetPause(true);
@@ -70,7 +70,11 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
                 () => mediaPlayer.Media != null && mediaPlayer.Media.Duration > 0,
-                () => o.OnNext(new VideoLoadedEvent(videoUri))));
+                () =>
+                {
+                    mediaPlayer?.PauseAsync();
+                    o.OnNext(new VideoLoadedEvent(videoUri));
+                }));
             return Disposable.Empty;
         });
     }
@@ -83,20 +87,20 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
     public override void Play()
     {
-        isPaused = false;
+        shouldBePlaying = true;
         mediaPlayer?.PlayAsync();
     }
 
     public override void Pause()
     {
-        isPaused = true;
-        mediaPlayer?.Pause();
+        shouldBePlaying = false;
+        mediaPlayer?.PauseAsync();
     }
 
     public override void Stop()
     {
-        isPaused = false;
-        mediaPlayer?.Stop();
+        shouldBePlaying = true;
+        mediaPlayer?.StopAsync();
     }
 
     public override bool IsPlaying
@@ -136,7 +140,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         get
         {
             // VLC MediaPlayer continues time even if not playing. Workaround: return old time if not playing.
-            return !isPaused && mediaPlayer.IsPlaying
+            return shouldBePlaying && mediaPlayer.IsPlaying
                 ? mediaPlayer.Time
                 : lastVlcMediaPlayerTimeInMillisWhenPlaying;
         }
