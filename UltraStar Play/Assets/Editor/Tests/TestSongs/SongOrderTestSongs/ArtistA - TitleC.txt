@@ -1,0 +1,9 @@
+﻿#TITLE:TitleC
+#ARTIST:ArtistA
+#MP3:4s.ogg
+#BPM:200
+P1
+: 4 3 9 Hel
+: 8 3 9  lo
+: 12 3 9  P1!
+E
