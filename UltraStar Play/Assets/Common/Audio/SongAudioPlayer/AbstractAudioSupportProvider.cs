@@ -3,7 +3,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjection, IAudioSupportProvider
+public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IAudioSupportProvider
 {
     [Inject]
     protected Settings settings;
@@ -29,7 +29,7 @@ public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjecti
         Unload();
     }
 
-    protected virtual void OnInjectionFinished()
+    public virtual void OnInjectionFinished()
     {
         sceneNavigator.BeforeSceneChangeEventStream
             .Subscribe(evt =>
