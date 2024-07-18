@@ -3,13 +3,10 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IAudioSupportProvider
+public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjection, IAudioSupportProvider
 {
     [Inject]
     protected Settings settings;
-
-    [Inject]
-    protected SceneNavigator sceneNavigator;
 
     public abstract IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis);
     public abstract bool IsSupported(string audioUri);
@@ -27,16 +24,5 @@ public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjecti
     protected virtual void OnDestroy()
     {
         Unload();
-    }
-
-    public virtual void OnInjectionFinished()
-    {
-        sceneNavigator.BeforeSceneChangeEventStream
-            .Subscribe(evt =>
-            {
-                Stop();
-                Unload();
-            })
-            .AddTo(gameObject);
     }
 }
