@@ -63,7 +63,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     private Button quitSceneButton;
 
     [Inject(UxmlName = R.UxmlNames.songOrderDropdownField)]
-    private EnumField songOrderDropdownField;
+    private DropdownField songOrderDropdownField;
 
     [Inject(UxmlName = R.UxmlNames.playerList)]
     private VisualElement playerList;
@@ -245,6 +245,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     private readonly Subject<BeforeSongStartedEvent> beforeSongStartedEventStream = new();
     public IObservable<BeforeSongStartedEvent> BeforeSongStartedEventStream => beforeSongStartedEventStream;
 
+    private DropdownFieldControl<ESongOrder> songOrderDropdownFieldControl;
+
     public void OnInjectionFinished()
     {
         using IDisposable d = onInjectionFinishedProfilerMarker.Auto();
@@ -294,11 +296,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         nonPersistentSettings.MicTestActive.Subscribe(_ => UpdateMicCheckButton());
         UpdateMicCheckButton();
 
-        songOrderDropdownField.value = settings.SongOrder;
-        songOrderDropdownField.RegisterValueChangedCallback(evt =>
+        songOrderDropdownFieldControl = new(songOrderDropdownField, EnumUtils.GetValuesAsList<ESongOrder>(), settings.SongOrder,
+            item => Translation.Get(item));
+        songOrderDropdownFieldControl.SelectionAsObservable.Subscribe(newValue =>
         {
-            Debug.Log($"New order: {evt.newValue}");
-            settings.SongOrder = (ESongOrder)evt.newValue;
+            Debug.Log($"New order: {newValue}");
+            settings.SongOrder = newValue;
             UpdateFilteredSongs();
         });
 
@@ -328,7 +331,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         settings.ObserveEveryValueChanged(it => it.Difficulty)
             .Subscribe(it =>
             {
-                if (songOrderDropdownField.value is ESongOrder.LocalHighScore)
+                if (settings.SongOrder is ESongOrder.LocalHighScore)
                 {
                     UpdateFilteredSongs();
                 }
