@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UniInject;
 using UniRx;
@@ -65,23 +66,47 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
             AudioSource.Pause();
         });
-        songAudioPlayer.PositionEventStream.Subscribe(_ =>
-        {
-            if (AudioSource.clip == null
-                || !songAudioPlayer.IsPlaying)
-            {
-                return;
-            }
-
-            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
-        });
         songAudioPlayer.PlaybackSpeedChangedEventStream.Subscribe(newValue => AudioUtils.SetPitchWithPitchShifter(AudioSource, (float)newValue));
+
+        // Update AudioClip (instrumental, vocals) when corresponding settings change
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource)
+            .Subscribe(_ => UpdateAudioClip());
+
+        // Update music volume (instrumental, vocals, songAudioPlayer) when corresponding settings change
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource)
+            .Subscribe(_ => UpdateVolume());
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.MusicVolumePercent)
+            .Subscribe(_ => UpdateVolume());
+
+        songAudioPlayer.PlaybackStartedEventStream
+            .Subscribe(_ =>
+            {
+                UpdateVolume();
+                UpdateAudioClip();
+            });
     }
 
     private void Update()
     {
-        SelectAudioClip();
-        UpdateVolume();
+        SynchronizePositionWithSongAudioPlayer();
+    }
+
+    private void SynchronizePositionWithSongAudioPlayer()
+    {
+        if (!songAudioPlayer.IsPlaying)
+        {
+            return;
+        }
+
+        double targetPositionInMillis = songAudioPlayer.PositionInMillis;
+        double actualPositionInMillis = AudioSource.time * 1000;
+        double positionDifferenceInMillis = targetPositionInMillis - actualPositionInMillis;
+        double positionDistanceInMillis = Math.Abs(positionDifferenceInMillis);
+        if (positionDistanceInMillis > 1200)
+        {
+            // Re-Synchronize
+            AudioSource.time = (float)(targetPositionInMillis / 1000);
+        }
     }
 
     private void UpdateVolume()
@@ -98,7 +123,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private void SelectAudioClip()
+    private void UpdateAudioClip()
     {
         if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.OriginalMusic)
         {
