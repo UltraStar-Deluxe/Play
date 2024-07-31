@@ -37,7 +37,7 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
 
     public void OnInjectionFinished()
     {
-        Debug.Log("nameof(JukeboxAndSingControl)} -  OnInjectionFinished");
+        Debug.Log($"{nameof(JukeboxAndSingControl)} -  OnInjectionFinished");
 
         isInjectionFinished = true;
         singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.playerUiContainer).ToList());
@@ -52,6 +52,8 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             .Where(evt => evt.RecordedNote?.TargetNote != null
                           && evt.RecordedNote.TargetNote.MidiNote == evt.RecordedNote.RoundedMidiNote)
             .Subscribe(evt => lastMicInputTimeInMillis = TimeUtils.GetUnixTimeMilliseconds());
+
+        DisableSingSceneFinisher();
     }
 
     private void Update()
@@ -157,5 +159,19 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             unseenSongMetas = songMetaManager.GetSongMetas().ToList();
         }
         return RandomUtils.RandomOf(unseenSongMetas);
+    }
+
+    private void DisableSingSceneFinisher()
+    {
+        try
+        {
+            Debug.Log($"{nameof(JukeboxAndSingControl)} - disable SingSceneFinished");
+            FindFirstObjectByType<SingSceneFinisher>().gameObject.SetActive(false);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"{nameof(JukeboxAndSingControl)} - failed to disable SingSceneFinished");
+        }
     }
 }
