@@ -77,11 +77,17 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
     private void UpdateBackgroundMusic()
     {
         UpdateAudioClip();
+        UpdateVolume();
+        UpdatePlayPause();
+    }
 
-        // Update volume
+    private void UpdateVolume()
+    {
         backgroundMusicAudioSource.volume = settings.BackgroundMusicVolumePercent / 100f;
+    }
 
-        // Play or pause the music
+    private void UpdatePlayPause()
+    {
         if (ShouldPlayBackgroundMusic
             && !backgroundMusicAudioSource.isPlaying)
         {
@@ -98,7 +104,7 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
             backgroundMusicAudioSource.Play();
         }
         else if (!ShouldPlayBackgroundMusic
-            && backgroundMusicAudioSource.isPlaying)
+                 && backgroundMusicAudioSource.isPlaying)
         {
             backgroundMusicAudioSource.Pause();
             lastPauseTimeInSeconds = Time.time;
@@ -125,6 +131,8 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
                     {
                         backgroundMusicAudioSource.clip = defaultBackgroundMusicAudioClip;
                     }
+
+                    UpdatePlayPause();
                 });
         }
     }
