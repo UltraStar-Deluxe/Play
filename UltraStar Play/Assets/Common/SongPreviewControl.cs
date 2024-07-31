@@ -104,10 +104,12 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     {
         float audioFadeInFactor = (Time.time - fadeInStartTimeInSeconds) / Math.Max(AudioFadeInDurationInSeconds, 0.001f);
         audioFadeInFactor = NumberUtils.Limit(audioFadeInFactor, 0, 1);
-        float maxVolume = GetFinalPreviewVolume();
-        songAudioPlayer.VolumeFactor = audioFadeInFactor * maxVolume;
+        float audioFadeInFactorEased = LeanTween.easeInSine(0, 1, audioFadeInFactor);
 
-        return audioFadeInFactor;
+        float maxVolume = GetFinalPreviewVolume();
+        songAudioPlayer.VolumeFactor = audioFadeInFactorEased * maxVolume;
+
+        return audioFadeInFactorEased;
     }
 
     public virtual void StartSongPreview(SongMeta songMeta)
