@@ -25,7 +25,7 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
             && SongAudioPlayerVlcMediaPlayer != null;
     }
 
-    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
+    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis)
     {
         return Observable.Create<VideoLoadedEvent>(o =>
         {

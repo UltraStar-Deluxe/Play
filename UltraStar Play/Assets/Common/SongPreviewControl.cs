@@ -200,8 +200,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         videoFadeInStartTimeInSeconds = Time.time;
         isFadeInStarted = true;
         int previewStartInMillis = GetPreviewStartInMillis(songMeta);
-        StartAudioPreview(songMeta, previewStartInMillis);
-        StartVideoPreview(songMeta);
+        StartAudioPreview(songMeta, previewStartInMillis)
+            .Subscribe(_ => StartVideoPreview(songMeta));
 
         startSongPreviewEventStream.OnNext(songMeta);
     }
@@ -223,20 +223,24 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
+        Log.Debug(() => $"StartVideoPreview '{songMeta.GetArtistDashTitle()}'");
+
         VideoFadeIn.Value = 0;
         BackgroundImageFadeIn.Value = 0;
 
         songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(songMeta);
     }
 
-    protected virtual void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
+    protected virtual IObservable<SongAudioLoadedEvent> StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
     {
         if (!gameObject.activeInHierarchy)
         {
-            return;
+            return Observable.Empty<SongAudioLoadedEvent>();
         }
 
-        songAudioPlayer.LoadAndPlayAsObservable(songMeta, previewStartInMillis)
+        Log.Debug(() => $"StartAudioPreview '{songMeta.GetArtistDashTitle()}'");
+
+        return songAudioPlayer.LoadAndPlayAsObservable(songMeta, previewStartInMillis)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
@@ -244,10 +248,11 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                     "reason", ex.Message));
             })
-            .Subscribe(_ =>
+            .Select(evt =>
             {
                 songAudioPlayer.VolumeFactor = 0;
                 songAudioPlayer.PlayAudio();
+                return evt;
             });
     }
 

@@ -21,6 +21,8 @@ public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjecti
     public abstract double DurationInMillis { get; }
     public abstract double VolumeFactor { get; set; }
 
+    protected bool IsFullyLoaded => DurationInMillis > 0;
+
     protected virtual void OnDestroy()
     {
         Unload();

@@ -26,6 +26,11 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     private void UpdateVlcMediaPlayerPause()
     {
         // TODO: Workaround for unreliable VLC MediaPlayer pause state ( https://code.videolan.org/videolan/vlc/-/issues/28353 )
+        if (!IsFullyLoaded)
+        {
+            return;
+        }
+
         if (!shouldBePlaying && mediaPlayer != null && mediaPlayer.IsPlaying)
         {
             Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing. Set VLC MediaPlayer to pause again.");
@@ -47,7 +52,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
                && !videoEqualsAudio;
     }
 
-    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
+    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis)
     {
         // Instantiate new vlc player
         if (mediaPlayer == null)
@@ -69,6 +74,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
         // Play to trigger loading. PlayAsync to not block the main thread and avoid stutter.
         mediaPlayer.PlayAsync();
+        PositionInMillis = startPositionInMillis;
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
@@ -78,7 +84,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
                 () => mediaPlayer.Media != null && mediaPlayer.Media.Duration > 0,
                 () =>
                 {
-                    mediaPlayer.SetPause(true);
+                    mediaPlayer.SetPause(!shouldBePlaying);
                     o.OnNext(new VideoLoadedEvent(videoUri));
                 }));
             return Disposable.Empty;
@@ -94,13 +100,19 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     public override void Play()
     {
         shouldBePlaying = true;
-        mediaPlayer?.SetPause(false);
+        if (IsFullyLoaded)
+        {
+            mediaPlayer?.SetPause(false);
+        }
     }
 
     public override void Pause()
     {
         shouldBePlaying = false;
-        mediaPlayer?.SetPause(true);
+        if (IsFullyLoaded)
+        {
+            mediaPlayer?.SetPause(true);
+        }
     }
 
     public override void Stop()
@@ -157,7 +169,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         }
     }
 
-    public override double DurationInMillis => mediaPlayer.Length;
+    public override double DurationInMillis => mediaPlayer?.Length ?? 0;
 
     private void DestroyVlcMediaPlayer()
     {

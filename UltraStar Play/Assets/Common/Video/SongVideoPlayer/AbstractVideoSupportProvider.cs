@@ -10,7 +10,7 @@ public abstract class AbstractVideoSupportProvider : MonoBehaviour, INeedInjecti
     [Inject]
     protected SceneNavigator sceneNavigator;
 
-    public abstract IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri);
+    public abstract IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis);
     public abstract bool IsSupported(string videoUri, bool videoEqualsAudio);
     public abstract void Unload();
     public abstract void Play();
@@ -22,6 +22,8 @@ public abstract class AbstractVideoSupportProvider : MonoBehaviour, INeedInjecti
     public abstract double PlaybackSpeed { get; set; }
     public abstract double PositionInMillis { get; set; }
     public abstract double DurationInMillis { get; }
+
+    protected bool IsFullyLoaded => DurationInMillis > 0;
 
     public virtual void SetBackgroundScaleMode(ESongBackgroundScaleMode mode)
     {

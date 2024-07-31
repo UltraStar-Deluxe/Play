@@ -3,7 +3,7 @@ using UnityEngine;
 
 public interface IVideoSupportProvider
 {
-    public IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri);
+    public IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis);
     public void Unload();
     public bool IsSupported(string videoUri, bool videoEqualsAudio);
     public void Play();

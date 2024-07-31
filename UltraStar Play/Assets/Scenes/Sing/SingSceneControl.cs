@@ -320,9 +320,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         InitSingingLyricsControls();
 
-        StartAudioPlayback();
-
-        StartVideoOrShowBackgroundImage();
+        StartAudioPlayback()
+            .Subscribe(_ => StartVideoOrShowBackgroundImage());
 
         // Input legend (in pause overlay)
         UpdateInputLegend();
@@ -1221,17 +1220,17 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
     }
 
-    private void StartAudioPlayback()
+    private IObservable<SongAudioLoadedEvent> StartAudioPlayback()
     {
         if (songAudioPlayer.IsPlaying)
         {
             Debug.LogWarning("Song already playing");
-            return;
+            return Observable.Empty<SongAudioLoadedEvent>();
         }
 
         double startPositionInMillis = GetStartPositionInMillis();
 
-        songAudioPlayer.LoadAndPlayAsObservable(SongMeta, startPositionInMillis)
+        return songAudioPlayer.LoadAndPlayAsObservable(SongMeta, startPositionInMillis)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
@@ -1241,7 +1240,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
                 sceneNavigator.LoadScene(EScene.SongSelectScene);
             })
-            .Subscribe(_ =>
+            .Select(evt =>
             {
                 timeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationInMillis);
                 governanceOverlayTimeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationInMillis);
@@ -1254,9 +1253,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 {
                     songAudioPlayer.PlayAudio();
                 }
-            });
 
-        SkipToPosition(startPositionInMillis);
+                return evt;
+            });
     }
 
     private double GetStartPositionInMillis()

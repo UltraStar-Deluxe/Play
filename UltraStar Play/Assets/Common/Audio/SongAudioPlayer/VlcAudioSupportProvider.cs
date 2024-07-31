@@ -39,6 +39,11 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
     private void UpdateVlcMediaPlayerPause()
     {
         // TODO: Workaround for unreliable VLC MediaPlayer pause state ( https://code.videolan.org/videolan/vlc/-/issues/28353 )
+        if (!IsFullyLoaded)
+        {
+            return;
+        }
+
         if (!shouldBePlaying && vlcMediaPlayer != null && vlcMediaPlayer.IsPlaying)
         {
             Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing. Set VLC MediaPlayer to pause again.");
@@ -82,7 +87,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         return Observable.Create<AudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => this == null || DurationInMillis > 0,
+                () => this == null || IsFullyLoaded,
                 () =>
                 {
                     if (this == null)
@@ -92,7 +97,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
                         throw new AudioSupportProviderException(errorMessage);
                     }
 
-                    vlcMediaPlayer.SetPause(true);
+                    vlcMediaPlayer.SetPause(!shouldBePlaying);
                     o.OnNext(new AudioLoadedEvent(audioUri));
                 }));
             return Disposable.Empty;
@@ -115,13 +120,19 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
     public override void Play()
     {
         shouldBePlaying = true;
-        vlcMediaPlayer?.SetPause(false);
+        if (IsFullyLoaded)
+        {
+            vlcMediaPlayer?.SetPause(false);
+        }
     }
 
     public override void Pause()
     {
         shouldBePlaying = false;
-        vlcMediaPlayer?.SetPause(true);
+        if (IsFullyLoaded)
+        {
+            vlcMediaPlayer?.SetPause(true);
+        }
     }
 
     public override void Stop()
