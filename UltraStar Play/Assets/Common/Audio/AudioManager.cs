@@ -4,6 +4,7 @@ using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Networking;
 
 /**
@@ -15,6 +16,9 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
     private const int CriticalCacheSize = 10;
     private readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
+
+    [InjectedInInspector]
+    public AudioMixerGroup pitchShifterAudioMixerGroup;
 
     protected override object GetInstance()
     {

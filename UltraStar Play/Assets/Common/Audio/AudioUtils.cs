@@ -7,11 +7,15 @@ public static class AudioUtils
     public static void SetPitchWithPitchShifter(AudioSource audioSource, float pitch)
     {
         if (audioSource == null
-            || audioSource.outputAudioMixerGroup == null
+            || Math.Abs(audioSource.pitch - pitch) < 0.01f)
+        {
+            return;
+        }
+
+        if (audioSource.outputAudioMixerGroup == null
             || audioSource.outputAudioMixerGroup.audioMixer == null)
         {
-            Debug.LogWarning("Cannot set pitch with PitchShifter because the AudioSource is not set up correctly.");
-            return;
+            audioSource.outputAudioMixerGroup = AudioManager.Instance.pitchShifterAudioMixerGroup;
         }
 
         // Setting the pitch of an AudioPlayer will change tempo and pitch.
