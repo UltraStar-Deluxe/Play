@@ -253,7 +253,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
     {
         if (recordedAudioWaveFormVisualization == null)
         {
-            int textureWidth = 1024;
+            int textureWidth = 512;
             int textureHeight = 128;
             recordedAudioWaveFormVisualization = new AudioWaveFormVisualization(
                 gameObject,

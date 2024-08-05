@@ -40,6 +40,9 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
 
     private VisualElement TargetElement => noteAreaWaveform;
 
+    private AudioClip lastAudioClip;
+    private float[] audioWaveFormSamples;
+
     public void OnInjectionFinished()
     {
         noteAreaControl.ViewportEventStream
@@ -106,7 +109,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
 
         if (audioWaveFormVisualization == null)
         {
-            int textureWidth = 1024;
+            int textureWidth = 512;
             int textureHeight = 128;
             audioWaveFormVisualization = new AudioWaveFormVisualization(
                 songEditorSceneControl.gameObject,
@@ -123,10 +126,22 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
             return;
         }
 
-        double minSampleSingleChannel = ((double)noteAreaControl.MinMillisecondsInViewport / 1000) * audioClip.frequency;
-        double maxSampleSingleChannel = ((double)noteAreaControl.MaxMillisecondsInViewport / 1000) * audioClip.frequency;
-        SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioClip, (int)minSampleSingleChannel, (int)maxSampleSingleChannel);
+        if (lastAudioClip != audioClip)
+        {
+            lastAudioClip = audioClip;
+            using (new DisposableStopwatch("Update audio wave form - get audio samples"))
+            {
+                audioWaveFormSamples = AudioUtils.GetAudioSamples(audioClip, 0);
+            }
+        }
 
-        isDirty = false;
+        using (new DisposableStopwatch("Update audio wave form"))
+        {
+            double minSampleSingleChannel = ((double)noteAreaControl.MinMillisecondsInViewport / 1000) * audioClip.frequency;
+            double maxSampleSingleChannel = ((double)noteAreaControl.MaxMillisecondsInViewport / 1000) * audioClip.frequency;
+            SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioWaveFormSamples, (int)minSampleSingleChannel, (int)maxSampleSingleChannel);
+
+            isDirty = false;
+        }
     }
 }

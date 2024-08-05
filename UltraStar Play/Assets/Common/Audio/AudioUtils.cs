@@ -87,7 +87,7 @@ public static class AudioUtils
         return shortSampleArray;
     }
 
-    public static float[] GetAudioSamples(double startInMillis, double lengthInMillis, AudioClip audioClip, bool convertToMono)
+    public static float[] GetAudioSamples(AudioClip audioClip, double startInMillis, double lengthInMillis, bool convertToMono)
     {
         if (lengthInMillis <= 0)
         {
@@ -120,6 +120,21 @@ public static class AudioUtils
         }
     }
 
+    public static float[] GetAudioSamples(AudioClip audioClip, int channel)
+    {
+        float[] singleChannelSamples = new float[audioClip.samples];
+        float[] allSamples = new float[audioClip.samples * audioClip.channels];
+        audioClip.GetData(allSamples, 0);
+
+        // Fill the single channel array with the samples of the selected channel
+        for (int i = 0; i < singleChannelSamples.Length; i++)
+        {
+            singleChannelSamples[i] = allSamples[i * audioClip.channels + channel];
+        }
+
+        return singleChannelSamples;
+    }
+
     public static float[] GetSamplesOfBeatRangeFromAudioClip(
         SongMeta songMeta,
         AudioClip audioClip,
@@ -138,7 +153,7 @@ public static class AudioUtils
         double singleBeatLengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta);
         double lengthInMillis = singleBeatLengthInMillis * lengthInBeats;
 
-        float[] monoAudioSamples = GetAudioSamples(startBeatInMillis, lengthInMillis, audioClip, convertToMono);
+        float[] monoAudioSamples = GetAudioSamples(audioClip, startBeatInMillis, lengthInMillis, convertToMono);
         return monoAudioSamples;
     }
 
