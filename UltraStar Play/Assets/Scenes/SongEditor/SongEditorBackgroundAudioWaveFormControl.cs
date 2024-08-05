@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using UniInject;
 using UniRx;
@@ -33,7 +32,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
 
     private int lastNoteAreaMin;
     private int lastNoteAreaWidth;
-    private bool isDirty;
+    private bool isViewportDirty = true;
     private int lastUpdateAudioWaveformFrameCount;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
@@ -51,22 +50,19 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
                 if (evt.X != lastNoteAreaMin
                     || evt.Width != lastNoteAreaWidth)
                 {
-                    TargetElement.HideByVisibility();
                     lastNoteAreaMin = evt.X;
                     lastNoteAreaWidth = evt.Width;
-                    isDirty = true;
+                    isViewportDirty = true;
                 }
             })
             .AddTo(gameObject);
 
-        // Update audio wave form when note area was stable for some time.
         noteAreaControl.ViewportEventStream
-            .Throttle(new TimeSpan(0, 0, 0, 0, 800))
             .Subscribe(_ =>
             {
-                TargetElement.ShowByVisibility();
-                if (isDirty)
+                if (isViewportDirty)
                 {
+                    isViewportDirty = false;
                     UpdateAudioWaveForm();
                 }
             })
@@ -97,7 +93,9 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
         }
         TargetElement.ShowByVisibility();
 
-        if (!songAudioPlayer.IsFullyLoaded
+        if (!VisualElementUtils.HasGeometry(TargetElement)
+            || noteAreaControl.MinMillisecondsInViewport == noteAreaControl.MaxMillisecondsInViewport
+            || !songAudioPlayer.IsFullyLoaded
             // Must be an audio format. Getting all the samples does not work with video files.
             || !ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Audio))
             || !VisualElementUtils.HasGeometry(TargetElement)
@@ -129,19 +127,11 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
         if (lastAudioClip != audioClip)
         {
             lastAudioClip = audioClip;
-            using (new DisposableStopwatch("Update audio wave form - get audio samples"))
-            {
-                audioWaveFormSamples = AudioUtils.GetAudioSamples(audioClip, 0);
-            }
+            audioWaveFormSamples = AudioUtils.GetAudioSamples(audioClip, 0);
         }
 
-        using (new DisposableStopwatch("Update audio wave form"))
-        {
-            double minSampleSingleChannel = ((double)noteAreaControl.MinMillisecondsInViewport / 1000) * audioClip.frequency;
-            double maxSampleSingleChannel = ((double)noteAreaControl.MaxMillisecondsInViewport / 1000) * audioClip.frequency;
-            SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioWaveFormSamples, (int)minSampleSingleChannel, (int)maxSampleSingleChannel);
-
-            isDirty = false;
-        }
+        double minSampleSingleChannel = ((double)noteAreaControl.MinMillisecondsInViewport / 1000) * audioClip.frequency;
+        double maxSampleSingleChannel = ((double)noteAreaControl.MaxMillisecondsInViewport / 1000) * audioClip.frequency;
+        SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioWaveFormSamples, (int)minSampleSingleChannel, (int)maxSampleSingleChannel);
     }
 }

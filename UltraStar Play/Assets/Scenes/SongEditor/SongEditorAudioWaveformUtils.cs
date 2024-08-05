@@ -8,7 +8,7 @@ public static class SongEditorAudioWaveformUtils
         SongMeta songMeta,
         Settings settings)
     {
-        using IDisposable d = new DisposableStopwatch($"Get audio clip to draw audio wave form");
+        // using IDisposable d = new DisposableStopwatch($"Get audio clip to draw audio wave form");
 
         ESongEditorSamplesSource samplesSource = GetAudioWaveformSamplesSource(settings);
         string audioUri = GetAudioUri(songMeta, samplesSource);
@@ -80,7 +80,7 @@ public static class SongEditorAudioWaveformUtils
             return;
         }
 
-        using IDisposable d = new DisposableStopwatch($"Draw audio wave form");
+        // using IDisposable d = new DisposableStopwatch($"Draw audio wave form");
         audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(audioClip, minSampleSingleChannel, maxSampleSingleChannel);
     }
 
@@ -96,7 +96,7 @@ public static class SongEditorAudioWaveformUtils
             return;
         }
 
-        using IDisposable d = new DisposableStopwatch($"Draw audio wave form");
+        // using IDisposable d = new DisposableStopwatch($"Draw audio wave form");
         audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(samples, minSample, maxSample);
     }
 
