@@ -12,9 +12,10 @@ For support questions, please use our Discord: https://discord.gg/PAUJFKCGbb
 -->
 
 ### Actual behaviour
-
-Tell us what happens
+Tell us what happens.
 
 ### Expected behaviour
+Tell us what should actually happen.
 
-Tell us what should actually happen
+### Implementation hints
+Information on how the expected behavior could be achieved (optional).
