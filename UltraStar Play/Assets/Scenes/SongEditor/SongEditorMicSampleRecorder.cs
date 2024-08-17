@@ -264,7 +264,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
             recordedAudioWaveFormVisualization.WaveformColor = Colors.red;
         }
 
-        recordedAudioWaveFormVisualization.DrawWaveFormMinAndMaxValues(RecordingBuffer);
+        recordedAudioWaveFormVisualization.DrawAudioWaveForm(RecordingBuffer);
     }
 
     private void OnRecordingEvent(RecordingEvent recordingEvent)

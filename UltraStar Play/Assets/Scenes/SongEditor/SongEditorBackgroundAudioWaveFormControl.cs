@@ -116,6 +116,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
                 textureHeight,
                 "song editor background audio visualization");
             audioWaveFormVisualization.WaveformColor = Colors.darkSlateGrey;
+            audioWaveFormVisualization.AudioWaveFormCalculator = new PrecalculatingAudioWaveFormCalculator();
         }
 
         AudioClip audioClip = SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
