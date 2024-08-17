@@ -94,6 +94,11 @@ public static class SongMetaUtils
             return true;
         }
 
+        if (WebRequestUtils.IsFileUri(pathOrUri))
+        {
+            return File.Exists(new Uri(pathOrUri).LocalPath);
+        }
+
         return File.Exists(GetAbsoluteFilePath(songMeta, pathOrUri));
     }
 
