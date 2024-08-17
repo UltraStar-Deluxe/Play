@@ -238,7 +238,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             }
         }
 
-        if (adjustFollowingNotesIfNeeded && settings.SongEditorSettings.AdjustFollowingNotes)
+        if (SongEditorSettingsUtils.ShouldAdjustFollowingNotes(settings, adjustFollowingNotesIfNeeded))
         {
             MoveNotesVertical(dragEvent, followingNotes, false);
         }
@@ -257,7 +257,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             }
         }
 
-        if (adjustFollowingNotesIfNeeded && settings.SongEditorSettings.AdjustFollowingNotes)
+        if (SongEditorSettingsUtils.ShouldAdjustFollowingNotes(settings, adjustFollowingNotesIfNeeded))
         {
             MoveNotesHorizontal(dragEvent, followingNotes, false);
         }
@@ -277,7 +277,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             }
         }
 
-        if (adjustFollowingNotesIfNeeded && settings.SongEditorSettings.AdjustFollowingNotes)
+        if (SongEditorSettingsUtils.ShouldAdjustFollowingNotes(settings, adjustFollowingNotesIfNeeded))
         {
             MoveNotesHorizontal(dragEvent, followingNotes, false);
         }
@@ -360,7 +360,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             note.SetStartAndEndBeat((int)newStartBeat, (int)newEndBeat);
         }
 
-        if (adjustFollowingNotesIfNeeded && settings.SongEditorSettings.AdjustFollowingNotes)
+        if (SongEditorSettingsUtils.ShouldAdjustFollowingNotes(settings, adjustFollowingNotesIfNeeded))
         {
             MoveNotesHorizontal(dragEvent, followingNotes, false);
         }
