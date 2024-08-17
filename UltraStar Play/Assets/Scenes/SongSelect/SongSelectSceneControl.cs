@@ -1005,9 +1005,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
             string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-            Debug.Log($"");
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioNotFound,
-                "name", audioUri));
+            Translation errorMessage = Translation.Get(R.Messages.songSelectScene_error_audioNotFound,
+                "name", audioUri);
+            Debug.LogWarning(errorMessage);
+            NotificationManager.CreateNotification(errorMessage);
             return;
         }
 
