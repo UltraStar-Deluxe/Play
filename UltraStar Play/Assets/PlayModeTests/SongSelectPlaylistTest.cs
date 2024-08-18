@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework;
 using Responsible;
 using UniInject;
 using UnityEngine;
@@ -15,6 +16,7 @@ using static ResponsibleVisualElementUtils;
 public class SongSelectPlaylistTest : AbstractPlayModeTest
 {
     private const string TestPlaylistName = "TestPlaylist";
+    private string TestPlaylistFilePath => $"{ApplicationUtils.PlaylistFolder}/{TestPlaylistName}.{ApplicationUtils.UltraStarPlaylistFileExtension}";
 
     protected override string TestSceneName => EScene.SongSelectScene.ToString();
 
@@ -46,18 +48,24 @@ public class SongSelectPlaylistTest : AbstractPlayModeTest
                 .ContinueWith(_ => WaitForCondition("all song visible",
                             () => songRouletteControl.SongEntries.Count == 3)
                         .ExpectWithinSeconds(10))
+                .ContinueWith(_ => Do("remove old test playlist",
+                        () => playlistManager.TryRemovePlaylist(playlistManager.GetPlaylistByName(TestPlaylistName))))
                 .ContinueWith(_ => WaitForCondition("no test playlist exists",
                         () => !playlistManager.HasPlaylist(TestPlaylistName))
                     .ExpectWithinSeconds(10))
                 .ContinueWith(_ => ClickButton(R.UxmlNames.searchPropertyButton))
+                .ContinueWith(_ => WaitForFrames(1))
                 .ContinueWith(_ => ClickButton(R.UxmlNames.createPlaylistButton))
+                .ContinueWith(_ => WaitForFrames(1))
                 .ContinueWith(_ => SetElementValue("newPlaylistNameTextField", TestPlaylistName))
                 .ContinueWith(_ => ClickButton(R.Messages.common_ok))
+                .ContinueWith(_ => WaitForFrames(1))
                 .ContinueWith(_ => WaitForCondition("test playlist is empty",
                         () => playlistManager.GetPlaylistByName(TestPlaylistName) != null
                               && playlistManager.GetPlaylistByName(TestPlaylistName).IsEmpty)
                         .ExpectWithinSeconds(10))
                 .ContinueWith(_ => Do("open song entry menu", () => InputFixture.PressAndRelease(Keyboard.spaceKey)))
+                .ContinueWith(_ => WaitForFrames(1))
                 .ContinueWith(_ => GetElement<Button>(button => button.Query<Label>().ToList()
                     .AnyMatch(label => label.text.Contains(TestPlaylistName))))
                 .ContinueWith(button => ClickButton(button))
