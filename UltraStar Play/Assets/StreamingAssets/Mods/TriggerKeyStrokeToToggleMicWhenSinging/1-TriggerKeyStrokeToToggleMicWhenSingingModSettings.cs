@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UniInject;
 using WindowsInput.Native;
+using Newtonsoft.Json;
 
 public class TriggerKeyStrokeToToggleMicWhenSingingModSettings : IModSettings
 {
@@ -9,6 +10,7 @@ public class TriggerKeyStrokeToToggleMicWhenSingingModSettings : IModSettings
     public bool requireControlModifier = true;
     public bool showNotificationOnTriggerKeyStroke = true;
     
+    [JsonIgnore]
     public Action OnTriggerShortcut { get; set; }
 
     public List<IModSettingControl> GetModSettingControls()

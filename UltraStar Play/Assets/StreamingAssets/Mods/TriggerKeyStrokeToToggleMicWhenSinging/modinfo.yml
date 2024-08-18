@@ -7,3 +7,4 @@ authors:
   - email@melodymania.org
 requiredAssemblies:
   - WindowsInput
+  - Newtonsoft.Json
