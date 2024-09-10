@@ -11,6 +11,16 @@ public class UltraStarSongFormatTest
     private static readonly string folderPath = Application.dataPath + "/Editor/Tests/TestSongs";
 
     [Test]
+    public void ShouldHandleNoteWithoutLyricsAndMissingLastSeparator()
+    {
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/NoteWithoutLyricsAndMissingLastSeparator.txt", out List<SongIssue> _);
+        Assert.IsNotNull(songMeta);
+        List<Note> notes = SongMetaUtils.GetAllNotes(songMeta);
+        Assert.IsTrue(notes.Count == 6);
+        Assert.IsTrue(notes[1].Text.IsNullOrEmpty());
+    }
+
+    [Test]
     public void ShouldAddPhraseEndBeatIfNotSameAsMaxBeat()
     {
         SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/WithPhraseEndBeat.txt", out List<SongIssue> _);

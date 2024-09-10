@@ -219,7 +219,7 @@ public class UltraStarSongVoicesParser
     private Note CreateNote(string line)
     {
         List<string> data = ParseNoteSegments(line.TrimStart());
-        if (data.Count < 5)
+        if (data.Count < 4)
         {
             throw new UltraStarSongParserException(GetIncompleteNoteErrorMessage(line));
         }
@@ -228,7 +228,8 @@ public class UltraStarSongVoicesParser
         string startBeatString = data[1];
         string lengthString = data[2];
         string txtPitchString = data[3];
-        string lyricsString = data[4];
+        // Lyrics and thus also the last separator are optional.
+        string lyricsString = data.Count >= 5 ? data[4] : "";
 
         if (noteTypeString.IsNullOrEmpty()
             || startBeatString.IsNullOrEmpty()
