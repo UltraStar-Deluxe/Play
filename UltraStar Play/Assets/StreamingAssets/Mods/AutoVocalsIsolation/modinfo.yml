@@ -1,0 +1,5 @@
+name: Vocals Isolation on Song Start
+version: 1.0.0
+description: Start vocals isolation when singing a song.
+authors:
+  - email@melodymania.org
