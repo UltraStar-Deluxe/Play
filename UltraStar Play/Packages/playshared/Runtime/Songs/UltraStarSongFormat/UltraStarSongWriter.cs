@@ -79,12 +79,14 @@ public static class UltraStarFormatWriter
             AppendNote(sb, note);
         }
 
-        if (sentence.ExtendedMaxBeat > sentence.MaxBeat)
-        {
-            sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
-        } else {
-            sb.AppendLine($"-");
-        }
+        // TODO: Linebreak timing could be optional but is required by some other tools, https://github.com/UltraStar-Deluxe/format/issues/64
+        sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+        // if (sentence.ExtendedMaxBeat > sentence.MaxBeat)
+        // {
+        //     sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+        // } else {
+        //     sb.AppendLine($"-");
+        // }
     }
 
     private static bool IsNotEmpty(Voice voice)

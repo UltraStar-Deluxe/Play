@@ -19,6 +19,7 @@ public class UltraStarSongFormatTest
     }
 
     [Test]
+    [Ignore("Linebreak timing could be optional but is required by some other tools, https://github.com/UltraStar-Deluxe/format/issues/64")]
     public void ShouldNotAddPhraseEndBeatIfSameAsMaxBeat()
     {
         SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/WithoutPhraseEndBeat.txt", out List<SongIssue> _);
