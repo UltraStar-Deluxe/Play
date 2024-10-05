@@ -57,7 +57,7 @@ GameObject:
   - component: {fileID: 3168561779329018817}
   m_Layer: 0
   m_Name: WebViewVideoSupportProvider
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -145,7 +145,7 @@ GameObject:
   - component: {fileID: 3486777015339389307}
   m_Layer: 0
   m_Name: FfmpegVideoSupportProvider
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -297,7 +297,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songAudioPlayer: {fileID: 0}
   videoPlayer: {fileID: 7416615285511047229}
-  forceSyncOnForwardJumpInTheSong: 0
 --- !u!1 &9198272023589213903
 GameObject:
   m_ObjectHideFlags: 0
@@ -310,7 +309,7 @@ GameObject:
   - component: {fileID: 3051572588235740523}
   m_Layer: 0
   m_Name: VlcVideoSupportProvider
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

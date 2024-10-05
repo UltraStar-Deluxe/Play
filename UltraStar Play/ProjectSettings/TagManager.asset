@@ -11,6 +11,7 @@ TagManager:
   - SceneInjectionManager
   - FxTemporaire
   - NetworkManager
+  - MelodyManiaOnly
   layers:
   - Default
   - TransparentFX

@@ -400,7 +400,7 @@ GameObject:
   - component: {fileID: 3822308763357709982}
   m_Layer: 0
   m_Name: SteamLobbyManager
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -627,7 +627,7 @@ GameObject:
   - component: {fileID: 7843896322145466110}
   m_Layer: 0
   m_Name: BackgroundLightsVolume
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -833,7 +833,7 @@ GameObject:
   - component: {fileID: 4887425252056006294}
   m_Layer: 0
   m_Name: SteamAchievementManager
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1441,7 +1441,7 @@ GameObject:
   - component: {fileID: 7115146823324156866}
   m_Layer: 0
   m_Name: BackgroundParticlesCamera
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1673,7 +1673,7 @@ GameObject:
   - component: {fileID: 40393421652004942}
   m_Layer: 9
   m_Name: WebViewCanvas
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2136,7 +2136,7 @@ GameObject:
   - component: {fileID: 2908706229821383301}
   m_Layer: 1
   m_Name: BackgroundParticles
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7068,7 +7068,7 @@ GameObject:
   - component: {fileID: 2514473756895476179}
   m_Layer: 0
   m_Name: SteamLobbyMemberManager
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7180,7 +7180,7 @@ GameObject:
   - component: {fileID: 3705748409921045012}
   m_Layer: 0
   m_Name: WebViewScriptFileSystemWatcher
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7598,7 +7598,7 @@ GameObject:
   - component: {fileID: 880683781346573580}
   m_Layer: 0
   m_Name: BackgroundLights
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7889,7 +7889,7 @@ GameObject:
   - component: {fileID: 3810538232154436742}
   m_Layer: 0
   m_Name: WebViewCamera
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8220,7 +8220,7 @@ GameObject:
   - component: {fileID: 8854215853695137417}
   m_Layer: 0
   m_Name: WebViewManager
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8322,7 +8322,7 @@ GameObject:
   - component: {fileID: 8839172341623466722}
   m_Layer: 0
   m_Name: SteamManager
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8736,7 +8736,7 @@ GameObject:
   - component: {fileID: 1628927209193663992}
   m_Layer: 0
   m_Name: SteamFacepunchTransport
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8952,7 +8952,7 @@ GameObject:
   - component: {fileID: 5407635756000707737}
   m_Layer: 0
   m_Name: AudioSeparationManager
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9445,7 +9445,7 @@ GameObject:
   - component: {fileID: 3317958610338434365}
   m_Layer: 0
   m_Name: BackgroundLightsPrefabInstances
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9481,7 +9481,7 @@ GameObject:
   - component: {fileID: 3137819104876236808}
   m_Layer: 0
   m_Name: SteamWorkshopManager
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9563,7 +9563,7 @@ GameObject:
   - component: {fileID: 3410599487978932490}
   m_Layer: 0
   m_Name: SteamOnlineMultiplayerBackendConfigurator
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9610,7 +9610,7 @@ GameObject:
   - component: {fileID: 702766123259852127}
   m_Layer: 0
   m_Name: SongMediaFileConversionManager
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9878,7 +9878,7 @@ GameObject:
   - component: {fileID: 4064531691309379963}
   m_Layer: 0
   m_Name: SpeechRecognitionManager
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9924,7 +9924,7 @@ GameObject:
   - component: {fileID: 5112597850325165970}
   m_Layer: 5
   m_Name: VlcManager
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10151,7 +10151,7 @@ GameObject:
   - component: {fileID: 280587633030602300}
   m_Layer: 0
   m_Name: PitchDetectionManager
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
