@@ -7,24 +7,8 @@ TagManager:
   - UIDocument
   - InputManager
   - DontDestroyOnLoadManager
-  - Unused_1
-  - SceneInjectionManager
   - EventSystem
-  - Unused_2
-  - Unused_3
-  - Unused_4
-  - Unused_5
-  - Unused_6
-  - Unused_7
-  - Unused_8
-  - Unused_9
-  - Unused_10
-  - Unused_11
-  - Unused_12
-  - Unused_13
-  - Unused_14
-  - Unused_15
-  - Unused_16
+  - SceneInjectionManager
   - FxTemporaire
   - NetworkManager
   layers:
