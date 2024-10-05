@@ -198,7 +198,7 @@ GameObject:
   - component: {fileID: 7886403322010772810}
   m_Layer: 0
   m_Name: UiManager
-  m_TagString: UiManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -259,7 +259,7 @@ GameObject:
   - component: {fileID: 461665969244419356}
   m_Layer: 0
   m_Name: SceneChangeAnimationControl
-  m_TagString: SceneChangeAnimationControl
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -444,7 +444,7 @@ GameObject:
   - component: {fileID: 6237943900623501783}
   m_Layer: 0
   m_Name: AudioManager
-  m_TagString: AudioManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -490,7 +490,7 @@ GameObject:
   - component: {fileID: 6885474098598336995}
   m_Layer: 0
   m_Name: PlaylistManager
-  m_TagString: PlaylistManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1122,7 +1122,7 @@ GameObject:
   - component: {fileID: 9022508001146490944}
   m_Layer: 0
   m_Name: TranslationManager
-  m_TagString: TranslationManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1263,7 +1263,7 @@ GameObject:
   - component: {fileID: 732203885253972898}
   m_Layer: 0
   m_Name: SceneNavigator
-  m_TagString: SceneNavigator
+  m_TagString: PlaylistManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1951,7 +1951,7 @@ GameObject:
   - component: {fileID: 559590344586563084}
   m_Layer: 0
   m_Name: SettingsManager
-  m_TagString: SettingsManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6967,7 +6967,7 @@ GameObject:
   - component: {fileID: 2908706230957184143}
   m_Layer: 0
   m_Name: ThemeManager
-  m_TagString: ThemeManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7023,8 +7023,8 @@ GameObject:
   - component: {fileID: 4351641984961804500}
   - component: {fileID: 7313716740902211290}
   m_Layer: 0
-  m_Name: ServerSideConnectRequestManager
-  m_TagString: ServerSideConnectRequestManager
+  m_Name: ServerSideCompanionClientManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7224,7 +7224,7 @@ GameObject:
   - component: {fileID: 1404843766538612946}
   m_Layer: 5
   m_Name: CursorManager
-  m_TagString: CursorManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7798,7 +7798,7 @@ GameObject:
   - component: {fileID: 8056212404583243169}
   m_Layer: 0
   m_Name: ApplicationManager
-  m_TagString: ApplicationManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8016,7 +8016,7 @@ GameObject:
   - component: {fileID: 8766943392089600911}
   m_Layer: 0
   m_Name: SongMetaManager
-  m_TagString: SongMetaManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8549,7 +8549,7 @@ GameObject:
   - component: {fileID: 8801158838415278696}
   m_Layer: 0
   m_Name: MidiManager
-  m_TagString: MidiManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8859,7 +8859,7 @@ GameObject:
   - component: {fileID: 706983948665156908}
   m_Layer: 0
   m_Name: StatsManager
-  m_TagString: StatsManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9968,7 +9968,7 @@ GameObject:
   - component: {fileID: 8955570316857827816}
   m_Layer: 0
   m_Name: ContextMenuPopupManager
-  m_TagString: ContextMenuPopupManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

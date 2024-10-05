@@ -54,7 +54,7 @@ public class HashSetChipsComboControl<T>
         CloseValueChooserDialog();
 
         chipsComboDialog = VisualElementUtils.LoadVisualElementFromResources("UIDocuments/ChipsComboDialog");
-        UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
+        UIDocument uiDocument = UIDocumentUtils.FindUIDocumentOrThrow();
         uiDocument.rootVisualElement.Add(chipsComboDialog);
 
         ScrollView scrollView = chipsComboDialog.Q<ScrollView>("dialogContentScrollView");
