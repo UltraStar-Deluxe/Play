@@ -45,43 +45,43 @@ public class SongSelectPlaylistTest : AbstractPlayModeTest
         try
         {
             yield return ExpectScene(EScene.SongSelectScene)
-                .ContinueWith(_ => WaitForCondition("all song visible",
+                .ContinueWith(WaitForCondition("all song visible",
                             () => songRouletteControl.SongEntries.Count == 3)
                         .ExpectWithinSeconds(10))
-                .ContinueWith(_ => Do("remove old test playlist",
+                .ContinueWith(Do("remove old test playlist",
                         () => playlistManager.TryRemovePlaylist(playlistManager.GetPlaylistByName(TestPlaylistName))))
-                .ContinueWith(_ => WaitForCondition("no test playlist exists",
+                .ContinueWith(WaitForCondition("no test playlist exists",
                         () => !playlistManager.HasPlaylist(TestPlaylistName))
                     .ExpectWithinSeconds(10))
-                .ContinueWith(_ => ClickButton(R.UxmlNames.searchPropertyButton))
-                .ContinueWith(_ => WaitForFrames(1))
-                .ContinueWith(_ => ClickButton(R.UxmlNames.createPlaylistButton))
-                .ContinueWith(_ => WaitForFrames(1))
-                .ContinueWith(_ => SetElementValue("newPlaylistNameTextField", TestPlaylistName))
-                .ContinueWith(_ => ClickButton(R.Messages.common_ok))
-                .ContinueWith(_ => WaitForFrames(1))
-                .ContinueWith(_ => WaitForCondition("test playlist is empty",
+                .ContinueWith(ClickButton(R.UxmlNames.searchPropertyButton))
+                .ContinueWith(WaitForFrames(1))
+                .ContinueWith(ClickButton(R.UxmlNames.createPlaylistButton))
+                .ContinueWith(WaitForFrames(1))
+                .ContinueWith(SetElementValue("newPlaylistNameTextField", TestPlaylistName))
+                .ContinueWith(ClickButton(R.Messages.common_ok))
+                .ContinueWith(WaitForFrames(1))
+                .ContinueWith(WaitForCondition("test playlist is empty",
                         () => playlistManager.GetPlaylistByName(TestPlaylistName) != null
                               && playlistManager.GetPlaylistByName(TestPlaylistName).IsEmpty)
                         .ExpectWithinSeconds(10))
-                .ContinueWith(_ => Do("open song entry menu", () => InputFixture.PressAndRelease(Keyboard.spaceKey)))
-                .ContinueWith(_ => WaitForFrames(1))
-                .ContinueWith(_ => GetElement<Button>(button => button.Query<Label>().ToList()
+                .ContinueWith(Do("open song entry menu", () => InputFixture.PressAndRelease(Keyboard.spaceKey)))
+                .ContinueWith(WaitForFrames(1))
+                .ContinueWith(GetElement<Button>(button => button.Query<Label>().ToList()
                     .AnyMatch(label => label.text.Contains(TestPlaylistName))))
                 .ContinueWith(button => ClickButton(button))
-                .ContinueWith(_ => WaitForCondition("entry added to playlist", () => playlistManager.GetPlaylistByName(TestPlaylistName).Count == 1).ExpectWithinSeconds(10))
-                // .ContinueWith(_ => ClickButton(R.UxmlNames.searchPropertyButton))
-                .ContinueWith(_ => SetElementValue(R.UxmlNames.playlistDropdownField, TestPlaylistName))
-                .ContinueWith(_ => WaitForCondition("test playlist selected",
+                .ContinueWith(WaitForCondition("entry added to playlist", () => playlistManager.GetPlaylistByName(TestPlaylistName).Count == 1).ExpectWithinSeconds(10))
+                // .ContinueWith(ClickButton(R.UxmlNames.searchPropertyButton))
+                .ContinueWith(SetElementValue(R.UxmlNames.playlistDropdownField, TestPlaylistName))
+                .ContinueWith(WaitForCondition("test playlist selected",
                             () => nonPersistentSettings.PlaylistName.Value == TestPlaylistName)
                             .ExpectWithinSeconds(10))
-                .ContinueWith(_ => WaitForCondition("filtered song visible",
+                .ContinueWith(WaitForCondition("filtered song visible",
                             () => songRouletteControl.SongEntries.Count == 1)
                         .ExpectWithinSeconds(10))
-                .ContinueWith(_ => ClickButton(R.UxmlNames.editPlaylistButton))
-                .ContinueWith(_ => ClickButton(R.UxmlNames.deletePlaylistButton))
-                .ContinueWith(_ => ClickButton(R.UxmlNames.confirmDeletePlaylistButton))
-                .ContinueWith(_ => WaitForCondition("no test playlist exists",
+                .ContinueWith(ClickButton(R.UxmlNames.editPlaylistButton))
+                .ContinueWith(ClickButton(R.UxmlNames.deletePlaylistButton))
+                .ContinueWith(ClickButton(R.UxmlNames.confirmDeletePlaylistButton))
+                .ContinueWith(WaitForCondition("no test playlist exists",
                         () => !playlistManager.HasPlaylist(TestPlaylistName))
                     .ExpectWithinSeconds(10))
                 .ToYieldInstruction(this.Executor);
