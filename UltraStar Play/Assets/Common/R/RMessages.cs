@@ -109,6 +109,10 @@ public static partial class R
         public static readonly string enum_MediaType_InstrumentalAudio = "enum_MediaType_InstrumentalAudio";
         public static readonly string enum_MediaType_Video = "enum_MediaType_Video";
         public static readonly string enum_MediaType_VocalsAudio = "enum_MediaType_VocalsAudio";
+        public static readonly string enum_NoteDisplayLineCount_Auto = "enum_NoteDisplayLineCount_Auto";
+        public static readonly string enum_NoteDisplayLineCount_Few = "enum_NoteDisplayLineCount_Few";
+        public static readonly string enum_NoteDisplayLineCount_Many = "enum_NoteDisplayLineCount_Many";
+        public static readonly string enum_NoteDisplayLineCount_Medium = "enum_NoteDisplayLineCount_Medium";
         public static readonly string enum_NoteDisplayMode_None = "enum_NoteDisplayMode_None";
         public static readonly string enum_NoteDisplayMode_ScrollingNoteStream = "enum_NoteDisplayMode_ScrollingNoteStream";
         public static readonly string enum_NoteDisplayMode_SentenceBySentence = "enum_NoteDisplayMode_SentenceBySentence";
@@ -533,7 +537,6 @@ public static partial class R
         public static readonly string songEditor_action_showOriginalAudio = "songEditor_action_showOriginalAudio";
         public static readonly string songEditor_action_showPlaybackAudio = "songEditor_action_showPlaybackAudio";
         public static readonly string songEditor_action_showVocalsAudio = "songEditor_action_showVocalsAudio";
-        public static readonly string songEditor_action_simplifyNoteStart = "songEditor_action_simplifyNoteStart";
         public static readonly string songEditor_action_speechRecognitionOnAudio = "songEditor_action_speechRecognitionOnAudio";
         public static readonly string songEditor_clickToFindBpm_firstClicks = "songEditor_clickToFindBpm_firstClicks";
         public static readonly string songEditor_clickToFindBpm_initialValue = "songEditor_clickToFindBpm_initialValue";
