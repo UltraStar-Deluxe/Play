@@ -11,8 +11,8 @@ public class ToggleMuteViaShortcutTest : AbstractPlayModeTest
 
     [UnityTest]
     public IEnumerator ToggleMuteShouldAffectVolume() => ExpectNotMutedAndNonZeroVolume()
-        .ContinueWith(_ => PressAndReleaseF10Key())
-        .ContinueWith(_ => ExpectMutedAndZeroVolume())
+        .ContinueWith(PressAndReleaseF10Key())
+        .ContinueWith(ExpectMutedAndZeroVolume())
         .ToYieldInstruction(Executor);
 
     private ITestInstruction<object> ExpectNotMutedAndNonZeroVolume() => WaitForCondition(

@@ -48,17 +48,17 @@ public class LoadSongsOnDemandTest : AbstractPlayModeTest
 
     [UnityTest]
     public IEnumerator ShouldLoadSongsOnDemand() => IgnoreFailingMessages()
-        .ContinueWith(_ => ExpectSongScanFinished())
-        .ContinueWith(_ => ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount))
-        .ContinueWith(_ => SelectNextSong())
-        .ContinueWith(_ => ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 1))
-        .ContinueWith(_ => SelectNextSong())
-        .ContinueWith(_ => SelectNextSong())
-        .ContinueWith(_ => ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 3))
-        .ContinueWith(_ => SelectPreviousSong())
-        .ContinueWith(_ => SelectPreviousSong())
-        .ContinueWith(_ => SelectPreviousSong())
-        .ContinueWith(_ => ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 3))
+        .ContinueWith(ExpectSongScanFinished())
+        .ContinueWith(ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount))
+        .ContinueWith(SelectNextSong())
+        .ContinueWith(ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 1))
+        .ContinueWith(SelectNextSong())
+        .ContinueWith(SelectNextSong())
+        .ContinueWith(ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 3))
+        .ContinueWith(SelectPreviousSong())
+        .ContinueWith(SelectPreviousSong())
+        .ContinueWith(SelectPreviousSong())
+        .ContinueWith(ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 3))
         .ToYieldInstruction(Executor);
 
     private static ITestInstruction<object> ExpectSongScanFinished()
