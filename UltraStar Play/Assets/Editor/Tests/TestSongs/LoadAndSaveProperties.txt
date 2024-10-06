@@ -35,8 +35,12 @@
 #NUMBERWITHDOT:43.2
 P1
 : 4 3 9 Hel
-: 8 3 9  lo
-: 12 3 9  P1!
+: 8 3 9 lo
+: 12 3 9  world
+-
+: 20 3 9 Hel
+: 22 3 9 lo
+: 28 3 9  P1!
 P2
 : 4 3 9 Hel
 : 8 3 9  lo

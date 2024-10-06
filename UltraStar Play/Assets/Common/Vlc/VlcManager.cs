@@ -54,6 +54,12 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
         // But how to know when the object is ready to be disposed?
         Task.Run(() =>
         {
+            if (libVLC == null)
+            {
+                // libVLC has already been disposed, probably by closing the app.
+                return;
+            }
+
             int sleepTimeInMillis = 500;
             Log.Debug(() => $"Sleeping {sleepTimeInMillis} ms before disposing Vlc MediaPlayer to make crash in libVLC less likely (Media: '{mediaUrl}', NativeReference: {mediaPlayerNativeReference})");
             Thread.Sleep(sleepTimeInMillis);

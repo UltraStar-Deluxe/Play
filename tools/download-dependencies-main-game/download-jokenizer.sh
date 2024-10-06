@@ -14,8 +14,9 @@ git init
 git remote add origin https://github.com/umutozel/Jokenizer.Net.git
 git config core.sparsecheckout true
 echo "src/Jokenizer.Net/*" >> .git/info/sparse-checkout
+git pull --depth=100 origin master
 # Commit from 10 Feb 2020: 8fb6452eea609f5de46911be73d982056080e658
-git pull --depth=1 origin 8fb6452eea609f5de46911be73d982056080e658
+git checkout 8fb6452eea609f5de46911be73d982056080e658
 
 echo "Moving downloaded files to correct position for this project..."
 mv -v src/Jokenizer.Net/* ./

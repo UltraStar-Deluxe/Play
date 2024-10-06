@@ -31,7 +31,7 @@ public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
             && ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(videoUri));
     }
 
-    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
+    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis)
     {
         videoPlayerErrorMessages.Clear();
         videoPlayer.url = videoUri;
@@ -43,6 +43,7 @@ public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
 
         // Start VideoPlayer to trigger loading
         videoPlayer.Play();
+        PositionInMillis = startPositionInMillis;
 
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
         return Observable.Create<VideoLoadedEvent>(o =>

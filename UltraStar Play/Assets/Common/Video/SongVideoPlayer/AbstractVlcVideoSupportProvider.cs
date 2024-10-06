@@ -41,9 +41,11 @@ public abstract class AbstractVlcVideoSupportProvider : AbstractVideoSupportProv
     {
         try
         {
-            if (mediaPlayer == null
-                || !mediaPlayer.IsPlaying
-                || targetTexture == null)
+            if (this == null
+                || targetTexture == null
+                || mediaPlayer == null
+                || mediaPlayer.NativeReference == IntPtr.Zero
+                || !mediaPlayer.IsPlaying)
             {
                 return;
             }

@@ -11,7 +11,6 @@ public static partial class R
         public static readonly string action_addTeam = "action_addTeam";
         public static readonly string action_addToPlaylist = "action_addToPlaylist";
         public static readonly string action_apply = "action_apply";
-        public static readonly string action_buyOnSteam = "action_buyOnSteam";
         public static readonly string action_cancel = "action_cancel";
         public static readonly string action_close = "action_close";
         public static readonly string action_confirmDelete = "action_confirmDelete";
@@ -110,6 +109,10 @@ public static partial class R
         public static readonly string enum_MediaType_InstrumentalAudio = "enum_MediaType_InstrumentalAudio";
         public static readonly string enum_MediaType_Video = "enum_MediaType_Video";
         public static readonly string enum_MediaType_VocalsAudio = "enum_MediaType_VocalsAudio";
+        public static readonly string enum_NoteDisplayLineCount_Auto = "enum_NoteDisplayLineCount_Auto";
+        public static readonly string enum_NoteDisplayLineCount_Few = "enum_NoteDisplayLineCount_Few";
+        public static readonly string enum_NoteDisplayLineCount_Many = "enum_NoteDisplayLineCount_Many";
+        public static readonly string enum_NoteDisplayLineCount_Medium = "enum_NoteDisplayLineCount_Medium";
         public static readonly string enum_NoteDisplayMode_None = "enum_NoteDisplayMode_None";
         public static readonly string enum_NoteDisplayMode_ScrollingNoteStream = "enum_NoteDisplayMode_ScrollingNoteStream";
         public static readonly string enum_NoteDisplayMode_SentenceBySentence = "enum_NoteDisplayMode_SentenceBySentence";
@@ -277,8 +280,6 @@ public static partial class R
         public static readonly string mainScene_newVersionDialog_title = "mainScene_newVersionDialog_title";
         public static readonly string mainScene_quitDialog_message = "mainScene_quitDialog_message";
         public static readonly string mainScene_quitDialog_title = "mainScene_quitDialog_title";
-        public static readonly string mainScene_supportTheProjectDialog_message = "mainScene_supportTheProjectDialog_message";
-        public static readonly string mainScene_supportTheProjectDialog_title = "mainScene_supportTheProjectDialog_title";
         public static readonly string mod_error_failedToLoad = "mod_error_failedToLoad";
         public static readonly string mod_error_nameConflict = "mod_error_nameConflict";
         public static readonly string mod_error_settingsEmpty = "mod_error_settingsEmpty";
@@ -495,6 +496,7 @@ public static partial class R
         public static readonly string singScene_action_restart = "singScene_action_restart";
         public static readonly string singScene_missingMicrophones_message = "singScene_missingMicrophones_message";
         public static readonly string singScene_missingMicrophones_title = "singScene_missingMicrophones_title";
+        public static readonly string singScene_options_noteDisplayLineCount = "singScene_options_noteDisplayLineCount";
         public static readonly string singScene_options_noteDisplayMode = "singScene_options_noteDisplayMode";
         public static readonly string singScene_options_showLyricsArea = "singScene_options_showLyricsArea";
         public static readonly string singScene_options_showLyricsOnNotes = "singScene_options_showLyricsOnNotes";
@@ -523,6 +525,7 @@ public static partial class R
         public static readonly string songEditor_action_pasteNotes = "songEditor_action_pasteNotes";
         public static readonly string songEditor_action_resetVideoGap = "songEditor_action_resetVideoGap";
         public static readonly string songEditor_action_setGap = "songEditor_action_setGap";
+        public static readonly string songEditor_action_setGapKeepNotePosition = "songEditor_action_setGapKeepNotePosition";
         public static readonly string songEditor_action_setMedleyEnd = "songEditor_action_setMedleyEnd";
         public static readonly string songEditor_action_setMedleyStart = "songEditor_action_setMedleyStart";
         public static readonly string songEditor_action_setNoteTypeFreestyle = "songEditor_action_setNoteTypeFreestyle";
@@ -560,6 +563,8 @@ public static partial class R
         public static readonly string songEditor_helpDialog_title = "songEditor_helpDialog_title";
         public static readonly string songEditor_issues_title = "songEditor_issues_title";
         public static readonly string songEditor_layers_title = "songEditor_layers_title";
+        public static readonly string songEditor_lrcImportDialog_importToP1 = "songEditor_lrcImportDialog_importToP1";
+        public static readonly string songEditor_lrcImportDialog_importToP2 = "songEditor_lrcImportDialog_importToP2";
         public static readonly string songEditor_lrcImportDialog_success = "songEditor_lrcImportDialog_success";
         public static readonly string songEditor_lrcImportDialog_title = "songEditor_lrcImportDialog_title";
         public static readonly string songEditor_midiImportDialog_assignToPlayer = "songEditor_midiImportDialog_assignToPlayer";
@@ -733,13 +738,12 @@ public static partial class R
         public static readonly string uri_howToConfigureMicsAndSpeaker = "uri_howToConfigureMicsAndSpeaker";
         public static readonly string uri_howToMods = "uri_howToMods";
         public static readonly string uri_howToPlayerProfiles = "uri_howToPlayerProfiles";
+        public static readonly string uri_howToReportIssues = "uri_howToReportIssues";
         public static readonly string uri_howToSearchExpressions = "uri_howToSearchExpressions";
         public static readonly string uri_howToSongEditor = "uri_howToSongEditor";
         public static readonly string uri_howToSteamWorkshop = "uri_howToSteamWorkshop";
         public static readonly string uri_howToThemes = "uri_howToThemes";
         public static readonly string uri_logFiles = "uri_logFiles";
-        public static readonly string uri_melodyMania = "uri_melodyMania";
-        public static readonly string uri_melodyMania_onSteam = "uri_melodyMania_onSteam";
         public static readonly string validation_missingValue = "validation_missingValue";
         public static readonly string webView_askToOpenWebsiteDialog_confirm = "webView_askToOpenWebsiteDialog_confirm";
         public static readonly string webView_askToOpenWebsiteDialog_message = "webView_askToOpenWebsiteDialog_message";

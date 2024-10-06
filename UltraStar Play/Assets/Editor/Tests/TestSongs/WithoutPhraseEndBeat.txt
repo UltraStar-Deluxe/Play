@@ -1,0 +1,12 @@
+﻿#VERSION:1.1.0
+#TITLE:SomeTitle
+#ARTIST:SomeArtist
+#AUDIO:SomeAudio.ogg
+: 4 3 9 Hel
+: 8 3 9 lo
+: 12 3 9  world
+-
+: 20 3 9 Hel
+: 22 3 9 lo
+: 28 3 9  world
+E

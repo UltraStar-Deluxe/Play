@@ -372,11 +372,11 @@
       "url": "https://packages.unity.com"
     },
     "com.whisper.unity": {
-      "version": "https://github.com/achimmihca/whisper.unity.git?path=/Packages/com.whisper.unity#37df0f23f6aff4d63d96278865b177c037db6d10",
+      "version": "https://github.com/Macoron/whisper.unity.git?path=/Packages/com.whisper.unity#1.3.1",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "37df0f23f6aff4d63d96278865b177c037db6d10"
+      "hash": "30f9e11edfcca3584aa9e6da3ff237631121a3fa"
     },
     "com.yasirkula.androidruntimepermissions": {
       "version": "https://github.com/yasirkula/UnityAndroidRuntimePermissions.git",

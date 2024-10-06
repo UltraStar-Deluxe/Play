@@ -8,15 +8,18 @@ using UniRx;
 public class SongEditorPositionHistoryNavigationControl : INeedInjection, IInjectionFinishedListener
 {
     private const int MaxPositionHistoryLength = 50;
-    
+
     [Inject]
     private SongAudioPlayer songAudioPlayer;
+
+    [Inject]
+    private SongEditorSelectionControl songEditorSelectionControl;
 
     private readonly List<double> positionInMillisHistory = new();
 
     private int historyIndex;
     private double ignoreNewPositionInMillis = -1;
-    
+
     public void OnInjectionFinished()
     {
         songAudioPlayer.PositionEventStream
@@ -25,13 +28,13 @@ public class SongEditorPositionHistoryNavigationControl : INeedInjection, IInjec
             .Subscribe(positionInMillis => AddNavigationPositionToHistory(positionInMillis));
 
         InputManager.GetInputAction(R.InputActions.songEditor_navigateForward).PerformedAsObservable()
-            .Where(_ => !songAudioPlayer.IsPlaying)
+            .Where(_ => !songAudioPlayer.IsPlaying && songEditorSelectionControl.IsSelectionEmpty)
             .Subscribe(_ => NavigateForwardInHistory());
-        
+
         InputManager.GetInputAction(R.InputActions.songEditor_navigateBackward).PerformedAsObservable()
-            .Where(_ => !songAudioPlayer.IsPlaying)
+            .Where(_ => !songAudioPlayer.IsPlaying && songEditorSelectionControl.IsSelectionEmpty)
             .Subscribe(_ => NavigateBackwardInHistory());
-        
+
         AddInitialNavigationPositionToHistory();
     }
 
@@ -68,7 +71,7 @@ public class SongEditorPositionHistoryNavigationControl : INeedInjection, IInjec
             return;
         }
         historyIndex = nextHistoryIndex;
-        
+
         double loadedHistoryPositionInMillis = positionInMillisHistory[indexInHistoryArray];
         ignoreNewPositionInMillis = loadedHistoryPositionInMillis;
         songAudioPlayer.PositionInMillis = loadedHistoryPositionInMillis;
@@ -76,13 +79,13 @@ public class SongEditorPositionHistoryNavigationControl : INeedInjection, IInjec
 
     private void AddNavigationPositionToHistory(double positionInMillis)
     {
-        if (ignoreNewPositionInMillis >= 0 
+        if (ignoreNewPositionInMillis >= 0
             && Math.Abs(ignoreNewPositionInMillis - positionInMillis) < 1)
         {
             ignoreNewPositionInMillis = -1;
             return;
         }
-        
+
         // Remove discarded positions from history
         while (historyIndex > 0
                && positionInMillisHistory.Count > 0)
@@ -90,19 +93,19 @@ public class SongEditorPositionHistoryNavigationControl : INeedInjection, IInjec
             positionInMillisHistory.RemoveLast();
             historyIndex--;
         }
-        
+
         if (positionInMillisHistory.Count >= MaxPositionHistoryLength)
         {
             positionInMillisHistory.RemoveLast();
         }
-        
+
         if (positionInMillisHistory.Count > 0
             && Math.Abs(positionInMillisHistory.LastOrDefault() - positionInMillis) < 1000)
         {
             // Ignore similar position
             return;
         }
-        
+
         positionInMillisHistory.Add(positionInMillis);
     }
 }

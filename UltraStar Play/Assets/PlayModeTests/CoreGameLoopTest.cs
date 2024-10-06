@@ -38,13 +38,13 @@ public class CoreGameLoopTest : AbstractPlayModeTest
 
     [UnityTest]
     public IEnumerator CoreGameLoopWorksWithoutErrors() => IgnoreFailingMessages()
-        .ContinueWith(_ => StartSinging())
-        .ContinueWith(_ => ExpectScene(EScene.SingScene))
-        .ContinueWith(_ => ExpectScene(EScene.SingingResultsScene, TestSongAudioLengthInSeconds + 2))
-        .ContinueWith(_ => ExpectSingingResultScore(expectedScore))
-        .ContinueWith(_ => ExpectSingleHighscoreEntryInStatistics(expectedScore))
-        .ContinueWith(_ => ClickContinue())
-        .ContinueWith(_ => ExpectScene(EScene.SongSelectScene))
+        .ContinueWith(StartSinging())
+        .ContinueWith(ExpectScene(EScene.SingScene))
+        .ContinueWith(ExpectScene(EScene.SingingResultsScene, TestSongAudioLengthInSeconds + 2))
+        .ContinueWith(ExpectSingingResultScore(expectedScore))
+        .ContinueWith(ExpectSingleHighscoreEntryInStatistics(expectedScore))
+        .ContinueWith(ClickContinue())
+        .ContinueWith(ExpectScene(EScene.SongSelectScene))
         .ToYieldInstruction(Executor);
 
     private ITestInstruction<object> ClickContinue()

@@ -239,7 +239,7 @@ public class SongMetaScanner
 
         try
         {
-            LazyLoadedFromFileSongMeta songMeta = new LazyLoadedFromFileSongMeta(txtFile);
+            LazyLoadedFromFileSongMeta songMeta = new LazyLoadedFromFileSongMeta(txtFile, null, settings.UseUniversalCharsetDetector);
             if (settings.SongDataFetchType is EFetchType.Upfront)
             {
                 songMeta.LoadSongIfNotDoneYet();

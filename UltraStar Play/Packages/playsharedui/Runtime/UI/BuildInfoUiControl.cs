@@ -45,6 +45,6 @@ public class BuildInfoUiControl : INeedInjection, IInjectionFinishedListener
             Debug.LogWarning("Unity version in VERSION.txt info file does not match the current Unity version. " +
                              $"VERSION.txt: '{unityVersion}', Application.unityVersion: '{Application.unityVersion}'");
         }
-        unityVersionLabel.SetTranslatedText(Translation.Get("buildInfo_unityVersion", "value", buildTimeStamp));
+        unityVersionLabel.SetTranslatedText(Translation.Get("buildInfo_unityVersion", "value", unityVersion));
     }
 }

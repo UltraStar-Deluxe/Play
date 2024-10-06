@@ -8,9 +8,6 @@ public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjecti
     [Inject]
     protected Settings settings;
 
-    [Inject]
-    protected SceneNavigator sceneNavigator;
-
     public abstract IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis);
     public abstract bool IsSupported(string audioUri);
     public abstract void Unload();
@@ -24,19 +21,10 @@ public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjecti
     public abstract double DurationInMillis { get; }
     public abstract double VolumeFactor { get; set; }
 
+    protected bool IsFullyLoaded => DurationInMillis > 0;
+
     protected virtual void OnDestroy()
     {
         Unload();
-    }
-
-    protected virtual void OnInjectionFinished()
-    {
-        sceneNavigator.BeforeSceneChangeEventStream
-            .Subscribe(evt =>
-            {
-                Stop();
-                Unload();
-            })
-            .AddTo(gameObject);
     }
 }

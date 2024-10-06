@@ -1,5 +1,5 @@
 name: Jukebox and Sing
-version: 1.0.0
+version: 1.0.2
 description : |
   Plays next songs automatically and shows the singing UI only when mic input is received.
   Good for spontaneous singing on parties.

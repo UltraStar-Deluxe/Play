@@ -16,7 +16,7 @@ public class FfmpegVideoSupportProvider : AbstractVideoSupportProvider
                && ApplicationUtils.IsFfmpegSupportedAudioFormat(Path.GetExtension(videoUri));
     }
 
-    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
+    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis)
     {
         // Loading is done by SongAudioPlayer
         return Observable.Return<VideoLoadedEvent>(new VideoLoadedEvent(videoUri));

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -14,11 +15,15 @@ using UnityEngine.UIElements;
  */
 public class ScrollViewScrollWheelSpeedControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
-    [Inject] private UIDocument uiDocument;
+    [Inject]
+    private UIDocument uiDocument;
 
     public void OnInjectionFinished()
     {
         DoUpdateScrollWheelSpeedOfAllScrollViews(uiDocument.rootVisualElement);
+
+        ContextMenuPopupControl.AnyContextMenuOpenedEventStream.Subscribe(evt =>
+            DoUpdateScrollWheelSpeedOfAllScrollViews(evt.Control.VisualElement));
     }
 
     public static void UpdateScrollWheelSpeedOfAllScrollViews(VisualElement root)

@@ -6,6 +6,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -171,6 +172,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             versionDetailsContainer.ShowByDisplay();
             StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(10, () => versionDetailsContainer.HideByDisplay()));
             Debug.Log("Version info: " + versionPropertiesTextAsset.text);
+            ClipboardUtils.CopyToClipboard(versionPropertiesTextAsset.text);
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
         });
 
         InitInputActions();
