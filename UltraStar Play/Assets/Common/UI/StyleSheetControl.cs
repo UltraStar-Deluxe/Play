@@ -14,7 +14,7 @@ public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
         printScreenSize = true;
     }
 
-    public static StyleSheetControl Instance => GameObjectUtils.FindComponentWithTag<StyleSheetControl>("StyleSheetControl");
+    public static StyleSheetControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StyleSheetControl>();
 
     private static bool printScreenSize = true;
 
@@ -23,7 +23,7 @@ public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
 
     [InjectedInInspector]
     public StyleSheet smallScreenStyleSheet;
-    
+
     [Inject]
     private UIDocument uiDocument;
 
@@ -49,7 +49,7 @@ public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
-    
+
     protected override void OnDisableSingleton()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;

@@ -101,7 +101,7 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
         // TODO: Input simulation does not work reliably for some reason
         // => Do("select all", () => TriggerInputAction(R.InputActions.songEditor_selectAll))
         => Do("select all", () => songEditorSelectionControl.SelectAll())
-            .ContinueWith(_ => WaitForCondition("has selected notes", () => !songEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty())
+            .ContinueWith(WaitForCondition("has selected notes", () => !songEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty())
                 .ExpectWithinSeconds(10));
 
     private double GetPositionBehindLastNoteInMillis()

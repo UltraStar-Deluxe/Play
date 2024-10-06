@@ -80,7 +80,7 @@ GameObject:
   - component: {fileID: 3861213630092814636}
   m_Layer: 5
   m_Name: FfmpegAudioSupportProvider
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 1189495157972319652}
   m_Layer: 5
   m_Name: VlcAudioSupportProvider
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -215,7 +215,7 @@ GameObject:
   - component: {fileID: 2255947415180972824}
   m_Layer: 5
   m_Name: WebViewAudioSupportProvider
-  m_TagString: Untagged
+  m_TagString: MelodyManiaOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

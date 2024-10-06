@@ -10,6 +10,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static WebViewManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<WebViewManager>();
 
+    private static bool isWebConfigInitialized;
+
     [InjectedInInspector]
     public CanvasWebViewPrefab webViewPrefabPrefab;
 
@@ -155,18 +157,6 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     {
         DirectoryUtils.CreateDirectory(WebViewUtils.GetDefaultWebViewScriptsAbsolutePath());
 
-        // By default browsers block web pages from autoplaying video or audio.
-        // Explicitly allow playback of video or audio without user interaction.
-        // This must be called early, e.g. in Awake.
-        Web.SetAutoplayEnabled(true);
-
-        // Google only allows sign-in from selected browser.
-        // Thus, set the User-Agent header to a browser that is allowed by Google.
-        if (!settings.CustomUserAgent.IsNullOrEmpty())
-        {
-            Web.SetUserAgent(settings.CustomUserAgent);
-        }
-
         sceneNavigator.BeforeSceneChangeEventStream.Subscribe(_ => OnBeforeSceneChanged());
         sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
         settings.ObserveEveryValueChanged(it => it.VolumePercent)
@@ -176,7 +166,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
         if (settings.EnableWebView)
         {
-            InstantiateWebView();
+            InitializeWebViewConfig();
+            InstantiateWebViewPrefab();
         }
     }
 
@@ -187,9 +178,40 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             webViewPrefabInstance.Initialized -= OnWebViewPrefabInstanceInitialized;
         }
+        WebViewUtils.ClearCache();
     }
 
-    private void InstantiateWebView()
+    private void InitializeWebViewConfig()
+    {
+        // Cannot change certain configuration after Chromium has been started
+        if (isWebConfigInitialized)
+        {
+            return;
+        }
+        isWebConfigInitialized = true;
+
+        try
+        {
+            // By default browsers block web pages from autoplaying video or audio.
+            // Explicitly allow playback of video or audio without user interaction.
+            // This must be called early, e.g. in Awake.
+            Web.SetAutoplayEnabled(true);
+
+            // Google only allows sign-in from selected browser.
+            // Thus, set the User-Agent header to a browser that is allowed by Google.
+            if (!settings.CustomUserAgent.IsNullOrEmpty())
+            {
+                Web.SetUserAgent(settings.CustomUserAgent);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            Debug.LogError($"Failed to instantiate WebView config: {e.Message}");
+        }
+    }
+
+    private void InstantiateWebViewPrefab()
     {
         if (webViewPrefabInstance != null)
         {
