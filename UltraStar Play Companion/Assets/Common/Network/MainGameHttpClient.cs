@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 
 public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
 {
-    public static MainGameHttpClient Instance => GameObjectUtils.FindComponentWithTag<MainGameHttpClient>("MainGameHttpClient");
+    public static MainGameHttpClient Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MainGameHttpClient>();
 
     public bool IsConnected => serverIPEndPoint != null && httpServerPort > 0;
 

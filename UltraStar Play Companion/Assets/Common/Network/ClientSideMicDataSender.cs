@@ -11,14 +11,6 @@ using UnityEngine;
 
 public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
 {
-    public static ClientSideMicDataSender Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<ClientSideMicDataSender>("ClientSideMicrophoneDataSender");
-        }
-    }
-
     [Inject]
     private Settings companionAppSettings;
 
