@@ -27,11 +27,11 @@ jobs:
           - StandaloneWindows64
     steps:
       # Clone repo and restore cache
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           lfs: true
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ${{ env.PROJECT_PATH }}/Library
           key: Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-${{ hashFiles(env.PROJECT_PATH) }}
@@ -56,7 +56,7 @@ jobs:
           testMode: all
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           customParameters: "-nographics"
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Test results (all modes)
