@@ -17,6 +17,7 @@ namespace LibVLCSharp
         public long Time { get; set; }
         public bool IsPlaying { get; set; }
         public double Length { get; set; }
+        public int Volume { get; set; }
 
         public MediaTrackList Tracks(object video)
         {
@@ -60,6 +61,18 @@ namespace LibVLCSharp
         }
 
         public void SetVolume(int volume)
+        {
+        }
+
+        public void SetPause(bool value)
+        {
+        }
+
+        public void StopAsync()
+        {
+        }
+
+        public void PlayAsync()
         {
         }
     }
