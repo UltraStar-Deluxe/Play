@@ -84,9 +84,9 @@ public static partial class R
         public const string playersContainer = "playersContainer";
         public const string playersContainerTitle = "playersContainerTitle";
         public const string PlayerSelectPlayerEntryUi = "PlayerSelectPlayerEntryUi";
+        public const string recordingDeviceChooser = "recordingDeviceChooser";
         public const string recordingDeviceColorIndicator = "recordingDeviceColorIndicator";
         public const string recordingDeviceInfo = "recordingDeviceInfo";
-        public const string recordingDeviceChooser = "recordingDeviceChooser";
         public const string row = "row";
         public const string sceneTitle = "sceneTitle";
         public const string scrollWheelArea = "scrollWheelArea";

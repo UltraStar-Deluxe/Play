@@ -11,6 +11,7 @@ public static partial class R
         public static readonly string action_addTeam = "action_addTeam";
         public static readonly string action_addToPlaylist = "action_addToPlaylist";
         public static readonly string action_apply = "action_apply";
+        public static readonly string action_buyOnSteam = "action_buyOnSteam";
         public static readonly string action_cancel = "action_cancel";
         public static readonly string action_close = "action_close";
         public static readonly string action_confirmDelete = "action_confirmDelete";
@@ -109,6 +110,10 @@ public static partial class R
         public static readonly string enum_MediaType_InstrumentalAudio = "enum_MediaType_InstrumentalAudio";
         public static readonly string enum_MediaType_Video = "enum_MediaType_Video";
         public static readonly string enum_MediaType_VocalsAudio = "enum_MediaType_VocalsAudio";
+        public static readonly string enum_NoteDisplayLineCount_Auto = "enum_NoteDisplayLineCount_Auto";
+        public static readonly string enum_NoteDisplayLineCount_Few = "enum_NoteDisplayLineCount_Few";
+        public static readonly string enum_NoteDisplayLineCount_Many = "enum_NoteDisplayLineCount_Many";
+        public static readonly string enum_NoteDisplayLineCount_Medium = "enum_NoteDisplayLineCount_Medium";
         public static readonly string enum_NoteDisplayMode_None = "enum_NoteDisplayMode_None";
         public static readonly string enum_NoteDisplayMode_ScrollingNoteStream = "enum_NoteDisplayMode_ScrollingNoteStream";
         public static readonly string enum_NoteDisplayMode_SentenceBySentence = "enum_NoteDisplayMode_SentenceBySentence";
@@ -276,6 +281,8 @@ public static partial class R
         public static readonly string mainScene_newVersionDialog_title = "mainScene_newVersionDialog_title";
         public static readonly string mainScene_quitDialog_message = "mainScene_quitDialog_message";
         public static readonly string mainScene_quitDialog_title = "mainScene_quitDialog_title";
+        public static readonly string mainScene_supportTheProjectDialog_message = "mainScene_supportTheProjectDialog_message";
+        public static readonly string mainScene_supportTheProjectDialog_title = "mainScene_supportTheProjectDialog_title";
         public static readonly string mod_error_failedToLoad = "mod_error_failedToLoad";
         public static readonly string mod_error_nameConflict = "mod_error_nameConflict";
         public static readonly string mod_error_settingsEmpty = "mod_error_settingsEmpty";
@@ -533,7 +540,6 @@ public static partial class R
         public static readonly string songEditor_action_showOriginalAudio = "songEditor_action_showOriginalAudio";
         public static readonly string songEditor_action_showPlaybackAudio = "songEditor_action_showPlaybackAudio";
         public static readonly string songEditor_action_showVocalsAudio = "songEditor_action_showVocalsAudio";
-        public static readonly string songEditor_action_simplifyNoteStart = "songEditor_action_simplifyNoteStart";
         public static readonly string songEditor_action_speechRecognitionOnAudio = "songEditor_action_speechRecognitionOnAudio";
         public static readonly string songEditor_clickToFindBpm_firstClicks = "songEditor_clickToFindBpm_firstClicks";
         public static readonly string songEditor_clickToFindBpm_initialValue = "songEditor_clickToFindBpm_initialValue";
@@ -741,6 +747,8 @@ public static partial class R
         public static readonly string uri_howToSteamWorkshop = "uri_howToSteamWorkshop";
         public static readonly string uri_howToThemes = "uri_howToThemes";
         public static readonly string uri_logFiles = "uri_logFiles";
+        public static readonly string uri_melodyMania = "uri_melodyMania";
+        public static readonly string uri_melodyMania_onSteam = "uri_melodyMania_onSteam";
         public static readonly string validation_missingValue = "validation_missingValue";
         public static readonly string webView_askToOpenWebsiteDialog_confirm = "webView_askToOpenWebsiteDialog_confirm";
         public static readonly string webView_askToOpenWebsiteDialog_message = "webView_askToOpenWebsiteDialog_message";
