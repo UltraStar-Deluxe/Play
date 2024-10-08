@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         unityVersion:
-          - 2022.2.4f1
+          - 2023.2.12f1
         targetPlatform:
           - Android
           - iOS
