@@ -12,7 +12,7 @@
                 </ui:Button>
             </ui:VisualElement>
             <ui:Label text="$songSelectScene_order" display-tooltip-when-elided="true" name="orderChooserTitle" class="smallFont" style="margin-bottom: 5px;" />
-            <ui:EnumField choices="Order by Title, Order by Artist" name="songOrderDropdownField" type="ESongOrder, Common" class="roundCorners mb-3" style="flex-grow: 1;" />
+            <ui:DropdownField choices="Order by Title, Order by Artist" name="songOrderDropdownField" type="ESongOrder, Common" class="roundCorners mb-3" style="flex-grow: 1;" />
             <AccordionGroup>
                 <AccordionItem label="$songSelectScene_searchProperty_title" name="searchPropertyAccordionItem" content-visible="false">
                     <ui:VisualElement name="toggles" class="child-mb-2" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">

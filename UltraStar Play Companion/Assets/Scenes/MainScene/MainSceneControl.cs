@@ -400,7 +400,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             && audioWaveForm.IsVisibleByVisibility()
             && audioWaveFormVisualization != null)
         {
-            audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(clientSideMicDataSender.MicSamples);
+            audioWaveFormVisualization.DrawAudioWaveForm(clientSideMicDataSender.MicSamples);
         }
     }
 

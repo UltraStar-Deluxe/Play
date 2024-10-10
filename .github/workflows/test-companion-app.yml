@@ -11,6 +11,8 @@ on:
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+  UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
   PROJECT_PATH: UltraStar Play Companion
 
 jobs:
@@ -21,17 +23,17 @@ jobs:
       fail-fast: false
       matrix:
         unityVersion:
-          - 2022.2.4f1
+          - 2023.2.12f1
         targetPlatform:
           - Android
           - iOS
     steps:
       # Clone repo and restore cache
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           lfs: true
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ${{ env.PROJECT_PATH }}/Library
           key: Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-${{ hashFiles(env.PROJECT_PATH) }}
@@ -46,17 +48,19 @@ jobs:
         run: sh setup.sh
       
       # Test Unity project
-      - uses: game-ci/unity-test-runner@v2.1.1
+      - uses: game-ci/unity-test-runner@v4
         id: testRunner
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           projectPath: ${{ env.PROJECT_PATH }}
           unityVersion: ${{ matrix.unityVersion }}
           testMode: all
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           customParameters: "-nographics"
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Test results (all modes)

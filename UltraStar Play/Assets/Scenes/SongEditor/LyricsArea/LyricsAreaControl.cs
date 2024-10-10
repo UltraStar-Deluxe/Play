@@ -211,7 +211,6 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
                 or NotesPastedEvent
                 or NotesAddedEvent
                 or SentencesChangedEvent
-                or ImportedNotesEvent
                 or NotesChangedEvent)
         {
             UpdateLyrics();

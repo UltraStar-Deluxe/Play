@@ -8,6 +8,8 @@ on:
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+  UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
   PROJECT_PATH: UltraStar Play Companion
 
 jobs:
@@ -18,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         unityVersion:
-          - 2022.2.4f1
+          - 2023.2.12f1
         targetPlatform:
           # - StandaloneWindows64
           # - StandaloneLinux64
@@ -30,11 +32,11 @@ jobs:
           # - WebGL
     steps:
       # Clone repo and restore cache
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           lfs: true
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ${{ env.PROJECT_PATH }}/Library
           key: Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-${{ hashFiles(env.PROJECT_PATH) }}
@@ -49,16 +51,18 @@ jobs:
         run: sh setup.sh
 
       # Build Executables.
-      - uses: game-ci/unity-builder@v2.1.2
+      - uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           projectPath: ${{ env.PROJECT_PATH }}
           unityVersion: ${{ matrix.unityVersion }}
           targetPlatform: ${{ matrix.targetPlatform }}
           customParameters: '-myParameter myValue -myBoolean -ThirdParameter andItsValue'
           allowDirtyBuild: true
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.targetPlatform }}-build
           path: build/${{ matrix.targetPlatform }}

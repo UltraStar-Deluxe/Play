@@ -110,6 +110,10 @@ public static partial class R
         public static readonly string enum_MediaType_InstrumentalAudio = "enum_MediaType_InstrumentalAudio";
         public static readonly string enum_MediaType_Video = "enum_MediaType_Video";
         public static readonly string enum_MediaType_VocalsAudio = "enum_MediaType_VocalsAudio";
+        public static readonly string enum_NoteDisplayLineCount_Auto = "enum_NoteDisplayLineCount_Auto";
+        public static readonly string enum_NoteDisplayLineCount_Few = "enum_NoteDisplayLineCount_Few";
+        public static readonly string enum_NoteDisplayLineCount_Many = "enum_NoteDisplayLineCount_Many";
+        public static readonly string enum_NoteDisplayLineCount_Medium = "enum_NoteDisplayLineCount_Medium";
         public static readonly string enum_NoteDisplayMode_None = "enum_NoteDisplayMode_None";
         public static readonly string enum_NoteDisplayMode_ScrollingNoteStream = "enum_NoteDisplayMode_ScrollingNoteStream";
         public static readonly string enum_NoteDisplayMode_SentenceBySentence = "enum_NoteDisplayMode_SentenceBySentence";
@@ -495,6 +499,7 @@ public static partial class R
         public static readonly string singScene_action_restart = "singScene_action_restart";
         public static readonly string singScene_missingMicrophones_message = "singScene_missingMicrophones_message";
         public static readonly string singScene_missingMicrophones_title = "singScene_missingMicrophones_title";
+        public static readonly string singScene_options_noteDisplayLineCount = "singScene_options_noteDisplayLineCount";
         public static readonly string singScene_options_noteDisplayMode = "singScene_options_noteDisplayMode";
         public static readonly string singScene_options_showLyricsArea = "singScene_options_showLyricsArea";
         public static readonly string singScene_options_showLyricsOnNotes = "singScene_options_showLyricsOnNotes";
@@ -523,6 +528,7 @@ public static partial class R
         public static readonly string songEditor_action_pasteNotes = "songEditor_action_pasteNotes";
         public static readonly string songEditor_action_resetVideoGap = "songEditor_action_resetVideoGap";
         public static readonly string songEditor_action_setGap = "songEditor_action_setGap";
+        public static readonly string songEditor_action_setGapKeepNotePosition = "songEditor_action_setGapKeepNotePosition";
         public static readonly string songEditor_action_setMedleyEnd = "songEditor_action_setMedleyEnd";
         public static readonly string songEditor_action_setMedleyStart = "songEditor_action_setMedleyStart";
         public static readonly string songEditor_action_setNoteTypeFreestyle = "songEditor_action_setNoteTypeFreestyle";
@@ -560,6 +566,8 @@ public static partial class R
         public static readonly string songEditor_helpDialog_title = "songEditor_helpDialog_title";
         public static readonly string songEditor_issues_title = "songEditor_issues_title";
         public static readonly string songEditor_layers_title = "songEditor_layers_title";
+        public static readonly string songEditor_lrcImportDialog_importToP1 = "songEditor_lrcImportDialog_importToP1";
+        public static readonly string songEditor_lrcImportDialog_importToP2 = "songEditor_lrcImportDialog_importToP2";
         public static readonly string songEditor_lrcImportDialog_success = "songEditor_lrcImportDialog_success";
         public static readonly string songEditor_lrcImportDialog_title = "songEditor_lrcImportDialog_title";
         public static readonly string songEditor_midiImportDialog_assignToPlayer = "songEditor_midiImportDialog_assignToPlayer";
@@ -733,6 +741,7 @@ public static partial class R
         public static readonly string uri_howToConfigureMicsAndSpeaker = "uri_howToConfigureMicsAndSpeaker";
         public static readonly string uri_howToMods = "uri_howToMods";
         public static readonly string uri_howToPlayerProfiles = "uri_howToPlayerProfiles";
+        public static readonly string uri_howToReportIssues = "uri_howToReportIssues";
         public static readonly string uri_howToSearchExpressions = "uri_howToSearchExpressions";
         public static readonly string uri_howToSongEditor = "uri_howToSongEditor";
         public static readonly string uri_howToSteamWorkshop = "uri_howToSteamWorkshop";

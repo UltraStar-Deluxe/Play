@@ -2,11 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
 public static class ApplicationUtils
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        // Unity API only allows to query these properties on the main thread.
+        threadSafePersistentDataPath = Application.persistentDataPath;
+        threadSafeStreamingAssetsPath = Application.streamingAssetsPath;
+        threadSafeTemporaryCachePath = Application.temporaryCachePath;
+    }
+
     public static int CurrentFrameRate => Math.Max(1, Application.targetFrameRate > 0
         // The target frame rate is used
         ? Application.targetFrameRate
@@ -49,8 +59,66 @@ public static class ApplicationUtils
         }
     }
 
-    public static readonly string ultraStarPlaylistFileExtension = "upl";
-    public static readonly string m3uPlaylistFileExtension = "m3u";
+    private static string threadSafeStreamingAssetsPath;
+    public static string ThreadSafeStreamingAssetsPath
+    {
+        get
+        {
+            if (ThreadUtils.IsMainThread())
+            {
+                return Application.streamingAssetsPath;
+            }
+
+            if (threadSafeStreamingAssetsPath.IsNullOrEmpty())
+            {
+                throw new Exception("StreamingAssetsPath has not been stored yet for thread-safe usage");
+            }
+            return threadSafeStreamingAssetsPath;
+        }
+    }
+
+    private static string threadSafeTemporaryCachePath;
+    public static string ThreadSafeTemporaryCachePath
+    {
+        get
+        {
+            if (ThreadUtils.IsMainThread())
+            {
+                return Application.temporaryCachePath;
+            }
+
+            if (threadSafeTemporaryCachePath.IsNullOrEmpty())
+            {
+                throw new Exception("TemporaryCachePath has not been stored yet for thread-safe usage");
+            }
+            return threadSafeTemporaryCachePath;
+        }
+    }
+
+    private static string threadSafePersistentDataPath;
+    public static string ThreadSafePersistentDataPath
+    {
+        get
+        {
+            if (ThreadUtils.IsMainThread())
+            {
+                return Application.persistentDataPath;
+            }
+
+            if (threadSafePersistentDataPath.IsNullOrEmpty())
+            {
+                throw new Exception("PersistentDataPath has not been stored yet for thread-safe usage");
+            }
+            return threadSafePersistentDataPath;
+        }
+    }
+
+    public static string PlaylistFolder => GetPersistentDataPath("Playlists");
+    public static string FavoritesPlaylistFilePath => $"{PlaylistFolder}/{FavoritesPlaylistName}.{UltraStarPlaylistFileExtension}";
+    public const string FavoritesPlaylistName = "Favorites";
+
+    public const string UltraStarPlaylistFileExtension = "upl";
+    public const string M3uPlaylistFileExtension = "m3u";
 
     public static readonly IReadOnlyCollection<string> supportedSoundfontFiles = new HashSet<string>
     {
@@ -161,15 +229,15 @@ public static class ApplicationUtils
     public static string GetStreamingAssetsPath(string pathInStreamingAssetsFolder)
     {
 #if UNITY_ANDROID
-        return AndroidStreamingAssets.Path + "/" + pathInStreamingAssetsFolder;
+        return $"{AndroidStreamingAssets.Path}/{pathInStreamingAssetsFolder}";
 #else
-        return Application.streamingAssetsPath + "/" + pathInStreamingAssetsFolder;
+        return $"{ThreadSafeStreamingAssetsPath}/{pathInStreamingAssetsFolder}";
 #endif
     }
 
     public static string GetPersistentDataPath(string pathInPersistentDataFolder)
     {
-        return Application.persistentDataPath + "/" + pathInPersistentDataFolder;
+        return $"{ThreadSafePersistentDataPath}/{pathInPersistentDataFolder}";
     }
 
     public static Vector2 GetScreenSize()
@@ -379,14 +447,14 @@ public static class ApplicationUtils
 
     public static string GetTemporaryCachePath(string pathInsideTemporaryCachePath)
     {
-        return $"{Application.temporaryCachePath}/{pathInsideTemporaryCachePath}";
+        return $"{ThreadSafeTemporaryCachePath}/{pathInsideTemporaryCachePath}";
     }
 
     private static IReadOnlyCollection<string> ReadAudioFileExtensionsFromFile()
     {
         try
         {
-            return File.ReadAllLines(GetStreamingAssetsPath("audio-file-extensions.txt"), System.Text.Encoding.UTF8);
+            return File.ReadAllLines(GetStreamingAssetsPath("audio-file-extensions.txt"), Encoding.UTF8);
         }
         catch (Exception ex)
         {
@@ -402,7 +470,7 @@ public static class ApplicationUtils
     {
         try
         {
-            return File.ReadAllLines(GetStreamingAssetsPath("ffmpeg-supported-common-file-extensions.txt"), System.Text.Encoding.UTF8);
+            return File.ReadAllLines(GetStreamingAssetsPath("ffmpeg-supported-common-file-extensions.txt"), Encoding.UTF8);
         }
         catch (Exception ex)
         {

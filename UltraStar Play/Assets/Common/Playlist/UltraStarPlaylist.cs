@@ -44,7 +44,7 @@ public class UltraStarPlaylist : IPlaylist
     public void SetFileName(string newValue)
     {
         string directoryPath = Path.GetDirectoryName(FilePath);
-        FilePath = directoryPath + $"/{newValue}.{ApplicationUtils.ultraStarPlaylistFileExtension}";
+        FilePath = directoryPath + $"/{newValue}.{ApplicationUtils.UltraStarPlaylistFileExtension}";
         headerFields.Remove("NAME");
     }
 

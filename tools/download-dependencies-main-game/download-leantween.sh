@@ -18,7 +18,8 @@ echo "Assets/LeanTween/Documentation/*" >> .git/info/sparse-checkout
 echo "Assets/LeanTween/License.txt" >> .git/info/sparse-checkout
 echo "Assets/LeanTween/ReadMe.txt" >> .git/info/sparse-checkout
 # commit of 18th September 2020: ea745c3f94d8682327c912030dfc6b65cbe1ced5
-git pull --depth=1 origin ea745c3f94d8682327c912030dfc6b65cbe1ced5
+git pull --depth=100 origin master
+git checkout ea745c3f94d8682327c912030dfc6b65cbe1ced5
 
 echo "Moving downloaded files to correct position for this project..."
 mv -v ./Assets/LeanTween/* ./

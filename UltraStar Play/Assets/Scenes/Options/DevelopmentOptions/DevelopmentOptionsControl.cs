@@ -71,11 +71,17 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.httpEndpointExampleLabel)]
     private Label httpEndpointExampleLabel;
 
-    [Inject(UxmlName = R.UxmlNames.showLogButton)]
-    private Button showLogButton;
+    [Inject(UxmlName = R.UxmlNames.showConsoleButton)]
+    private Button showConsoleButton;
+
+    [Inject(UxmlName = R.UxmlNames.openLogFolderButton)]
+    private Button openLogFolderButton;
 
     [Inject(UxmlName = R.UxmlNames.copyLogButton)]
     private Button copyLogButton;
+
+    [Inject(UxmlName = R.UxmlNames.reportIssueButton)]
+    private Button reportIssueButton;
 
     [Inject(UxmlName = R.UxmlNames.openPersistentDataPathButton)]
     private Button openPersistentDataPathButton;
@@ -91,6 +97,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlName = R.UxmlNames.simulateJitterInMillisField)]
     private IntegerField simulateJitterInMillisField;
+
+    [Inject(UxmlName = R.UxmlNames.songSelectSongPreviewDelay)]
+    private IntegerField songSelectSongPreviewDelay;
 
     [Inject]
     private ThemeManager themeManager;
@@ -295,7 +304,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         }
 
         // View and copy log
-        showLogButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
+        showConsoleButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
+        openLogFolderButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(Log.logFileFolder));
+        reportIssueButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToReportIssues)));
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
@@ -450,6 +461,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(wipeLyricsEffectToggle,
             () => settings.WipeLyrics,
             newValue => settings.WipeLyrics = newValue);
+
+        // Song preview delay
+        FieldBindingUtils.Bind(songSelectSongPreviewDelay,
+            () => settings.SongPreviewDelayInMillis,
+            newValue => settings.SongPreviewDelayInMillis = newValue);
 
         // Vfx enabled
         FieldBindingUtils.Bind(vfxEnabledToggle,

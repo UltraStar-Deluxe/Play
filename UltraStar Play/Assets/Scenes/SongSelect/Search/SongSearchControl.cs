@@ -97,6 +97,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     private TooltipControl searchExpressionIconTooltipControl;
 
     public bool IsSearchPropertyDropdownVisible => searchPropertyDropdownOverlay.IsVisibleByDisplay();
+    public bool IsSearching => !searchTextField.value.IsNullOrEmpty();
 
     private HashSet<ESearchProperty> searchProperties = new();
 
@@ -116,7 +117,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
         searchTextField.DisableParseEscapeSequences();
-        searchTextField.RegisterCallback<NavigationSubmitEvent>(_ => submitEventStream.OnNext(VoidEvent.instance));
+        searchTextField.RegisterCallback<NavigationSubmitEvent>(_ => SubmitSearch());
         new TextFieldHintControl(searchTextFieldHint);
 
         songSelectSceneInputControl.FuzzySearchText.Subscribe(newValue => searchTextFieldHint.SetVisibleByVisibility(newValue.IsNullOrEmpty()));
@@ -207,6 +208,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
 
         filterActiveIcon.SetVisibleByDisplay(isAnyFilterOrPlaylistActive);
         filterInactiveIcon.SetVisibleByDisplay(!isAnyFilterOrPlaylistActive);
+    }
+
+    public void SubmitSearch()
+    {
+        submitEventStream.OnNext(VoidEvent.instance);
     }
 
     public void ShowSearchPropertyDropdownOverlay()

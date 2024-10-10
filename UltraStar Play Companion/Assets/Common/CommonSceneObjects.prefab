@@ -57,7 +57,7 @@ GameObject:
   - component: {fileID: 5626457258006968070}
   m_Layer: 0
   m_Name: TranslationManager
-  m_TagString: TranslationManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -304,7 +304,7 @@ GameObject:
   - component: {fileID: 1770134915371172135}
   m_Layer: 0
   m_Name: MainGameHttpClient
-  m_TagString: MainGameHttpClient
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -348,7 +348,7 @@ GameObject:
   - component: {fileID: 7793846927334274922}
   m_Layer: 0
   m_Name: ApplicationManager
-  m_TagString: ApplicationManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -486,7 +486,7 @@ GameObject:
   - component: {fileID: 7793846928232682640}
   m_Layer: 0
   m_Name: SettingsManager
-  m_TagString: SettingsManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -530,7 +530,7 @@ GameObject:
   - component: {fileID: 5134610190192529917}
   m_Layer: 0
   m_Name: SceneInjectionManager
-  m_TagString: SceneInjectionManager
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

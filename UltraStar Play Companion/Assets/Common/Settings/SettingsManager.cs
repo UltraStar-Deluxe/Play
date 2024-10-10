@@ -11,13 +11,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         settings = null;
     }
 
-    public static SettingsManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<SettingsManager>("SettingsManager");
-        }
-    }
+    public static SettingsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SettingsManager>();
 
     // The settings must be written to the same path they have been loaded from.
     // This field stores the path from where settings have been loaded / will be saved.

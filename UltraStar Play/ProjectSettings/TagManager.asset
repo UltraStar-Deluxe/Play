@@ -7,26 +7,11 @@ TagManager:
   - UIDocument
   - InputManager
   - DontDestroyOnLoadManager
-  - TranslationManager
-  - SceneInjectionManager
   - EventSystem
-  - UiManager
-  - SceneChangeAnimationControl
-  - AudioManager
-  - PlaylistManager
-  - SceneNavigator
-  - SettingsManager
-  - ThemeManager
-  - ServerSideConnectRequestManager
-  - CursorManager
-  - ApplicationManager
-  - SongMetaManager
-  - MidiManager
-  - StatsManager
-  - StyleSheetControl
-  - ContextMenuPopupManager
+  - SceneInjectionManager
   - FxTemporaire
   - NetworkManager
+  - MelodyManiaOnly
   layers:
   - Default
   - TransparentFX

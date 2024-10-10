@@ -12,8 +12,6 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static PlaylistManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PlaylistManager>();
 
-    public static readonly string favoritesPlaylistName = "Favorites";
-
     private List<IPlaylist> playlists = new();
 
     public IReadOnlyList<IPlaylist> Playlists
@@ -48,9 +46,6 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream
         .ObserveOnMainThread();
 
-    private string favoritesPlaylistFilePath;
-    private string playlistFolder;
-
     // TODO: Should be injected
     private SongMetaManager songMetaManager;
     private Settings settings;
@@ -68,26 +63,24 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         settings = SettingsManager.Instance.Settings;
         nonPersistentSettings = SettingsManager.Instance.NonPersistentSettings;
 
-        playlistFolder = $"{Application.persistentDataPath}/Playlists";
-        favoritesPlaylistFilePath = $"{playlistFolder}/{favoritesPlaylistName}.{ApplicationUtils.ultraStarPlaylistFileExtension}";
         CreateFavoritePlaylistIfNotExist();
     }
 
     private void CreateFavoritePlaylistIfNotExist()
     {
-        if (!Directory.Exists(playlistFolder))
+        if (!Directory.Exists(ApplicationUtils.PlaylistFolder))
         {
-            Directory.CreateDirectory(playlistFolder);
+            Directory.CreateDirectory(ApplicationUtils.PlaylistFolder);
         }
-        if (!File.Exists(favoritesPlaylistFilePath))
+        if (!File.Exists(ApplicationUtils.FavoritesPlaylistFilePath))
         {
-            File.WriteAllText(favoritesPlaylistFilePath, "# UltraStar playlist");
+            File.WriteAllText(ApplicationUtils.FavoritesPlaylistFilePath, "# UltraStar playlist");
         }
     }
 
     public bool IsFavoritesPlaylist(IPlaylist playlist)
     {
-        return playlist.Name == favoritesPlaylistName;
+        return playlist.Name == ApplicationUtils.FavoritesPlaylistName;
     }
 
     public void SavePlaylist(UltraStarPlaylist playlist)
@@ -123,7 +116,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
         playlists = new List<IPlaylist>();
 
-        await ScanPlaylistsInFolderAsync(playlistFolder);
+        await ScanPlaylistsInFolderAsync(ApplicationUtils.PlaylistFolder);
 
         List<string> songFolders = SettingsUtils.GetEnabledSongFolders(settings);
         foreach (string songFolder in songFolders)
@@ -143,7 +136,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     private async Task ScanM3UPlaylistsInFolder(string folder)
     {
-        FileScanner scanner = new($"*.{ApplicationUtils.m3uPlaylistFileExtension}", true, true);
+        FileScanner scanner = new($"*.{ApplicationUtils.M3uPlaylistFileExtension}", true, true);
         List<string> playlistFilePaths = scanner.GetFiles(folder, true);
         foreach (string filePath in playlistFilePaths)
         {
@@ -162,7 +155,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     private async Task ScanUltraStarPlaylistsInFolder(string folder)
     {
-        string ultraStarPlaylistFileExtensionPattern = $"*.{ApplicationUtils.ultraStarPlaylistFileExtension}";
+        string ultraStarPlaylistFileExtensionPattern = $"*.{ApplicationUtils.UltraStarPlaylistFileExtension}";
         FileScanner scanner = new(ultraStarPlaylistFileExtensionPattern, true, true);
         List<string> playlistFilePaths = scanner.GetFiles(folder, true);
         foreach (string filePath in playlistFilePaths)
@@ -185,7 +178,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         playlists.Add(playlist);
 
         if (playlist is UltraStarPlaylist
-            && Path.GetFullPath(favoritesPlaylistFilePath) == Path.GetFullPath(filePath))
+            && Path.GetFullPath(ApplicationUtils.FavoritesPlaylistFilePath) == Path.GetFullPath(filePath))
         {
             // This is the special playlist for the favorite songs.
             favoritesPlaylist = playlist as UltraStarPlaylist;
@@ -266,7 +259,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
         UltraStarPlaylist ultraStarPlaylist = playlist as UltraStarPlaylist;
         if (playlist is UltraStarAllSongsPlaylist
-            || playlist.Name == favoritesPlaylistName
+            || playlist.Name == ApplicationUtils.FavoritesPlaylistName
             || playlist.FilePath.IsNullOrEmpty()
             || ultraStarPlaylist == null)
         {
@@ -284,7 +277,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         string oldName = playlist.Name;
         string oldPath = playlist.FilePath;
         string oldFolder = Path.GetDirectoryName(playlist.FilePath);
-        string newPath = $"{oldFolder}/{newName}.{ApplicationUtils.ultraStarPlaylistFileExtension}";
+        string newPath = $"{oldFolder}/{newName}.{ApplicationUtils.UltraStarPlaylistFileExtension}";
         try
         {
             Debug.Log($"Moving playlist from '{oldPath}' to '{newPath}'");
@@ -317,7 +310,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     {
         if (playlist == null
             || playlist is UltraStarAllSongsPlaylist
-            || playlist.Name == favoritesPlaylistName
+            || playlist.Name == ApplicationUtils.FavoritesPlaylistName
             || playlist.FilePath.IsNullOrEmpty())
         {
             return Translation.Get(R.Messages.playlist_error_cannotRemove);
@@ -353,7 +346,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     public UltraStarPlaylist CreateNewPlaylist(string initialName)
     {
         string newPlaylistName = GetNewUniquePlaylistName(initialName);
-        string newPlaylistPath = $"{playlistFolder}/{newPlaylistName}.{ApplicationUtils.ultraStarPlaylistFileExtension}";
+        string newPlaylistPath = $"{ApplicationUtils.PlaylistFolder}/{newPlaylistName}.{ApplicationUtils.UltraStarPlaylistFileExtension}";
 
         // Create playlist file
         File.WriteAllText(newPlaylistPath, "# UltraStar playlist");

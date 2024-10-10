@@ -31,7 +31,7 @@
     "com.unity.ugui": "2.0.0",
     "com.unity.ui.builder": "2.0.0",
     "com.unity.vectorgraphics": "2.0.0-preview.21",
-    "com.whisper.unity": "https://github.com/achimmihca/whisper.unity.git?path=/Packages/com.whisper.unity#37df0f23f6aff4d63d96278865b177c037db6d10",
+    "com.whisper.unity": "https://github.com/Macoron/whisper.unity.git?path=/Packages/com.whisper.unity#1.3.1",
     "com.yasirkula.androidruntimepermissions": "https://github.com/yasirkula/UnityAndroidRuntimePermissions.git",
     "com.yasirkula.ingamedebugconsole": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.5.8",
     "jillejr.newtonsoft.json-for-unity.converters": "https://github.com/applejag/Newtonsoft.Json-for-Unity.Converters.git#1.6.3",

@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using UniInject;
 using UniRx;
@@ -33,12 +32,15 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
 
     private int lastNoteAreaMin;
     private int lastNoteAreaWidth;
-    private bool isDirty;
+    private bool isViewportDirty = true;
     private int lastUpdateAudioWaveformFrameCount;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
     private VisualElement TargetElement => noteAreaWaveform;
+
+    private AudioClip lastAudioClip;
+    private float[] audioWaveFormSamples;
 
     public void OnInjectionFinished()
     {
@@ -48,22 +50,19 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
                 if (evt.X != lastNoteAreaMin
                     || evt.Width != lastNoteAreaWidth)
                 {
-                    TargetElement.HideByVisibility();
                     lastNoteAreaMin = evt.X;
                     lastNoteAreaWidth = evt.Width;
-                    isDirty = true;
+                    isViewportDirty = true;
                 }
             })
             .AddTo(gameObject);
 
-        // Update audio wave form when note area was stable for some time.
         noteAreaControl.ViewportEventStream
-            .Throttle(new TimeSpan(0, 0, 0, 0, 800))
             .Subscribe(_ =>
             {
-                TargetElement.ShowByVisibility();
-                if (isDirty)
+                if (isViewportDirty)
                 {
+                    isViewportDirty = false;
                     UpdateAudioWaveForm();
                 }
             })
@@ -94,7 +93,9 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
         }
         TargetElement.ShowByVisibility();
 
-        if (!songAudioPlayer.IsFullyLoaded
+        if (!VisualElementUtils.HasGeometry(TargetElement)
+            || noteAreaControl.MinMillisecondsInViewport == noteAreaControl.MaxMillisecondsInViewport
+            || !songAudioPlayer.IsFullyLoaded
             // Must be an audio format. Getting all the samples does not work with video files.
             || !ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Audio))
             || !VisualElementUtils.HasGeometry(TargetElement)
@@ -106,7 +107,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
 
         if (audioWaveFormVisualization == null)
         {
-            int textureWidth = 1024;
+            int textureWidth = 512;
             int textureHeight = 128;
             audioWaveFormVisualization = new AudioWaveFormVisualization(
                 songEditorSceneControl.gameObject,
@@ -115,6 +116,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
                 textureHeight,
                 "song editor background audio visualization");
             audioWaveFormVisualization.WaveformColor = Colors.darkSlateGrey;
+            audioWaveFormVisualization.AudioWaveFormCalculator = new PrecalculatingAudioWaveFormCalculator();
         }
 
         AudioClip audioClip = SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
@@ -123,10 +125,14 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
             return;
         }
 
+        if (lastAudioClip != audioClip)
+        {
+            lastAudioClip = audioClip;
+            audioWaveFormSamples = AudioUtils.GetAudioSamples(audioClip, 0);
+        }
+
         double minSampleSingleChannel = ((double)noteAreaControl.MinMillisecondsInViewport / 1000) * audioClip.frequency;
         double maxSampleSingleChannel = ((double)noteAreaControl.MaxMillisecondsInViewport / 1000) * audioClip.frequency;
-        SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioClip, (int)minSampleSingleChannel, (int)maxSampleSingleChannel);
-
-        isDirty = false;
+        SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioWaveFormSamples, (int)minSampleSingleChannel, (int)maxSampleSingleChannel);
     }
 }

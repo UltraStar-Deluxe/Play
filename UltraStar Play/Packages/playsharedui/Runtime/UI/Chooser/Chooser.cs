@@ -75,7 +75,7 @@ public class Chooser : VisualElement
     {
         Label = label;
     }
-
+    
     public Chooser()
     {
         // Load UXML and add as child element

@@ -4,8 +4,8 @@ using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Networking;
-using Debug = UnityEngine.Debug;
 
 /**
  * Handles loading and caching of AudioClips.
@@ -16,6 +16,9 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
     private const int CriticalCacheSize = 10;
     private readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
+
+    [InjectedInInspector]
+    public AudioMixerGroup pitchShifterAudioMixerGroup;
 
     protected override object GetInstance()
     {
@@ -32,6 +35,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         AudioClip result = null;
         // Load with busy waiting
         Instance.LoadAudioClipFromUri(uri, streamAudio, true)
+            .CatchIgnore((Exception ex) => result = null)
             .Subscribe(audioClip => result = audioClip);
         return result;
     }
@@ -53,6 +57,11 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
             return Observable.Throw<AudioClip>(new IllegalArgumentException($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.JoinWith(", ")}"));
         }
 
+        if (!TryGetUri(uri, out Uri uriObject))
+        {
+            return Observable.Throw<AudioClip>(new IllegalArgumentException($"URI is invalid. Maybe the file does not exist. URI: '{uri}'"));
+        }
+
         if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
             && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
         {
@@ -69,7 +78,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         return Observable.Create<AudioClip>(o =>
         {
             // Send web request
-            UnityWebRequest webRequest = AudioUtils.CreateAudioClipRequest(new Uri(uri), streamAudio);
+            UnityWebRequest webRequest = AudioUtils.CreateAudioClipRequest(uriObject, streamAudio);
             webRequest.SendWebRequest();
 
             // Check web request result in coroutine
@@ -100,6 +109,20 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
             return Disposable.Empty;
         });
+    }
+
+    private bool TryGetUri(string uriString, out Uri uri)
+    {
+        try
+        {
+            uri = new Uri(uriString);
+            return true;
+        }
+        catch (UriFormatException)
+        {
+            uri = null;
+            return false;
+        }
     }
 
     private void ClearCache()

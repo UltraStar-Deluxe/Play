@@ -45,13 +45,15 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
     public IObservable<SongAudioLoadedEvent> LoadedEventStream => loadedEventStream;
 
     public IObservable<Pair<double>> JumpBackEventStream
-        => positionEventStream.Pairwise().Where(pair => pair.Previous > pair.Current);
+        => positionEventStream.Pairwise().Where(pair => IsFullyLoaded
+                                                        && pair.Previous > pair.Current);
 
     public IObservable<Pair<double>> JumpForwardEventStream
         // The position will increase in normal playback. A big increase however, can always be considered as "jump".
         // Furthermore, when not currently playing, then every forward change can be considered as "jump".
-        => positionEventStream.Pairwise().Where(pair => (pair.Previous + MinForwardJumpOffsetInMillis) < pair.Current
-                                                        || (!IsPlaying && pair.Previous < pair.Current));
+        => positionEventStream.Pairwise().Where(pair => IsFullyLoaded
+                                                        && ((pair.Previous + MinForwardJumpOffsetInMillis) < pair.Current
+                                                            || (!IsPlaying && pair.Previous < pair.Current)));
 
     // The current position in the song in milliseconds.
     private double positionInMillis;
@@ -138,7 +140,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
     }
 
     private bool isPlaying;
-    public bool IsPlaying => isPlaying;
+    public bool IsPlaying => IsFullyLoaded && isPlaying;
     public bool IsPlayingOfAudioProvider => IsFullyLoaded && currentAudioSupportProvider.IsPlaying;
 
     public bool IsPartiallyLoaded => currentAudioSupportProvider != null;
@@ -299,6 +301,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         bool streamAudio,
         double startPositionInMillis)
     {
+        Log.Debug(() => $"SongAudioPlayer.DoLoadAndPlayAsObservable '{audioUri}'");
+
         IAudioSupportProvider audioSupportProvider = availableAudioSupportProviders
             .FirstOrDefault(it => it.IsSupported(audioUri));
         if (audioSupportProvider == null)
@@ -340,6 +344,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
 
     public void UnloadAudio()
     {
+        Log.Debug(() => $"SongAudioPlayer.UnloadAudio '{loadedSongMeta.GetArtistDashTitle()}'");
         StopAllCoroutines();
         StopAudio();
 
@@ -410,13 +415,13 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         if (IsPlaying
             && !currentAudioSupportProvider.IsPlaying)
         {
-            Debug.Log($"{nameof(SongAudioPlayer)} should be playing, but {currentAudioSupportProvider} is not. Starting its playback now.");
+            Log.Debug(() => $"{nameof(SongAudioPlayer)} should be playing, but {currentAudioSupportProvider} is not. Starting its playback now.");
             currentAudioSupportProvider.Play();
         }
         else if (!IsPlaying
                  && currentAudioSupportProvider.IsPlaying)
         {
-            Debug.Log($"{nameof(SongAudioPlayer)} should not be playing, but {currentAudioSupportProvider} is. Pausing its playback now.");
+            Log.Debug(() => $"{nameof(SongAudioPlayer)} should not be playing, but {currentAudioSupportProvider} is. Pausing its playback now.");
             currentAudioSupportProvider.Pause();
         }
     }

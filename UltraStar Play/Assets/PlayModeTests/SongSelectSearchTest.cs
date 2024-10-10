@@ -15,30 +15,30 @@ public class SongSelectSearchTest : AbstractPlayModeTest
 
     [UnityTest]
     public IEnumerator SongSearchShouldIgnoreAccents() => ExpectAnySongSelectEntry()
-        .ContinueWith(_ => SetSearchText("eLLo"))
+        .ContinueWith(SetSearchText("eLLo"))
         .ContinueWith(ExpectSongSelectEntryWithArtistName("HèllóArtist"))
         .ToYieldInstruction(this.Executor);
 
     [UnityTest]
     public IEnumerator CancelSongSearchShouldGoBackToLastSelection() => ExpectAnySongSelectEntry()
-        .ContinueWith(_ => SelectSongSelectEntryWithTitle("ArtistHelloWithAccent"))
-        .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => SetSearchText("Default"))
-        .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => CancelSearch())
-        .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => ExpectSelectedSongSelectEntryWithTitle("ArtistHelloWithAccent"))
+        .ContinueWith(SelectSongSelectEntryWithTitle("ArtistHelloWithAccent"))
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(SetSearchText("Default"))
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(CancelSearch())
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(ExpectSelectedSongSelectEntryWithTitle("ArtistHelloWithAccent"))
         .ToYieldInstruction(this.Executor);
 
     [UnityTest]
     public IEnumerator SubmitSongSearchShouldContinueAtCurrentSelection() => ExpectAnySongSelectEntry()
-        .ContinueWith(_ => SelectSongSelectEntryWithTitle("ArtistHelloWithAccent"))
-        .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => SetSearchText("ArtistHelloNoAccent"))
-        .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => SubmitSearch())
-        .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => ExpectSelectedSongSelectEntryWithTitle("ArtistHelloNoAccent"))
+        .ContinueWith(SelectSongSelectEntryWithTitle("ArtistHelloWithAccent"))
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(SetSearchText("ArtistHelloNoAccent"))
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(SubmitSearch())
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(ExpectSelectedSongSelectEntryWithTitle("ArtistHelloNoAccent"))
         .ToYieldInstruction(this.Executor);
 
     protected override List<string> GetRelativeTestSongFilePaths()

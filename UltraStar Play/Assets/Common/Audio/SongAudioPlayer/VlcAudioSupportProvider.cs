@@ -13,22 +13,48 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
     private MediaPlayer vlcMediaPlayer;
     public MediaPlayer VlcMediaPlayer => vlcMediaPlayer;
 
-    private long lastVlcMediaPlayerTimeWhenPlaying;
-    private float lastAudioListenerVolume;
+    private long lastVlcMediaPlayerTimeInMillisWhenPlaying;
     private double lastSetVolumeFactor = 1;
+
+    private bool shouldBePlaying;
 
     private void Update()
     {
-        if (IsPlaying)
+        if (shouldBePlaying && IsPlaying)
         {
-            lastVlcMediaPlayerTimeWhenPlaying = vlcMediaPlayer.Time;
+            lastVlcMediaPlayerTimeInMillisWhenPlaying = vlcMediaPlayer.Time;
         }
 
-        // Update volume when AudioListener.volume changes
-        if (Math.Abs(AudioListener.volume - lastAudioListenerVolume) > 0.01f)
+        UpdateVlcMediaPlayerPause();
+
+        // Update volume when AudioListener.volume changes, which is considered as part of the property setter
+        if (shouldBePlaying
+            && IsPlaying
+            && Math.Abs(VlcMediaPlayerTargetVolumePercent - vlcMediaPlayer.Volume) > 1)
         {
-            lastAudioListenerVolume = AudioListener.volume;
-            // AudioListener.volume is considered as part of the property setter
+            VolumeFactor = lastSetVolumeFactor;
+        }
+    }
+
+    private void UpdateVlcMediaPlayerPause()
+    {
+        // TODO: Workaround for unreliable VLC MediaPlayer pause state ( https://code.videolan.org/videolan/vlc/-/issues/28353 )
+        if (!IsFullyLoaded)
+        {
+            return;
+        }
+
+        if (!shouldBePlaying && vlcMediaPlayer != null && vlcMediaPlayer.IsPlaying)
+        {
+            Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing. Set VLC MediaPlayer to pause again.");
+            vlcMediaPlayer.SetPause(true);
+            vlcMediaPlayer.SetVolume(0);
+            PositionInMillis = lastVlcMediaPlayerTimeInMillisWhenPlaying;
+        }
+        else if (shouldBePlaying && vlcMediaPlayer != null && !vlcMediaPlayer.IsPlaying)
+        {
+            Log.Verbose(() => "Should be playing but VLC MediaPlayer is paused. Set VLC MediaPlayer to play again.");
+            vlcMediaPlayer.SetPause(false);
             VolumeFactor = lastSetVolumeFactor;
         }
     }
@@ -38,11 +64,10 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         if (vlcMediaPlayer == null)
         {
             vlcMediaPlayer = vlcManager.CreateMediaPlayer();
-            VolumeFactor = lastSetVolumeFactor;
         }
         else
         {
-            vlcMediaPlayer.Stop();
+            vlcMediaPlayer.StopAsync();
         }
 
         if (vlcMediaPlayer.Media != null)
@@ -52,8 +77,9 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
 
         vlcMediaPlayer.Media = new Media(new Uri(audioUri));
 
-        // Play to trigger loading
-        Play();
+        // Play to trigger loading. PlayAsync to not block the main thread and avoid stutter.
+        vlcMediaPlayer.SetVolume(0);
+        vlcMediaPlayer.PlayAsync();
         PositionInMillis = startPositionInMillis;
 
         // The video is loaded asynchronously.
@@ -61,7 +87,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         return Observable.Create<AudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => this == null || DurationInMillis > 0,
+                () => this == null || IsFullyLoaded,
                 () =>
                 {
                     if (this == null)
@@ -71,6 +97,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
                         throw new AudioSupportProviderException(errorMessage);
                     }
 
+                    vlcMediaPlayer.SetPause(!shouldBePlaying);
                     o.OnNext(new AudioLoadedEvent(audioUri));
                 }));
             return Disposable.Empty;
@@ -92,34 +119,26 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
 
     public override void Play()
     {
-        if (vlcMediaPlayer == null
-            || vlcMediaPlayer.IsPlaying)
+        shouldBePlaying = true;
+        if (IsFullyLoaded)
         {
-            return;
+            vlcMediaPlayer?.SetPause(false);
         }
-
-        vlcMediaPlayer.Play();
     }
 
     public override void Pause()
     {
-        if (vlcMediaPlayer == null
-            || !vlcMediaPlayer.IsPlaying)
+        shouldBePlaying = false;
+        if (IsFullyLoaded)
         {
-            return;
+            vlcMediaPlayer?.SetPause(true);
         }
-
-        vlcMediaPlayer.Pause();
     }
 
     public override void Stop()
     {
-        if (vlcMediaPlayer == null)
-        {
-            return;
-        }
-
-        vlcMediaPlayer.Stop();
+        shouldBePlaying = false;
+        vlcMediaPlayer?.StopAsync();
     }
 
     public override bool IsPlaying
@@ -154,13 +173,17 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         get
         {
             // VLC MediaPlayer continues time even if not playing. Workaround: return old time if not playing.
-            return vlcMediaPlayer.IsPlaying
+            return shouldBePlaying && vlcMediaPlayer.IsPlaying
                 ? vlcMediaPlayer.Time
-                : lastVlcMediaPlayerTimeWhenPlaying;
+                : lastVlcMediaPlayerTimeInMillisWhenPlaying;
         }
 
         // VLC MediaPlayer jumps to the end of the song when time is 0, so set 1 as minimum.
-        set => vlcMediaPlayer.SetTime((long)Math.Max(1, value));
+        set
+        {
+            lastVlcMediaPlayerTimeInMillisWhenPlaying = (long)value;
+            vlcMediaPlayer.SetTime((long)Math.Max(1, value));
+        }
     }
 
     public override double DurationInMillis => vlcMediaPlayer?.Length ?? 0;
@@ -171,9 +194,14 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         set
         {
             lastSetVolumeFactor = value;
-            vlcMediaPlayer?.SetVolume((int)(value * 100.0 * AudioListener.volume));
+            if (shouldBePlaying && IsPlaying)
+            {
+                vlcMediaPlayer?.SetVolume(VlcMediaPlayerTargetVolumePercent);
+            }
         }
     }
+
+    private int VlcMediaPlayerTargetVolumePercent => (int)(lastSetVolumeFactor * 100.0 * AudioListener.volume);
 
     private void DestroyVlcMediaPlayer()
     {

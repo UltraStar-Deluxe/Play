@@ -43,15 +43,19 @@ public static class UltraStarFormatWriter
         nonEmptyVoices.Sort(Voice.comparerById);
         foreach (Voice voice in nonEmptyVoices)
         {
-            AppendVoice(sb, voice);
+            AppendVoice(sb, voice, nonEmptyVoices.Count > 1);
         }
         sb.Append("E");
         return sb.ToString();
     }
 
-    private static void AppendVoice(StringBuilder sb, Voice voice)
+    private static void AppendVoice(StringBuilder sb, Voice voice, bool appendVoiceId)
     {
-        sb.AppendLine(voice.Id.ToString());
+        if (appendVoiceId)
+        {
+            // P1 is optional when only having one voice
+            sb.AppendLine(voice.Id.ToString());
+        }
         List<Sentence> sortedSentences = new(voice.Sentences);
         sortedSentences.Sort(Sentence.comparerByStartBeat);
         foreach (Sentence sentence in sortedSentences)
@@ -74,7 +78,15 @@ public static class UltraStarFormatWriter
         {
             AppendNote(sb, note);
         }
+
+        // TODO: Linebreak timing could be optional but is required by some other tools, https://github.com/UltraStar-Deluxe/format/issues/64
         sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+        // if (sentence.ExtendedMaxBeat > sentence.MaxBeat)
+        // {
+        //     sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+        // } else {
+        //     sb.AppendLine($"-");
+        // }
     }
 
     private static bool IsNotEmpty(Voice voice)

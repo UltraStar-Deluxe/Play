@@ -13,7 +13,7 @@ public class WebViewVideoSupportProvider : AbstractVideoSupportProvider
         return WebViewUtils.CanHandleWebViewUrl(videoUri);
     }
 
-    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
+    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis)
     {
         return Observable.Create<VideoLoadedEvent>(o =>
         {

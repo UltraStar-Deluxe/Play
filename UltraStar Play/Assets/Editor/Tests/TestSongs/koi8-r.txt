@@ -1,4 +1,4 @@
-#TITLE:SongTitle
+#TITLE:Я люблю тебя
 #ARTIST:Кириллица is Cyrillic
 #MP3:TestSong.ogg
 #BPM:200

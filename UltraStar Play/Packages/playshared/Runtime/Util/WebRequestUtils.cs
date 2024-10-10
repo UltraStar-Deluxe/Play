@@ -1,5 +1,11 @@
 ﻿public static class WebRequestUtils
 {
+    public static bool IsFileUri(string uri)
+    {
+        return !uri.IsNullOrEmpty()
+               && uri.StartsWith("file://");
+    }
+
     public static bool IsHttpOrHttpsUri(string uri)
     {
         return !uri.IsNullOrEmpty()
@@ -21,7 +27,7 @@
             // This is a Windows-like network path.
             // MUST prefix it with the file:// scheme AND an additional slash for Unity API to work.
             // See https://forum.unity.com/threads/unitywebrequest-and-local-area-network.714353/
-            return "file:///" + absolutePath;
+            return "file:///" + absolutePath.Replace("/", "\\");
         }
 
         if (absolutePath.StartsWith("//"))

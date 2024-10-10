@@ -168,7 +168,7 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
             note.SetStartAndEndBeat(newStartBeat, newEndBeat);
         }
 
-        if (adjustFollowingNotesIfNeeded && settings.SongEditorSettings.AdjustFollowingNotes)
+        if (SongEditorSettingsUtils.ShouldAdjustFollowingNotes(settings, adjustFollowingNotesIfNeeded))
         {
             MoveNotesHorizontal(dragEvent, followingNotes, false);
         }

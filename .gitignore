@@ -23,18 +23,6 @@ pretrained_models/
 *.*.map
 *.*.map.meta
 
-# Generated classes
-# TODO: Cannot generate code in Unity from C#. Thus, all generated files need to be added to Git.
-#       See https://forum.unity.com/threads/generate-code-before-build-in-project-with-compiler-errors.1412511/#post-8878443.
-#R_PlaySharedUssClasses.cs
-#R_PlaySharedUxmlNames.cs
-#RUssClasses.cs
-#RUxmlNames.cs
-
-# Source maps
-*.*.map
-*.*.map.meta
-
 # Rider (JetBrains IDE) data
 .idea/
 
@@ -84,7 +72,7 @@ ehthumbs.db
 
 # Custom files
 ToDo.txt.lnk
-UltraStar Play - Data.lnk
 MelodyMania-Data.lnk
+UltraStar Play - Data.lnk
 Unity-Editor-Log.lnk
 Steam Workshop Content.lnk

@@ -299,6 +299,12 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
             // Move the playback position to the start of the note
             double positionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, Note.StartBeat);
             songAudioPlayer.PositionInMillis = positionInMillis;
+
+            // Select note if not in current selection
+            if (!selectionControl.IsSelected(Note))
+            {
+                selectionControl.SetSelection(new List<EditorNoteControl> { this });
+            }
         }
     }
 

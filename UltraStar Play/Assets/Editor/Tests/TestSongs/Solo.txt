@@ -1,0 +1,8 @@
+﻿#VERSION:1.1.0
+#TITLE:SomeTitle
+#ARTIST:SomeArtist
+#AUDIO:SomeAudio.ogg
+: 4 3 9 Hel
+: 8 3 9  lo
+: 12 3 9  First Vocals!
+E

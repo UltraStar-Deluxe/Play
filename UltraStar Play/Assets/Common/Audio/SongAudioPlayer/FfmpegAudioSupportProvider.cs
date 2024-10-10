@@ -64,6 +64,10 @@ public class FfmpegAudioSupportProvider : AbstractAudioSupportProvider
                         return;
                     }
 
+                    if (IsPlaying)
+                    {
+                        ffplayCommand.TogglePause();
+                    }
                     o.OnNext(new AudioLoadedEvent(audioUri));
                 }));
             return Disposable.Empty;

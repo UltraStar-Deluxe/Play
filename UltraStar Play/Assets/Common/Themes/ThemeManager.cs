@@ -647,15 +647,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
     }
 
-    private void OnDestroy()
+    protected override void OnDestroySingleton()
     {
-        if (Instance != this)
-        {
-            return;
-        }
-
-        // Destroy all instantiated assets
-
         if (backgroundMaterialCopy != null)
         {
             backgroundMaterial.CopyPropertiesFromMaterial(backgroundMaterialCopy);
@@ -672,6 +665,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             styleSheetFileSystemWatcher.Dispose();
         }
+
+        ApplyThemeStyleUtils.ClearCache();
     }
 
     public void SetCurrentTheme(ThemeMeta themeMeta)

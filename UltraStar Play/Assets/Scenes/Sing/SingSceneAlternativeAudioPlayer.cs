@@ -135,13 +135,13 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     {
         float songAudioPlayerTimeInSeconds = (float)songAudioPlayer.PositionInSeconds;
         if (instrumentalAudioSource.clip != null
-            && !instrumentalAudioSource.isPlaying)
+            && instrumentalAudioSource.isPlaying)
         {
             instrumentalAudioSource.time = songAudioPlayerTimeInSeconds;
         }
 
         if (vocalsAudioSource.clip != null
-            && !vocalsAudioSource.isPlaying)
+            && vocalsAudioSource.isPlaying)
         {
             vocalsAudioSource.time = songAudioPlayerTimeInSeconds;
         }

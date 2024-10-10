@@ -13,12 +13,18 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
-        OpenContextMenuPopups = new List<ContextMenuPopupControl>();
+        openContextMenuPopups = new List<ContextMenuPopupControl>();
+        anyContextMenuOpenedEventStream = new Subject<ContextMenuOpenedEvent>();
     }
 
     private bool wasNoButtonOrTouchPressed;
 
-    public static List<ContextMenuPopupControl> OpenContextMenuPopups { get; private set; } = new();
+    public static IReadOnlyList<ContextMenuPopupControl> OpenContextMenuPopups => openContextMenuPopups;
+    private static List<ContextMenuPopupControl> openContextMenuPopups = new();
+
+    public static IObservable<ContextMenuOpenedEvent> AnyContextMenuOpenedEventStream => anyContextMenuOpenedEventStream;
+    private static Subject<ContextMenuOpenedEvent> anyContextMenuOpenedEventStream = new Subject<ContextMenuOpenedEvent>();
+
     public static bool IsAnyContextMenuPopupOpen => OpenContextMenuPopups.Count > 0;
 
     [Inject]
@@ -47,8 +53,11 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     private Vector2 lastSize;
     private Vector2 lastPosition;
 
-    private readonly Subject<VoidEvent> contextMenuClosedEventStream = new();
-    public IObservable<VoidEvent> ContextMenuClosedEventStream => contextMenuClosedEventStream;
+    public IObservable<ContextMenuOpenedEvent> ContextMenuOpenedEventStream => contextMenuOpenedEventStream;
+    private readonly Subject<ContextMenuOpenedEvent> contextMenuOpenedEventStream = new Subject<ContextMenuOpenedEvent>();
+
+    public IObservable<ContextMenuClosedEvent> ContextMenuClosedEventStream => contextMenuClosedEventStream;
+    private readonly Subject<ContextMenuClosedEvent> contextMenuClosedEventStream = new Subject<ContextMenuClosedEvent>();
 
     /**
      * Optional object to associate data with the popup menu.
@@ -84,7 +93,9 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         closeContextMenuDisposable.AddTo(gameObject);
 
         CloseAllOpenContextMenus();
-        OpenContextMenuPopups.Add(this);
+        openContextMenuPopups.Add(this);
+        contextMenuOpenedEventStream.OnNext(new ContextMenuOpenedEvent(this));
+        anyContextMenuOpenedEventStream.OnNext(new ContextMenuOpenedEvent(this));
 
         visualElement.RegisterCallback<GeometryChangedEvent>(evt =>
         {
@@ -162,8 +173,8 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     {
         closeContextMenuDisposable.Dispose();
         visualElement.RemoveFromHierarchy();
-        OpenContextMenuPopups.Remove(this);
-        contextMenuClosedEventStream.OnNext(VoidEvent.instance);
+        openContextMenuPopups.Remove(this);
+        contextMenuClosedEventStream.OnNext(new ContextMenuClosedEvent(this));
     }
 
     private static void CloseAllOpenContextMenus()

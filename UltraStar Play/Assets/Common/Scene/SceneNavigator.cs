@@ -13,17 +13,10 @@ using Debug = UnityEngine.Debug;
 
 public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        sceneEnumToSceneData.Clear();
-    }
-
     public static SceneNavigator Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SceneNavigator>();
 
-    /// Static map to store and load SceneData instances across scenes.
-    private static readonly Dictionary<Type, SceneData> sceneDataTypeToSceneData = new();
-    private static readonly Dictionary<EScene, SceneData> sceneEnumToSceneData = new();
+    private readonly Dictionary<Type, SceneData> sceneDataTypeToSceneData = new();
+    private readonly Dictionary<EScene, SceneData> sceneEnumToSceneData = new();
 
     private readonly Subject<BeforeSceneChangeEvent> beforeSceneChangeEventStream = new();
     public IObservable<BeforeSceneChangeEvent> BeforeSceneChangeEventStream => beforeSceneChangeEventStream;
@@ -157,6 +150,11 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
     public static SceneData GetSceneData(EScene scene)
     {
+        return Instance != null ? Instance.DoGetSceneData(scene) : null;
+    }
+
+    private SceneData DoGetSceneData(EScene scene)
+    {
         if (sceneEnumToSceneData.TryGetValue(scene, out SceneData sceneData))
         {
             return sceneData;
@@ -168,6 +166,11 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     }
 
     public static T GetSceneData<T>(T defaultValue) where T : SceneData
+    {
+        return Instance != null ? Instance.DoGetSceneData(defaultValue) : defaultValue;
+    }
+
+    private T DoGetSceneData<T>(T defaultValue) where T : SceneData
     {
         if (sceneDataTypeToSceneData.TryGetValue(typeof(T), out SceneData sceneData))
         {

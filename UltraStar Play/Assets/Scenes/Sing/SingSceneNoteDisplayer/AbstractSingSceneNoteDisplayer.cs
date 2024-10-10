@@ -7,6 +7,7 @@ using UniInject.Extensions;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Random = UnityEngine.Random;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -197,14 +198,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
             return;
         }
 
-        // Notes can be placed on and between the drawn lines (between causes -1).
-        // The first and last line is not used (which causes -2). Thus, in total it is -3.
-        noteRowCount = (lineCount * 2) - 3;
-        // Check that there is at least one row for every possible note in an octave.
-        if (noteRowCount < 12)
-        {
-            throw new UnityException(this.GetType() + " must be initialized with a row count >= 12 (one row for each note in an octave)");
-        }
+        noteRowCount = GetNoteRowCount(lineCount);
         noteRowToYPercent = new Dictionary<int, float>();
 
         float lineHeightPercent = 1.0f / lineCount;
@@ -228,6 +222,20 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
             }
         }
         lineDisplayer.DrawLines(yPercentagesToDrawLinesFor.ToArray());
+    }
+
+    public static int GetNoteRowCount(int lineCount)
+    {
+        // Notes can be placed on and between the drawn lines (between causes -1).
+        // The first and last line is not used (which causes -2). Thus, in total it is -3.
+        int result = (lineCount * 2) - 3;
+        // Check that there is at least one row for every possible note in an octave.
+        return NumberUtils.Limit(result, 12, int.MaxValue);
+    }
+
+    public static int GetLineCount(int noteRowCount)
+    {
+        return (int)Math.Ceiling((noteRowCount + 3) / 2.0);
     }
 
     public void RemoveAllDisplayedNotes()
@@ -413,16 +421,16 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
             .WithRootVisualElement(star)
             .CreateAndInject<StarParticleControl>();
 
-        float xPercent = UnityEngine.Random.Range(0f, 100f);
-        float yPercent = UnityEngine.Random.Range(0f, 100f);
+        float xPercent = Random.Range(0f, 100f);
+        float yPercent = Random.Range(0f, 100f);
         Vector2 startPos = new(xPercent, yPercent);
         starControl.SetPosition(startPos);
         LeanTween.value(singSceneControl.gameObject, startPos, startPos + GetRandomVector2(-50, 50), 1f)
             .setOnUpdate((Vector2 p) => starControl.SetPosition(p));
 
-        Vector2 startScale = Vector2.one * UnityEngine.Random.Range(0.2f, 0.5f);
+        Vector2 startScale = Vector2.one * Random.Range(0.2f, 0.5f);
         starControl.SetScale(Vector2.zero);
-        LeanTween.value(singSceneControl.gameObject, startScale, startScale * UnityEngine.Random.Range(1f, 2f), 1f)
+        LeanTween.value(singSceneControl.gameObject, startScale, startScale * Random.Range(1f, 2f), 1f)
             .setOnUpdate((Vector2 s) => starControl.SetScale(s))
             .setOnComplete(() => RemoveStarControl(starControl));
 
@@ -445,7 +453,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     private Vector2 GetRandomVector2(float min, float max)
     {
-        return new Vector2(UnityEngine.Random.Range(min, max), UnityEngine.Random.Range(min, max));
+        return new Vector2(Random.Range(min, max), Random.Range(min, max));
     }
 
     protected virtual int CalculateNoteRow(int midiNote, int beat)

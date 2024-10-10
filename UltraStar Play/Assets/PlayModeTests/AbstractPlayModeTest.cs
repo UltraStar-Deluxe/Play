@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using PrimeInputActions;
-using Responsible;
 using Responsible.Unity;
 using UniInject;
 using UniRx;
@@ -13,7 +11,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
-using static Responsible.Responsibly;
 
 public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjection
 {
@@ -35,6 +32,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
     [UnityTearDown]
     public IEnumerator UnityTearDown()
     {
+        LogAssert.ignoreFailingMessages = true;
         yield return TearDownTestFixture();
     }
 
@@ -48,7 +46,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
             .SceneInjectionFinishedEventStream
             .Subscribe(evt => evt.SceneInjector.Inject(this));
 
-        yield return LoadSceneByName("CommonTestScene");
+        yield return LoadInitialScene();
 
         AssertUtils.HasType<TestSettings>(SettingsManager.Instance.Settings);
         ConfigureTestSettings(SettingsManager.Instance.Settings as TestSettings);
@@ -72,6 +70,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
         StatisticsManager.StatisticsLoaderSaver = null;
         IMicrophoneAdapter.Instance = new PortAudioForUnityMicrophoneAdapter();
         sceneInjectionFinishedSubscription?.Dispose();
+        DeleteAllGameObjects();
         yield return null;
     }
 
@@ -194,6 +193,12 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
         SimulatedMicrophoneAdapter.SetSimulatedDevicePitchInHz(playerProfile.Name, 440);
     }
 
+    private IEnumerator LoadInitialScene()
+    {
+        // Start with a simple scene that has all common objects but does not require a special game state.
+        yield return LoadSceneByName("CommonTestScene");
+    }
+
     private IEnumerator LoadTestScene()
     {
         yield return LoadSceneByName(TestSceneName);
@@ -209,8 +214,17 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
         Debug.Log($"Loading test scene {sceneName}");
         SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         yield return new WaitUntilWithTimeout(
-            "wait until test scene loaded",
+            $"Wait until test scene loaded: sceneName '{sceneName}'",
             TimeSpan.FromSeconds(10),
             () => SceneManager.GetActiveScene().name == sceneName);
+    }
+
+    private void DeleteAllGameObjects()
+    {
+        foreach (GameObject gameObject in SceneManager.GetActiveScene().GetRootGameObjects())
+        {
+            GameObject.Destroy(gameObject);
+        }
+        GameObject.Destroy(DontDestroyOnLoadManager.Instance.gameObject);
     }
 }

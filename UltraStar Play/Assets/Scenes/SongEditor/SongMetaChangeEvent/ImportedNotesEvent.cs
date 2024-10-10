@@ -1,3 +1,3 @@
-﻿public class ImportedNotesEvent : SongMetaChangeEvent
+﻿public class ImportedNotesEvent : NotesAddedEvent
 {
 }

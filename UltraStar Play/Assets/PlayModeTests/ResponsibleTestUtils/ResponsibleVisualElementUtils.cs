@@ -37,19 +37,19 @@ public class ResponsibleVisualElementUtils
 
     public static ITestInstruction<object> ClickButton(Button button)
         => ExpectElementIsFocusableNow(button)
-            .ContinueWith(_ => Do(
+            .ContinueWith(Do(
                 $"click button '{button?.name}'",
                 () => button.Click()));
 
     public static ITestInstruction<object> SendNavigationSubmitEvent(VisualElement visualElement)
         => ExpectElementIsFocusableNow(visualElement)
-            .ContinueWith(_ => Do(
+            .ContinueWith(Do(
                 $"send NavigationSubmitEvent on '{visualElement?.name}'",
                 () => visualElement.SendNavigationSubmitEvent()));
 
     public static ITestInstruction<object> SendPointerDownEvent(VisualElement visualElement)
         => ExpectElementIsFocusableNow(visualElement)
-            .ContinueWith(_ => Do(
+            .ContinueWith(Do(
                 $"Send PointerDownEvent on '{visualElement?.name}'",
                 () => visualElement.SendPointerDownEvent()));
 

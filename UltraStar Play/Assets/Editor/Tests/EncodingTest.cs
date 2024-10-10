@@ -103,7 +103,7 @@ public class EncodingTest
         ShouldDetectCorrectEncoding("koi8-r.txt",
             true,
             "Кириллица is Cyrillic",
-            "SongTitle");
+            "Я люблю тебя");
     }
 
     [Test]

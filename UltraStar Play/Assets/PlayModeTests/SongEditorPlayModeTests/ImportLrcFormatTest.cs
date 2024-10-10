@@ -28,10 +28,10 @@ public class SongEditorLrcFormatImportTest : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator ShouldImportLrcFormat() => IgnoreFailingMessages()
         .ContinueWith(ExpectScene(EScene.SongEditorScene))
-        .ContinueWith(_ => ClickButton(R.UxmlNames.openImportLrcDialogButton))
-        .ContinueWith(_ => SetElementValue(R.UxmlNames.importLrcTextField, lrcExample))
-        .ContinueWith(_ => ClickButton(R.UxmlNames.importLrcFormatDialogButton))
-        .ContinueWith(_ => WaitForCondition("expect notes have been imported",
+        .ContinueWith(ClickButton(R.UxmlNames.openImportLrcDialogButton))
+        .ContinueWith(SetElementValue(R.UxmlNames.importLrcTextField, lrcExample))
+        .ContinueWith(ClickButton(R.UxmlNames.importLrcFormatButton))
+        .ContinueWith(WaitForCondition("expect notes have been imported",
             () => ImportedNotes.Count == 30
                   && SongMetaUtils.GetLyrics(ImportedNotes).StartsWith("Freude, schöner Götterfunken"))
             .ExpectWithinSeconds(10))

@@ -109,7 +109,13 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 
     private NetworkManager FindOrCreateNetworkManager()
     {
-        NetworkManager networkManager = FindObjectOfType<NetworkManager>();
+        NetworkManager networkManager = NetworkManager.Singleton;
+        if (networkManager != null)
+        {
+            return networkManager;
+        }
+
+        networkManager = FindObjectOfType<NetworkManager>();
         if (networkManager != null)
         {
             return networkManager;
