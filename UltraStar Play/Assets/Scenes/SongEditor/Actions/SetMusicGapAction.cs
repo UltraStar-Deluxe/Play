@@ -21,14 +21,29 @@ public class SetMusicGapAction : INeedInjection
     [Inject]
     private PanelHelper panelHelper;
 
-    public void Execute(double positionInMillis)
+    [Inject]
+    private MoveNotesAction moveNotesAction;
+
+    [Inject]
+    private SentenceFitToNoteAction sentenceFitToNoteAction;
+
+    public void Execute(double positionInMillis, bool keepNotesPosition = false)
     {
-        songMeta.GapInMillis = (float)positionInMillis;
+        double oldGapInMillis = songMeta.GapInMillis;
+        songMeta.GapInMillis = positionInMillis;
+
+        if (keepNotesPosition)
+        {
+            double offsetInMillis = songMeta.GapInMillis - oldGapInMillis;
+            int offsetInBeats = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, offsetInMillis);
+            moveNotesAction.MoveNotesHorizontal(-offsetInBeats, SongMetaUtils.GetAllNotes(songMeta));
+            sentenceFitToNoteAction.Execute(SongMetaUtils.GetAllSentences(songMeta));
+        }
     }
 
-    public void ExecuteAndNotify(double positionInMillis)
+    public void ExecuteAndNotify(double positionInMillis, bool keepNotesPosition = false)
     {
-        Execute(positionInMillis);
+        Execute(positionInMillis, keepNotesPosition);
         songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Gap));
     }
 }

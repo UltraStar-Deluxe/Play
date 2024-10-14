@@ -8,6 +8,43 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     [Inject]
     private VlcManager vlcManager;
 
+    private long lastVlcMediaPlayerTimeInMillisWhenPlaying;
+    private bool shouldBePlaying;
+
+    protected override void Update()
+    {
+        base.Update();
+
+        if (shouldBePlaying && IsPlaying)
+        {
+            lastVlcMediaPlayerTimeInMillisWhenPlaying = mediaPlayer.Time;
+        }
+
+        UpdateVlcMediaPlayerPause();
+    }
+
+    private void UpdateVlcMediaPlayerPause()
+    {
+        // TODO: Workaround for unreliable VLC MediaPlayer pause state ( https://code.videolan.org/videolan/vlc/-/issues/28353 )
+        if (!IsFullyLoaded)
+        {
+            return;
+        }
+
+        if (!shouldBePlaying && mediaPlayer != null && mediaPlayer.IsPlaying)
+        {
+            Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing. Set VLC MediaPlayer to pause again.");
+            mediaPlayer.SetPause(true);
+            PositionInMillis = lastVlcMediaPlayerTimeInMillisWhenPlaying;
+        }
+        else if (shouldBePlaying && mediaPlayer != null && !mediaPlayer.IsPlaying)
+        {
+            Log.Verbose(() => "Should be playing but VLC MediaPlayer is paused. Set VLC MediaPlayer to play again.");
+            mediaPlayer.SetPause(false);
+            PositionInMillis = lastVlcMediaPlayerTimeInMillisWhenPlaying;
+        }
+    }
+
     public override bool IsSupported(string videoUri, bool videoEqualsAudio)
     {
         return base.IsSupported(videoUri, videoEqualsAudio)
@@ -15,7 +52,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
                && !videoEqualsAudio;
     }
 
-    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri)
+    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis)
     {
         // Instantiate new vlc player
         if (mediaPlayer == null)
@@ -34,7 +71,10 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         }
 
         mediaPlayer.Media = new Media(new Uri(videoUri));
-        mediaPlayer.Play();
+
+        // Play to trigger loading. PlayAsync to not block the main thread and avoid stutter.
+        mediaPlayer.PlayAsync();
+        PositionInMillis = startPositionInMillis;
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
@@ -42,7 +82,11 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
                 () => mediaPlayer.Media != null && mediaPlayer.Media.Duration > 0,
-                () => o.OnNext(new VideoLoadedEvent(videoUri))));
+                () =>
+                {
+                    mediaPlayer.SetPause(!shouldBePlaying);
+                    o.OnNext(new VideoLoadedEvent(videoUri));
+                }));
             return Disposable.Empty;
         });
     }
@@ -55,17 +99,26 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
     public override void Play()
     {
-        mediaPlayer?.Play();
+        shouldBePlaying = true;
+        if (IsFullyLoaded)
+        {
+            mediaPlayer?.SetPause(false);
+        }
     }
 
     public override void Pause()
     {
-        mediaPlayer?.Pause();
+        shouldBePlaying = false;
+        if (IsFullyLoaded)
+        {
+            mediaPlayer?.SetPause(true);
+        }
     }
 
     public override void Stop()
     {
-        mediaPlayer?.Stop();
+        shouldBePlaying = true;
+        mediaPlayer?.StopAsync();
     }
 
     public override bool IsPlaying
@@ -102,11 +155,21 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
     public override double PositionInMillis
     {
-        get => mediaPlayer?.Time ?? 0;
-        set => mediaPlayer?.SetTime((long)value);
+        get
+        {
+            // VLC MediaPlayer continues time even if not playing. Workaround: return old time if not playing.
+            return shouldBePlaying && mediaPlayer.IsPlaying
+                ? mediaPlayer.Time
+                : lastVlcMediaPlayerTimeInMillisWhenPlaying;
+        }
+        set
+        {
+            lastVlcMediaPlayerTimeInMillisWhenPlaying = (long)value;
+            mediaPlayer?.SetTime((long)value);
+        }
     }
 
-    public override double DurationInMillis => mediaPlayer.Length;
+    public override double DurationInMillis => mediaPlayer?.Length ?? 0;
 
     private void DestroyVlcMediaPlayer()
     {

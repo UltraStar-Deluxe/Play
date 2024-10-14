@@ -32,18 +32,18 @@ public class LyricsEditingTest : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator ShouldEditLyricsOfSingleNote() => IgnoreFailingMessages()
         .ContinueWith(ExpectScene(EScene.SongEditorScene))
-        .ContinueWith(_ => WaitForThenDoAndReturn("note with original text", () => GetNoteElementByLyrics(OriginalNoteText)))
-        .ContinueWith(_ => Do("select next note", () => InputFixture.PressAndRelease(Keyboard.tabKey)))
-        .ContinueWith(_ => Do("select next note", () =>  InputFixture.PressAndRelease(Keyboard.tabKey)))
-        .ContinueWith(_ => WaitForCondition("expect note selected",
+        .ContinueWith(WaitForThenDoAndReturn("note with original text", () => GetNoteElementByLyrics(OriginalNoteText)))
+        .ContinueWith(Do("select next note", () => InputFixture.PressAndRelease(Keyboard.tabKey)))
+        .ContinueWith(Do("select next note", () =>  InputFixture.PressAndRelease(Keyboard.tabKey)))
+        .ContinueWith(WaitForCondition("expect note selected",
                 () => songEditorSelectionControl.GetSelectedNotes().Count == 1
                       && songEditorSelectionControl.GetSelectedNotes()[0].Text == OriginalNoteText)
             .ExpectWithinSeconds(10))
-        .ContinueWith(_ => Do("open lyrics editing", () => InputFixture.PressAndRelease(Keyboard.f2Key)))
-        .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => SetElementValue(R.UxmlNames.editLyricsPopupTextField, EditedNoteText))
-        .ContinueWith(_ => Do("submit lyrics editing", () => InputFixture.PressAndRelease(Keyboard.enterKey)))
-        .ContinueWith(_ => WaitForCondition("expect lyrics have been changed",
+        .ContinueWith(Do("open lyrics editing", () => InputFixture.PressAndRelease(Keyboard.f2Key)))
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(SetElementValue(R.UxmlNames.editLyricsPopupTextField, EditedNoteText))
+        .ContinueWith(Do("submit lyrics editing", () => InputFixture.PressAndRelease(Keyboard.enterKey)))
+        .ContinueWith(WaitForCondition("expect lyrics have been changed",
             () => SongMetaUtils.GetLyrics(SongMeta, EVoiceId.P1).Contains(EditedNoteText))
             .ExpectWithinSeconds(10))
         .ToYieldInstruction(Executor);
@@ -51,20 +51,20 @@ public class LyricsEditingTest : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator ShouldEditLyricsViaLyricsArea() => IgnoreFailingMessages()
         .ContinueWith(ExpectScene(EScene.SongEditorScene))
-        .ContinueWith(_ => WaitForThenDoAndReturn("note with original text", () => GetNoteElementByLyrics(OriginalNoteText)))
-        .ContinueWith(_ => ClickButton(R.UxmlNames.toggleLyricsAreaEditModeButton))
-        .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => GetElement<TextField>(R.UxmlNames.lyricsAreaTextField))
+        .ContinueWith(WaitForThenDoAndReturn("note with original text", () => GetNoteElementByLyrics(OriginalNoteText)))
+        .ContinueWith(ClickButton(R.UxmlNames.toggleLyricsAreaEditModeButton))
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(GetElement<TextField>(R.UxmlNames.lyricsAreaTextField))
         .ContinueWith(textField => WaitForCondition("TextField has original text",
                 () => textField.value.Contains(OriginalNoteText)).ExpectWithinSeconds(10))
-        .ContinueWith(_ => GetElement<TextField>(R.UxmlNames.lyricsAreaTextField))
+        .ContinueWith(GetElement<TextField>(R.UxmlNames.lyricsAreaTextField))
         .ContinueWith(textField => SetElementValue(textField, textField.value.Replace(OriginalNoteText, EditedNoteText)))
-        .ContinueWith(_ => GetElement<TextField>(R.UxmlNames.lyricsAreaTextField))
+        .ContinueWith(GetElement<TextField>(R.UxmlNames.lyricsAreaTextField))
         .ContinueWith(textField => WaitForCondition("TextField has edited text",
             () => textField.value.Contains(EditedNoteText)).ExpectWithinSeconds(10))
-        .ContinueWith(_ => WaitForSeconds(1))
-        .ContinueWith(_ => ClickButton(R.UxmlNames.toggleLyricsAreaEditModeButton))
-        .ContinueWith(_ => WaitForCondition("expect lyrics have been changed",
+        .ContinueWith(WaitForSeconds(1))
+        .ContinueWith(ClickButton(R.UxmlNames.toggleLyricsAreaEditModeButton))
+        .ContinueWith(WaitForCondition("expect lyrics have been changed",
                 () => SongMetaUtils.GetLyrics(SongMeta, EVoiceId.P1).Contains(EditedNoteText))
             .ExpectWithinSeconds(10))
         .ToYieldInstruction(Executor);

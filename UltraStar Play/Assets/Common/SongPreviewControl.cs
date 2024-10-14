@@ -10,11 +10,7 @@ using UnityEngine;
 
 public class SongPreviewControl : MonoBehaviour, INeedInjection
 {
-    [InjectedInInspector]
-    public float previewDelayInSeconds = 0.5f;
-
-    [InjectedInInspector]
-    public bool stopOldImmediatelyOnStartNew;
+    public int PreviewDelayInMillis { get; set; } = -1;
 
     public float AudioFadeInDurationInSeconds { get; set; } = 2;
     public float VideoFadeInDurationInSeconds { get; set; } = 2;
@@ -108,10 +104,12 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     {
         float audioFadeInFactor = (Time.time - fadeInStartTimeInSeconds) / Math.Max(AudioFadeInDurationInSeconds, 0.001f);
         audioFadeInFactor = NumberUtils.Limit(audioFadeInFactor, 0, 1);
-        float maxVolume = GetFinalPreviewVolume();
-        songAudioPlayer.VolumeFactor = audioFadeInFactor * maxVolume;
+        float audioFadeInFactorEased = LeanTween.easeInSine(0, 1, audioFadeInFactor);
 
-        return audioFadeInFactor;
+        float maxVolume = GetFinalPreviewVolume();
+        songAudioPlayer.VolumeFactor = audioFadeInFactorEased * maxVolume;
+
+        return audioFadeInFactorEased;
     }
 
     public virtual void StartSongPreview(SongMeta songMeta)
@@ -121,24 +119,27 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (stopOldImmediatelyOnStartNew)
-        {
-            StopSongPreview();
-        }
-        else
-        {
-            StopAllCoroutines();
-        }
+        StopSongPreview();
 
         if (songMeta == currentPreviewSongMeta)
         {
             return;
         }
-
         currentPreviewSongMeta = songMeta;
-        if (songMeta != null)
+
+        int delayInMillis = PreviewDelayInMillis >= 0
+            ? PreviewDelayInMillis
+            : settings.SongPreviewDelayInMillis;
+        if (songMeta != null
+            && delayInMillis > 0)
         {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(previewDelayInSeconds, () => DoStartSongPreview(songMeta)));
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(
+                delayInMillis / 1000f,
+                () => DoStartSongPreview(songMeta)));
+        }
+        else
+        {
+            DoStartSongPreview(songMeta);
         }
     }
 
@@ -171,8 +172,19 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     public virtual void StopSongPreview()
     {
         StopAllCoroutines();
-        songAudioPlayer.UnloadAudio();
-        songVideoPlayer.UnloadVideo();
+        if (songAudioPlayer != null)
+        {
+            songAudioPlayer.UnloadAudio();
+
+            // Set volume to zero to avoid hearing the last bit of the song.
+            songAudioPlayer.VolumeFactor = 0;
+        }
+
+        if (songVideoPlayer != null)
+        {
+            songVideoPlayer.UnloadVideo();
+        }
+
         isFadeInStarted = false;
         stopSongPreviewEventStream.OnNext(currentPreviewSongMeta);
     }
@@ -190,8 +202,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         videoFadeInStartTimeInSeconds = Time.time;
         isFadeInStarted = true;
         int previewStartInMillis = GetPreviewStartInMillis(songMeta);
-        StartAudioPreview(songMeta, previewStartInMillis);
-        StartVideoPreview(songMeta);
+        StartAudioPreview(songMeta, previewStartInMillis)
+            .Subscribe(_ => StartVideoPreview(songMeta));
 
         startSongPreviewEventStream.OnNext(songMeta);
     }
@@ -213,20 +225,24 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
+        Log.Debug(() => $"StartVideoPreview '{songMeta.GetArtistDashTitle()}'");
+
         VideoFadeIn.Value = 0;
         BackgroundImageFadeIn.Value = 0;
 
         songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(songMeta);
     }
 
-    protected virtual void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
+    protected virtual IObservable<SongAudioLoadedEvent> StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
     {
         if (!gameObject.activeInHierarchy)
         {
-            return;
+            return Observable.Empty<SongAudioLoadedEvent>();
         }
 
-        songAudioPlayer.LoadAndPlayAsObservable(songMeta)
+        Log.Debug(() => $"StartAudioPreview '{songMeta.GetArtistDashTitle()}'");
+
+        return songAudioPlayer.LoadAndPlayAsObservable(songMeta, previewStartInMillis)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
@@ -234,12 +250,11 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                     "reason", ex.Message));
             })
-            .Subscribe(_ =>
+            .Select(evt =>
             {
-                Debug.Log($"Skipping to song preview of {songMeta.Title} at {previewStartInMillis} ms");
-                songAudioPlayer.PositionInMillis = previewStartInMillis;
                 songAudioPlayer.VolumeFactor = 0;
                 songAudioPlayer.PlayAudio();
+                return evt;
             });
     }
 

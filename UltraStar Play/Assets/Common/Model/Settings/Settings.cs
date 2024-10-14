@@ -102,6 +102,7 @@ public class Settings : ISettings
 
     // Sing scene settings
     public ENoteDisplayMode NoteDisplayMode { get; set; } = ENoteDisplayMode.SentenceBySentence;
+    public int NoteDisplayLineCount { get; set; } = 10;
     public EStaticLyricsDisplayMode StaticLyricsDisplayMode { get; set; } = EStaticLyricsDisplayMode.Bottom;
     public bool WipeLyrics { get; set; } = true;
     public bool ShowPitchIndicator { get; set; }
@@ -120,6 +121,7 @@ public class Settings : ISettings
         ESearchProperty.Title,
     };
     public Dictionary<string, MicProfileReference> PlayerProfileNameToLastUsedMicProfile { get; private set; } = new();
+    public int SongPreviewDelayInMillis { get; set; } = 500;
 
     // Technical settings
     public bool ShowFps { get; set; }

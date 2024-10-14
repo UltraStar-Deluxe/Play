@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
@@ -134,13 +135,13 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         base.StartSongPreview(songMeta);
     }
 
-    protected override void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
+    protected override IObservable<SongAudioLoadedEvent> StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
     {
         if (currentSongSelectEntryControl == null)
         {
-            return;
+            return Observable.Empty<SongAudioLoadedEvent>();
         }
-        base.StartAudioPreview(songMeta, previewStartInMillis);
+        return base.StartAudioPreview(songMeta, previewStartInMillis);
     }
 
     protected override void StartVideoPreview(SongMeta songMeta)

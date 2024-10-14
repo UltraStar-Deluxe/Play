@@ -62,7 +62,7 @@ public static class SpeechRecognitionUtils
         return GetOrCreateSpeechRecognizerAsObservable(speechRecognitionParameters, null)
             .SelectMany(speechRecognizer =>
             {
-                speechRecognitionJob.SetStatus(EJobStatus.Running);
+                speechRecognitionJob?.SetStatus(EJobStatus.Running);
 
                 return DoSpeechRecognitionAsObservable(
                         monoAudioSamples,

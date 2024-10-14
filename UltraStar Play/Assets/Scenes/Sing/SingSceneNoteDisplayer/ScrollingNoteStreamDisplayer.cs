@@ -67,9 +67,10 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         displayedBeats = (int)Math.Ceiling(SongMetaBpmUtils.BeatsPerSecond(songMeta) * DisplayedNoteDurationInSeconds);
     }
 
-    public override void SetLineCount(int lineCount)
+    public override void SetLineCount(int theLineCount)
     {
-        base.SetLineCount(lineCount);
+        base.SetLineCount(theLineCount);
+
 
         PrecalculateNoteRowUnwrapped();
         PrecalculateBeatRangeToNote();
@@ -98,8 +99,20 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 
     private void PrecalculateNoteRowUnwrapped()
     {
-        Note previousNote = null;
+        if (settings.NoteDisplayLineCount <= 0)
+        {
+            // "All" lines should be displayed. Thus, there are enough lines to map a MidiNote to a NoteRow.
+            PrecalculateNoteRowUnwrappedByAbsoluteMidiNotePositions();
+        }
+        else
+        {
+            PrecalculateNoteRowUnwrappedByRelativeMidiNoteDistance();
+        }
+    }
 
+    private void PrecalculateNoteRowUnwrappedByRelativeMidiNoteDistance()
+    {
+        Note previousNote = null;
         List<Note> currentBatch = new();
         foreach (Note currentNote in upcomingNotes)
         {
@@ -119,6 +132,16 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             noteToPrecalculatedNoteRowUnwrapped[currentNote] = noteRow;
             previousNote = currentNote;
         }
+    }
+
+    private void PrecalculateNoteRowUnwrappedByAbsoluteMidiNotePositions()
+    {
+        int minMidiNote = SongMetaUtils.GetMaxMidiNote(upcomingNotes);
+        foreach (Note currentNote in upcomingNotes)
+        {
+            noteToPrecalculatedNoteRowUnwrapped[currentNote] = currentNote.MidiNote - minMidiNote;
+        }
+        ShiftPrecalculatedNoteRowUnwrappedToMinimizeWrapping(upcomingNotes);
     }
 
     private void ShiftPrecalculatedNoteRowUnwrappedToMinimizeWrapping(List<Note> notesInBatch)

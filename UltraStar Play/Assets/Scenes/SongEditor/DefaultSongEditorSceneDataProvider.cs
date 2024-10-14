@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -40,7 +41,7 @@ public class DefaultSongEditorSceneDataProvider : MonoBehaviour, IDefaultSceneDa
         SongMetaManager.Instance.WaitUntilSongScanFinished();
         SongMeta defaultSongMeta = SongMetaManager.Instance
             .GetSongMetas()
-            .FirstOrDefault(it => it.Title == GetDefaultSongName());
+            .FirstOrDefault(it => string.Equals(it.Title, GetDefaultSongName(), StringComparison.InvariantCultureIgnoreCase));
         if (defaultSongMeta == null)
         {
             Debug.LogWarning($"No song with title '{GetDefaultSongName()}' was found. Using the first found song instead.");

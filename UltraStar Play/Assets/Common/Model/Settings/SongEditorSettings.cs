@@ -8,7 +8,7 @@ public class SongEditorSettings
     public int MusicVolumePercent { get; set; } = 100;
     public ESongEditorSamplesSource PlaybackSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
     public ESongEditorAudioWaveformSamplesSource AudioWaveformSamplesSource { get; set; } = ESongEditorAudioWaveformSamplesSource.SameAsPlayback;
-    public bool GoToLastPlaybackPosition { get; set; } = true;
+    public bool GoToLastPlaybackPosition { get; set; }
     public int PlaybackPreBeginInMillis { get; set; }
     public int PlaybackPostEndInMillis { get; set; }
 

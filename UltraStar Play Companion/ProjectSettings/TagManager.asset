@@ -5,16 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - UIDocument
-  - ApplicationManager
-  - SettingsManager
   - SceneInjectionManager
-  - CoroutineManager
-  - ClientSideMicSampleRecorder
-  - ClientSideMicrophoneDataSender
-  - TranslationManager
   - InputManager
   - DontDestroyOnLoadManager
-  - MainGameHttpClient
   layers:
   - Default
   - TransparentFX

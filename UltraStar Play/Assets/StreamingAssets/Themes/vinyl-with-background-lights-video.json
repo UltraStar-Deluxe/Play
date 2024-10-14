@@ -1,0 +1,29 @@
+{
+    "parentTheme": "vinyl",
+
+    "dynamicBackground": {
+        "imagePath": "backgrounds/dot-grid-with-vinyl-bottom-right.jpg",
+        "lightVideoPath": "backgrounds/background-lights-blue.mp4"
+    },
+
+    "sceneSpecificBackgrounds": {
+        "MainScene": {
+            "dynamicBackground": {
+                "imagePath": "backgrounds/dot-grid-with-vinyl-left.jpg",
+                "lightVideoPath": "backgrounds/background-lights-blue.mp4"
+            }
+        },
+        "SongSelectScene": {
+            "dynamicBackground": {
+                "imagePath": "backgrounds/dot-grid-with-vinyl-bottom-right.jpg",
+                "lightVideoPath": "backgrounds/background-lights-blue.mp4"
+            }
+        },
+        "SingingResultsScene": {
+            "dynamicBackground": {
+                "imagePath": "backgrounds/dot-grid-with-vinyl-bottom-right.jpg",
+                "lightVideoPath": "backgrounds/background-lights-blue.mp4"
+            }
+        }
+    }
+}

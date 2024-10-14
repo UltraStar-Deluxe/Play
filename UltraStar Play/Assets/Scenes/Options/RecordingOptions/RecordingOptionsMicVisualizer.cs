@@ -77,7 +77,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
             ? micData
             : emptySamplesArray;
 
-        audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(displayData);
+        audioWaveFormVisualization.DrawAudioWaveForm(displayData);
     }
 
     public void SetMicProfile(MicProfile micProfile)

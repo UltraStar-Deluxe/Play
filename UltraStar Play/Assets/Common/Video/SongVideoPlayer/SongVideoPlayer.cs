@@ -11,7 +11,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 {
     private static readonly HashSet<string> ignoredVideoFiles = new();
 
-    private const int ImmediatePlaybackPositionSyncThresholdInMillis = 400;
+    private const int ImmediatePlaybackPositionSyncThresholdInMillis = 2000;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -156,7 +156,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     }
 
     private bool isPlaying;
-    public bool IsPlaying => isPlaying;
+    public bool IsPlaying => IsFullyLoaded && isPlaying;
 
     private bool IsPlayingOfVideoProvider => IsPartiallyLoaded && currentVideoSupportProvider.IsPlaying;
 
@@ -175,19 +175,20 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         // Synchronize playback position with SongAudioPlayer
         songAudioPlayer.JumpBackEventStream.Subscribe(evt =>
         {
-            if (Math.Abs(evt.Previous - evt.Current) > ImmediatePlaybackPositionSyncThresholdInMillis)
+            if (IsPlaying
+                && Math.Abs(evt.Previous - evt.Current) > ImmediatePlaybackPositionSyncThresholdInMillis)
             {
-                SyncVideoWithMusic(true);
+                SyncVideoPositionWithAudio(true);
             }
         })
         .AddTo(gameObject);
 
-        songAudioPlayer.JumpForwardEventStream
-        .Subscribe(evt =>
+        songAudioPlayer.JumpForwardEventStream.Subscribe(evt =>
         {
-            if (Math.Abs(evt.Previous - evt.Current) > ImmediatePlaybackPositionSyncThresholdInMillis)
+            if (IsPlaying
+                && Math.Abs(evt.Previous - evt.Current) > ImmediatePlaybackPositionSyncThresholdInMillis)
             {
-                SyncVideoWithMusic(true);
+                SyncVideoPositionWithAudio(true);
             }
         })
         .AddTo(gameObject);
@@ -232,6 +233,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         UnloadVideo();
 
+        Log.Debug(() => $"SongVideoPlayer.DoLoadAndPlayAsObservable '{videoUri}'");
+
         IVideoSupportProvider videoSupportProvider = availableVideoSupportProviders
             .FirstOrDefault(it => it.IsSupported(videoUri, videoEqualsAudio));
         if (videoSupportProvider == null)
@@ -244,7 +247,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         return Observable.Create<VideoLoadedEvent>(o =>
         {
-            videoSupportProvider.LoadAsObservable(videoUri)
+            videoSupportProvider.LoadAsObservable(videoUri, songAudioPlayer.PositionInMillis)
                 .CatchIgnore((Exception ex) =>
                 {
                     Debug.LogException(ex);
@@ -281,6 +284,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public void UnloadVideo()
     {
+        Log.Debug(() => $"SongVideoPlayer.UnloadAudio '{loadedSongMeta.GetArtistDashTitle()}'");
         StopAllCoroutines();
         StopVideo();
 
@@ -302,7 +306,9 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     private void SyncVideoPlayPauseWithAudio()
     {
         if (!IsFullyLoaded
-            || !gameObject.activeInHierarchy)
+            || !gameObject.activeInHierarchy
+            // When the SongAudioPlayer is used to also play the video then there is nothing to synchronize
+            || currentVideoSupportProvider is SongAudioPlayerVlcVideoSupportProvider)
         {
             return;
         }
@@ -333,7 +339,9 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     public void SyncVideoPositionWithAudio(bool forceImmediateSync)
     {
         if (!IsFullyLoaded
-            || (!forceImmediateSync && nextSyncTimeInSeconds > Time.time))
+            || (!forceImmediateSync && nextSyncTimeInSeconds > Time.time)
+            // When the SongAudioPlayer is used to also play the video then there is nothing to synchronize
+            || currentVideoSupportProvider is SongAudioPlayerVlcVideoSupportProvider)
         {
             return;
         }
@@ -576,13 +584,13 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         if (IsPlaying
             && !currentVideoSupportProvider.IsPlaying)
         {
-            Debug.Log($"{nameof(SongVideoPlayer)} should be playing, but {currentVideoSupportProvider} is not. Starting its playback now.");
+            Log.Debug(() => $"{nameof(SongVideoPlayer)} should be playing, but {currentVideoSupportProvider} is not. Starting its playback now.");
             currentVideoSupportProvider.Play();
         }
         else if (!IsPlaying
                  && currentVideoSupportProvider.IsPlaying)
         {
-            Debug.Log($"{nameof(SongVideoPlayer)} should not be playing, but {currentVideoSupportProvider} is. Pausing its playback now.");
+            Log.Debug(() => $"{nameof(SongVideoPlayer)} should not be playing, but {currentVideoSupportProvider} is. Pausing its playback now.");
             currentVideoSupportProvider.Pause();
         }
     }

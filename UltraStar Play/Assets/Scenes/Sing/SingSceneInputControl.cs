@@ -46,10 +46,12 @@ public class SingSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => OnBack());
 
         InputManager.GetInputAction(R.InputActions.usplay_increaseVolume).PerformedAsObservable()
+            .Where(evt => !ContextMenuPopupControl.IsAnyContextMenuPopupOpen)
             .Where(evt => evt.ReadValue<Vector2>().y < 0)
             .Subscribe(_ => OnIncreaseVolume());
 
         InputManager.GetInputAction(R.InputActions.usplay_decreaseVolume).PerformedAsObservable()
+            .Where(evt => !ContextMenuPopupControl.IsAnyContextMenuPopupOpen)
             .Where(evt => evt.ReadValue<Vector2>().y > 0)
             .Subscribe(_ => OnDecreaseVolume());
     }

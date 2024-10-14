@@ -11,6 +11,8 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
     // Remember played songs to prefer unplayed songs in random selection.
     private readonly static HashSet<SongMeta> seenSongMetas = new HashSet<SongMeta>();
 
+    private const float FadeTimeInSeconds = 1f;
+
     [Inject]
     private SingSceneControl singSceneControl;
 
@@ -37,12 +39,17 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
 
     public void OnInjectionFinished()
     {
-        Debug.Log("nameof(JukeboxAndSingControl)} -  OnInjectionFinished");
+        Debug.Log($"{nameof(JukeboxAndSingControl)} - OnInjectionFinished");
 
         isInjectionFinished = true;
         singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.playerUiContainer).ToList());
         singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.bottomLyricsContainer).ToList());
 
+        CreateModInfoLabel();
+
+        // Hide SingingUIElement initially. Show them after fade-out animation has finished
+        singingUiElements.ForEach(elem => elem.HideByVisibility());
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(FadeTimeInSeconds, () => singingUiElements.ForEach(elem => elem.ShowByVisibility())));
         FadeOutSingingUiElements();
 
         // Show UI when any new notes have been recorded
@@ -52,6 +59,19 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             .Where(evt => evt.RecordedNote?.TargetNote != null
                           && evt.RecordedNote.TargetNote.MidiNote == evt.RecordedNote.RoundedMidiNote)
             .Subscribe(evt => lastMicInputTimeInMillis = TimeUtils.GetUnixTimeMilliseconds());
+
+        DisableSingSceneFinisher();
+    }
+
+    private void CreateModInfoLabel()
+    {
+        Label modInfoLabel = new Label();
+        modInfoLabel.AddToClassList("tinyFont");
+        modInfoLabel.AddToClassList("textShadow");
+        modInfoLabel.text = "Jukebox&Sing mod is active";
+
+        VisualElement songInfoContainer = uiDocument.rootVisualElement.Q("governanceOverlay").Q("songInfoContainer");
+        songInfoContainer.Add(modInfoLabel);
     }
 
     private void Update()
@@ -90,7 +110,8 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
         }
 
         int timeBeforeEndInMillis = 1000;
-        if (songAudioPlayer.PositionInMillis >= songAudioPlayer.DurationInMillis - timeBeforeEndInMillis)
+        if (songAudioPlayer.IsFullyLoaded
+            && songAudioPlayer.PositionInMillis >= songAudioPlayer.DurationInMillis - timeBeforeEndInMillis)
         {
             Debug.Log($"{nameof(JukeboxAndSingControl)} - End of song detected. Starting next song soon.");
             isFinishing = true;
@@ -108,7 +129,7 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
         }
 
         isFadedOut = false;
-        Debug.Log($"{nameof(JukeboxAndSingControl)} -  Fade in singing UI elements");
+        Debug.Log($"{nameof(JukeboxAndSingControl)} - Fade in singing UI elements");
         singingUiElements.ForEach(element => AnimationUtils.FadeInVisualElement(gameObject, element, 1f));
     }
 
@@ -120,7 +141,7 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
         }
 
         isFadedOut = true;
-        Debug.Log($"{nameof(JukeboxAndSingControl)} -  Fade out singing UI elements");
+        Debug.Log($"{nameof(JukeboxAndSingControl)} - Fade out singing UI elements");
         singingUiElements.ForEach(element => AnimationUtils.FadeOutVisualElement(gameObject, element, 1f));
     }
 
@@ -129,11 +150,11 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
         SongMeta nextSongMeta = GetNextSongMeta();
         if (nextSongMeta == null)
         {
-            Debug.Log($"{nameof(JukeboxAndSingControl)} -  no next song found");
+            Debug.Log($"{nameof(JukeboxAndSingControl)} - No next song found");
             return;
         }
 
-        Debug.Log($"{nameof(JukeboxAndSingControl)} -  starting next song '{SongMetaUtils.GetArtistDashTitle(nextSongMeta)}'");
+        Debug.Log($"{nameof(JukeboxAndSingControl)} - Starting next song '{SongMetaUtils.GetArtistDashTitle(nextSongMeta)}'");
 
         SingSceneData currentSingSceneData = SceneNavigator.GetSceneDataOrThrow<SingSceneData>();
         SingSceneData nextSingSceneData = new SingSceneData();
@@ -157,5 +178,19 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             unseenSongMetas = songMetaManager.GetSongMetas().ToList();
         }
         return RandomUtils.RandomOf(unseenSongMetas);
+    }
+
+    private void DisableSingSceneFinisher()
+    {
+        try
+        {
+            Debug.Log($"{nameof(JukeboxAndSingControl)} - Disable SingSceneFinisher");
+            FindFirstObjectByType<SingSceneFinisher>().gameObject.SetActive(false);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"{nameof(JukeboxAndSingControl)} - Failed to disable SingSceneFinisher");
+        }
     }
 }

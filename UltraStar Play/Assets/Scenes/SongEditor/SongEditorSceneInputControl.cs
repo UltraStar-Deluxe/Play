@@ -383,7 +383,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             List<Note> followingNotes = GetFollowingNotesOrEmptyListIfDeactivated(selectedNotes);
 
             // Move with Shift
-            if (modifier == EKeyboardModifier.Shift)
+            if (modifier is EKeyboardModifier.Shift or EKeyboardModifier.CtrlAlt)
             {
                 if (direction.x != 0)
                 {
@@ -396,19 +396,19 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             }
 
             // Move notes one octave up / down via Ctrl+Shift
-            if (modifier == EKeyboardModifier.CtrlShift)
+            if (modifier is EKeyboardModifier.CtrlShift or EKeyboardModifier.CtrlShiftAlt)
             {
                 moveNotesAction.MoveNotesVerticalAndNotify((int)direction.y * 12, selectedNotes, followingNotes);
             }
 
             // Extend right side with Alt
-            if (modifier == EKeyboardModifier.Alt)
+            if (modifier is EKeyboardModifier.Alt or EKeyboardModifier.ShiftAlt)
             {
                 extendNotesAction.ExtendNotesRightAndNotify((int)direction.x, selectedNotes, followingNotes);
             }
 
             // Extend left side with Ctrl
-            if (modifier == EKeyboardModifier.Ctrl)
+            if (modifier is EKeyboardModifier.Ctrl or EKeyboardModifier.CtrlShift)
             {
                 extendNotesAction.ExtendNotesLeftAndNotify((int)direction.x, selectedNotes);
             }
@@ -667,8 +667,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private List<Note> GetFollowingNotesOrEmptyListIfDeactivated(List<Note> selectedNotes)
     {
-
-        if (settings.SongEditorSettings.AdjustFollowingNotes)
+        if (SongEditorSettingsUtils.ShouldAdjustFollowingNotes(settings)
+            // Special case: should still move following notes one octave up/down via Ctrl+Shift+Alt
+            || (settings.SongEditorSettings.AdjustFollowingNotes && InputUtils.GetCurrentKeyboardModifier() is EKeyboardModifier.CtrlShiftAlt))
         {
             return SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
         }

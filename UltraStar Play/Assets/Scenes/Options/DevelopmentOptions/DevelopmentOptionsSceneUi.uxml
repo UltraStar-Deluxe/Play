@@ -3,6 +3,17 @@
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1">
             <ui:VisualElement name="buttonContainer" class="child-mb-1" style="flex-wrap: wrap; flex-direction: row-reverse; width: 100%;">
                 <ui:VisualElement name="row">
+                    <ui:Button display-tooltip-when-elided="true" name="openLogFolderButton" class="controlMinWidth" style="margin-right: 5px; flex-direction: row;">
+                        <ui:Label text="Log Folder" name="openLogFolderLabel" />
+                        <MaterialIcon tabindex="-1" icon="open_in_new" name="openFolderIcon" />
+                    </ui:Button>
+                    <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="controlMinWidth" style="margin-right: 5px;" />
+                </ui:VisualElement>
+                <ui:Button display-tooltip-when-elided="true" name="reportIssueButton" class="controlMinWidth" style="margin-right: 5px; flex-direction: row;">
+                    <ui:Label text="Report Issue" name="reportIssueLabel" />
+                    <MaterialIcon tabindex="-1" icon="bug_report" name="reportIssueIcon" />
+                </ui:Button>
+                <ui:VisualElement name="row">
                     <ui:Button display-tooltip-when-elided="true" name="openPersistentDataPathButton" style="margin-right: 5px; flex-direction: row;">
                         <ui:Label tabindex="-1" text="Data Folder" display-tooltip-when-elided="true" name="openPersistentDataPathLabel" />
                         <MaterialIcon tabindex="-1" icon="open_in_new" name="openFolderIcon" />
@@ -12,10 +23,7 @@
                         <MaterialIcon tabindex="-1" icon="open_in_new" name="openFolderIcon" />
                     </ui:Button>
                 </ui:VisualElement>
-                <ui:VisualElement name="row">
-                    <ui:Button text="View Log" display-tooltip-when-elided="true" name="showLogButton" class="controlMinWidth" style="margin-right: 5px;" />
-                    <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="controlMinWidth" style="margin-right: 5px;" />
-                </ui:VisualElement>
+                <ui:Button text="Show Console" display-tooltip-when-elided="true" name="showConsoleButton" class="controlMinWidth" style="margin-right: 5px;" />
                 <ui:Button text="Publish Steam Workshop Item" name="uploadWorkshopItemButton" class="controlMinWidth" style="margin-right: 5px; align-self: flex-end;" />
             </ui:VisualElement>
             <Chooser name="minimumLogLevelChooser" label="Minimum Log Level¹" wrap-around="true" class="noBackgroundInHierarchy" />
@@ -57,6 +65,7 @@
                 <ui:Toggle name="enableDynamicThemesToggle" label="Enable Themes¹" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="wipeLyricsEffectToggle" label="Wipe Lyrics Effect" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="analyzeBeatsWithoutTargetNoteToggle" label="Analyze Beats Without Target Note" class="noBackgroundInHierarchy" />
+                <ui:IntegerField label="Song Preview Delay (ms)" name="songSelectSongPreviewDelay" value="500" class="noBackgroundInHierarchy mb-3" />
             </AccordionItem>
             <AccordionItem name="clientConnectionGroup" label="Companion Client Connections" class="child-mb-3">
                 <ui:IntegerField label="Connection Port¹&#10;(default 34567)" name="clientDiscoveryPortTextField" value="34567" class="noBackgroundInHierarchy mb-3" />

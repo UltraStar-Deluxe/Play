@@ -11,6 +11,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 {
     public static readonly Color sentenceStartLineColor = Colors.CreateColor("#8F6A4E");
     public static readonly Color sentenceEndLineColor = Colors.CreateColor("#4F878F");
+    public static readonly Color songStartLineColor = Colors.CreateColor("#8F4F7D");
+    public static readonly Color songEndLineColor = Colors.CreateColor("#694F8F");
 
     private const int HideElementThresholdInMillis = 40 * 1000;
 
@@ -250,6 +252,24 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     {
         UpdateNotes();
         UpdateSentences();
+        UpdateSongStartAndEndMarkerLines();
+    }
+
+    private void UpdateSongStartAndEndMarkerLines()
+    {
+        if (songMeta.StartInMillis > 0)
+        {
+            int startInBeats = (int)SongMetaBpmUtils.MillisToBeats(songMeta, songMeta.StartInMillis);
+            float xStartPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(startInBeats);
+            DrawVerticalMarkerLine(xStartPercent, songStartLineColor);
+        }
+
+        if (songMeta.EndInMillis > 0)
+        {
+            int endInBeats = (int)SongMetaBpmUtils.MillisToBeats(songMeta, songMeta.EndInMillis);
+            float xEndPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(endInBeats);
+            DrawVerticalMarkerLine(xEndPercent, songEndLineColor);
+        }
     }
 
     public void UpdateSentences()
@@ -537,12 +557,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             float xStartPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(sentence.MinBeat);
             float xEndPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(sentence.ExtendedMaxBeat);
 
-            DrawSentenceMarkerLine(xStartPercent, sentenceStartLineColor, 0);
-            DrawSentenceMarkerLine(xEndPercent, sentenceEndLineColor, DashedVerticalLineTexture2D.height / 2);
+            DrawVerticalMarkerLine(xStartPercent, sentenceStartLineColor, true, 0);
+            DrawVerticalMarkerLine(xEndPercent, sentenceEndLineColor, true, DashedVerticalLineTexture2D.height / 2);
         });
     }
 
-    private void DrawSentenceMarkerLine(float xPercent, Color color, int yDashOffset)
+    private void DrawVerticalMarkerLine(float xPercent, Color color, bool dashed = false, int yDashOffset = 0)
     {
         float lineWidth = settings.SongEditorSettings.SentenceLineSizeInPx;
         if (xPercent < 0
@@ -554,11 +574,18 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         VisualElement line = new();
         line.AddToClassList("sentenceMarkerLine");
-        line.style.backgroundImage = new StyleBackground(DashedVerticalLineTexture2D);
-        line.style.backgroundPositionY = new StyleBackgroundPosition(new BackgroundPosition(BackgroundPositionKeyword.Top, yDashOffset));
-        line.style.unityBackgroundImageTintColor = new StyleColor(color);
         line.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
         line.style.width = new StyleLength(new Length(lineWidth, LengthUnit.Pixel));
+        if (dashed)
+        {
+            line.style.backgroundImage = new StyleBackground(DashedVerticalLineTexture2D);
+            line.style.backgroundPositionY = new StyleBackgroundPosition(new BackgroundPosition(BackgroundPositionKeyword.Top, yDashOffset));
+            line.style.unityBackgroundImageTintColor = new StyleColor(color);
+        }
+        else
+        {
+            line.style.backgroundColor = new StyleColor(color);
+        }
         sentenceLinesContainer.Add(line);
     }
 
