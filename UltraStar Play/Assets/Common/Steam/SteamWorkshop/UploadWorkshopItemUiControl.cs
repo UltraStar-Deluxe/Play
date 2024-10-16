@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Steamworks.Ugc;
@@ -16,14 +16,12 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     {
         PlayerProfileUtils.PlayerProfileImagesFolderName,
         ThemeFolderUtils.ThemeFolderName,
-        ModFolderUtils.ModsRootFolderName,
-        WebViewUtils.WebViewScriptsFolderName,
+        ModFolderUtils.ModsRootFolderName
     };
 
     private static readonly string PlayerProfileImageTag = "PlayerProfileImage";
     private static readonly string ThemeTag = "Theme";
     private static readonly string ModTag = "Mod";
-    private static readonly string WebViewScriptTag = "WebViewScript";
 
     [Inject(UxmlName = R.UxmlNames.workshopItemChooser)]
     private DropdownField workshopItemChooser;
@@ -199,8 +197,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         {
             { PlayerProfileUtils.PlayerProfileImagesFolderName, PlayerProfileImageTag },
             { ThemeFolderUtils.ThemeFolderName, ThemeTag },
-            { ModFolderUtils.ModsRootFolderName, ModTag },
-            { WebViewUtils.WebViewScriptsFolderName, WebViewScriptTag },
+            { ModFolderUtils.ModsRootFolderName, ModTag }
         };
         foreach (string expectedSubfolder in expectedContentFolderSubfolders)
         {

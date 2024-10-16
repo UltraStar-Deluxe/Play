@@ -72,6 +72,7 @@ public static class SongMetaUtils
         return GetExistingResourceUriOrFirst(songMeta, songMeta.InstrumentalAudio, songMeta.InstrumentalAudioUrl);
     }
 
+    [Obsolete]
     public static string GetWebViewUrl(SongMeta songMeta)
     {
         return GetExistingResourceUriOrFirst(songMeta, songMeta.AudioUrl, songMeta.VideoUrl);
