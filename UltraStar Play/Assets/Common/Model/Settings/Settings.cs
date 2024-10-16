@@ -147,11 +147,6 @@ public class Settings : ISettings
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
     public int CompanionClientMessageBufferTimeInMillis { get; set; } = 150;
 
-    // WebView settings
-    public List<string> AcceptedWebViewHosts { get; set; } = new();
-    public bool EnableWebView { get; set; } = true;
-    public string CustomUserAgent { get; set; } = "";
-
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
     public SongEditorSettings SongEditorSettings { get; set; } = new();

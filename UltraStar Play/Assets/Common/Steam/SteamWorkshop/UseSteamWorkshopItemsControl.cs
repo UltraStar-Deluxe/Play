@@ -18,7 +18,6 @@ public class UseSteamWorkshopItemsControl : INeedInjection
         }
 
         Debug.Log($"Using content from {items.Count} Steam Workshop items: {items.Select(it => it.Title).JoinWith(", ")}");
-        UseDownloadedWorkshopItemsForWebView(items);
         UseDownloadedWorkshopItemsForPlayerProfileImages(items);
         UseDownloadedWorkshopItemsForMods(items);
         UseDownloadedWorkshopItemsForThemes(items);
@@ -75,24 +74,6 @@ public class UseSteamWorkshopItemsControl : INeedInjection
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to make use of downloaded Workshop Items for player profile images: {ex.Message}");
-        }
-    }
-
-    private void UseDownloadedWorkshopItemsForWebView(List<Item> items)
-    {
-        try
-        {
-            WebViewUtils.AdditionalWebViewScriptsFolders = UnionWithSubfolderInWorkshopItems(
-                WebViewUtils.AdditionalWebViewScriptsFolders,
-                items,
-                WebViewUtils.WebViewScriptsFolderName);
-            Debug.Log($"Using Steam Workshop items for additional web view script folders: {WebViewUtils.AdditionalWebViewScriptsFolders.JoinWith(", ")}");
-            WebViewManager.Instance.ReloadScripts();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to make use of downloaded Workshop Items for WebView: {ex.Message}");
         }
     }
 

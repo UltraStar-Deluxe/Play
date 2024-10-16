@@ -18,7 +18,6 @@
         "playsharedui",
         "AndroidRuntimePermissions.Runtime",
         "UnityStandaloneFileBrowser",
-        "Vuplex.WebView",
         "LiteNetLib",
         "com.whisper.unity",
         "OneJS"

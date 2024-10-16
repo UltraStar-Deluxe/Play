@@ -34,9 +34,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     private IVideoSupportProvider currentVideoSupportProvider;
     public IVideoSupportProvider CurrentVideoSupportProvider => currentVideoSupportProvider;
 
-    [Inject]
-    private WebViewManager webViewManager;
-
     [Inject(UxmlName = R.UxmlNames.songVideoImage, Optional = true)]
     private VisualElement videoImageVisualElement;
     public VisualElement VideoImageVisualElement

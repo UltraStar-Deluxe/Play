@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -264,14 +264,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                     settings.EnableDynamicThemes = enableDynamicThemes;
                 });
 
-        FieldBindingUtils.Bind(enableWebViewToggle,
-            () => settings.EnableWebView,
-            newValue => settings.EnableWebView = newValue);
-
-        FieldBindingUtils.Bind(webViewCustomUserAgentTextField,
-            () => settings.CustomUserAgent,
-            newValue => settings.CustomUserAgent = newValue);
-
         FieldBindingUtils.Bind(songScanMaxBatchCountChooser,
             () => settings.SongScanMaxBatchCount,
             newValue => settings.SongScanMaxBatchCount = newValue);
@@ -321,16 +313,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         else
         {
             openPersistentDataPathButton.HideByDisplay();
-        }
-
-        // Open WebView scripts path
-        if (PlatformUtils.IsStandalone)
-        {
-            openWebViewScriptsPathButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(WebViewUtils.GetDefaultWebViewScriptsAbsolutePath()));
-        }
-        else
-        {
-            openWebViewScriptsPathButton.HideByDisplay();
         }
 
         // Message delay
