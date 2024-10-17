@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -39,7 +40,7 @@ public class BatchIsolateVocalsModSettings : IModSettings
 
     private void OnSelectAll()
     {
-        toggles.ForEach(toggle => toggle.value = true);
+        toggles.FindAll(toggle => toggle.enabledSelf).ForEach(toggle => toggle.value = true);
     }
 
     private void OnDeselectAll()
@@ -152,13 +153,33 @@ public class BatchIsolateVocalsModSettings : IModSettings
                 toggle.label = SongMetaUtils.GetArtistDashTitle(songMeta);
                 toggle.value = false;
                 toggle.userData = songMeta;
-                
-                toggles.Add(toggle);
 
+                if (!IsSongSupported(songMeta))
+                {
+                    toggle.SetEnabled(false);
+                }
+                toggles.Add(toggle);
                 toggleContainer.Add(toggle);
             }
 
             return toggleContainer;
         }
+
+        private readonly string[] supportedExtensions = { "wav", "mp3", "ogg", "m4a", "wma", "flac" };
+
+        private bool IsSongSupported(SongMeta songMeta)
+        {
+            string audio = songMeta.Audio;
+            string extension = Path.GetExtension(audio).ToLower();
+            if (extension.StartsWith("."))
+            {
+                extension = extension.Substring(1);
+            }
+            bool result = Array.Exists(supportedExtensions, ext => ext.Equals(extension));
+            Debug.Log($"Checking support for {audio}, extension: {extension}, result: {result}");
+            return result;
+        }
+
+
     }
 }
