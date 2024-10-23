@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:AIFF Format Test
+#ARTIST:Test Artist
 #MP3:aiff.aiff
 #BPM:200
 - 0

@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:WMV Format Test
+#ARTIST:Test Artist
 #MP3:wmv.wmv
 #VIDEO:wmv.wmv
 #BPM:200

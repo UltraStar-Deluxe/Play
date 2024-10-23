@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:M4A Format Test
+#ARTIST:Test Artist
 #MP3:m4a.m4a
 #BPM:200
 - 0
