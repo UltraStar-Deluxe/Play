@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:MKV Format Test
+#ARTIST:Test Artist
 #MP3:mkv.mkv
 #VIDEO:mkv.mkv
 #BPM:200

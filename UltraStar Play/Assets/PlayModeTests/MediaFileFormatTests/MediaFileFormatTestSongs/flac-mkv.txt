@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:FLAC-MKV Format Test
+#ARTIST:Test Artist
 #MP3:flac.flac
 #VIDEO:mkv.mkv
 #BPM:200

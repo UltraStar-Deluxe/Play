@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:MPEG2 Format Test
+#ARTIST:Test Artist
 #MP3:mpeg2.mpg
 #VIDEO:mpeg2.mpg
 #BPM:200

@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:OGG-WebM-VP8 Format Test
+#ARTIST:Test Artist
 #MP3:ogg.ogg
 #VIDEO:webm-vp8.webm
 #BPM:200
