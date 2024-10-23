@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
@@ -31,9 +31,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     [Inject]
     private UIDocument uiDocument;
-
-    [Inject]
-    private SongMediaFileConversionManager songMediaFileConversionManager;
 
     [Inject]
     private UiManager uiManager;
@@ -411,56 +408,13 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             VisualElement songIssueUi = CreateSongIssueListIssueEntry(songIssue);
             accordionItem.Add(songIssueUi);
 
-            // Add quick fix buttons
-            AddQuickFixButtons(accordionItem, songIssue, quickFixActions);
+            // TODO: Add quick fix buttons back? See commit history. I don't think the game should concern
+            // itself with fixing the user's song library. Surely purpose built tools exist in the USDX
+            // ecosystem already? But also, if we have ffmpeg, just use it to play the media directly instead
+            // of converting? Honestly, I don't like the idea of the game modifying the user's song
+            // collection in any way.
 
             lastSongMetaPath = songMetaPath;
-        }
-    }
-
-    private void AddQuickFixButtons(
-        VisualElement parent,
-        SongIssue songIssue,
-        List<QuickFixAction> quickFixActions)
-    {
-        if (songIssue.SongIssueData is FormatNotSupportedSongIssueData formatNotSupportedSongIssueData)
-        {
-            if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.InstrumentalAudio)
-            {
-                Action quickFixAction = () => songMediaFileConversionManager.ConvertInstrumentalAudioToSupportedFormat(songIssue.SongMeta);
-                Button quickFixButton = CreateQuickFixButton(Translation.Get(R.Messages.options_songLibrary_action_quickFix_instrumentalAudioFormat), quickFixAction);
-                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData,
-                    Translation.Get(R.Messages.options_songLibrary_action_quickFix_instrumentalAudioFormat),
-                    quickFixAction));
-                parent.Add(quickFixButton);
-            }
-            else if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.VocalsAudio)
-            {
-                Action quickFixAction = () => songMediaFileConversionManager.ConvertVocalsAudioToSupportedFormat(songIssue.SongMeta);
-                Button quickFixButton = CreateQuickFixButton(Translation.Get(R.Messages.options_songLibrary_action_quickFix_vocalsAudioFormat), quickFixAction);
-                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData,
-                    Translation.Get(R.Messages.options_songLibrary_action_quickFix_vocalsAudioFormat),
-                    quickFixAction));
-                parent.Add(quickFixButton);
-            }
-            else if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.Audio)
-            {
-                Action quickFixAction = () => songMediaFileConversionManager.ConvertAudioToSupportedFormat(songIssue.SongMeta);
-                Button quickFixButton = CreateQuickFixButton(Translation.Get(R.Messages.options_songLibrary_action_quickFix_audioFormat), quickFixAction);
-                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData,
-                    Translation.Get(R.Messages.options_songLibrary_action_quickFix_audioFormat),
-                    quickFixAction));
-                parent.Add(quickFixButton);
-            }
-            else if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.Video)
-            {
-                Action quickFixAction = () => songMediaFileConversionManager.ConvertVideoToSupportedFormat(songIssue.SongMeta);
-                Button quickFixButton = CreateQuickFixButton(Translation.Get(R.Messages.options_songLibrary_action_quickFix_videoFormat), quickFixAction);
-                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData,
-                    Translation.Get(R.Messages.options_songLibrary_action_quickFix_videoFormat),
-                    quickFixAction));
-                parent.Add(quickFixButton);
-            }
         }
     }
 
