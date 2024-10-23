@@ -66,9 +66,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     [Inject]
     private SceneNavigator sceneNavigator;
 
-    [Inject]
-    private VlcManager vlcManager;
-
     public bool ForceSyncOnForwardJump { get; set; }
 
     private SongMeta loadedSongMeta;
@@ -305,10 +302,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private void SyncVideoPlayPauseWithAudio()
     {
-        if (!IsFullyLoaded
-            || !gameObject.activeInHierarchy
-            // When the SongAudioPlayer is used to also play the video then there is nothing to synchronize
-            || currentVideoSupportProvider is SongAudioPlayerVlcVideoSupportProvider)
+        if (!IsFullyLoaded || !gameObject.activeInHierarchy)
         {
             return;
         }
@@ -338,10 +332,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public void SyncVideoPositionWithAudio(bool forceImmediateSync)
     {
-        if (!IsFullyLoaded
-            || (!forceImmediateSync && nextSyncTimeInSeconds > Time.time)
-            // When the SongAudioPlayer is used to also play the video then there is nothing to synchronize
-            || currentVideoSupportProvider is SongAudioPlayerVlcVideoSupportProvider)
+        if (!IsFullyLoaded || !forceImmediateSync && nextSyncTimeInSeconds > Time.time)
         {
             return;
         }
