@@ -1004,7 +1004,6 @@ Transform:
   - {fileID: 1873797141292969039}
   - {fileID: 3570172285929320791}
   - {fileID: 8951246057956905287}
-  - {fileID: 1535503042610526989}
   - {fileID: 2311127367653777862}
   - {fileID: 7657069212502855339}
   m_Father: {fileID: 8069444317427349030}
@@ -9596,50 +9595,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7858c3b3db034e2aa03cae273cc54e4c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &8022432702083802998
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1535503042610526989}
-  - component: {fileID: 702766123259852127}
-  m_Layer: 0
-  m_Name: SongMediaFileConversionManager
-  m_TagString: MelodyManiaOnly
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1535503042610526989
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8022432702083802998}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5483831765678408185}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &702766123259852127
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8022432702083802998}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 998caedc1a8d42fb86616e21b51a656a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &8036134303383211572
