@@ -20,7 +20,6 @@
     "com.unity.mobile.android-logcat": "1.4.2",
     "com.unity.netcode.gameobjects": "1.8.1",
     "com.unity.nuget.newtonsoft-json": "3.2.1",
-    "com.unity.render-pipelines.universal": "16.0.5",
     "com.unity.toolchain.win-x86_64-linux-x86_64": "2.0.9",
     "com.unity.ugui": "2.0.0",
     "com.unity.ui.builder": "2.0.0",
