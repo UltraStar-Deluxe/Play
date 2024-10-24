@@ -21,7 +21,6 @@
         "com.achimmihca.simplehttpserverforunity",
         "com.achimmihca.scenechangeanimations",
         "com.achimmihca.portaudioforunity",
-        "com.achimmihca.sqliteunity",
         "playshared",
         "playsharedui",
         "SpleeterSharp",
@@ -44,7 +43,6 @@
         "HtmlAgilityPack.dll",
         "LibVLCSharp.dll",
         "Mono.CSharp.dll",
-        "Mono.Data.Sqlite.dll",
         "ICSharpCode.SharpZipLib.dll",
         "WindowsInput.dll",
         "Newtonsoft.Json.dll"
