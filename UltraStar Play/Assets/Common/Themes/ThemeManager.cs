@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -307,8 +307,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private StyleSheet LoadAndCacheStyleSheet(string styleSheetFile)
     {
-        string styleSheetContent = File.ReadAllText(styleSheetFile);
-        StyleSheet styleSheet = StyleSheetUtils.CreateStyleSheet(styleSheetContent);
+        // This used to call into a style sheet builder that used some propriatery JavaScript thing that is
+        // not available. I'm leaving all the style sheet code in for now although it must be doing nothing
+        // because I expect we will want some sort of theme styling eventually.
+        StyleSheet styleSheet = new();
+
         filePathToStyleSheet[styleSheetFile] = styleSheet;
 
         AddStyleSheetFileSystemWatcher(styleSheetFile, styleSheet);
@@ -339,8 +342,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             bool wasAdded = uiDocument.rootVisualElement.styleSheets.Contains(styleSheet);
             uiDocument.rootVisualElement.styleSheets.Remove(styleSheet);
 
-            string styleSheetContent = File.ReadAllText(styleSheetFile);
-            StyleSheetUtils.BuildStyleSheet(styleSheet, styleSheetContent);
+            // There was another call to a style sheet builder here.
 
             if (wasAdded)
             {
