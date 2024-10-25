@@ -30,7 +30,6 @@
         "LiteNetLib",
         "com.whisper.unity",
         "FfmpegUnity",
-        "VLCUnity",
         "OneJS"
     ],
     "includePlatforms": [],
@@ -42,7 +41,6 @@
         "Flurl.dll",
         "Flurl.Http.dll",
         "HtmlAgilityPack.dll",
-        "LibVLCSharp.dll",
         "Mono.CSharp.dll",
         "Mono.Data.Sqlite.dll",
         "ICSharpCode.SharpZipLib.dll",
