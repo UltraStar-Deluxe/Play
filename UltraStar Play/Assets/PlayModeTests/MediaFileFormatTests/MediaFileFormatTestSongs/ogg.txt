@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:OGG Format Test
+#ARTIST:Test Artist
 #MP3:ogg.ogg
 #BPM:200
 - 0
