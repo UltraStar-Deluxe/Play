@@ -31,7 +31,6 @@
         "Facepunch.Steamworks.Win64.dll",
         "Flurl.dll",
         "Flurl.Http.dll",
-        "HtmlAgilityPack.dll",
         "ICSharpCode.SharpZipLib.dll"
     ],
     "autoReferenced": false,

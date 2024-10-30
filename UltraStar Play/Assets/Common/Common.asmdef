@@ -40,7 +40,6 @@
         "Facepunch.Steamworks.Win64.dll",
         "Flurl.dll",
         "Flurl.Http.dll",
-        "HtmlAgilityPack.dll",
         "Mono.CSharp.dll",
         "Mono.Data.Sqlite.dll",
         "ICSharpCode.SharpZipLib.dll",
