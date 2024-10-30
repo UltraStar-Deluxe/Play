@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:MP4-HVEC Format Test
+#ARTIST:Test Artist
 #MP3:mp4-hvec.mp4
 #VIDEO:mp4-hvec.mp4
 #BPM:200

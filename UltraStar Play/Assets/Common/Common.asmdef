@@ -30,7 +30,6 @@
         "LiteNetLib",
         "com.whisper.unity",
         "FfmpegUnity",
-        "VLCUnity",
         "OneJS"
     ],
     "includePlatforms": [],
@@ -41,11 +40,9 @@
         "Facepunch.Steamworks.Win64.dll",
         "Flurl.dll",
         "Flurl.Http.dll",
-        "LibVLCSharp.dll",
         "Mono.CSharp.dll",
         "Mono.Data.Sqlite.dll",
         "ICSharpCode.SharpZipLib.dll",
-        "WindowsInput.dll",
         "Newtonsoft.Json.dll"
     ],
     "autoReferenced": false,

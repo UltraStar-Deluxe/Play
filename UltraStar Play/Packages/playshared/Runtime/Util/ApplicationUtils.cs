@@ -144,26 +144,6 @@ public static class ApplicationUtils
         .Where(line => !line.IsNullOrEmpty())
         .ToHashSet();
 
-    // Supported file formats of ffmpeg can be obtained via "ffmpeg -demuxers"
-    // See also https://stackoverflow.com/questions/50069235/what-are-all-of-the-file-extensions-supported-by-ffmpeg
-    // See also http://www.ffmpeg.org/general.html#toc-Supported-File-Formats_002c-Codecs-or-Features
-    public static readonly IReadOnlyCollection<string> ffmpegSupportedFileExtensions = ReadFfmpegSupportedFileExtensionsFromFile()
-        .Select(line => line.Trim().TrimStart('.'))
-        .Where(line => !line.IsNullOrEmpty())
-        .ToHashSet();
-
-    public static readonly IReadOnlyCollection<string> ffmpegSupportedAudioFiles = ffmpegSupportedFileExtensions
-        .Where(fileExtension => audioFileExtensions.Contains(fileExtension))
-        .ToList();
-
-    public static readonly IReadOnlyCollection<string> ffmpegSupportedVideoFiles = ffmpegSupportedFileExtensions
-        .Where(fileExtension => !audioFileExtensions.Contains(fileExtension))
-        .ToList();
-
-    public static readonly IReadOnlyCollection<string> vlcSupportedFileExtensions = ffmpegSupportedFileExtensions;
-    public static readonly IReadOnlyCollection<string> vlcSupportedAudioFiles = ffmpegSupportedAudioFiles;
-    public static readonly IReadOnlyCollection<string> vlcSupportedVideoFiles = ffmpegSupportedVideoFiles;
-
     public static readonly IReadOnlyCollection<string> unitySupportedAudioFiles = new HashSet<string>
     {
         "mp3",
@@ -268,30 +248,6 @@ public static class ApplicationUtils
     {
         fileExtension = NormalizeFileExtension(fileExtension);
         return unitySupportedAudioFiles.Contains(fileExtension);
-    }
-
-    public static bool IsFfmpegSupportedAudioFormat(string fileExtension)
-    {
-        fileExtension = NormalizeFileExtension(fileExtension);
-        return ffmpegSupportedAudioFiles.Contains(fileExtension);
-    }
-
-    public static bool IsFfmpegSupportedVideoFormat(string fileExtension)
-    {
-        fileExtension = NormalizeFileExtension(fileExtension);
-        return ffmpegSupportedVideoFiles.Contains(fileExtension);
-    }
-
-    public static bool IsVlcSupportedAudioFormat(string fileExtension)
-    {
-        fileExtension = NormalizeFileExtension(fileExtension);
-        return vlcSupportedAudioFiles.Contains(fileExtension);
-    }
-
-    public static bool IsVlcSupportedVideoFormat(string fileExtension)
-    {
-        fileExtension = NormalizeFileExtension(fileExtension);
-        return vlcSupportedVideoFiles.Contains(fileExtension);
     }
 
     public static bool IsSupportedAudioFormat(string fileExtension)
@@ -432,16 +388,12 @@ public static class ApplicationUtils
     {
         return unitySupportedAudioFiles
             .Union(supportedMidiFiles)
-            .Union(includeFfmpegFormats ? ffmpegSupportedAudioFiles : new List<string>())
-            .Union(includeVlcFormats ? ffmpegSupportedAudioFiles : new List<string>())
             .ToHashSet();
     }
 
     private static IReadOnlyCollection<string> GetSupportedVideoFiles(bool includeFfmpegFormats, bool includeVlcFormats)
     {
         return unitySupportedVideoFiles
-            .Union(includeFfmpegFormats ? ffmpegSupportedVideoFiles : new List<string>())
-            .Union(includeVlcFormats ? vlcSupportedVideoFiles : new List<string>())
             .ToHashSet();
     }
 
@@ -462,22 +414,6 @@ public static class ApplicationUtils
 
             List<string> fallbackList = new List<string>() { "ogg", "mp3", "wav" };
             Debug.LogError($"Failed to load audio file extensions from file. Using fallback list: {fallbackList.JoinWith(", ")}");
-            return fallbackList;
-        }
-    }
-
-    private static IReadOnlyCollection<string> ReadFfmpegSupportedFileExtensionsFromFile()
-    {
-        try
-        {
-            return File.ReadAllLines(GetStreamingAssetsPath("ffmpeg-supported-common-file-extensions.txt"), Encoding.UTF8);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-
-            List<string> fallbackList = new List<string>() { "ogg", "mp3", "wav" };
-            Debug.LogError($"Failed to load ffmpeg supported audio file extensions from file. Using fallback list: {fallbackList.JoinWith(", ")}");
             return fallbackList;
         }
     }
