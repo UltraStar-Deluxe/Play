@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 
 old_dir=$(pwd)
 
@@ -14,3 +14,4 @@ wget -O MuseScore_General.sf2.bytes https://ftp.osuosl.org/pub/musescore/soundfo
 cd "$old_dir"
 echo "Downloading Soundfonts done"
 echo ""
+

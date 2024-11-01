@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 
 old_dir=$(pwd)
 

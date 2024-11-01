@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 
 old_dir=$(pwd)
 
@@ -26,3 +26,4 @@ rm -rf .git
 cd "$old_dir"
 echo "Downloading UniRx done"
 echo ""
+

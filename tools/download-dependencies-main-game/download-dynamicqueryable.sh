@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 
 old_dir=$(pwd)
 
@@ -28,3 +28,4 @@ rm -rf Properties
 cd "$old_dir"
 echo "Downloading DynamicQueryable done"
 echo ""
+

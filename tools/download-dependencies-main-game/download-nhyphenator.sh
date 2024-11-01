@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 
 old_dir=$(pwd)
 
@@ -26,3 +26,4 @@ yphenator\", \"includePlatforms\": [], \"references\": [] }" >  "./NHyphenator.a
 cd "$old_dir"
 echo "Downloading NHyphenator done"
 echo ""
+

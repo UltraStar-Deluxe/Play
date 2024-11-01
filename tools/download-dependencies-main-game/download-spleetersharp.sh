@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 
 old_dir=$(pwd)
 
@@ -28,3 +28,4 @@ echo "{ \"name\": \"SpleeterSharp\", \"includePlatforms\": [], \"references\": [
 cd "$old_dir"
 echo "Downloading SpleeterSharp done"
 echo ""
+

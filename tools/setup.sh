@@ -1,4 +1,4 @@
-old_dir=$(pwd)
+﻿old_dir=$(pwd)
 
 echo "Downloading dependencies of main game"
 echo "==========================="

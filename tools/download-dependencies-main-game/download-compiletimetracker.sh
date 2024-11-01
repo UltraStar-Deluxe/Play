@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 
 old_dir=$(pwd)
 
@@ -29,3 +29,4 @@ echo "{ \"name\": \"CompileTimeTrackerEditor\", \"includePlatforms\": [\"Editor\
 cd "$old_dir"
 echo "Downloading CompileTimeTracker done"
 echo ""
+
