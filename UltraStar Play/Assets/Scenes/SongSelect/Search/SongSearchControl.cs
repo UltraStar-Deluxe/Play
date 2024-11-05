@@ -262,10 +262,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         string searchText = GetRawSearchText() != "#"
             ? GetSearchText()
             : "";
-        List<SongMeta> filteredSongs = songMetas
-            .Where(songMeta => searchText.IsNullOrEmpty()
-                               || SongMetaMatchesSearchedProperties(songMeta, searchText))
-            .ToList();
+        string[] searchTexts = searchText.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+        List<SongMeta> filteredSongs = songMetas;
+        for (string searchWord in searchTexts) {
+            filteredSongs = filteredSongs.Where(songMeta => SongMetaMatchesSearchedProperties(songMeta, searchWord)).ToList();
+        }
         return filteredSongs;
     }
 
