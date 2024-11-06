@@ -262,9 +262,14 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         string searchText = GetRawSearchText() != "#"
             ? GetSearchText()
             : "";
+        if (searchText.IsNullOrEmpty()) {
+            return songMetas;
+        }
+        // Split searchText at whitespaces and match each word individually
+        string[] searchTexts = searchText.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
         List<SongMeta> filteredSongs = songMetas
-            .Where(songMeta => searchText.IsNullOrEmpty()
-                               || SongMetaMatchesSearchedProperties(songMeta, searchText))
+            .Where(songMeta => searchTexts.IsNullOrEmpty()
+                               || searchTexts.AllMatch(searchWord => SongMetaMatchesSearchedProperties(songMeta, searchWord)))
             .ToList();
         return filteredSongs;
     }
