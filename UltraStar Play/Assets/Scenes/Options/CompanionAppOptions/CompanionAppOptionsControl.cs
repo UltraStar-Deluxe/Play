@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UniInject;
 using UniRx;
-using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -10,7 +9,7 @@ using UnityEngine.UIElements;
 
 public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
-    [FormerlySerializedAs("companionClientListEntryAsset")] [InjectedInInspector]
+    [InjectedInInspector]
     public VisualTreeAsset companionClientListEntryUi;
 
     [Inject(UxmlName = R.UxmlNames.companionClientCountLabel)]
