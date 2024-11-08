@@ -187,7 +187,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription(description)
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation, settings)
             .SetCallbackAndAdd(requestData =>
             {
                 if (virtualKeyboard == null)
@@ -206,7 +206,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription("Move the current mouse if any by the given X and Y delta values")
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation, settings)
             .SetCallbackAndAdd(requestData =>
             {
                 Log.Verbose(() => $"Received input simulation request '{path}' via URL '{requestData.Context.Request.Url}'");
@@ -225,7 +225,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription("Simulate scroll wheel events")
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation, settings)
             .SetCallbackAndAdd(requestData =>
             {
                 Log.Debug(() => $"Received input simulation request '{path}' via URL '{requestData.Context.Request.Url}'");
@@ -290,7 +290,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription(description)
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation, settings)
             .SetCallbackAndAdd(request =>
             {
                 callback(request);
@@ -309,7 +309,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription(description)
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation, settings)
             .SetCallbackAndAdd(_ =>
             {
                 if (condition != null

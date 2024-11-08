@@ -146,6 +146,7 @@ public class Settings : ISettings
     public string HttpServerHost { get; set; } = new("");
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
     public int CompanionClientMessageBufferTimeInMillis { get; set; } = 150;
+    public bool RequireCompanionClientPermission { get; set; }
 
     // WebView settings
     public List<string> AcceptedWebViewHosts { get; set; } = new();

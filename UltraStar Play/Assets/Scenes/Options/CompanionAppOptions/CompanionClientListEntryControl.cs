@@ -25,7 +25,7 @@ public class CompanionClientListEntryControl : INeedInjection, IInjectionFinishe
         UpdatePermissions();
     }
 
-    private void UpdatePermissions()
+    public void UpdatePermissions()
     {
         permissionsContainer.Clear();
         List<HttpApiPermission> givenPermissions = SettingsUtils.GetPermissions(settings, clientHandler.ClientId);
@@ -61,6 +61,7 @@ public class CompanionClientListEntryControl : INeedInjection, IInjectionFinishe
 
             permissionsContainer.Add(permissionToggle);
         });
+        permissionsContainer.SetVisibleByDisplay(settings.RequireCompanionClientPermission);
     }
 
     private string GetPermissionName(HttpApiPermission permission)

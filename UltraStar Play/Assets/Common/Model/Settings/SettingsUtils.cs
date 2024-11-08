@@ -42,6 +42,11 @@ public static class SettingsUtils
 
     public static List<HttpApiPermission> GetPermissions(Settings settings, string clientId)
     {
+        if (!settings.RequireCompanionClientPermission)
+        {
+            return EnumUtils.GetValuesAsList<HttpApiPermission>();
+        }
+
         if (clientId.IsNullOrEmpty())
         {
             return new();
