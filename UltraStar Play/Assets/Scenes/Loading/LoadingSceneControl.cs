@@ -18,6 +18,9 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public int preloadSongCount = 10;
 
+    [InjectedInInspector]
+    public TextAsset localVersionTextAsset;
+
     [Inject]
     private SongMetaManager songMetaManager;
 
@@ -54,6 +57,9 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         // Normally, the next scene should start before the error message is shown.
         unexpectedErrorContainer.HideByDisplay();
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(8, () => ShowGeneralErrorMessage()));
+
+        // Log version info
+        Debug.Log($"VERSION.txt file content:\n{localVersionTextAsset.text}");
 
         // The settings are loaded on access.
         Settings settings = SettingsManager.Instance.Settings;
