@@ -78,6 +78,7 @@ public class BatchIsolateVocalsModSettings : IModSettings
         Debug.Log($"BatchIsolateVocals - Batch isolating vocals of {songMetas.Count} songs");
 
         Job batchJob = new Job(Translation.Of("Batch isolate vocals"));
+        batchJob.AdoptChildJobError = false; // Continue with other jobs, even if one fails.
         jobManager.AddJob(batchJob);
 
         // Create jobs for every song, but only start the first job
@@ -105,7 +106,23 @@ public class BatchIsolateVocalsModSettings : IModSettings
         Job audioSeparationJob = audioSeparationJobs[i];
 
         audioSeparationManager.ProcessSongMetaAsObservable(songMeta, true, audioSeparationJob)
-            // Start next job when finished
+            // Start next job on failure
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogError($"Failed to separate audio of batch song {i + 1} / {songMetas.Count}: {ex.Message}.");
+                Debug.LogException(ex); 
+                
+                int nextIndex = i + 1;
+                if (nextIndex < songMetas.Count)
+                {
+                    StartNextSongInBatch(songMetas, audioSeparationJobs, nextIndex);
+                }
+                else
+                {
+                    Debug.Log($"Finished batch isolation of vocals.");
+                }
+            })
+            // Start next job on success
             .Subscribe(evt =>
             {
                 Debug.Log($"Successfully separated audio of batch song {i + 1} / {songMetas.Count}: {evt}.");
