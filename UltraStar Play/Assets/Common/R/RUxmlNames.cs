@@ -81,7 +81,6 @@ public static partial class R
         public const string centerContent = "centerContent";
         public const string centerControls = "centerControls";
         public const string changeVoiceButton = "changeVoiceButton";
-        public const string checkCodecIsSupportedToggle = "checkCodecIsSupportedToggle";
         public const string clientConnectionGroup = "clientConnectionGroup";
         public const string clientDiscoveryPortTextField = "clientDiscoveryPortTextField";
         public const string clientIcon = "clientIcon";
@@ -188,7 +187,6 @@ public static partial class R
         public const string entryContainer = "entryContainer";
         public const string exitSceneButton = "exitSceneButton";
         public const string externalToolsGroup = "externalToolsGroup";
-        public const string ffmpegConversionCommandsJsonChooser = "ffmpegConversionCommandsJsonChooser";
         public const string filterActiveIcon = "filterActiveIcon";
         public const string filterInactiveIcon = "filterInactiveIcon";
         public const string filterListContainer = "filterListContainer";
@@ -359,7 +357,6 @@ public static partial class R
         public const string lobbyInfoContainer = "lobbyInfoContainer";
         public const string lobbyInfoLabel = "lobbyInfoLabel";
         public const string localHighScoreContainer = "localHighScoreContainer";
-        public const string logFfmpegOutputToggle = "logFfmpegOutputToggle";
         public const string logo = "logo";
         public const string logoContainer = "logoContainer";
         public const string logVlcOutputToggle = "logVlcOutputToggle";
@@ -962,7 +959,6 @@ public static partial class R
         public const string urlChooserButton = "urlChooserButton";
         public const string urlTextField = "urlTextField";
         public const string urlTextFieldHint = "urlTextFieldHint";
-        public const string useFfmpegToPlayMediaFilesChooser = "useFfmpegToPlayMediaFilesChooser";
         public const string usePortAudioToggle = "usePortAudioToggle";
         public const string useUniversalCharsetDetectorToggle = "useUniversalCharsetDetectorToggle";
         public const string useVlcToPlayMediaFilesChooser = "useVlcToPlayMediaFilesChooser";

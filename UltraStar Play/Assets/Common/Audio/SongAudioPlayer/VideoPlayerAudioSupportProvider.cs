@@ -82,7 +82,6 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
     {
         return !WebViewUtils.CanHandleWebViewUrl(audioUri)
             && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
-            && settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
             && ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(audioUri));
     }
 

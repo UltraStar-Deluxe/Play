@@ -207,9 +207,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             {
                 List<SongIssue> mediaFormatSongIssues = GetSupportedMediaFormatIssues(
                     songMeta,
-                    settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never,
-                    settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never,
-                    settings.CheckCodecIsSupported);
+                    settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never);
                 result.AddRange(mediaFormatSongIssues);
             }
             catch (Exception ex)
@@ -246,9 +244,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
      */
     private static List<SongIssue> GetSupportedMediaFormatIssues(
         SongMeta songMeta,
-        bool useFfmpegToPlayMediaFiles,
-        bool useVlcToPlayMediaFiles,
-        bool checkCodecIsSupported)
+        bool useVlcToPlayMediaFiles)
     {
         List<SongIssue> songIssues = new();
 
@@ -267,32 +263,6 @@ public class SongIssueManager : AbstractSingletonBehaviour
                     "expected", UnitySupportedVideoFileExtensionsCsv),
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
                 ESongIssueSeverity.Warning);
-        }
-
-        if (useFfmpegToPlayMediaFiles
-            && !useVlcToPlayMediaFiles)
-        {
-            // The ffmpeg integration in Unity can at the moment only play one file.
-            // Thus, check video file is either same as audio file or ffmpeg is not used to play it.
-            bool isVideoEmptyOrSameAsAudio = songMeta.Video.IsNullOrEmpty()
-                                             || string.Equals(songMeta.Video, songMeta.Audio, StringComparison.InvariantCultureIgnoreCase);
-            if (!isVideoEmptyOrSameAsAudio
-                && !ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(songMeta.Video))
-                && !WebViewUtils.CanHandleWebViewUrl(songMeta.Video))
-            {
-                songIssues.Add(SongIssue.CreateWarning(songMeta, Translation.Get(R.Messages.songIssue_media_videoDiffersFromAudio,
-                    "supportedFormats", UnitySupportedVideoFileExtensionsCsv)));
-
-                // Do not attempt to load this video file, it will not work.
-                SongVideoPlayer.AddIgnoredVideoFile(songMeta.Video);
-            }
-        }
-
-        if (checkCodecIsSupported
-            && !useFfmpegToPlayMediaFiles
-            && !useVlcToPlayMediaFiles)
-        {
-            CheckVideoCodecsAreSupportedByUnity(songIssues, songMeta);
         }
 
         // Check audio format.
@@ -325,7 +295,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             }
         }
 
-        // Vocals audio and instrumental audio must use formats that are supported by Unity. Ffmpeg can only be used for the main audio.
+        // Vocals audio and instrumental audio must use formats that are supported by Unity.
         string vocalsAudioUri = SongMetaUtils.GetVocalsAudioUri(songMeta);
         CheckResourceExists(songIssues, songMeta, vocalsAudioUri,
             () => Translation.Get(R.Messages.songIssue_media_notFound,
@@ -354,72 +324,6 @@ public class SongIssueManager : AbstractSingletonBehaviour
         songIssues.ForEach(songIssue => songIssue.Log());
 
         return songIssues;
-    }
-
-
-    private static void CheckVideoCodecsAreSupportedByUnity(List<SongIssue> songIssues, SongMeta songMeta)
-    {
-        if (!songMeta.Audio.IsNullOrEmpty())
-        {
-            CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Audio,
-                codec => Translation.Get(R.Messages.songIssue_media_unsupported,
-                    "actual", codec,
-                    "expected", UnitySupportedVideoFileExtensionsCsv),
-                () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
-                ESongIssueSeverity.Error);
-        }
-
-        if (!songMeta.Video.IsNullOrEmpty())
-        {
-            CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Video,
-                codec => Translation.Get(R.Messages.songIssue_media_unsupported,
-                    "actual", codec,
-                    "expected", UnitySupportedVideoFileExtensionsCsv),
-                () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
-                ESongIssueSeverity.Warning);
-        }
-    }
-
-    private static void CheckVideoCodecIsSupported(
-        List<SongIssue> songIssues,
-        SongMeta songMeta,
-        string pathOrUri,
-        Func<string, Translation> errorMessageGetter,
-        Func<SongIssueData> songIssueDataGetter,
-        ESongIssueSeverity severity)
-    {
-        string videoFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, pathOrUri);
-        if (!FileUtils.Exists(videoFilePath))
-        {
-            return;
-        }
-
-        string videoFileExtension = PathUtils.GetExtensionWithoutDot(videoFilePath)
-            .ToLowerInvariant();
-        if (!ApplicationUtils.IsSupportedVideoFormat(videoFileExtension))
-        {
-            return;
-        }
-
-        if (videoFileExtension == "webm"
-            || videoFileExtension == "mp4")
-        {
-            string ffprobeArguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"INPUT_FILE\"";
-            ProcessUtils.RunProcess(
-                ApplicationUtils.GetStreamingAssetsPath("ffmpeg/ffprobe.exe"),
-                ffprobeArguments.Replace("INPUT_FILE", videoFilePath),
-                out string ffprobeOutput,
-                out string ffprobeErrorOutput,
-                LogEventLevel.Verbose,
-                LogEventLevel.Verbose);
-
-            string codec = ffprobeOutput.Trim().ToLowerInvariant();
-            if (codec == "vp9"
-                || codec == "av1")
-            {
-                songIssues.Add(new SongIssue(severity, songIssueDataGetter(), errorMessageGetter(codec), -1, -1));
-            }
-        }
     }
 
     private static string GetUriOrExtensionWithoutDot(string pathOrUri)

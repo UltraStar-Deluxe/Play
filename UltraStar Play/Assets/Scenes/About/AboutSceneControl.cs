@@ -27,7 +27,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
         { "Pixabay", "InfoAndLegalTexts/Pixabay-Content-License.txt" },
         { "CEF", "InfoAndLegalTexts/Chromium-Embedded-Framework.txt" },
 
-        // Libraries used by "Ffmpeg for Unity"
+        // Libraries used by "Ffmpeg for Unity", maybe also by VLC
         { "BSD 2-Clause", "InfoAndLegalTexts/BSD-2-Clause.txt" },
         { "BSD 3-Clause", "InfoAndLegalTexts/BSD-3-Clause.txt" },
         { "LGPGv2.1", "InfoAndLegalTexts/lgpl-2.1.txt" },

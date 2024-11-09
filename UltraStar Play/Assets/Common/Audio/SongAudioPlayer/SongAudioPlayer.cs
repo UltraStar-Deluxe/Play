@@ -209,7 +209,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
             positionEventStream.OnNext(PositionInMillis);
         }
 
-        // Apply playback state to (sadly buggy) AudioSupportProviders (ffmpeg and vlc).
+        // Apply playback state to (sadly buggy) AudioSupportProviders (vlc).
         if (TimeUtils.IsDurationAboveThresholdInSeconds(lastApplyPlaybackStateToAudioProviderTimeInSeconds, 1))
         {
             lastApplyPlaybackStateToAudioProviderTimeInSeconds = Time.time;

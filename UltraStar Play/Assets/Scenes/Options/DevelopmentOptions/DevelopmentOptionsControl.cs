@@ -143,26 +143,14 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.generatedFolderPathTextField)]
     private TextField generatedFolderPathTextField;
 
-    [Inject(UxmlName = R.UxmlNames.ffmpegConversionCommandsJsonChooser)]
-    private TextField ffmpegConversionCommandsJsonChooser;
-
     [Inject(UxmlName = R.UxmlNames.songVideoPlaybackChooser)]
     private Chooser songVideoPlaybackChooser;
-
-    [Inject(UxmlName = R.UxmlNames.useFfmpegToPlayMediaFilesChooser)]
-    private Chooser useFfmpegToPlayMediaFilesChooser;
-
-    [Inject(UxmlName = R.UxmlNames.logFfmpegOutputToggle)]
-    private Toggle logFfmpegOutputToggle;
 
     [Inject(UxmlName = R.UxmlNames.useVlcToPlayMediaFilesChooser)]
     private Chooser useVlcToPlayMediaFilesChooser;
 
     [Inject(UxmlName = R.UxmlNames.logVlcOutputToggle)]
     private Toggle logVlcOutputToggle;
-
-    [Inject(UxmlName = R.UxmlNames.checkCodecIsSupportedToggle)]
-    private Toggle checkCodecIsSupportedToggle;
 
     [Inject(UxmlName = R.UxmlNames.vfxEnabledToggle)]
     private Toggle vfxEnabledToggle;
@@ -380,24 +368,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .Bind(() => settings.UpgradeUltraStarSongFormatVersionForSave,
                 newValue => settings.UpgradeUltraStarSongFormatVersionForSave = newValue);
 
-        // Ffmpeg playback / conversion
-        FieldBindingUtils.Bind(ffmpegConversionCommandsJsonChooser,
-            () => JsonConverter.ToJson(settings.FileFormatToFfmpegConversionArguments, true),
-            newValueAsString =>
-            {
-                try
-                {
-                    Dictionary<string, string> newValueAsDict = JsonConverter.FromJson<Dictionary<string, string>>(newValueAsString);
-                    settings.FileFormatToFfmpegConversionArguments = newValueAsDict;
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError(
-                        $"Failed to update ffmpeg conversion commands with the following JSON: '{newValueAsString}', error message: {ex.Message}");
-                }
-            });
-
         // SongVideoPlayback
         new EnumChooserControl<ESongVideoPlayback>(songVideoPlaybackChooser)
             .Bind(() => settings.SongVideoPlayback,
@@ -411,25 +381,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(logVlcOutputToggle,
             () => settings.LogVlcOutput,
             newValue => settings.LogVlcOutput = newValue);
-
-
-        // ffmpeg
-        new EnumChooserControl<EThirdPartyLibraryUsage>(useFfmpegToPlayMediaFilesChooser)
-            .Bind(() => settings.FfmpegToPlayMediaFilesUsage,
-                newValue => settings.FfmpegToPlayMediaFilesUsage = newValue);
-
-        FieldBindingUtils.Bind(logFfmpegOutputToggle,
-            () => settings.LogFfmpegOutput,
-            newValue => settings.LogFfmpegOutput = newValue);
-
-        // Media file conversion
-        FieldBindingUtils.Bind(checkCodecIsSupportedToggle,
-            () => settings.CheckCodecIsSupported,
-            newValue => settings.CheckCodecIsSupported = newValue);
-
-        new NumberChooserControl(maxConcurrentSongMediaConversionsChooser, settings.MaxConcurrentSongMediaConversions).Bind(
-            () => settings.MaxConcurrentSongMediaConversions,
-            newValue => settings.MaxConcurrentSongMediaConversions = (int)Math.Max(newValue, 0));
 
         // PortAudio device info
         portAudioDeviceInfoButton.RegisterCallbackButtonTriggered(_ => ShowPortAudioDeviceInfo());

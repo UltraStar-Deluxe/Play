@@ -63,8 +63,7 @@ public class SongMetaScanner
         // because it can only be called from the main thread and issues in songs are translated.
         Translation.Get(R.Messages.common_ok);
 
-        // Update supported file formats when ffmpeg is (not) used.
-        ApplicationUtils.UseFfmpegToPlayMediaFiles = settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never;
+        // Update supported file formats when vlc is (not) used.
         ApplicationUtils.UseVlcToPlayMediaFiles = settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never;
 
         isSongScanStarted = true;

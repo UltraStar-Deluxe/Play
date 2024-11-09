@@ -123,7 +123,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
         MidiManager.Instance.InitIfNotDoneYet();
 
-        Debug.Log("Supported file extensions by ffmpeg: " + ApplicationUtils.ffmpegSupportedFileExtensions.JoinWith(", "));
+        Debug.Log("Supported file extensions by vlc: " + ApplicationUtils.vlcSupportedFileExtensions.JoinWith(", "));
 
         // Continue to next scene when preloading data has finished.
         long maxWaitTimeInMillis = 1200;
