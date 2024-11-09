@@ -13,9 +13,6 @@ public class MoveNoteToOwnSentenceAction : INeedInjection
     [Inject]
     private DeleteSentencesAction deleteSentencesAction;
 
-    [Inject]
-    private SongMeta songMeta;
-
     public bool CanMoveToOwnSentence(List<Note> notes)
     {
         if (notes.IsNullOrEmpty())
@@ -35,10 +32,6 @@ public class MoveNoteToOwnSentenceAction : INeedInjection
         Voice affectedVoice = notes
             .Select(note => note.Sentence?.Voice)
             .FirstOrDefault();
-        if (affectedVoice == null)
-        {
-            affectedVoice = songMeta.Voices.FirstOrDefault();
-        }
 
         Sentence newSentence = new();
         newSentence.SetVoice(affectedVoice);

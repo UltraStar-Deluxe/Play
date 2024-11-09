@@ -68,6 +68,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private MoveNoteToOwnSentenceAction moveNoteToOwnSentenceAction;
 
     [Inject]
+    private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
+
+    [Inject]
     private ExtendNotesAction extendNotesAction;
 
     [Inject]
@@ -275,6 +278,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private void AssignSelectedNotesToOwnSentence()
     {
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.Select(note => note.Sentence?.Voice).AllMatch(voice => voice == null))
+        {
+            moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, EVoiceId.P1);
+        }
         moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes);
     }
 
