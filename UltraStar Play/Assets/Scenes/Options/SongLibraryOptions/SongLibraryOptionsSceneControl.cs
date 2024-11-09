@@ -33,9 +33,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     private UIDocument uiDocument;
 
     [Inject]
-    private SongMediaFileConversionManager songMediaFileConversionManager;
-
-    [Inject]
     private UiManager uiManager;
 
     [Inject(UxmlName = R.UxmlNames.songFolderList)]
@@ -411,56 +408,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             VisualElement songIssueUi = CreateSongIssueListIssueEntry(songIssue);
             accordionItem.Add(songIssueUi);
 
-            // Add quick fix buttons
-            AddQuickFixButtons(accordionItem, songIssue, quickFixActions);
-
             lastSongMetaPath = songMetaPath;
-        }
-    }
-
-    private void AddQuickFixButtons(
-        VisualElement parent,
-        SongIssue songIssue,
-        List<QuickFixAction> quickFixActions)
-    {
-        if (songIssue.SongIssueData is FormatNotSupportedSongIssueData formatNotSupportedSongIssueData)
-        {
-            if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.InstrumentalAudio)
-            {
-                Action quickFixAction = () => songMediaFileConversionManager.ConvertInstrumentalAudioToSupportedFormat(songIssue.SongMeta);
-                Button quickFixButton = CreateQuickFixButton(Translation.Get(R.Messages.options_songLibrary_action_quickFix_instrumentalAudioFormat), quickFixAction);
-                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData,
-                    Translation.Get(R.Messages.options_songLibrary_action_quickFix_instrumentalAudioFormat),
-                    quickFixAction));
-                parent.Add(quickFixButton);
-            }
-            else if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.VocalsAudio)
-            {
-                Action quickFixAction = () => songMediaFileConversionManager.ConvertVocalsAudioToSupportedFormat(songIssue.SongMeta);
-                Button quickFixButton = CreateQuickFixButton(Translation.Get(R.Messages.options_songLibrary_action_quickFix_vocalsAudioFormat), quickFixAction);
-                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData,
-                    Translation.Get(R.Messages.options_songLibrary_action_quickFix_vocalsAudioFormat),
-                    quickFixAction));
-                parent.Add(quickFixButton);
-            }
-            else if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.Audio)
-            {
-                Action quickFixAction = () => songMediaFileConversionManager.ConvertAudioToSupportedFormat(songIssue.SongMeta);
-                Button quickFixButton = CreateQuickFixButton(Translation.Get(R.Messages.options_songLibrary_action_quickFix_audioFormat), quickFixAction);
-                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData,
-                    Translation.Get(R.Messages.options_songLibrary_action_quickFix_audioFormat),
-                    quickFixAction));
-                parent.Add(quickFixButton);
-            }
-            else if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.Video)
-            {
-                Action quickFixAction = () => songMediaFileConversionManager.ConvertVideoToSupportedFormat(songIssue.SongMeta);
-                Button quickFixButton = CreateQuickFixButton(Translation.Get(R.Messages.options_songLibrary_action_quickFix_videoFormat), quickFixAction);
-                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData,
-                    Translation.Get(R.Messages.options_songLibrary_action_quickFix_videoFormat),
-                    quickFixAction));
-                parent.Add(quickFixButton);
-            }
         }
     }
 

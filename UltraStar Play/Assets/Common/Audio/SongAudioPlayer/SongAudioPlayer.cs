@@ -195,22 +195,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         }
     }
 
-    public RenderTexture FfmpegRenderTexture {
-        get
-        {
-            return currentAudioSupportProvider is FfmpegAudioSupportProvider ffmpegAudioSupportProvider
-                ? ffmpegAudioSupportProvider.FfmpegRenderTexture
-                : null;
-        }
-        set
-        {
-            if (currentAudioSupportProvider is FfmpegAudioSupportProvider ffmpegAudioSupportProvider)
-            {
-                ffmpegAudioSupportProvider.FfmpegRenderTexture = value;
-            }
-        }
-    }
-
     private float lastApplyPlaybackStateToAudioProviderTimeInSeconds;
 
     private void OnDestroy()

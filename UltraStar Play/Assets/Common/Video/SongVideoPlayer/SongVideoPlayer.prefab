@@ -133,50 +133,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06d91442df944178bef442f53df7fce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &7315398503593224281
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6591457441299718734}
-  - component: {fileID: 3486777015339389307}
-  m_Layer: 0
-  m_Name: FfmpegVideoSupportProvider
-  m_TagString: MelodyManiaOnly
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6591457441299718734
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7315398503593224281}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7416615286320622969}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3486777015339389307
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7315398503593224281}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36ab02965ce44c45997229b3c09fec0d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &7416615285511047231
 GameObject:
   m_ObjectHideFlags: 0
@@ -279,7 +235,6 @@ Transform:
   - {fileID: 3906242730807344510}
   - {fileID: 4956308107791758637}
   - {fileID: 2773199538522580672}
-  - {fileID: 6591457441299718734}
   - {fileID: 4374696399890248055}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
