@@ -3,9 +3,6 @@ VERSION.txt
 ################################
 ## Plugins
 
-Plugins/Jokenizer.Net/
-Plugins/Jokenizer.Net.meta
-
 Plugins/DynamicQueryable/
 Plugins/DynamicQueryable.meta
 
