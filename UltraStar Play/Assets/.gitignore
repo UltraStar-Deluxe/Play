@@ -3,9 +3,6 @@ VERSION.txt
 ################################
 ## Plugins
 
-Plugins/Opportunity.LrcParser/
-Plugins/Opportunity.LrcParser.meta
-
 Plugins/Jokenizer.Net/
 Plugins/Jokenizer.Net.meta
 
