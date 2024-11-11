@@ -3,9 +3,6 @@ VERSION.txt
 ################################
 ## Plugins
 
-Plugins/SpleeterSharp/
-Plugins/SpleeterSharp.meta
-
 Plugins/UnityStandaloneFileBrowser/
 Plugins/UnityStandaloneFileBrowser.meta
 
