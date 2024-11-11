@@ -3,9 +3,6 @@ VERSION.txt
 ################################
 ## Plugins
 
-Plugins/CSharpSynthForUnity/
-Plugins/CSharpSynthForUnity.meta
-
 Plugins/CompileTimeTracker/
 Plugins/CompileTimeTracker.meta
 
