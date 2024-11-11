@@ -20,8 +20,10 @@ StreamingAssets/SpleeterMsvcExe.meta
 StreamingAssets/BasicPitchExe/
 StreamingAssets/BasicPitchExe.meta
 
-StreamingAssets/SpeechRecognitionModels/
-StreamingAssets/SpeechRecognitionModels.meta
+StreamingAssets/SpeechRecognitionModels/WhisperModels/ggml-base.bin
+StreamingAssets/SpeechRecognitionModels/WhisperModels/ggml-base.bin.meta
+StreamingAssets/SpeechRecognitionModels/WhisperModels/ggml-small.bin
+StreamingAssets/SpeechRecognitionModels/WhisperModels/ggml-small.bin.meta
 
 StreamingAssets/DemoSongs/
 StreamingAssets/DemoSongs.meta
