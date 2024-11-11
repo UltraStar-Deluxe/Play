@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 807c738c080f28841b91df5dade9fe2d
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Prefabs/VLC Example Track Label.prefab
+  uploadId: 606875

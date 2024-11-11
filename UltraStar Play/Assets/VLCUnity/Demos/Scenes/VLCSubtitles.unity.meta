@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ab86454cbf497434ea87fd8ec6aa3fd1
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Scenes/VLCSubtitles.unity
+  uploadId: 606875

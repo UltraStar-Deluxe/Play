@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 1d1059fd3fa25354fb0b08c527da3c2b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Scripts/VLCPlayerExampleCamera.cs
+  uploadId: 606875

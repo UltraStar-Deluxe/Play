@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 59af0835fdb47604cb4c646fe9e6684b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Materials/texture_base_light_flou.mat
+  uploadId: 606875

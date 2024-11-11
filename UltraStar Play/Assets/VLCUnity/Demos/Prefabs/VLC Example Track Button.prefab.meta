@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 34337d4d3b7a75749abe73fea2ac840a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Prefabs/VLC Example Track Button.prefab
+  uploadId: 606875

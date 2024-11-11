@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 944b9b7728fcfac45b686314884e558b
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/intf/cli.luac
+  uploadId: 606875

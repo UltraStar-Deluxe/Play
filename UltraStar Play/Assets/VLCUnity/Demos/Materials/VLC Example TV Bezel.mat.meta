@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ef667010367d6ef4bb9a5d4d2245d501
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Materials/VLC Example TV Bezel.mat
+  uploadId: 606875
