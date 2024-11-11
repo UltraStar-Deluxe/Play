@@ -1,11 +1,5 @@
 VERSION.txt
 
-################################
-## Plugins
-
-Plugins/NHyphenator
-Plugins/NHyphenator.meta
-
 ########################################
 ## Third-party assets
 Background Bokeh VFX/
