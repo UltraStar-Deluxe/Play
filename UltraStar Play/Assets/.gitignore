@@ -1,40 +1,16 @@
 VERSION.txt
 
-ExtractedStyles.uss
-ExtractedStyles.uss.meta
-
 ################################
 ## Plugins
 
-Plugins/LitJson/
-Plugins/LitJson.meta
-
 Plugins/UniRx/
 Plugins/UniRx.meta
-
-Plugins/FullSerializer/
-Plugins/FullSerializer.meta
-
-Plugins/NLayer/
-Plugins/NLayer.meta
 
 Plugins/CSharpSynthForUnity/
 Plugins/CSharpSynthForUnity.meta
 
 Plugins/CompileTimeTracker/
 Plugins/CompileTimeTracker.meta
-
-Plugins/Unity-Ui-Extensions/
-Plugins/Unity-Ui-Extensions.meta
-
-Plugins/SharpZipLib/
-Plugins/SharpZipLib.meta
-
-Plugins/TexMesh Pro/
-Plugins/TexMesh Pro.meta
-
-Plugins/UniInject/
-Plugins/UniInject.meta
 
 Plugins/Serilog/Serilog/
 Plugins/Serilog/Serilog.meta
@@ -50,17 +26,11 @@ Plugins/Jokenizer.Net.meta
 Plugins/DynamicQueryable/
 Plugins/DynamicQueryable.meta
 
-Plugins/Vosk/
-Plugins/Vosk.meta
-
 Plugins/SpleeterSharp/
 Plugins/SpleeterSharp.meta
 
 Plugins/UnityStandaloneFileBrowser/
 Plugins/UnityStandaloneFileBrowser.meta
-
-Plugins/Soundfonts/MuseScore_General.sf2.bytes
-Plugins/Soundfonts.meta
 
 Plugins/NHyphenator
 Plugins/NHyphenator.meta
@@ -96,9 +66,6 @@ OneJS.meta
 
 ######################################
 ## StreamingAssets
-StreamingAssets/Input/UltraStarPlayInputActions.inputactions
-StreamingAssets/Input/UltraStarPlayInputActions.inputactions.meta
-
 StreamingAssets/SpleeterMsvcExe/
 StreamingAssets/SpleeterMsvcExe.meta
 
@@ -113,9 +80,6 @@ StreamingAssets/DemoSongs.meta
 
 StreamingAssets/ffmpeg/
 StreamingAssets/ffmpeg.meta
-
-StreamingAssets/RuntimeLoadedScripts/DemoMod
-StreamingAssets/RuntimeLoadedScripts/DemoMod.meta
 
 ######################################
 ## Play Mode Tests
