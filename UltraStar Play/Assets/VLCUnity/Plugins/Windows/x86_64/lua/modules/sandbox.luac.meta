@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 9ba25aa8e7affb649801f7df7f8cfd31
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/modules/sandbox.luac
+  uploadId: 606875

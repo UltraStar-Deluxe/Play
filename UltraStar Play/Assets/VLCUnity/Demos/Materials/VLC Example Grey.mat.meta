@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3faab2ee40f1bcc40907f82f540a9345
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Materials/VLC Example Grey.mat
+  uploadId: 606875

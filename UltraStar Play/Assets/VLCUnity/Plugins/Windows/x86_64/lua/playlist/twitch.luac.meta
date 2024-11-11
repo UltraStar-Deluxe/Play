@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 655859c7699210c4eac3c0de3b7409af
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/playlist/twitch.luac
+  uploadId: 606875

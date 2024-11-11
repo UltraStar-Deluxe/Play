@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2bbd1c975ce6ab54d8c2d21e0521bb72
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Editor/PreBuild.cs
+  uploadId: 606875

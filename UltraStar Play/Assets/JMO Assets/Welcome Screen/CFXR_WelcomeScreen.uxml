@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:VisualElement name="main">
+
+        <engine:VisualElement name="titlebox">
+            <engine:Label name="lbl_welcometo" text="Welcome to" />
+            <engine:Image name="img_title" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="roundedbox">
+            <engine:TextElement text="Cartoon FX Remaster FREE contains sample effects taken from the commercial Cartoon FX Remaster 1,2,3,4 packs!" />
+            <engine:TextElement text="Feel free to use them for your projects, and please buy any or all of the commercial packs if you want more!" />
+            <engine:VisualElement style="height: 10px;" />
+            <engine:TextElement text="Effects are taken from:" />
+            <engine:Label name="btn_cfxr1" class="hyperlink" text="• Cartoon FX Remaster 1" />
+            <engine:Label name="btn_cfxr2" class="hyperlink" text="• Cartoon FX Remaster 2" />
+            <engine:Label name="btn_cfxr3" class="hyperlink" text="• Cartoon FX Remaster 3" />
+            <engine:Label name="btn_cfxr4" class="hyperlink" text="• Cartoon FX Remaster 4" />
+            <engine:VisualElement style="height: 10px;" />
+            <engine:TextElement text="You can also buy all effects at once at" />
+            <engine:TextElement text="a reduced price through the" />
+            <engine:Label name="btn_cfxrbundle" class="hyperlink" text="• Cartoon FX Remaster Bundle" />
+            <engine:VisualElement style="height: 10px;" />
+
+            <engine:VisualElement style="display:flex; flex-direction: row;">
+                <engine:TextElement text="Thank you! :)" />
+                <engine:VisualElement name="spacer" style="flex-grow: 1;" />
+                <engine:Button name="close_dontshow" text="Close and don't show again" />
+                <engine:Button name="close" text="Close" />
+            </engine:VisualElement>
+
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

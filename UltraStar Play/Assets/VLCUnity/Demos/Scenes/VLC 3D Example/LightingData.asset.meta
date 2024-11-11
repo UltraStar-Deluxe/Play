@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e8b4e1a095817e74f840751fb18734e4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 112000000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Scenes/VLC 3D Example/LightingData.asset
+  uploadId: 606875

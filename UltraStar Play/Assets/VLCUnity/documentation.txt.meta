@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 35657205bcd2d344393ef4cfb4ccb254
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/documentation.txt
+  uploadId: 606875

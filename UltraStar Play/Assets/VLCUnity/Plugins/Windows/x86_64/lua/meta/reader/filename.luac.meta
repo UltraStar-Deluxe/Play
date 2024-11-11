@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d2e864f7688fb4945ac6703f5c0f2a01
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/meta/reader/filename.luac
+  uploadId: 606875
