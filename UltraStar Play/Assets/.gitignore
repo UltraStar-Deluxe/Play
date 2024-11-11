@@ -3,9 +3,6 @@ VERSION.txt
 ################################
 ## Plugins
 
-Plugins/CompileTimeTracker/
-Plugins/CompileTimeTracker.meta
-
 Plugins/Serilog/Serilog/
 Plugins/Serilog/Serilog.meta
 Plugins/Serilog/Serilog.Sinks.File/
