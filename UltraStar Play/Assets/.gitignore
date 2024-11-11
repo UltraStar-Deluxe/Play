@@ -3,9 +3,6 @@ VERSION.txt
 ################################
 ## Plugins
 
-Plugins/UniRx/
-Plugins/UniRx.meta
-
 Plugins/CSharpSynthForUnity/
 Plugins/CSharpSynthForUnity.meta
 
