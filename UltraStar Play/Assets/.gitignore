@@ -3,11 +3,6 @@ VERSION.txt
 ################################
 ## Plugins
 
-Plugins/Serilog/Serilog/
-Plugins/Serilog/Serilog.meta
-Plugins/Serilog/Serilog.Sinks.File/
-Plugins/Serilog/Serilog.Sinks.File.meta
-
 Plugins/Opportunity.LrcParser/
 Plugins/Opportunity.LrcParser.meta
 
