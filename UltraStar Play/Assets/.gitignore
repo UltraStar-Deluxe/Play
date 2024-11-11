@@ -3,9 +3,6 @@ VERSION.txt
 ################################
 ## Plugins
 
-Plugins/DynamicQueryable/
-Plugins/DynamicQueryable.meta
-
 Plugins/SpleeterSharp/
 Plugins/SpleeterSharp.meta
 
