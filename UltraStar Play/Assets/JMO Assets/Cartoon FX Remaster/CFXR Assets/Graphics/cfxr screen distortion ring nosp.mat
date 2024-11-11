@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: cfxr screen distortion ring nosp
+  m_Shader: {fileID: 4800000, guid: 9f1e1c035a8fc0b4cab1d282789b282b, type: 3}
+  m_ShaderKeywords: EFFECT_BUMP _ _ALPHABLEND_ON _CFXR_DITHERED_SHADOWS_OFF _CFXR_OVERLAYBLEND_RGBA
+    _CFXR_OVERLAYTEX_OFF _NORMALMAP _OVERLAYTEX_OFF
+  m_LightmapFlags: 0
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 2900
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _ScreenDistortionTex:
+        m_Texture: {fileID: 2800000, guid: ffd6561da19547744878ef631ea6ed88, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _Cutoff: 0.1
+    - _DebugVisualize: 0
+    - _EdgeFadePow: 1
+    - _ScreenDistortionScale: 0.25
+    - _SoftParticlesFadeDistanceFar: 0.33
+    - _SoftParticlesFadeDistanceNear: 0
+    - _UseAlphaClip: 0
+    - _UseEF: 0
+    - _UseSP: 0
+    m_Colors: []

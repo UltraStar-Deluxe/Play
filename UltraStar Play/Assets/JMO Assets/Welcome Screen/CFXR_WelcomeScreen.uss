@@ -1,0 +1,105 @@
+:root
+{
+    --color-cfxrf: rgba(64, 220, 160, 0.5);
+    --color-cfxrf-link: rgba(64, 220, 160, 1.0);
+    --color-cfxrf-link-hover: rgba(130, 240, 204, 1.0);
+}
+
+VisualElement#main
+{
+    padding: 10px;
+    color: #D2D2D2;
+}
+
+VisualElement#titlebox
+{
+    padding: 10px;
+
+    background-color: rgba(0, 0, 0, 0.2);
+
+    border-width: 2px;
+    border-radius: 6px;
+    border-color: var(--color-cfxrf);
+
+    border-bottom-width: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+Label#lbl_welcometo
+{
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+Image#img_title
+{
+    height: 46px;
+    width: 364px;
+    top: 6px;
+    align-self: flex-start;
+}
+
+VisualElement.roundedbox
+{
+    padding: 8px;
+
+    border-width: 2px;
+    border-radius: 6px;
+    border-color: var(--color-cfxrf);
+
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+Label#lbl_title
+{
+    font-size: 28px;
+    -unity-font-style: bold;
+    color: #42daa3;
+}
+
+TextElement
+{
+    font-size: 14px;
+}
+
+Label.hyperlink
+{
+    color: var(--color-cfxrf-link);
+    font-size: 14px;
+    -unity-text-align: middle-left;
+    cursor: link;
+}
+Label.hyperlink:hover
+{
+    background-color: rgba(255, 255, 255, 0.2);
+    color: var(--color-cfxrf-link-hover);
+}
+Label.hyperlink:active
+{
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+Button
+{
+    background-color: #444;
+    border-color: #333;
+    color: #CCC;
+    cursor: link;
+}
+Button:hover
+{
+    background-color: #555;
+    border-color: #444;
+}
+Button:active
+{
+    background-color: #333;
+    border-color: #222;
+    color: #AAA;
+}

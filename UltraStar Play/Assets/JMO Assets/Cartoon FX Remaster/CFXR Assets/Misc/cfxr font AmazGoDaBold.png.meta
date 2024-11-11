@@ -1,0 +1,1836 @@
+fileFormatVersion: 2
+guid: 7ab74e659e1f0a34d9cfec21c478fc12
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 21300000
+    second: amz2_0
+  - first:
+      213: 21300002
+    second: amz2_1
+  - first:
+      213: 21300004
+    second: amz2_2
+  - first:
+      213: 21300006
+    second: amz2_3
+  - first:
+      213: 21300008
+    second: amz2_4
+  - first:
+      213: 21300010
+    second: amz2_5
+  - first:
+      213: 21300012
+    second: amz2_6
+  - first:
+      213: 21300014
+    second: amz2_7
+  - first:
+      213: 21300016
+    second: amz2_8
+  - first:
+      213: 21300018
+    second: amz2_9
+  - first:
+      213: 21300020
+    second: amz2_10
+  - first:
+      213: 21300022
+    second: amz2_11
+  - first:
+      213: 21300024
+    second: amz2_12
+  - first:
+      213: 21300026
+    second: amz2_13
+  - first:
+      213: 21300028
+    second: amz2_14
+  - first:
+      213: 21300030
+    second: amz2_15
+  - first:
+      213: 21300032
+    second: amz2_16
+  - first:
+      213: 21300034
+    second: amz2_17
+  - first:
+      213: 21300036
+    second: amz2_18
+  - first:
+      213: 21300038
+    second: amz2_19
+  - first:
+      213: 21300040
+    second: amz2_20
+  - first:
+      213: 21300042
+    second: amz2_21
+  - first:
+      213: 21300044
+    second: amz2_22
+  - first:
+      213: 21300046
+    second: amz2_23
+  - first:
+      213: 21300048
+    second: amz2_24
+  - first:
+      213: 21300050
+    second: amz2_25
+  - first:
+      213: 21300052
+    second: amz2_26
+  - first:
+      213: 21300054
+    second: amz2_27
+  - first:
+      213: 21300056
+    second: amz2_28
+  - first:
+      213: 21300058
+    second: amz2_29
+  - first:
+      213: 21300060
+    second: amz2_30
+  - first:
+      213: 21300062
+    second: amz2_31
+  - first:
+      213: 21300064
+    second: amz2_32
+  - first:
+      213: 21300066
+    second: amz2_33
+  - first:
+      213: 21300068
+    second: amz2_34
+  - first:
+      213: 21300070
+    second: amz2_35
+  - first:
+      213: 21300072
+    second: amz2_36
+  - first:
+      213: 21300074
+    second: amz2_37
+  - first:
+      213: 21300076
+    second: amz2_38
+  - first:
+      213: 21300078
+    second: amz2_39
+  - first:
+      213: 21300080
+    second: amz2_40
+  - first:
+      213: 21300082
+    second: amz2_41
+  - first:
+      213: 21300084
+    second: amz2_42
+  - first:
+      213: 21300086
+    second: amz2_43
+  - first:
+      213: 21300088
+    second: amz2_44
+  - first:
+      213: 21300090
+    second: amz2_45
+  - first:
+      213: 21300092
+    second: amz2_46
+  - first:
+      213: 21300094
+    second: amz2_47
+  - first:
+      213: 21300096
+    second: amz2_48
+  - first:
+      213: 21300098
+    second: amz2_49
+  - first:
+      213: 21300100
+    second: amz2_50
+  - first:
+      213: 21300102
+    second: amz2_51
+  - first:
+      213: 21300104
+    second: amz2_52
+  - first:
+      213: 21300106
+    second: amz2_53
+  - first:
+      213: 21300108
+    second: amz2_54
+  - first:
+      213: 21300110
+    second: amz2_55
+  - first:
+      213: 21300112
+    second: amz2_56
+  - first:
+      213: 21300114
+    second: amz2_57
+  - first:
+      213: 21300116
+    second: amz2_58
+  - first:
+      213: 21300118
+    second: amz2_59
+  - first:
+      213: 21300120
+    second: amz2_60
+  - first:
+      213: 21300122
+    second: amz2_61
+  - first:
+      213: 21300124
+    second: amz2_62
+  - first:
+      213: 21300126
+    second: amz2_63
+  - first:
+      213: 21300128
+    second: amz2_64
+  - first:
+      213: 21300130
+    second: amz2_65
+  - first:
+      213: 21300132
+    second: amz2_66
+  - first:
+      213: 21300134
+    second: amz2_67
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 0
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  swizzle: 50462976
+  cookieLightType: 1
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: amz2_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 7
+        width: 35
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e9e89e94b29a35e47aa2fe87f53acb1c
+      internalID: 21300000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_1
+      rect:
+        serializedVersion: 2
+        x: 61
+        y: 37
+        width: 35
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a83278d92fb1d84cab1daa0f6079221
+      internalID: 21300002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_2
+      rect:
+        serializedVersion: 2
+        x: 118
+        y: 7
+        width: 62
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b5c8527a6fc07bd469c0bb3c5354574f
+      internalID: 21300004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_3
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 3
+        width: 52
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 98759fb56b336b14b9a948a7f26fc8b8
+      internalID: 21300006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_4
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 7
+        width: 58
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 82709bd3025b9cb4c8a9c312b6f35def
+      internalID: 21300008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_5
+      rect:
+        serializedVersion: 2
+        x: 359
+        y: 11
+        width: 46
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fde64adf3e4f0bc41a9971196dca33f3
+      internalID: 21300010
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_6
+      rect:
+        serializedVersion: 2
+        x: 437
+        y: 37
+        width: 25
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b3be39825ed3f14e81c28a30f45b895
+      internalID: 21300012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_7
+      rect:
+        serializedVersion: 2
+        x: 486
+        y: 8
+        width: 35
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a51789ff747389645a6f44d945a5d883
+      internalID: 21300014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_8
+      rect:
+        serializedVersion: 2
+        x: 546
+        y: 8
+        width: 38
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fef400c27fa3de6468f022c0344d98f0
+      internalID: 21300016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_9
+      rect:
+        serializedVersion: 2
+        x: 614
+        y: 34
+        width: 34
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 468b553971a2b634eab1d3cc06c573dc
+      internalID: 21300018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_10
+      rect:
+        serializedVersion: 2
+        x: 673
+        y: 20
+        width: 36
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cce9fc538708ab44b839cee75fff3fcd
+      internalID: 21300020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_11
+      rect:
+        serializedVersion: 2
+        x: 790
+        y: 25
+        width: 36
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 55d0b16ffe2184a48b780c0b860534ff
+      internalID: 21300022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_12
+      rect:
+        serializedVersion: 2
+        x: 902
+        y: 7
+        width: 35
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c4487faf57316f4bac683d52dba37b7
+      internalID: 21300024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_13
+      rect:
+        serializedVersion: 2
+        x: 973
+        y: 7
+        width: 53
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 864aa05ebca299d4abe03fa89ac3abc0
+      internalID: 21300026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_14
+      rect:
+        serializedVersion: 2
+        x: 1054
+        y: 7
+        width: 31
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6340c78200662f4eab8d58d49f1f780
+      internalID: 21300028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_15
+      rect:
+        serializedVersion: 2
+        x: 1105
+        y: 7
+        width: 56
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 64d359c646f02b144a597fef67fe811d
+      internalID: 21300030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_16
+      rect:
+        serializedVersion: 2
+        x: 1185
+        y: 7
+        width: 55
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2078d84c78e988347b041c0b43cd5036
+      internalID: 21300032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_17
+      rect:
+        serializedVersion: 2
+        x: 1269
+        y: 8
+        width: 53
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff2fcdb120038cd45998d8404ec526a1
+      internalID: 21300034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_18
+      rect:
+        serializedVersion: 2
+        x: 1344
+        y: 7
+        width: 58
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d88328cef04916459101dd060f7b379
+      internalID: 21300036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_19
+      rect:
+        serializedVersion: 2
+        x: 1429
+        y: 7
+        width: 58
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 281331b91bd01ed43a7d6371bfd3d2af
+      internalID: 21300038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_20
+      rect:
+        serializedVersion: 2
+        x: 1520
+        y: 7
+        width: 52
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: efe1c367a36cc144388b951fbd829bd2
+      internalID: 21300040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_21
+      rect:
+        serializedVersion: 2
+        x: 1593
+        y: 7
+        width: 57
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f83fc57611ee0c7409514038edf05f98
+      internalID: 21300042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_22
+      rect:
+        serializedVersion: 2
+        x: 1678
+        y: 7
+        width: 59
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5373ed8d1c00f39448b288721e884042
+      internalID: 21300044
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_23
+      rect:
+        serializedVersion: 2
+        x: 1763
+        y: 15
+        width: 27
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1751e72c325d1d144a5e316e4ab34ed5
+      internalID: 21300046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_24
+      rect:
+        serializedVersion: 2
+        x: 1813
+        y: 8
+        width: 30
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b8123bdcb36746438520c66af965d0f
+      internalID: 21300048
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_25
+      rect:
+        serializedVersion: 2
+        x: 1870
+        y: 18
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b571999082fce441b0870ba5788800c
+      internalID: 21300050
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_26
+      rect:
+        serializedVersion: 2
+        x: 1925
+        y: 19
+        width: 39
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7e63ab38ee08a5b4fa53e47f161ce9fa
+      internalID: 21300052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_27
+      rect:
+        serializedVersion: 2
+        x: 1992
+        y: 18
+        width: 31
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d53a0364cae46b409d65350005162f0
+      internalID: 21300054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_28
+      rect:
+        serializedVersion: 2
+        x: 2056
+        y: 7
+        width: 48
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06a08a972bbff2246937a55a78aeab2e
+      internalID: 21300056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_29
+      rect:
+        serializedVersion: 2
+        x: 2130
+        y: 3
+        width: 66
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 887ac9c1ee3eb9e45a157d1dca4abcac
+      internalID: 21300058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_30
+      rect:
+        serializedVersion: 2
+        x: 2220
+        y: 8
+        width: 57
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57e5e9dd5c67fdc4caa5a39884e93025
+      internalID: 21300060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_31
+      rect:
+        serializedVersion: 2
+        x: 2309
+        y: 7
+        width: 53
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5aca87d7bf9cf1746ab6464e2d2174e3
+      internalID: 21300062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_32
+      rect:
+        serializedVersion: 2
+        x: 2393
+        y: 7
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c92ac101928285f4b8aa28e8c169e8e8
+      internalID: 21300064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_33
+      rect:
+        serializedVersion: 2
+        x: 2481
+        y: 7
+        width: 59
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7765754671c4f3a44a2cd822b87af138
+      internalID: 21300066
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_34
+      rect:
+        serializedVersion: 2
+        x: 2567
+        y: 7
+        width: 54
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b51eb84e4f573c448c320fc7630f56d
+      internalID: 21300068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_35
+      rect:
+        serializedVersion: 2
+        x: 2643
+        y: 8
+        width: 55
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 35aa411eeb621324785db5b340fed688
+      internalID: 21300070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_36
+      rect:
+        serializedVersion: 2
+        x: 2722
+        y: 7
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d56ddd2a483311a479181a8a364e3380
+      internalID: 21300072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_37
+      rect:
+        serializedVersion: 2
+        x: 2807
+        y: 7
+        width: 57
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d3ea7d74c0871d4695ad46c64436d03
+      internalID: 21300074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_38
+      rect:
+        serializedVersion: 2
+        x: 2884
+        y: 7
+        width: 45
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 20f57a7e036df3647a8c491e5188ba3e
+      internalID: 21300076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_39
+      rect:
+        serializedVersion: 2
+        x: 2950
+        y: 7
+        width: 59
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3586b3707150d7041bf1594d68d38cd9
+      internalID: 21300078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_40
+      rect:
+        serializedVersion: 2
+        x: 3033
+        y: 8
+        width: 56
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f1d926d3c24d8ae4a8a3699e3ee99fdb
+      internalID: 21300080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_41
+      rect:
+        serializedVersion: 2
+        x: 3113
+        y: 7
+        width: 51
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1cf7ef537a5be9642bbcb9cdb386e0ae
+      internalID: 21300082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_42
+      rect:
+        serializedVersion: 2
+        x: 3189
+        y: 7
+        width: 67
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0fddaa67599b034478c767de8a9624fb
+      internalID: 21300084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_43
+      rect:
+        serializedVersion: 2
+        x: 3286
+        y: 6
+        width: 59
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53415aea067f1e644a90f42bff06c099
+      internalID: 21300086
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_44
+      rect:
+        serializedVersion: 2
+        x: 3371
+        y: 7
+        width: 62
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f1a0198d211d94c47ba19a0b47f9d189
+      internalID: 21300088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_45
+      rect:
+        serializedVersion: 2
+        x: 3461
+        y: 8
+        width: 58
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ead40395e7fd2ed478c9de7b68fc73e9
+      internalID: 21300090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_46
+      rect:
+        serializedVersion: 2
+        x: 3547
+        y: 0
+        width: 61
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e851a63eced1964694c139cf52a69e4
+      internalID: 21300092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_47
+      rect:
+        serializedVersion: 2
+        x: 3636
+        y: 8
+        width: 57
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59886af3c91784f4caa2cbc01c19112d
+      internalID: 21300094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_48
+      rect:
+        serializedVersion: 2
+        x: 3719
+        y: 7
+        width: 58
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2953970fe542d4b43918c3f89b4f8d2c
+      internalID: 21300096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_49
+      rect:
+        serializedVersion: 2
+        x: 3809
+        y: 7
+        width: 52
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c22bcaae4a9c23b479840c5b6f405e5d
+      internalID: 21300098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_50
+      rect:
+        serializedVersion: 2
+        x: 3881
+        y: 7
+        width: 56
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8208c8989a7b8e64499ad671edd2b134
+      internalID: 21300100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_51
+      rect:
+        serializedVersion: 2
+        x: 3966
+        y: 8
+        width: 57
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ef2f83415a5e5c442b6b3282e6e72ce2
+      internalID: 21300102
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_52
+      rect:
+        serializedVersion: 2
+        x: 4050
+        y: 8
+        width: 71
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 794b1ff565559bb4faac4026bdb1f817
+      internalID: 21300104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_53
+      rect:
+        serializedVersion: 2
+        x: 4139
+        y: 8
+        width: 63
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 58f94a02e73224f499d8012b1e2e5ee6
+      internalID: 21300106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_54
+      rect:
+        serializedVersion: 2
+        x: 4229
+        y: 7
+        width: 56
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 331fef24cd57bd7489495282440bb0c4
+      internalID: 21300108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_55
+      rect:
+        serializedVersion: 2
+        x: 4304
+        y: 7
+        width: 60
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f052351d3666234dba556da763cb9dd
+      internalID: 21300110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_56
+      rect:
+        serializedVersion: 2
+        x: 4385
+        y: 7
+        width: 37
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc7832b5b3476064181ae7b9b1e17f09
+      internalID: 21300112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_57
+      rect:
+        serializedVersion: 2
+        x: 4448
+        y: 8
+        width: 25
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 44d776dc4a9ca2a4788d608647cecebb
+      internalID: 21300114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_58
+      rect:
+        serializedVersion: 2
+        x: 4499
+        y: 8
+        width: 35
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09aef4a522c75a44e8a99ce06a21059c
+      internalID: 21300116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_59
+      rect:
+        serializedVersion: 2
+        x: 4562
+        y: 39
+        width: 31
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8df1820d1997e6646b42a893e9005bb0
+      internalID: 21300118
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_60
+      rect:
+        serializedVersion: 2
+        x: 4685
+        y: 37
+        width: 23
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13466f6dc5ba8ae459ef38243a95b78a
+      internalID: 21300120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_61
+      rect:
+        serializedVersion: 2
+        x: 4735
+        y: 10
+        width: 35
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 146998fab8d87d346aacb265acd77dcc
+      internalID: 21300122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_62
+      rect:
+        serializedVersion: 2
+        x: 4794
+        y: 2
+        width: 33
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4cc8fc59250c24d4e926f73871fe3e66
+      internalID: 21300124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_63
+      rect:
+        serializedVersion: 2
+        x: 4851
+        y: 10
+        width: 35
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d824e9f450f51324c90f0332f3a7d415
+      internalID: 21300126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_64
+      rect:
+        serializedVersion: 2
+        x: 4914
+        y: 27
+        width: 35
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 37de2ec0c00f96f43b07d2062393f2ab
+      internalID: 21300128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_65
+      rect:
+        serializedVersion: 2
+        x: 732
+        y: 2
+        width: 25
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d725c5f59dd34749b09d73420181b59
+      internalID: 21300130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_66
+      rect:
+        serializedVersion: 2
+        x: 850
+        y: 7
+        width: 23
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b5da9be1afcb8da4599e64316a38d376
+      internalID: 21300132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: amz2_67
+      rect:
+        serializedVersion: 2
+        x: 4611
+        y: 1
+        width: 40
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 26d197e64d705d243b68cab5be54b24b
+      internalID: 21300134
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      amz2_37: 21300074
+      amz2_0: 21300000
+      amz2_32: 21300064
+      amz2_63: 21300126
+      amz2_44: 21300088
+      amz2_29: 21300058
+      amz2_40: 21300080
+      amz2_11: 21300022
+      amz2_21: 21300042
+      amz2_18: 21300036
+      amz2_23: 21300046
+      amz2_25: 21300050
+      amz2_38: 21300076
+      amz2_28: 21300056
+      amz2_57: 21300114
+      amz2_33: 21300066
+      amz2_22: 21300044
+      amz2_41: 21300082
+      amz2_60: 21300120
+      amz2_9: 21300018
+      amz2_20: 21300040
+      amz2_16: 21300032
+      amz2_43: 21300086
+      amz2_50: 21300100
+      amz2_27: 21300054
+      amz2_55: 21300110
+      amz2_64: 21300128
+      amz2_67: 21300134
+      amz2_45: 21300090
+      amz2_46: 21300092
+      amz2_49: 21300098
+      amz2_56: 21300112
+      amz2_61: 21300122
+      amz2_2: 21300004
+      amz2_3: 21300006
+      amz2_47: 21300094
+      amz2_6: 21300012
+      amz2_39: 21300078
+      amz2_17: 21300034
+      amz2_53: 21300106
+      amz2_36: 21300072
+      amz2_35: 21300070
+      amz2_8: 21300016
+      amz2_5: 21300010
+      amz2_7: 21300014
+      amz2_19: 21300038
+      amz2_30: 21300060
+      amz2_48: 21300096
+      amz2_58: 21300116
+      amz2_62: 21300124
+      amz2_34: 21300068
+      amz2_15: 21300030
+      amz2_54: 21300108
+      amz2_59: 21300118
+      amz2_66: 21300132
+      amz2_42: 21300084
+      amz2_1: 21300002
+      amz2_10: 21300020
+      amz2_13: 21300026
+      amz2_4: 21300008
+      amz2_31: 21300062
+      amz2_26: 21300052
+      amz2_14: 21300028
+      amz2_12: 21300024
+      amz2_24: 21300048
+      amz2_51: 21300102
+      amz2_65: 21300130
+      amz2_52: 21300104
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
