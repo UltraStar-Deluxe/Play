@@ -3,9 +3,6 @@ VERSION.txt
 ################################
 ## Plugins
 
-Plugins/UnityStandaloneFileBrowser/
-Plugins/UnityStandaloneFileBrowser.meta
-
 Plugins/NHyphenator
 Plugins/NHyphenator.meta
 
