@@ -146,6 +146,7 @@ public class Settings : ISettings
     public string HttpServerHost { get; set; } = new("");
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
     public int CompanionClientMessageBufferTimeInMillis { get; set; } = 150;
+    public bool RequireCompanionClientPermission { get; set; }
 
     // WebView settings
     public List<string> AcceptedWebViewHosts { get; set; } = new();
@@ -166,27 +167,6 @@ public class Settings : ISettings
     // Vlc settings
     public bool LogVlcOutput { get; set; }
     public EThirdPartyLibraryUsage VlcToPlayMediaFilesUsage { get; set; } = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
-
-    // Ffmpeg settings
-    public bool LogFfmpegOutput { get; set; }
-    public EThirdPartyLibraryUsage FfmpegToPlayMediaFilesUsage { get; set; } = EThirdPartyLibraryUsage.Never;
-    public Dictionary<string, string> FileFormatToFfmpegConversionArguments { get; set; } = new()
-    {
-        // Copy mkv codec and convert to mp4 (very fast)
-        {"mkv", "-y -i \"INPUT_FILE\" -c copy \"INPUT_FILE_WITHOUT_EXTENSION.mp4\""},
-        // Convert audio files to ogg
-        {"ANY_AUDIO", "-y -i \"INPUT_FILE\" \"INPUT_FILE_WITHOUT_EXTENSION.ogg\""},
-        // Convert video files to mp4
-        {"ANY_VIDEO", "-y -i \"INPUT_FILE\" -qscale 0 \"INPUT_FILE_WITHOUT_EXTENSION.mp4\""},
-    };
-    public int MaxConcurrentSongMediaConversions { get; set; } = 3;
-
-    /**
-     * Check that VP9 is not used in webm files and AV1 is not used in mp4 files.
-     * These codecs are not supported by Unity.
-     * Note that these checks slow down the song search process significantly, thus disabled by default.
-     */
-    public bool CheckCodecIsSupported { get; set; }
 
     // Mods
     public List<string> EnabledMods { get; private set; } = new();

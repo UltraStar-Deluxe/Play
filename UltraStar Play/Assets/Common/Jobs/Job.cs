@@ -14,6 +14,8 @@ public class Job
     public IReadOnlyList<Job> ChildJobs => childJobs;
     public Job ParentJob { get; private set; }
 
+    public bool AdoptChildJobError { get; set; }
+
     public long EstimatedTotalDurationInMillis { get; set; }
     public double EstimatedCurrentProgressInPercent
     {
@@ -123,7 +125,8 @@ public class Job
             }
         }
 
-        if (anyChildHasError)
+        if (anyChildHasError
+            && AdoptChildJobError)
         {
             SetResult(EJobResult.Error);
         }

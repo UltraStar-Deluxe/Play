@@ -62,11 +62,6 @@ public static partial class R
         public const string bottomRow = "bottomRow";
         public const string bpmGroup = "bpmGroup";
         public const string bpmTextField = "bpmTextField";
-        public const string btn_cfxr1 = "btn_cfxr1";
-        public const string btn_cfxr2 = "btn_cfxr2";
-        public const string btn_cfxr3 = "btn_cfxr3";
-        public const string btn_cfxr4 = "btn_cfxr4";
-        public const string btn_cfxrbundle = "btn_cfxrbundle";
         public const string buildTimeStampLabel = "buildTimeStampLabel";
         public const string buttonContainer = "buttonContainer";
         public const string buttonRecordingButtonTextField = "buttonRecordingButtonTextField";
@@ -86,13 +81,10 @@ public static partial class R
         public const string centerContent = "centerContent";
         public const string centerControls = "centerControls";
         public const string changeVoiceButton = "changeVoiceButton";
-        public const string checkCodecIsSupportedToggle = "checkCodecIsSupportedToggle";
         public const string clientConnectionGroup = "clientConnectionGroup";
         public const string clientDiscoveryPortTextField = "clientDiscoveryPortTextField";
         public const string clientIcon = "clientIcon";
         public const string clientNameLabel = "clientNameLabel";
-        public const string close = "close";
-        public const string close_dontshow = "close_dontshow";
         public const string closeIcon = "closeIcon";
         public const string closeImportLrcDialogButton = "closeImportLrcDialogButton";
         public const string closeImportMidiDialogButton = "closeImportMidiDialogButton";
@@ -195,7 +187,6 @@ public static partial class R
         public const string entryContainer = "entryContainer";
         public const string exitSceneButton = "exitSceneButton";
         public const string externalToolsGroup = "externalToolsGroup";
-        public const string ffmpegConversionCommandsJsonChooser = "ffmpegConversionCommandsJsonChooser";
         public const string filterActiveIcon = "filterActiveIcon";
         public const string filterInactiveIcon = "filterInactiveIcon";
         public const string filterListContainer = "filterListContainer";
@@ -263,7 +254,6 @@ public static partial class R
         public const string ignoreThisVersionButton = "ignoreThisVersionButton";
         public const string image = "image";
         public const string imageAsCursorToggle = "imageAsCursorToggle";
-        public const string img_title = "img_title";
         public const string importLrcDialogOverlay = "importLrcDialogOverlay";
         public const string ImportLrcDialogUi = "ImportLrcDialogUi";
         public const string importLrcFormatButton = "importLrcFormatButton";
@@ -350,7 +340,6 @@ public static partial class R
         public const string layerVisibleButton = "layerVisibleButton";
         public const string layerVisibleIcon = "layerVisibleIcon";
         public const string layoutGroup = "layoutGroup";
-        public const string lbl_welcometo = "lbl_welcometo";
         public const string leadingPlayerIcon = "leadingPlayerIcon";
         public const string leftArrow = "leftArrow";
         public const string leftButton = "leftButton";
@@ -368,7 +357,6 @@ public static partial class R
         public const string lobbyInfoContainer = "lobbyInfoContainer";
         public const string lobbyInfoLabel = "lobbyInfoLabel";
         public const string localHighScoreContainer = "localHighScoreContainer";
-        public const string logFfmpegOutputToggle = "logFfmpegOutputToggle";
         public const string logo = "logo";
         public const string logoContainer = "logoContainer";
         public const string logVlcOutputToggle = "logVlcOutputToggle";
@@ -385,7 +373,6 @@ public static partial class R
         public const string lyricsContainer = "lyricsContainer";
         public const string lyricsLabel = "lyricsLabel";
         public const string lyricsPropertyToggle = "lyricsPropertyToggle";
-        public const string main = "main";
         public const string maxConcurrentSongMediaConversionsChooser = "maxConcurrentSongMediaConversionsChooser";
         public const string mediaFileFormatGroup = "mediaFileFormatGroup";
         public const string messageBufferTimeTextField = "messageBufferTimeTextField";
@@ -650,6 +637,7 @@ public static partial class R
         public const string reportIssueButton = "reportIssueButton";
         public const string reportIssueIcon = "reportIssueIcon";
         public const string reportIssueLabel = "reportIssueLabel";
+        public const string requireCompanionClientPermissionsToggle = "requireCompanionClientPermissionsToggle";
         public const string requiresRestartLabel = "requiresRestartLabel";
         public const string resetActiveFiltersButton = "resetActiveFiltersButton";
         public const string resetMusicPlaybackSpeedButton = "resetMusicPlaybackSpeedButton";
@@ -915,7 +903,6 @@ public static partial class R
         public const string timeValueLabel = "timeValueLabel";
         public const string title = "title";
         public const string titleAndDescription = "titleAndDescription";
-        public const string titlebox = "titlebox";
         public const string titleContainer = "titleContainer";
         public const string titleImageAndText = "titleImageAndText";
         public const string titleLabel = "titleLabel";
@@ -972,7 +959,6 @@ public static partial class R
         public const string urlChooserButton = "urlChooserButton";
         public const string urlTextField = "urlTextField";
         public const string urlTextFieldHint = "urlTextFieldHint";
-        public const string useFfmpegToPlayMediaFilesChooser = "useFfmpegToPlayMediaFilesChooser";
         public const string usePortAudioToggle = "usePortAudioToggle";
         public const string useUniversalCharsetDetectorToggle = "useUniversalCharsetDetectorToggle";
         public const string useVlcToPlayMediaFilesChooser = "useVlcToPlayMediaFilesChooser";

@@ -31,7 +31,6 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
     {
         base.ConfigureTestSettings(settings);
         settings.LogVlcOutput = true;
-        settings.LogFfmpegOutput = true;
     }
 
     protected IEnumerator SongAudioPlayerShouldLoadFile(

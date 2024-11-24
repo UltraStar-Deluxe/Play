@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8eb1a989babc27a448529bffdd83f3d7
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/playlist/youtube.luac
+  uploadId: 606875

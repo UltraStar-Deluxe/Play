@@ -116,6 +116,11 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
         return companionClientHandler;
     }
 
+    public void DisconnectAll()
+    {
+        liteNetLibServer.DisconnectAll();
+    }
+
     public List<ICompanionClientHandler> GetAllCompanionClientHandlers()
     {
         return peerToCompanionClientHandler.Values.ToList();

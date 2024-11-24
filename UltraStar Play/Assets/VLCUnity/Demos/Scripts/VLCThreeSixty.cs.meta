@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 699ff01a0b194194c91de64b70b01b1d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Scripts/VLCThreeSixty.cs
+  uploadId: 606875

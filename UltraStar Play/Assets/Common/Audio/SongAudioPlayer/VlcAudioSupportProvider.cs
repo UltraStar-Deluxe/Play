@@ -108,8 +108,8 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
     {
         return !WebViewUtils.CanHandleWebViewUrl(audioUri)
             && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
-            && (ApplicationUtils.IsFfmpegSupportedAudioFormat(Path.GetExtension(audioUri))
-                || ApplicationUtils.IsFfmpegSupportedVideoFormat(Path.GetExtension(audioUri)));
+            && (ApplicationUtils.IsVlcSupportedAudioFormat(Path.GetExtension(audioUri))
+                || ApplicationUtils.IsVlcSupportedVideoFormat(Path.GetExtension(audioUri)));
     }
 
     public override void Unload()

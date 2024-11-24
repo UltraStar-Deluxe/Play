@@ -1,0 +1,28 @@
+fileFormatVersion: 2
+guid: 46eed2c2b5878e34a9c350e4f9386afb
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Liberation Sans
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Fonts/LiberationSans.ttf
+  uploadId: 606875

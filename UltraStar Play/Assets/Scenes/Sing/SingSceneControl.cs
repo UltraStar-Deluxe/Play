@@ -1229,8 +1229,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         double startPositionInMillis = GetStartPositionInMillis();
+        bool streamAudio = InaccurateMp3WorkaroundUtils.ShouldStreamAudio(SongMetaUtils.GetAudioUri(SongMeta));
 
-        return songAudioPlayer.LoadAndPlayAsObservable(SongMeta, startPositionInMillis)
+        return songAudioPlayer.LoadAndPlayAsObservable(SongMeta, startPositionInMillis, streamAudio)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);

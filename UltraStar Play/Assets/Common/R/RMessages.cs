@@ -324,6 +324,7 @@ public static partial class R
         public static readonly string options_companionApp_button = "options_companionApp_button";
         public static readonly string options_companionApp_noConnectedApps = "options_companionApp_noConnectedApps";
         public static readonly string options_companionApp_noConnectedApps_hint = "options_companionApp_noConnectedApps_hint";
+        public static readonly string options_companionApp_requirePermissions = "options_companionApp_requirePermissions";
         public static readonly string options_companionApp_title = "options_companionApp_title";
         public static readonly string options_companionClientCount = "options_companionClientCount";
         public static readonly string options_defaultMedleyDuration = "options_defaultMedleyDuration";

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: fa4a1e81f57ad9346a659344ffd87959
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/playlist/bbc_co_uk.luac
+  uploadId: 606875

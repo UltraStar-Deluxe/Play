@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8b1ed0eada2fa4642916f261a5621501
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/LibVLCSharp.xml
+  uploadId: 606875

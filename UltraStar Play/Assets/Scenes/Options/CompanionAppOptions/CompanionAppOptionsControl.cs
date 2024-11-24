@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UniInject;
 using UniRx;
-using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -10,8 +9,11 @@ using UnityEngine.UIElements;
 
 public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
-    [FormerlySerializedAs("companionClientListEntryAsset")] [InjectedInInspector]
+    [InjectedInInspector]
     public VisualTreeAsset companionClientListEntryUi;
+
+    [Inject(UxmlName = R.UxmlNames.requireCompanionClientPermissionsToggle)]
+    private Toggle requireCompanionClientPermissionsToggle;
 
     [Inject(UxmlName = R.UxmlNames.companionClientCountLabel)]
     private Label companionClientCountLabel;
@@ -37,6 +39,16 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     {
         base.Start();
 
+        FieldBindingUtils.Bind(requireCompanionClientPermissionsToggle,
+            () => settings.RequireCompanionClientPermission,
+            newValue =>
+            {
+                settings.RequireCompanionClientPermission = newValue;
+                companionClientListEntryControls.ForEach(it => it.UpdatePermissions());
+                // Disconnect all such that they reconnect with new permissions.
+                serverSideCompanionClientManager.DisconnectAll();
+            });
+
         UpdateCompanionClients();
         serverSideCompanionClientManager.ClientConnectionChangedEventStream
             .Subscribe(_ => UpdateCompanionClients())
@@ -45,23 +57,21 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
 
     private void UpdateCompanionClients()
     {
-        companionClientList.Clear();
         List<ICompanionClientHandler> allCompanionClientHandlers = serverSideCompanionClientManager.GetAllCompanionClientHandlers();
         allCompanionClientHandlers.Sort((a, b) => string.Compare(a.ClientName, b.ClientName, StringComparison.InvariantCultureIgnoreCase));
-        allCompanionClientHandlers.ForEach(clientHandler =>
-            {
-                companionClientList.Add(CreateClientEntry(clientHandler));
-            });
+
+        requireCompanionClientPermissionsToggle.SetVisibleByDisplay(!allCompanionClientHandlers.IsNullOrEmpty());
+        noCompanionClientsContainer.SetVisibleByDisplay(allCompanionClientHandlers.IsNullOrEmpty());
+        if (allCompanionClientHandlers.IsNullOrEmpty())
+        {
+            HighlightHelpIcon();
+        }
 
         companionClientCountLabel.SetTranslatedText(Translation.Get(R.Messages.options_companionClientCount,
             "count", serverSideCompanionClientManager.CompanionClientCount));
 
-        bool noCompanionClients = serverSideCompanionClientManager.CompanionClientCount <= 0;
-        noCompanionClientsContainer.SetVisibleByDisplay(noCompanionClients);
-        if (noCompanionClients)
-        {
-            HighlightHelpIcon();
-        }
+        companionClientList.Clear();
+        allCompanionClientHandlers.ForEach(clientHandler => companionClientList.Add(CreateClientEntry(clientHandler)));
     }
 
     private VisualElement CreateClientEntry(ICompanionClientHandler clientHandler)

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c165abc321ad7e8438d770942a45fd94
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Materials/cone6_texture 1.mat
+  uploadId: 606875

@@ -29,7 +29,7 @@ public abstract class AbstractVlcVideoSupportProvider : AbstractVideoSupportProv
     {
         return !WebRequestUtils.IsHttpOrHttpsUri(videoUri)
                && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
-               && ApplicationUtils.IsFfmpegSupportedVideoFormat(Path.GetExtension(videoUri));
+               && ApplicationUtils.IsVlcSupportedVideoFormat(Path.GetExtension(videoUri));
     }
 
     public override void SetTargetTexture(RenderTexture renderTexture)

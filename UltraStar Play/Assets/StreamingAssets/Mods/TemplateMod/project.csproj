@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net481</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- DLL files that are shipped with the game.
+             These libraries are already loaded in the app domain.
+             They can be accessed by specifying their namespaces in modinfo.json in the "requires" list. -->
+        <Reference Include="DEFAULT_DLL_FOLDER/*.dll" />
+
+        <!-- DLL files in the mod folder.
+             These libraries are loaded when the mod is loaded.
+             They can be accessed by the mod without further configuration. -->
+        <Reference Include="*.dll" />
+
+        <Compile Include="*.cs"/>
+    </ItemGroup>
+</Project>

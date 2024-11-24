@@ -103,7 +103,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
         }
         if (!FileUtils.Exists(modelPath))
         {
-            errorMessage = "Speech recognition model path is not a valid file path.";
+            errorMessage = $"Speech recognition model path is not a valid file path: '{modelPath}'";
             return false;
         }
 

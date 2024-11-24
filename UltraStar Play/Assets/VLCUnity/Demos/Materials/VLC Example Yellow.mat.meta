@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 049635c8279f6ef4aa631e6f435e4d40
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Materials/VLC Example Yellow.mat
+  uploadId: 606875

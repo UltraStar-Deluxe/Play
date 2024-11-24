@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: daa9272a8cc777f439f36320a8930b2c
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/meta/art/03_lastfm.luac
+  uploadId: 606875

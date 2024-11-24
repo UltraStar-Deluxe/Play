@@ -137,7 +137,7 @@ PlayerSettings:
   vulkanEnableLateAcquireNextImage: 0
   vulkanEnableCommandBufferRecycling: 1
   loadStoreDebugModeEnabled: 0
-  bundleVersion: 1.4.2-beta1
+  bundleVersion: 1.4.2
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -821,7 +821,7 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   scriptingDefineSymbols:
     Android: OS_MUTEX;VUPLEX_STANDALONE
-    Standalone: OS_MUTEX;VUPLEX_STANDALONE;HAS_ONEJS;HAS_VUPLEX_WEBVIEW;HAS_VLC_UNITY;HAS_FFMPEG_UNITY;MELODY_MANIA
+    Standalone: OS_MUTEX;HAS_ONEJS;HAS_VUPLEX_WEBVIEW;HAS_VLC_UNITY;MELODY_MANIA;VUPLEX_STANDALONE
     WebGL: OS_MUTEX
     iPhone: OS_MUTEX
   additionalCompilerArguments: {}

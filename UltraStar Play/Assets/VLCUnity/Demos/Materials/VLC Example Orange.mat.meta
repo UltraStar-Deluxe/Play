@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c72878619e1ca0b4f828b2ab16ed17c8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Materials/VLC Example Orange.mat
+  uploadId: 606875

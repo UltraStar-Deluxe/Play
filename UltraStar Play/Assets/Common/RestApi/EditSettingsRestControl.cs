@@ -26,7 +26,7 @@ public class EditSettingsRestControl : AbstractRestControl, INeedInjection
         httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.Config)
             .SetDescription($"Set config. Only present fields in the request body are set.")
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteConfig)
+            .SetRequiredPermission(HttpApiPermission.WriteConfig, settings)
             .SetCallbackAndAdd(requestData =>
             {
                 string jsonBody = requestData.Context.Request.GetBodyAsString();

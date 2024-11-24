@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 30da8b344a6891d4883949b0cd5b8bfe
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Scripts/VLCYouTubePlayback.cs
+  uploadId: 606875

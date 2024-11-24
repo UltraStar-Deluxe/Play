@@ -1,0 +1,1 @@
+You can find more speech recognition models on https://huggingface.co/ggerganov/whisper.cpp

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d64d4aed00c5eb84d9112a4e0434d91d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Materials/texture_shadow.mat
+  uploadId: 606875

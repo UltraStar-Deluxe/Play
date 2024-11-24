@@ -9,10 +9,10 @@ public class MoveNoteToOwnSentenceAction : INeedInjection
 {
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
-    
+
     [Inject]
     private DeleteSentencesAction deleteSentencesAction;
-    
+
     public bool CanMoveToOwnSentence(List<Note> notes)
     {
         if (notes.IsNullOrEmpty())
@@ -24,23 +24,27 @@ public class MoveNoteToOwnSentenceAction : INeedInjection
 
     public void MoveToOwnSentence(List<Note> notes)
     {
-        List<Sentence> affectedSentences = notes.Select(note => note.Sentence).ToList();
+        List<Sentence> affectedSentences = notes
+            .Where(note => note.Sentence != null)
+            .Select(note => note.Sentence)
+            .ToList();
 
-        Sentence newSentence = new();
-        Voice voice = notes
+        Voice affectedVoice = notes
             .Select(note => note.Sentence?.Voice)
             .FirstOrDefault();
-        newSentence.SetVoice(voice);
-        
+
+        Sentence newSentence = new();
+        newSentence.SetVoice(affectedVoice);
+
         notes.ForEach(note =>
         {
             // Prevent notes from merging into a single word
             SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(note);
-            
+
             note.SetSentence(newSentence);
         });
         newSentence.FitToNotes();
-        
+
         // Remove old sentence if not more notes left
         List<Sentence> sentencesWithoutNotes = affectedSentences.Where(it => it.Notes.IsNullOrEmpty()).ToList();
         deleteSentencesAction.Execute(sentencesWithoutNotes);

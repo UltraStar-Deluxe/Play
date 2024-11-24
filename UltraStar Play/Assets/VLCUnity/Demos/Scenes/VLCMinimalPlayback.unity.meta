@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3ab416dc90b6a1049a485c4e50f09bdc
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Scenes/VLCMinimalPlayback.unity
+  uploadId: 606875

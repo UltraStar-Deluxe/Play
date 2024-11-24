@@ -126,7 +126,16 @@ public static class ApplyThemeStyleUtils
         {
             VisualElement initialSelectedVisualElement = listView.GetSelectedVisualElement();
             listViewToSelectedVisualElement[listView] = initialSelectedVisualElement;
-            listView.selectionChanged += selectedObjects => OnListViewSelectionChanged(listView, selectedObjects);
+            listView.selectionChanged += selectedObjects => OnListViewSelectionChanged(listView);
+        }
+    }
+
+    public static void UpdateStylesOnListViewFocusChanged(ListViewH listView)
+    {
+        if (listView != null)
+        {
+            listView.RegisterCallback<FocusEvent>(evt => OnListViewFocusChanged(listView, true), TrickleDown.TrickleDown);
+            listView.RegisterCallback<BlurEvent>(evt => OnListViewFocusChanged(listView, false), TrickleDown.TrickleDown);
         }
     }
 
@@ -137,11 +146,11 @@ public static class ApplyThemeStyleUtils
         {
             VisualElement initialSelectedVisualElement = listView.GetSelectedVisualElement();
             listViewToSelectedVisualElement[listView] = initialSelectedVisualElement;
-            listView.selectionChanged += selectedObjects => OnListViewSelectionChanged(listView, selectedObjects);
+            listView.selectionChanged += selectedObjects => OnListViewSelectionChanged(listView);
         }
     }
 
-    private static void OnListViewSelectionChanged(ListView listView, IEnumerable<object> selectedObjects)
+    private static void OnListViewSelectionChanged(ListView listView)
     {
         VisualElement oldSelectedVisualElement = listViewToSelectedVisualElement[listView];
         SetListViewItemActive(listView, oldSelectedVisualElement, false);
@@ -153,7 +162,24 @@ public static class ApplyThemeStyleUtils
         }
     }
 
-    private static void OnListViewSelectionChanged(ListViewH listView, IEnumerable<object> selectedObjects)
+    private static void OnListViewFocusChanged(ListViewH listView, bool focused)
+    {
+        if (!listViewToSelectedVisualElement.TryGetValue(listView, out VisualElement oldSelectedVisualElement))
+        {
+            return;
+        }
+
+        VisualElement listItem = GetListViewItem(oldSelectedVisualElement);
+        if (listItem != null
+            && visualElementToData.TryGetValue(listItem, out VisualElementData listItemData))
+        {
+            // Apply active style only if ListView is focused
+            listItemData.isActive = focused;
+            UpdateStyles(listItemData);
+        }
+    }
+
+    private static void OnListViewSelectionChanged(ListViewH listView)
     {
         if (!listViewToSelectedVisualElement.TryGetValue(listView, out VisualElement oldSelectedVisualElement))
         {
@@ -162,7 +188,8 @@ public static class ApplyThemeStyleUtils
         SetListViewItemActive(listView, oldSelectedVisualElement, false);
 
         VisualElement newSelectedVisualElement = listView.GetSelectedVisualElement();
-        if (newSelectedVisualElement != null)
+        if (newSelectedVisualElement != null
+            && VisualElementUtils.IsListViewFocused(listView))
         {
             SetListViewItemActive(listView, newSelectedVisualElement, true);
         }
@@ -175,9 +202,7 @@ public static class ApplyThemeStyleUtils
             return;
         }
 
-        VisualElement listItem = listItemAncestor.ClassListContains("listItem")
-            ? listItemAncestor
-            : listItemAncestor.Q(null, "listItem");
+        VisualElement listItem = GetListViewItem(listItemAncestor);
         if (listItem != null
             && visualElementToData.TryGetValue(listItem, out VisualElementData listItemData))
         {
@@ -221,6 +246,19 @@ public static class ApplyThemeStyleUtils
         {
             listViewToSelectedVisualElement[listView] = null;
         }
+    }
+
+    private static VisualElement GetListViewItem(VisualElement listItemAncestor)
+    {
+        if (listItemAncestor == null)
+        {
+            return null;
+        }
+
+        VisualElement listItem = listItemAncestor.ClassListContains("listItem")
+            ? listItemAncestor
+            : listItemAncestor.Q(null, "listItem");
+        return listItem;
     }
 
     private static void ApplyGradient(VisualElementData data, GradientConfig newGradientConfig)

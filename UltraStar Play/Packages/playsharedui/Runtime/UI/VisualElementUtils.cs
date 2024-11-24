@@ -268,4 +268,10 @@ public static class VisualElementUtils
         element.style.left = pos.x - (element.parent != null ? element.parent.worldBound.xMin : 0);
         element.style.top = pos.y - (element.parent != null ? element.parent.worldBound.yMin : 0);
     }
+
+    public static bool IsListViewFocused(ListViewH listView)
+    {
+        return listView.focusController.focusedElement is VisualElement focusedElement
+               && focusedElement.GetAncestors().Contains(listView);
+    }
 }

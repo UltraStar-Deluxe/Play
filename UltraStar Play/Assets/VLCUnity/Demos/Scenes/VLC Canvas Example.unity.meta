@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b1b70164e45051b4fa2c1ea6575cdb0d
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Demos/Scenes/VLC Canvas Example.unity
+  uploadId: 606875

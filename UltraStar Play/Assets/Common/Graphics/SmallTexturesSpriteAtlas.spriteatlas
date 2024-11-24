@@ -48,6 +48,8 @@ SpriteAtlas:
     - 83cbc846d56ee8d48b9ba347ed508287: 21300000
     - d6012347551fd4745ac902d66c144d9f: 21300000
     - f2d31bb76127a7545bb62af37e7e006f: 21300000
+    - 0babf1c7d1bbb374d8d09884cc3a4e8a: 5579906493742513239
+    - 0babf1c7d1bbb374d8d09884cc3a4e8a: 8345525588690253302
     - 2a2b659882f1296429f136eb2369ef29: 21300000
     - ecea42b89d4de5f42a25fd1a598b26a1: 21300000
     - a6393dfa169b0764d80cb569f918b34c: 21300000
@@ -67,6 +69,8 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 83cbc846d56ee8d48b9ba347ed508287, type: 3}
   - {fileID: 21300000, guid: d6012347551fd4745ac902d66c144d9f, type: 3}
   - {fileID: 21300000, guid: f2d31bb76127a7545bb62af37e7e006f, type: 3}
+  - {fileID: 5579906493742513239, guid: 0babf1c7d1bbb374d8d09884cc3a4e8a, type: 3}
+  - {fileID: 8345525588690253302, guid: 0babf1c7d1bbb374d8d09884cc3a4e8a, type: 3}
   - {fileID: 21300000, guid: 2a2b659882f1296429f136eb2369ef29, type: 3}
   - {fileID: 21300000, guid: ecea42b89d4de5f42a25fd1a598b26a1, type: 3}
   - {fileID: 21300000, guid: a6393dfa169b0764d80cb569f918b34c, type: 3}
@@ -85,6 +89,8 @@ SpriteAtlas:
   - '[score]rating_6'
   - '[score]rating_3'
   - '[score]rating_2'
+  - DuetIconWithOutline_1
+  - DuetIconWithOutline_0
   - '[score]rating_2'
   - DuetIcon
   - '[score]rating_7'

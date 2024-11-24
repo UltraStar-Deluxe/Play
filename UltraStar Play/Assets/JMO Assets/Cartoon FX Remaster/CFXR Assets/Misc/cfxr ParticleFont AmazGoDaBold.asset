@@ -1,0 +1,289 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffbf5f8b3f8ff3e49bbbf5495becc6b3, type: 3}
+  m_Name: cfxr ParticleFont AmazGoDaBold
+  m_EditorClassIdentifier: 
+  CharSequence: '!"#$%&''()*+-/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^`{|}~,._'
+  CharSprites:
+  - {fileID: 21300000, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300002, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300004, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300006, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300008, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300010, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300012, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300014, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300016, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300018, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300020, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300022, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300024, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300026, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300028, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300030, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300032, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300034, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300036, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300038, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300040, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300042, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300044, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300046, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300048, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300050, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300052, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300054, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300056, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300058, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300060, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300062, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300064, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300066, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300068, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300070, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300072, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300074, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300076, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300078, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300080, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300082, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300084, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300086, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300088, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300090, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300092, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300094, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300096, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300098, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300100, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300102, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300104, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300106, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300108, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300110, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300112, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300114, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300116, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300118, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300120, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300122, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300124, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300126, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300128, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300130, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300132, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  - {fileID: 21300134, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  CharKerningOffsets:
+  - name: '!'
+    pre: -22
+    post: -12
+  - name: '"'
+    pre: 0
+    post: 0
+  - name: '#'
+    pre: 0
+    post: 0
+  - name: $
+    pre: 0
+    post: 0
+  - name: '%'
+    pre: 0
+    post: 0
+  - name: '&'
+    pre: 0
+    post: 0
+  - name: ''''
+    pre: 0
+    post: 0
+  - name: (
+    pre: 0
+    post: 0
+  - name: )
+    pre: 0
+    post: 0
+  - name: '*'
+    pre: 0
+    post: 0
+  - name: +
+    pre: 0
+    post: 0
+  - name: '-'
+    pre: -14
+    post: 0
+  - name: /
+    pre: 0
+    post: 0
+  - name: 0
+    pre: 0
+    post: -4
+  - name: 1
+    pre: -14
+    post: 0
+  - name: 2
+    pre: -5
+    post: 0
+  - name: 3
+    pre: 0
+    post: 5
+  - name: 4
+    pre: -5
+    post: 0
+  - name: 5
+    pre: 0
+    post: 0
+  - name: 6
+    pre: 0
+    post: 0
+  - name: 7
+    pre: 0
+    post: -8
+  - name: 8
+    pre: -4
+    post: 0
+  - name: 9
+    pre: 0
+    post: 0
+  - name: ':'
+    pre: 0
+    post: 0
+  - name: ;
+    pre: 0
+    post: 0
+  - name: <
+    pre: 0
+    post: 0
+  - name: =
+    pre: 0
+    post: 0
+  - name: '>'
+    pre: 0
+    post: 0
+  - name: '?'
+    pre: -6
+    post: 0
+  - name: '@'
+    pre: 12
+    post: -10
+  - name: A
+    pre: -2
+    post: 0
+  - name: B
+    pre: 0
+    post: 5
+  - name: C
+    pre: 0
+    post: -2
+  - name: D
+    pre: 0
+    post: 0
+  - name: E
+    pre: 0
+    post: -8
+  - name: F
+    pre: -6
+    post: -10
+  - name: G
+    pre: 0
+    post: 0
+  - name: H
+    pre: -2
+    post: -4
+  - name: I
+    pre: -20
+    post: -6
+  - name: J
+    pre: 0
+    post: 0
+  - name: K
+    pre: 0
+    post: -8
+  - name: L
+    pre: -8
+    post: 8
+  - name: M
+    pre: 0
+    post: 8
+  - name: N
+    pre: 0
+    post: 0
+  - name: O
+    pre: 0
+    post: 0
+  - name: P
+    pre: 0
+    post: 0
+  - name: Q
+    pre: 0
+    post: 0
+  - name: R
+    pre: 0
+    post: 0
+  - name: S
+    pre: 0
+    post: 0
+  - name: T
+    pre: 0
+    post: -10
+  - name: U
+    pre: 0
+    post: 4
+  - name: V
+    pre: 0
+    post: 0
+  - name: W
+    pre: 16
+    post: -10
+  - name: X
+    pre: 0
+    post: 0
+  - name: Y
+    pre: -2
+    post: -4
+  - name: Z
+    pre: 0
+    post: 0
+  - name: '['
+    pre: 0
+    post: 0
+  - name: \
+    pre: 0
+    post: 0
+  - name: ']'
+    pre: 0
+    post: 0
+  - name: ^
+    pre: 0
+    post: 0
+  - name: '`'
+    pre: 0
+    post: 0
+  - name: '{'
+    pre: 0
+    post: 0
+  - name: '|'
+    pre: 0
+    post: 0
+  - name: '}'
+    pre: 0
+    post: 0
+  - name: ~
+    pre: 0
+    post: 0
+  - name: ','
+    pre: 0
+    post: 0
+  - name: .
+    pre: -35
+    post: 10
+  - name: _
+    pre: 0
+    post: 0

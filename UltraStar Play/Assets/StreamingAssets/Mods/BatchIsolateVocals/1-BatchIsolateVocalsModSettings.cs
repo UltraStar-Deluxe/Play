@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -39,7 +40,8 @@ public class BatchIsolateVocalsModSettings : IModSettings
 
     private void OnSelectAll()
     {
-        toggles.ForEach(toggle => toggle.value = true);
+        toggles.FindAll(toggle => toggle.enabledSelf)
+            .ForEach(toggle => toggle.value = true);
     }
 
     private void OnDeselectAll()
@@ -76,6 +78,7 @@ public class BatchIsolateVocalsModSettings : IModSettings
         Debug.Log($"BatchIsolateVocals - Batch isolating vocals of {songMetas.Count} songs");
 
         Job batchJob = new Job(Translation.Of("Batch isolate vocals"));
+        batchJob.AdoptChildJobError = false; // Continue with other jobs, even if one fails.
         jobManager.AddJob(batchJob);
 
         // Create jobs for every song, but only start the first job
@@ -103,7 +106,23 @@ public class BatchIsolateVocalsModSettings : IModSettings
         Job audioSeparationJob = audioSeparationJobs[i];
 
         audioSeparationManager.ProcessSongMetaAsObservable(songMeta, true, audioSeparationJob)
-            // Start next job when finished
+            // Start next job on failure
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogError($"Failed to separate audio of batch song {i + 1} / {songMetas.Count}: {ex.Message}.");
+                Debug.LogException(ex); 
+                
+                int nextIndex = i + 1;
+                if (nextIndex < songMetas.Count)
+                {
+                    StartNextSongInBatch(songMetas, audioSeparationJobs, nextIndex);
+                }
+                else
+                {
+                    Debug.Log($"Finished batch isolation of vocals.");
+                }
+            })
+            // Start next job on success
             .Subscribe(evt =>
             {
                 Debug.Log($"Successfully separated audio of batch song {i + 1} / {songMetas.Count}: {evt}.");
@@ -112,7 +131,7 @@ public class BatchIsolateVocalsModSettings : IModSettings
                 {
                     StartNextSongInBatch(songMetas, audioSeparationJobs, nextIndex);
                 }
-                else 
+                else
                 {
                     Debug.Log($"Finished batch isolation of vocals.");
                 }
@@ -152,13 +171,33 @@ public class BatchIsolateVocalsModSettings : IModSettings
                 toggle.label = SongMetaUtils.GetArtistDashTitle(songMeta);
                 toggle.value = false;
                 toggle.userData = songMeta;
-                
-                toggles.Add(toggle);
 
+                if (!IsSongSupported(songMeta))
+                {
+                    toggle.SetEnabled(false);
+                }
+                toggles.Add(toggle);
                 toggleContainer.Add(toggle);
             }
 
             return toggleContainer;
         }
+
+        private readonly string[] supportedExtensions = { "wav", "mp3", "ogg", "m4a", "wma", "flac" };
+
+        private bool IsSongSupported(SongMeta songMeta)
+        {
+            string audio = songMeta.Audio;
+            string extension = Path.GetExtension(audio).ToLower();
+            if (extension.StartsWith("."))
+            {
+                extension = extension.Substring(1);
+            }
+            bool result = Array.Exists(supportedExtensions, ext => ext.Equals(extension));
+            Debug.Log($"Checking support for {audio}, extension: {extension}, result: {result}");
+            return result;
+        }
+
+
     }
 }

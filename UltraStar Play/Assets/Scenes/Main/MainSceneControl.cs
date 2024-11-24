@@ -5,7 +5,6 @@ using SteamOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -14,13 +13,6 @@ using IBinding = UniInject.IBinding;
 
 public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IBinder
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        hasLoggedVersionInfo = false;
-    }
-    private static bool hasLoggedVersionInfo;
-
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
@@ -129,12 +121,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     private void Start()
     {
-        if (!hasLoggedVersionInfo)
-        {
-            hasLoggedVersionInfo = true;
-            Debug.Log("Version info: " + versionPropertiesTextAsset.text);
-        }
-
         startButton.RegisterCallbackButtonTriggered(_ => OpenSongSelectScene());
         startButton.Focus();
         partyButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.PartyModeScene));

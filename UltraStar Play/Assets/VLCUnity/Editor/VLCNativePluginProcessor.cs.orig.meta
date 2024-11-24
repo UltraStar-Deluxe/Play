@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ecdea068ac083a94f9872e434d26722d
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133979
+  packageName: VLC for Unity (Windows)
+  packageVersion: 0.1.8
+  assetPath: Assets/VLCUnity/Editor/VLCNativePluginProcessor.cs.orig
+  uploadId: 606875

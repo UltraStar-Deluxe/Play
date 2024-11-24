@@ -10,14 +10,20 @@ public static class EndpointHandlerBuilderExtensions
         endpointHandlerBuilder.SetCallback(requestCallback);
         endpointHandlerBuilder.Add();
     }
-    
-    public static EndpointHandlerBuilder SetRequiredPermission(this EndpointHandlerBuilder endpointHandlerBuilder, HttpApiPermission requiredPermission)
+
+    public static EndpointHandlerBuilder SetRequiredPermission(this EndpointHandlerBuilder endpointHandlerBuilder, HttpApiPermission requiredPermission, Settings settings)
     {
+        if (!settings.RequireCompanionClientPermission)
+        {
+            // Permissions are disabled
+            return endpointHandlerBuilder;
+        }
+
         endpointHandlerBuilder.SetCondition(requestData =>
         {
             string clientId = requestData.Context.Request.Headers["client-id"];
             Settings settings = SettingsManager.Instance.Settings;
-            
+
             List<HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, clientId);
             if (permissions.Contains(requiredPermission))
             {
@@ -31,7 +37,7 @@ public static class EndpointHandlerBuilderExtensions
         });
         return endpointHandlerBuilder;
     }
-    
+
     public static EndpointHandlerBuilder AddUserData(this EndpointHandlerBuilder endpointHandlerBuilder, object key, object value)
     {
         endpointHandlerBuilder.UserData[key] = value;
