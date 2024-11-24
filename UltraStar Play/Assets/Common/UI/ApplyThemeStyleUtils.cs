@@ -164,7 +164,10 @@ public static class ApplyThemeStyleUtils
 
     private static void OnListViewFocusChanged(ListViewH listView, bool focused)
     {
-        VisualElement oldSelectedVisualElement = listViewToSelectedVisualElement[listView];
+        if (!listViewToSelectedVisualElement.TryGetValue(listView, out VisualElement oldSelectedVisualElement))
+        {
+            return;
+        }
 
         VisualElement listItem = GetListViewItem(oldSelectedVisualElement);
         if (listItem != null
