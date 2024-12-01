@@ -120,6 +120,10 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
             {
                 result.Add(songQueueEntryDto);
             }
+            else
+            {
+                return result;
+            }
         }
 
         return result;
