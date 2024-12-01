@@ -105,7 +105,27 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         return singSceneData;
     }
 
+    public List<SongQueueEntryDto> GetSongQueueEntries(int index)
+    {
+        List<SongQueueEntryDto> allSongQueueEntries = GetSongQueueEntries().ToList();
+        for (int i = 0; i < index; i++)
+        {
+            List<SongQueueEntryDto> peekedSongQueueEntries = PeekNextSongQueueEntries(allSongQueueEntries);
+            if (i == index)
+            {
+                return peekedSongQueueEntries;
+            }
+        }
+
+        return null;
+    }
+
     public List<SongQueueEntryDto> PeekNextSongQueueEntries()
+    {
+        return PeekNextSongQueueEntries(GetSongQueueEntries());
+    }
+
+    private List<SongQueueEntryDto> PeekNextSongQueueEntries(IReadOnlyList<SongQueueEntryDto> allSongQueueEntries)
     {
         if (IsSongQueueEmpty)
         {
@@ -113,7 +133,7 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         List<SongQueueEntryDto> result = new();
-        foreach (SongQueueEntryDto songQueueEntryDto in GetSongQueueEntries())
+        foreach (SongQueueEntryDto songQueueEntryDto in allSongQueueEntries)
         {
             if (result.IsNullOrEmpty()
                 || songQueueEntryDto.IsMedleyWithPreviousEntry)

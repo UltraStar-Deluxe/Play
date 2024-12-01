@@ -251,17 +251,19 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                 }
             });
 
-        contextMenuPopup.AddButton(Translation.Get(R.Messages.songQueue_action_add), "playlist_add",
+        VisualElement enqueueMenuEntry = contextMenuPopup.AddButton(Translation.Get(R.Messages.songQueue_action_add), "playlist_add",
             () =>
             {
                 songSelectSceneControl.AddSongToSongQueue(songEntry.SongMeta);
             });
+        enqueueMenuEntry.Q<Button>().name = "enqueueButton";
 
-        contextMenuPopup.AddButton(Translation.Get(R.Messages.songQueue_action_addAsMedley), "link",
+        VisualElement enqueueAsMenuEntry = contextMenuPopup.AddButton(Translation.Get(R.Messages.songQueue_action_addAsMedley), "link",
             () =>
             {
                 songSelectSceneControl.AddSongToSongQueueAsMedley(songEntry.SongMeta);
             });
+        enqueueAsMenuEntry.Q<Button>().name = "enqueueAsMedleyButton";
 
         // Open song editor / song folder
         contextMenuPopup.AddButton(Translation.Get(R.Messages.action_openSongEditor), "edit",
