@@ -550,26 +550,36 @@ public static class SongMetaUtils
 
     public static int GetMedleyStartBeat(SongMeta songMeta)
     {
-        if (songMeta.MedleyStartInMillis > 0)
-        {
-            return (int)SongMetaBpmUtils.MillisToBeats(songMeta, songMeta.MedleyStartInMillis);
-        }
-        else
-        {
-            return GetDefaultMedleyStartBeat(songMeta);
-        }
+        return HasSpecifiedMedleyStartBeat(songMeta)
+            ? GetSpecifiedMedleyStartBeat(songMeta)
+            : GetDefaultMedleyStartBeat(songMeta);
     }
 
     public static int GetMedleyEndBeat(SongMeta songMeta, int targetDurationInSeconds)
     {
-        if (songMeta.MedleyEndInMillis > 0)
-        {
-            return (int)SongMetaBpmUtils.MillisToBeats(songMeta, songMeta.MedleyEndInMillis);
-        }
-        else
-        {
-            return GetDefaultMedleyEndBeat(songMeta, targetDurationInSeconds);
-        }
+        return HasSpecifiedMedleyEndBeat(songMeta)
+             ? GetSpecifiedMedleyEndBeat(songMeta)
+             : GetDefaultMedleyEndBeat(songMeta, targetDurationInSeconds);
+    }
+
+    private static int GetSpecifiedMedleyStartBeat(SongMeta songMeta)
+    {
+        return (int)SongMetaBpmUtils.MillisToBeats(songMeta, songMeta.MedleyStartInMillis);
+    }
+
+    private static bool HasSpecifiedMedleyStartBeat(SongMeta songMeta)
+    {
+        return NumberUtils.IsDistanceGreaterThan(songMeta.MedleyStartInMillis, 0, 1);
+    }
+
+    private static int GetSpecifiedMedleyEndBeat(SongMeta songMeta)
+    {
+        return (int)SongMetaBpmUtils.MillisToBeats(songMeta, songMeta.MedleyEndInMillis);
+    }
+
+    private static bool HasSpecifiedMedleyEndBeat(SongMeta songMeta)
+    {
+        return NumberUtils.IsDistanceGreaterThan(songMeta.MedleyEndInMillis, 0, 1);
     }
 
     private static int GetDefaultMedleyStartBeat(SongMeta songMeta)
@@ -594,7 +604,7 @@ public static class SongMetaUtils
 
     private static int GetDefaultMedleyEndBeat(SongMeta songMeta, int targetDurationInSeconds)
     {
-        // End the medley approx. 30 seconds afterward the start.
+        // End the medley several seconds after the medley start.
         int medleyStartBeta = GetMedleyStartBeat(songMeta);
         int targetDurationInBeats = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, targetDurationInSeconds * 1000);
         int targetEndBeat = medleyStartBeta + targetDurationInBeats;
