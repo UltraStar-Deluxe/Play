@@ -898,7 +898,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         return singScenePlayerData;
     }
 
-    private void StartSingSceneWithNextSongQueueEntry()
+    public void StartSingSceneWithNextSongQueueEntry()
     {
         if (songQueueManager.IsSongQueueEmpty)
         {

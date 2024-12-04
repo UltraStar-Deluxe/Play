@@ -107,17 +107,23 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
 
     public List<SongQueueEntryDto> GetSongQueueEntries(int index)
     {
-        List<SongQueueEntryDto> allSongQueueEntries = GetSongQueueEntries().ToList();
-        for (int i = 0; i < index; i++)
+        List<SongQueueEntryDto> remainingSongQueueEntries = GetSongQueueEntries().ToList();
+        for (int i = 0; i <= index; i++)
         {
-            List<SongQueueEntryDto> peekedSongQueueEntries = PeekNextSongQueueEntries(allSongQueueEntries);
+            List<SongQueueEntryDto> peekedSongQueueEntries = PeekNextSongQueueEntries(remainingSongQueueEntries);
             if (i == index)
             {
                 return peekedSongQueueEntries;
             }
+            else if (peekedSongQueueEntries.IsNullOrEmpty())
+            {
+                return new List<SongQueueEntryDto>();
+            }
+
+            remainingSongQueueEntries.RemoveAll(peekedSongQueueEntries);
         }
 
-        return null;
+        return new List<SongQueueEntryDto>();
     }
 
     public List<SongQueueEntryDto> PeekNextSongQueueEntries()
@@ -129,7 +135,7 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
     {
         if (IsSongQueueEmpty)
         {
-            return null;
+            return new List<SongQueueEntryDto>();
         }
 
         List<SongQueueEntryDto> result = new();
