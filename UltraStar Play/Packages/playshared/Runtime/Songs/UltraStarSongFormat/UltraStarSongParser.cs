@@ -100,7 +100,7 @@ public static class UltraStarSongParser
         {
             try
             {
-                ApplyOptionalHeaderField(songMeta, item.Key, item.Value);
+                ApplyOptionalHeaderField(songMeta, item.Key, item.Value, songIssues);
             }
             catch (Exception ex)
             {
@@ -310,7 +310,7 @@ public static class UltraStarSongParser
         }
     }
 
-    private static void ApplyOptionalHeaderField(UltraStarSongMeta songMeta, string key, string value)
+    private static void ApplyOptionalHeaderField(UltraStarSongMeta songMeta, string key, string value, List<SongIssue> songIssues)
     {
         switch (key)
         {
@@ -429,8 +429,27 @@ public static class UltraStarSongParser
             case "YEAR":
                 songMeta.Year = (uint)ParseNumber(key, value);
                 break;
-            default:
+            case "AUDIOAUTHOR":
+            case "AUDIOLICENSE":
+            case "AUDIOSOURCE":
+            case "BACKGROUNDAUTHOR":
+            case "BACKGROUNDLICENSE":
+            case "BACKGROUNDSOURCE":
+            case "CREATOR":
+            case "ENCODING":
+            case "FIXER":
+            case "P1":
+            case "P2":
+                // Known additional header entry
                 songMeta.SetAdditionalHeaderEntry(key, value);
+                break;
+            default:
+                // Unknown additional header entry
+                songMeta.SetAdditionalHeaderEntry(key, value);
+                Debug.LogWarning($"Unknown header field: key '{key}', value '{value}'");
+                songIssues.Add(SongIssue.CreateWarning(songMeta, Translation.Get("songIssue_headerField_unknown",
+                    "key", key,
+                    "value", value)));
                 break;
         }
     }

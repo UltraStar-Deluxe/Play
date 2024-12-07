@@ -661,6 +661,7 @@ public static partial class R
         public static readonly string songIssue_headerField = "songIssue_headerField";
         public static readonly string songIssue_headerField_duplicate = "songIssue_headerField_duplicate";
         public static readonly string songIssue_headerField_invalidFormat = "songIssue_headerField_invalidFormat";
+        public static readonly string songIssue_headerField_unknown = "songIssue_headerField_unknown";
         public static readonly string songIssue_media_missingAudioAndUnsupportedWebsite = "songIssue_media_missingAudioAndUnsupportedWebsite";
         public static readonly string songIssue_media_notFound = "songIssue_media_notFound";
         public static readonly string songIssue_media_unsupported = "songIssue_media_unsupported";
