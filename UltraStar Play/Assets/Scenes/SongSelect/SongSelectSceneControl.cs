@@ -947,7 +947,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
         {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason, "reason", "Failed to load txt file"));
+            return;
+        }
+
+        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        {
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioNotFound));
             return;
         }
 
