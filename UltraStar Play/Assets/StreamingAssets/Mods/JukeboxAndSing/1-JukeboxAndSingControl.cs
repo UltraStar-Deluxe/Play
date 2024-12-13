@@ -28,6 +28,9 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
+    private JukeboxAndSingModSettings modSettings;
+
     private List<VisualElement> singingUiElements = new List<VisualElement>();
 
     private bool isFinishing;
@@ -43,7 +46,11 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
 
         isInjectionFinished = true;
         singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.playerUiContainer).ToList());
-        singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.bottomLyricsContainer).ToList());
+        if (modSettings.HideLyrics)
+        {
+            singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.bottomLyricsContainer).ToList());
+            singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.topLyricsContainer).ToList());
+        }
 
         CreateModInfoLabel();
 
