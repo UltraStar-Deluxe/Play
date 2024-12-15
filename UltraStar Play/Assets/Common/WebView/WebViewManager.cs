@@ -72,7 +72,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private bool IsFullyLoaded => DurationInMillis > 0;
+    private bool IsFullyLoaded => IsContentLoaded && DurationInMillis > 0;
 
     private long receivedPositionUpdatedTimeInMillis;
     private double receivedPositionInMillis;
@@ -115,7 +115,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
             // The embedded browser does not consider AudioListener.volume. Thus, this must be considered here explicitly.
             float jsVolume = AudioListener.volume * NumberUtils.PercentToFactor(volumeInPercent) * 100;
-            ExecuteJavaScript($"setVolume({jsVolume})");
+            ExecuteSetVolume(jsVolume);
         }
     }
 
@@ -557,7 +557,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             if (isContentLoaded && isLoadingUrlOfSameHost && javaScriptCanLoadUrl)
             {
                 Debug.Log("Loading new URL via JavaScript");
-                ExecuteJavaScript($"setVolume(0)");
+                ExecuteSetVolume(0);
                 ExecuteJavaScript($"loadUrl('{url}')");
             }
             else
@@ -617,7 +617,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
         isPlaying = false;
         ExecuteJavaScript("pausePlayback()");
-        ExecuteJavaScript("setVolume(0)");
+        ExecuteSetVolume(0);
     }
 
     public void StopPlayback()
@@ -670,9 +670,20 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         SetWebViewRenderTexture(defaultRenderTexture);
     }
 
+    private void ExecuteSetVolume(float volume)
+    {
+        ExecuteJavaScript($"setVolume({volume})");
+    }
+
     private void ExecuteJavaScript(string javaScript)
     {
-        Log.Verbose(() => $"Executing JavaScript in WebView: {javaScript}");
+        if (!IsFullyLoaded)
+        {
+            Log.Verbose(() => $"Not executing JavaScript because WebView not fully loaded yet: '{javaScript}'");
+            return;
+        }
+
+        Log.Verbose(() => $"Executing JavaScript in WebView: '{javaScript}'");
         webView.ExecuteJavaScript(javaScript, null);
     }
 }
