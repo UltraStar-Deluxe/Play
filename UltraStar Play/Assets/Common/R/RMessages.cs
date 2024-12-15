@@ -693,6 +693,7 @@ public static partial class R
         public static readonly string songSelectScene_highscore = "songSelectScene_highscore";
         public static readonly string songSelectScene_loadingSongs_title = "songSelectScene_loadingSongs_title";
         public static readonly string songSelectScene_lyricsDialog_title = "songSelectScene_lyricsDialog_title";
+        public static readonly string songSelectScene_menu_title = "songSelectScene_menu_title";
         public static readonly string songSelectScene_missingMicDialog_ignoreAndStart = "songSelectScene_missingMicDialog_ignoreAndStart";
         public static readonly string songSelectScene_missingMicDialog_message = "songSelectScene_missingMicDialog_message";
         public static readonly string songSelectScene_missingMicDialog_title = "songSelectScene_missingMicDialog_title";

@@ -24,6 +24,9 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
     private Settings settings;
 
     [Inject]
+    private GameObject gameObject;
+
+    [Inject]
     private SongSearchControl songSearchControl;
 
     [Inject]
@@ -123,7 +126,10 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         {
             songIndexLabel.AddToClassList("smallFont");
         }
-        entryIndexContainer.SetVisibleByDisplay(settings.ShowSongIndexInSongSelect);
+
+        settings.ObserveEveryValueChanged(_ => settings.ShowSongIndexInSongSelect)
+            .Subscribe(newValue => entryIndexContainer.SetVisibleByDisplay(newValue))
+            .AddTo(gameObject);
     }
 
     private void OpenHighScoreScene()

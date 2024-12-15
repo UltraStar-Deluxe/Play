@@ -6,11 +6,37 @@ using System.Text;
 using NHyphenator;
 using NHyphenator.Loaders;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public static class SettingsUtils
 {
     private const string DefaultSpeechRecognitionModelPathInStreamingAssets = "SpeechRecognitionModels/WhisperModels/ggml-tiny.bin";
     private const string DefaultSpeechRecognitionLanguage = "auto";
+
+    public static bool IsCoopModeEnabled(Settings settings)
+    {
+        return settings.ScoreMode == EScoreMode.CommonAverage;
+    }
+
+    public static void SetCoopModeEnabled(Settings settings, bool newValue)
+    {
+        if (IsCoopModeEnabled(settings) != newValue)
+        {
+            ToggleCoopModeEnabled(settings);
+        }
+    }
+
+    public static void ToggleCoopModeEnabled(Settings settings)
+    {
+        if (settings.ScoreMode == EScoreMode.CommonAverage)
+        {
+            settings.ScoreMode = EScoreMode.Individual;
+        }
+        else
+        {
+            settings.ScoreMode = EScoreMode.CommonAverage;
+        }
+    }
 
     public static CultureInfo GetCultureInfo(ISettings settings)
     {

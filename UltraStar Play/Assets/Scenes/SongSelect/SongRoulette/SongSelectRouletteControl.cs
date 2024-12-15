@@ -142,9 +142,14 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         }, TrickleDown.TrickleDown);
 
         // Hide scroll bars
-        songListViewScrollView.horizontalScrollerVisibility = settings.ShowScrollBarInSongSelect
-            ? ScrollerVisibility.Auto
-            : ScrollerVisibility.Hidden;
+        settings.ObserveEveryValueChanged(_ => settings.ShowScrollBarInSongSelect)
+            .Subscribe(newValue =>
+            {
+                songListViewScrollView.horizontalScrollerVisibility = newValue
+                    ? ScrollerVisibility.Auto
+                    : ScrollerVisibility.Hidden;
+            })
+            .AddTo(gameObject);
         songListViewScrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;
         songListView.makeItem = OnMakeItem;
         songListView.bindItem = OnBindItem;

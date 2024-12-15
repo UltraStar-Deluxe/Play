@@ -8,9 +8,6 @@
             <Chooser name="previewFadeInDurationChooser" label="$options_previewFadeInDuration" wrap-around="true" min-value="0" max-value="5" step-value="0.5" class="noBackgroundInHierarchy" />
             <Chooser name="songBackgroundScaleModeChooser" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="$options_songBackgroundScaleMode" class="noBackgroundInHierarchy" />
             <ui:Toggle name="imageAsCursorToggle" label="$options_useImageAsCursor" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="showSongIndexInSongSelectToggle" label="$options_showIndexInSongSelect" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="showScrollBarInSongSelectToggle" label="$options_showScrollBarInSongSelect" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="navigateFoldersInSongSelectToggle" label="$options_navigateFoldersInSongSelect" class="noBackgroundInHierarchy" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>
