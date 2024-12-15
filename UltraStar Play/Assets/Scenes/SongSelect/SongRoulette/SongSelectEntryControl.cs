@@ -12,6 +12,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 {
     public const float MaxClickDistanceThresholdInPx = 5f;
 
+    private const string NavigateToParentFolderIcon = "↑";
+
     [Inject]
     private SongRouletteControl songRouletteControl;
 
@@ -56,6 +58,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private CreateSingAlongSongControl createSingAlongSongControl;
+
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private AudioSeparationManager audioSeparationManager;
@@ -481,14 +486,25 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         }
         else if (SongSelectEntry is SongSelectFolderEntry folderEntry)
         {
-            songTitle.SetTranslatedText(Translation.Of(folderEntry.DirectoryInfo.Name));
             songArtist.SetTranslatedText(Translation.Empty);
+            songTitle.SetTranslatedText(Translation.Of(GetSongFolderEntryTitle(folderEntry)));
         }
         else
         {
             songTitle.SetTranslatedText(Translation.Empty);
             songArtist.SetTranslatedText(Translation.Empty);
         }
+    }
+
+    private string GetSongFolderEntryTitle(SongSelectFolderEntry folderEntry)
+    {
+        if (SettingsUtils.IsSongFolderNavigationRootFolder(settings, folderEntry.DirectoryInfo)
+            || folderEntry.DirectoryInfo?.FullName == nonPersistentSettings.SongSelectDirectoryInfo?.Parent?.FullName)
+        {
+            return NavigateToParentFolderIcon;
+        }
+
+        return folderEntry.DirectoryInfo.Name;
     }
 
     public void Dispose()

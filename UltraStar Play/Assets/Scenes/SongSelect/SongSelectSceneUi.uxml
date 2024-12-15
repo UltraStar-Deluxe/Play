@@ -67,9 +67,6 @@
                     <MaterialIcon tabindex="-1" name="modifiersActiveIcon" icon="videogame_asset" class="warningFontColor" />
                     <MaterialIcon tabindex="-1" name="modifiersInactiveIcon" icon="videogame_asset_off" />
                 </ui:Button>
-                <ui:Button name="navigateFolderUpButton" class="squareButton transparentButton">
-                    <MaterialIcon name="navigateFolderUpIcon" icon="folder" />
-                </ui:Button>
                 <ui:Button display-tooltip-when-elided="true" name="selectRandomSongButton" class="squareButton transparentButton">
                     <MaterialIcon tabindex="-1" name="selectRandomSongIcon" icon="casino" />
                 </ui:Button>

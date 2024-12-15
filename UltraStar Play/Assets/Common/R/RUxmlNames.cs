@@ -208,6 +208,7 @@ public static partial class R
         public const string freeForAllItemToggle = "freeForAllItemToggle";
         public const string fullscreenModeChooser = "fullscreenModeChooser";
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
+        public const string gameModifierIcon = "gameModifierIcon";
         public const string gameModifiersTitle = "gameModifiersTitle";
         public const string gameOptionsButton = "gameOptionsButton";
         public const string GameRoundModifierDialogUi = "GameRoundModifierDialogUi";
@@ -263,6 +264,7 @@ public static partial class R
         public const string httpServerPortTextField = "httpServerPortTextField";
         public const string icon = "icon";
         public const string iconBar = "iconBar";
+        public const string iconWithTitle = "iconWithTitle";
         public const string ignoreAllFutureVersionsButton = "ignoreAllFutureVersionsButton";
         public const string ignoreThisVersionButton = "ignoreThisVersionButton";
         public const string image = "image";
@@ -457,7 +459,6 @@ public static partial class R
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
         public const string navigateFoldersInSongSelectToggle = "navigateFoldersInSongSelectToggle";
-        public const string navigateFolderUpIcon = "navigateFolderUpIcon";
         public const string newHighscoreContainer = "newHighscoreContainer";
         public const string newHighscoreIcon = "newHighscoreIcon";
         public const string newHighscoreLabel = "newHighscoreLabel";
@@ -821,6 +822,7 @@ public static partial class R
         public const string songPropertiesSideBarContainer = "songPropertiesSideBarContainer";
         public const string songPropertiesTitle = "songPropertiesTitle";
         public const string songPropertyEntryUiRoot = "songPropertyEntryUiRoot";
+        public const string songQueueIcon = "songQueueIcon";
         public const string songQueueLengthContainer = "songQueueLengthContainer";
         public const string songQueueLengthLabel = "songQueueLengthLabel";
         public const string songQueueOverlay = "songQueueOverlay";

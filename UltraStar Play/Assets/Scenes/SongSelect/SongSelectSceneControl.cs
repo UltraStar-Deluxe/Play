@@ -21,8 +21,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     private static readonly ProfilerMarker onInjectionFinishedProfilerMarker = new ProfilerMarker("SongSelectSceneControl.OnInjectionFinished");
     private readonly IComparer<object> songMetaPropertyComparer = new NullOrEmptyValueLastComparer();
 
-    private const string VirtualRootFolderName = "SONG_SELECT_ROOT";
-
     [InjectedInInspector]
     public SongSelectSceneInputControl songSelectSceneInputControl;
 
@@ -79,9 +77,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     [Inject(UxmlName = R.UxmlNames.coopModeToggle)]
     private Toggle coopModeToggle;
-
-    [Inject(UxmlName = R.UxmlNames.navigateFolderUpButton)]
-    private Button navigateFolderUpButton;
 
     [Inject]
     private AchievementEventStream achievementEventStream;
@@ -364,12 +359,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         InitSongRoulette();
 
         importSongsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.SongLibraryOptionsScene)));
-
-        if (settings.NavigateByFoldersInSongSelect)
-        {
-            navigateFolderUpButton.RegisterCallbackButtonTriggered(_ => TryNavigateToParentFolder());
-        }
-        navigateFolderUpButton.SetVisibleByDisplay(settings.NavigateByFoldersInSongSelect);
 
         createSingAlongSongControl.CreatedSingAlongVersionEventStream.Subscribe(processedSongMeta =>
         {
@@ -1129,7 +1118,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         DirectoryInfo oldDirectoryInfo = nonPersistentSettings.SongSelectDirectoryInfo;
         if (oldDirectoryInfo == null
             || oldDirectoryInfo.Parent == null
-            || oldDirectoryInfo.Name == VirtualRootFolderName)
+            || SettingsUtils.IsSongFolderNavigationRootFolder(settings, oldDirectoryInfo))
         {
             return false;
         }
@@ -1139,7 +1128,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                 !settings.DisabledSongFolders.Contains(songFolder)
                 && new DirectoryInfo(songFolder).FullName == oldDirectoryInfo.FullName))
         {
-            nonPersistentSettings.SongSelectDirectoryInfo = new DirectoryInfo(VirtualRootFolderName);
+            nonPersistentSettings.SongSelectDirectoryInfo = new DirectoryInfo(SettingsUtils.SongFolderNavigationVirtualRootFolderName);
         }
         else
         {
@@ -1326,15 +1315,32 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private List<SongMeta> GetFilteredSongMetas()
     {
-        // Ignore prefix for special search syntax
         IPlaylist playlist = SongSelectionPlaylistChooserControl.Selection.Value;
+        bool PlaylistMatches(SongMeta songMeta)
+        {
+            return playlist == null
+                   || playlist.HasSongEntry(songMeta);
+        }
+
+        bool ActiveFiltersMatches(SongMeta songMeta)
+        {
+            return songSelectFilterControl.SongMetaPassesActiveFilters(songMeta);
+        }
+
+        bool CurrentFolderMatches(SongMeta songMeta)
+        {
+            return nonPersistentSettings.SongSelectDirectoryInfo == null
+                   // Typically each song has its own folder. Thus, show a song if its PARENT folder matches the selected folder.
+                   || SongMetaUtils.GetDirectoryInfo(songMeta)?.Parent?.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName
+                   // Show songs that can not be shown otherwise in virtual root folder
+                   || (SongMetaUtils.GetDirectoryInfo(songMeta) == null
+                       && SettingsUtils.IsSongFolderNavigationRootFolder(settings, nonPersistentSettings.SongSelectDirectoryInfo));
+        }
+
         List<SongMeta> filteredSongs = songSearchControl.GetFilteredSongMetas(songMetas)
-            .Where(songMeta => playlist == null
-                            || playlist.HasSongEntry(songMeta))
-            .Where(songMeta => songSelectFilterControl.SongMetaPassesActiveFilters(songMeta))
-            .Where(songMeta => nonPersistentSettings.SongSelectDirectoryInfo == null
-                               // Typically each song has its own folder. Thus, show a song if its PARENT folder matches the selected folder.
-                               || SongMetaUtils.GetDirectoryInfo(songMeta)?.Parent?.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName)
+            .Where(PlaylistMatches)
+            .Where(ActiveFiltersMatches)
+            .Where(CurrentFolderMatches)
             .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
             .ToList();
         return filteredSongs;
@@ -1436,17 +1442,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.UpdateFilteredSongs");
 
-        if (settings.NavigateByFoldersInSongSelect
-            && nonPersistentSettings.SongSelectDirectoryInfo == null)
-        {
-            nonPersistentSettings.SongSelectDirectoryInfo = new DirectoryInfo(VirtualRootFolderName);
-        }
-        else if (!settings.NavigateByFoldersInSongSelect
-                 && nonPersistentSettings.SongSelectDirectoryInfo != null)
-        {
-            nonPersistentSettings.SongSelectDirectoryInfo = null;
-        }
+        // Prepare to navigate by directory if needed
+        UpdateSongSelectDirectoryInfo();
 
+        // Check if filtered songs might have changed
         List<SongMeta> filteredSongMetas = GetFilteredSongMetas();
         if (!filteredSongMetas.IsNullOrEmpty()
             && filteredSongMetas.SequenceEqual(lastSongMetasOfSongRouletteControl)
@@ -1457,14 +1456,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         lastSongMetasOfSongRouletteControl = filteredSongMetas;
         lastDirectoryInfoOfSongRouletteControl = nonPersistentSettings.SongSelectDirectoryInfo;
 
+        // Prepare to update entries
         List<SongSelectEntry> newEntries = new();
 
         // Add folder entries
         if (settings.NavigateByFoldersInSongSelect)
         {
-            List<DirectoryInfo> directoryInfos = GetFilteredDirectoryInfos();
-            newEntries.AddRange(directoryInfos
-                .Select(directoryInfo => new SongSelectFolderEntry(directoryInfo)));
+            newEntries.AddRange(CreateSongSelectFolderEntries());
         }
 
         // Add song entries
@@ -1474,6 +1472,41 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         songRouletteControl.SetEntries(newEntries);
     }
 
+    private List<SongSelectEntry> CreateSongSelectFolderEntries()
+    {
+        List<SongSelectEntry> entries = new();
+
+        // Add entry to navigate to parent folder
+        if (nonPersistentSettings.SongSelectDirectoryInfo.Name != SettingsUtils.SongFolderNavigationVirtualRootFolderName)
+        {
+            DirectoryInfo parentDirectoryInfo = SettingsUtils.IsSongFolderNavigationRootFolder(settings, nonPersistentSettings.SongSelectDirectoryInfo.Parent)
+                    ? new DirectoryInfo(SettingsUtils.SongFolderNavigationVirtualRootFolderName)
+                    : nonPersistentSettings.SongSelectDirectoryInfo.Parent;
+            entries.Add(new SongSelectFolderEntry(parentDirectoryInfo));
+        }
+
+        // Add entries for other files and folders
+        List<DirectoryInfo> directoryInfos = GetFilteredDirectoryInfos();
+        entries.AddRange(directoryInfos
+            .Select(directoryInfo => new SongSelectFolderEntry(directoryInfo)));
+
+        return entries;
+    }
+
+    private void UpdateSongSelectDirectoryInfo()
+    {
+        if (settings.NavigateByFoldersInSongSelect
+            && SettingsUtils.IsSongFolderNavigationRootFolder(settings, nonPersistentSettings.SongSelectDirectoryInfo))
+        {
+            nonPersistentSettings.SongSelectDirectoryInfo = new DirectoryInfo(SettingsUtils.SongFolderNavigationVirtualRootFolderName);
+        }
+        else if (!settings.NavigateByFoldersInSongSelect
+                 && nonPersistentSettings.SongSelectDirectoryInfo != null)
+        {
+            nonPersistentSettings.SongSelectDirectoryInfo = null;
+        }
+    }
+
     private List<DirectoryInfo> GetFilteredDirectoryInfos()
     {
         if (nonPersistentSettings.SongSelectDirectoryInfo == null)
@@ -1481,7 +1514,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return new();
         }
 
-        if (nonPersistentSettings.SongSelectDirectoryInfo.Name == VirtualRootFolderName)
+        if (nonPersistentSettings.SongSelectDirectoryInfo.Name == SettingsUtils.SongFolderNavigationVirtualRootFolderName)
         {
             return settings.SongDirs
                 .Where(songFolder => !settings.DisabledSongFolders.Contains(songFolder))

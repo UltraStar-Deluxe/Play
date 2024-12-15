@@ -1,17 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using NHyphenator;
 using NHyphenator.Loaders;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public static class SettingsUtils
 {
     private const string DefaultSpeechRecognitionModelPathInStreamingAssets = "SpeechRecognitionModels/WhisperModels/ggml-tiny.bin";
     private const string DefaultSpeechRecognitionLanguage = "auto";
+
+    public const string SongFolderNavigationVirtualRootFolderName = "SONG_SELECT_ROOT";
+
+    public static bool IsSongFolderNavigationRootFolder(Settings settings, DirectoryInfo directoryInfo)
+    {
+        return directoryInfo == null
+            || directoryInfo.Name == SongFolderNavigationVirtualRootFolderName
+            || settings.SongDirs
+                .Select(songFolder => new DirectoryInfo(songFolder))
+                .AnyMatch(songFolder => songFolder.Parent?.FullName == directoryInfo.FullName);
+    }
 
     public static bool IsCoopModeEnabled(Settings settings)
     {
