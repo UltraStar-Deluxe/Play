@@ -76,6 +76,7 @@ public static partial class R_PlayShared
         public const string rsetIcon = "rsetIcon";
         public const string songArtist = "songArtist";
         public const string songInfo = "songInfo";
+        public const string songQueueEntriesListView = "songQueueEntriesListView";
         public const string songQueueEntriesScrollView = "songQueueEntriesScrollView";
         public const string songQueueEntryModifierActiveIcon = "songQueueEntryModifierActiveIcon";
         public const string SongQueueEntryUi = "SongQueueEntryUi";

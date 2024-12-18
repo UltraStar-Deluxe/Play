@@ -83,6 +83,11 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
         });
     }
 
+    public void ShowToggleMedleyButton()
+    {
+        toggleMedleyButton.ShowByDisplay();
+    }
+
     public void HideToggleMedleyButton()
     {
         toggleMedleyButton.HideByDisplay();
