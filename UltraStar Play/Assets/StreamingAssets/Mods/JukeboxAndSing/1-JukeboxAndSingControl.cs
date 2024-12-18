@@ -46,6 +46,7 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
 
         isInjectionFinished = true;
         singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.playerUiContainer).ToList());
+        singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.playerInfoContainer).ToList());
         if (modSettings.HideLyrics)
         {
             singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.bottomLyricsContainer).ToList());
