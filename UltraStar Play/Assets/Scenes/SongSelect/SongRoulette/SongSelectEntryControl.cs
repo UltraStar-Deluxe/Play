@@ -12,6 +12,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 {
     public const float MaxClickDistanceThresholdInPx = 5f;
 
+    private const string NavigateToParentFolderIcon = "↑";
+
     [Inject]
     private SongRouletteControl songRouletteControl;
 
@@ -56,6 +58,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private CreateSingAlongSongControl createSingAlongSongControl;
+
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private AudioSeparationManager audioSeparationManager;
@@ -251,17 +256,19 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                 }
             });
 
-        contextMenuPopup.AddButton(Translation.Get(R.Messages.songQueue_action_add), "playlist_add",
+        VisualElement enqueueMenuEntry = contextMenuPopup.AddButton(Translation.Get(R.Messages.songQueue_action_add), "playlist_add",
             () =>
             {
                 songSelectSceneControl.AddSongToSongQueue(songEntry.SongMeta);
             });
+        enqueueMenuEntry.Q<Button>().name = "enqueueButton";
 
-        contextMenuPopup.AddButton(Translation.Get(R.Messages.songQueue_action_addAsMedley), "link",
+        VisualElement enqueueAsMenuEntry = contextMenuPopup.AddButton(Translation.Get(R.Messages.songQueue_action_addAsMedley), "link",
             () =>
             {
                 songSelectSceneControl.AddSongToSongQueueAsMedley(songEntry.SongMeta);
             });
+        enqueueAsMenuEntry.Q<Button>().name = "enqueueAsMedleyButton";
 
         // Open song editor / song folder
         contextMenuPopup.AddButton(Translation.Get(R.Messages.action_openSongEditor), "edit",
@@ -479,14 +486,25 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         }
         else if (SongSelectEntry is SongSelectFolderEntry folderEntry)
         {
-            songTitle.SetTranslatedText(Translation.Of(folderEntry.DirectoryInfo.Name));
             songArtist.SetTranslatedText(Translation.Empty);
+            songTitle.SetTranslatedText(Translation.Of(GetSongFolderEntryTitle(folderEntry)));
         }
         else
         {
             songTitle.SetTranslatedText(Translation.Empty);
             songArtist.SetTranslatedText(Translation.Empty);
         }
+    }
+
+    private string GetSongFolderEntryTitle(SongSelectFolderEntry folderEntry)
+    {
+        if (SettingsUtils.IsSongFolderNavigationRootFolder(settings, folderEntry.DirectoryInfo)
+            || folderEntry.DirectoryInfo?.FullName == nonPersistentSettings.SongSelectDirectoryInfo?.Parent?.FullName)
+        {
+            return NavigateToParentFolderIcon;
+        }
+
+        return folderEntry.DirectoryInfo.Name;
     }
 
     public void Dispose()

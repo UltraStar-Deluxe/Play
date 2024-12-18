@@ -217,4 +217,13 @@ public static class NumberUtils
         }
     }
 
+    public static bool IsDistanceGreaterThan(double from, double to, double threshold)
+    {
+        return Math.Abs(to - from) > threshold;
+    }
+
+    public static bool IsDistanceLessThan(double from, double to, double threshold)
+    {
+        return Math.Abs(to - from) < threshold;
+    }
 }

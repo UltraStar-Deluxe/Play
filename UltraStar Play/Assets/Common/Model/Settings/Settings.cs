@@ -48,7 +48,7 @@ public class Settings : ISettings
     public EDifficulty Difficulty { get; set; } = EDifficulty.Medium;
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;
     public string CommonScoreNameSeparator { get; set; } = new(" & ");
-    public int DefaultMedleyTargetDurationInSeconds { get; set; } = 30;
+    public int DefaultMedleyTargetDurationInSeconds { get; set; } = 40;
     public int ReducedAudioVolumePercent { get; set; } = 1;
     public float PassTheMicTimeInSeconds { get; set; } = 20;
     public bool JokerRuleEnabled { get; set; } = true;

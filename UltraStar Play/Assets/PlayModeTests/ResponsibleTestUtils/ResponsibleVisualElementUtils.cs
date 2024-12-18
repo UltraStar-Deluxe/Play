@@ -39,7 +39,7 @@ public class ResponsibleVisualElementUtils
         => ExpectElementIsFocusableNow(button)
             .ContinueWith(Do(
                 $"click button '{button?.name}'",
-                () => button.Click()));
+                () => button.SendClickEvent()));
 
     public static ITestInstruction<object> SendNavigationSubmitEvent(VisualElement visualElement)
         => ExpectElementIsFocusableNow(visualElement)

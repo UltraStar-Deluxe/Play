@@ -5856,6 +5856,7 @@ public static partial class R
         public const string horizontalGridLine = "horizontalGridLine";
         public const string horizontalSeparatorLine = "horizontalSeparatorLine";
         public const string h_px = "h-px";
+        public const string hyperlink = "hyperlink";
         public const string icon = "icon";
         public const string iconImage = "iconImage";
         public const string ignoreTheme = "ignoreTheme";
@@ -14327,6 +14328,7 @@ public static partial class R
         public const string rounded_bl_xl = "rounded-bl-xl";
         public const string rounded_b_md = "rounded-b-md";
         public const string rounded_b_none = "rounded-b-none";
+        public const string roundedbox = "roundedbox";
         public const string rounded_br = "rounded-br";
         public const string rounded_br_2xl = "rounded-br-2xl";
         public const string rounded_br_3xl = "rounded-br-3xl";

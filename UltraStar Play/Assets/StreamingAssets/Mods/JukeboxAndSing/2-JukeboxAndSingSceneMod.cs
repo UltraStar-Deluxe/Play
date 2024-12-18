@@ -7,6 +7,9 @@ using UnityEngine;
 
 public class JukeboxAndSingSceneMod : ISceneMod
 {
+    [Inject]
+    private JukeboxAndSingModSettings modSettings;
+
     public void OnSceneEntered(SceneEnteredContext sceneEnteredContext)
     {
         if (sceneEnteredContext.Scene != EScene.SingScene)
@@ -21,7 +24,9 @@ public class JukeboxAndSingSceneMod : ISceneMod
             GameObject gameObject = new GameObject();
             JukeboxAndSingControl monoBehaviour = gameObject.AddComponent<JukeboxAndSingControl>();
             monoBehaviour.name = "JukeboxAndSingControl";
-            sceneEnteredContext.SceneInjector.Inject(monoBehaviour);
+            sceneEnteredContext.SceneInjector
+              .WithBindingForInstance(modSettings)
+              .Inject(monoBehaviour);
         }));
     }
 }

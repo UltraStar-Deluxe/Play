@@ -35,7 +35,6 @@
                 <Chooser name="portAudioHostApiChooser" label="PortAudio Host API¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                 <Chooser name="portAudioOutputDeviceChooser" label="PortAudio Output Device" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                 <ui:Button text="Show PortAudio Devices" display-tooltip-when-elided="true" name="portAudioDeviceInfoButton" style="align-self: flex-end;" />
-                <Chooser name="systemAudioBackendDelayChooser" label="System Audio Backend Delay" wrap-around="true" min-value="0" max-value="500" step-value="10" class="noBackgroundInHierarchy" />
                 <Chooser name="pitchDetectionAlgorithmChooser" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />
                 <ui:Toggle name="customEventSystemOptInOnAndroidToggle" label="Use custom event system&#10;for input actions.&#10;This enables better keyboard&#10;and gamepad control&#10;but can cause issues on Android¹" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
             </AccordionItem>

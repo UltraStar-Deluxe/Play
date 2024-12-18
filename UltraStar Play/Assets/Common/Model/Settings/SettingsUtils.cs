@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using NHyphenator;
@@ -11,6 +12,42 @@ public static class SettingsUtils
 {
     private const string DefaultSpeechRecognitionModelPathInStreamingAssets = "SpeechRecognitionModels/WhisperModels/ggml-tiny.bin";
     private const string DefaultSpeechRecognitionLanguage = "auto";
+
+    public const string SongFolderNavigationVirtualRootFolderName = "SONG_SELECT_ROOT";
+
+    public static bool IsSongFolderNavigationRootFolder(Settings settings, DirectoryInfo directoryInfo)
+    {
+        return directoryInfo == null
+            || directoryInfo.Name == SongFolderNavigationVirtualRootFolderName
+            || settings.SongDirs
+                .Select(songFolder => new DirectoryInfo(songFolder))
+                .AnyMatch(songFolder => songFolder.Parent?.FullName == directoryInfo.FullName);
+    }
+
+    public static bool IsCoopModeEnabled(Settings settings)
+    {
+        return settings.ScoreMode == EScoreMode.CommonAverage;
+    }
+
+    public static void SetCoopModeEnabled(Settings settings, bool newValue)
+    {
+        if (IsCoopModeEnabled(settings) != newValue)
+        {
+            ToggleCoopModeEnabled(settings);
+        }
+    }
+
+    public static void ToggleCoopModeEnabled(Settings settings)
+    {
+        if (settings.ScoreMode == EScoreMode.CommonAverage)
+        {
+            settings.ScoreMode = EScoreMode.Individual;
+        }
+        else
+        {
+            settings.ScoreMode = EScoreMode.CommonAverage;
+        }
+    }
 
     public static CultureInfo GetCultureInfo(ISettings settings)
     {

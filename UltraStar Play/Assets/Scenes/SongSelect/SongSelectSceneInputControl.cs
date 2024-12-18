@@ -227,6 +227,10 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSelectSceneControl.OnCancelSearch();
         }
+        else if (songSelectSceneControl.SceneMenuSlideInControl.Visible.Value)
+        {
+            songSelectSceneControl.SceneMenuSlideInControl.SlideOut();
+        }
         else if (songSelectSceneControl.SongQueueSlideInControl.Visible.Value)
         {
             songSelectSceneControl.SongQueueSlideInControl.SlideOut();

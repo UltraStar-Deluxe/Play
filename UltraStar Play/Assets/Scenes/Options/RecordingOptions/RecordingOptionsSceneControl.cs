@@ -102,6 +102,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
     [Inject(UxmlName = R.UxmlNames.micPlaybackVolumeChooser)]
     private Chooser micPlaybackVolumeChooser;
 
+    [Inject(UxmlName = R.UxmlNames.systemAudioBackendDelayChooser)]
+    private Chooser systemAudioBackendDelayChooser;
+
     private SampleRateChooserControl sampleRateChooserControl;
     private LabeledChooserControl<MicProfile> deviceChooserControl;
     private LabeledChooserControl<int> amplificationChooserControl;
@@ -286,6 +289,12 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
             .Subscribe(newValue => micPlaybackVolumeChooser.SetVisibleByDisplay(newValue))
             .AddTo(gameObject);
+
+        // System audio backend delay
+        UnitNumberChooserControl systemAudioBackendDelayChooserControl = new(systemAudioBackendDelayChooser, "ms");
+        systemAudioBackendDelayChooserControl.Bind(
+            () => settings.SystemAudioBackendDelayInMillis,
+            newValue => settings.SystemAudioBackendDelayInMillis = (int)newValue);
     }
 
     private void OnConnectedMicDevicesChanged()
