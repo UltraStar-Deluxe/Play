@@ -169,6 +169,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject(UxmlName = R.UxmlNames.toggleModifiersOverlayButton)]
     private Button toggleModifiersOverlayButton;
 
+    [Inject(UxmlName = R_PlayShared.UxmlNames.resetModifiersButton)]
+    private Button resetModifiersButton;
+
     [Inject(UxmlName = R.UxmlNames.modifiersActiveIcon)]
     private VisualElement modifiersActiveIcon;
 
@@ -258,6 +261,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private DropdownFieldControl<ESongOrder> songOrderDropdownFieldControl;
 
+    private bool AnyModifierOrCoopModeActive => nonPersistentSettings.GameRoundSettings.AnyModifierActive ||
+                                                SettingsUtils.IsCoopModeEnabled(settings);
+
     public void OnInjectionFinished()
     {
         using IDisposable d = onInjectionFinishedProfilerMarker.Auto();
@@ -315,6 +321,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             settings.SongOrder = newValue;
             UpdateFilteredSongs();
         });
+
+        resetModifiersButton.RegisterCallbackButtonTriggered(_ => ResetCoopMode());
 
         selectRandomSongButton.RegisterCallbackButtonTriggered(_ => SelectRandomSong());
         FieldBindingUtils.Bind(searchExpressionToggle,
@@ -375,6 +383,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         InitSceneMenu();
 
         UpdateSceneTitle();
+    }
+
+    private void ResetCoopMode()
+    {
+        if (SettingsUtils.IsCoopModeEnabled(settings))
+        {
+            SettingsUtils.SetCoopModeEnabled(settings, false);
+        }
     }
 
     private void InitSceneMenu()
@@ -473,7 +489,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         // Modifier active icon
         modifiersActiveIcon.HideByDisplay();
-        nonPersistentSettings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierActive)
+        nonPersistentSettings.ObserveEveryValueChanged(_ => AnyModifierOrCoopModeActive)
             .Subscribe(_ => UpdateModifiersActiveIcon());
 
         // Delay initialization of modifier dialog control
@@ -516,8 +532,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void UpdateModifiersActiveIcon()
     {
-        modifiersActiveIcon.SetVisibleByDisplay(nonPersistentSettings.GameRoundSettings.AnyModifierActive);
-        modifiersInactiveIcon.SetVisibleByDisplay(!nonPersistentSettings.GameRoundSettings.AnyModifierActive);
+        modifiersActiveIcon.SetVisibleByDisplay(AnyModifierOrCoopModeActive);
+        modifiersInactiveIcon.SetVisibleByDisplay(!AnyModifierOrCoopModeActive);
     }
 
     private void InitDifficultyAndScoreMode()
@@ -538,7 +554,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         UpdateDifficultyAndScoreModeControls();
 
-        FieldBindingUtils.Bind(coopModeToggle,
+        FieldBindingUtils.Bind(
+            gameObject,
+            coopModeToggle,
             () => SettingsUtils.IsCoopModeEnabled(settings),
             newValue =>
             {
