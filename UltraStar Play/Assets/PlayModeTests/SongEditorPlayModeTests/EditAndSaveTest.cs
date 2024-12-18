@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -85,13 +86,9 @@ public class EditAndSaveTest : AbstractPlayModeTest
 
         // Assert changes have been persisted and loaded as expected
         SongMeta loadedEditedSongMeta = new LazyLoadedFromFileSongMeta(copiedSongMetaPath);
-        string expectedJson = JsonConverter.ToJson(editedSongMeta);
-        string actualJson = JsonConverter.ToJson(loadedEditedSongMeta);
-        Debug.Log($"Expected JSON: {expectedJson}");
-        Debug.Log($"Actual JSON: {actualJson}");
-        Assert.AreEqual(expectedJson, actualJson);
+        SongMetaAssertUtils.AssertSongMetasAreEqual(editedSongMeta, loadedEditedSongMeta);
 
         // Assert that there is a change compared to the original song
-        Assert.AreNotEqual(JsonConverter.ToJson(originalSongMetaPath), JsonConverter.ToJson(loadedEditedSongMeta));
+        Assert.Throws<AssertionException>(() => SongMetaAssertUtils.AssertSongMetasAreEqual(originalSongMeta, loadedEditedSongMeta));
     }
 }
