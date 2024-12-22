@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UniInject;
-using UnityEngine;
+using UniRx;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -13,30 +14,33 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
     private VisualTreeAsset songQueueEntryUi;
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.songQueueEntriesListView)]
-    private ListView songQueueEntriesListView;
+    private ListView listView;
 
     [Inject]
     private Injector injector;
 
-    private List<SongQueueEntryDto> songQueueEntryDtos = new List<SongQueueEntryDto>();
+    private ListViewReorderByDragAndDropControl listViewReorderByDragAndDropControl;
+
+    private IReadOnlyList<SongQueueEntryDto> songQueueEntryDtos = new List<SongQueueEntryDto>();
 
     public Action<SongQueueEntryDto> OnDelete { get; set; }
     public Action<SongQueueEntryDto> OnToggleMedley { get; set; }
+    public Action<List<SongQueueEntryDto>> OnReorderedList { get; set; }
 
     public void OnInjectionFinished()
     {
-        songQueueEntriesListView.makeItem = OnMakeItem;
-        songQueueEntriesListView.bindItem = OnBindItem;
-        songQueueEntriesListView.unbindItem = OnUnbindItem;
-        songQueueEntriesListView.handleDrop += OnHandleDrop;
+        listView.makeItem = OnMakeItem;
+        listView.bindItem = OnBindItem;
+        listView.unbindItem = OnUnbindItem;
+
+        listViewReorderByDragAndDropControl = new ListViewReorderByDragAndDropControl(listView);
+        listViewReorderByDragAndDropControl.ReorderEventStream
+            .Subscribe(evt =>
+            {
+                OnReorderedList?.Invoke(evt.UpdatedItemsSource as List<SongQueueEntryDto>);
+            });
 
         Clear();
-    }
-
-    private UnityEngine.UIElements.DragVisualMode OnHandleDrop(HandleDragAndDropArgs arg)
-    {
-        Debug.Log("OnHandleDrop");
-        return UnityEngine.UIElements.DragVisualMode.Move;
     }
 
     private void OnBindItem(VisualElement element, int index)
@@ -44,8 +48,7 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
         SongQueueEntryUiControl entryControl = element.userData as SongQueueEntryUiControl;
         SongQueueEntryDto songQueueEntryDto = songQueueEntryDtos[index];
 
-        // TODO: implement
-        // entryControl.SongQueueEntryDto = songQueueEntryDto;
+        entryControl.SongQueueEntryDto = songQueueEntryDto;
         entryControl.OnDelete = () => OnDelete?.Invoke(songQueueEntryDto);
         entryControl.OnToggleMedley = () => OnToggleMedley?.Invoke(songQueueEntryDto);
 
@@ -60,27 +63,18 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         // Remove borders of medley entries.
-        if (songQueueEntryDto.IsMedleyWithPreviousEntry)
-        {
-            element.AddToClassList("medleyWithPrevious");
-        }
-
         SongQueueEntryDto nextSongQueueEntryDto = CollectionUtils.SafeGet(songQueueEntryDtos, index + 1, null);
-        if (nextSongQueueEntryDto != null
-            && nextSongQueueEntryDto.IsMedleyWithPreviousEntry)
-        {
-            element.AddToClassList("medleyWithNext");
-        }
+        element.EnableInClassList("medleyWithPrevious", songQueueEntryDto.IsMedleyWithPreviousEntry);
+        element.EnableInClassList("medleyWithNext", nextSongQueueEntryDto?.IsMedleyWithPreviousEntry ?? false);
     }
 
     private void OnUnbindItem(VisualElement element, int index)
     {
         SongQueueEntryUiControl entryControl = element.userData as SongQueueEntryUiControl;
 
-        // TODO: implement
-        // entryControl.SongQueueEntryDto = null;
-        entryControl.OnDelete = () => { };
-        entryControl.OnToggleMedley = () => { };
+        entryControl.SongQueueEntryDto = null;
+        entryControl.OnDelete = null;
+        entryControl.OnToggleMedley = null;
     }
 
     private VisualElement OnMakeItem()
@@ -98,9 +92,9 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
         // Remember focus
         // int focusedIndex = -1;
         // bool wasToggleMedleyButtonFocused = false;
-        // VisualElement focusedElement = VisualElementUtils.GetFocusedVisualElement(songQueueEntriesListView.focusController);
+        // VisualElement focusedElement = VisualElementUtils.GetFocusedVisualElement(listView.focusController);
         // if (focusedElement != null
-        //     && focusedElement.GetAncestors().Contains(songQueueEntriesListView))
+        //     && focusedElement.GetAncestors().Contains(listView))
         // {
         //     // Search index of focused element
         //     SongQueueEntryUiControl focusedSongQueueEntryUiControl = SongQueueEntryControls.FirstOrDefault(control => focusedElement.GetAncestors().Contains(control.VisualElement));
@@ -114,7 +108,8 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
         //     }
         // }
 
-        songQueueEntriesListView.itemsSource = this.songQueueEntryDtos;
+        this.songQueueEntryDtos = songQueueEntryDtos;
+        listView.itemsSource = this.songQueueEntryDtos.ToList();
 
         // Restore focus
         // focusedIndex = Math.Min(focusedIndex, SongQueueEntryControls.Count - 1);

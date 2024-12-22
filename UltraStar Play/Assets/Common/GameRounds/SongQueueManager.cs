@@ -40,6 +40,13 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         return Instance;
     }
 
+    public void SetSongQueueEntries(List<SongQueueEntryDto> songQueueEntryDtos)
+    {
+        this.songQueueEntryDtos.Clear();
+        this.songQueueEntryDtos.AddRange(songQueueEntryDtos);
+        songQueueChangedEventStream.OnNext(new SongQueueChangedEvent(this.songQueueEntryDtos));
+    }
+
     public void AddSongQueueEntry(SongQueueEntryDto songQueueEntryDto)
     {
         songQueueEntryDtos.Add(songQueueEntryDto);
