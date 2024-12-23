@@ -50,6 +50,7 @@ public class ListViewReorderByDragAndDropControl
         }
 
         MoveItem(listView.itemsSource, sourceIndex, targetIndex);
+        listView.SetSelection(targetIndex);
         listView.RefreshItems();
 
         Debug.Log($"OnHandleDrop: sourceIndex: {sourceIndex}, targetIndex: {targetIndex}, items: {JsonConverter.ToJson(listView.itemsSource)}");
