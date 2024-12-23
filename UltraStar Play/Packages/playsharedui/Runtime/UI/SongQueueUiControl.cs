@@ -26,6 +26,7 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
     public Action<SongQueueEntryDto> OnDelete { get; set; }
     public Action<SongQueueEntryDto> OnToggleMedley { get; set; }
     public Action<List<SongQueueEntryDto>> OnReorderedList { get; set; }
+    public bool HasWriteSongQueuePermission { get; set; } = true;
 
     public void OnInjectionFinished()
     {
@@ -66,6 +67,14 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
         SongQueueEntryDto nextSongQueueEntryDto = CollectionUtils.SafeGet(songQueueEntryDtos, index + 1, null);
         element.EnableInClassList("medleyWithPrevious", songQueueEntryDto.IsMedleyWithPreviousEntry);
         element.EnableInClassList("medleyWithNext", nextSongQueueEntryDto?.IsMedleyWithPreviousEntry ?? false);
+
+        // Hide controls if missing permissions
+        if (!HasWriteSongQueuePermission)
+        {
+            entryControl.HideControls();
+            listView.reorderable = false;
+        }
+        listView.reorderable = HasWriteSongQueuePermission;
     }
 
     private void OnUnbindItem(VisualElement element, int index)
@@ -89,45 +98,8 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
 
     public void SetSongQueueEntryDtos(IReadOnlyList<SongQueueEntryDto> songQueueEntryDtos)
     {
-        // Remember focus
-        // int focusedIndex = -1;
-        // bool wasToggleMedleyButtonFocused = false;
-        // VisualElement focusedElement = VisualElementUtils.GetFocusedVisualElement(listView.focusController);
-        // if (focusedElement != null
-        //     && focusedElement.GetAncestors().Contains(listView))
-        // {
-        //     // Search index of focused element
-        //     SongQueueEntryUiControl focusedSongQueueEntryUiControl = SongQueueEntryControls.FirstOrDefault(control => focusedElement.GetAncestors().Contains(control.VisualElement));
-        //     if (focusedSongQueueEntryUiControl != null)
-        //     {
-        //         focusedIndex = SongQueueEntryControls.IndexOf(focusedSongQueueEntryUiControl);
-        //         if (focusedIndex >= 0)
-        //         {
-        //             wasToggleMedleyButtonFocused = focusedElement.name == R_PlayShared.UxmlNames.toggleMedleyButton;
-        //         }
-        //     }
-        // }
-
         this.songQueueEntryDtos = songQueueEntryDtos;
         listView.itemsSource = this.songQueueEntryDtos.ToList();
-
-        // Restore focus
-        // focusedIndex = Math.Min(focusedIndex, SongQueueEntryControls.Count - 1);
-        // if (focusedIndex >= 0)
-        // {
-        //     SongQueueEntryUiControl focusedSongQueueEntryUiControl = SongQueueEntryControls[focusedIndex];
-        //     if (focusedSongQueueEntryUiControl != null)
-        //     {
-        //         if (wasToggleMedleyButtonFocused)
-        //         {
-        //             focusedSongQueueEntryUiControl.ToggleMedleyButton?.Focus();
-        //         }
-        //         else
-        //         {
-        //             focusedSongQueueEntryUiControl.DeleteButton?.Focus();
-        //         }
-        //     }
-        // }
     }
 
     public void Clear()

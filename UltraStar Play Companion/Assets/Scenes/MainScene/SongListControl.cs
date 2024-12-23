@@ -56,13 +56,14 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
     [Inject]
     private Injector injector;
 
+    [Inject(UxmlName = R_PlayShared.UxmlNames.songQueueEntriesListView)]
+    private ListView listView;
+
     private readonly TabGroupControl tabGroupControl = new();
     private readonly SongDetailsControl songDetailsControl = new();
     private readonly SongQueueUiControl songQueueUiControl = new();
 
-    private List<SongQueueEntryDto> SongQueueEntryDtos => songQueueUiControl.SongQueueEntryControls
-        .Select(control => control.SongQueueEntryDto)
-        .ToList();
+    private List<SongQueueEntryDto> songQueueEntryDtos = new();
 
     private ScrollView songListViewScrollView;
     private Vector2 songListViewScrollPosBeforeHide = new Vector2(-1, -1);
@@ -162,7 +163,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
     private void DeleteSongQueueEntry(SongQueueEntryDto entry)
     {
         mainGameHttpClient.DeleteRequest(HttpApiEndpointPaths.SongQueueEntryIndex
-                .ReplaceOrThrow("{index}", SongQueueEntryDtos.IndexOf(entry).ToString()),
+                .ReplaceOrThrow("{index}", songQueueEntryDtos.IndexOf(entry).ToString()),
             response =>
             {
                 UpdateSongQueue();
@@ -177,7 +178,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
     {
         entry.IsMedleyWithPreviousEntry = !entry.IsMedleyWithPreviousEntry;
         mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntryIndex
-                .ReplaceOrThrow("{index}", SongQueueEntryDtos.IndexOf(entry).ToString()),
+                .ReplaceOrThrow("{index}", songQueueEntryDtos.IndexOf(entry).ToString()),
             entry.ToJson(),
             MimeTypeUtils.ApplicationJson,
             response =>
@@ -209,12 +210,10 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
                     return;
                 }
 
-                songQueueUiControl.SetSongQueueEntryDtos(listDto.Items);
+                songQueueUiControl.HasWriteSongQueuePermission = mainGameHttpClient.Permissions.Value.Contains(HttpApiPermission.WriteSongQueue);
 
-                if (!mainGameHttpClient.Permissions.Value.Contains(HttpApiPermission.WriteSongQueue))
-                {
-                    songQueueUiControl.HideControls();
-                }
+                songQueueEntryDtos = listDto.Items;
+                songQueueUiControl.SetSongQueueEntryDtos(songQueueEntryDtos);
             },
             ex =>
             {

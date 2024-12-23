@@ -85,7 +85,7 @@ public class SongQueueEntryUiControl : INeedInjection
     public void HideControls()
     {
         deleteButton.HideByDisplay();
-        toggleMedleyButton.HideByDisplay();
+        HideToggleMedleyButton();
     }
 
     private void UpdateSongQueueEntryUi()

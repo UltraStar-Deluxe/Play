@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Linq;
 using UniRx;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 public class ListViewReorderByDragAndDropControl
@@ -52,8 +51,6 @@ public class ListViewReorderByDragAndDropControl
         MoveItem(listView.itemsSource, sourceIndex, targetIndex);
         listView.SetSelection(targetIndex);
         listView.RefreshItems();
-
-        Debug.Log($"OnHandleDrop: sourceIndex: {sourceIndex}, targetIndex: {targetIndex}, items: {JsonConverter.ToJson(listView.itemsSource)}");
 
         reorderEventStream.OnNext(new ReorderedEvent(sourceIndex, targetIndex, listView.itemsSource));
 
