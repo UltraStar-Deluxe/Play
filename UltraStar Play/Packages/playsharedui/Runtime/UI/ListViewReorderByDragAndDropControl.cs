@@ -60,7 +60,7 @@ public class ListViewReorderByDragAndDropControl
         return UnityEngine.UIElements.DragVisualMode.Move;
     }
 
-    static void MoveItem(IList list, int sourceIndex, int targetIndex)
+    private static void MoveItem(IList list, int sourceIndex, int targetIndex)
     {
         if (sourceIndex < 0
             || sourceIndex >= list.Count)
