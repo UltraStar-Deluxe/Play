@@ -77,14 +77,11 @@ public static partial class R_PlayShared
         public const string songArtist = "songArtist";
         public const string songInfo = "songInfo";
         public const string songQueueEntriesListView = "songQueueEntriesListView";
-        public const string songQueueEntriesScrollView = "songQueueEntriesScrollView";
         public const string songQueueEntryModifierActiveIcon = "songQueueEntryModifierActiveIcon";
-        public const string SongQueueEntryUi = "SongQueueEntryUi";
         public const string songQueueEntryUiRoot = "songQueueEntryUiRoot";
         public const string SongQueuePlayerEntryUi = "SongQueuePlayerEntryUi";
         public const string songQueueUiRoot = "songQueueUiRoot";
         public const string SongSelectGameRoundPlayerEntryUi = "SongSelectGameRoundPlayerEntryUi";
-        public const string SongSelectGameRoundUi = "SongSelectGameRoundUi";
         public const string songTitle = "songTitle";
         public const string spacer = "spacer";
         public const string toggleAccordionItemContentButton = "toggleAccordionItemContentButton";
