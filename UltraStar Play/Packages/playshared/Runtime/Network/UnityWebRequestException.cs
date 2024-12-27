@@ -6,7 +6,7 @@ public class UnityWebRequestException : Exception
     public UnityWebRequest UnityWebRequest { get; private set; }
 
     public UnityWebRequestException(UnityWebRequest unityWebRequest)
-        : base($"UnityWebRequest failed with result: {unityWebRequest.result}. Message: {unityWebRequest.error}")
+        : base($"UnityWebRequest failed: method '{unityWebRequest.method}', url '{unityWebRequest.url}', result '{unityWebRequest.result}', error '{unityWebRequest.error}'")
     {
         UnityWebRequest = unityWebRequest;
     }
