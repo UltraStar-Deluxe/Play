@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="songQueueUiRoot" style="position: relative; align-items: stretch; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; justify-content: flex-start; flex-grow: 1;">
-        <ui:ListView name="songQueueEntriesListView" fixed-item-height="56" reorderable="true" style="flex-grow: 1;" />
+        <ui:ListView name="songQueueEntriesListView" fixed-item-height="75" reorderable="true" reorder-mode="Animated" style="flex-grow: 1;" />
     </ui:VisualElement>
 </ui:UXML>

@@ -1,4 +1,17 @@
 /**************************************************/
+/* LIST VIEW */
+/**************************************************/
+.unity-list-view__reorderable-handle {
+    display: none;
+}
+
+.unity-list-view__reorderable-item__container {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/**************************************************/
 /* LABEL */
 /**************************************************/
 

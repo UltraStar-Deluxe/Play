@@ -18,7 +18,8 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
     public bool IsSongQueueEmpty => songQueueEntryDtos.IsNullOrEmpty();
 
     private readonly Subject<SongQueueChangedEvent> songQueueChangedEventStream = new();
-    public IObservable<SongQueueChangedEvent> SongQueueChangedEventStream => songQueueChangedEventStream;
+    public IObservable<SongQueueChangedEvent> SongQueueChangedEventStream => songQueueChangedEventStream
+        .ObserveOnMainThread();
 
     [Inject]
     private UiManager uiManager;

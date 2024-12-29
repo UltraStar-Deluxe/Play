@@ -18,6 +18,8 @@ using IBinding = UniInject.IBinding;
 
 public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
+    private const float SongQueueItemHeightInPx = 65;
+
     private static readonly ProfilerMarker onInjectionFinishedProfilerMarker = new ProfilerMarker("SongSelectSceneControl.OnInjectionFinished");
     private readonly IComparer<object> songMetaPropertyComparer = new NullOrEmptyValueLastComparer();
 
@@ -442,7 +444,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         startSongQueueButton.RegisterCallbackButtonTriggered(_ => StartSingSceneWithNextSongQueueEntry());
         songQueueUiControl.OnToggleMedley = songQueueEntryDto => songQueueManager.ToggleMedley(songQueueEntryDto);
         songQueueUiControl.OnDelete = songQueueEntryDto => songQueueManager.RemoveSongQueueEntry(songQueueEntryDto);
-        songQueueUiControl.OnReorderedList = songQueueEntryDtos => songQueueManager.SetSongQueueEntries(songQueueEntryDtos);
+        songQueueUiControl.OnItemIndexChanged = OnItemIndexChanged;
+        songQueueUiControl.ItemHeight = SongQueueItemHeightInPx;
+    }
+
+    private void OnItemIndexChanged(SongQueueUiControl.ItemIndexChangedEvent evt)
+    {
+        songQueueManager.SetSongQueueEntries(evt.UpdatedItems.ToList());
     }
 
     private void InitSlideInControls()

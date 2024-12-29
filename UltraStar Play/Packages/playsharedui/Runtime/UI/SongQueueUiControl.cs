@@ -19,29 +19,40 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private Injector injector;
 
-    private ListViewReorderByDragAndDropControl listViewReorderByDragAndDropControl;
-
     private IReadOnlyList<SongQueueEntryDto> songQueueEntryDtos = new List<SongQueueEntryDto>();
 
     public Action<SongQueueEntryDto> OnDelete { get; set; }
     public Action<SongQueueEntryDto> OnToggleMedley { get; set; }
-    public Action<List<SongQueueEntryDto>> OnReorderedList { get; set; }
+    public Action<ItemIndexChangedEvent> OnItemIndexChanged { get; set; }
     public bool HasWriteSongQueuePermission { get; set; } = true;
+
+    public float ItemHeight
+    {
+        get => listView.fixedItemHeight;
+        set => listView.fixedItemHeight = value;
+    }
 
     public void OnInjectionFinished()
     {
         listView.makeItem = OnMakeItem;
         listView.bindItem = OnBindItem;
         listView.unbindItem = OnUnbindItem;
-
-        listViewReorderByDragAndDropControl = new ListViewReorderByDragAndDropControl(listView);
-        listViewReorderByDragAndDropControl.ReorderEventStream
-            .Subscribe(evt =>
-            {
-                OnReorderedList?.Invoke(evt.UpdatedItemsSource as List<SongQueueEntryDto>);
-            });
+        listView.itemIndexChanged += OnItemIndexChangedInternal;
 
         Clear();
+    }
+
+    private void OnItemIndexChangedInternal(int oldIndex, int newIndex)
+    {
+        songQueueEntryDtos = listView.itemsSource as List<SongQueueEntryDto>;
+
+        // First entry cannot be medley with previous entry.
+        if (!songQueueEntryDtos.IsNullOrEmpty())
+        {
+            songQueueEntryDtos[0].IsMedleyWithPreviousEntry = false;
+        }
+
+        OnItemIndexChanged?.Invoke(new ItemIndexChangedEvent(oldIndex, newIndex, songQueueEntryDtos));
     }
 
     private void OnBindItem(VisualElement element, int index)
@@ -105,5 +116,19 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
     public void Clear()
     {
         SetSongQueueEntryDtos(new List<SongQueueEntryDto>());
+    }
+
+    public class ItemIndexChangedEvent
+    {
+        public int OldIndex { get; private set; }
+        public int NewIndex { get; private set; }
+        public IReadOnlyList<SongQueueEntryDto> UpdatedItems { get; private set; }
+
+        public ItemIndexChangedEvent(int oldIndex, int newIndex, IReadOnlyList<SongQueueEntryDto> updatedItems)
+        {
+            OldIndex = oldIndex;
+            NewIndex = newIndex;
+            UpdatedItems = updatedItems;
+        }
     }
 }

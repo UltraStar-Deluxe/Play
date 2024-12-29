@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -9,6 +8,8 @@ using UnityEngine.UIElements;
 
 public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
+    private const float SongQueueItemHeightInPx = 80;
+
     private IComparer<SongDto> songDtoComparer = new SongListSongDtoComparer();
 
     [Inject(Key = nameof(songListEntryUi))]
@@ -98,8 +99,10 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
 
         mainGameHttpClient.Permissions.Subscribe(_ => UpdateSongQueue());
 
-        songQueueUiControl.OnDelete = entry => DeleteSongQueueEntry(entry);
-        songQueueUiControl.OnToggleMedley = entry => ToggleMedley(entry);
+        songQueueUiControl.OnDelete = DeleteSongQueueEntry;
+        songQueueUiControl.OnToggleMedley = ToggleMedley;
+        songQueueUiControl.OnItemIndexChanged = OnSongQueueItemIndexChanged;
+        songQueueUiControl.ItemHeight = SongQueueItemHeightInPx;
 
         songListView.makeItem = OnMakeItem;
         songListView.bindItem = OnBindItem;
@@ -189,6 +192,13 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
             {
                 UpdateSongQueue();
             });
+    }
+
+    private void OnSongQueueItemIndexChanged(SongQueueUiControl.ItemIndexChangedEvent evt)
+    {
+        Debug.Log($"OnSongQueueItemIndexChanged: {evt.OldIndex}, {evt.NewIndex}");
+        string json = new ListDto<SongQueueEntryDto>(evt.UpdatedItems.ToList()).ToJson();
+        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueue, json);
     }
 
     private void UpdateSongQueue()

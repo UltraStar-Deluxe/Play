@@ -71,6 +71,29 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(dto);
             });
 
+        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.SongQueue)
+            .SetDescription($"Set song queue")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
+            {
+                string json = requestData.Context.Request.GetBodyAsString();
+                ListDto<SongQueueEntryDto> listDto = JsonConverter.FromJson<ListDto<SongQueueEntryDto>>(json);
+                List<SongQueueEntryDto> songQueueEntryDtos = listDto.Items;
+
+                for (int i = 0; i < songQueueEntryDtos.Count; i++)
+                {
+                    SongQueueEntryDto songQueueEntryDto = songQueueEntryDtos[i];
+                    string errorMessage = songQueueManager.GetSongQueueEntryErrorMessage(songQueueEntryDto);
+                    if (!errorMessage.IsNullOrEmpty())
+                    {
+                        Debug.LogError($"Invalid song queue entry at index {i}: {errorMessage}");
+                        return;
+                    }
+                }
+
+                songQueueManager.SetSongQueueEntries(songQueueEntryDtos);
+            });
+
         httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.SongQueueEntry)
             .SetDescription($"Add entry song queue to the song queue.")
             .SetRemoveOnDestroy(gameObject)
