@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using PrimeInputActions;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -28,6 +30,12 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.songImageInner)]
     private VisualElement songImageInner;
+
+    [Inject(UxmlName = R.UxmlNames.folderImage)]
+    private VisualElement folderImage;
+
+    [Inject(UxmlName = R.UxmlNames.folderPreviewImage)]
+    private VisualElement folderPreviewImage;
 
     [Inject(UxmlName = R.UxmlNames.songArtist)]
     private Label songArtist;
@@ -77,6 +85,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private FolderPreviewImageManager folderPreviewImageManager;
+
     private TooltipControl songEntryRemoteSourceIconTooltipControl;
 
     /**
@@ -84,7 +95,6 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
      */
     public string Name { get; set; }
 
-    private SongSelectEntry songSelectEntry;
     public SongSelectEntry SongSelectEntry
     {
         get => songSelectEntryProperty.Value;
@@ -350,7 +360,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         }
         else if (SongSelectEntry is SongSelectFolderEntry folderEntry)
         {
-            SetDefaultFolderImage();
+            UpdateFolderCover(folderEntry);
         }
         else
         {
@@ -363,6 +373,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         SongMeta songMeta = songEntry.SongMeta;
         lastSongMetaCover = songMeta.Cover;
         lastSongMetaBackground = songMeta.Background;
+
+        folderImage.HideByDisplay();
+        folderPreviewImage.HideByDisplay();
 
         SongMetaImageUtils.GetCoverOrBackgroundImageUri(songMeta)
             .SelectMany(uri =>
@@ -418,28 +431,53 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     private bool SongEntryChanged(SongMeta songMeta)
     {
-        return !IsSongEntry(songMeta);
+        return SongSelectEntry is not SongSelectSongEntry songEntry
+               || songEntry.SongMeta != songMeta;
     }
 
-    private bool IsSongEntry(SongMeta songMeta)
+    private bool FolderEntryChanged(DirectoryInfo directoryInfo)
     {
-        return SongSelectEntry is SongSelectSongEntry songSelectSongEntry
-               && songSelectSongEntry.SongMeta == songMeta;
+        return SongSelectEntry is not SongSelectFolderEntry folderEntry
+               || folderEntry.DirectoryInfo.FullName != directoryInfo.FullName;
     }
 
-    private void SetDefaultFolderImage()
+    private void UpdateFolderCover(SongSelectFolderEntry folderEntry)
     {
-        songImageOuter.style.backgroundImage = new StyleBackground(UiManager.Instance.defaultFolderImage);
-        songImageOuter.style.unityBackgroundImageTintColor = new StyleColor(Color.white);
+        songImageOuter.style.backgroundImage = new StyleBackground(StyleKeyword.Undefined);
+        songImageOuter.style.unityBackgroundImageTintColor = new StyleColor(Color.clear);
 
-        songImageInner.style.backgroundImage = new StyleBackground(UiManager.Instance.defaultFolderImage);
-        songImageInner.style.unityBackgroundImageTintColor = new StyleColor(Color.white);
+        songImageInner.style.backgroundImage = new StyleBackground(StyleKeyword.Undefined);
+        songImageInner.style.unityBackgroundImageTintColor = new StyleColor(Color.clear);
+
+        folderImage.ShowByDisplay();
+        UpdateFolderPreviewImage(folderEntry);
+    }
+
+    private async void UpdateFolderPreviewImage(SongSelectFolderEntry folderEntry)
+    {
+        folderPreviewImage.HideByDisplay();
+        await Awaitable.BackgroundThreadAsync();
+        string imageUri = folderPreviewImageManager.GetFolderPreviewImageUri(folderEntry.DirectoryInfo);
+        if (imageUri.IsNullOrEmpty()
+            || FolderEntryChanged(folderEntry.DirectoryInfo))
+        {
+            return;
+        }
+
+        await Awaitable.MainThreadAsync();
+        Sprite sprite = await ImageManager.LoadSpriteFromUri(imageUri);
+        if (sprite == null)
+        {
+            return;
+        }
+        folderPreviewImage.ShowByDisplay();
+        folderPreviewImage.style.backgroundImage = new StyleBackground(sprite);
     }
 
     private void SetDefaultSongCoverImageWithColor()
     {
         SongMetaImageUtils.SetDefaultSongImage(songImageOuter, songImageInner);
-        if (songSelectEntry is SongSelectSongEntry songEntry)
+        if (SongSelectEntry is SongSelectSongEntry songEntry)
         {
             SongMetaImageUtils.SetDefaultSongImageColor(songEntry.SongMeta, songImageOuter, songImageInner);
         }

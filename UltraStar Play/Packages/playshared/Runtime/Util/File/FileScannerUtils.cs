@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class FileScannerUtils
 {
-    public static List<string> ScanForFiles(List<string> folders, List<string> fileExtensionPatterns)
+    public static List<string> ScanForFiles(List<string> folders, IReadOnlyCollection<string> fileExtensionPatterns, bool recursive = true)
     {
         FileScanner fileScanner = new(fileExtensionPatterns, true, true);
         List<string> files = new();
@@ -12,10 +12,10 @@ public static class FileScannerUtils
         {
             try
             {
-                List<string> txtFilesInSongDir = fileScanner.GetFiles(folder, true);
+                List<string> txtFilesInSongDir = fileScanner.GetFiles(folder, recursive);
                 files.AddRange(txtFilesInSongDir);
 
-                Log.Debug(() => $"Found {txtFilesInSongDir.Count} files matching patterns {fileExtensionPatterns.JoinWith(", ")} in folder: '{folder}'");
+                Log.Verbose(() => $"Found {txtFilesInSongDir.Count} files matching patterns {fileExtensionPatterns.JoinWith(", ")} in folder: '{folder}'");
             }
             catch (Exception ex)
             {

@@ -205,6 +205,8 @@ public static partial class R
         public const string filtersAccordionItem = "filtersAccordionItem";
         public const string firstPlaceTrophyImage = "firstPlaceTrophyImage";
         public const string firstTeamUi = "firstTeamUi";
+        public const string folderImage = "folderImage";
+        public const string folderPreviewImage = "folderPreviewImage";
         public const string freeForAllItemToggle = "freeForAllItemToggle";
         public const string fullscreenModeChooser = "fullscreenModeChooser";
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
