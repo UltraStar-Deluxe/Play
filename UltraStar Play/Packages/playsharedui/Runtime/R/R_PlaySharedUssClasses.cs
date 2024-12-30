@@ -106,6 +106,7 @@ public static partial class R_PlayShared
         public const string modalDialogContainer = "modalDialogContainer";
         public const string mr_1 = "mr-1";
         public const string mt_2 = "mt-2";
+        public const string mx_2 = "mx-2";
         public const string nextLyrics = "nextLyrics";
         public const string noBackground = "noBackground";
         public const string noBackgroundInHierarchy = "noBackgroundInHierarchy";
@@ -123,6 +124,7 @@ public static partial class R_PlayShared
         public const string overlay = "overlay";
         public const string overlayBackground = "overlayBackground";
         public const string overlayDialog = "overlayDialog";
+        public const string pb_2 = "pb-2";
         public const string playerProfilePlaceholder = "playerProfilePlaceholder";
         public const string playerScoreLabel = "playerScoreLabel";
         public const string png = "png";
@@ -208,6 +210,8 @@ public static partial class R_PlayShared
         public const string unity_integer_field = "unity-integer-field";
         public const string unity_label = "unity-label";
         public const string unity_list_view__empty_label = "unity-list-view__empty-label";
+        public const string unity_list_view__reorderable_handle = "unity-list-view__reorderable-handle";
+        public const string unity_list_view__reorderable_item__container = "unity-list-view__reorderable-item__container";
         public const string unity_progress_bar = "unity-progress-bar";
         public const string unity_progress_bar__background = "unity-progress-bar__background";
         public const string unity_progress_bar__container = "unity-progress-bar__container";
