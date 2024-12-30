@@ -76,6 +76,7 @@ PlayerSettings:
   androidMinimumWindowWidth: 400
   androidMinimumWindowHeight: 300
   androidFullscreenMode: 1
+  androidAutoRotationBehavior: 1
   androidApplicationEntry: 1
   defaultIsNativeResolution: 1
   macRetinaSupport: 1
@@ -175,7 +176,7 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 28425329
+  AndroidBundleVersionCode: 28922018
   AndroidMinSdkVersion: 23
   AndroidTargetSdkVersion: 33
   AndroidPreferredInstallLocation: 1

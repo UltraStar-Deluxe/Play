@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class FileScanner
 {
-    private readonly List<string> fileExtensionPatterns;
+    private readonly IReadOnlyCollection<string> fileExtensionPatterns;
     private readonly bool excludeHiddenFolders;
     private readonly bool excludeHiddenFiles;
 
@@ -14,7 +14,7 @@ public class FileScanner
     {
     }
 
-    public FileScanner(List<string> fileExtensionPatterns, bool excludeHiddenFolders, bool excludeHiddenFiles)
+    public FileScanner(IReadOnlyCollection<string> fileExtensionPatterns, bool excludeHiddenFolders, bool excludeHiddenFiles)
     {
         this.fileExtensionPatterns = fileExtensionPatterns;
         this.excludeHiddenFolders = excludeHiddenFolders;

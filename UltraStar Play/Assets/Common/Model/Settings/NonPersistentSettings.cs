@@ -15,6 +15,7 @@ public class NonPersistentSettings
     public ReactiveProperty<bool> IsSearchExpressionsEnabled { get; private set; } = new();
     public ReactiveProperty<string> LastValidSearchExpression { get; private set; } = new();
     public DirectoryInfo SongSelectDirectoryInfo { get; set; }
+    public Dictionary<string, string> SongSelectDirectoryPathToLastSelection { get; set; } = new();
 
     // Song editor settings
     public ReactiveProperty<float> SongEditorMusicPlaybackSpeed { get; set; } = new(1);

@@ -324,6 +324,7 @@ public static partial class R
         public static readonly string options_companionApp_button = "options_companionApp_button";
         public static readonly string options_companionApp_noConnectedApps = "options_companionApp_noConnectedApps";
         public static readonly string options_companionApp_noConnectedApps_hint = "options_companionApp_noConnectedApps_hint";
+        public static readonly string options_companionApp_requirePermissions = "options_companionApp_requirePermissions";
         public static readonly string options_companionApp_title = "options_companionApp_title";
         public static readonly string options_companionClientCount = "options_companionClientCount";
         public static readonly string options_defaultMedleyDuration = "options_defaultMedleyDuration";
@@ -660,6 +661,7 @@ public static partial class R
         public static readonly string songIssue_headerField = "songIssue_headerField";
         public static readonly string songIssue_headerField_duplicate = "songIssue_headerField_duplicate";
         public static readonly string songIssue_headerField_invalidFormat = "songIssue_headerField_invalidFormat";
+        public static readonly string songIssue_headerField_unknown = "songIssue_headerField_unknown";
         public static readonly string songIssue_media_missingAudioAndUnsupportedWebsite = "songIssue_media_missingAudioAndUnsupportedWebsite";
         public static readonly string songIssue_media_notFound = "songIssue_media_notFound";
         public static readonly string songIssue_media_unsupported = "songIssue_media_unsupported";
@@ -691,6 +693,7 @@ public static partial class R
         public static readonly string songSelectScene_highscore = "songSelectScene_highscore";
         public static readonly string songSelectScene_loadingSongs_title = "songSelectScene_loadingSongs_title";
         public static readonly string songSelectScene_lyricsDialog_title = "songSelectScene_lyricsDialog_title";
+        public static readonly string songSelectScene_menu_title = "songSelectScene_menu_title";
         public static readonly string songSelectScene_missingMicDialog_ignoreAndStart = "songSelectScene_missingMicDialog_ignoreAndStart";
         public static readonly string songSelectScene_missingMicDialog_message = "songSelectScene_missingMicDialog_message";
         public static readonly string songSelectScene_missingMicDialog_title = "songSelectScene_missingMicDialog_title";

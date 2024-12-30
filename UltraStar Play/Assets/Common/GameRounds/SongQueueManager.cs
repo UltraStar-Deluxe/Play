@@ -18,7 +18,8 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
     public bool IsSongQueueEmpty => songQueueEntryDtos.IsNullOrEmpty();
 
     private readonly Subject<SongQueueChangedEvent> songQueueChangedEventStream = new();
-    public IObservable<SongQueueChangedEvent> SongQueueChangedEventStream => songQueueChangedEventStream;
+    public IObservable<SongQueueChangedEvent> SongQueueChangedEventStream => songQueueChangedEventStream
+        .ObserveOnMainThread();
 
     [Inject]
     private UiManager uiManager;
@@ -38,6 +39,13 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
     protected override object GetInstance()
     {
         return Instance;
+    }
+
+    public void SetSongQueueEntries(List<SongQueueEntryDto> songQueueEntryDtos)
+    {
+        this.songQueueEntryDtos.Clear();
+        this.songQueueEntryDtos.AddRange(songQueueEntryDtos);
+        songQueueChangedEventStream.OnNext(new SongQueueChangedEvent(this.songQueueEntryDtos));
     }
 
     public void AddSongQueueEntry(SongQueueEntryDto songQueueEntryDto)
