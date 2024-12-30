@@ -1133,6 +1133,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
         nonPersistentSettings.SongSelectDirectoryInfo = directoryInfo;
         UpdateFilteredSongs();
+
+        // Restore selection
+        if (nonPersistentSettings.SongSelectDirectoryPathToLastSelection.TryGetValue(directoryInfo.FullName, out string lastSelection))
+        {
+            songRouletteControl.SelectEntryByPath(lastSelection);
+            songRouletteControl.FinishTransition();
+        }
     }
 
     public bool TryNavigateToParentFolder()
