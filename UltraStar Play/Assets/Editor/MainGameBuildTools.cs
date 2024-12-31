@@ -53,7 +53,7 @@ public static class MainGameBuildTools
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
         customBuildOptions.uploadToSteam = true;
 
-        BuildUtils.UploadBuildOutputToSteam(customBuildOptions);
+        SteamBuildUtils.UploadBuildOutputToSteam(customBuildOptions);
     }
 
     [MenuItem("Tools/Build/Linux64")]
