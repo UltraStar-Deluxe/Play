@@ -1,0 +1,5 @@
+name: Mic Input Saver
+version: 1.0.0
+description: Saves the microphone input of players to a wav file.
+authors:
+  - email@melodymania.org
