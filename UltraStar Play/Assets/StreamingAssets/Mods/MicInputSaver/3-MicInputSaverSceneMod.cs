@@ -11,6 +11,9 @@ public class MicInputSaverSceneMod : ISceneMod
     [Inject]
     private MicInputSaverModSettings modSettings;
 
+    [Inject]
+    private ModObjectContext modObjectContext;
+
     public void OnSceneEntered(SceneEnteredContext sceneEnteredContext)
     {
         if (sceneEnteredContext.Scene != EScene.SingScene)
@@ -23,6 +26,7 @@ public class MicInputSaverSceneMod : ISceneMod
         MicInputSaverMonoBehaviour behaviour = gameObject.AddComponent<MicInputSaverMonoBehaviour>();
         sceneEnteredContext.SceneInjector
             .WithBindingForInstance(modSettings)
+            .WithBindingForInstance(modObjectContext)
             .Inject(behaviour);
     }
 }
@@ -34,6 +38,9 @@ public class MicInputSaverMonoBehaviour : MonoBehaviour, INeedInjection, IInject
 
     [Inject]
     private MicInputSaverModSettings modSettings;
+    
+    [Inject]
+    private ModObjectContext modObjectContext;
 
     [Inject]
     private SingSceneControl singSceneControl;
@@ -105,43 +112,112 @@ public class MicInputSaverMonoBehaviour : MonoBehaviour, INeedInjection, IInject
 
     private void SaveTargetArrays()
     {
-        string targetDirectory = GetTargetDirectory();
-        Directory.CreateDirectory(targetDirectory);
-        Debug.Log($"{nameof(MicInputSaverMonoBehaviour)} saving mic input to {targetDirectory}");
-
         PlayerProfileToTargetArray.ForEach(entry =>
         {
             PlayerProfile playerProfile = entry.Key;
             float[] micSamples = entry.Value;
-
-            int writtenSamplesCount = PlayerProfileToTargetArrayIndex[playerProfile];
-            float[] writtenMicSamples = new float[writtenSamplesCount];
-            Array.Copy(micSamples, writtenMicSamples, writtenSamplesCount);
-
-            PlayerControl playerControl = singSceneControl.PlayerControls
-                .Where(it => it.PlayerProfile == playerProfile)
-                .FirstOrDefault();
-            if (playerControl == null)
-            {
-                return;
-            }
-            MicSampleRecorder micSampleRecorder = playerControl.PlayerMicPitchTracker.MicSampleRecorder;
-
-            int channels = 1;
-            int sampleRate = micSampleRecorder.FinalSampleRate.Value;
-            string targetFilePath = $"{targetDirectory}/{DateTime.Now:yyyy-MM-dd-HH-mm-ss} - {SongMetaUtils.GetArtistDashTitle(songMeta)} - {playerProfile.Name}.wav";
-            WavFileWriter.WriteFile(targetFilePath, sampleRate, channels, writtenMicSamples);
-
-            string logMessage = $"Mic input of '{playerProfile.Name}' saved to '{targetFilePath}'";
-            Debug.Log(logMessage);
-            NotificationManager.CreateNotification(Translation.Of(logMessage));
+            SaveTargetArray(playerProfile, micSamples);
         });
+
+        NotificationManager.CreateNotification(Translation.Of($"Mic input saved to {GetTargetDirectory()}"));
+    }
+
+    private void SaveTargetArray(PlayerProfile playerProfile, float[] micSamples)
+    {
+        int micSampleRate = GetMicSampleRate(playerProfile);
+        if (micSampleRate <= 0)
+        {
+            return;
+        }
+
+        // Find written samples
+        int writtenSamplesCount = PlayerProfileToTargetArrayIndex[playerProfile];
+        float[] writtenMicSamples = new float[writtenSamplesCount];
+        Array.Copy(micSamples, writtenMicSamples, writtenSamplesCount);
+
+        // Shift samples by mic delay
+        int micDelayInMillis = GetMicDelayInMillis(playerProfile);
+        int micDelayInSamples = (int)(micDelayInMillis * 0.001 * micSampleRate);
+        AudioMixerUtils.Shift(writtenMicSamples, -micDelayInSamples);
+
+        // Normalize samples
+        AudioMixerUtils.Normalize(writtenMicSamples, 0.75f);
+
+        // Save samples
+        int channels = 1;
+        string targetFilePath = GetTargetFilePath(playerProfile);
+        WavFileWriter.WriteFile(targetFilePath, micSampleRate, channels, writtenMicSamples);
+        Debug.Log($"Mic input of '{playerProfile.Name}' saved to '{targetFilePath}'");
+
+        // Save mix with instrumental audio
+        string instrumentalAudioFilePath = SongMetaUtils.GetInstrumentalAudioUri(songMeta);
+        if(File.Exists(instrumentalAudioFilePath))
+        {
+            AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(instrumentalAudioFilePath, false);
+            int instrumentalSampleRate = audioClip.frequency;
+            float[] resampledMicSamples = AudioMixerUtils.Resample(writtenMicSamples, micSampleRate, instrumentalSampleRate);
+            float[] instrumentalSamples = GetMonoSamples(audioClip);
+            float[] mixedSamples = AudioMixerUtils.Mix(instrumentalSamples, resampledMicSamples);
+
+            string mixTargetFilePath = GetTargetFilePath(playerProfile, " - mixed");
+            WavFileWriter.WriteFile(mixTargetFilePath, instrumentalSampleRate, channels, mixedSamples);
+            Debug.Log($"Mix of instrumental and mic input of '{playerProfile.Name}' saved to '{mixTargetFilePath}'");
+        }
+    }
+
+    private float[] GetMonoSamples(AudioClip audioClip)
+    {
+        // Get the total number of samples and channels
+        int totalSamples = audioClip.samples;
+        int channels = audioClip.channels;
+
+        // Retrieve the audio data
+        float[] multiChannelSamples = new float[totalSamples * channels];
+        audioClip.GetData(multiChannelSamples, 0);
+
+        // Convert to mono
+        float[] monoSamples = AudioUtils.ToMonoAudioSamples(multiChannelSamples, channels);
+        return monoSamples;
+    }
+
+    private int GetMicSampleRate(PlayerProfile playerProfile)
+    {
+        PlayerControl playerControl = GetPlayerControl(playerProfile);
+        if (playerControl == null)
+        {
+            return 0;
+        }
+        return playerControl.PlayerMicPitchTracker.MicSampleRecorder.FinalSampleRate.Value;
+    }
+
+    private int GetMicDelayInMillis(PlayerProfile playerProfile)
+    {
+        PlayerControl playerControl = GetPlayerControl(playerProfile);
+        if (playerControl == null)
+        {
+            return 0;
+        }
+        return playerControl.PlayerMicPitchTracker.MicSampleRecorder.MicProfile.DelayInMillis;
     }
 
     private string GetTargetDirectory()
     {
         return !modSettings.targetDirectory.IsNullOrEmpty()
             ? modSettings.targetDirectory
-            : ApplicationUtils.GetPersistentDataPath("MicInputRecordings");
+            : $"{modObjectContext.ModPersistentDataFolder}/Recordings";
+    }
+
+    private string GetTargetFilePath(PlayerProfile playerProfile, string suffix="")
+    {
+        string targetDirectory = GetTargetDirectory();
+        Directory.CreateDirectory(targetDirectory);
+        Debug.Log($"{nameof(MicInputSaverMonoBehaviour)} saving mic input to {targetDirectory}");
+
+        return $"{targetDirectory}/{SongMetaUtils.GetArtistDashTitle(songMeta)} - {playerProfile.Name}{suffix}.wav";
+    }
+
+    private PlayerControl GetPlayerControl(PlayerProfile playerProfile)
+    {
+        return singSceneControl.PlayerControls.FirstOrDefault(it => it.PlayerProfile == playerProfile);
     }
 }
