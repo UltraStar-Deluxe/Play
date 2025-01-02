@@ -2,13 +2,13 @@ using System.Collections.Generic;
 
 public class MicInputSaverModSettings : IModSettings
 {
-    public string targetDirectory = "";
+    public int audioShiftInMillis;
 
     public List<IModSettingControl> GetModSettingControls()
     {
         return new List<IModSettingControl>()
         {
-            new StringModSettingControl(() => targetDirectory, newValue => targetDirectory = newValue) { Label = "Target directory (leave empty for default)" },
+            new IntModSettingControl(() => audioShiftInMillis, newValue => audioShiftInMillis = newValue) { Label = "Audio shift (ms)" },
         };
     }
 }
