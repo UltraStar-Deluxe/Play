@@ -117,6 +117,9 @@ public class SettingsProblemHintControl
         return result;
     }
 
+    /**
+     * Checks whether the path is already contained in the other folders, either directly or indirectly as subfolder.
+     */
     public static bool IsDuplicateFolder(string path, List<string> folders)
     {
         if (path.IsNullOrEmpty()
