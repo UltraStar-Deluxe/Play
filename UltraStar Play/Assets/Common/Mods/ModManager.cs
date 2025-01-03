@@ -894,9 +894,9 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return $"{GetModPersistentDataFolder(modFolder)}/modsettings.json";
     }
 
-    public ModFolder GetModFolder(ModName modName)
+    public static ModFolder GetModFolder(ModName modName)
     {
-        return typeToModFolder
+        return Instance.typeToModFolder
             .Values
             .Distinct()
             .FirstOrDefault(modFolder => Equals(modFolder.ModName, modName));

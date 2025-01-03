@@ -11,6 +11,7 @@ using UnityEngine.TestTools;
 public class ModTest : AbstractPlayModeTest
 {
     private static readonly ModName testModName = new ModName("TESTMOD");
+    private static readonly ModName modWithSettings = new ModName("SongFileCache");
 
     private static ModFolder testModFolder;
 
@@ -28,6 +29,21 @@ public class ModTest : AbstractPlayModeTest
         }
         DirectoryUtils.Delete(testModFolder.Value, true);
         testModFolder = null;
+    }
+
+    [UnityTest]
+    public IEnumerator ModShouldHaveSettings() {
+        LogAssert.ignoreFailingMessages = true;
+
+        SettingsManager.Instance.Settings.EnabledMods.Clear();
+        SettingsManager.Instance.Settings.EnabledMods.Add(modWithSettings.Value);
+        ModManager.Instance.LoadAndInstantiateMods();
+        yield return null;
+        Assert.IsEmpty(ModManager.Instance.FailedToLoadModFolders);
+
+        ModFolder modFolderWithSettings = ModManager.GetModFolder(modWithSettings);
+        List<IModSettings> modSettings = ModManager.GetModObjects<IModSettings>(modFolderWithSettings);
+        Assert.IsNotEmpty(modSettings);
     }
 
     [UnityTest]
