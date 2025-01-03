@@ -5,15 +5,15 @@ using UniRx;
 using System;
 using System.Collections.Generic;
 
-public class MicInputSaverLifeCycle : IOnLoadMod, IOnDisableMod
+public class MicRecordingSaverLifeCycle : IOnLoadMod, IOnDisableMod
 {
     public void OnLoadMod()
     {
-        Debug.Log($"{nameof(MicInputSaverLifeCycle)}.OnLoadMod");
+        Debug.Log($"{nameof(MicRecordingSaverLifeCycle)}.OnLoadMod");
     }
 
     public void OnDisableMod()
     {
-        Debug.Log($"{nameof(MicInputSaverLifeCycle)}.OnDisableMod");
+        Debug.Log($"{nameof(MicRecordingSaverLifeCycle)}.OnDisableMod");
     }
 }

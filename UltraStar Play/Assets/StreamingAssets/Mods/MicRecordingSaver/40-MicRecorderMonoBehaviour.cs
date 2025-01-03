@@ -2,10 +2,10 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class MicInputSaverMonoBehaviour : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public class MicRecorderMonoBehaviour : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     [Inject]
-    private MicInputSaverModSettings modSettings;
+    private MicRecordingSaverModSettings modSettings;
 
     [Inject]
     private SingSceneControl singSceneControl;
@@ -34,14 +34,14 @@ public class MicInputSaverMonoBehaviour : MonoBehaviour, INeedInjection, IInject
 
     private void Initialize()
     {
-        Debug.Log($"{nameof(MicInputSaverMonoBehaviour)} initializing");
+        Debug.Log($"{nameof(MicRecorderMonoBehaviour)} initializing");
         MicRecordingData.PlayerProfileToMicRecording.Clear();
-        singSceneControl.PlayerControls.ForEach(InitializeMicInputRecording);
+        singSceneControl.PlayerControls.ForEach(InitializeMicRecording);
     }
 
-    private void InitializeMicInputRecording(PlayerControl playerControl)
+    private void InitializeMicRecording(PlayerControl playerControl)
     {
-        Debug.Log($"{nameof(MicInputSaverMonoBehaviour)} initializing {playerControl.PlayerProfile.Name}");
+        Debug.Log($"{nameof(MicRecorderMonoBehaviour)} initializing {playerControl.PlayerProfile.Name}");
         if (playerControl.MicProfile == null)
         {
             return;

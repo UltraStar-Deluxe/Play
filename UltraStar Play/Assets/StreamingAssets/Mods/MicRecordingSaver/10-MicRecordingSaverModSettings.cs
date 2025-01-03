@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class MicInputSaverModSettings : IModSettings
+public class MicRecordingSaverModSettings : IModSettings
 {
     public int audioShiftInMillis;
 

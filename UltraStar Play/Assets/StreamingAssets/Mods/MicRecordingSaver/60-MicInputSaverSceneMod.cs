@@ -4,10 +4,10 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class MicInputSaverSceneMod : ISceneMod
+public class MicRecordingSaverSceneMod : ISceneMod
 {
     [Inject]
-    private MicInputSaverModSettings modSettings;
+    private MicRecordingSaverModSettings modSettings;
 
     [Inject]
     private ModObjectContext modObjectContext;
@@ -16,15 +16,15 @@ public class MicInputSaverSceneMod : ISceneMod
     {
         if (sceneEnteredContext.Scene == EScene.SingScene)
         {
-            CreateMicInputSaverMonoBehaviour(sceneEnteredContext);
+            CreateMicRecordingSaverMonoBehaviour(sceneEnteredContext);
         }
         else if (sceneEnteredContext.Scene == EScene.SingingResultsScene)
         {
-            AddSaveMicInputButton(sceneEnteredContext);
+            AddSaveButton(sceneEnteredContext);
         }
     }
 
-    private void AddSaveMicInputButton(SceneEnteredContext sceneEnteredContext)
+    private void AddSaveButton(SceneEnteredContext sceneEnteredContext)
     {
         if (MicRecordingData.PlayerProfileToMicRecording.IsNullOrEmpty())
         {
@@ -37,7 +37,7 @@ public class MicInputSaverSceneMod : ISceneMod
 
         // Create button
         Button button = new Button();
-        button.text = "Save Mic Input";
+        button.text = "Save Mic Recording";
         button.AddToClassList("mx-3");
         button.RegisterCallbackButtonTriggered(_ =>
         {
@@ -56,11 +56,11 @@ public class MicInputSaverSceneMod : ISceneMod
             .Insert(1, button);
     }
 
-    private void CreateMicInputSaverMonoBehaviour(SceneEnteredContext sceneEnteredContext)
+    private void CreateMicRecordingSaverMonoBehaviour(SceneEnteredContext sceneEnteredContext)
     {
         GameObject gameObject = new GameObject();
-        gameObject.name = nameof(MicInputSaverMonoBehaviour);
-        MicInputSaverMonoBehaviour behaviour = gameObject.AddComponent<MicInputSaverMonoBehaviour>();
+        gameObject.name = nameof(MicRecorderMonoBehaviour);
+        MicRecorderMonoBehaviour behaviour = gameObject.AddComponent<MicRecorderMonoBehaviour>();
         sceneEnteredContext.SceneInjector
             .WithBindingForInstance(modSettings)
             .WithBindingForInstance(modObjectContext)
