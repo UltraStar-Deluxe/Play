@@ -10,24 +10,24 @@ using UnityEngine.TestTools;
 
 public class ModTest : AbstractPlayModeTest
 {
-    private const string TestModName = "TESTMOD";
+    private static readonly ModName testModName = new ModName("TESTMOD");
 
-    private static string testModFolder;
+    private static ModFolder testModFolder;
 
     private static List<TestCaseData> ModNames => ModManager.GetModFolders()
-        .Select(modFolder => new TestCaseData(ModManager.GetModFolderName(modFolder)).Returns(null))
+        .Select(modFolder => new TestCaseData(modFolder.ModName).Returns(null))
         .ToList();
 
     [TearDown]
     public void DeleteTestModFolder()
     {
-        if (testModFolder.IsNullOrEmpty()
-            || !Directory.Exists(testModFolder))
+        if (testModFolder == null
+            || !Directory.Exists(testModFolder.Value))
         {
             return;
         }
-        DirectoryUtils.Delete(testModFolder, true);
-        testModFolder = "";
+        DirectoryUtils.Delete(testModFolder.Value, true);
+        testModFolder = null;
     }
 
     [UnityTest]
@@ -35,12 +35,12 @@ public class ModTest : AbstractPlayModeTest
     {
         LogAssert.ignoreFailingMessages = true;
 
-        testModFolder = ModManager.Instance.CreateModFolderFromTemplate(TestModName);
+        testModFolder = ModManager.Instance.CreateModFolderFromTemplate(testModName);
         Assert.IsNotNull(testModFolder);
-        Assert.IsTrue(Directory.Exists(testModFolder));
+        Assert.IsTrue(Directory.Exists(testModFolder.Value));
 
         SettingsManager.Instance.Settings.EnabledMods.Clear();
-        SettingsManager.Instance.Settings.EnabledMods.Add(TestModName);
+        SettingsManager.Instance.Settings.EnabledMods.Add(testModName.Value);
         ModManager.Instance.LoadAndInstantiateMods();
         yield return null;
 
@@ -49,11 +49,11 @@ public class ModTest : AbstractPlayModeTest
 
     [UnityTest]
     [TestCaseSource(nameof(ModNames))]
-	public IEnumerator ModsLoadSuccessfully(string modName) {
+	public IEnumerator ModsLoadSuccessfully(ModName modName) {
         LogAssert.ignoreFailingMessages = true;
 
         SettingsManager.Instance.Settings.EnabledMods.Clear();
-        SettingsManager.Instance.Settings.EnabledMods.Add(modName);
+        SettingsManager.Instance.Settings.EnabledMods.Add(modName.Value);
         ModManager.Instance.LoadAndInstantiateMods();
         yield return null;
 

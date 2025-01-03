@@ -3,7 +3,7 @@
 public class LoadModSettingsException : Exception
 {
     public string ModSettingsPath { get; set; }
-    public string ModFolder { get; set; }
+    public ModFolder ModFolder { get; set; }
 
     public LoadModSettingsException(string message) : base(message)
     {

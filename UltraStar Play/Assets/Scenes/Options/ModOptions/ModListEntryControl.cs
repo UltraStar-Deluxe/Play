@@ -43,8 +43,8 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.warningContainer)]
     private VisualElement warningContainer;
 
-    [Inject(Key = "modFolder")]
-    public string ModFolder { get; private set; }
+    [Inject]
+    public ModFolder ModFolder { get; private set; }
 
     [Inject(Key = nameof(modInfoDialogUi))]
     private VisualTreeAsset modInfoDialogUi;
@@ -83,7 +83,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
 
         modInfoButton.RegisterCallbackButtonTriggered(_ => ShowModInfoDialog());
         modSettingsButton.RegisterCallbackButtonTriggered(_ => ShowModSettingsDialog());
-        openModFolderButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(ModFolder));
+        openModFolderButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(ModFolder.Value));
 
         modManager.ObserveEveryValueChanged(it => it.FailedToLoadModFolders.Count)
             .Subscribe(_ => UpdateWarning())
