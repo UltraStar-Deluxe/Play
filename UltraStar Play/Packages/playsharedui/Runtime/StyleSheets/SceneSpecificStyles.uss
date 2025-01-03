@@ -7,8 +7,6 @@
 }
 
 .songSelectSongEntryIcon {
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(32, 32, 32, 0.35);
     font-size: var(--font-size-l);
 }
 
