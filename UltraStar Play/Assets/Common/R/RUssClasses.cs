@@ -14391,6 +14391,7 @@ public static partial class R
         public const string rounded_t_sm = "rounded-t-sm";
         public const string rounded_t_xl = "rounded-t-xl";
         public const string rounded_xl = "rounded-xl";
+        public const string row = "row";
         public const string scale_0 = "scale-0";
         public const string scale_100 = "scale-100";
         public const string scale_105 = "scale-105";

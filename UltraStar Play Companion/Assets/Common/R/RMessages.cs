@@ -408,6 +408,7 @@ public static partial class R
         public static readonly string options_songLibrary_noSongFoldersFoundInfo = "options_songLibrary_noSongFoldersFoundInfo";
         public static readonly string options_songLibrary_refreshIssues = "options_songLibrary_refreshIssues";
         public static readonly string options_songLibrary_songFolder_duplicate = "options_songLibrary_songFolder_duplicate";
+        public static readonly string options_songLibrary_songFolder_hiddenFoldersAreIgnored = "options_songLibrary_songFolder_hiddenFoldersAreIgnored";
         public static readonly string options_songLibrary_songFolder_missingValue = "options_songLibrary_songFolder_missingValue";
         public static readonly string options_songLibrary_songFolder_noFolder = "options_songLibrary_songFolder_noFolder";
         public static readonly string options_songLibrary_songFolder_notFound = "options_songLibrary_songFolder_notFound";
