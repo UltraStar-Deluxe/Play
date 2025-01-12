@@ -4,6 +4,7 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
@@ -27,6 +28,9 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
 
     [Inject]
     private UIDocument uiDocument;
+
+    [Inject]
+    private SongQueueManager songQueueManager;
 
     [Inject]
     private JukeboxAndSingModSettings modSettings;
@@ -92,8 +96,21 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             return;
         }
 
+        UpdateSkipSong();
         UpdateUiElementsFadeOut();
         UpdateFinishingScene();
+    }
+
+    private void UpdateSkipSong()
+    {
+        // Skip song with button
+        if (InputUtils.IsKeyboardShiftPressed()
+            && Keyboard.current != null 
+            && (Keyboard.current.sKey.wasReleasedThisFrame
+                || Keyboard.current.rightArrowKey.wasReleasedThisFrame))
+        {
+            StartNextSong();
+        }
     }
 
     private void OnDestroy()
@@ -199,6 +216,22 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
     }
 
     private SongMeta GetNextSongMeta()
+    {
+        SongMeta nextSongQueueSongMeta = GetNextSongQueueSongMeta();
+        if (nextSongQueueSongMeta != null) {
+            return nextSongQueueSongMeta;
+        }
+
+        return GetNextRandomSongMeta();
+    }
+
+    private SongMeta GetNextSongQueueSongMeta()
+    {
+        SingSceneData singSceneData = songQueueManager.CreateNextSingSceneData(singSceneControl.PartyModeSceneData);
+        return singSceneData?.SongMetas?.FirstOrDefault();
+    }
+
+    private SongMeta GetNextRandomSongMeta()
     {
         List<SongMeta> unseenSongMetas = songMetaManager.GetSongMetas()
             .Except(seenSongMetas)

@@ -70,6 +70,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         "UnityEngine.UIModule",
         "UnityEngine.VideoModule",
 
+        "Unity.InputSystem",
+
         // From Unity Packages
         "com.achimmihca.uniinject",
         "playshared",
