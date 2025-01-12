@@ -45,6 +45,7 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
         Debug.Log($"{nameof(JukeboxAndSingControl)} - OnInjectionFinished");
 
         isInjectionFinished = true;
+
         singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.playerUiContainer).ToList());
         singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.playerInfoContainer).ToList());
         if (modSettings.HideLyrics)
@@ -52,6 +53,8 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.bottomLyricsContainer).ToList());
             singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.topLyricsContainer).ToList());
         }
+        
+        DisableVfxCamera();
 
         CreateModInfoLabel();
 
@@ -91,6 +94,27 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
 
         UpdateUiElementsFadeOut();
         UpdateFinishingScene();
+    }
+
+    private void OnDestroy()
+    {
+        EnableVfxCamera();
+    }
+
+    private void DisableVfxCamera()
+    {
+        foreach (Transform vfxCamera in Camera.main.transform)
+        {
+            vfxCamera.GetComponent<Camera>().enabled = false;
+        }
+    }
+
+    private void EnableVfxCamera()
+    {
+        foreach (Transform vfxCamera in Camera.main.transform)
+        {
+            vfxCamera.GetComponent<Camera>().enabled = true;
+        }
     }
 
     private void UpdateUiElementsFadeOut()
