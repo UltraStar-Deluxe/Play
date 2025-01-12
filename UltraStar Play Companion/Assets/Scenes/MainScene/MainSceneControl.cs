@@ -218,8 +218,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
-            int textureWidth = 512;
-            int textureHeight = 256;
+            int textureWidth = 256;
+            int textureHeight = 128;
             audioWaveFormVisualization = new AudioWaveFormVisualization(
                 gameObject,
                 audioWaveForm,
