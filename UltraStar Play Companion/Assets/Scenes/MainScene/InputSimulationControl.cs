@@ -220,7 +220,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void OnPointerDownOnMousePadArea(PointerDownEvent evt)
+    private async void OnPointerDownOnMousePadArea(PointerDownEvent evt)
     {
         Log.Debug(() => "OnPointerDownOnMousePadArea");
         UpdateClickCountOnPointerDownOnMousePadArea();
@@ -231,34 +231,29 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         mousePadAreaStartPos = evt.localPosition;
         lastMousePadAreaPos = evt.localPosition;
 
-        // Check for single click, i.e. released all fingers after single click
         if (mousePadAreaPointerDownEventClickCount == 1)
         {
-            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(ClickTimeThresholdInSeconds, () =>
+            // Check for single click, i.e. released all fingers after single click
+            await Awaitable.WaitForSecondsAsync(ClickTimeThresholdInSeconds);
+            if (!isPointerDownOnMousePadArea
+                && mousePadAreaPointerDownEventClickCount == 1
+                && !isMousePadAreaTotalPointerDeltaAboveThreshold
+                && !awaitingDragEnd)
             {
-                if (!isPointerDownOnMousePadArea
-                    && mousePadAreaPointerDownEventClickCount == 1
-                    && !isMousePadAreaTotalPointerDeltaAboveThreshold
-                    && !awaitingDragEnd)
-                {
-                    SendSimulateLeftMouseButtonClickRequest();
-                }
-            }));
+                SendSimulateLeftMouseButtonClickRequest();
+            }
         }
-
-        // Check for double click, i.e. released all fingers after double click
-        if (mousePadAreaPointerDownEventClickCount == 2)
+        else if (mousePadAreaPointerDownEventClickCount == 2)
         {
-            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(DoubleClickTimeThresholdInSeconds, () =>
+            // Check for double click, i.e. released all fingers after double click
+            await Awaitable.WaitForSecondsAsync(DoubleClickTimeThresholdInSeconds);
+            if (!isPointerDownOnMousePadArea
+                && mousePadAreaPointerDownEventClickCount == 2
+                && !isMousePadAreaTotalPointerDeltaAboveThreshold
+                && !awaitingDragEnd)
             {
-                if (!isPointerDownOnMousePadArea
-                    && mousePadAreaPointerDownEventClickCount == 2
-                    && !isMousePadAreaTotalPointerDeltaAboveThreshold
-                    && !awaitingDragEnd)
-                {
-                    SendSimulateLeftMouseButtonDoubleClickRequest();
-                }
-            }));
+                SendSimulateLeftMouseButtonDoubleClickRequest();
+            }
         }
     }
 
