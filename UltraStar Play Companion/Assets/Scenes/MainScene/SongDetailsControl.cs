@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -252,7 +253,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         UpdateEnqueueButton();
     }
 
-    private void UpdatePlayersAndMics()
+    private async void UpdatePlayersAndMics()
     {
         bool receivedPlayers = false;
         bool receivedMicrophones = false;
@@ -265,52 +266,63 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         playerEntryControls.Clear();
 
-        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailablePlayers,
-            response =>
+        playerProfileNames = await GetPlayerProfileNamesAsync();
+
+        micProfiles = await GetMicProfilesAsync();
+
+        DoUpdatePlayersAndMics(playerProfileNames, micProfiles);
+    }
+
+    private async Task<List<MicProfile>> GetMicProfilesAsync()
+    {
+        try
+        {
+            string response = await mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailableMicrophones);
+            ListDto<MicProfile> listDto = JsonConverter.FromJson<ListDto<MicProfile>>(response);
+            if (listDto == null
+                || listDto.Items == null)
             {
-                ListDto<string> listDto = JsonConverter.FromJson<ListDto<string>>(response);
-                if (listDto == null
-                    || listDto.Items == null)
-                {
-                    Debug.LogError($"Failed to get players. Response: {response}");
-                    playersContainer.Clear();
-                    playersContainer.Add(new Label("Failed to load players"));
-                    return;
-                }
+                Debug.LogError($"Failed to get available microphones. Response: {response}");
+                return new List<MicProfile>();
+            }
 
-                playerProfileNames = listDto.Items;
-
-                receivedPlayers = true;
-                if (receivedPlayers && receivedMicrophones)
-                {
-                    DoUpdatePlayersAndMics(playerProfileNames, micProfiles);
-                }
-            });
-
-        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailableMicrophones,
-            response =>
+            if (listDto.Items.IsNullOrEmpty())
             {
-                ListDto<MicProfile> listDto = JsonConverter.FromJson<ListDto<MicProfile>>(response);
-                if (listDto == null
-                    || listDto.Items == null)
-                {
-                    Debug.LogError($"Failed to get available microphones. Response: {response}");
-                    return;
-                }
+                Debug.LogWarning($"No available microphones found. Response: {response}");
+            }
 
-                if (listDto.Items.IsNullOrEmpty())
-                {
-                    Debug.LogWarning($"No available microphones found. Response: {response}");
-                }
+            return listDto.Items;
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
 
-                micProfiles = listDto.Items;
+        return new List<MicProfile>();
+    }
 
-                receivedMicrophones = true;
-                if (receivedPlayers && receivedMicrophones)
-                {
-                    DoUpdatePlayersAndMics(playerProfileNames, micProfiles);
-                }
-            });
+    private async Awaitable<List<string>> GetPlayerProfileNamesAsync()
+    {
+        try
+        {
+            string response = await mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailablePlayers);
+            ListDto<string> listDto = JsonConverter.FromJson<ListDto<string>>(response);
+            if (listDto == null
+                || listDto.Items == null)
+            {
+                Debug.LogError($"Failed to get players. Response: {response}");
+                playersContainer.Clear();
+                playersContainer.Add(new Label("Failed to load players"));
+            }
+
+            return listDto.Items;
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
+
+        return new List<string>();
     }
 
     private void DoUpdatePlayersAndMics(List<string> playerProfileNames, List<MicProfile> micProfiles)
@@ -456,54 +468,67 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         enqueueMedleyButton.SetEnabled(enqueueButton.enabledInHierarchy);
     }
 
-    private void LoadSongImage()
+    private async void LoadSongImage()
     {
         songImage.HideByVisibility();
 
-        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.SongImage.ReplaceOrThrow("{songId}", songDto.Hash),
-            response =>
+        try
+        {
+            string response = await mainGameHttpClient.GetRequest(HttpApiEndpointPaths.SongImage
+                .ReplaceOrThrow("{songId}", songDto.Hash));
+
+            ImageDto imageDto = JsonConverter.FromJson<ImageDto>(response);
+            if (imageDto == null
+                || imageDto.JpgBytesBase64.IsNullOrEmpty())
             {
-                ImageDto imageDto = JsonConverter.FromJson<ImageDto>(response);
-                if (imageDto == null
-                    || imageDto.JpgBytesBase64.IsNullOrEmpty())
-                {
-                    Debug.LogError($"Failed to load image for song {songDto.Artist} - {songDto.Title}. Response: {response}");
-                    return;
-                }
-                songImage.ShowByVisibility();
-                byte[] jpgBytes = Convert.FromBase64String(imageDto.JpgBytesBase64);
+                Debug.LogError($"Failed to load image for song {songDto.Artist} - {songDto.Title}. Response: {response}");
+                return;
+            }
 
-                // Remove old texture if any
-                GameObject.Destroy(texture2D);
+            songImage.ShowByVisibility();
+            byte[] jpgBytes = Convert.FromBase64String(imageDto.JpgBytesBase64);
 
-                // Load new texture from bytes
-                texture2D = new Texture2D(2, 2);
-                // This will auto-resize the texture dimensions.
-                texture2D.LoadImage(jpgBytes);
+            // Remove old texture if any
+            GameObject.Destroy(texture2D);
 
-                songImage.style.backgroundImage = new StyleBackground(texture2D);
-            });
+            // Load new texture from bytes
+            texture2D = new Texture2D(2, 2);
+            // This will auto-resize the texture dimensions.
+            texture2D.LoadImage(jpgBytes);
+
+            songImage.style.backgroundImage = new StyleBackground(texture2D);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
     }
 
-    private void LoadSongDetails()
+    private async void LoadSongDetails()
     {
         SetLyrics("Loading lyrics...");
 
-        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.Song.ReplaceOrThrow("{songId}", songDto.Hash),
-            response =>
-            {
-                SongDetailsDto songDetailsDto = JsonConverter.FromJson<SongDetailsDto>(response);
-                if (songDetailsDto == null
-                    || songDetailsDto.SongId.IsNullOrEmpty())
-                {
-                    Debug.LogError($"Failed to load details for song {songDto.Artist} - {songDto.Title}. Response: {response}");
-                    return;
-                }
+        string response = await mainGameHttpClient.GetRequest(HttpApiEndpointPaths.Song
+            .ReplaceOrThrow("{songId}", songDto.Hash));
 
-                isFavorite = songDetailsDto.IsFavorite;
-                UpdateLyrics(songDetailsDto.VoiceDisplayNameToLyricsMap);
-                UpdateFavoriteButton();
-            });
+        try
+        {
+            SongDetailsDto songDetailsDto = JsonConverter.FromJson<SongDetailsDto>(response);
+            if (songDetailsDto == null
+                || songDetailsDto.SongId.IsNullOrEmpty())
+            {
+                Debug.LogError($"Failed to load details for song {songDto.Artist} - {songDto.Title}. Response: {response}");
+                return;
+            }
+
+            isFavorite = songDetailsDto.IsFavorite;
+            UpdateLyrics(songDetailsDto.VoiceDisplayNameToLyricsMap);
+            UpdateFavoriteButton();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
     }
 
     private void UpdateFavoriteButton()
