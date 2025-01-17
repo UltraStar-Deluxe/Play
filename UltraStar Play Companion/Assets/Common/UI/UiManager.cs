@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UniInject;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -12,12 +11,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
 
     [InjectedInInspector]
-    public VisualTreeAsset notificationOverlayUi;
-
-    [InjectedInInspector]
-    public VisualTreeAsset notificationUi;
-
-     [InjectedInInspector]
     public VisualTreeAsset messageDialogUi;
 
     [InjectedInInspector]
@@ -38,34 +31,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     protected override object GetInstance()
     {
         return Instance;
-    }
-
-    private Label DoCreateNotification(string text)
-    {
-        VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
-        if (notificationOverlay == null)
-        {
-            notificationOverlay = notificationOverlayUi.CloneTree().Children().First();
-            uiDocument.rootVisualElement.Add(notificationOverlay);
-        }
-
-        TemplateContainer templateContainer = notificationUi.CloneTree();
-        VisualElement notification = templateContainer.Children().First();
-        Label notificationLabel = notification.Q<Label>("notificationLabel");
-        notificationLabel.text = text;
-        notificationOverlay.Add(notification);
-
-        // Fade out then remove
-        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, 2, 1));
-
-        return notificationLabel;
-    }
-
-    public static Label CreateNotification(
-        string text,
-        params string[] additionalTextClasses)
-    {
-        return Instance.DoCreateNotification(text);
     }
 
     public List<IBinding> GetBindings()

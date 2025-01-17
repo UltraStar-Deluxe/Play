@@ -130,7 +130,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         if (selectedPlayerControls.IsNullOrEmpty())
         {
             Debug.LogError("Cannot enqueue song. No player profiles selected.");
-            UiManager.CreateNotification("Select a player first");
+            NotificationManager.CreateNotification(Translation.Of("Select a player first"));
             return;
         }
 
@@ -140,7 +140,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         HideSongDetails();
 
-        UiManager.CreateNotification($"Enqueued Song '{dto.SongDto.Title}'");
+        NotificationManager.CreateNotification(Translation.Of($"Enqueued Song '{dto.SongDto.Title}'"));
     }
 
     private void EnqueueSongAsMedley()
@@ -149,7 +149,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         if (selectedPlayerControls.IsNullOrEmpty())
         {
             Debug.LogError("Cannot enqueue song. No player profiles selected.");
-            UiManager.CreateNotification("Select a player first");
+            NotificationManager.CreateNotification(Translation.Of("Select a player first"));
             return;
         }
 
@@ -159,7 +159,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         HideSongDetails();
 
-        UiManager.CreateNotification($"Enqueued Medley Song '{dto.SongDto.Title}'");
+        NotificationManager.CreateNotification(Translation.Of($"Enqueued Medley Song '{dto.SongDto.Title}'"));
     }
 
     public List<PlayerSelectPlayerEntryControl> GetSelectedPlayerControls()

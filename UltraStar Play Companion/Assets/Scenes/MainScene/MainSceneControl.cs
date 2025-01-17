@@ -336,7 +336,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
-            UiManager.CreateNotification("Copied log to clipboard");
+            NotificationManager.CreateNotification(Translation.Of("Copied log to clipboard"));
         });
     }
 
