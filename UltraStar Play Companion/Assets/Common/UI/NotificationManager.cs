@@ -61,6 +61,7 @@ public class NotificationManager : AbstractSingletonBehaviour, INeedInjection
         CreateNotification(label);
     }
 
+#if UNITY_EDITOR
     private void Update()
     {
         if (Keyboard.current.rightCtrlKey.wasPressedThisFrame)
@@ -68,4 +69,5 @@ public class NotificationManager : AbstractSingletonBehaviour, INeedInjection
             CreateNotification(Translation.Of("Ctrl pressed"));
         }
     }
+#endif
 }
