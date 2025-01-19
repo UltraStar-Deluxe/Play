@@ -35,7 +35,6 @@ public static partial class R
         public static readonly string action_replay = "action_replay";
         public static readonly string action_restart = "action_restart";
         public static readonly string action_separateAudio = "action_separateAudio";
-        public static readonly string action_showAttribution = "action_showAttribution";
         public static readonly string action_showHighscores = "action_showHighscores";
         public static readonly string action_showInfo = "action_showInfo";
         public static readonly string action_showOwnResults = "action_showOwnResults";
@@ -493,7 +492,6 @@ public static partial class R
         public static readonly string singingResultsScene_scores_notes = "singingResultsScene_scores_notes";
         public static readonly string singingResultsScene_scores_perfectSentencesBonus = "singingResultsScene_scores_perfectSentencesBonus";
         public static readonly string singScene_action_openAppearanceSubmenu = "singScene_action_openAppearanceSubmenu";
-        public static readonly string singScene_action_openAttributionSubmenu = "singScene_action_openAttributionSubmenu";
         public static readonly string singScene_action_requiresRestart = "singScene_action_requiresRestart";
         public static readonly string singScene_action_restart = "singScene_action_restart";
         public static readonly string singScene_missingMicrophones_message = "singScene_missingMicrophones_message";

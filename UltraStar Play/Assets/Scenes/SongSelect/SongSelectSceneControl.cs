@@ -753,11 +753,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(firstVoiceLyrics));
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(secondVoiceLyrics));
         }
-
-        // Add attribution and license info
-        AccordionItem attributionAccordionItem = new(Translation.Get(R.Messages.action_showAttribution));
-        attributionAccordionItem.Add(AttributionUtils.CreateAttributionVisualElement(songMeta));
-        lyricsDialogControl.AddVisualElement(attributionAccordionItem);
     }
 
     public void InitSongMetas()

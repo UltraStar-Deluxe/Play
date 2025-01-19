@@ -393,12 +393,6 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             contextMenuControl.OpenContextMenu(Vector2.zero, this);
         });
 
-        contextMenuPopup.AddButton(Translation.Get(R.Messages.singScene_action_openAttributionSubmenu), "info_outline", () =>
-        {
-            singSceneControl.Pause();
-            ShowSongInfoDialog();
-        });
-
         if (!singSceneControl.HasPartyModeSceneData)
         {
             contextMenuPopup.AddButton(Translation.Get(R.Messages.action_openSongEditor), "edit",
@@ -431,13 +425,6 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             contextMenuPopup.AddButton(Translation.Get(R.Messages.action_separateAudio), "call_split",
                 () => audioSeparationManager.ProcessSongMeta(singSceneControl.SongMeta, true));
         }
-    }
-
-    private void ShowSongInfoDialog()
-    {
-        MessageDialogControl messageDialogControl = UiManager.Instance.CreateDialogControl(Translation.Get(R.Messages.action_showAttribution));
-        messageDialogControl.AddVisualElement(AttributionUtils.CreateAttributionVisualElement(songMeta));
-        messageDialogControl.AddButton(Translation.Get(R.Messages.action_close), _ => messageDialogControl.CloseDialog());
     }
 
     private void OnContextMenuClosed(ContextMenuPopupControl contextMenuPopupControl)
