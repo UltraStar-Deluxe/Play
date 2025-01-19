@@ -12,9 +12,10 @@ public class EditAndSaveTest : AbstractPlayModeTest
     protected static readonly string testFolderPath = Application.dataPath + "/Editor/Tests/TestSongs";
 
     [UnityTest]
-    public IEnumerator CanEditSongAndSaveChanges()
+    public IEnumerator CanEditSongAndSaveChanges() => CanEditSongAndSaveChangesAsync();
+    private async Awaitable CanEditSongAndSaveChangesAsync()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         // Load SongMeta from temporary file
         string testSongFolderName = "SongEditorTestSongs";
@@ -42,7 +43,7 @@ public class EditAndSaveTest : AbstractPlayModeTest
             SongMeta = editedSongMeta,
         });
 
-        yield return new WaitForSeconds(0.5f);
+        await Awaitable.WaitForSecondsAsync(0.5f);
 
         Assert.IsNotNull(injector, "Did not get injector for loaded scene");
 
@@ -79,7 +80,7 @@ public class EditAndSaveTest : AbstractPlayModeTest
         // Assert GAP has been changed as expected
         Assert.AreEqual(newVideoGap, editedSongMeta.VideoGapInMillis, 0.1);
 
-        yield return new WaitForSeconds(0.5f);
+        await Awaitable.WaitForSecondsAsync(0.5f);
 
         // Save edited song
         SongMetaManager.Instance.SaveSong(editedSongMeta, true);

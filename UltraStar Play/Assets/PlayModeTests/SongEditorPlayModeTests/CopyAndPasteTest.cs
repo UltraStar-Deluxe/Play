@@ -6,15 +6,15 @@ using Responsible;
 using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
-using static Responsible.Responsibly;
-using static ResponsibleSceneUtils;
-using static ResponsibleLogAssertUtils;
+using static SceneConditionUtils;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class CopyAndPasteTest : AbstractSongEditorActionTest
 {
+    private float waitTimeInSeconds = 0.1f;
+
     private static readonly List<TestCaseData> testCases = new List<TestCaseData>()
     {
         new TestCaseData("SongEditorTestSongs/Copy-Note.txt", "SongEditorTestSongs/Copy-Note-Pasted.txt").Returns(null),
@@ -34,80 +34,99 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
 
     [UnityTest]
     [TestCaseSource(nameof(testCases))]
-    public IEnumerator CopyAndPasteShouldPreserveNotes(string songFilePath, string expectedSongFilePath) => IgnoreFailingMessages()
-        .ContinueWith(OpenSongEditorWithNewSong(songFilePath))
-        .ContinueWith(ExpectScene(EScene.SongEditorScene))
-        // Select all and copy
-        .ContinueWith(SelectAll())
-        .ContinueWith(WaitForSeconds(1))
-        .ContinueWith(CopyNotes())
-        .ContinueWith(WaitForSeconds(1))
-        // Select all again, go to first note, then delete
-        .ContinueWith(SelectAll())
-        .ContinueWith(WaitForSeconds(1))
-        .ContinueWith(MoveToFirstSelectedNote())
-        .ContinueWith(WaitForSeconds(1))
-        .ContinueWith(DeleteNotes())
-        .ContinueWith(WaitForSeconds(1))
-        // Paste
-        .ContinueWith(PasteNotes())
-        .ContinueWith(WaitForSeconds(1))
+    public IEnumerator CopyAndPasteShouldPreserveNotes(string songFilePath, string expectedSongFilePath)
+    {
+        LogAssert.ignoreFailingMessages = true;
+        return CopyAndPasteShouldPreserveNotesAsync(songFilePath, expectedSongFilePath);
+    }
 
-        .ContinueWith(ExpectCurrentSongEqualsExpectedResult(songFilePath))
-        .ToYieldInstruction(this.Executor);
+    private async Awaitable CopyAndPasteShouldPreserveNotesAsync(string songFilePath, string expectedSongFilePath)
+    {
+        LogAssert.ignoreFailingMessages = true;
+        await OpenSongEditorWithNewSong(songFilePath);
+        await ExpectScene(EScene.SongEditorScene);
+
+        // Select all and copy
+        await SelectAll();
+        await CopyNotes();
+
+        // Select all again, go to first note, then delete
+        await SelectAll();
+        await MoveToFirstSelectedNote();
+        await DeleteNotes();
+
+        // Paste
+        await PasteNotes();
+
+        await ExpectCurrentSongEqualsExpectedResult(expectedSongFilePath);
+    }
 
     [UnityTest]
     [TestCaseSource(nameof(testCases))]
-    public IEnumerator CopyAndPasteShouldAddNotesAndPreserveSentences(string songFilePath, string expectedSongFilePath) => IgnoreFailingMessages()
-        .ContinueWith(OpenSongEditorWithNewSong(songFilePath))
-        .ContinueWith(ExpectScene(EScene.SongEditorScene))
-        // Select all and copy
-        .ContinueWith(SelectAll())
-        .ContinueWith(WaitForSeconds(1))
-        .ContinueWith(CopyNotes())
-        .ContinueWith(WaitForSeconds(1))
-        // Go behind last note
-        .ContinueWith(SelectAll())
-        .ContinueWith(WaitForSeconds(1))
-        .ContinueWith(MoveBehindLastNote())
-        .ContinueWith(WaitForSeconds(1))
-        // Paste
-        .ContinueWith(PasteNotes())
-        .ContinueWith(WaitForSeconds(1))
-
-        .ContinueWith(ExpectCurrentSongEqualsExpectedResult(expectedSongFilePath))
-        .ToYieldInstruction(this.Executor);
-
-    private ITestInstruction<object> MoveToFirstSelectedNote()
-        => Do("move to first selected note", () => songAudioPlayer.PositionInMillis = GetFirstSelectedNotePositionInMillis());
-
-    private ITestInstruction<object> MoveBehindLastNote()
-        => Do("move behind last note", () => songAudioPlayer.PositionInMillis = GetAfterLastNoteEndPositionInMillis());
-
-    private ITestInstruction<object> DeleteNotes()
-        => Do("delete selected notes", () => songEditorSceneInputControl.DeleteSelectedNotes());
-
-    private ITestInstruction<object> CopyNotes()
-        // TODO: Input simulation does not work reliably for some reason
-        // => TriggerInputAction(R.InputActions.songEditor_copy);
-        => Do("copy selected notes", () => songEditorCopyPasteManager.CopySelection());
-
-    private ITestInstruction<object> PasteNotes()
-        // TODO: Input simulation does not work reliably for some reason
-        // => TriggerInputAction(R.InputActions.songEditor_paste);
-        => Do("paste copied notes", () => songEditorCopyPasteManager.Paste());
-
-    private ITestInstruction<object> SelectAll()
-        // TODO: Input simulation does not work reliably for some reason
-        // => Do("select all", () => TriggerInputAction(R.InputActions.songEditor_selectAll))
-        => Do("select all", () => songEditorSelectionControl.SelectAll())
-            .ContinueWith(WaitForCondition("has selected notes", () => !songEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty())
-                .ExpectWithinSeconds(10));
-
-    private double GetPositionBehindLastNoteInMillis()
+    public IEnumerator CopyAndPasteShouldAddNotesAndPreserveSentences(string songFilePath, string expectedSongFilePath) =>
+        CopyAndPasteShouldAddNotesAndPreserveSentencesAsync(songFilePath, expectedSongFilePath);
+    private async Awaitable CopyAndPasteShouldAddNotesAndPreserveSentencesAsync(string songFilePath, string expectedSongFilePath)
     {
-        int positionInBeats = SongMetaUtils.GetAllNotes(SongMeta).Select(note => note.EndBeat).Max() + 2;
-        return SongMetaBpmUtils.BeatsToMillis(SongMeta, positionInBeats);
+        LogAssert.ignoreFailingMessages = true;
+        await OpenSongEditorWithNewSong(songFilePath);
+        await ExpectScene(EScene.SongEditorScene);
+
+        // Select all and copy
+        await SelectAll();
+        await CopyNotes();
+
+        // Go behind last note
+        await SelectAll();
+        await MoveBehindLastNote();
+
+        // Paste
+        await PasteNotes();
+
+        await ExpectCurrentSongEqualsExpectedResult(expectedSongFilePath);
+    }
+
+    private async Awaitable MoveToFirstSelectedNote()
+    {
+        songAudioPlayer.PositionInMillis = GetFirstSelectedNotePositionInMillis();
+        await Awaitable.WaitForSecondsAsync(waitTimeInSeconds);
+    }
+
+    private async Awaitable MoveBehindLastNote()
+    {
+        songAudioPlayer.PositionInMillis = GetAfterLastNoteEndPositionInMillis();
+        await Awaitable.WaitForSecondsAsync(waitTimeInSeconds);
+    }
+
+    private async Awaitable DeleteNotes()
+    {
+        // TODO: Input simulation does not work reliably for some reason
+        // TriggerInputAction(R.InputActions.songEditor_delete);
+        songEditorSceneInputControl.DeleteSelectedNotes();
+        await Awaitable.WaitForSecondsAsync(waitTimeInSeconds);
+    }
+
+    private async Awaitable CopyNotes()
+    {
+        // TODO: Input simulation does not work reliably for some reason
+        // TriggerInputAction(R.InputActions.songEditor_copy);
+        songEditorCopyPasteManager.CopySelection();
+        await Awaitable.WaitForSecondsAsync(waitTimeInSeconds);
+    }
+
+    private async Awaitable PasteNotes()
+    {
+        // TODO: Input simulation does not work reliably for some reason
+        // TriggerInputAction(R.InputActions.songEditor_paste);
+        songEditorCopyPasteManager.Paste();
+        await Awaitable.WaitForSecondsAsync(waitTimeInSeconds);
+    }
+
+    private async Awaitable SelectAll()
+    {
+        // TODO: Input simulation does not work reliably for some reason
+        // TriggerInputAction(R.InputActions.songEditor_selectAll);
+        songEditorSelectionControl.SelectAll();
+        await AwaitableTestUtils.WaitForConditionAsync(() => !songEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty());
     }
 
     private double GetFirstSelectedNotePositionInMillis()

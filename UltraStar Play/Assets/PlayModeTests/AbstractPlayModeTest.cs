@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using NUnit.Framework;
 using Responsible.Unity;
 using UniInject;
 using UniRx;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -18,25 +20,31 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
 
     private IDisposable sceneInjectionFinishedSubscription;
 
-    [UnitySetUp]
-    public IEnumerator UnitySetUp()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void StaticInit()
     {
-        LogAssert.ignoreFailingMessages = true;
+        Debug.Log("Setting NetworkManager LogLevel to Nothing.");
+        NetworkManagerInitialization.InitNetworkManagerSingleton();
+        NetworkManager.Singleton.LogLevel = LogLevel.Nothing;
+    }
 
-        yield return SetUpTestFixture();
-
-        yield return LoadTestScene();
-        yield return new WaitForEndOfFrame();
+    [UnitySetUp]
+    public IEnumerator UnitySetUp() => UnitySetUpAsync();
+    private async Awaitable UnitySetUpAsync()
+    {
+        await SetUpTestFixture();
+        await LoadTestScene();
+        await Awaitable.EndOfFrameAsync();
     }
 
     [UnityTearDown]
-    public IEnumerator UnityTearDown()
+    public IEnumerator UnityTearDown() => UnityTearDownAsync();
+    private async Awaitable UnityTearDownAsync()
     {
-        LogAssert.ignoreFailingMessages = true;
-        yield return TearDownTestFixture();
+        await TearDownTestFixture();
     }
 
-    private IEnumerator SetUpTestFixture()
+    private async Awaitable SetUpTestFixture()
     {
         SettingsManager.SettingsLoaderSaver = new TestSettingsLoaderSaver();
         StatisticsManager.StatisticsLoaderSaver = new TestStatisticsLoaderSaver();
@@ -44,9 +52,21 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
 
         sceneInjectionFinishedSubscription = UltraStarPlaySceneInjectionManager
             .SceneInjectionFinishedEventStream
-            .Subscribe(evt => evt.SceneInjector.Inject(this));
+            .Subscribe(evt =>
+            {
+                try
+                {
+                    evt.SceneInjector.Inject(this);
+                }
+                catch (InjectionException e)
+                {
+                    // Only log warning for failed injection
+                    // because it is expected when loading intermediate scenes before the final test scene.
+                    Debug.LogWarning(e.Message);
+                }
+            });
 
-        yield return LoadInitialScene();
+        await LoadInitialScene();
 
         AssertUtils.HasType<TestSettings>(SettingsManager.Instance.Settings);
         ConfigureTestSettings(SettingsManager.Instance.Settings as TestSettings);
@@ -64,14 +84,13 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
         Executor = new UnityTestInstructionExecutor();
     }
 
-    private IEnumerator TearDownTestFixture()
+    private async Awaitable TearDownTestFixture()
     {
         SettingsManager.SettingsLoaderSaver = null;
         StatisticsManager.StatisticsLoaderSaver = null;
         IMicrophoneAdapter.Instance = new PortAudioForUnityMicrophoneAdapter();
         sceneInjectionFinishedSubscription?.Dispose();
         DeleteAllGameObjects();
-        yield return null;
     }
 
     private void AssertMicSampleRecorderIsSimulated()
@@ -193,30 +212,29 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
         SimulatedMicrophoneAdapter.SetSimulatedDevicePitchInHz(playerProfile.Name, 440);
     }
 
-    private IEnumerator LoadInitialScene()
+    private async Awaitable LoadInitialScene()
     {
         // Start with a simple scene that has all common objects but does not require a special game state.
-        yield return LoadSceneByName("CommonTestScene");
+        await LoadSceneByName("CommonTestScene");
     }
 
-    private IEnumerator LoadTestScene()
+    public async Awaitable LoadTestScene()
     {
-        yield return LoadSceneByName(TestSceneName);
+        await LoadSceneByName(TestSceneName);
     }
 
-    private static IEnumerator LoadSceneByName(string sceneName)
+    private static async Awaitable LoadSceneByName(string sceneName)
     {
         if (sceneName.IsNullOrEmpty())
         {
-            yield break;
+            return;
         }
 
         Debug.Log($"Loading test scene {sceneName}");
         SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
-        yield return new WaitUntilWithTimeout(
-            $"Wait until test scene loaded: sceneName '{sceneName}'",
-            TimeSpan.FromSeconds(10),
-            () => SceneManager.GetActiveScene().name == sceneName);
+        await AwaitableTestUtils.WaitForConditionAsync(
+            () => SceneManager.GetActiveScene().name == sceneName,
+            new WaitForConditionConfig {description = $"test scene loaded: sceneName '{sceneName}'"});
     }
 
     private void DeleteAllGameObjects()
