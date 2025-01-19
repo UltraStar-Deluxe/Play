@@ -23,9 +23,14 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void StaticInit()
     {
+        // Prevent failed tests during setup because of LogAssert unexpected log messages of 'error' severity.
+        // Therefore, log nothing or warning instead of error.
         Debug.Log("Setting NetworkManager LogLevel to Nothing.");
         NetworkManagerInitialization.InitNetworkManagerSingleton();
         NetworkManager.Singleton.LogLevel = LogLevel.Nothing;
+
+        Debug.Log("Setting ServerSideCompanionClientManager.CustomNetLogger.ErrorToWarning to true.");
+        ServerSideCompanionClientManager.CustomNetLogger.ErrorToWarning = true;
     }
 
     [UnitySetUp]
