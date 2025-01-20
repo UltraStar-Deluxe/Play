@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using Responsible;
 using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -38,7 +37,7 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
         CopyAndPasteShouldPreserveNotesAsync(songFilePath, expectedSongFilePath);
     private async Awaitable CopyAndPasteShouldPreserveNotesAsync(string songFilePath, string expectedSongFilePath)
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
         await OpenSongEditorWithNewSong(songFilePath);
         await ExpectScene(EScene.SongEditorScene);
 
@@ -64,7 +63,7 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
         CopyAndPasteShouldAddNotesAndPreserveSentencesAsync(songFilePath, expectedSongFilePath);
     private async Awaitable CopyAndPasteShouldAddNotesAndPreserveSentencesAsync(string songFilePath, string expectedSongFilePath)
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
         await OpenSongEditorWithNewSong(songFilePath);
         await ExpectScene(EScene.SongEditorScene);
 

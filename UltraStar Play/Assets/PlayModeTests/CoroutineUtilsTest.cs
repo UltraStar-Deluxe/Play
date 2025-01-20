@@ -10,7 +10,7 @@ public class CoroutineUtilsTest : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator SequenceIsExecutedStepByStep()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         List<string> list = new();
 
@@ -29,7 +29,7 @@ public class CoroutineUtilsTest : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator ExceptionInCoroutineStopsSequence()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         List<string> list = new();
 

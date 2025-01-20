@@ -19,7 +19,7 @@ public class SceneChangeAsyncTest : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator ShouldChangeScene() => ShouldChangeSceneAsync();
     private async Awaitable ShouldChangeSceneAsync() {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
         await WaitForSceneAsync(EScene.MainScene);
         await ClickButtonAsync(R.UxmlNames.aboutButton);
         await WaitForSceneAsync(EScene.AboutScene);

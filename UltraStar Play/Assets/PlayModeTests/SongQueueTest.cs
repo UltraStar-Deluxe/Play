@@ -43,7 +43,7 @@ public class SongQueueTest : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator ShouldStartSongsFromQueue()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
         yield return WaitUntilScene(EScene.SongSelectScene);
         yield return EnqueueSong(medleySongTitle_0);
         yield return new WaitForSeconds(0.2f);

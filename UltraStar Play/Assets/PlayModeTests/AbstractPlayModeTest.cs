@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using CommonOnlineMultiplayer;
 using NUnit.Framework;
-using Responsible.Unity;
 using UniInject;
 using UniRx;
 using Unity.Netcode;
@@ -14,7 +13,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
-public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjection
+public abstract class AbstractPlayModeTest : AbstractInputSystemTest, INeedInjection
 {
     protected virtual string TestSceneName => "CommonTestScene";
 
@@ -86,8 +85,6 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
 
         InputFixture = new InputTestFixture();
         Keyboard = InputSystem.GetDevice<Keyboard>();
-
-        Executor = new UnityTestInstructionExecutor();
     }
 
     private async Awaitable TearDownTestFixture()

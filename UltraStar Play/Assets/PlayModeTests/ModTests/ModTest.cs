@@ -33,7 +33,7 @@ public class ModTest : AbstractPlayModeTest
 
     [UnityTest]
     public IEnumerator ModShouldHaveSettings() {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         SettingsManager.Instance.Settings.EnabledMods.Clear();
         SettingsManager.Instance.Settings.EnabledMods.Add(modWithSettings.Value);
@@ -49,7 +49,7 @@ public class ModTest : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator NewModLoadsSuccessfully()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         testModFolder = ModManager.Instance.CreateModFolderFromTemplate(testModName);
         Assert.IsNotNull(testModFolder);
@@ -66,7 +66,7 @@ public class ModTest : AbstractPlayModeTest
     [UnityTest]
     [TestCaseSource(nameof(ModNames))]
 	public IEnumerator ModsLoadSuccessfully(ModName modName) {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         SettingsManager.Instance.Settings.EnabledMods.Clear();
         SettingsManager.Instance.Settings.EnabledMods.Add(modName.Value);

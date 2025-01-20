@@ -26,7 +26,7 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator ShouldCreateSingAlongData()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         Dictionary<EVoiceId,string> voiceIdToDisplayName = new();
 

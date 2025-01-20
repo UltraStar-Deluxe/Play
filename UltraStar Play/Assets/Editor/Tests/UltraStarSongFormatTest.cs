@@ -182,7 +182,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldIgnoreNegativeNoteValues()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/NegativeNoteValues.txt", out List<SongIssue> _);
         Assert.NotNull(songMeta);

@@ -58,7 +58,7 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
         double targetDurationInMillis = DefaultTargetDurationInMillis,
         long maxWaitTimeInMillis = DefaultMaxWaitTimeInMillis) where T : ISongMediaLoadedEvent
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         string songFilePath = GetSongMetaFilePath(txtFilePath);
         long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
