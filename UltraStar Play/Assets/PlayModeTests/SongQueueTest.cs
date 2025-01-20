@@ -6,6 +6,10 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
+using static UnityEngine.Awaitable;
+using static ConditionTestUtils;
+using static SceneConditionTestUtils;
+using static VisualElementTestUtils;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -41,81 +45,70 @@ public class SongQueueTest : AbstractPlayModeTest
     };
 
     [UnityTest]
-    public IEnumerator ShouldStartSongsFromQueue()
+    public IEnumerator ShouldStartSongsFromQueue() => ShouldStartSongsFromQueueAsync();
+    private async Awaitable ShouldStartSongsFromQueueAsync()
     {
         LogAssertUtils.IgnoreFailingMessages();
-        yield return WaitUntilScene(EScene.SongSelectScene);
-        yield return EnqueueSong(medleySongTitle_0);
-        yield return new WaitForSeconds(0.2f);
-        yield return EnqueueSong(medleySongTitle_1);
-        yield return new WaitForSeconds(0.2f);
-        yield return EnqueueSongAsMedley(medleySongTitle_2);
-        yield return ExpectSongQueue(0, medleySongTitle_0);
-        yield return ExpectSongQueue(1, medleySongTitle_1, medleySongTitle_2);
+
+        // When
+        await ExpectScene(EScene.SongSelectScene);
+        await EnqueueSong(medleySongTitle_0);
+        await WaitForSecondsAsync(0.2f);
+        await EnqueueSong(medleySongTitle_1);
+        await WaitForSecondsAsync(0.2f);
+        await EnqueueSongAsMedley(medleySongTitle_2);
+
+        // Then
+        await ExpectSongQueue(0, medleySongTitle_0);
+        await ExpectSongQueue(1, medleySongTitle_1, medleySongTitle_2);
 
         // TODO: The test execution terminates without proper error message when attempting to change to SingScene.
-        // yield return StartSingingWithSongQueue();
-        // yield return WaitUntilScene(EScene.SingScene);
-        // yield return ExpectSongQueue(0, medleySongTitle_1, medleySongTitle_2);
+        // await StartSingingWithSongQueue();
+        // await WaitUntilScene(EScene.SingScene);
+        // await ExpectSongQueue(0, medleySongTitle_1, medleySongTitle_2);
     }
 
-    private CustomYieldInstruction WaitUntilScene(EScene scene)
+    private async Awaitable ExpectSongQueue(int songQueueEntryIndex, params string[] titles)
     {
-        return new WaitUntilWithTimeout($"wait for scene {scene}", TimeSpan.FromMilliseconds(1000),
-            () => SceneNavigator.Instance.CurrentScene == scene);
+        await WaitForCondition(() =>
+        {
+            List<SongQueueEntryDto> nextSongQueueEntries =
+                songQueueManager.GetSongQueueEntries(songQueueEntryIndex);
+
+            string expectedTitlesCsv = titles.JoinWith(",");
+            string titlesCsv = nextSongQueueEntries.Select(entry => entry.SongDto.Title).JoinWith(",");
+            return string.Equals(titlesCsv, expectedTitlesCsv);
+        }, new WaitForConditionConfig { description = $"wait for song queue entry {songQueueEntryIndex} to have titles '{titles.JoinWith(",")}'"});
     }
 
-    private IEnumerator ExpectSongQueue(int songQueueEntryIndex, params string[] titles)
-    {
-        yield return new WaitUntilWithTimeout(
-            $"wait for song queue entry {songQueueEntryIndex} to have titles '{titles.JoinWith(",")}'",
-            TimeSpan.FromMilliseconds(1000),
-            () =>
-            {
-                List<SongQueueEntryDto> nextSongQueueEntries =
-                    songQueueManager.GetSongQueueEntries(songQueueEntryIndex);
-
-                string expectedTitlesCsv = titles.JoinWith(",");
-                string titlesCsv = nextSongQueueEntries.Select(entry => entry.SongDto.Title).JoinWith(",");
-                return string.Equals(titlesCsv, expectedTitlesCsv);
-            });
-    }
-
-    private IEnumerator EnqueueSong(string title)
+    private async Awaitable EnqueueSong(string title)
     {
         songRouletteControl.SelectEntryBySongMeta(songMetaManager.GetSongMetaByTitle(title));
-        yield return new WaitForSeconds(1f);
-        yield return ClickSelectedSongMenuButton("enqueueButton");
+        await WaitForSecondsAsync(1);
+        await ClickSelectedSongMenuButton("enqueueButton");
     }
 
-    private IEnumerator EnqueueSongAsMedley(string title)
+    private async Awaitable EnqueueSongAsMedley(string title)
     {
         songRouletteControl.SelectEntryBySongMeta(songMetaManager.GetSongMetaByTitle(title));
-        yield return new WaitForSeconds(1f);
-        yield return ClickSelectedSongMenuButton("enqueueAsMedleyButton");
+        await WaitForSecondsAsync(1f);
+        await ClickSelectedSongMenuButton("enqueueAsMedleyButton");
     }
 
-    private IEnumerator ClickSelectedSongMenuButton(string uxmlName)
+    private async Awaitable ClickSelectedSongMenuButton(string uxmlName)
     {
         // Cannot use ClickButton method because this button is not focusable
         songRouletteControl.SelectedEntryControl.VisualElement.Q<Button>(R.UxmlNames.openSongMenuButton)
             .SendClickEvent();
-        yield return new WaitForSeconds(0.2f);
-        yield return ClickButton(uxmlName);
-        yield return new WaitForSeconds(0.2f);
+        await WaitForSecondsAsync(0.2f);
+        await ClickButton(uxmlName);
+        await WaitForSecondsAsync(0.2f);
     }
 
-    private IEnumerator ClickButton(string uxmlName)
+    private async Awaitable StartSingingWithSongQueue()
     {
-        yield return new WaitUntilWithTimeout($"wait until button can be clicked: {uxmlName}", TimeSpan.FromSeconds(10),
-            () => VisualElementUtils.IsFocusableNow(uiDocument.rootVisualElement.Q<Button>(uxmlName), uiDocument));
-        uiDocument.rootVisualElement.Q<Button>(uxmlName).SendClickEvent();
-    }
-
-    private IEnumerator StartSingingWithSongQueue()
-    {
-        yield return ClickButton(R.UxmlNames.toggleSongQueueOverlayButton);
-        yield return new WaitForSeconds(0.5f);
-        yield return ClickButton(R.UxmlNames.startSongQueueButton);
+        await ClickButton(R.UxmlNames.toggleSongQueueOverlayButton);
+        await WaitForSecondsAsync(0.5f);
+        await ClickButton(R.UxmlNames.startSongQueueButton);
     }
 }
