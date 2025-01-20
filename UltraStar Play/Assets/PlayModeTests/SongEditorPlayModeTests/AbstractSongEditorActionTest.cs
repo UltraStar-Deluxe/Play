@@ -20,7 +20,7 @@ public abstract class AbstractSongEditorActionTest : AbstractSongEditorTest
 
     protected async Awaitable ExpectCurrentSongEqualsExpectedResult(string expectedResultSong)
     {
-        await ConditionTestUtils.WaitForConditionAsync(() =>
+        await ConditionTestUtils.WaitForCondition(() =>
         {
             UltraStarSongMeta expectedSongMeta = UltraStarSongParser.ParseFile(GetAbsoluteTestSongFilePath(expectedResultSong), out List<SongIssue> _);
             SongMetaAssertUtils.AssertSongMetasAreEqual(expectedSongMeta, SongMeta);

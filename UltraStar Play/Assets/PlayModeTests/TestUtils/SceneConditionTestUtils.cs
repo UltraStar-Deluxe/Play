@@ -4,6 +4,6 @@ public class SceneConditionTestUtils
 {
     public static async Awaitable ExpectScene(EScene scene)
     {
-        await ConditionTestUtils.WaitForConditionAsync(() => SceneNavigator.Instance.CurrentScene == scene);
+        await ConditionTestUtils.WaitForCondition(() => SceneNavigator.Instance.CurrentScene == scene);
     }
 }

@@ -238,7 +238,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
 
         Debug.Log($"Loading test scene {sceneName}");
         SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
-        await ConditionTestUtils.WaitForConditionAsync(
+        await ConditionTestUtils.WaitForCondition(
             () => SceneManager.GetActiveScene().name == sceneName,
             new WaitForConditionConfig {description = $"test scene loaded: sceneName '{sceneName}'"});
     }

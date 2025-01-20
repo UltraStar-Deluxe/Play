@@ -35,7 +35,7 @@ public class LyricsEditingTest : AbstractPlayModeTest
         await OpenLyricsPopupEditor();
         await VisualElementTestUtils.SetElementValue(R.UxmlNames.editLyricsPopupTextField, EditedNoteText);
         await SubmitLyricsPopupEditor();
-        await ConditionTestUtils.WaitForConditionAsync(
+        await ConditionTestUtils.WaitForCondition(
             () => SongMetaUtils.GetLyrics(SongMeta, EVoiceId.P1).Contains(EditedNoteText),
             new WaitForConditionConfig { description = $"expect lyrics to contain '{EditedNoteText}'"});
     }
@@ -81,7 +81,7 @@ public class LyricsEditingTest : AbstractPlayModeTest
 
     private async Awaitable ExpectSelectedNote(string lyrics)
     {
-        await ConditionTestUtils.WaitForConditionAsync(() =>
+        await ConditionTestUtils.WaitForCondition(() =>
             {
                 List<Note> selectedNotes = songEditorSelectionControl.GetSelectedNotes();
                 return selectedNotes.Count == 1 && selectedNotes[0].Text == lyrics;

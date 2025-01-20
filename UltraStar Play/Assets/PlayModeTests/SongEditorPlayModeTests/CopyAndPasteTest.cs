@@ -123,7 +123,7 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
         // TODO: Input simulation does not work reliably for some reason
         // TriggerInputAction(R.InputActions.songEditor_selectAll);
         songEditorSelectionControl.SelectAll();
-        await ConditionTestUtils.WaitForConditionAsync(() => !songEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty());
+        await ConditionTestUtils.WaitForCondition(() => !songEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty());
     }
 
     private double GetFirstSelectedNotePositionInMillis()
