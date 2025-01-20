@@ -33,7 +33,7 @@ public abstract class AbstractSongEditorTest : AbstractPlayModeTest
             SongMeta = songMeta,
             PreviousScene = EScene.SongSelectScene,
         });
-        await SceneConditionUtils.ExpectScene(EScene.SongEditorScene);
+        await SceneConditionTestUtils.ExpectScene(EScene.SongEditorScene);
         Debug.Log($"loaded song editor successfully with '{songMeta.GetArtistDashTitle()}'");
         await Awaitable.WaitForSecondsAsync(0.1f);
     }

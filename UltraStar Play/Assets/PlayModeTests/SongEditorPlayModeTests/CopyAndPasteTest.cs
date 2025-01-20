@@ -6,7 +6,7 @@ using Responsible;
 using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
-using static SceneConditionUtils;
+using static SceneConditionTestUtils;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -123,7 +123,7 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
         // TODO: Input simulation does not work reliably for some reason
         // TriggerInputAction(R.InputActions.songEditor_selectAll);
         songEditorSelectionControl.SelectAll();
-        await AwaitableTestUtils.WaitForConditionAsync(() => !songEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty());
+        await ConditionTestUtils.WaitForConditionAsync(() => !songEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty());
     }
 
     private double GetFirstSelectedNotePositionInMillis()

@@ -1,9 +1,16 @@
 ﻿using System;
 using UnityEngine;
 
-public class AwaitableTestUtils
+public class ConditionTestUtils
 {
     public const int DefaultTimeoutInMillis = 10000;
+
+    public static async Awaitable<T> WaitForObjectAsync<T>(Func<T> getter, WaitForConditionConfig config = null)
+    {
+        await WaitForConditionAsync(() => getter() != null,
+            new WaitForConditionConfig(config) { description = $"wait for object '{config.description}'" });
+        return getter();
+    }
 
     public static async Awaitable WaitForConditionAsync(Action action, WaitForConditionConfig config = null)
     {
@@ -35,7 +42,7 @@ public class AwaitableTestUtils
                 Debug.LogException(e);
             }
 
-            await Awaitable.WaitForSecondsAsync(config.delayBetweenAttemptsInMillis / 1000f);
+            await Awaitable.WaitForSecondsAsync((float)(config.delayBetweenAttemptsInMillis / 1000.0));
         }
 
         if (!condition())
@@ -48,6 +55,17 @@ public class AwaitableTestUtils
 public class WaitForConditionConfig
 {
     public string description = "condition";
-    public float timeoutInMillis = AwaitableTestUtils.DefaultTimeoutInMillis;
-    public float delayBetweenAttemptsInMillis = 500;
+    public double timeoutInMillis = ConditionTestUtils.DefaultTimeoutInMillis;
+    public double delayBetweenAttemptsInMillis = 500;
+
+    public WaitForConditionConfig()
+    {
+    }
+
+    public WaitForConditionConfig(WaitForConditionConfig config)
+    {
+        description = config.description;
+        timeoutInMillis = config.timeoutInMillis;
+        delayBetweenAttemptsInMillis = config.delayBetweenAttemptsInMillis;
+    }
 }
