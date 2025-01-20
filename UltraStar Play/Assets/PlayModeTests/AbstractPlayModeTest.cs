@@ -25,6 +25,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
     {
         // Prevent failed tests during setup because of LogAssert unexpected log messages of 'error' severity.
         // Therefore, log nothing or warning instead of error.
+        // See https://discussions.unity.com/t/logassert-ignorefailingmessages-does-not-work-still-unhandled-log-message/923329/2
         Debug.Log("Setting NetworkManager LogLevel to Nothing.");
         NetworkManagerInitialization.InitNetworkManagerSingleton();
         NetworkManager.Singleton.LogLevel = LogLevel.Nothing;

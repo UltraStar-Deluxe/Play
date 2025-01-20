@@ -34,12 +34,8 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
 
     [UnityTest]
     [TestCaseSource(nameof(testCases))]
-    public IEnumerator CopyAndPasteShouldPreserveNotes(string songFilePath, string expectedSongFilePath)
-    {
-        LogAssert.ignoreFailingMessages = true;
-        return CopyAndPasteShouldPreserveNotesAsync(songFilePath, expectedSongFilePath);
-    }
-
+    public IEnumerator CopyAndPasteShouldPreserveNotes(string songFilePath, string expectedSongFilePath) =>
+        CopyAndPasteShouldPreserveNotesAsync(songFilePath, expectedSongFilePath);
     private async Awaitable CopyAndPasteShouldPreserveNotesAsync(string songFilePath, string expectedSongFilePath)
     {
         LogAssert.ignoreFailingMessages = true;
@@ -58,7 +54,8 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
         // Paste
         await PasteNotes();
 
-        await ExpectCurrentSongEqualsExpectedResult(expectedSongFilePath);
+        // Compare to original song because we deleted original notes before re-pasting the same set of notes.
+        await ExpectCurrentSongEqualsExpectedResult(songFilePath);
     }
 
     [UnityTest]
