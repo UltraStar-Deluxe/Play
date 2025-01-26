@@ -234,7 +234,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
     }
 
-    private void LoadCurrentTheme()
+    private async Awaitable LoadCurrentTheme()
     {
         if (!settings.EnableDynamicThemes)
         {
@@ -260,13 +260,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         ApplyThemeStyleSheets(themeMeta);
 
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
-        {
-            ApplyThemeBackground(themeMeta);
-            alreadyProcessedVisualElements.Clear();
-            ApplyStyles(uiDocument.rootVisualElement);
-            anyThemeLoaded = true;
-        }));
+        await Awaitable.EndOfFrameAsync();
+        ApplyThemeBackground(themeMeta);
+        alreadyProcessedVisualElements.Clear();
+        ApplyStyles(uiDocument.rootVisualElement);
+        anyThemeLoaded = true;
     }
 
     private void ApplyThemeStyleSheets(ThemeMeta themeMeta)

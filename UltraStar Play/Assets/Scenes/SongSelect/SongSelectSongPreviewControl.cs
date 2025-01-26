@@ -2,6 +2,7 @@
 using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -99,7 +100,7 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         }
     }
 
-    public void StartSongPreview(SongSelectEntrySelection songSelectEntrySelection)
+    public async Awaitable StartSongPreview(SongSelectEntrySelection songSelectEntrySelection)
     {
         if (songSelectEntrySelection.Index != initialSongIndex)
         {
@@ -120,10 +121,10 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         currentSongSelectEntryControl = songRouletteControl.EntryControls
             .FirstOrDefault(it => it.SongSelectEntry == selectedSongEntry);
 
-        StartSongPreview(selectedSongEntry.SongMeta);
+        await StartSongPreview(selectedSongEntry.SongMeta);
     }
 
-    public override void StartSongPreview(SongMeta songMeta)
+    public override async Awaitable StartSongPreview(SongMeta songMeta)
     {
         if (currentSongSelectEntryControl == null)
         {
@@ -132,7 +133,7 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         songPreviewVideoImage.HideByDisplay();
         songPreviewBackgroundImage.HideByDisplay();
 
-        base.StartSongPreview(songMeta);
+        await base.StartSongPreview(songMeta);
     }
 
     protected override IObservable<SongAudioLoadedEvent> StartAudioPreview(SongMeta songMeta, int previewStartInMillis)

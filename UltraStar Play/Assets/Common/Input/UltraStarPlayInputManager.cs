@@ -75,7 +75,7 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         UpdateInputDeviceIcon();
         InputDeviceChangeEventStream.Subscribe(_ => UpdateInputDeviceIcon());
 
-        AwaitableUtils.ExecuteRepeatedlyInSeconds(1, () => UpdateInputDeviceEnum(), gameObject);
+        AwaitableUtils.ExecuteRepeatedlyInSeconds(gameObject, 1, () => UpdateInputDeviceEnum());
     }
 
     private void UpdateInputDeviceEnum()

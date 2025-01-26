@@ -78,15 +78,11 @@ public class FileDownloadControl : MonoBehaviour
         }
     }
 
-    private void FetchFileSize()
+    private async Awaitable FetchFileSize()
     {
-        StartCoroutine(FileSizeUpdateCoroutine(WebRequest.uri));
-    }
-
-    private IEnumerator FileSizeUpdateCoroutine(Uri uri)
-    {
+        Uri uri = WebRequest.uri;
         using UnityWebRequest request = UnityWebRequest.Head(uri);
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result
             is UnityWebRequest.Result.ConnectionError

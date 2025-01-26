@@ -248,7 +248,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         ActivateLayout();
         FillLayout();
 
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => InitVfx()));
+        AwaitableUtils.ExecuteAfterDelayInFrames(gameObject, 1, () => InitVfx());
     }
 
     private void InitSongPreview()

@@ -346,11 +346,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             });
 
         // Update TimeBar every second
-        StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>
+        AwaitableUtils.ExecuteRepeatedlyInSeconds(gameObject, 1f, () =>
         {
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInMillis, songAudioPlayer.DurationInMillis);
             governanceOverlayTimeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInMillis, songAudioPlayer.DurationInMillis);
-        }));
+        });
 
         // Start medley if needed
         if (sceneData.IsMedley)

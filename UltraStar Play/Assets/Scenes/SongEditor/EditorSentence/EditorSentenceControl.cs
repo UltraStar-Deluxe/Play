@@ -88,10 +88,12 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
 
         // Double click to edit lyrics
         new DoubleClickControl(VisualElement).DoublePointerDownEventStream
-            .Subscribe(_ =>
+            .Subscribe(async _ =>
             {
-                // Opening the lyrics needs a little delay. Otherwise the lyrics will close again because of blur event.
-                MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => StartEditingLyrics()));
+                // Opening the lyrics needs a little delay. Otherwise, the lyrics will close again because of blur event.
+                await Awaitable.MainThreadAsync();
+                await Awaitable.NextFrameAsync();
+                StartEditingLyrics();
             });
     }
 
@@ -120,7 +122,7 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
         editLyricsPopup.style.height = height;
         editLyricsPopup.style.maxWidth = Length.Percent(100);
         editLyricsPopup.style.maxHeight = Length.Percent(100);
-        
+
         lyricsInputControl = injector
             .WithBindingForInstance(this)
             .CreateAndInject<EditorSentenceLyricsInputControl>();

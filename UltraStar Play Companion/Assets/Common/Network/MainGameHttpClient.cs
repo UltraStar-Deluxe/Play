@@ -100,53 +100,15 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
 
     private async Awaitable<string> SendRequest(UnityWebRequest unityWebRequest)
     {
-        try
-        {
-            AddHeaders(unityWebRequest);
-            await unityWebRequest.SendWebRequest();
-
-            if (unityWebRequest.result is UnityWebRequest.Result.Success)
-            {
-                LogRequestSuccess(unityWebRequest);
-                return unityWebRequest.downloadHandler?.text;
-            }
-            else
-            {
-                string errorMessage = unityWebRequest.error ?? "Unknown error";
-                Exception ex = new($"{unityWebRequest.result}: {errorMessage}");
-                LogRequestError(unityWebRequest, ex);
-                throw new UnityWebRequestException(unityWebRequest);
-            }
-        }
-        catch (Exception ex)
-        {
-            LogRequestError(unityWebRequest, ex);
-            throw ex;
-        }
-        finally
-        {
-            unityWebRequest.Dispose();
-        }
+        AddHeaders(unityWebRequest);
+        DownloadHandler downloadHandler = await AwaitableUtils.SendWebRequest(unityWebRequest);
+        return downloadHandler?.text;
     }
 
     private void AddHeaders(UnityWebRequest unityWebRequest)
     {
         unityWebRequest.SetRequestHeader("client-id", settings.ClientId);
         unityWebRequest.SetRequestHeader("client-name", settings.ClientName);
-    }
-
-    private void LogRequestError(UnityWebRequest unityWebRequest, Exception ex)
-    {
-        string responseBody = unityWebRequest.downloadHandler?.text;
-        Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' has failed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, error message: {ex.Message}, response body: {responseBody}");
-        Debug.LogException(ex);
-    }
-
-    private void LogRequestSuccess(UnityWebRequest unityWebRequest)
-    {
-        string responseBody = unityWebRequest.downloadHandler?.text;
-        Log.Verbose(() =>
-            $"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, response body: {responseBody}");
     }
 
     private void ThrowIfNotConnected()

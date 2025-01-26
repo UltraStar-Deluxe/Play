@@ -15,6 +15,8 @@ using UnityEngine.UIElements;
 
 public class LoadingSceneControl : MonoBehaviour, INeedInjection
 {
+    private const long MaxWaitTimeInMillis = 1200;
+
     [InjectedInInspector]
     public int preloadSongCount = 10;
 
@@ -51,12 +53,22 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     private bool IsAllPreloadingFinished => IsSteamWorkshopItemsDownloadFinished;
     private bool IsSteamWorkshopItemsDownloadFinished => steamWorkshopManager.DownloadState is SteamWorkshopManager.EDownloadState.Finished;
 
+    private long waitStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+
+    private bool hasFinishedScene;
+
     private void Start()
     {
         // Show general error message after short pause.
         // Normally, the next scene should start before the error message is shown.
         unexpectedErrorContainer.HideByDisplay();
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(8, () => ShowGeneralErrorMessage()));
+        AwaitableUtils.ExecuteAfterDelayInSeconds(8, () =>
+        {
+            if (gameObject)
+            {
+                ShowGeneralErrorMessage();
+            }
+        });
 
         // Log version info
         Debug.Log($"VERSION.txt file content:\n{localVersionTextAsset.text}");
@@ -79,16 +91,16 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         // However, in case of an Exception (e.g. song folder not found)
         // it might be useful to continue via button.
         InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
-            .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
+            .Subscribe(_ => FinishAfterDelay());
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
+            .Subscribe(_ => FinishAfterDelay());
         InputManager.GetInputAction(R.InputActions.ui_click).PerformedAsObservable()
-            .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
+            .Subscribe(_ => FinishAfterDelay());
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
-            .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
+            .Subscribe(_ => FinishAfterDelay());
         InputManager.GetInputAction(R.InputActions.usplay_enter).PerformedAsObservable()
-            .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
-        hiddenContinueButton.RegisterCallbackButtonTriggered(_ => StartCoroutine(FinishAfterDelay()));
+            .Subscribe(_ => FinishAfterDelay());
+        hiddenContinueButton.RegisterCallbackButtonTriggered(_ => FinishAfterDelay());
 
         // Keep mobile devices from turning off the screen while the game is running.
         Screen.sleepTimeout = (int)0f;
@@ -100,7 +112,13 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
         // The SongMetas are loaded on access.
         songMetaManager.ScanSongsIfNotDoneYet();
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.5f, () => PreloadSongMedia()));
+        AwaitableUtils.ExecuteAfterDelayInSeconds(0.5f, () =>
+        {
+            if (gameObject)
+            {
+                PreloadSongMedia();
+            }
+        });
 
         // Extract StreamingAssets on Android from the JAR
         AndroidStreamingAssets.Extract();
@@ -125,12 +143,17 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
         Debug.Log("Supported file extensions by vlc: " + ApplicationUtils.vlcSupportedFileExtensions.JoinWith(", "));
 
-        // Continue to next scene when preloading data has finished.
-        long maxWaitTimeInMillis = 1200;
-        long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-        StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-            () => IsAllPreloadingFinished || TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis),
-            () => FinishScene()));
+        waitStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+    }
+
+    private void Update()
+    {
+        // Continue to next scene when preloading data has finished, or max wait time has been reached.
+        if (IsAllPreloadingFinished
+            || TimeUtils.IsDurationAboveThresholdInMillis(waitStartTimeInMillis, MaxWaitTimeInMillis))
+        {
+            FinishScene();
+        }
     }
 
     private void PreloadSongMedia()
@@ -204,14 +227,20 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
     private void FinishScene()
     {
+        if (hasFinishedScene)
+        {
+            return;
+        }
+        hasFinishedScene = true;
+
         // Loading completed, continue with next scene
         SceneNavigator.Instance.LoadScene(EScene.MainScene);
     }
 
-    private IEnumerator FinishAfterDelay()
+    private async Awaitable FinishAfterDelay()
     {
         // Wait delay in case loading just didn't finish yet.
-        yield return new WaitForSeconds(1);
+        await Awaitable.WaitForSecondsAsync(1);
         FinishScene();
     }
 

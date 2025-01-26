@@ -19,7 +19,7 @@ public class SongEditorIssueAnalyzerControl : INeedInjection, IInjectionFinished
 
     private readonly Subject<IReadOnlyCollection<SongIssue>> issuesEventStream = new();
     public IObservable<IReadOnlyCollection<SongIssue>> IssuesEventStream => issuesEventStream;
-    
+
     public IReadOnlyCollection<SongIssue> Issues { get; private set; } = new List<SongIssue>();
 
     public void OnInjectionFinished()
@@ -28,8 +28,7 @@ public class SongEditorIssueAnalyzerControl : INeedInjection, IInjectionFinished
             // When there is no new change to the song for some time, then update the issues.
             .Throttle(new TimeSpan(0, 0, 0, 0, 500))
             .Subscribe(_ => UpdateIssues());
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
-            () => UpdateIssues()));
+        AwaitableUtils.ExecuteAfterDelayInFrames(1, () => UpdateIssues());
     }
 
     private void UpdateIssues()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UniRx;
 using Unity.Collections;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
@@ -17,7 +18,7 @@ namespace CommonOnlineMultiplayer
             this.messagingControl = messagingControl;
         }
 
-        private void DelayMessage(string messageName, IReadOnlyList<ulong> targetNetcodeClientIds, Action action)
+        private async Awaitable DelayMessage(string messageName, IReadOnlyList<ulong> targetNetcodeClientIds, Action action)
         {
             if (DelayInMillis <= 0)
             {
@@ -28,8 +29,10 @@ namespace CommonOnlineMultiplayer
             int sleepTimeInMillis = RandomUtils.Range(1, DelayInMillis);
             float sleepTimeInSeconds = sleepTimeInMillis / 1000f;
             Log.Verbose(() => $"Delaying message '{messageName}' to Netcode clients {targetNetcodeClientIds.JoinWith(", ")} by {sleepTimeInSeconds:F3} seconds");
-            MainThreadDispatcher.StartCoroutine(
-            CoroutineUtils.ExecuteAfterDelayInSeconds(sleepTimeInSeconds, action));
+
+            await Awaitable.MainThreadAsync();
+            await Awaitable.WaitForSecondsAsync(sleepTimeInSeconds);
+            action();
         }
 
         public void RegisterNamedMessageHandlersToForwardMessages()

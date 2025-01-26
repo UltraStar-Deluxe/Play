@@ -40,15 +40,14 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
 
     public void OnInjectionFinished()
     {
-        // LayerManager is not yet initialized. So wait one frame.
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
-            () =>
-            {
-                layerManager.GetVoiceLayers()
-                    .ForEach(layer => CreateLayerInputControl(layer));
-                layerManager.GetEnumLayers()
-                    .ForEach(layer => CreateLayerInputControl(layer));
-            }));
+        // LayerManager might not be initialized yet. So wait one frame.
+        AwaitableUtils.ExecuteAfterDelayInFrames(1, () =>
+        {
+            layerManager.GetVoiceLayers()
+                .ForEach(layer => CreateLayerInputControl(layer));
+            layerManager.GetEnumLayers()
+                .ForEach(layer => CreateLayerInputControl(layer));
+        });
     }
 
     private void CreateLayerInputControl(AbstractSongEditorLayer layer)

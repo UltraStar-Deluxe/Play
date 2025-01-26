@@ -38,8 +38,7 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
         {
             if (singSceneControl.PlayerControls.IsNullOrEmpty())
             {
-                MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
-                    () => InitCommonScore()));
+                AwaitableUtils.ExecuteAfterDelayInFrames(1, () => InitCommonScore());
             }
             else
             {

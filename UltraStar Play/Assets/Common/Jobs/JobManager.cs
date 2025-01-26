@@ -176,7 +176,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         jobToJobControl.Add(job, jobListEntryControl);
 
         // Only show this job in the UI if it takes a noticeable amount of time.
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.5f, () =>
+        AwaitableUtils.ExecuteAfterDelayInSeconds(0.5f, () =>
         {
             if (GameObjectUtils.IsDestroyed(this))
             {
@@ -194,7 +194,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
                     MinimizeJobList();
                 }
             }
-        }));
+        });
 
         job.ChildJobs.ForEach(childJob => CreateOrUpdateJobUi(childJob));
     }

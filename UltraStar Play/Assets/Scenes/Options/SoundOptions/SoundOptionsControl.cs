@@ -125,8 +125,8 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
         midiManager.PlayMidiFile(demoMidiFile);
 
         float demoMidiFileDurationInSeconds = 4;
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(demoMidiFileDurationInSeconds,
-            () => backgroundMusicManager.BackgroundMusicAudioSource.mute = false));
+        AwaitableUtils.ExecuteAfterDelayInSeconds(demoMidiFileDurationInSeconds,
+            () => backgroundMusicManager.BackgroundMusicAudioSource.mute = false);
     }
 
     protected override void OnDestroy()

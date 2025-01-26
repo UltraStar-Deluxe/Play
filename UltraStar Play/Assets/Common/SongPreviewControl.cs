@@ -112,7 +112,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         return audioFadeInFactorEased;
     }
 
-    public virtual void StartSongPreview(SongMeta songMeta)
+    public virtual async Awaitable StartSongPreview(SongMeta songMeta)
     {
         if (!gameObject.activeInHierarchy)
         {
@@ -133,9 +133,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         if (songMeta != null
             && delayInMillis > 0)
         {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(
-                delayInMillis / 1000f,
-                () => DoStartSongPreview(songMeta)));
+            await Awaitable.WaitForSecondsAsync(delayInMillis / 1000f);
+            DoStartSongPreview(songMeta);
         }
         else
         {

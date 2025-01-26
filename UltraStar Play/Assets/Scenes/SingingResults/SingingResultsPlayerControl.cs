@@ -320,20 +320,19 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
 
     public void InitTopScoreVfx()
     {
-        singingResultsSceneControl.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(TotalScoreAnimTimeInSeconds,
-            () =>
+        AwaitableUtils.ExecuteAfterDelayInSeconds(singingResultsSceneControl.gameObject, TotalScoreAnimTimeInSeconds, () =>
+        {
+            VfxManager.CreateParticleEffect(new ParticleEffectConfig()
             {
-                VfxManager.CreateParticleEffect(new ParticleEffectConfig()
-                {
-                    particleEffect = EParticleEffect.LightGlowALoop,
-                    panelPos = playerImage.worldBound.center,
-                    scale = 0.4f,
-                    loop = true,
-                    isBackground = true,
-                    target = playerImage,
-                    hideAndShowWithTarget = true,
-                });
-            }));
+                particleEffect = EParticleEffect.LightGlowALoop,
+                panelPos = playerImage.worldBound.center,
+                scale = 0.4f,
+                loop = true,
+                isBackground = true,
+                target = playerImage,
+                hideAndShowWithTarget = true,
+            });
+        });
     }
 
     public void SetModScoreVisible(bool isVisible)

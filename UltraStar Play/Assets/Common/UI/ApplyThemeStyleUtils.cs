@@ -279,11 +279,11 @@ public static class ApplyThemeStyleUtils
             else
             {
                 // Transition to new gradient
-                MainThreadDispatcher.StartCoroutine(AnimationUtils.TransitionBackgroundImageGradientCoroutine(
+                AnimationUtils.TransitionBackgroundImageGradientAsync(
                     visualElement,
                     data.currentGradientConfig,
                     newGradientConfig,
-                    0.2f));
+                    0.2f);
             }
         }
         data.currentGradientConfig = newGradientConfig;

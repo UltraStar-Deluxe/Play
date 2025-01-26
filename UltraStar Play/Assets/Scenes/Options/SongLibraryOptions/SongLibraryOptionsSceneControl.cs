@@ -133,17 +133,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .WithRootVisualElement(visualElement)
             .CreateAndInject<DownloadSongArchiveUiControl>();
 
-        // Send web request
-        UnityWebRequest webRequest = UnityWebRequest.Get(new Uri(songArchiveInfoJsonUrl));
-        webRequest.SendWebRequest();
-        StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
-            downloadHandler =>
-            {
-                downloadSongArchiveUiControl.SongArchiveEntries =
-                    JsonConverter.FromJson<List<SongArchiveEntry>>(downloadHandler.text);
-            },
-            ex => Debug.LogException(ex)));
-
         downloadSongArchiveUiControl.IsDoneWithoutError.Subscribe(newValue =>
         {
             if (newValue)
@@ -176,6 +165,21 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         downloadSongArchiveUiControls.Add(downloadSongArchiveUiControl);
 
         UpdateSongFolderList();
+
+        UpdateSongArchiveEntriesAsync(downloadSongArchiveUiControl);
+    }
+
+    private async Awaitable UpdateSongArchiveEntriesAsync(DownloadSongArchiveUiControl downloadSongArchiveUiControl)
+    {
+        try
+        {
+            string response = await AwaitableUtils.SendWebRequest(UnityWebRequest.Get(new Uri(songArchiveInfoJsonUrl)));
+            downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(response);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
     }
 
     private void AddNewSongFolder()

@@ -1,5 +1,6 @@
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -23,16 +24,14 @@ public class InGameDebugConsoleManager : AbstractInGameDebugConsoleManager, INee
 
     protected override void StartSingleton()
     {
-        sceneNavigator.SceneChangedEventStream.Subscribe(_ =>
+        sceneNavigator.SceneChangedEventStream.Subscribe(async _ =>
             {
                 // The EventSystem may be disabled afterwards because of EventSystemOptInOnAndroid. Thus, update after a frame.
-                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () =>
+                await Awaitable.NextFrameAsync();
+                if (debugLogManager.IsLogWindowVisible)
                 {
-                    if (debugLogManager.IsLogWindowVisible)
-                    {
-                        EnableInGameDebugConsoleEventSystemIfNeeded();
-                    }
-                }));
+                    EnableInGameDebugConsoleEventSystemIfNeeded();
+                }
 
                 UpdateDebugLogPopupVisible();
             })
