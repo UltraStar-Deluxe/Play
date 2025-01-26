@@ -320,8 +320,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         InitSingingLyricsControls();
 
-        StartAudioPlayback()
-            .Subscribe(_ => StartVideoOrShowBackgroundImage());
+        StartAudioAndVideoAsync();
 
         // Input legend (in pause overlay)
         UpdateInputLegend();
@@ -368,6 +367,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         TriggerAchievementsAtSongStart();
+    }
+
+    private async Awaitable StartAudioAndVideoAsync()
+    {
+        await StartAudioPlayback();
+        await StartVideoOrShowBackgroundImage();
     }
 
     private void CreateGameRoundModifiers()
@@ -652,18 +657,18 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         lastLeadingPlayerControl = leadingPlayerControl;
     }
 
-    private void StartVideoOrShowBackgroundImage()
+    private async Awaitable StartVideoOrShowBackgroundImage()
     {
         try
         {
             string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(SongMeta, WebViewUtils.CanHandleWebViewUrl);
             if (SongMetaUtils.ResourceExists(SongMeta, videoUri))
             {
-                songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
+                await songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
             }
             else
             {
-                songVideoPlayer.ShowBackgroundImage(SongMeta);
+                await songVideoPlayer.ShowBackgroundImage(SongMeta);
             }
         }
         catch (Exception ex)
@@ -1220,43 +1225,41 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
     }
 
-    private IObservable<SongAudioLoadedEvent> StartAudioPlayback()
+    private async Awaitable StartAudioPlayback()
     {
         if (songAudioPlayer.IsPlaying)
         {
             Debug.LogWarning("Song already playing");
-            return Observable.Empty<SongAudioLoadedEvent>();
+            return;
         }
 
         double startPositionInMillis = GetStartPositionInMillis();
         bool streamAudio = InaccurateMp3WorkaroundUtils.ShouldStreamAudio(SongMetaUtils.GetAudioUri(SongMeta));
 
-        return songAudioPlayer.LoadAndPlayAsObservable(SongMeta, startPositionInMillis, streamAudio)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to load audio: {ex.Message}");
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                    "reason", ex.Message));
-                PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
-                sceneNavigator.LoadScene(EScene.SongSelectScene);
-            })
-            .Select(evt =>
-            {
-                timeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationInMillis);
-                governanceOverlayTimeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationInMillis);
+        try
+        {
+            await songAudioPlayer.LoadAndPlayAsync(SongMeta, startPositionInMillis, streamAudio);
+            timeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationInMillis);
+            governanceOverlayTimeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationInMillis);
 
-                if (sceneData.StartPaused)
-                {
-                    songAudioPlayer.PauseAudio();
-                }
-                else
-                {
-                    songAudioPlayer.PlayAudio();
-                }
-
-                return evt;
-            });
+            if (sceneData.StartPaused)
+            {
+                songAudioPlayer.PauseAudio();
+            }
+            else
+            {
+                songAudioPlayer.PlayAudio();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load audio: {ex.Message}");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", ex.Message));
+            PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
+            sceneNavigator.LoadScene(EScene.SongSelectScene);
+        }
     }
 
     private double GetStartPositionInMillis()

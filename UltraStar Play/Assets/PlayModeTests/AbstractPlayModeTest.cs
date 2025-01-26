@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using static ConditionUtils;
 
 public abstract class AbstractPlayModeTest : AbstractInputSystemTest, INeedInjection
 {
@@ -235,7 +236,7 @@ public abstract class AbstractPlayModeTest : AbstractInputSystemTest, INeedInjec
 
         Debug.Log($"Loading test scene {sceneName}");
         SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
-        await ConditionTestUtils.WaitForCondition(
+        await WaitForCondition(
             () => SceneManager.GetActiveScene().name == sceneName,
             new WaitForConditionConfig {description = $"test scene loaded: sceneName '{sceneName}'"});
     }

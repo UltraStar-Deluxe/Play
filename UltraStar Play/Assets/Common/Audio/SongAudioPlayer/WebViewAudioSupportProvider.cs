@@ -8,45 +8,24 @@ public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
     [Inject]
     private WebViewManager webViewManager;
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
+    public override async Awaitable<AudioLoadedEvent> LoadAsync(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         bool success = webViewManager.LoadUrl(audioUri);
         if (!success)
         {
-            return ObservableUtils.LogExceptionThenThrow<AudioLoadedEvent>(
-                new SongAudioPlayerException($"Failed to load audio via WebView with URL {audioUri}"));
+            ExceptionUtils.LogThenThrow(new SongAudioPlayerException($"Failed to load audio via WebView with URL {audioUri}"));
         }
 
         // The WebView is loaded asynchronously. When the duration is available then the audio is loaded.
-        long startTime = TimeUtils.GetUnixTimeMilliseconds();
-        long timeoutInMillis = 30000;
-        return Observable.Create<AudioLoadedEvent>(o =>
+        await ConditionUtils.WaitForCondition(() => !this || DurationInMillis > 0,
+            new WaitForConditionConfig {description = $"load audio '{audioUri}'", timeoutInMillis = 30000});
+        if (!this)
         {
-            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => this == null
-                      || DurationInMillis > 0
-                      || TimeUtils.IsDurationAboveThresholdInMillis(startTime, timeoutInMillis),
-                () =>
-                {
-                    if (this == null)
-                    {
-                        string errorMessage = $"Failed to load audio clip '{audioUri}': {nameof(WebViewAudioSupportProvider)} has been destroyed already.";
-                        Debug.LogError(errorMessage);
-                        throw new AudioSupportProviderException(errorMessage);
-                    }
+            ExceptionUtils.LogThenThrow(new AudioSupportProviderException($"Failed to load audio clip '{audioUri}': {nameof(WebViewAudioSupportProvider)} has been destroyed already."));
+        }
 
-                    if (TimeUtils.IsDurationAboveThresholdInMillis(startTime, timeoutInMillis))
-                    {
-                        o.OnError(new AudioSupportProviderException("Loading audio using WebView timed out."));
-                        return;
-                    }
-
-                    PositionInMillis = startPositionInMillis;
-                    o.OnNext(new AudioLoadedEvent(audioUri));
-                }));
-
-            return Disposable.Empty;
-        });
+        PositionInMillis = startPositionInMillis;
+        return new AudioLoadedEvent(audioUri);
     }
 
     public override bool IsSupported(string audioUri)

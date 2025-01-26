@@ -6,7 +6,7 @@ using UnityEngine.TestTools;
 using UnityEngine.UIElements;
 using static SceneConditionTestUtils;
 using static VisualElementTestUtils;
-using static ConditionTestUtils;
+using static ConditionUtils;
 
 public class CoreGameLoopTest : AbstractPlayModeTest
 {

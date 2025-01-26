@@ -141,26 +141,24 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             .CreateAndInject<DragToChangeRightSideBarWidthControl>();
     }
 
-    private void Start()
+    private async void Start()
     {
         Debug.Log($"Start editing of '{SongMeta.Title}' at {sceneData.PositionInMillis} ms.");
 
         InitSongEditorStyleSheet();
 
-        songAudioPlayer.LoadAndPlayAsObservable(SongMeta, sceneData.PositionInMillis, false)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to load audio: {ex.Message}");
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                    "reason", ex.Message));
-            })
-            // Subscribe to trigger the (cold) observable.
-            .Subscribe(_ =>
-            {
-                songAudioPlayer.PauseAudio();
-            })
-            .AddTo(gameObject);
+        try
+        {
+            await songAudioPlayer.LoadAndPlayAsync(SongMeta, sceneData.PositionInMillis, false);
+            songAudioPlayer.PauseAudio();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load audio: {ex.Message}");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", ex.Message));
+        }
 
         songAudioPlayer.PlaybackStartedEventStream
             .Subscribe(positionInMillis => OnAudioPlaybackStarted(positionInMillis));

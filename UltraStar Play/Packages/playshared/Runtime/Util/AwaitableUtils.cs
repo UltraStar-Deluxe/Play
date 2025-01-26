@@ -66,32 +66,16 @@ public static class AwaitableUtils
         Log.Debug(() => $"Exited loop because until GameObject '{gameObjectName}' has been destroyed");
     }
 
-    public static async Awaitable ExecuteWhenConditionIsTrue(GameObject gameObject, Func<bool> condition, Action action)
-    {
-        while (!condition())
-        {
-            await Awaitable.NextFrameAsync();
-            if (!gameObject)
-            {
-                // GameObject has been deleted, so exit this method.
-                return;
-            }
-        }
-        action();
-    }
-
     public static async Awaitable SendWebRequest(UnityWebRequest unityWebRequest)
     {
         void LogSuccess()
         {
-            string responseBody = unityWebRequest.downloadHandler?.text;
-            Log.Verbose(() => $"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, response body: {responseBody}");
+            Log.Verbose(() => $"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}");
         }
 
         void LogError(Exception ex)
         {
-            string responseBody = unityWebRequest.downloadHandler?.text;
-            Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' has failed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, error message: {ex.Message}, response body: {responseBody}");
+            Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' has failed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, error message: {ex.Message}");
             Debug.LogException(ex);
         }
 

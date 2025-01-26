@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -32,34 +33,37 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
     public static AudioClip LoadAudioClipFromUriImmediately(string uri, bool streamAudio = true)
     {
-        AudioClip result = null;
+        Awaitable<AudioClip> awaitable = Instance.LoadAudioClipFromUriAsync(uri, streamAudio, true);
+
         // Load with busy waiting
-        Instance.LoadAudioClipFromUri(uri, streamAudio, true)
-            .CatchIgnore((Exception ex) => result = null)
-            .Subscribe(audioClip => result = audioClip);
-        return result;
+        while (!awaitable.GetAwaiter().IsCompleted)
+        {
+            Debug.LogWarning($"Waiting for audio to load via Thread.Sleep: audioUri '{uri}', streamAudio: {streamAudio}");
+            Thread.Sleep(10);
+        }
+        return awaitable.GetAwaiter().GetResult();
     }
 
-    public static IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio = true)
+    public static async Awaitable<AudioClip> LoadAudioClipFromUriAsync(string uri, bool streamAudio = true)
     {
-        return Instance.LoadAudioClipFromUri(uri, streamAudio, false);
+        return await Instance.LoadAudioClipFromUriAsync(uri, streamAudio, false);
     }
 
-    private IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio, bool busyWaiting)
+    private async Awaitable<AudioClip> LoadAudioClipFromUriAsync(string uri, bool streamAudio, bool busyWaiting)
     {
         if (uri.IsNullOrEmpty())
         {
-            return ObservableUtils.LogExceptionThenThrow<AudioClip>(new NullReferenceException("Cannot load AudioClip, URI is null or empty"));
+            throw new NullReferenceException("Cannot load AudioClip, URI is null or empty");
         }
 
         if (!ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))
         {
-            return Observable.Throw<AudioClip>(new IllegalArgumentException($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.JoinWith(", ")}"));
+            throw new IllegalArgumentException($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.JoinWith(", ")}");
         }
 
         if (!TryGetUri(uri, out Uri uriObject))
         {
-            return Observable.Throw<AudioClip>(new IllegalArgumentException($"URI is invalid. Maybe the file does not exist. URI: '{uri}'"));
+            throw new IllegalArgumentException($"URI is invalid. Maybe the file does not exist. URI: '{uri}'");
         }
 
         if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
@@ -67,48 +71,29 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         {
             if (streamAudio && cachedAudioClip.StreamedAudioClip != null)
             {
-                return Observable.Return<AudioClip>(cachedAudioClip.StreamedAudioClip);
+                return cachedAudioClip.StreamedAudioClip;
             }
             else if (!streamAudio && cachedAudioClip.FullAudioClip != null)
             {
-                return Observable.Return<AudioClip>(cachedAudioClip.FullAudioClip);
+                return cachedAudioClip.FullAudioClip;
             }
         }
 
-        return Observable.Create<AudioClip>(o =>
+        try
         {
-            // Send web request
-            UnityWebRequest webRequest = AudioUtils.CreateAudioClipRequest(uriObject, streamAudio);
-            webRequest.SendWebRequest();
+            using UnityWebRequest webRequest = CreateAudioClipRequest(uriObject, streamAudio);
+            await AwaitableUtils.SendWebRequest(webRequest);
 
-            // Check web request result in coroutine
-            Instance.StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
-                downloadHandler =>
-                {
-                    if (downloadHandler is DownloadHandlerAudioClip downloadHandlerAudioClip
-                        && downloadHandlerAudioClip.audioClip != null)
-                    {
-                        AudioClip audioClip = downloadHandlerAudioClip.audioClip;
-                        AddAudioClipToCache(uri, audioClip, streamAudio);
-
-                        o.OnNext(audioClip);
-                        o.OnCompleted();
-                    }
-                    else
-                    {
-                        o.OnError(new LoadAudioException($"Failed to load AudioClip from URI: '{uri}'"));
-                    }
-                },
-                ex =>
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to load AudioClip from URI: '{uri}': {ex.Message}");
-                    o.OnError(ex);
-                },
-                busyWaiting));
-
-            return Disposable.Empty;
-        });
+            AudioClip audioClip = (webRequest.downloadHandler as DownloadHandlerAudioClip).audioClip;
+            AddAudioClipToCache(uri, audioClip, streamAudio);
+            return audioClip;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load AudioClip from URI: '{uri}': {ex.Message}");
+            throw ex;
+        }
     }
 
     private bool TryGetUri(string uriString, out Uri uri)
@@ -198,5 +183,13 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
                 FullAudioClip = audioClip;
             }
         }
+    }
+
+    private static UnityWebRequest CreateAudioClipRequest(Uri uriHandle, bool streamAudio)
+    {
+        UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uriHandle, AudioType.UNKNOWN);
+        DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
+        downloadHandler.streamAudio = streamAudio;
+        return webRequest;
     }
 }

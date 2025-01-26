@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
 using static UnityEngine.Awaitable;
-using static ConditionTestUtils;
+using static ConditionUtils;
 using static SceneConditionTestUtils;
 using static VisualElementTestUtils;
 

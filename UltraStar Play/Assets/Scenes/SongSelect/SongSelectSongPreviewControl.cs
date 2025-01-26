@@ -136,21 +136,21 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         await base.StartSongPreview(songMeta);
     }
 
-    protected override IObservable<SongAudioLoadedEvent> StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
-    {
-        if (currentSongSelectEntryControl == null)
-        {
-            return Observable.Empty<SongAudioLoadedEvent>();
-        }
-        return base.StartAudioPreview(songMeta, previewStartInMillis);
-    }
-
-    protected override void StartVideoPreview(SongMeta songMeta)
+    protected override async Awaitable StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
     {
         if (currentSongSelectEntryControl == null)
         {
             return;
         }
-        base.StartVideoPreview(songMeta);
+        await base.StartAudioPreview(songMeta, previewStartInMillis);
+    }
+
+    protected override async Awaitable StartVideoPreview(SongMeta songMeta)
+    {
+        if (currentSongSelectEntryControl == null)
+        {
+            return;
+        }
+        await base.StartVideoPreview(songMeta);
     }
 }

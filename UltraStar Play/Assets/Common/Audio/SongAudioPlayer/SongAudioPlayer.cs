@@ -226,30 +226,31 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         }
     }
 
-    public void LoadAndPlay(
+    public async void LoadAndPlay(
         SongMeta songMeta,
         double startPositionInMillis = 0,
         bool streamAudio = true)
     {
-        LoadAndPlayAsObservable(
+        try
+        {
+            await LoadAndPlayAsync(
                 songMeta,
                 startPositionInMillis,
-                streamAudio)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                    "reason", ex.Message));
-            })
-            // Subscribe to trigger observable
-            .Subscribe(evt => Debug.Log($"Loaded audio: {evt.MediaUri}'"));
+                streamAudio);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", ex.Message));
+        }
     }
 
-    public IObservable<SongAudioLoadedEvent> LoadAndPlayAsObservable(SongMeta songMeta)
-        => LoadAndPlayAsObservable(songMeta, 0);
+    public async Awaitable<SongAudioLoadedEvent> LoadAndPlayAsync(SongMeta songMeta)
+        => await LoadAndPlayAsync(songMeta, 0);
 
-    public IObservable<SongAudioLoadedEvent> LoadAndPlayAsObservable(
+    public async Awaitable<SongAudioLoadedEvent> LoadAndPlayAsync(
         SongMeta songMeta,
         double startPositionInMillis,
         bool streamAudio = true)
@@ -259,27 +260,23 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
-            return ObservableUtils.LogExceptionThenThrow<SongAudioLoadedEvent>(
-                new SongAudioPlayerException($"Audio resource does not exist: {audioUri}"));
+            ExceptionUtils.LogThenThrow(new SongAudioPlayerException($"Audio resource does not exist: {audioUri}"));
         }
 
-        return DoLoadAndPlayAsObservable(audioUri, audioSupportProviders, streamAudio, startPositionInMillis)
-            .Select(evt =>
-            {
-                loadedSongMeta = songMeta;
-                DurationInMillis = currentAudioSupportProvider.DurationInMillis;
-                currentAudioSupportProvider.VolumeFactor = VolumeFactor;
-                if (IsPlaying)
-                {
-                    currentAudioSupportProvider.Play();
-                }
+        AudioLoadedEvent evt = await DoLoadAndPlayAsync(audioUri, audioSupportProviders, streamAudio, startPositionInMillis);
+        loadedSongMeta = songMeta;
+        DurationInMillis = currentAudioSupportProvider.DurationInMillis;
+        currentAudioSupportProvider.VolumeFactor = VolumeFactor;
+        if (IsPlaying)
+        {
+            currentAudioSupportProvider.Play();
+        }
 
-                loadedEventStream.OnNext(new SongAudioLoadedEvent(songMeta, evt.AudioUri));
-                return new SongAudioLoadedEvent(songMeta, evt.AudioUri);
-            });
+        loadedEventStream.OnNext(new SongAudioLoadedEvent(songMeta, evt.AudioUri));
+        return new SongAudioLoadedEvent(songMeta, evt.AudioUri);
     }
 
-    private IObservable<AudioLoadedEvent> DoLoadAndPlayAsObservable(
+    private async Awaitable<AudioLoadedEvent> DoLoadAndPlayAsync(
         string audioUri,
         IAudioSupportProvider[] availableAudioSupportProviders,
         bool streamAudio,
@@ -291,39 +288,31 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
             .FirstOrDefault(it => it.IsSupported(audioUri));
         if (audioSupportProvider == null)
         {
-            return ObservableUtils.LogExceptionThenThrow<AudioLoadedEvent>(
-                new SongAudioPlayerException($"Unsupported audio resource '{audioUri}'."));
+            ExceptionUtils.LogThenThrow(new SongAudioPlayerException($"Unsupported audio resource '{audioUri}'."));
         }
 
         Debug.Log($"Loading audio '{audioUri}' via {audioSupportProvider}");
 
-        return Observable.Create<AudioLoadedEvent>(o =>
+        try
         {
-            audioSupportProvider.LoadAsObservable(audioUri, streamAudio, startPositionInMillis)
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    IAudioSupportProvider[] remainingAudioSupportProviders = availableAudioSupportProviders
-                        .Except(new List<IAudioSupportProvider>() { audioSupportProvider })
-                        .ToArray();
-                    Debug.LogError($"Failed to load audio '{audioUri}' via {audioSupportProvider}. Using one of {remainingAudioSupportProviders.JoinWith(", ")} as fallback: {ex.Message}");
+            AudioLoadedEvent evt = await audioSupportProvider.LoadAsync(audioUri, streamAudio, startPositionInMillis);
+            currentAudioSupportProvider = audioSupportProvider;
+            return evt;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            IAudioSupportProvider[] remainingAudioSupportProviders = availableAudioSupportProviders
+                .Except(new List<IAudioSupportProvider>() { audioSupportProvider })
+                .ToArray();
+            Debug.LogError($"Failed to load audio '{audioUri}' via {audioSupportProvider}. Using one of {remainingAudioSupportProviders.JoinWith(", ")} as fallback: {ex.Message}");
 
-                    if (remainingAudioSupportProviders.IsNullOrEmpty())
-                    {
-                        o.OnError(new VideoSupportProviderException($"Failed to load audio and no remaining audio support providers: {audioUri}"));
-                        return;
-                    }
-                    DoLoadAndPlayAsObservable(audioUri, remainingAudioSupportProviders, streamAudio, startPositionInMillis)
-                        .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
-                })
-                .Subscribe(evt =>
-                {
-                    currentAudioSupportProvider = audioSupportProvider;
-                    o.OnNext(evt);
-                })
-                .AddTo(gameObject);
-            return Disposable.Empty;
-        });
+            if (remainingAudioSupportProviders.IsNullOrEmpty())
+            {
+                throw new VideoSupportProviderException($"Failed to load audio and no remaining audio support providers: {audioUri}");
+            }
+            return await DoLoadAndPlayAsync(audioUri, remainingAudioSupportProviders, streamAudio, startPositionInMillis);
+        }
     }
 
     public void UnloadAudio()
@@ -336,12 +325,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         currentAudioSupportProvider = null;
         DurationInMillis = 0;
         loadedSongMeta = null;
-    }
-
-    private void FireLoadedEvent(IObserver<SongAudioLoadedEvent> o, SongMeta songMeta, string audioUri)
-    {
-        o.OnNext(new SongAudioLoadedEvent(songMeta, audioUri));
-        loadedEventStream.OnNext(new SongAudioLoadedEvent(songMeta, audioUri));
     }
 
     public void ReloadAudio()

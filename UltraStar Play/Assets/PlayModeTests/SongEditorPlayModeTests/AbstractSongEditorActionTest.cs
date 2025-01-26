@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UniInject;
 using UnityEngine;
+using static ConditionUtils;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -19,7 +20,7 @@ public abstract class AbstractSongEditorActionTest : AbstractSongEditorTest
 
     protected async Awaitable ExpectCurrentSongEqualsExpectedResult(string expectedResultSong)
     {
-        await ConditionTestUtils.WaitForCondition(() =>
+        await WaitForCondition(() =>
         {
             UltraStarSongMeta expectedSongMeta = UltraStarSongParser.ParseFile(GetAbsoluteTestSongFilePath(expectedResultSong), out List<SongIssue> _);
             SongMetaAssertUtils.AssertSongMetasAreEqual(expectedSongMeta, SongMeta);

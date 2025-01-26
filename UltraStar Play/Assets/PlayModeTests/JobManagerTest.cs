@@ -4,7 +4,7 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
 using static UnityEngine.Awaitable;
-using static ConditionTestUtils;
+using static ConditionUtils;
 
 public class JobManagerTest : AbstractPlayModeTest
 {

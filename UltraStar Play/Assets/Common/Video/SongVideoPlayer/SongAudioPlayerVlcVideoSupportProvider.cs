@@ -2,6 +2,7 @@
 using LibVLCSharp;
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 {
@@ -25,21 +26,17 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
             && SongAudioPlayerVlcMediaPlayer != null;
     }
 
-    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis)
+    public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {
-        return Observable.Create<VideoLoadedEvent>(o =>
+        await ConditionUtils.WaitForCondition(() => !this || SongAudioPlayerVlcMediaPlayer?.Media?.Duration > 0,
+            new WaitForConditionConfig { description = "libVLC MediaPlayer has loaded audio with valid duration" });
+        if (!this)
         {
-            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => SongAudioPlayerVlcMediaPlayer != null
-                      && SongAudioPlayerVlcMediaPlayer.Media != null
-                      && SongAudioPlayerVlcMediaPlayer.Media.Duration > 0,
-                () =>
-                {
-                    mediaPlayer = SongAudioPlayerVlcMediaPlayer;
-                    o.OnNext(new VideoLoadedEvent(videoUri));
-                }));
-            return Disposable.Empty;
-        });
+            ExceptionUtils.LogThenThrow(new VideoSupportProviderException($"Failed to load video '{videoUri}': {nameof(SongAudioPlayerVlcVideoSupportProvider)} has been destroyed already."));
+        }
+
+        mediaPlayer = SongAudioPlayerVlcMediaPlayer;
+        return new VideoLoadedEvent(videoUri);
     }
 
     public override void Unload()

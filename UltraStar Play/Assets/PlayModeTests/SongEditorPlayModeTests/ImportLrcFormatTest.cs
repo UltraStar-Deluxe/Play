@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
-using static ConditionTestUtils;
+using static ConditionUtils;
 using static SceneConditionTestUtils;
 using static VisualElementTestUtils;
 

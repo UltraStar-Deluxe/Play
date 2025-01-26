@@ -1019,7 +1019,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         songRouletteControl.SelectEntryBySongMeta(randomSongMeta);
     }
 
-    private void CheckAudioThenStartSingScene(SongMeta songMeta)
+    private async void CheckAudioThenStartSingScene(SongMeta songMeta)
     {
         if (songMeta == null)
         {
@@ -1051,16 +1051,19 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
 
         // Check that the used audio format can be loaded.
-        songAudioPlayer.LoadAndPlayAsObservable(songMeta)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError( $"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
-                    "name", songMeta.Audio,
-                    "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
-            })
-            .Subscribe(_ => StartSingSceneWithGivenSongAndSettings(songMeta, false, true));
+        try
+        {
+            await songAudioPlayer.LoadAndPlayAsync(songMeta);
+            StartSingSceneWithGivenSongAndSettings(songMeta, false, true);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError( $"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
+                "name", songMeta.Audio,
+                "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
+        }
     }
 
     private void ShowFailedToLoadVoicesDialog(SongMeta songMeta)

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class ConditionTestUtils
+public class ConditionUtils
 {
     public const int DefaultTimeoutInMillis = 10000;
 
@@ -55,7 +55,7 @@ public class ConditionTestUtils
 public class WaitForConditionConfig
 {
     public string description = "condition";
-    public double timeoutInMillis = ConditionTestUtils.DefaultTimeoutInMillis;
+    public double timeoutInMillis = ConditionUtils.DefaultTimeoutInMillis;
     public double delayBetweenAttemptsInMillis = 500;
 
     public WaitForConditionConfig()

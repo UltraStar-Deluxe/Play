@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.TestTools;
-using static ConditionTestUtils;
+using static ConditionUtils;
 using static UnityEngine.Awaitable;
 
 public class ToggleMuteViaShortcutTest : AbstractPlayModeTest

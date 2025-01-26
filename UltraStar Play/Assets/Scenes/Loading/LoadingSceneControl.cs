@@ -167,39 +167,49 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         songMetas.ForEach(songMeta => PreloadSongMetaMedia(songMeta));
     }
 
-    private void PreloadSongMetaMedia(SongMeta songMeta)
+    private async void PreloadSongMetaMedia(SongMeta songMeta)
     {
         Debug.Log($"Preloading local media of song {songMeta}");
         try
         {
+            // Preload audio
             if (SongMetaUtils.AudioResourceExists(songMeta)
                 && !WebRequestUtils.IsHttpOrHttpsUri(SongMetaUtils.GetAudioUri(songMeta))
                 && ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(SongMetaUtils.GetAudioUri(songMeta)))
                 && !ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(SongMetaUtils.GetAudioUri(songMeta))))
             {
-                // Load as streaming audio
-                AudioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta)).Subscribe(
-                    loadedAudioClip => Debug.Log($"Preloaded AudioClip {loadedAudioClip.name}"));
+                string audioUri = SongMetaUtils.GetAudioUri(songMeta);
+                AudioClip loadedAudioClip = await AudioManager.LoadAudioClipFromUriAsync(audioUri);
+                Debug.Log($"Preloaded audio '{loadedAudioClip.name}'");
             }
 
+            // Preload cover
             if (SongMetaUtils.CoverResourceExists(songMeta)
                 && !WebRequestUtils.IsHttpOrHttpsUri(SongMetaUtils.GetCoverUri(songMeta))
                 && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(SongMetaUtils.GetCoverUri(songMeta))))
             {
-                ImageManager.LoadSpriteFromUriAsync(SongMetaUtils.GetCoverUri(songMeta));
+                string coverUri = SongMetaUtils.GetCoverUri(songMeta);
+                await ImageManager.LoadSpriteFromUriAsync(coverUri);
+                Debug.Log($"Preloaded cover image '{coverUri}'");
             }
 
+            // Preload background
             if (SongMetaUtils.BackgroundResourceExists(songMeta)
                 && !WebRequestUtils.IsHttpOrHttpsUri(SongMetaUtils.GetBackgroundUri(songMeta))
                 && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(SongMetaUtils.GetBackgroundUri(songMeta))))
             {
-                ImageManager.LoadSpriteFromUriAsync(SongMetaUtils.GetBackgroundUri(songMeta));
+                string backgroundUri = SongMetaUtils.GetBackgroundUri(songMeta);
+                await ImageManager.LoadSpriteFromUriAsync(backgroundUri);
+                Debug.Log($"Preloaded background image '{backgroundUri}'");
             }
 
             // Video resource of the song does not need to be cached.
 
             // Parse whole file by reading the voices.
-            Voice voice = songMeta.Voices.FirstOrDefault();
+            if (songMeta.TryGetVoice(EVoiceId.P1, out Voice _))
+            {
+                Debug.Log($"Preloaded voices of '{songMeta.GetArtistDashTitle()}'");
+            }
         }
         catch (Exception ex)
         {

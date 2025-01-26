@@ -2,13 +2,14 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static ConditionUtils;
 
 public class VisualElementTestUtils
 {
     public static async Awaitable<T> GetElement<T>(string uxmlName, string ussClass = null, VisualElement root = null, float timeoutInSeconds = 10)
         where T : VisualElement
     {
-        return await ConditionTestUtils.WaitForObject(
+        return await WaitForObject(
             () => GetRootVisualElement(root).Q<T>(uxmlName, ussClass),
             new WaitForConditionConfig {
                 description = $"UI element with UXML name '{uxmlName}' and USS class '{ussClass}' from root element '{GetRootVisualElement(root)?.name}'",
@@ -18,7 +19,7 @@ public class VisualElementTestUtils
     public static async Awaitable<T> GetElement<T>(Func<T, bool> predicate, VisualElement root = null, float timeoutInSeconds = 10)
         where T : VisualElement
     {
-        return await ConditionTestUtils.WaitForObject(
+        return await WaitForObject(
             () => GetRootVisualElement(root).Query<T>().Where(predicate).ToList().FirstOrDefault(),
             new WaitForConditionConfig {
                 description = $"UI element with predicate from root element '{GetRootVisualElement(root)?.name}'",
@@ -65,7 +66,7 @@ public class VisualElementTestUtils
 
     public static async Awaitable ExpectElementIsFocusableNow(VisualElement element, double timeoutInSeconds = 10)
     {
-        await ConditionTestUtils.WaitForCondition(
+        await WaitForCondition(
                 () => VisualElementUtils.IsFocusableNow(element, GetUiDocumentOrThrow()),
                 new WaitForConditionConfig
                 {
@@ -76,7 +77,7 @@ public class VisualElementTestUtils
 
     public static async Awaitable ExpectElementHasValue<T>(BaseField<T> element, T value, double timeoutInSeconds = 10)
     {
-        await ConditionTestUtils.WaitForCondition(
+        await WaitForCondition(
             () => Equals(element.value, value),
             new WaitForConditionConfig
             {

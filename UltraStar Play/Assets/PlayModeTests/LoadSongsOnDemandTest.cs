@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.TestTools;
 using static UnityEngine.Awaitable;
-using static ConditionTestUtils;
+using static ConditionUtils;
 using static SceneConditionTestUtils;
 using static VisualElementTestUtils;
 

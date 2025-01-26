@@ -10,33 +10,37 @@ public static class SongMetaImageUtils
 {
     private static YouTubeCoverImageProvider youTubeCoverImageProvider = new();
 
-    public static IObservable<string> GetBackgroundOrCoverImageUri(SongMeta songMeta)
+    public static async Awaitable<string> GetBackgroundOrCoverImageUri(SongMeta songMeta)
     {
         string uri = SongMetaUtils.GetBackgroundUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return Observable.Return(uri);
+            return uri;
         }
 
         // Try the cover image as fallback
         uri = SongMetaUtils.GetCoverUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return Observable.Return(uri);
+            return uri;
         }
 
         // Try to find an image via mods
         List<ISongBackgroundImageProvider> songBackgroundImageProviders = ModManager.GetModObjects<ISongBackgroundImageProvider>();
         if (songBackgroundImageProviders.IsNullOrEmpty())
         {
-            return Observable.Return("");
+            return "";
         }
-        return songBackgroundImageProviders
-            .Select(songBackgroundImageProvider => songBackgroundImageProvider.GetBackgroundImageUri(songMeta))
-            .Merge()
-            .Where(it => !it.IsNullOrEmpty())
-            .FirstOrDefault()
-            .ObserveOnMainThread();
+
+        foreach (ISongBackgroundImageProvider songBackgroundImageProvider in songBackgroundImageProviders)
+        {
+            string backgroundImageUri = await songBackgroundImageProvider.GetBackgroundImageUri(songMeta);
+            if (!backgroundImageUri.IsNullOrEmpty())
+            {
+                return backgroundImageUri;
+            }
+        }
+        return "";
     }
 
     public static async Awaitable<string> GetCoverOrBackgroundImageUri(SongMeta songMeta)

@@ -59,7 +59,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         }
     }
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
+    public override async Awaitable<AudioLoadedEvent> LoadAsync(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         if (vlcMediaPlayer == null)
         {
@@ -84,24 +84,15 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
-        return Observable.Create<AudioLoadedEvent>(o =>
+        await ConditionUtils.WaitForCondition(() => !this || IsFullyLoaded,
+            new WaitForConditionConfig {description = $"load audio '{audioUri}'" });
+        if (!this)
         {
-            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => this == null || IsFullyLoaded,
-                () =>
-                {
-                    if (this == null)
-                    {
-                        string errorMessage = $"Failed to load audio clip '{audioUri}': {nameof(VlcAudioSupportProvider)} has been destroyed already.";
-                        Debug.LogError(errorMessage);
-                        throw new AudioSupportProviderException(errorMessage);
-                    }
+            ExceptionUtils.LogThenThrow(new AudioSupportProviderException($"Failed to load audio clip '{audioUri}': {nameof(VlcAudioSupportProvider)} has been destroyed already."));
+        }
 
-                    vlcMediaPlayer.SetPause(!shouldBePlaying);
-                    o.OnNext(new AudioLoadedEvent(audioUri));
-                }));
-            return Disposable.Empty;
-        });
+        vlcMediaPlayer.SetPause(!shouldBePlaying);
+        return new AudioLoadedEvent(audioUri);
     }
 
     public override bool IsSupported(string audioUri)

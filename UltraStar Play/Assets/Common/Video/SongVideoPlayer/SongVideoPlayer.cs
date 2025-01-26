@@ -226,7 +226,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    private IObservable<VideoLoadedEvent> DoLoadAndPlayVideoAsObservable(
+    private async Awaitable<VideoLoadedEvent> DoLoadAndPlayVideoAsync(
         string videoUri,
         IVideoSupportProvider[] availableVideoSupportProviders,
         bool videoEqualsAudio)
@@ -239,38 +239,32 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             .FirstOrDefault(it => it.IsSupported(videoUri, videoEqualsAudio));
         if (videoSupportProvider == null)
         {
-            return ObservableUtils.LogExceptionThenThrow<VideoLoadedEvent>(
-                    new SongVideoPlayerException($"Unsupported video resource '{videoUri}'."));
+            ExceptionUtils.LogThenThrow(new SongVideoPlayerException($"Unsupported video resource '{videoUri}'."));
         }
 
         Debug.Log($"Loading video '{videoUri}' via {videoSupportProvider}");
 
-        return Observable.Create<VideoLoadedEvent>(o =>
+        try
         {
-            videoSupportProvider.LoadAsObservable(videoUri, songAudioPlayer.PositionInMillis)
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    IVideoSupportProvider[] remainingVideoSupportProviders = availableVideoSupportProviders
-                        .Except(new List<IVideoSupportProvider>() { videoSupportProvider })
-                        .ToArray();
-                    Debug.LogError($"Failed to load video '{videoUri}' via {videoSupportProvider}. Using one of {remainingVideoSupportProviders.JoinWith(", ")} as fallback: {ex.Message}");
+            VideoLoadedEvent evt = await videoSupportProvider.LoadAsync(videoUri, songAudioPlayer.PositionInMillis);
+            currentVideoSupportProvider = videoSupportProvider;
+            return evt;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            IVideoSupportProvider[] remainingVideoSupportProviders = availableVideoSupportProviders
+                .Except(new List<IVideoSupportProvider>() { videoSupportProvider })
+                .ToArray();
+            Debug.LogError($"Failed to load video '{videoUri}' via {videoSupportProvider}. Using one of {remainingVideoSupportProviders.JoinWith(", ")} as fallback: {ex.Message}");
 
-                    if (remainingVideoSupportProviders.IsNullOrEmpty())
-                    {
-                        o.OnError(new VideoSupportProviderException($"Failed to load video and no remaining video support providers: {videoUri}"));
-                        return;
-                    }
-                    DoLoadAndPlayVideoAsObservable(videoUri, remainingVideoSupportProviders, videoEqualsAudio)
-                        .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
-                })
-                .Subscribe(evt =>
-                {
-                    currentVideoSupportProvider = videoSupportProvider;
-                    o.OnNext(evt);
-                });
-            return Disposable.Empty;
-        });
+            if (remainingVideoSupportProviders.IsNullOrEmpty())
+            {
+                throw new VideoSupportProviderException($"Failed to load video and no remaining video support providers: {videoUri}");
+            }
+
+            return await DoLoadAndPlayVideoAsync(videoUri, remainingVideoSupportProviders, videoEqualsAudio);
+        }
     }
 
     private void ShowVideoImageVisualElement()
@@ -396,7 +390,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         return videoGapInMillis < 0 && positionInMillis < -videoGapInMillis;
     }
 
-    public void ShowBackgroundImage(SongMeta songMeta)
+    public async Awaitable ShowBackgroundImage(SongMeta songMeta)
     {
         if (songMeta == null)
         {
@@ -411,8 +405,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             videoImageVisualElement.style.opacity = 0;
         }
 
-        SongMetaImageUtils.GetBackgroundOrCoverImageUri(songMeta)
-            .Subscribe(uri => SetBackgroundImageFromUri(uri));
+        string uri = await SongMetaImageUtils.GetBackgroundOrCoverImageUri(songMeta);
+        SetBackgroundImageFromUri(uri);
     }
 
     private async void SetBackgroundImageFromUri(string uri)
@@ -431,51 +425,51 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         HasLoadedBackgroundImage = true;
     }
 
-    public void ReloadVideo()
+    public async void ReloadVideo()
     {
         // This method is used in the SongEditor. But only on Standalone platform when the video file changed.
-        LoadAndPlayAsObservable(loadedSongMeta)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to reload video: {ex.Message}");
-            })
-            // Subscribe to trigger the observable
-            .Subscribe(evt => Debug.Log($"Loaded video: {evt.MediaUri}"));
+        try
+        {
+            await LoadAndPlayAsync(loadedSongMeta);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to reload video: {ex.Message}");
+        }
     }
 
-    public void LoadAndPlayVideoOrShowBackgroundImage(SongMeta songMeta)
+    public async Awaitable LoadAndPlayVideoOrShowBackgroundImage(SongMeta songMeta)
     {
         if (!HasVideoUri(songMeta)
             || IsSongVideoPlaybackDisabled())
         {
-            ShowBackgroundImage(songMeta);
+            await ShowBackgroundImage(songMeta);
             return;
         }
 
-        LoadAndPlayAsObservable(songMeta)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to load video of '{songMeta.GetArtistDashTitle()}': {ex.Message}");
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                    "reason",
-                    ex.Message));
-                ShowBackgroundImage(songMeta);
-            })
-            // Subscribe to trigger observable
-            .Subscribe(evt =>
-            {
-                Debug.Log($"Successfully loaded video of song '{songMeta.GetArtistDashTitle()}'");
+        try
+        {
+            await LoadAndPlayAsync(songMeta);
 
-                if (loadedSongMeta.VideoGapInMillis > 0)
-                {
-                    // Positive VideoGap, thus skip the start of the video
-                    PositionInMillis = loadedSongMeta.VideoGapInMillis;
-                }
+            Debug.Log($"Successfully loaded video of song '{songMeta.GetArtistDashTitle()}'");
+            if (loadedSongMeta.VideoGapInMillis > 0)
+            {
+                // Positive VideoGap, thus skip the start of the video
+                PositionInMillis = loadedSongMeta.VideoGapInMillis;
+            }
 
-                ShowVideoImageVisualElement();
-            });
+            ShowVideoImageVisualElement();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load video of '{songMeta.GetArtistDashTitle()}': {ex.Message}");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason",
+                ex.Message));
+            await ShowBackgroundImage(songMeta);
+        }
     }
 
     private bool IsSongVideoPlaybackDisabled()
@@ -493,7 +487,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public IObservable<SongVideoLoadedEvent> LoadAndPlayAsObservable(SongMeta songMeta)
+    public async Awaitable<SongVideoLoadedEvent> LoadAndPlayAsync(SongMeta songMeta)
     {
         UnloadVideo();
 
@@ -502,36 +496,30 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         if (videoUri.IsNullOrEmpty())
         {
-            return ObservableUtils.LogExceptionThenThrow<SongVideoLoadedEvent>(
-                new SongVideoPlayerException($"Ignoring empty video resource"));
+            ExceptionUtils.LogThenThrow(new SongVideoPlayerException($"Ignoring empty video resource"));
         }
 
         if (ignoredVideoFiles.Contains(songMeta.Video))
         {
-            return ObservableUtils.LogExceptionThenThrow<SongVideoLoadedEvent>(
-                new SongVideoPlayerException($"Ignoring video resource: '{videoUri}'"));
+            ExceptionUtils.LogThenThrow(new SongVideoPlayerException($"Ignoring video resource: '{videoUri}'"));
         }
 
         if (!SongMetaUtils.ResourceExists(songMeta, videoUri))
         {
-            return ObservableUtils.LogExceptionThenThrow<SongVideoLoadedEvent>(
-                new SongVideoPlayerException($"Video resource does not exist: {videoUri}"));
+            ExceptionUtils.LogThenThrow(new SongVideoPlayerException($"Video resource does not exist: {videoUri}"));
         }
 
-        return DoLoadAndPlayVideoAsObservable(
-                videoUri,
-                videoSupportProviders,
-                songMeta.Video == songMeta.Audio)
-            .Select(evt =>
-            {
-                loadedSongMeta = songMeta;
-                DurationInMillis = currentVideoSupportProvider.DurationInMillis;
-                currentVideoSupportProvider.PositionInMillis = songAudioPlayer.PositionInMillis;
-                currentVideoSupportProvider.SetTargetTexture(videoPlayer.targetTexture);
-                PlayVideo();
+        VideoLoadedEvent evt = await DoLoadAndPlayVideoAsync(
+            videoUri,
+            videoSupportProviders,
+            songMeta.Video == songMeta.Audio);
+        loadedSongMeta = songMeta;
+        DurationInMillis = currentVideoSupportProvider.DurationInMillis;
+        currentVideoSupportProvider.PositionInMillis = songAudioPlayer.PositionInMillis;
+        currentVideoSupportProvider.SetTargetTexture(videoPlayer.targetTexture);
+        PlayVideo();
 
-                return new SongVideoLoadedEvent(songMeta, evt.VideoUri);
-            });
+        return new SongVideoLoadedEvent(songMeta, evt.VideoUri);
     }
 
     private void UpdateBackgroundScaleMode()
