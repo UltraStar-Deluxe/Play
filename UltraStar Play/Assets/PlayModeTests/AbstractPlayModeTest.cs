@@ -38,8 +38,8 @@ public abstract class AbstractPlayModeTest : AbstractInputSystemTest, INeedInjec
     public IEnumerator UnitySetUp() => UnitySetUpAsync();
     private async Awaitable UnitySetUpAsync()
     {
-        await SetUpTestFixture();
-        await LoadTestScene();
+        await SetUpTestFixtureAsync();
+        await LoadTestSceneAsync();
         await Awaitable.EndOfFrameAsync();
     }
 
@@ -47,10 +47,10 @@ public abstract class AbstractPlayModeTest : AbstractInputSystemTest, INeedInjec
     public IEnumerator UnityTearDown() => UnityTearDownAsync();
     private async Awaitable UnityTearDownAsync()
     {
-        await TearDownTestFixture();
+        await TearDownTestFixtureAsync();
     }
 
-    private async Awaitable SetUpTestFixture()
+    private async Awaitable SetUpTestFixtureAsync()
     {
         SettingsManager.SettingsLoaderSaver = new TestSettingsLoaderSaver();
         StatisticsManager.StatisticsLoaderSaver = new TestStatisticsLoaderSaver();
@@ -72,7 +72,7 @@ public abstract class AbstractPlayModeTest : AbstractInputSystemTest, INeedInjec
                 }
             });
 
-        await LoadInitialScene();
+        await LoadInitialSceneAsync();
 
         AssertUtils.HasType<TestSettings>(SettingsManager.Instance.Settings);
         ConfigureTestSettings(SettingsManager.Instance.Settings as TestSettings);
@@ -88,7 +88,7 @@ public abstract class AbstractPlayModeTest : AbstractInputSystemTest, INeedInjec
         Keyboard = InputSystem.GetDevice<Keyboard>();
     }
 
-    private async Awaitable TearDownTestFixture()
+    private async Awaitable TearDownTestFixtureAsync()
     {
         SettingsManager.SettingsLoaderSaver = null;
         StatisticsManager.StatisticsLoaderSaver = null;
@@ -216,18 +216,18 @@ public abstract class AbstractPlayModeTest : AbstractInputSystemTest, INeedInjec
         SimulatedMicrophoneAdapter.SetSimulatedDevicePitchInHz(playerProfile.Name, 440);
     }
 
-    private async Awaitable LoadInitialScene()
+    private async Awaitable LoadInitialSceneAsync()
     {
         // Start with a simple scene that has all common objects but does not require a special game state.
-        await LoadSceneByName("CommonTestScene");
+        await LoadSceneByNameAsync("CommonTestScene");
     }
 
-    public async Awaitable LoadTestScene()
+    public async Awaitable LoadTestSceneAsync()
     {
-        await LoadSceneByName(TestSceneName);
+        await LoadSceneByNameAsync(TestSceneName);
     }
 
-    private static async Awaitable LoadSceneByName(string sceneName)
+    private static async Awaitable LoadSceneByNameAsync(string sceneName)
     {
         if (sceneName.IsNullOrEmpty())
         {
@@ -236,7 +236,7 @@ public abstract class AbstractPlayModeTest : AbstractInputSystemTest, INeedInjec
 
         Debug.Log($"Loading test scene {sceneName}");
         SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
-        await WaitForCondition(
+        await WaitForConditionAsync(
             () => SceneManager.GetActiveScene().name == sceneName,
             new WaitForConditionConfig {description = $"test scene loaded: sceneName '{sceneName}'"});
     }

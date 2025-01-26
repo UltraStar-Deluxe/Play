@@ -28,7 +28,7 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
 
     public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {
-        await ConditionUtils.WaitForCondition(() => !this || SongAudioPlayerVlcMediaPlayer?.Media?.Duration > 0,
+        await ConditionUtils.WaitForConditionAsync(() => !this || SongAudioPlayerVlcMediaPlayer?.Media?.Duration > 0,
             new WaitForConditionConfig { description = "libVLC MediaPlayer has loaded audio with valid duration" });
         if (!this)
         {

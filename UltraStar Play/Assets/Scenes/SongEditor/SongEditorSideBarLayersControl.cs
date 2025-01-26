@@ -41,7 +41,7 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
     public void OnInjectionFinished()
     {
         // LayerManager might not be initialized yet. So wait one frame.
-        AwaitableUtils.ExecuteAfterDelayInFrames(1, () =>
+        AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () =>
         {
             layerManager.GetVoiceLayers()
                 .ForEach(layer => CreateLayerInputControl(layer));

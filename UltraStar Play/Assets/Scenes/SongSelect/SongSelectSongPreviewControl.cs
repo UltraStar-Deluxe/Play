@@ -100,7 +100,7 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         }
     }
 
-    public async Awaitable StartSongPreview(SongSelectEntrySelection songSelectEntrySelection)
+    public void StartSongPreview(SongSelectEntrySelection songSelectEntrySelection)
     {
         if (songSelectEntrySelection.Index != initialSongIndex)
         {
@@ -121,10 +121,10 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         currentSongSelectEntryControl = songRouletteControl.EntryControls
             .FirstOrDefault(it => it.SongSelectEntry == selectedSongEntry);
 
-        await StartSongPreview(selectedSongEntry.SongMeta);
+        StartSongPreview(selectedSongEntry.SongMeta);
     }
 
-    public override async Awaitable StartSongPreview(SongMeta songMeta)
+    public override void StartSongPreview(SongMeta songMeta)
     {
         if (currentSongSelectEntryControl == null)
         {
@@ -133,24 +133,24 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         songPreviewVideoImage.HideByDisplay();
         songPreviewBackgroundImage.HideByDisplay();
 
-        await base.StartSongPreview(songMeta);
+        base.StartSongPreview(songMeta);
     }
 
-    protected override async Awaitable StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
+    protected override async Awaitable StartAudioPreviewAsync(SongMeta songMeta, int previewStartInMillis)
     {
         if (currentSongSelectEntryControl == null)
         {
             return;
         }
-        await base.StartAudioPreview(songMeta, previewStartInMillis);
+        await base.StartAudioPreviewAsync(songMeta, previewStartInMillis);
     }
 
-    protected override async Awaitable StartVideoPreview(SongMeta songMeta)
+    protected override async Awaitable StartVideoPreviewAsync(SongMeta songMeta)
     {
         if (currentSongSelectEntryControl == null)
         {
             return;
         }
-        await base.StartVideoPreview(songMeta);
+        await base.StartVideoPreviewAsync(songMeta);
     }
 }

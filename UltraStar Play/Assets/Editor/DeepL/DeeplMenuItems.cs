@@ -100,7 +100,7 @@ public static class DeeplTranslationMenuItems
                 continue;
             }
 
-            Dictionary<string, string> translationResults = await TranslateViaDeepL(
+            Dictionary<string, string> translationResults = await TranslateViaDeeplAsync(
                 authKey,
                 targetLanguage.ToString(),
                 missingProTransTranslations);
@@ -151,7 +151,7 @@ public static class DeeplTranslationMenuItems
         }
     }
 
-    private static async Task<Dictionary<string, string>> TranslateViaDeepL(
+    private static async Task<Dictionary<string, string>> TranslateViaDeeplAsync(
         string authKey,
         string targetLanguage,
         List<ProTransTranslation> proTransTranslations)
@@ -164,7 +164,7 @@ public static class DeeplTranslationMenuItems
             .ToArray();
         Debug.Log($"Translating {texts.Length} texts to '{targetLanguage}' via DeepL:\n    {texts.JoinWith("\n    ")}");
 
-        DeeplResponse response = await PerformDeeplRequest(
+        DeeplResponse response = await PerformDeeplRequestAsync(
             authKey,
             texts,
             targetLanguage);
@@ -218,7 +218,7 @@ public static class DeeplTranslationMenuItems
         public string value;
     }
 
-    private static async Task<DeeplResponse> PerformDeeplRequest(
+    private static async Task<DeeplResponse> PerformDeeplRequestAsync(
         string authKey,
         string[] strings,
         string targetLanguage)

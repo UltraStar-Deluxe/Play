@@ -377,7 +377,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker
         // Thus, send the new position in song more aggressively.
         List<float> delaysInSeconds = new(){ 0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
         delaysInSeconds.ForEach(delayInSeconds =>
-            AwaitableUtils.ExecuteAfterDelayInSeconds(gameObject, delayInSeconds, () => SendPositionToClient()));
+            AwaitableUtils.ExecuteAfterDelayInSecondsAsync(gameObject, delayInSeconds, () => SendPositionToClient()));
     }
 
     private void SendPositionToClient()
@@ -551,7 +551,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker
         {
             // After last sentence or no sentences at all.
             // Wait until the mic has finished recording the last note.
-            AwaitableUtils.ExecuteAfterDelayInSeconds(gameObject, 1f,
+            AwaitableUtils.ExecuteAfterDelayInSecondsAsync(gameObject, 1f,
                 () =>
                 {
                     currentAndUpcomingNotesInRecordingSentence = new List<Note>();

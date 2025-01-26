@@ -390,7 +390,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         return videoGapInMillis < 0 && positionInMillis < -videoGapInMillis;
     }
 
-    public async Awaitable ShowBackgroundImage(SongMeta songMeta)
+    public async void ShowBackgroundImage(SongMeta songMeta)
     {
         if (songMeta == null)
         {
@@ -405,7 +405,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             videoImageVisualElement.style.opacity = 0;
         }
 
-        string uri = await SongMetaImageUtils.GetBackgroundOrCoverImageUri(songMeta);
+        string uri = await SongMetaImageUtils.GetBackgroundOrCoverImageUriAsync(songMeta);
         SetBackgroundImageFromUri(uri);
     }
 
@@ -439,12 +439,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public async Awaitable LoadAndPlayVideoOrShowBackgroundImage(SongMeta songMeta)
+    public async void LoadAndPlayVideoOrShowBackgroundImage(SongMeta songMeta)
     {
         if (!HasVideoUri(songMeta)
             || IsSongVideoPlaybackDisabled())
         {
-            await ShowBackgroundImage(songMeta);
+            ShowBackgroundImage(songMeta);
             return;
         }
 
@@ -468,7 +468,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                 "reason",
                 ex.Message));
-            await ShowBackgroundImage(songMeta);
+            ShowBackgroundImage(songMeta);
         }
     }
 

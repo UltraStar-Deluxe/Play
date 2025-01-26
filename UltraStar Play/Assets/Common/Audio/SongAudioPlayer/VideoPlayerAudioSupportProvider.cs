@@ -39,7 +39,7 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
         PositionInMillis = startPositionInMillis;
 
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
-        await ConditionUtils.WaitForCondition(() => !this || videoPlayer.length > 0 || videoPlayerErrorMessages.Count > 0,
+        await ConditionUtils.WaitForConditionAsync(() => !this || videoPlayer.length > 0 || videoPlayerErrorMessages.Count > 0,
             new WaitForConditionConfig {description = $"load audio '{audioUri}'" });
         if (!this)
         {

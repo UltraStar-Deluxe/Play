@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class YouTubeCoverImageProvider : ISongCoverImageProvider
 {
-    public async Awaitable<string> GetCoverImageUri(SongMeta songMeta)
+    public async Awaitable<string> GetCoverImageUriAsync(SongMeta songMeta)
     {
         string webViewUri = SongMetaUtils.GetWebViewUrl(songMeta);
         if (TryGetYouTubeUri(webViewUri, out Uri uri))

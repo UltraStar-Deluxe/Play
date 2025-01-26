@@ -112,7 +112,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         return audioFadeInFactorEased;
     }
 
-    public virtual async Awaitable StartSongPreview(SongMeta songMeta)
+    public virtual async void StartSongPreview(SongMeta songMeta)
     {
         if (!gameObject.activeInHierarchy)
         {
@@ -134,11 +134,11 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             && delayInMillis > 0)
         {
             await Awaitable.WaitForSecondsAsync(delayInMillis / 1000f);
-            await DoStartSongPreview(songMeta);
+            await DoStartSongPreviewAsync(songMeta);
         }
         else
         {
-            await DoStartSongPreview(songMeta);
+            await DoStartSongPreviewAsync(songMeta);
         }
     }
 
@@ -188,7 +188,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         stopSongPreviewEventStream.OnNext(currentPreviewSongMeta);
     }
 
-    protected virtual async Awaitable DoStartSongPreview(SongMeta songMeta)
+    protected virtual async Awaitable DoStartSongPreviewAsync(SongMeta songMeta)
     {
         if (songMeta == null
             || currentPreviewSongMeta != songMeta)
@@ -201,13 +201,13 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         videoFadeInStartTimeInSeconds = Time.time;
         isFadeInStarted = true;
         int previewStartInMillis = GetPreviewStartInMillis(songMeta);
-        await StartAudioPreview(songMeta, previewStartInMillis);
-        await StartVideoPreview(songMeta);
+        await StartAudioPreviewAsync(songMeta, previewStartInMillis);
+        await StartVideoPreviewAsync(songMeta);
 
         startSongPreviewEventStream.OnNext(songMeta);
     }
 
-    protected virtual async Awaitable StartVideoPreview(SongMeta songMeta)
+    protected virtual async Awaitable StartVideoPreviewAsync(SongMeta songMeta)
     {
         if (!gameObject.activeInHierarchy
             || songVideoPlayer == null
@@ -229,10 +229,10 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         VideoFadeIn.Value = 0;
         BackgroundImageFadeIn.Value = 0;
 
-        await songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(songMeta);
+        songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(songMeta);
     }
 
-    protected virtual async Awaitable StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
+    protected virtual async Awaitable StartAudioPreviewAsync(SongMeta songMeta, int previewStartInMillis)
     {
         if (!gameObject.activeInHierarchy)
         {

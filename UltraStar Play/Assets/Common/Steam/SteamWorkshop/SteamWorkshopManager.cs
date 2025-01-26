@@ -116,7 +116,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
     private async Task<List<Item>> QuerySubscribedWorkshopItemsAsync()
     {
         Debug.Log($"Querying subscribed Steam Workshop items");
-        List<Item> result = await ReadAllPages(Query.Items.WhereUserSubscribed());
+        List<Item> result = await ReadAllPagesAsync(Query.Items.WhereUserSubscribed());
         Debug.Log($"Found {result.Count} subscribed Steam Workshop items");
         return result;
     }
@@ -124,12 +124,12 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
     private async Task<List<Item>> QueryPublishedWorkshopItemsAsync()
     {
         Debug.Log($"Querying published Steam Workshop items");
-        List<Item> result = await ReadAllPages(Query.Items.WhereUserPublished());
+        List<Item> result = await ReadAllPagesAsync(Query.Items.WhereUserPublished());
         Debug.Log($"Found {result.Count} published Steam Workshop items");
         return result;
     }
 
-    private async Task<List<Item>> ReadAllPages(Query ugcQuery)
+    private async Task<List<Item>> ReadAllPagesAsync(Query ugcQuery)
     {
         // Some entries are returned multiple times. Thus, Use dictionary with unique ID as key.
         Dictionary<ulong, Item> itemIdToItem = new();
@@ -172,7 +172,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         bool isNewWorkshopItem = workshopItemId <= 0;
         if (isNewWorkshopItem)
         {
-            string errorMessage = await GetNewWorkshopItemErrorMessage(contentFolderPath, previewImagePath, title);
+            string errorMessage = await GetNewWorkshopItemErrorMessageAsync(contentFolderPath, previewImagePath, title);
             if (!errorMessage.IsNullOrEmpty())
             {
                 throw new SteamException(errorMessage);
@@ -254,7 +254,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         await DownloadWorkshopItemsAsObservable();
     }
 
-    private async Task<string> GetNewWorkshopItemErrorMessage(string contentFolderPath, string previewImagePath, string title)
+    private async Task<string> GetNewWorkshopItemErrorMessageAsync(string contentFolderPath, string previewImagePath, string title)
     {
         if (!DirectoryUtils.Exists(contentFolderPath))
         {

@@ -3,8 +3,8 @@ using static ConditionUtils;
 
 public class SceneConditionTestUtils
 {
-    public static async Awaitable ExpectScene(EScene scene, WaitForConditionConfig config = null)
+    public static async Awaitable ExpectSceneAsync(EScene scene, WaitForConditionConfig config = null)
     {
-        await WaitForCondition(() => SceneNavigator.Instance.CurrentScene == scene, config);
+        await WaitForConditionAsync(() => SceneNavigator.Instance.CurrentScene == scene, config);
     }
 }

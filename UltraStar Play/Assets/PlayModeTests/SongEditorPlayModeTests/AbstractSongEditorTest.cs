@@ -12,7 +12,7 @@ public abstract class AbstractSongEditorTest : AbstractPlayModeTest
     protected override List<string> GetRelativeTestSongFilePaths()
         => new List<string> { "SongEditorTestSongs/EditSongMeta.txt" };
 
-    protected async Awaitable OpenSongEditorWithNewSong(string fileName)
+    protected async Awaitable OpenSongEditorWithNewSongAsync(string fileName)
     {
         // Add song
         Debug.Log($"add song '{fileName}'");
@@ -33,7 +33,7 @@ public abstract class AbstractSongEditorTest : AbstractPlayModeTest
             SongMeta = songMeta,
             PreviousScene = EScene.SongSelectScene,
         });
-        await SceneConditionTestUtils.ExpectScene(EScene.SongEditorScene);
+        await SceneConditionTestUtils.ExpectSceneAsync(EScene.SongEditorScene);
         Debug.Log($"loaded song editor successfully with '{songMeta.GetArtistDashTitle()}'");
         await Awaitable.WaitForSecondsAsync(0.1f);
     }

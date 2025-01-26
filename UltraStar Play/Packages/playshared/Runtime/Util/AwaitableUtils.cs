@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 public static class AwaitableUtils
 {
-    public static async Awaitable ExecuteAfterDelayInFrames(int delayInFrames, Action action)
+    public static async Awaitable ExecuteAfterDelayInFramesAsync(int delayInFrames, Action action)
     {
         for (int i = 0; i < delayInFrames; i++)
         {
@@ -16,7 +16,7 @@ public static class AwaitableUtils
         action();
     }
 
-    public static async Awaitable ExecuteAfterDelayInFrames(GameObject gameObject, int delayInFrames, Action action)
+    public static async Awaitable ExecuteAfterDelayInFramesAsync(GameObject gameObject, int delayInFrames, Action action)
     {
         for (int i = 0; i < delayInFrames; i++)
         {
@@ -32,14 +32,14 @@ public static class AwaitableUtils
         action();
     }
 
-    public static async Awaitable ExecuteAfterDelayInSeconds(float delayInSeconds, Action action)
+    public static async Awaitable ExecuteAfterDelayInSecondsAsync(float delayInSeconds, Action action)
     {
         await Awaitable.WaitForSecondsAsync(delayInSeconds);
         // Code to execute after the delay
         action();
     }
 
-    public static async Awaitable ExecuteAfterDelayInSeconds(GameObject gameObject, float delayInSeconds, Action action)
+    public static async Awaitable ExecuteAfterDelayInSecondsAsync(GameObject gameObject, float delayInSeconds, Action action)
     {
         await Awaitable.WaitForSecondsAsync(delayInSeconds);
 
@@ -52,7 +52,7 @@ public static class AwaitableUtils
         action();
     }
 
-    public static async Awaitable ExecuteRepeatedlyInSeconds(GameObject gameObject, float delayInSeconds, Action action)
+    public static async Awaitable ExecuteRepeatedlyInSecondsAsync(GameObject gameObject, float delayInSeconds, Action action)
     {
         string gameObjectName = gameObject.name;
 
@@ -66,7 +66,7 @@ public static class AwaitableUtils
         Log.Debug(() => $"Exited loop because until GameObject '{gameObjectName}' has been destroyed");
     }
 
-    public static async Awaitable SendWebRequest(UnityWebRequest unityWebRequest)
+    public static async Awaitable SendWebRequestAsync(UnityWebRequest unityWebRequest)
     {
         void LogSuccess()
         {
@@ -104,7 +104,7 @@ public static class AwaitableUtils
 
     public static async Awaitable<string> GetWebRequestResponseAsync(UnityWebRequest unityWebRequest)
     {
-        await SendWebRequest(unityWebRequest);
+        await SendWebRequestAsync(unityWebRequest);
         return unityWebRequest.downloadHandler?.text;
     }
 }

@@ -304,7 +304,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
             modSettingsProblemHintIcon,
             SettingsProblemHintControl.GetModSettingsProblems(modManager));
 
-        AwaitableUtils.ExecuteRepeatedlyInSeconds(gameObject, 0.5f, () =>
+        AwaitableUtils.ExecuteRepeatedlyInSecondsAsync(gameObject, 0.5f, () =>
         {
             songSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songIssueManager));
             recordingSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetRecordingSettingsProblems(settings));

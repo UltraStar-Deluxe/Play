@@ -22,16 +22,16 @@ public class JobManagerTest : AbstractPlayModeTest
     private async Awaitable ShouldFailParentJobAsync()
     {
         LogAssertUtils.IgnoreFailingMessages();
-        await EnqueueJobs(true);
+        await EnqueueJobsAsync(true);
         await WaitForSecondsAsync(0.5f);
 
-        await StartJob(childJob1);
+        await StartJobAsync(childJob1);
         await WaitForSecondsAsync(0.5f);
 
-        await FailJob(childJob1);
+        await FailJobAsync(childJob1);
         await WaitForSecondsAsync(0.5f);
 
-        await ExpectJobResult(EJobResult.Error, childJob1, parentJob);
+        await ExpectJobResultAsync(EJobResult.Error, childJob1, parentJob);
     }
 
     [UnityTest]
@@ -39,20 +39,20 @@ public class JobManagerTest : AbstractPlayModeTest
     private async Awaitable ShouldNotFailParentAsync()
     {
         LogAssertUtils.IgnoreFailingMessages();
-        await EnqueueJobs(false);
+        await EnqueueJobsAsync(false);
         await WaitForSecondsAsync(0.5f);
 
-        await StartJob(childJob1);
+        await StartJobAsync(childJob1);
         await WaitForSecondsAsync(0.5f);
 
-        await FailJob(childJob1);
+        await FailJobAsync(childJob1);
         await WaitForSecondsAsync(0.5f);
 
-        await ExpectJobResult(EJobResult.Error, childJob1);
-        await ExpectJobResult(EJobResult.Pending, parentJob);
+        await ExpectJobResultAsync(EJobResult.Error, childJob1);
+        await ExpectJobResultAsync(EJobResult.Pending, parentJob);
     }
 
-    private async Awaitable EnqueueJobs(bool adoptChildJobError)
+    private async Awaitable EnqueueJobsAsync(bool adoptChildJobError)
     {
         parentJob = new Job(Translation.Of(nameof(parentJob)));
         parentJob.AdoptChildJobError = adoptChildJobError;
@@ -67,24 +67,24 @@ public class JobManagerTest : AbstractPlayModeTest
         await WaitForSecondsAsync(0.5f);
     }
 
-    private async Awaitable StartJob(Job job)
+    private async Awaitable StartJobAsync(Job job)
     {
         Debug.Log($"Start job {job.Name}");
         childJob1.SetStatus(EJobStatus.Running);
         await WaitForSecondsAsync(0.5f);
     }
 
-    private async Awaitable FailJob(Job job)
+    private async Awaitable FailJobAsync(Job job)
     {
         Debug.Log($"Fail job {job.Name}");
         job.SetResult(EJobResult.Error);
         await WaitForSecondsAsync(0.5f);
     }
 
-    private async Awaitable ExpectJobResult(EJobResult jobResult, params Job[] jobs)
+    private async Awaitable ExpectJobResultAsync(EJobResult jobResult, params Job[] jobs)
     {
         string jobNameCsv = jobs.Select(job => job.Name).JoinWith(",");
-        await WaitForCondition(
+        await WaitForConditionAsync(
             () => jobs.AllMatch(job => job.Result.Value == jobResult),
             new WaitForConditionConfig { description = $"Expect job result {jobResult} for {jobNameCsv}" });
     }

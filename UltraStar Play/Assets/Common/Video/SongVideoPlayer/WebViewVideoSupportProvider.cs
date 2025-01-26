@@ -15,7 +15,7 @@ public class WebViewVideoSupportProvider : AbstractVideoSupportProvider
 
     public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {
-        await ConditionUtils.WaitForCondition(() => !this || webViewManager.DurationInMillis > 0,
+        await ConditionUtils.WaitForConditionAsync(() => !this || webViewManager.DurationInMillis > 0,
             new WaitForConditionConfig {description = $"load video '{videoUri}'", timeoutInMillis = 30000});
         if (!this)
         {

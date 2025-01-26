@@ -5,23 +5,23 @@ public class ConditionUtils
 {
     public const int DefaultTimeoutInMillis = 10000;
 
-    public static async Awaitable<T> WaitForObject<T>(Func<T> getter, WaitForConditionConfig config = null)
+    public static async Awaitable<T> WaitForObjectAsync<T>(Func<T> getter, WaitForConditionConfig config = null)
     {
-        await WaitForCondition(() => getter() != null,
+        await WaitForConditionAsync(() => getter() != null,
             new WaitForConditionConfig(config) { description = $"wait for object '{config.description}'" });
         return getter();
     }
 
-    public static async Awaitable WaitForCondition(Action action, WaitForConditionConfig config = null)
+    public static async Awaitable WaitForConditionAsync(Action action, WaitForConditionConfig config = null)
     {
-        await WaitForCondition(() =>
+        await WaitForConditionAsync(() =>
         {
             action();
             return true;
         }, config);
     }
 
-    public static async Awaitable WaitForCondition(Func<bool> condition, WaitForConditionConfig config = null)
+    public static async Awaitable WaitForConditionAsync(Func<bool> condition, WaitForConditionConfig config = null)
     {
         config ??= new WaitForConditionConfig();
 

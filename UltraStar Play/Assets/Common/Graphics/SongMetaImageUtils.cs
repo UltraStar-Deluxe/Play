@@ -10,7 +10,7 @@ public static class SongMetaImageUtils
 {
     private static YouTubeCoverImageProvider youTubeCoverImageProvider = new();
 
-    public static async Awaitable<string> GetBackgroundOrCoverImageUri(SongMeta songMeta)
+    public static async Awaitable<string> GetBackgroundOrCoverImageUriAsync(SongMeta songMeta)
     {
         string uri = SongMetaUtils.GetBackgroundUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
@@ -43,7 +43,7 @@ public static class SongMetaImageUtils
         return "";
     }
 
-    public static async Awaitable<string> GetCoverOrBackgroundImageUri(SongMeta songMeta)
+    public static async Awaitable<string> GetCoverOrBackgroundImageUriAsync(SongMeta songMeta)
     {
         string uri = SongMetaUtils.GetCoverUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
@@ -69,7 +69,7 @@ public static class SongMetaImageUtils
 
         foreach (ISongCoverImageProvider songCoverImageProvider in songCoverImageProviders)
         {
-            string coverImageUri = await songCoverImageProvider.GetCoverImageUri(songMeta);
+            string coverImageUri = await songCoverImageProvider.GetCoverImageUriAsync(songMeta);
             if (!coverImageUri.IsNullOrEmpty())
             {
                 return coverImageUri;
@@ -79,12 +79,12 @@ public static class SongMetaImageUtils
         return "";
     }
 
-    public static async Awaitable SetCoverOrBackgroundImage(CancellationToken cancellationToken, SongMeta songMeta, params VisualElement[] visualElements)
+    public static async Awaitable SetCoverOrBackgroundImageAsync(CancellationToken cancellationToken, SongMeta songMeta, params VisualElement[] visualElements)
     {
         try
         {
-            string uri = await GetCoverOrBackgroundImageUri(songMeta);
-            await SetCoverOrBackgroundImageFromUri(cancellationToken, songMeta, uri, visualElements);
+            string uri = await GetCoverOrBackgroundImageUriAsync(songMeta);
+            await SetCoverOrBackgroundImageFromUriAsync(cancellationToken, songMeta, uri, visualElements);
         }
         catch (Exception ex)
         {
@@ -93,7 +93,7 @@ public static class SongMetaImageUtils
         }
     }
 
-    public static void SetCoverOrBackgroundImage(Sprite sprite, params VisualElement[] visualElements)
+    public static void SetCoverOrBackgroundImageAsync(Sprite sprite, params VisualElement[] visualElements)
     {
         foreach (VisualElement visualElement in visualElements)
         {
@@ -102,7 +102,7 @@ public static class SongMetaImageUtils
         }
     }
 
-    public static async Awaitable SetCoverOrBackgroundImageFromUri(CancellationToken cancellationToken, SongMeta songMeta, string uri, params VisualElement[] visualElements)
+    public static async Awaitable SetCoverOrBackgroundImageFromUriAsync(CancellationToken cancellationToken, SongMeta songMeta, string uri, params VisualElement[] visualElements)
     {
         if (uri.IsNullOrEmpty())
         {
@@ -118,7 +118,7 @@ public static class SongMetaImageUtils
                 return;
             }
 
-            SetCoverOrBackgroundImage(loadedSprite, visualElements);
+            SetCoverOrBackgroundImageAsync(loadedSprite, visualElements);
         }
         catch (Exception ex)
         {

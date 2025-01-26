@@ -48,7 +48,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
             .AddTo(gameObject);
     }
 
-    private async Awaitable OnEnterSentence(PlayerControl.EnterSentenceEvent evt)
+    private async void OnEnterSentence(PlayerControl.EnterSentenceEvent evt)
     {
         lastEnterSentenceEvent = evt;
         Sentence sentence = evt.Sentence;
@@ -89,7 +89,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
             // Afterwards, fade out notes, then remove notes.
             if (playerControl != null)
             {
-                AwaitableUtils.ExecuteAfterDelayInSeconds(playerControl.gameObject, 1f, () =>
+                AwaitableUtils.ExecuteAfterDelayInSecondsAsync(playerControl.gameObject, 1f, () =>
                 {
                     currentSentence = sentence;
                     FadeOutNotesAfterLastSentence();

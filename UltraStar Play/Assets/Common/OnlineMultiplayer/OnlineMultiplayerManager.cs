@@ -222,7 +222,7 @@ namespace CommonOnlineMultiplayer
         public void OnLobbyMemberNetworkObjectDestroyed(ulong netcodeClientId)
         {
             // The object has not been destroyed yet. Wait one frame to finish destruction.
-            AwaitableUtils.ExecuteAfterDelayInFrames(1, () =>
+            AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () =>
             {
                 LobbyMemberManager.UpdateLobbyMemberRegistry();
                 lobbyMemberConnectionChangedEventSteam.OnNext(new LobbyMemberDisconnectedEvent(netcodeClientId));

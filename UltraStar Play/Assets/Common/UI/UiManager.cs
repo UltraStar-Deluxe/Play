@@ -248,7 +248,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
         }
     }
 
-    public async Awaitable<Sprite> LoadPlayerProfileImage(string imagePath)
+    public async Awaitable<Sprite> LoadPlayerProfileImageAsync(string imagePath)
     {
         if (imagePath.IsNullOrEmpty())
         {

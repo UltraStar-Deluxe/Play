@@ -6,67 +6,67 @@ using static ConditionUtils;
 
 public class VisualElementTestUtils
 {
-    public static async Awaitable<T> GetElement<T>(string uxmlName, string ussClass = null, VisualElement root = null, float timeoutInSeconds = 10)
+    public static async Awaitable<T> GetElementAsync<T>(string uxmlName, string ussClass = null, VisualElement root = null, float timeoutInSeconds = 10)
         where T : VisualElement
     {
-        return await WaitForObject(
+        return await WaitForObjectAsync(
             () => GetRootVisualElement(root).Q<T>(uxmlName, ussClass),
             new WaitForConditionConfig {
                 description = $"UI element with UXML name '{uxmlName}' and USS class '{ussClass}' from root element '{GetRootVisualElement(root)?.name}'",
                 timeoutInMillis = timeoutInSeconds * 1000});
     }
 
-    public static async Awaitable<T> GetElement<T>(Func<T, bool> predicate, VisualElement root = null, float timeoutInSeconds = 10)
+    public static async Awaitable<T> GetElementAsync<T>(Func<T, bool> predicate, VisualElement root = null, float timeoutInSeconds = 10)
         where T : VisualElement
     {
-        return await WaitForObject(
+        return await WaitForObjectAsync(
             () => GetRootVisualElement(root).Query<T>().Where(predicate).ToList().FirstOrDefault(),
             new WaitForConditionConfig {
                 description = $"UI element with predicate from root element '{GetRootVisualElement(root)?.name}'",
                 timeoutInMillis = timeoutInSeconds * 1000});
     }
 
-    public static async Awaitable SetElementValue<T>(string uxmlName, T newValue)
+    public static async Awaitable SetElementValueAsync<T>(string uxmlName, T newValue)
     {
-        BaseField<T> baseField = await GetElement<BaseField<T>>(uxmlName);
-        await SetElementValue(baseField, newValue);
+        BaseField<T> baseField = await GetElementAsync<BaseField<T>>(uxmlName);
+        await SetElementValueAsync(baseField, newValue);
     }
 
-    public static async Awaitable SetElementValue<T>(BaseField<T> element, T newValue)
+    public static async Awaitable SetElementValueAsync<T>(BaseField<T> element, T newValue)
     {
-        await ExpectElementIsFocusableNow(element);
+        await ExpectElementIsFocusableNowAsync(element);
         element.Focus();
         element.value = newValue;
-        await ExpectElementHasValue(element, newValue);
+        await ExpectElementHasValueAsync(element, newValue);
     }
 
-    public static async Awaitable ClickButton(string uxmlName)
+    public static async Awaitable ClickButtonAsync(string uxmlName)
     {
-        Button element = await GetElement<Button>(uxmlName);
-        await ClickButton(element);
+        Button element = await GetElementAsync<Button>(uxmlName);
+        await ClickButtonAsync(element);
     }
 
-    public static async Awaitable ClickButton(Button button)
+    public static async Awaitable ClickButtonAsync(Button button)
     {
-        await ExpectElementIsFocusableNow(button);
+        await ExpectElementIsFocusableNowAsync(button);
         button.SendClickEvent();
     }
 
-    public static async Awaitable SendNavigationSubmitEvent(VisualElement visualElement)
+    public static async Awaitable SendNavigationSubmitEventAsync(VisualElement visualElement)
     {
-        await ExpectElementIsFocusableNow(visualElement);
+        await ExpectElementIsFocusableNowAsync(visualElement);
         visualElement.SendNavigationSubmitEvent();
     }
 
-    public static async Awaitable SendPointerDownEvent(VisualElement visualElement)
+    public static async Awaitable SendPointerDownEventAsync(VisualElement visualElement)
     {
-        await ExpectElementIsFocusableNow(visualElement);
+        await ExpectElementIsFocusableNowAsync(visualElement);
         visualElement.SendPointerDownEvent();
     }
 
-    public static async Awaitable ExpectElementIsFocusableNow(VisualElement element, double timeoutInSeconds = 10)
+    public static async Awaitable ExpectElementIsFocusableNowAsync(VisualElement element, double timeoutInSeconds = 10)
     {
-        await WaitForCondition(
+        await WaitForConditionAsync(
                 () => VisualElementUtils.IsFocusableNow(element, GetUiDocumentOrThrow()),
                 new WaitForConditionConfig
                 {
@@ -75,9 +75,9 @@ public class VisualElementTestUtils
                 });
     }
 
-    public static async Awaitable ExpectElementHasValue<T>(BaseField<T> element, T value, double timeoutInSeconds = 10)
+    public static async Awaitable ExpectElementHasValueAsync<T>(BaseField<T> element, T value, double timeoutInSeconds = 10)
     {
-        await WaitForCondition(
+        await WaitForConditionAsync(
             () => Equals(element.value, value),
             new WaitForConditionConfig
             {

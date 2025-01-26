@@ -57,7 +57,7 @@ public class PlayerProfileImageChooserControl : PicturedChooserControl<string>
                 takeWebCamImageButton.HideByDisplay();
                 removeWebCamImageButton.ShowByDisplay();
 
-                Sprite loadedWebCamImage = await uiManager.LoadPlayerProfileImage(webCamImagePath);
+                Sprite loadedWebCamImage = await uiManager.LoadPlayerProfileImageAsync(webCamImagePath);
                 Chooser.ItemLabel.style.backgroundImage = new StyleBackground(loadedWebCamImage);
             }
             else
@@ -73,7 +73,7 @@ public class PlayerProfileImageChooserControl : PicturedChooserControl<string>
 
         takeWebCamImageButton.HideByDisplay();
         removeWebCamImageButton.HideByDisplay();
-        Sprite loadedImage = await uiManager.LoadPlayerProfileImage(imagePath);
+        Sprite loadedImage = await uiManager.LoadPlayerProfileImageAsync(imagePath);
         Chooser.ItemLabel.style.backgroundImage = new StyleBackground(loadedImage);
     }
 

@@ -28,15 +28,15 @@ public class LyricsEditingTest : AbstractPlayModeTest
     public IEnumerator ShouldEditLyricsOfSingleNote() => ShouldEditLyricsOfSingleNoteAsync();
     private async Awaitable ShouldEditLyricsOfSingleNoteAsync()
     {
-        await SceneConditionTestUtils.ExpectScene(EScene.SongEditorScene);
-        await SelectNextNote();
-        await SelectNextNote();
-        await ExpectSelectedNote(OriginalNoteText);
+        await SceneConditionTestUtils.ExpectSceneAsync(EScene.SongEditorScene);
+        await SelectNextNoteAsync();
+        await SelectNextNoteAsync();
+        await ExpectSelectedNoteAsync(OriginalNoteText);
 
-        await OpenLyricsPopupEditor();
-        await VisualElementTestUtils.SetElementValue(R.UxmlNames.editLyricsPopupTextField, EditedNoteText);
-        await SubmitLyricsPopupEditor();
-        await WaitForCondition(
+        await OpenLyricsPopupEditorAsync();
+        await VisualElementTestUtils.SetElementValueAsync(R.UxmlNames.editLyricsPopupTextField, EditedNoteText);
+        await SubmitLyricsPopupEditorAsync();
+        await WaitForConditionAsync(
             () => SongMetaUtils.GetLyrics(SongMeta, EVoiceId.P1).Contains(EditedNoteText),
             new WaitForConditionConfig { description = $"expect lyrics to contain '{EditedNoteText}'"});
     }
@@ -45,44 +45,44 @@ public class LyricsEditingTest : AbstractPlayModeTest
     public IEnumerator ShouldEditLyricsViaLyricsArea() => ShouldEditLyricsViaLyricsAreaAsync();
     private async Awaitable ShouldEditLyricsViaLyricsAreaAsync()
     {
-        await SceneConditionTestUtils.ExpectScene(EScene.SongEditorScene);
+        await SceneConditionTestUtils.ExpectSceneAsync(EScene.SongEditorScene);
 
         // Given: Original lyrics
-        TextField textField = await VisualElementTestUtils.GetElement<TextField>(R.UxmlNames.lyricsAreaTextField);
+        TextField textField = await VisualElementTestUtils.GetElementAsync<TextField>(R.UxmlNames.lyricsAreaTextField);
         Assert.IsTrue(textField.value.Contains(OriginalNoteText));
 
         // When: Edit LyricsArea
-        await VisualElementTestUtils.ClickButton(R.UxmlNames.toggleLyricsAreaEditModeButton);
+        await VisualElementTestUtils.ClickButtonAsync(R.UxmlNames.toggleLyricsAreaEditModeButton);
         await Awaitable.WaitForSecondsAsync(1f);
-        await VisualElementTestUtils.SetElementValue(textField, textField.value.Replace(OriginalNoteText, EditedNoteText));
+        await VisualElementTestUtils.SetElementValueAsync(textField, textField.value.Replace(OriginalNoteText, EditedNoteText));
         await Awaitable.WaitForSecondsAsync(1f);
 
         // Then: LyricsArea has changed text
         Assert.IsTrue(textField.value.Contains(EditedNoteText));
 
         // When: Submit LyricsArea
-        await VisualElementTestUtils.ClickButton(R.UxmlNames.toggleLyricsAreaEditModeButton);
+        await VisualElementTestUtils.ClickButtonAsync(R.UxmlNames.toggleLyricsAreaEditModeButton);
         await Awaitable.WaitForSecondsAsync(1f);
 
         // Then: Song has changed text
         Assert.IsTrue(SongMetaUtils.GetLyrics(SongMeta, EVoiceId.P1).Contains(EditedNoteText));
     }
 
-    private async Awaitable SubmitLyricsPopupEditor()
+    private async Awaitable SubmitLyricsPopupEditorAsync()
     {
         InputFixture.PressAndRelease(Keyboard.enterKey);
         await Awaitable.WaitForSecondsAsync(0.1f);
     }
 
-    private async Awaitable OpenLyricsPopupEditor()
+    private async Awaitable OpenLyricsPopupEditorAsync()
     {
         InputFixture.PressAndRelease(Keyboard.f2Key);
         await Awaitable.WaitForSecondsAsync(0.1f);
     }
 
-    private async Awaitable ExpectSelectedNote(string lyrics)
+    private async Awaitable ExpectSelectedNoteAsync(string lyrics)
     {
-        await WaitForCondition(() =>
+        await WaitForConditionAsync(() =>
             {
                 List<Note> selectedNotes = songEditorSelectionControl.GetSelectedNotes();
                 return selectedNotes.Count == 1 && selectedNotes[0].Text == lyrics;
@@ -90,7 +90,7 @@ public class LyricsEditingTest : AbstractPlayModeTest
             new WaitForConditionConfig { description = $"expect selected note with lyrics '{lyrics}'"});
     }
 
-    private async Awaitable SelectNextNote()
+    private async Awaitable SelectNextNoteAsync()
     {
         InputFixture.PressAndRelease(Keyboard.tabKey);
         await Awaitable.WaitForSecondsAsync(0.1f);

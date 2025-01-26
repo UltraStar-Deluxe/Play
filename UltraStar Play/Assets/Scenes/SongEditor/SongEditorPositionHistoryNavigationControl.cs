@@ -39,7 +39,7 @@ public class SongEditorPositionHistoryNavigationControl : INeedInjection, IInjec
         AddInitialNavigationPositionToHistory();
     }
 
-    private async Awaitable AddInitialNavigationPositionToHistory()
+    private async void AddInitialNavigationPositionToHistory()
     {
         // Short delay because initial position may not be set yet.
         await Awaitable.WaitForSecondsAsync(0.1f);

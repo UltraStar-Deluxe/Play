@@ -51,16 +51,16 @@ public class SongQueueTest : AbstractPlayModeTest
         LogAssertUtils.IgnoreFailingMessages();
 
         // When
-        await ExpectScene(EScene.SongSelectScene);
-        await EnqueueSong(medleySongTitle_0);
+        await ExpectSceneAsync(EScene.SongSelectScene);
+        await EnqueueSongAsync(medleySongTitle_0);
         await WaitForSecondsAsync(0.2f);
-        await EnqueueSong(medleySongTitle_1);
+        await EnqueueSongAsync(medleySongTitle_1);
         await WaitForSecondsAsync(0.2f);
-        await EnqueueSongAsMedley(medleySongTitle_2);
+        await EnqueueSongAsMedleyAsync(medleySongTitle_2);
 
         // Then
-        await ExpectSongQueue(0, medleySongTitle_0);
-        await ExpectSongQueue(1, medleySongTitle_1, medleySongTitle_2);
+        await ExpectSongQueueAsync(0, medleySongTitle_0);
+        await ExpectSongQueueAsync(1, medleySongTitle_1, medleySongTitle_2);
 
         // TODO: The test execution terminates without proper error message when attempting to change to SingScene.
         // await StartSingingWithSongQueue();
@@ -68,9 +68,9 @@ public class SongQueueTest : AbstractPlayModeTest
         // await ExpectSongQueue(0, medleySongTitle_1, medleySongTitle_2);
     }
 
-    private async Awaitable ExpectSongQueue(int songQueueEntryIndex, params string[] titles)
+    private async Awaitable ExpectSongQueueAsync(int songQueueEntryIndex, params string[] titles)
     {
-        await WaitForCondition(() =>
+        await WaitForConditionAsync(() =>
         {
             List<SongQueueEntryDto> nextSongQueueEntries =
                 songQueueManager.GetSongQueueEntries(songQueueEntryIndex);
@@ -81,34 +81,34 @@ public class SongQueueTest : AbstractPlayModeTest
         }, new WaitForConditionConfig { description = $"wait for song queue entry {songQueueEntryIndex} to have titles '{titles.JoinWith(",")}'"});
     }
 
-    private async Awaitable EnqueueSong(string title)
+    private async Awaitable EnqueueSongAsync(string title)
     {
         songRouletteControl.SelectEntryBySongMeta(songMetaManager.GetSongMetaByTitle(title));
         await WaitForSecondsAsync(1);
-        await ClickSelectedSongMenuButton("enqueueButton");
+        await ClickSelectedSongMenuButtonAsync("enqueueButton");
     }
 
-    private async Awaitable EnqueueSongAsMedley(string title)
+    private async Awaitable EnqueueSongAsMedleyAsync(string title)
     {
         songRouletteControl.SelectEntryBySongMeta(songMetaManager.GetSongMetaByTitle(title));
         await WaitForSecondsAsync(1f);
-        await ClickSelectedSongMenuButton("enqueueAsMedleyButton");
+        await ClickSelectedSongMenuButtonAsync("enqueueAsMedleyButton");
     }
 
-    private async Awaitable ClickSelectedSongMenuButton(string uxmlName)
+    private async Awaitable ClickSelectedSongMenuButtonAsync(string uxmlName)
     {
         // Cannot use ClickButton method because this button is not focusable
         songRouletteControl.SelectedEntryControl.VisualElement.Q<Button>(R.UxmlNames.openSongMenuButton)
             .SendClickEvent();
         await WaitForSecondsAsync(0.2f);
-        await ClickButton(uxmlName);
+        await ClickButtonAsync(uxmlName);
         await WaitForSecondsAsync(0.2f);
     }
 
-    private async Awaitable StartSingingWithSongQueue()
+    private async Awaitable StartSingingWithSongQueueAsync()
     {
-        await ClickButton(R.UxmlNames.toggleSongQueueOverlayButton);
+        await ClickButtonAsync(R.UxmlNames.toggleSongQueueOverlayButton);
         await WaitForSecondsAsync(0.5f);
-        await ClickButton(R.UxmlNames.startSongQueueButton);
+        await ClickButtonAsync(R.UxmlNames.startSongQueueButton);
     }
 }

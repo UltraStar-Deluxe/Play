@@ -25,9 +25,9 @@ public class SongSelectSearchTest : AbstractPlayModeTest
     private async Awaitable SongSearchShouldIgnoreAccentsAsync()
     {
         LogAssertUtils.IgnoreFailingMessages();
-        await ExpectAnySongSelectEntry();
-        await SetSearchText("eLLo");
-        await ExpectSongSelectEntryWithArtistName("HèllóArtist");
+        await ExpectAnySongSelectEntryAsync();
+        await SetSearchTextAsync("eLLo");
+        await ExpectSongSelectEntryWithArtistNameAsync("HèllóArtist");
     }
 
 
@@ -36,14 +36,14 @@ public class SongSelectSearchTest : AbstractPlayModeTest
     private async Awaitable CancelSongSearchShouldGoBackToLastSelectionAsync()
     {
         LogAssertUtils.IgnoreFailingMessages();
-        await ExpectAnySongSelectEntry();
-        await SelectSongSelectEntryWithTitle("ArtistHelloWithAccent");
+        await ExpectAnySongSelectEntryAsync();
+        await SelectSongSelectEntryWithTitleAsync("ArtistHelloWithAccent");
         await WaitForSecondsAsync(1);
-        await SetSearchText("Default");
+        await SetSearchTextAsync("Default");
         await WaitForSecondsAsync(1);
-        await CancelSearch();
+        await CancelSearchAsync();
         await WaitForSecondsAsync(1);
-        await ExpectSelectedSongSelectEntryWithTitle("ArtistHelloWithAccent");
+        await ExpectSelectedSongSelectEntryWithTitleAsync("ArtistHelloWithAccent");
     }
 
     [UnityTest]
@@ -51,14 +51,14 @@ public class SongSelectSearchTest : AbstractPlayModeTest
     private async Awaitable SubmitSongSearchShouldContinueAtCurrentSelectionAsync()
     {
         LogAssertUtils.IgnoreFailingMessages();
-        await ExpectAnySongSelectEntry();
-        await SelectSongSelectEntryWithTitle("ArtistHelloWithAccent");
+        await ExpectAnySongSelectEntryAsync();
+        await SelectSongSelectEntryWithTitleAsync("ArtistHelloWithAccent");
         await WaitForSecondsAsync(1);
-        await SetSearchText("ArtistHelloNoAccent");
+        await SetSearchTextAsync("ArtistHelloNoAccent");
         await WaitForSecondsAsync(1);
-        await SubmitSearch();
+        await SubmitSearchAsync();
         await WaitForSecondsAsync(1);
-        await ExpectSelectedSongSelectEntryWithTitle("ArtistHelloNoAccent");
+        await ExpectSelectedSongSelectEntryWithTitleAsync("ArtistHelloNoAccent");
     }
 
     protected override List<string> GetRelativeTestSongFilePaths()
@@ -71,15 +71,15 @@ public class SongSelectSearchTest : AbstractPlayModeTest
         };
     }
 
-    private async Awaitable SetSearchText(string text)
+    private async Awaitable SetSearchTextAsync(string text)
     {
-        TextField textField = await GetElement<TextField>(R.UxmlNames.searchTextField);
-        await SetElementValue(textField, text);
+        TextField textField = await GetElementAsync<TextField>(R.UxmlNames.searchTextField);
+        await SetElementValueAsync(textField, text);
     }
 
-    private async Awaitable ExpectAnySongSelectEntry()
+    private async Awaitable ExpectAnySongSelectEntryAsync()
     {
-        await WaitForCondition(() =>
+        await WaitForConditionAsync(() =>
         {
             List<SongSelectSongEntry> songSelectSongEntries = songRouletteControl
                 .Entries
@@ -89,9 +89,9 @@ public class SongSelectSearchTest : AbstractPlayModeTest
         }, new WaitForConditionConfig { description = "expect any song select entry"});
     }
 
-    private async Awaitable ExpectSongSelectEntryWithArtistName(string text)
+    private async Awaitable ExpectSongSelectEntryWithArtistNameAsync(string text)
     {
-        await WaitForCondition(() =>
+        await WaitForConditionAsync(() =>
         {
             List<SongSelectSongEntry> songSelectSongEntries = songSelectSceneControl
                 .songRouletteControl
@@ -108,16 +108,16 @@ public class SongSelectSearchTest : AbstractPlayModeTest
         }, new WaitForConditionConfig { description = $"expect song select entry with artist name '{text}'"});
     }
 
-    private async Awaitable ExpectSelectedSongSelectEntryWithTitle(string title)
+    private async Awaitable ExpectSelectedSongSelectEntryWithTitleAsync(string title)
     {
-        await WaitForCondition(() =>
+        await WaitForConditionAsync(() =>
         {
             SongSelectSongEntry songEntry = songRouletteControl.SelectedEntry as SongSelectSongEntry;
             return songEntry.SongMeta.Title == title;
         });
     }
 
-    private async Awaitable SelectSongSelectEntryWithTitle(string title)
+    private async Awaitable SelectSongSelectEntryWithTitleAsync(string title)
     {
         SongSelectEntry matchingSongEntry = songRouletteControl.Entries.FirstOrDefault(entry =>
             entry is SongSelectSongEntry songEntry && songEntry.SongMeta.Title == title);
@@ -125,13 +125,13 @@ public class SongSelectSearchTest : AbstractPlayModeTest
         await WaitForSecondsAsync(0.5f);
     }
 
-    private async Awaitable CancelSearch()
+    private async Awaitable CancelSearchAsync()
     {
         InputFixture.PressAndRelease(Keyboard.escapeKey);
         await WaitForSecondsAsync(0.5f);
     }
 
-    private async Awaitable SubmitSearch()
+    private async Awaitable SubmitSearchAsync()
     {
         InputFixture.PressAndRelease(Keyboard.enterKey);
         await WaitForSecondsAsync(0.5f);

@@ -28,20 +28,20 @@ public class SongEditorLrcFormatImportTest : AbstractPlayModeTest
     public async Awaitable ShouldImportLrcFormatAsync()
     {
         // Given
-        await ExpectScene(EScene.SongEditorScene);
+        await ExpectSceneAsync(EScene.SongEditorScene);
 
         // When
-        await ClickButton(R.UxmlNames.openImportLrcDialogButton);
-        await SetElementValue(R.UxmlNames.importLrcTextField, lrcExample);
-        await ClickButton(R.UxmlNames.importLrcFormatButton);
+        await ClickButtonAsync(R.UxmlNames.openImportLrcDialogButton);
+        await SetElementValueAsync(R.UxmlNames.importLrcTextField, lrcExample);
+        await ClickButtonAsync(R.UxmlNames.importLrcFormatButton);
 
         // Then
-        await ExpectImportedNotes();
+        await ExpectImportedNotesAsync();
     }
 
-    private async Task ExpectImportedNotes()
+    private async Awaitable ExpectImportedNotesAsync()
     {
-        await WaitForCondition(() =>
+        await WaitForConditionAsync(() =>
             {
                 List<Note> importedNotes = songEditorLayerManager.GetLayerNotes(songEditorLayerManager.GetEnumLayer(ESongEditorLayer.Import));
                 return importedNotes.Count == 30

@@ -184,7 +184,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
         setSongDetailsCoverOrBackgroundImageCancellationTokenSource?.Cancel();
         setSongDetailsCoverOrBackgroundImageCancellationTokenSource = new CancellationTokenSource();
-        SongMetaImageUtils.SetCoverOrBackgroundImage(
+        SongMetaImageUtils.SetCoverOrBackgroundImageAsync(
             setSongDetailsCoverOrBackgroundImageCancellationTokenSource.Token,
             selectedSong,
             selectedSongImageInner,

@@ -40,30 +40,30 @@ public class CoreGameLoopTest : AbstractPlayModeTest
     private async Awaitable CoreGameLoopWorksWithoutErrorsAsync()
     {
         LogAssertUtils.IgnoreFailingMessages();
-        await StartSinging();
-        await ExpectScene(EScene.SingScene);
-        await ExpectScene(EScene.SingingResultsScene, new WaitForConditionConfig { timeoutInMillis = TestSongAudioLengthInMillis + 2000 });
-        await ExpectSingingResultScore(expectedScore);
-        await ExpectSingleHighscoreEntryInStatistics(expectedScore);
-        await ClickContinue();
-        await ExpectScene(EScene.SongSelectScene);
+        await StartSingingAsync();
+        await ExpectSceneAsync(EScene.SingScene);
+        await ExpectSceneAsync(EScene.SingingResultsScene, new WaitForConditionConfig { timeoutInMillis = TestSongAudioLengthInMillis + 2000 });
+        await ExpectSingingResultScoreAsync(expectedScore);
+        await ExpectSingleHighscoreEntryInStatisticsAsync(expectedScore);
+        await ClickContinueAsync();
+        await ExpectSceneAsync(EScene.SongSelectScene);
     }
 
-    private async Awaitable ClickContinue()
+    private async Awaitable ClickContinueAsync()
     {
-        Button continueButton = await GetElement<Button>(R.UxmlNames.continueButton);
-        await ClickButton(continueButton);
+        Button continueButton = await GetElementAsync<Button>(R.UxmlNames.continueButton);
+        await ClickButtonAsync(continueButton);
     }
 
-    private async Awaitable StartSinging()
+    private async Awaitable StartSingingAsync()
     {
         InputFixture.PressAndRelease(Keyboard.enterKey);
         await Awaitable.WaitForSecondsAsync(0.1f);
     }
 
-    private async Awaitable ExpectSingleHighscoreEntryInStatistics(int score)
+    private async Awaitable ExpectSingleHighscoreEntryInStatisticsAsync(int score)
     {
-        await WaitForCondition(() =>
+        await WaitForConditionAsync(() =>
         {
             List<HighScoreEntry> highScoreEntries = StatisticsManager.Instance.Statistics.LocalStatistics
                 .SelectMany(it => it.Value.HighScoreRecord.HighScoreEntries)
@@ -73,10 +73,10 @@ public class CoreGameLoopTest : AbstractPlayModeTest
         }, new WaitForConditionConfig { description = $"expect single highscore entry with {score} points" });
     }
 
-    private async Awaitable ExpectSingingResultScore(int score)
+    private async Awaitable ExpectSingingResultScoreAsync(int score)
     {
-        Label totalScoreLabel = await GetElement<Label>(R.UxmlNames.totalScoreLabel);
-        await WaitForCondition(
+        Label totalScoreLabel = await GetElementAsync<Label>(R.UxmlNames.totalScoreLabel);
+        await WaitForConditionAsync(
                 () => totalScoreLabel.text == score.ToString(),
                 new WaitForConditionConfig { description = $"score label shows {score}" });
     }

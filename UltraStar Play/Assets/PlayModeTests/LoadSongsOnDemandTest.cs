@@ -52,39 +52,39 @@ public class LoadSongsOnDemandTest : AbstractPlayModeTest
     private async Awaitable ShouldLoadSongsOnDemandAsync()
     {
         LogAssertUtils.IgnoreFailingMessages();
-        await ExpectSongScanFinished();
-        await ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount);
-        await SelectNextSong();
-        await ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 1);
-        await SelectNextSong();
-        await SelectNextSong();
-        await ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 3);
-        await SelectPreviousSong();
-        await SelectPreviousSong();
-        await SelectPreviousSong();
-        await ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 3);
+        await ExpectSongScanFinishedAsync();
+        await ExpectSongCountNotLoadedYetAsync(TotalSongCount - InitiallyVisibleSongCount);
+        await SelectNextSongAsync();
+        await ExpectSongCountNotLoadedYetAsync(TotalSongCount - InitiallyVisibleSongCount - 1);
+        await SelectNextSongAsync();
+        await SelectNextSongAsync();
+        await ExpectSongCountNotLoadedYetAsync(TotalSongCount - InitiallyVisibleSongCount - 3);
+        await SelectPreviousSongAsync();
+        await SelectPreviousSongAsync();
+        await SelectPreviousSongAsync();
+        await ExpectSongCountNotLoadedYetAsync(TotalSongCount - InitiallyVisibleSongCount - 3);
     }
 
-    private static async Awaitable ExpectSongScanFinished()
+    private static async Awaitable ExpectSongScanFinishedAsync()
     {
-        await WaitForCondition(() => SongMetaManager.Instance.IsSongScanFinished,
+        await WaitForConditionAsync(() => SongMetaManager.Instance.IsSongScanFinished,
             new WaitForConditionConfig { description = "wait for song scan finished" });
     }
 
-    private static async Awaitable ExpectSongCountNotLoadedYet(int count)
+    private static async Awaitable ExpectSongCountNotLoadedYetAsync(int count)
     {
-        await WaitForCondition(
+        await WaitForConditionAsync(
             () => GetSongsCountNotLoadedYet() == count,
             new WaitForConditionConfig { description = $"expect {count} songs to be not loaded yet, songs not loaded yet: {GetSongsCountNotLoadedYet()}" });
     }
 
-    private async Awaitable SelectNextSong()
+    private async Awaitable SelectNextSongAsync()
     {
         InputFixture.PressAndRelease(Keyboard.rightArrowKey);
         await WaitForSecondsAsync(0.1f);
     }
 
-    private async Awaitable SelectPreviousSong()
+    private async Awaitable SelectPreviousSongAsync()
     {
         InputFixture.PressAndRelease(Keyboard.leftArrowKey);
         await WaitForSecondsAsync(0.1f);

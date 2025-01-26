@@ -84,7 +84,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
-        await ConditionUtils.WaitForCondition(() => !this || IsFullyLoaded,
+        await ConditionUtils.WaitForConditionAsync(() => !this || IsFullyLoaded,
             new WaitForConditionConfig {description = $"load audio '{audioUri}'" });
         if (!this)
         {

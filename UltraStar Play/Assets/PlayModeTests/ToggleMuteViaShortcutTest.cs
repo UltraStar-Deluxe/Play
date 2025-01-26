@@ -16,34 +16,34 @@ public class ToggleMuteViaShortcutTest : AbstractPlayModeTest
         LogAssertUtils.IgnoreFailingMessages();
 
         // Given
-        await ExpectNotMutedAndNonZeroVolume();
+        await ExpectNotMutedAndNonZeroVolumeAsync();
 
         // When
-        await PressAndReleaseF10Key();
+        await PressAndReleaseF10KeyAsync();
 
         // Then
-        await ExpectMutedAndZeroVolume();
+        await ExpectMutedAndZeroVolumeAsync();
     }
 
-    private async Awaitable ExpectNotMutedAndNonZeroVolume()
+    private async Awaitable ExpectNotMutedAndNonZeroVolumeAsync()
     {
-        await WaitForCondition(() => !VolumeControl.Instance.IsMuted,
+        await WaitForConditionAsync(() => !VolumeControl.Instance.IsMuted,
                 new WaitForConditionConfig { description = "volume is not muted" });
-        await WaitForCondition(() => AudioListener.volume > 0,
+        await WaitForConditionAsync(() => AudioListener.volume > 0,
                 new WaitForConditionConfig { description = "volume is non-zero" });
     }
 
-    private async Awaitable PressAndReleaseF10Key()
+    private async Awaitable PressAndReleaseF10KeyAsync()
     {
         InputFixture.PressAndRelease(Keyboard.current.f10Key);
         await WaitForSecondsAsync(0.1f);
     }
 
-    private async Awaitable ExpectMutedAndZeroVolume()
+    private async Awaitable ExpectMutedAndZeroVolumeAsync()
     {
-        await WaitForCondition(() => VolumeControl.Instance.IsMuted,
+        await WaitForConditionAsync(() => VolumeControl.Instance.IsMuted,
             new WaitForConditionConfig { description = "volume is muted" });
-        await WaitForCondition(() => AudioListener.volume <= 0,
+        await WaitForConditionAsync(() => AudioListener.volume <= 0,
             new WaitForConditionConfig { description = "volume is zero" });
     }
 }

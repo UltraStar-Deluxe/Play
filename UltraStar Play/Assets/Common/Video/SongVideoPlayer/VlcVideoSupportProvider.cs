@@ -79,7 +79,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
-        await ConditionUtils.WaitForCondition(() => !this || mediaPlayer?.Media?.Duration > 0);
+        await ConditionUtils.WaitForConditionAsync(() => !this || mediaPlayer?.Media?.Duration > 0);
         if (!this)
         {
             ExceptionUtils.LogThenThrow(new VideoSupportProviderException($"Failed to load video '{videoUri}': {nameof(VlcVideoSupportProvider)} has been destroyed already."));

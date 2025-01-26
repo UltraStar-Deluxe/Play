@@ -17,7 +17,7 @@ public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
         }
 
         // The WebView is loaded asynchronously. When the duration is available then the audio is loaded.
-        await ConditionUtils.WaitForCondition(() => !this || DurationInMillis > 0,
+        await ConditionUtils.WaitForConditionAsync(() => !this || DurationInMillis > 0,
             new WaitForConditionConfig {description = $"load audio '{audioUri}'", timeoutInMillis = 30000});
         if (!this)
         {

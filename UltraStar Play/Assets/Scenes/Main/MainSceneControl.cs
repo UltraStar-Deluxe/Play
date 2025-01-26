@@ -142,7 +142,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         semanticVersionLabel.RegisterCallback<PointerDownEvent>(_ =>
         {
             versionDetailsContainer.ShowByDisplay();
-            AwaitableUtils.ExecuteAfterDelayInSeconds(10, () => versionDetailsContainer.HideByDisplay());
+            AwaitableUtils.ExecuteAfterDelayInSecondsAsync(10, () => versionDetailsContainer.HideByDisplay());
             Debug.Log("Version info: " + versionPropertiesTextAsset.text);
             ClipboardUtils.CopyToClipboard(versionPropertiesTextAsset.text);
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
@@ -206,7 +206,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
         quitGameDialogControl.CloseDialog();
         // Must not immediately focus next button or it will trigger as well
-        AwaitableUtils.ExecuteAfterDelayInFrames(1, () => quitButton.Focus());
+        AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () => quitButton.Focus());
     }
 
     public void OpenQuitGameDialog()

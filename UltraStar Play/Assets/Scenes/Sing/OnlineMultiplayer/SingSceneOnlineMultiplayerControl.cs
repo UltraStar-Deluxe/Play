@@ -268,7 +268,7 @@ public class SingSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjection, 
                     float delayInSeconds = ex is TimeoutException
                         ? 0
                         : SingSceneReadyResponseTimeoutInMillis / 1000f;
-                    AwaitableUtils.ExecuteAfterDelayInSeconds(gameObject, delayInSeconds,
+                    AwaitableUtils.ExecuteAfterDelayInSecondsAsync(gameObject, delayInSeconds,
                         () => SendInitialUnpauseMessageWhenAllReadyToStart(failedAttempts + 1));
                 }
             })

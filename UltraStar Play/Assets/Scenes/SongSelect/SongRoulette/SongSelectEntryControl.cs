@@ -381,7 +381,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
         try
         {
-            string uri = await SongMetaImageUtils.GetCoverOrBackgroundImageUri(songMeta);
+            string uri = await SongMetaImageUtils.GetCoverOrBackgroundImageUriAsync(songMeta);
             if (SongEntryChanged(songMeta))
             {
                 return;
@@ -404,7 +404,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                 SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
                 return;
             }
-            SongMetaImageUtils.SetCoverOrBackgroundImage(sprite, songImageOuter, songImageInner);
+            SongMetaImageUtils.SetCoverOrBackgroundImageAsync(sprite, songImageOuter, songImageInner);
         }
         catch (Exception ex)
         {

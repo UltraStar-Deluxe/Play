@@ -67,7 +67,7 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
         {
             // Move focus away
             textField.Blur();
-            AwaitableUtils.ExecuteAfterDelayInFrames(1, () => textField.GetRootVisualElement().Q<Button>().Focus());
+            AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () => textField.GetRootVisualElement().Q<Button>().Focus());
         }
     }
 

@@ -176,7 +176,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         jobToJobControl.Add(job, jobListEntryControl);
 
         // Only show this job in the UI if it takes a noticeable amount of time.
-        AwaitableUtils.ExecuteAfterDelayInSeconds(0.5f, () =>
+        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(0.5f, () =>
         {
             if (GameObjectUtils.IsDestroyed(this))
             {

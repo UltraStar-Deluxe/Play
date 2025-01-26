@@ -21,8 +21,8 @@ public class SceneChangeTest : AbstractPlayModeTest
     public IEnumerator ShouldChangeScene() => ShouldChangeSceneAsync();
     private async Awaitable ShouldChangeSceneAsync() {
         LogAssertUtils.IgnoreFailingMessages();
-        await ExpectScene(EScene.MainScene);
-        await ClickButton(R.UxmlNames.aboutButton);
-        await ExpectScene(EScene.AboutScene);
+        await ExpectSceneAsync(EScene.MainScene);
+        await ClickButtonAsync(R.UxmlNames.aboutButton);
+        await ExpectSceneAsync(EScene.AboutScene);
     }
 }

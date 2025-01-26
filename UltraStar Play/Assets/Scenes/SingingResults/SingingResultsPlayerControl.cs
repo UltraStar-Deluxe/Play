@@ -152,7 +152,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
 
     private async Awaitable InitSongRatingSpriteAsync()
     {
-        Sprite songRatingSprite = await LoadSongRatingSprite(songRating.EnumValue);
+        Sprite songRatingSprite = await LoadSongRatingSpriteAsync(songRating.EnumValue);
         if (songRatingSprite == null)
         {
             return;
@@ -247,14 +247,14 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
         return highScoreEntry.Score == singingResultsPlayerScore.TotalScore;
     }
 
-    private async Awaitable<Sprite> LoadSongRatingSprite(ESongRating songRatingEnumValue)
+    private async Awaitable<Sprite> LoadSongRatingSpriteAsync(ESongRating songRatingEnumValue)
     {
         if (!settings.EnableDynamicThemes
             || themeManager.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
         {
-            return await LoadDefaultSongRatingSprite(songRatingEnumValue);
+            return await LoadDefaultSongRatingSpriteAsync(songRatingEnumValue);
         }
-        return await LoadSongRatingSpriteFromTheme(songRatingEnumValue);
+        return await LoadSongRatingSpriteFromThemeAsync(songRatingEnumValue);
     }
 
     private string GetTeamName()
@@ -274,7 +274,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
         return teamSettings != null;
     }
 
-    private async Awaitable<Sprite> LoadSongRatingSpriteFromTheme(ESongRating songRatingEnumValue)
+    private async Awaitable<Sprite> LoadSongRatingSpriteFromThemeAsync(ESongRating songRatingEnumValue)
     {
         try
         {
@@ -282,7 +282,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
             string valueForSongRating = themeMeta.ThemeJson.songRatingIcons.GetValueForSongRating(songRatingEnumValue);
             if (valueForSongRating.IsNullOrEmpty())
             {
-                return await LoadDefaultSongRatingSprite(songRatingEnumValue);
+                return await LoadDefaultSongRatingSpriteAsync(songRatingEnumValue);
             }
 
             string imagePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, valueForSongRating);
@@ -292,11 +292,11 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
         {
             Debug.LogException(ex);
             Debug.LogError($"Load song rating sprite from theme failed: {ex.Message}");
-            return await LoadDefaultSongRatingSprite(songRatingEnumValue);
+            return await LoadDefaultSongRatingSpriteAsync(songRatingEnumValue);
         }
     }
 
-    private async Awaitable<Sprite> LoadDefaultSongRatingSprite(ESongRating songRatingEnumValue)
+    private async Awaitable<Sprite> LoadDefaultSongRatingSpriteAsync(ESongRating songRatingEnumValue)
     {
         SongRatingImageReference songRatingImageReference = singingResultsSceneControl.songRatingImageReferences
             .FirstOrDefault(it => it.songRating == songRatingEnumValue);
@@ -323,7 +323,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
 
     public void InitTopScoreVfx()
     {
-        AwaitableUtils.ExecuteAfterDelayInSeconds(singingResultsSceneControl.gameObject, TotalScoreAnimTimeInSeconds, () =>
+        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(singingResultsSceneControl.gameObject, TotalScoreAnimTimeInSeconds, () =>
         {
             VfxManager.CreateParticleEffect(new ParticleEffectConfig()
             {

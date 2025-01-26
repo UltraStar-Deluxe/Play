@@ -39,23 +39,23 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
     private async Awaitable CopyAndPasteShouldPreserveNotesAsync(string songFilePath, string expectedSongFilePath)
     {
         LogAssertUtils.IgnoreFailingMessages();
-        await OpenSongEditorWithNewSong(songFilePath);
-        await ExpectScene(EScene.SongEditorScene);
+        await OpenSongEditorWithNewSongAsync(songFilePath);
+        await ExpectSceneAsync(EScene.SongEditorScene);
 
         // Select all and copy
-        await SelectAll();
-        await CopyNotes();
+        await SelectAllAsync();
+        await CopyNotesAsync();
 
         // Select all again, go to first note, then delete
-        await SelectAll();
-        await MoveToFirstSelectedNote();
-        await DeleteNotes();
+        await SelectAllAsync();
+        await MoveToFirstSelectedNoteAsync();
+        await DeleteNotesAsync();
 
         // Paste
-        await PasteNotes();
+        await PasteNotesAsync();
 
         // Compare to original song because we deleted original notes before re-pasting the same set of notes.
-        await ExpectCurrentSongEqualsExpectedResult(songFilePath);
+        await ExpectCurrentSongEqualsExpectedResultAsync(songFilePath);
     }
 
     [UnityTest]
@@ -65,36 +65,36 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
     private async Awaitable CopyAndPasteShouldAddNotesAndPreserveSentencesAsync(string songFilePath, string expectedSongFilePath)
     {
         LogAssertUtils.IgnoreFailingMessages();
-        await OpenSongEditorWithNewSong(songFilePath);
-        await ExpectScene(EScene.SongEditorScene);
+        await OpenSongEditorWithNewSongAsync(songFilePath);
+        await ExpectSceneAsync(EScene.SongEditorScene);
 
         // Select all and copy
-        await SelectAll();
-        await CopyNotes();
+        await SelectAllAsync();
+        await CopyNotesAsync();
 
         // Go behind last note
-        await SelectAll();
-        await MoveBehindLastNote();
+        await SelectAllAsync();
+        await MoveBehindLastNoteAsync();
 
         // Paste
-        await PasteNotes();
+        await PasteNotesAsync();
 
-        await ExpectCurrentSongEqualsExpectedResult(expectedSongFilePath);
+        await ExpectCurrentSongEqualsExpectedResultAsync(expectedSongFilePath);
     }
 
-    private async Awaitable MoveToFirstSelectedNote()
+    private async Awaitable MoveToFirstSelectedNoteAsync()
     {
         songAudioPlayer.PositionInMillis = GetFirstSelectedNotePositionInMillis();
         await Awaitable.WaitForSecondsAsync(waitTimeInSeconds);
     }
 
-    private async Awaitable MoveBehindLastNote()
+    private async Awaitable MoveBehindLastNoteAsync()
     {
         songAudioPlayer.PositionInMillis = GetAfterLastNoteEndPositionInMillis();
         await Awaitable.WaitForSecondsAsync(waitTimeInSeconds);
     }
 
-    private async Awaitable DeleteNotes()
+    private async Awaitable DeleteNotesAsync()
     {
         // TODO: Input simulation does not work reliably for some reason
         // TriggerInputAction(R.InputActions.songEditor_delete);
@@ -102,7 +102,7 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
         await Awaitable.WaitForSecondsAsync(waitTimeInSeconds);
     }
 
-    private async Awaitable CopyNotes()
+    private async Awaitable CopyNotesAsync()
     {
         // TODO: Input simulation does not work reliably for some reason
         // TriggerInputAction(R.InputActions.songEditor_copy);
@@ -110,7 +110,7 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
         await Awaitable.WaitForSecondsAsync(waitTimeInSeconds);
     }
 
-    private async Awaitable PasteNotes()
+    private async Awaitable PasteNotesAsync()
     {
         // TODO: Input simulation does not work reliably for some reason
         // TriggerInputAction(R.InputActions.songEditor_paste);
@@ -118,12 +118,12 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
         await Awaitable.WaitForSecondsAsync(waitTimeInSeconds);
     }
 
-    private async Awaitable SelectAll()
+    private async Awaitable SelectAllAsync()
     {
         // TODO: Input simulation does not work reliably for some reason
         // TriggerInputAction(R.InputActions.songEditor_selectAll);
         songEditorSelectionControl.SelectAll();
-        await WaitForCondition(() => !songEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty());
+        await WaitForConditionAsync(() => !songEditorSelectionControl.GetSelectedNotes().IsNullOrEmpty());
     }
 
     private double GetFirstSelectedNotePositionInMillis()

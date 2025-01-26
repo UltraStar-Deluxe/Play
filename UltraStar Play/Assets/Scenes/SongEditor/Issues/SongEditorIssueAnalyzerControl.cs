@@ -28,7 +28,7 @@ public class SongEditorIssueAnalyzerControl : INeedInjection, IInjectionFinished
             // When there is no new change to the song for some time, then update the issues.
             .Throttle(new TimeSpan(0, 0, 0, 0, 500))
             .Subscribe(_ => UpdateIssues());
-        AwaitableUtils.ExecuteAfterDelayInFrames(1, () => UpdateIssues());
+        AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () => UpdateIssues());
     }
 
     private void UpdateIssues()

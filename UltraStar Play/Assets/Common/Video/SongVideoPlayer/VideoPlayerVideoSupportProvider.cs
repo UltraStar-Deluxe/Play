@@ -45,7 +45,7 @@ public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
         PositionInMillis = startPositionInMillis;
 
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
-        await ConditionUtils.WaitForCondition(() => !this
+        await ConditionUtils.WaitForConditionAsync(() => !this
                                                     || videoPlayer.length > 0
                                                     || videoPlayerErrorMessages.Count > 0);
         if (!this)

@@ -345,7 +345,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             });
 
         // Update TimeBar every second
-        AwaitableUtils.ExecuteRepeatedlyInSeconds(gameObject, 1f, () =>
+        AwaitableUtils.ExecuteRepeatedlyInSecondsAsync(gameObject, 1f, () =>
         {
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInMillis, songAudioPlayer.DurationInMillis);
             governanceOverlayTimeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInMillis, songAudioPlayer.DurationInMillis);
@@ -371,8 +371,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private async Awaitable StartAudioAndVideoAsync()
     {
-        await StartAudioPlayback();
-        await StartVideoOrShowBackgroundImage();
+        await StartAudioPlaybackAsync();
+        await StartVideoOrShowBackgroundImageAsync();
     }
 
     private void CreateGameRoundModifiers()
@@ -657,18 +657,18 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         lastLeadingPlayerControl = leadingPlayerControl;
     }
 
-    private async Awaitable StartVideoOrShowBackgroundImage()
+    private async Awaitable StartVideoOrShowBackgroundImageAsync()
     {
         try
         {
             string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(SongMeta, WebViewUtils.CanHandleWebViewUrl);
             if (SongMetaUtils.ResourceExists(SongMeta, videoUri))
             {
-                await songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
+                songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
             }
             else
             {
-                await songVideoPlayer.ShowBackgroundImage(SongMeta);
+                songVideoPlayer.ShowBackgroundImage(SongMeta);
             }
         }
         catch (Exception ex)
@@ -1225,7 +1225,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
     }
 
-    private async Awaitable StartAudioPlayback()
+    private async Awaitable StartAudioPlaybackAsync()
     {
         if (songAudioPlayer.IsPlaying)
         {

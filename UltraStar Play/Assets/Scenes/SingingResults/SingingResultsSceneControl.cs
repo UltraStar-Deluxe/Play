@@ -249,7 +249,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         ActivateLayout();
         FillLayout();
 
-        AwaitableUtils.ExecuteAfterDelayInFrames(gameObject, 1, () => InitVfx());
+        AwaitableUtils.ExecuteAfterDelayInFramesAsync(gameObject, 1, () => InitVfx());
     }
 
     private void InitSongPreview()
@@ -365,7 +365,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
         artistLabel.SetTranslatedText(Translation.Of(songMeta.Artist));
         titleLabel.SetTranslatedText(Translation.Of(songMeta.Title));
-        SongMetaImageUtils.SetCoverOrBackgroundImage(new CancellationToken(), songMeta, coverImage);
+        SongMetaImageUtils.SetCoverOrBackgroundImageAsync(new CancellationToken(), songMeta, coverImage);
     }
 
     private void FillLayout()

@@ -187,7 +187,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
     }
 
-    public void UpdateSceneTextures(Texture transitionTexture)
+    public async void UpdateSceneTextures(Texture transitionTexture)
     {
         if (backgroundMaterialCopy == null)
         {
@@ -230,11 +230,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         if (!anyThemeLoaded)
         {
-            LoadCurrentTheme();
+            await LoadCurrentThemeAsync();
         }
     }
 
-    private async Awaitable LoadCurrentTheme()
+    private async Awaitable LoadCurrentThemeAsync()
     {
         if (!settings.EnableDynamicThemes)
         {
@@ -384,7 +384,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return backgroundElement;
     }
 
-    private async Awaitable ApplyThemeStaticBackgroundImage(ThemeMeta themeMeta)
+    private async void ApplyThemeStaticBackgroundImage(ThemeMeta themeMeta)
     {
         EScene currentScene = GetCurrentScene();
         if (!ThemeMetaUtils.HasStaticBackground(themeMeta, settings, currentScene))
@@ -468,7 +468,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         lastThemeDynamicBackgroundJson = backgroundJsonAsString;
     }
 
-    private async Awaitable ApplyThemeParticleBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
+    private async void ApplyThemeParticleBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
     {
         // Material
         if (!backgroundJson.gradientRampFile.IsNullOrEmpty())
@@ -655,7 +655,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public void SetCurrentTheme(ThemeMeta themeMeta)
     {
         settings.ThemeName = themeMeta.FileNameWithoutExtension;
-        LoadCurrentTheme();
+        LoadCurrentThemeAsync();
     }
 
     public ThemeMeta GetCurrentTheme()
@@ -1203,7 +1203,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         themeMetas.Clear();
         failedToLoadThemeNames.Clear();
-        LoadCurrentTheme();
+        LoadCurrentThemeAsync();
     }
 
     private EScene GetCurrentScene()

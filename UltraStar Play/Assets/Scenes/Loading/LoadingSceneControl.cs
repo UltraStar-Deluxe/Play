@@ -62,7 +62,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         // Show general error message after short pause.
         // Normally, the next scene should start before the error message is shown.
         unexpectedErrorContainer.HideByDisplay();
-        AwaitableUtils.ExecuteAfterDelayInSeconds(8, () =>
+        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(8, () =>
         {
             if (gameObject)
             {
@@ -112,7 +112,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
         // The SongMetas are loaded on access.
         songMetaManager.ScanSongsIfNotDoneYet();
-        AwaitableUtils.ExecuteAfterDelayInSeconds(0.5f, () =>
+        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(0.5f, () =>
         {
             if (gameObject)
             {
@@ -245,7 +245,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         SceneNavigator.Instance.LoadScene(EScene.MainScene);
     }
 
-    private async Awaitable FinishAfterDelay()
+    private async void FinishAfterDelay()
     {
         // Wait delay in case loading just didn't finish yet.
         await Awaitable.WaitForSecondsAsync(1);

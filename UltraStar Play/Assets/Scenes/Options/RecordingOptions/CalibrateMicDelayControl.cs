@@ -72,7 +72,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
             });
     }
 
-    public async Task StartCalibration()
+    public async void StartCalibration()
     {
         if (calibrationPhase is not ECalibrationPhase.None
             || MicProfile == null)

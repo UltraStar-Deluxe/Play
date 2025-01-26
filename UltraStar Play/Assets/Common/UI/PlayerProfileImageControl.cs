@@ -74,7 +74,7 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
         if (lobbyMember == null)
         {
             string finalImagePath = uiManager.GetFinalPlayerProfileImagePath(playerProfile);
-            Sprite loadedSprite = await uiManager.LoadPlayerProfileImage(finalImagePath);
+            Sprite loadedSprite = await uiManager.LoadPlayerProfileImageAsync(finalImagePath);
             image.style.backgroundImage = new StyleBackground(loadedSprite);
         }
         else if (lobbyMember is SteamLobbyMember steamLobbyMember)

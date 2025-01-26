@@ -125,7 +125,7 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
         midiManager.PlayMidiFile(demoMidiFile);
 
         float demoMidiFileDurationInSeconds = 4;
-        AwaitableUtils.ExecuteAfterDelayInSeconds(demoMidiFileDurationInSeconds,
+        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(demoMidiFileDurationInSeconds,
             () => backgroundMusicManager.BackgroundMusicAudioSource.mute = false);
     }
 

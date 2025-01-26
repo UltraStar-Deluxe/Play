@@ -78,7 +78,7 @@ public class FileDownloadControl : MonoBehaviour
         }
     }
 
-    private async Awaitable FetchFileSize()
+    private async void FetchFileSize()
     {
         Uri uri = WebRequest.uri;
         using UnityWebRequest request = UnityWebRequest.Head(uri);

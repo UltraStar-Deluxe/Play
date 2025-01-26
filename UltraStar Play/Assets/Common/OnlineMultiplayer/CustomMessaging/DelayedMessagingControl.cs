@@ -18,7 +18,7 @@ namespace CommonOnlineMultiplayer
             this.messagingControl = messagingControl;
         }
 
-        private async Awaitable DelayMessage(string messageName, IReadOnlyList<ulong> targetNetcodeClientIds, Action action)
+        private async Awaitable DelayMessageAsync(string messageName, IReadOnlyList<ulong> targetNetcodeClientIds, Action action)
         {
             if (DelayInMillis <= 0)
             {
@@ -63,7 +63,7 @@ namespace CommonOnlineMultiplayer
             }
 
             FastBufferWriter fastBufferWriterCopy = CopyPersistent(fastBufferWriter);
-            DelayMessage(messageName, targetNetcodeClientIds,
+            DelayMessageAsync(messageName, targetNetcodeClientIds,
                 () => messagingControl.SendNamedMessageToClients(messageName, fastBufferWriterCopy, targetNetcodeClientIds, networkDelivery));
         }
 
@@ -80,7 +80,7 @@ namespace CommonOnlineMultiplayer
             }
 
             FastBufferWriter fastBufferWriterCopy = CopyPersistent(fastBufferWriter);
-            DelayMessage(messageName, new List<ulong>() {targetNetcodeClientId},
+            DelayMessageAsync(messageName, new List<ulong>() {targetNetcodeClientId},
                 () => messagingControl.SendNamedMessageToClient(messageName, fastBufferWriterCopy, targetNetcodeClientId, networkDelivery));
         }
 

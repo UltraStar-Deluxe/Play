@@ -238,7 +238,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
             });
     }
 
-    private async Awaitable SimulateMouseScrollDelta(Vector2 scrollDelta)
+    private async void SimulateMouseScrollDelta(Vector2 scrollDelta)
     {
         await Awaitable.MainThreadAsync();
 
@@ -249,7 +249,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         }
     }
 
-    private async Awaitable SimulateMouseDelta(Vector2 delta)
+    private async void SimulateMouseDelta(Vector2 delta)
     {
         if (delta == Vector2.zero)
         {
@@ -312,7 +312,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
             });
     }
 
-    private async Awaitable SimulateButtonClick(InputDevice inputDevice, InputControl inputControl, ESimulateButtonDirection simulateButtonDirection)
+    private async void SimulateButtonClick(InputDevice inputDevice, InputControl inputControl, ESimulateButtonDirection simulateButtonDirection)
     {
         Log.Debug(() => $"Triggering button event {simulateButtonDirection} on input control {inputControl}");
 
