@@ -301,7 +301,7 @@ public static class ApplyThemeStyleUtils
         }
     }
 
-    private static void ApplyStyle(VisualElementData data,
+    private static async void ApplyStyle(VisualElementData data,
         Color32 fontColor,
         Color32 borderColor,
         Color32 backgroundColor,
@@ -322,8 +322,8 @@ public static class ApplyThemeStyleUtils
                 : ThemeMetaUtils.GetAbsoluteFilePath(ThemeManager.Instance.GetCurrentTheme(), backgroundImagePath);
             if (File.Exists(absoluteBackgroundImagePath))
             {
-                ImageManager.LoadSpriteFromUri(absoluteBackgroundImagePath)
-                    .Subscribe(loadedSprite => visualElement.style.backgroundImage = new StyleBackground(loadedSprite));
+                Sprite loadedSprite = await ImageManager.LoadSpriteFromUriAsync(absoluteBackgroundImagePath);
+                visualElement.style.backgroundImage = new StyleBackground(loadedSprite);
                 visualElement.style.backgroundColor = new StyleColor(StyleKeyword.None);
             }
             else

@@ -5,15 +5,15 @@ using UnityEngine;
 
 public class YouTubeCoverImageProvider : ISongCoverImageProvider
 {
-    public IObservable<string> GetCoverImageUri(SongMeta songMeta)
+    public async Awaitable<string> GetCoverImageUri(SongMeta songMeta)
     {
         string webViewUri = SongMetaUtils.GetWebViewUrl(songMeta);
         if (TryGetYouTubeUri(webViewUri, out Uri uri))
         {
-            return Observable.Return(GetCoverImageFromYouTube(uri));
+            return GetCoverImageFromYouTube(uri);
         }
 
-        return Observable.Empty<string>();
+        return "";
     }
 
     private static string GetCoverImageFromYouTube(Uri uri)

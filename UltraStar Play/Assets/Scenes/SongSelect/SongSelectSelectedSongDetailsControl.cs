@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -90,7 +91,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
     private readonly SongSelectSongRatingIconControl songRatingIconControl = new SongSelectSongRatingIconControl();
 
-    private IDisposable setSongDetailsCoverOrBackgroundImageDisposable;
+    private CancellationTokenSource setSongDetailsCoverOrBackgroundImageCancellationTokenSource;
 
     public void OnInjectionFinished()
     {
@@ -181,8 +182,13 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         selectedSongTitle.SetTranslatedText(Translation.Of(selectedSong.Title));
         songIndexLabel.SetTranslatedText(Translation.Of($"{selection.Index + 1} / {selection.Count}"));
 
-        setSongDetailsCoverOrBackgroundImageDisposable?.Dispose();
-        setSongDetailsCoverOrBackgroundImageDisposable = SongMetaImageUtils.SetCoverOrBackgroundImage(selectedSong, selectedSongImageInner, selectedSongImageOuter);
+        setSongDetailsCoverOrBackgroundImageCancellationTokenSource?.Cancel();
+        setSongDetailsCoverOrBackgroundImageCancellationTokenSource = new CancellationTokenSource();
+        SongMetaImageUtils.SetCoverOrBackgroundImage(
+            setSongDetailsCoverOrBackgroundImageCancellationTokenSource.Token,
+            selectedSong,
+            selectedSongImageInner,
+            selectedSongImageOuter);
 
         // The song duration requires loading the audio file.
         // Loading every song only to show its duration is slow (e.g. when scrolling through songs).

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Buffers.Text;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -78,7 +80,7 @@ public static class AwaitableUtils
         action();
     }
 
-    public static async Awaitable<string> SendWebRequest(UnityWebRequest unityWebRequest)
+    public static async Awaitable SendWebRequest(UnityWebRequest unityWebRequest)
     {
         void LogSuccess()
         {
@@ -100,7 +102,6 @@ public static class AwaitableUtils
             if (unityWebRequest.result is UnityWebRequest.Result.Success)
             {
                 LogSuccess();
-                return unityWebRequest.downloadHandler?.text;
             }
             else
             {
@@ -115,9 +116,11 @@ public static class AwaitableUtils
             LogError(ex);
             throw ex;
         }
-        finally
-        {
-            unityWebRequest.Dispose();
-        }
+    }
+
+    public static async Awaitable<string> GetWebRequestResponseAsync(UnityWebRequest unityWebRequest)
+    {
+        await SendWebRequest(unityWebRequest);
+        return unityWebRequest.downloadHandler?.text;
     }
 }

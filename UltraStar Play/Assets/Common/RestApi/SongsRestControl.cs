@@ -92,35 +92,14 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                     }
                 }
 
-                bool sendResponseComplete = false;
-                MainThreadDispatcher.Send(state =>
-                {
-                    ImageManager.LoadSpriteFromUri(imageUri)
-                        .CatchIgnore((Exception ex) =>
-                        {
-                            Debug.LogException(ex);
-                            requestData.Context.Response.WriteJson(new ErrorMessageDto("Failed to load song image"));
-                            sendResponseComplete = true;
-                            Debug.LogError($"Failed to load song image from uri {imageUri}");
-                        })
-                        .Subscribe(loadedSprite =>
-                        {
-                            byte[] jpgBytes = loadedSprite.texture.EncodeToJPG();
-                            string jpgBytesBase64 = Convert.ToBase64String(jpgBytes);
-                            ImageDto imageDto = new() { JpgBytesBase64 = jpgBytesBase64, };
-
-                            Debug.Log($"Returning song image for song {songId}");
-                            requestData.Context.Response.WriteJson(imageDto);
-                            sendResponseComplete = true;
-                        });
-                }, null);
+                Awaitable sendSongImageResponseAsync = SendSongImageResponseAsync(requestData, songId, imageUri);
 
                 // Wait until the coroutine is finished.
                 // Otherwise the response is sent before the image is loaded.
                 Debug.Log($"Waiting for load image to complete");
                 long maxWaitTimeInMillis = 5000;
                 long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-                while(!sendResponseComplete)
+                while(!sendSongImageResponseAsync.IsCompleted)
                 {
                     long durationInMillis = TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis;
                     if (durationInMillis > maxWaitTimeInMillis)
@@ -133,6 +112,28 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 Debug.Log($"Load image completed after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms");
             });
 	}
+
+    private async Awaitable SendSongImageResponseAsync(EndpointRequestData requestData, string songId, string imageUri)
+    {
+        try
+        {
+            await Awaitable.MainThreadAsync();
+            Sprite loadedSprite = await ImageManager.LoadSpriteFromUriAsync(imageUri);
+
+            byte[] jpgBytes = loadedSprite.texture.EncodeToJPG();
+            string jpgBytesBase64 = Convert.ToBase64String(jpgBytes);
+            ImageDto imageDto = new() { JpgBytesBase64 = jpgBytesBase64, };
+
+            Debug.Log($"Returning song image for song {songId}");
+            requestData.Context.Response.WriteJson(imageDto);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load song image from uri '{imageUri}': {ex.Message}");
+            requestData.Context.Response.WriteJson(new ErrorMessageDto("Failed to load song image"));
+        }
+    }
 
     private Dictionary<string, string> CreateVoiceDisplayNameToLyricsMap(SongMeta songMeta)
     {

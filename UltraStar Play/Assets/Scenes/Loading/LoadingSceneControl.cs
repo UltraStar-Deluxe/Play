@@ -186,16 +186,14 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
                 && !WebRequestUtils.IsHttpOrHttpsUri(SongMetaUtils.GetCoverUri(songMeta))
                 && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(SongMetaUtils.GetCoverUri(songMeta))))
             {
-                ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta))
-                    .Subscribe(_ => { });
+                ImageManager.LoadSpriteFromUriAsync(SongMetaUtils.GetCoverUri(songMeta));
             }
 
             if (SongMetaUtils.BackgroundResourceExists(songMeta)
                 && !WebRequestUtils.IsHttpOrHttpsUri(SongMetaUtils.GetBackgroundUri(songMeta))
                 && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(SongMetaUtils.GetBackgroundUri(songMeta))))
             {
-                ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta))
-                    .Subscribe(_ => { });
+                ImageManager.LoadSpriteFromUriAsync(SongMetaUtils.GetBackgroundUri(songMeta));
             }
 
             // Video resource of the song does not need to be cached.

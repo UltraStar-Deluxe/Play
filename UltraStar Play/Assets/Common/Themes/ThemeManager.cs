@@ -384,7 +384,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return backgroundElement;
     }
 
-    private void ApplyThemeStaticBackgroundImage(ThemeMeta themeMeta)
+    private async Awaitable ApplyThemeStaticBackgroundImage(ThemeMeta themeMeta)
     {
         EScene currentScene = GetCurrentScene();
         if (!ThemeMetaUtils.HasStaticBackground(themeMeta, settings, currentScene))
@@ -403,12 +403,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         string absoluteImageFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.imagePath);
         if (ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(absoluteImageFilePath)))
         {
-            ImageManager.LoadSpriteFromUri(absoluteImageFilePath)
-                .Subscribe(loadedSprite =>
-                {
-                    backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
-                    ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.imageScaleMode);
-                });
+            Sprite loadedSprite = await ImageManager.LoadSpriteFromUriAsync(absoluteImageFilePath);
+            backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
+            ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.imageScaleMode);
         }
         else
         {
@@ -471,7 +468,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         lastThemeDynamicBackgroundJson = backgroundJsonAsString;
     }
 
-    private void ApplyThemeParticleBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
+    private async Awaitable ApplyThemeParticleBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
     {
         // Material
         if (!backgroundJson.gradientRampFile.IsNullOrEmpty())
@@ -482,13 +479,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 TextureWrapMode textureWrapMode = backgroundJson.gradientScrollingSpeed > 0
                     ? TextureWrapMode.Repeat
                     : TextureWrapMode.Clamp;
-                ImageManager.LoadSpriteFromUri(gradientPath)
-                    .Subscribe(gradientSprite =>
-                    {
-                        loadedSprites.Add(gradientSprite);
-                        gradientSprite.texture.wrapMode = textureWrapMode;
-                        backgroundMaterial.SetTexture("_ColorRampTex", gradientSprite.texture);
-                    });
+                Sprite gradientSprite = await ImageManager.LoadSpriteFromUriAsync(gradientPath);
+                loadedSprites.Add(gradientSprite);
+                gradientSprite.texture.wrapMode = textureWrapMode;
+                backgroundMaterial.SetTexture("_ColorRampTex", gradientSprite.texture);
             }
             else
             {
@@ -512,13 +506,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             string patternPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.patternFile);
             if (File.Exists(patternPath))
             {
-                ImageManager.LoadSpriteFromUri(patternPath)
-                    .Subscribe(patternSprite =>
-                    {
-                        loadedSprites.Add(patternSprite);
-                        patternSprite.texture.wrapMode = TextureWrapMode.Repeat;
-                        backgroundMaterial.SetTexture("_PatternTex", patternSprite.texture);
-                    });
+                Sprite patternSprite = await ImageManager.LoadSpriteFromUriAsync(patternPath);
+                loadedSprites.Add(patternSprite);
+                patternSprite.texture.wrapMode = TextureWrapMode.Repeat;
+                backgroundMaterial.SetTexture("_PatternTex", patternSprite.texture);
 
                 patternColor = backgroundJson.patternColor;
             }
@@ -558,13 +549,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             string particlePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.particleFile);
             if (File.Exists(particlePath))
             {
-                ImageManager.LoadSpriteFromUri(particlePath)
-                    .Subscribe(particleSprite =>
-                    {
-                        loadedSprites.Add(particleSprite);
-                        particleSprite.texture.wrapMode = TextureWrapMode.Clamp;
-                        particleMaterial.mainTexture = particleSprite.texture;
-                    });
+                Sprite particleSprite = await ImageManager.LoadSpriteFromUriAsync(particlePath);
+                loadedSprites.Add(particleSprite);
+                particleSprite.texture.wrapMode = TextureWrapMode.Clamp;
+                particleMaterial.mainTexture = particleSprite.texture;
             }
             else
             {
@@ -585,7 +573,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         backgroundParticleSystem.Play();
     }
 
-    private void ApplyThemeBaseBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
+    private async void ApplyThemeBaseBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
     {
         string absoluteVideoFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.videoPath);
         if (!absoluteVideoFilePath.IsNullOrEmpty()
@@ -606,13 +594,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             if (!absoluteImageFilePath.IsNullOrEmpty()
                 && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(absoluteImageFilePath)))
             {
-                ImageManager.LoadSpriteFromUri(absoluteImageFilePath)
-                    .Subscribe(loadedSprite =>
-                    {
-                        dynamicBackgroundStaticImageSprite = loadedSprite;
-                        backgroundShaderControl.SetBaseTexture(loadedSprite.texture);
-                        backgroundShaderControl.SetBaseTextureEnabled(true);
-                    });
+                Sprite loadedSprite = await ImageManager.LoadSpriteFromUriAsync(absoluteImageFilePath);
+                dynamicBackgroundStaticImageSprite = loadedSprite;
+                backgroundShaderControl.SetBaseTexture(loadedSprite.texture);
+                backgroundShaderControl.SetBaseTextureEnabled(true);
             }
             else
             {

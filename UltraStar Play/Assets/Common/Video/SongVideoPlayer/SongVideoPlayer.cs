@@ -415,23 +415,20 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             .Subscribe(uri => SetBackgroundImageFromUri(uri));
     }
 
-    private void SetBackgroundImageFromUri(string uri)
+    private async void SetBackgroundImageFromUri(string uri)
     {
         if (uri.IsNullOrEmpty())
         {
             return;
         }
 
-        ImageManager.LoadSpriteFromUri(uri)
-            .Subscribe(loadedSprite =>
-            {
-                if (backgroundImageVisualElement != null)
-                {
-                    backgroundImageVisualElement.ShowByDisplay();
-                    backgroundImageVisualElement.style.backgroundImage = new StyleBackground(loadedSprite);
-                }
-                HasLoadedBackgroundImage = true;
-            });
+        Sprite loadedSprite = await ImageManager.LoadSpriteFromUriAsync(uri);
+        if (backgroundImageVisualElement != null)
+        {
+            backgroundImageVisualElement.ShowByDisplay();
+            backgroundImageVisualElement.style.backgroundImage = new StyleBackground(loadedSprite);
+        }
+        HasLoadedBackgroundImage = true;
     }
 
     public void ReloadVideo()
