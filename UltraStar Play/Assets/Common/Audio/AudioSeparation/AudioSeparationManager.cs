@@ -33,24 +33,25 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     private readonly Subject<AudioSeparationFinishedEvent> audioSeparationFinishedEventStream = new();
     public Subject<AudioSeparationFinishedEvent> AudioSeparationFinishedEventStream => audioSeparationFinishedEventStream;
 
-    public void ProcessSongMeta(
+    public async void ProcessSongMeta(
         SongMeta songMeta,
         bool saveSong,
         Job audioSeparationJob = null)
     {
-        ProcessSongMetaAsObservable(songMeta, saveSong, audioSeparationJob)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Vocals isolation failed: {ex.Message}");
-                NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_audioSeparation_errorWithReason,
-                    "reason", ex.Message)));
-            })
-            // Subscribe to trigger the observable
-            .Subscribe(evt => Debug.Log($"Successfully separated audio: {evt}"));
+        try
+        {
+            await ProcessSongMetaAsync(songMeta, saveSong, audioSeparationJob);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Vocals isolation failed: {ex.Message}");
+            NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_audioSeparation_errorWithReason,
+                "reason", ex.Message)));
+        }
     }
 
-    public IObservable<AudioSeparationResult> ProcessSongMetaAsObservable(
+    public async Awaitable<AudioSeparationResult> ProcessSongMetaAsync(
         SongMeta songMeta,
         bool saveSong,
         Job audioSeparationJob = null)
@@ -82,44 +83,37 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             ? $"\"{ApplicationUtils.GetStreamingAssetsPath("SpleeterMsvcExe/Spleeter.exe").Replace("/", "\\")}\""
             : "";
 
-        return Observable.Create<bool>(o =>
-                {
-                    string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
-                    if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
-                    {
-                        o.OnError(new Exception(
-                            $"Vocals isolation not supported for this audio file.\n" +
-                            $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.JoinWith(", ")}"));
-                    }
-                    o.OnNext(true);
-                    o.OnCompleted();
-                    return Disposable.Empty;
-                })
-            .ContinueWith(DoProcessSongMetaAsObservable(
-                        songMeta,
-                        generatedSongFolderAbsolutePath,
-                        cancellationTokenSource.Token,
-                        fallbackAudioSeparationCommand,
-                        saveSong))
-            .SubscribeOn(Scheduler.ThreadPool)
-            .ObserveOnMainThread()
-            .Select(audioSeparationResult =>
-            {
-                audioSeparationJob.SetResult(EJobResult.Ok);
+        string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
+        if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
+        {
+            ExceptionUtils.LogThenThrow(new AudioSeparationException(
+                $"Vocals isolation not supported for this audio file. Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.JoinWith(", ")}"));
+        }
 
-                audioSeparationFinishedEventStream.OnNext(new AudioSeparationFinishedEvent(songMeta));
-                return audioSeparationResult;
-            })
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Vocals isolation failed: {ex.Message}");
-                audioSeparationJob.SetResult(EJobResult.Error);
-                throw ex;
-            });
+        try
+        {
+            await Awaitable.BackgroundThreadAsync();
+            AudioSeparationResult audioSeparationResult = await DoProcessSongMetaAsync(
+                songMeta,
+                generatedSongFolderAbsolutePath,
+                cancellationTokenSource.Token,
+                fallbackAudioSeparationCommand,
+                saveSong);
+
+            await Awaitable.MainThreadAsync();
+            audioSeparationJob.SetResult(EJobResult.Ok);
+            audioSeparationFinishedEventStream.OnNext(new AudioSeparationFinishedEvent(songMeta));
+            return audioSeparationResult;
+        }
+        catch (Exception ex)
+        {
+            audioSeparationJob.SetResult(EJobResult.Error);
+            ExceptionUtils.LogThenThrow(new AudioSeparationException($"Vocals isolation failed: song '{songMeta.GetArtistDashTitle()}'", ex));
+            throw ex; // Never reached because of re-throw in above method.
+        }
     }
 
-    private IObservable<AudioSeparationResult> DoProcessSongMetaAsObservable(SongMeta songMeta,
+    private async Awaitable<AudioSeparationResult> DoProcessSongMetaAsync(SongMeta songMeta,
         string generatedSongFolderAbsolutePath,
         CancellationToken cancellationToken,
         string fallbackAudioSeparationCommand,
@@ -128,66 +122,42 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         if (audioSeparationProcessCount > 0)
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
-            return Observable.Throw<AudioSeparationResult>(new IllegalStateException("Already performing vocals isolation"));
+            throw new AudioSeparationException("Already performing vocals isolation");
         }
 
-        return Observable.Create<AudioSeparationResult>(o =>
+        lock (lockObject)
         {
-            lock (lockObject)
+            try
             {
-                try
-                {
-                    audioSeparationProcessCount++;
+                audioSeparationProcessCount++;
 
-                    Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
-                    UpdateSpleeterSharpConfig(fallbackAudioSeparationCommand);
+                Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
+                UpdateSpleeterSharpConfig(fallbackAudioSeparationCommand);
 
-                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
+                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
 
-                    SpleeterParameters spleeterParameters = new();
-                    spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
-                    spleeterParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}.ogg";
-                    spleeterParameters.Overwrite = true;
+                SpleeterParameters spleeterParameters = new();
+                spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
+                spleeterParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}.ogg";
+                spleeterParameters.Overwrite = true;
 
-                    Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
-                    Task<SpleeterResult> splitTask = SpleeterUtils.SplitAsync(spleeterParameters, cancellationToken);
-                    splitTask.Wait();
-                    SpleeterResult spleeterResult = splitTask.Result;
+                Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
+                Task<SpleeterResult> splitTask = SpleeterUtils.SplitAsync(spleeterParameters, cancellationToken);
+                splitTask.Wait(cancellationToken);
+                SpleeterResult spleeterResult = splitTask.Result;
 
-                    UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult, saveSong);
+                UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult, saveSong);
 
-                    string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
-                    string vocalsAudioFilePath = songMeta.VocalsAudio;
-                    string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
-                    o.OnNext(new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath));
-
-                    // long startTime = TimeUtils.GetUnixTimeMilliseconds();
-                    // while (TimeUtils.GetUnixTimeMilliseconds() - startTime < 10000)
-                    // {
-                    //     if (cancellationToken.IsCancellationRequested)
-                    //     {
-                    //         Debug.Log("Cancel requested");
-                    //         cancellationToken.ThrowIfCancellationRequested();
-                    //         break;
-                    //     }
-                    //     Thread.Sleep(200);
-                    // }
-                    // o.OnNext(new AudioSeparationResult("", "", ""));
-                }
-                catch (Exception ex)
-                {
-                    o.OnError(ex);
-                }
-                finally
-                {
-                    audioSeparationProcessCount--;
-                }
-
-                o.OnCompleted();
+                string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
+                string vocalsAudioFilePath = songMeta.VocalsAudio;
+                string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
+                return new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath);
             }
-
-            return Disposable.Empty;
-        });
+            finally
+            {
+                audioSeparationProcessCount--;
+            }
+        }
     }
 
     private void UpdateSongMetaWithSpleeterResult(

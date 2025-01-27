@@ -185,17 +185,15 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
     }
 
-    private void CreateSingAlongDataViaAiTools()
+    private async void CreateSingAlongDataViaAiTools()
     {
         CreateSingAlongSongControl createSingAlongSongControl = injector
             .CreateAndInject<CreateSingAlongSongControl>();
-        createSingAlongSongControl.CreateSingAlongSongAsObservable(SongMeta, true)
-            .Subscribe(evt =>
-            {
-                Debug.Log($"Created sing-along data for song '{SongMeta.GetArtistDashTitle()}'");
-                editorNoteDisplayer.ClearNoteControls();
-                songMetaChangeEventStream.OnNext(new NotesChangedEvent());
-            });
+
+        await createSingAlongSongControl.CreateSingAlongSongAsync(SongMeta, true);
+        Debug.Log($"Created sing-along data for song '{SongMeta.GetArtistDashTitle()}'");
+        editorNoteDisplayer.ClearNoteControls();
+        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
     }
 
     private void InitSongEditorStyleSheet()

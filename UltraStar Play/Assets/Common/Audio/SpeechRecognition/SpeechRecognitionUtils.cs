@@ -29,7 +29,7 @@ public static class SpeechRecognitionUtils
         return (int)Math.Ceiling(lengthInMillis);
     }
 
-    public static IObservable<List<Note>> CreateNotesFromSpeechRecognitionAsObservable(
+    public static async Awaitable<List<Note>> CreateNotesFromSpeechRecognitionAsync(
         float[] monoAudioSamples,
         int startIndex,
         int endIndex,
@@ -59,47 +59,39 @@ public static class SpeechRecognitionUtils
             onProgress = null;
         }
 
-        return GetOrCreateSpeechRecognizerAsObservable(speechRecognitionParameters, null)
-            .SelectMany(speechRecognizer =>
-            {
-                speechRecognitionJob?.SetStatus(EJobStatus.Running);
+        try
+        {
+            SpeechRecognizer speechRecognizer = await GetOrCreateSpeechRecognizerAsync(speechRecognitionParameters, null);
+                    speechRecognitionJob?.SetStatus(EJobStatus.Running);
 
-                return DoSpeechRecognitionAsObservable(
-                        monoAudioSamples,
-                        startIndex,
-                        endIndex,
-                        sampleRate,
-                        cancellationTokenSource.Token,
-                        onProgress,
-                        speechRecognizer,
-                        continuous)
-                    // Execute on Background thread
-                    .SubscribeOn(Scheduler.ThreadPool)
-                    // Notify on Main thread
-                    .ObserveOnMainThread();
-            })
-            // Handle Exceptions
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Create notes from speech recognition failed: {ex.Message}");
-                speechRecognitionJob?.SetResult(EJobResult.Error);
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                    "reason", ex.Message));
-                throw ex;
-            })
-            .Select(speechRecognitionResult =>
-            {
-                speechRecognitionJob?.SetResult(EJobResult.Ok);
-                List<Note> createdNotes = speechRecognitionResult != null && !speechRecognitionResult.Words.IsNullOrEmpty()
-                    ? CreateNotesFromSpeechRecognitionResult(speechRecognitionResult.Words, songMeta, offsetInBeats, midiNote, hyphenator, spaceInMillisBetweenNotes)
-                    : new List<Note>();
+            await Awaitable.BackgroundThreadAsync();
+            SpeechRecognitionResult speechRecognitionResult = await DoSpeechRecognitionAsync(
+                monoAudioSamples,
+                startIndex,
+                endIndex,
+                sampleRate,
+                cancellationTokenSource.Token,
+                onProgress,
+                speechRecognizer,
+                continuous);
 
-                return createdNotes;
-            });
+            await Awaitable.MainThreadAsync();
+            speechRecognitionJob?.SetResult(EJobResult.Ok);
+            List<Note> createdNotes = CreateNotesFromSpeechRecognitionResult(speechRecognitionResult, songMeta, offsetInBeats, midiNote, hyphenator, spaceInMillisBetweenNotes);
+
+            return createdNotes;
+        }
+        catch (Exception ex)
+        {
+            speechRecognitionJob?.SetResult(EJobResult.Error);
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", ex.Message));
+            ExceptionUtils.LogThenThrow(new SpeechRecognitionException($"Create notes from speech recognition failed", ex));
+            throw ex; // Never reached because of re-throw in above method.
+        }
     }
 
-    public static IObservable<SpeechRecognizer> GetOrCreateSpeechRecognizerAsObservable(
+    public static async Awaitable<SpeechRecognizer> GetOrCreateSpeechRecognizerAsync(
         SpeechRecognitionParameters parameters,
         Job parentJob)
     {
@@ -107,13 +99,7 @@ public static class SpeechRecognitionUtils
         if (existingSpeechRecognizer != null
             && existingSpeechRecognizer.IsLoaded)
         {
-            // Nothing to do. Return observable that fires immediately.
-            return Observable.Create<SpeechRecognizer>(o =>
-            {
-                o.OnNext(existingSpeechRecognizer);
-                o.OnCompleted();
-                return Disposable.Empty;
-            });
+            return existingSpeechRecognizer;
         }
 
         // Create UI job
@@ -128,79 +114,27 @@ public static class SpeechRecognitionUtils
                 out SpeechRecognizer _))
         {
             loadSpeechRecognizerJob.SetResult(EJobResult.Error);
-            return Observable.Create<SpeechRecognizer>(o =>
-            {
-                o.OnError(new Exception(errorMessage));
-                o.OnCompleted();
-                return Disposable.Empty;
-            });
+            throw new SpeechRecognitionException(errorMessage);
         }
 
-        return LoadSpeechRecognizerAsObservable(parameters)
-            // Execute on Background thread
-            .SubscribeOn(Scheduler.ThreadPool)
-            // Notify on Main thread
-            .ObserveOnMainThread()
-            // Handle Exceptions
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Load speech recognizer failed: {ex.Message}");
-                loadSpeechRecognizerJob.SetResult(EJobResult.Error);
-                throw ex;
-            })
-            .Select(speechRecognizer =>
-            {
-                loadSpeechRecognizerJob.SetResult(EJobResult.Ok);
-                return speechRecognizer;
-            });
-    }
-
-    private static IObservable<SpeechRecognizer> LoadSpeechRecognizerAsObservable(
-        SpeechRecognitionParameters parameters)
-    {
-        if (speechRecognitionProcessCount > 0)
+        try
         {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
-            return Observable.Throw<SpeechRecognizer>(new IllegalStateException("Already performing speech recognition"));
+            await Awaitable.BackgroundThreadAsync();
+            SpeechRecognizer speechRecognizer = await LoadSpeechRecognizerAsync(parameters);
+            await Awaitable.MainThreadAsync();
+
+            loadSpeechRecognizerJob.SetResult(EJobResult.Ok);
+            return speechRecognizer;
         }
-
-        SpeechRecognitionManager speechRecognitionManager = SpeechRecognitionManager.Instance;
-
-        return Observable.Create<SpeechRecognizer>(o =>
+        catch (Exception ex)
         {
-            lock (lockObject)
-            {
-                try
-                {
-                    speechRecognitionProcessCount++;
-
-                    if (!speechRecognitionManager.TryInitExistingSpeechRecognizer(parameters, out string errorMessage))
-                    {
-                        o.OnError(new IllegalStateException(errorMessage));
-                        return Disposable.Empty;
-                    }
-
-                    SpeechRecognizer existingSpeechRecognizer = speechRecognitionManager.GetExistingSpeechRecognizer(parameters);
-                    o.OnNext(existingSpeechRecognizer);
-                    o.OnCompleted();
-
-                    return Disposable.Empty;
-                }
-                catch (Exception ex)
-                {
-                    o.OnError(ex);
-                    return Disposable.Empty;
-                }
-                finally
-                {
-                    speechRecognitionProcessCount--;
-                }
-            }
-        });
+            loadSpeechRecognizerJob.SetResult(EJobResult.Error);
+            ExceptionUtils.LogThenThrow(new SpeechRecognitionException("Load speech recognizer failed", ex));
+            throw ex; // Never reached because of re-throw in above method.
+        }
     }
 
-    public static IObservable<SpeechRecognitionResult> DoSpeechRecognitionAsObservable(
+    public static async Awaitable<SpeechRecognitionResult> DoSpeechRecognitionAsync(
         float[] monoSamples,
         int startIndex,
         int endIndex,
@@ -212,7 +146,7 @@ public static class SpeechRecognitionUtils
     {
         if (speechRecognitionProcessCount > 0)
         {
-            return Observable.Throw<SpeechRecognitionResult>(new IllegalStateException("Already performing speech recognition"));
+            throw new SpeechRecognitionException("Already performing speech recognition");
         }
 
         if (startIndex < 0)
@@ -224,60 +158,86 @@ public static class SpeechRecognitionUtils
         int lengthInSamples = endIndex - startIndex;
         if (lengthInSamples <= 0)
         {
-            return Observable.Throw<SpeechRecognitionResult>(new IllegalStateException("No samples for speech recognition"));
+            throw new SpeechRecognitionException("No samples for speech recognition");
         }
 
-        // Do speech recognition in an observable. The observable's code may be executed on a background thread.
-        return Observable.Create<SpeechRecognitionResult>(o =>
+        lock (lockObject)
         {
-            lock (lockObject)
+            try
             {
-                try
-                {
-                    speechRecognitionProcessCount++;
+                speechRecognitionProcessCount++;
 
-                    Stopwatch stopwatch = Stopwatch.StartNew();
+                Stopwatch stopwatch = Stopwatch.StartNew();
 
-                    SpeechRecognitionResult speechRecognitionResult = speechRecognizer.GetSpeechRecognitionResult(
-                        monoSamples,
-                        startIndex,
-                        endIndex,
-                        sampleRate,
-                        cancellationToken,
-                        onProgress);
+                SpeechRecognitionResult speechRecognitionResult = speechRecognizer.GetSpeechRecognitionResult(
+                    monoSamples,
+                    startIndex,
+                    endIndex,
+                    sampleRate,
+                    cancellationToken,
+                    onProgress);
 
-                    double startSecond = (double)startIndex / sampleRate;
-                    double endSecond = (double)endIndex / sampleRate;
-                    Debug.Log($"Analyzed text from second {startSecond:0.00} to second {endSecond:0.00} (duration of {endSecond-startSecond:0.00} seconds). Took {(stopwatch.ElapsedMilliseconds / 1000.0):0.00} seconds. Result: {speechRecognitionResult?.Text}");
+                double startSecond = (double)startIndex / sampleRate;
+                double endSecond = (double)endIndex / sampleRate;
+                Log.Debug(() => $"Analyzed text from second {startSecond:0.00} to second {endSecond:0.00} (duration of {endSecond-startSecond:0.00} seconds). Took {(stopwatch.ElapsedMilliseconds / 1000.0):0.00} seconds. Result: {speechRecognitionResult?.Text}");
 
-                    o.OnNext(speechRecognitionResult);
-                }
-                catch (Exception ex)
-                {
-                    o.OnError(ex);
-                    return Disposable.Empty;
-                }
-                finally
-                {
-                    speechRecognitionProcessCount--;
-                }
-
-                o.OnCompleted();
-                return Disposable.Empty;
+                return speechRecognitionResult;
             }
-        });
+            finally
+            {
+                speechRecognitionProcessCount--;
+            }
+        }
+    }
+
+    private static async Awaitable<SpeechRecognizer> LoadSpeechRecognizerAsync(
+        SpeechRecognitionParameters parameters)
+    {
+        if (speechRecognitionProcessCount > 0)
+        {
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
+            throw new SpeechRecognitionException("Already performing speech recognition");
+        }
+
+        SpeechRecognitionManager speechRecognitionManager = SpeechRecognitionManager.Instance;
+
+        lock (lockObject)
+        {
+            try
+            {
+                speechRecognitionProcessCount++;
+
+                if (!speechRecognitionManager.TryInitExistingSpeechRecognizer(parameters, out string errorMessage))
+                {
+                    throw new SpeechRecognitionException(errorMessage);
+                }
+
+                SpeechRecognizer existingSpeechRecognizer = speechRecognitionManager.GetExistingSpeechRecognizer(parameters);
+                return existingSpeechRecognizer;
+            }
+            finally
+            {
+                speechRecognitionProcessCount--;
+            }
+        }
     }
 
     private static List<Note> CreateNotesFromSpeechRecognitionResult(
-        List<SpeechRecognitionWordResult> words,
+        SpeechRecognitionResult speechRecognitionResult,
         SongMeta songMeta,
         int offsetInBeats,
         int midiNote,
         Hyphenator hyphenator,
         int spaceInMillisBetweenNotes)
     {
+        if (speechRecognitionResult == null
+            || speechRecognitionResult.Words.IsNullOrEmpty())
+        {
+            return new List<Note>();
+        }
+
         double beatsPerSeconds = SongMetaBpmUtils.BeatsPerSecond(songMeta);
-        List<Note> createdNotes = words.Select(resultEntry =>
+        List<Note> createdNotes = speechRecognitionResult.Words.Select(resultEntry =>
         {
             int noteStartInBeats = offsetInBeats + (int)(resultEntry.Start.TotalSeconds * beatsPerSeconds);
             int noteEndInBeats = offsetInBeats + (int)(resultEntry.End.TotalSeconds * beatsPerSeconds);

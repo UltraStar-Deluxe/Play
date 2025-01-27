@@ -34,30 +34,29 @@ public class PitchDetectionAction : AbstractAudioClipAction
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
     private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
 
-    public void CreateNotesUsingBasicPitch(bool notify)
+    public async void CreateNotesUsingBasicPitch(bool notify)
     {
         string fileName = Path.GetFileName(songMeta.Audio);
         Job pitchDetectionJob = JobManager.CreateAndAddJob(Translation.Get(R.Messages.job_pitchDetectionWithName,
             "name", fileName));
-        IObservable<BasicPitchDetectionResult> pitchDetectionObservable = pitchDetectionManager.ProcessSongMetaAsObservable(songMeta, pitchDetectionJob);
 
-        pitchDetectionObservable
-            .CatchIgnore((Exception ex) =>
-            {
-                pitchDetectionJob.SetResult(EJobResult.Error);
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.job_pitchDetection_errorWithReason,
-                    "reason", ex.Message));
-            })
-            .Subscribe(result =>
-            {
-                pitchDetectionJob.SetResult(EJobResult.Ok);
-                ImportBasicPitchMidiFile(result.MidiFilePath);
+        try
+        {
+            BasicPitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaAsync(songMeta, pitchDetectionJob);
+            pitchDetectionJob.SetResult(EJobResult.Ok);
+            ImportBasicPitchMidiFile(pitchDetectionResult.MidiFilePath);
 
-                if (notify)
-                {
-                    songMetaChangeEventStream.OnNext(new NotesChangedEvent());
-                }
-            });
+            if (notify)
+            {
+                songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+            }
+        }
+        catch (Exception ex)
+        {
+            pitchDetectionJob.SetResult(EJobResult.Error);
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_pitchDetection_errorWithReason,
+                "reason", ex.Message));
+        }
     }
 
     private void ImportBasicPitchMidiFile(string midiFilePath)
