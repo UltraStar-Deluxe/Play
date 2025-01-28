@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using SpleeterSharp;
 using UniInject;
 using UniRx;
@@ -15,8 +14,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 {
     public static AudioSeparationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioSeparationManager>();
 
-    private readonly object lockObject = new();
-    private int audioSeparationProcessCount;
+    private readonly SemaphoreSlim audioSeparationProcessSemaphore = new(1, 1);
 
     [Inject]
     private UiManager uiManager;
@@ -119,44 +117,38 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         string fallbackAudioSeparationCommand,
         bool saveSong)
     {
-        if (audioSeparationProcessCount > 0)
+        // Instant fail if already locked (timeout 0)
+        if (!await audioSeparationProcessSemaphore.WaitAsync(0, cancellationToken))
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
             throw new AudioSeparationException("Already performing vocals isolation");
         }
 
-        lock (lockObject)
+        try
         {
-            try
-            {
-                audioSeparationProcessCount++;
+            Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
+            UpdateSpleeterSharpConfig(fallbackAudioSeparationCommand);
 
-                Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
-                UpdateSpleeterSharpConfig(fallbackAudioSeparationCommand);
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
 
-                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
+            SpleeterParameters spleeterParameters = new();
+            spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
+            spleeterParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}.ogg";
+            spleeterParameters.Overwrite = true;
 
-                SpleeterParameters spleeterParameters = new();
-                spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
-                spleeterParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}.ogg";
-                spleeterParameters.Overwrite = true;
+            Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
+            SpleeterResult spleeterResult = await SpleeterUtils.SplitAsync(spleeterParameters, cancellationToken);
 
-                Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
-                Task<SpleeterResult> splitTask = SpleeterUtils.SplitAsync(spleeterParameters, cancellationToken);
-                splitTask.Wait(cancellationToken);
-                SpleeterResult spleeterResult = splitTask.Result;
+            UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult, saveSong);
 
-                UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult, saveSong);
-
-                string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
-                string vocalsAudioFilePath = songMeta.VocalsAudio;
-                string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
-                return new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath);
-            }
-            finally
-            {
-                audioSeparationProcessCount--;
-            }
+            string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
+            string vocalsAudioFilePath = songMeta.VocalsAudio;
+            string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
+            return new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath);
+        }
+        finally
+        {
+            audioSeparationProcessSemaphore.Release();
         }
     }
 
