@@ -13,13 +13,13 @@ public static class SpeechRecognitionUtils
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void StaticInit()
     {
-        lockObject = new();
-        speechRecognitionProcessCount = 0;
+        speechRecognitionProcessSemaphore = new(1,  1);
         IsApplicationTerminating = false;
     }
-    private static object lockObject = new();
-    private static int speechRecognitionProcessCount;
-    public static bool IsSpeechRecognitionRunning => speechRecognitionProcessCount > 0;
+
+    private static SemaphoreSlim speechRecognitionProcessSemaphore = new(1, 1);
+
+    public static bool IsSpeechRecognitionRunning => speechRecognitionProcessSemaphore.CurrentCount > 0;
 
     public static bool IsApplicationTerminating { get; set; }
     public static bool IsExternalSpeechRecognitionCallRunning { get; private set; }
@@ -144,8 +144,10 @@ public static class SpeechRecognitionUtils
         SpeechRecognizer speechRecognizer,
         bool continuous)
     {
-        if (speechRecognitionProcessCount > 0)
+        // Instant fail if already locked (timeout 0)
+        if (!await speechRecognitionProcessSemaphore.WaitAsync(0, cancellationToken))
         {
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
             throw new SpeechRecognitionException("Already performing speech recognition");
         }
 
@@ -161,39 +163,35 @@ public static class SpeechRecognitionUtils
             throw new SpeechRecognitionException("No samples for speech recognition");
         }
 
-        lock (lockObject)
+        try
         {
-            try
-            {
-                speechRecognitionProcessCount++;
+            Stopwatch stopwatch = Stopwatch.StartNew();
 
-                Stopwatch stopwatch = Stopwatch.StartNew();
+            SpeechRecognitionResult speechRecognitionResult = speechRecognizer.GetSpeechRecognitionResult(
+                monoSamples,
+                startIndex,
+                endIndex,
+                sampleRate,
+                cancellationToken,
+                onProgress);
 
-                SpeechRecognitionResult speechRecognitionResult = speechRecognizer.GetSpeechRecognitionResult(
-                    monoSamples,
-                    startIndex,
-                    endIndex,
-                    sampleRate,
-                    cancellationToken,
-                    onProgress);
+            double startSecond = (double)startIndex / sampleRate;
+            double endSecond = (double)endIndex / sampleRate;
+            Log.Debug(() => $"Analyzed text from second {startSecond:0.00} to second {endSecond:0.00} (duration of {endSecond-startSecond:0.00} seconds). Took {(stopwatch.ElapsedMilliseconds / 1000.0):0.00} seconds. Result: {speechRecognitionResult?.Text}");
 
-                double startSecond = (double)startIndex / sampleRate;
-                double endSecond = (double)endIndex / sampleRate;
-                Log.Debug(() => $"Analyzed text from second {startSecond:0.00} to second {endSecond:0.00} (duration of {endSecond-startSecond:0.00} seconds). Took {(stopwatch.ElapsedMilliseconds / 1000.0):0.00} seconds. Result: {speechRecognitionResult?.Text}");
-
-                return speechRecognitionResult;
-            }
-            finally
-            {
-                speechRecognitionProcessCount--;
-            }
+            return speechRecognitionResult;
+        }
+        finally
+        {
+            speechRecognitionProcessSemaphore.Release();
         }
     }
 
     private static async Awaitable<SpeechRecognizer> LoadSpeechRecognizerAsync(
         SpeechRecognitionParameters parameters)
     {
-        if (speechRecognitionProcessCount > 0)
+        // Instant fail if already locked (timeout 0)
+        if (!await speechRecognitionProcessSemaphore.WaitAsync(0))
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
             throw new SpeechRecognitionException("Already performing speech recognition");
@@ -201,24 +199,19 @@ public static class SpeechRecognitionUtils
 
         SpeechRecognitionManager speechRecognitionManager = SpeechRecognitionManager.Instance;
 
-        lock (lockObject)
+        try
         {
-            try
+            if (!speechRecognitionManager.TryInitExistingSpeechRecognizer(parameters, out string errorMessage))
             {
-                speechRecognitionProcessCount++;
-
-                if (!speechRecognitionManager.TryInitExistingSpeechRecognizer(parameters, out string errorMessage))
-                {
-                    throw new SpeechRecognitionException(errorMessage);
-                }
-
-                SpeechRecognizer existingSpeechRecognizer = speechRecognitionManager.GetExistingSpeechRecognizer(parameters);
-                return existingSpeechRecognizer;
+                throw new SpeechRecognitionException(errorMessage);
             }
-            finally
-            {
-                speechRecognitionProcessCount--;
-            }
+
+            SpeechRecognizer existingSpeechRecognizer = speechRecognitionManager.GetExistingSpeechRecognizer(parameters);
+            return existingSpeechRecognizer;
+        }
+        finally
+        {
+            speechRecognitionProcessSemaphore.Release();
         }
     }
 

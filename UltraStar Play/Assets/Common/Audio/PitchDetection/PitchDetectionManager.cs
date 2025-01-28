@@ -14,10 +14,9 @@ using UnityEngine;
 
 public class PitchDetectionManager : MonoBehaviour, INeedInjection
 {
-    private readonly object lockObject = new();
-    private int basicPitchProcessCount;
-
     public static PitchDetectionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PitchDetectionManager>();
+
+    private readonly SemaphoreSlim pitchDetectionProcessSemaphore = new(1, 1);
 
     [Inject]
     private UiManager uiManager;
@@ -108,46 +107,40 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         CancellationToken cancellationToken,
         string fallbackCommand)
     {
-        if (basicPitchProcessCount > 0)
+        // Instant fail if already locked (timeout 0)
+        if (!await pitchDetectionProcessSemaphore.WaitAsync(0, cancellationToken))
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
             throw new PitchDetectionException("Already performing pitch detection");
         }
 
-        lock (lockObject)
+        try
         {
-            try
+            Debug.Log($"Running basic pitch on vocals audio: {songMeta.VocalsAudio}");
+            UpdateBasicPitchRunnerConfig(fallbackCommand);
+
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
+
+            BasicPitchParameters basicPitchParameters = new();
+            basicPitchParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
+            basicPitchParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}";
+            DirectoryUtils.CreateDirectory(basicPitchParameters.OutputFolder);
+
+            Debug.Log($"Calling BasicPitchRunner with parameters {JsonConverter.ToJson(basicPitchParameters)}");
+            BasicPitchResult basicPitchResult = await BasicPitchRunnerUtils.RunBasicPitch(basicPitchParameters, cancellationToken);
+
+            if (TryMoveFilesOfBasicPitchResult(songMeta, generatedSongFolderAbsolutePath, basicPitchResult, out string midiFilePath))
             {
-                basicPitchProcessCount++;
-
-                Debug.Log($"Running basic pitch on vocals audio: {songMeta.VocalsAudio}");
-                UpdateBasicPitchRunnerConfig(fallbackCommand);
-
-                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
-
-                BasicPitchParameters basicPitchParameters = new();
-                basicPitchParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
-                basicPitchParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}";
-                DirectoryUtils.CreateDirectory(basicPitchParameters.OutputFolder);
-
-                Debug.Log($"Calling BasicPitchRunner with parameters {JsonConverter.ToJson(basicPitchParameters)}");
-                Task<BasicPitchResult> runBasicPitchTask = BasicPitchRunnerUtils.RunBasicPitch(basicPitchParameters, cancellationToken);
-                runBasicPitchTask.Wait(cancellationToken);
-                BasicPitchResult basicPitchResult = runBasicPitchTask.Result;
-
-                if (TryMoveFilesOfBasicPitchResult(songMeta, generatedSongFolderAbsolutePath, basicPitchResult, out string midiFilePath))
-                {
-                    return new BasicPitchDetectionResult(midiFilePath);
-                }
-                else
-                {
-                    throw new PitchDetectionException("MIDI file output of Basic Pitch not found");
-                }
+                return new BasicPitchDetectionResult(midiFilePath);
             }
-            finally
+            else
             {
-                basicPitchProcessCount--;
+                throw new PitchDetectionException("MIDI file output of Basic Pitch not found");
             }
+        }
+        finally
+        {
+            pitchDetectionProcessSemaphore.Release();
         }
     }
 
