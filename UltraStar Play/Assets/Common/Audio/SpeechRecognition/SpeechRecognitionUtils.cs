@@ -167,7 +167,7 @@ public static class SpeechRecognitionUtils
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            SpeechRecognitionResult speechRecognitionResult = speechRecognizer.GetSpeechRecognitionResult(
+            SpeechRecognitionResult speechRecognitionResult = await speechRecognizer.GetSpeechRecognitionResult(
                 monoSamples,
                 startIndex,
                 endIndex,
