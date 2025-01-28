@@ -31,25 +31,12 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         ClearCache();
     }
 
-    public static AudioClip LoadAudioClipFromUriImmediately(string uri, bool streamAudio = true)
-    {
-        Awaitable<AudioClip> awaitable = Instance.LoadAudioClipFromUriAsync(uri, streamAudio, true);
-
-        // Load with busy waiting
-        while (!awaitable.GetAwaiter().IsCompleted)
-        {
-            Debug.LogWarning($"Waiting for audio to load via Thread.Sleep: audioUri '{uri}', streamAudio: {streamAudio}");
-            Thread.Sleep(10);
-        }
-        return awaitable.GetAwaiter().GetResult();
-    }
-
     public static async Awaitable<AudioClip> LoadAudioClipFromUriAsync(string uri, bool streamAudio = true)
     {
-        return await Instance.LoadAudioClipFromUriAsync(uri, streamAudio, false);
+        return await Instance.DoLoadAudioClipFromUriAsync(uri, streamAudio);
     }
 
-    private async Awaitable<AudioClip> LoadAudioClipFromUriAsync(string uri, bool streamAudio, bool busyWaiting)
+    private async Awaitable<AudioClip> DoLoadAudioClipFromUriAsync(string uri, bool streamAudio)
     {
         if (uri.IsNullOrEmpty())
         {

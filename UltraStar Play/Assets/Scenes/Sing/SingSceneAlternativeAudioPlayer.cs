@@ -171,13 +171,13 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         PauseInstrumentalAndVocalsAudio();
     }
 
-    private void UseInstrumentalAndVocalsAudio()
+    private async void UseInstrumentalAndVocalsAudio()
     {
         if (!hasLoadedInstrumentalAndVocalsAudio)
         {
             hasLoadedInstrumentalAndVocalsAudio = true;
-            instrumentalAudioSource.clip = AudioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetInstrumentalAudioUri(songMeta), true);
-            vocalsAudioSource.clip = AudioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), true);
+            instrumentalAudioSource.clip = await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetInstrumentalAudioUri(songMeta), true);
+            vocalsAudioSource.clip = await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetVocalsAudioUri(songMeta), true);
         }
 
         songAudioPlayer.VolumeFactor = 0;

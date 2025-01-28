@@ -46,7 +46,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             return;
         }
 
-        AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
+        AudioClip audioClip = await GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
         if (audioClip == null)
         {
             return;
@@ -218,7 +218,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         SpeechRecognitionParameters speechRecognitionParameters,
         bool continuous)
     {
-        AudioClip audioClip = GetAudioClip(speechRecognitionSampleSource);
+        AudioClip audioClip = await GetAudioClip(speechRecognitionSampleSource);
         if (audioClip == null
             || lengthInBeats <= 0)
         {

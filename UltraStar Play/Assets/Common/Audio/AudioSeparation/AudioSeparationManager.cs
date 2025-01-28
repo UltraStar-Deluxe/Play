@@ -70,7 +70,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
         if (ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(audioUri)))
         {
-            AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(audioUri, false);
+            AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(audioUri, false);
             int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
             audioSeparationJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
         }

@@ -67,7 +67,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         }
         pitchDetectionJob.SetStatus(EJobStatus.Running);
 
-        AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(vocalsAudioUri, true);
+        AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(vocalsAudioUri);
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
         pitchDetectionJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 3.0);
 
