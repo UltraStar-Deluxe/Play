@@ -69,7 +69,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         try
         {
             using UnityWebRequest webRequest = CreateAudioClipRequest(uriObject, streamAudio);
-            await AwaitableUtils.SendWebRequestAsync(webRequest);
+            await WebRequestUtils.SendWebRequestAsync(webRequest);
 
             AudioClip audioClip = (webRequest.downloadHandler as DownloadHandlerAudioClip).audioClip;
             AddAudioClipToCache(uri, audioClip, streamAudio);

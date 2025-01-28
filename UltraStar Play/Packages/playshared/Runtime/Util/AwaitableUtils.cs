@@ -65,46 +65,4 @@ public static class AwaitableUtils
         }
         Log.Debug(() => $"Exited loop because until GameObject '{gameObjectName}' has been destroyed");
     }
-
-    public static async Awaitable SendWebRequestAsync(UnityWebRequest unityWebRequest)
-    {
-        void LogSuccess()
-        {
-            Log.Verbose(() => $"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}");
-        }
-
-        void LogError(Exception ex)
-        {
-            Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' has failed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, error message: {ex.Message}");
-            Debug.LogException(ex);
-        }
-
-        try
-        {
-            await unityWebRequest.SendWebRequest();
-
-            if (unityWebRequest.result is UnityWebRequest.Result.Success)
-            {
-                LogSuccess();
-            }
-            else
-            {
-                string errorMessage = unityWebRequest.error ?? "Unknown error";
-                Exception ex = new($"{unityWebRequest.result}: {errorMessage}");
-                LogError(ex);
-                throw new UnityWebRequestException(unityWebRequest);
-            }
-        }
-        catch (Exception ex)
-        {
-            LogError(ex);
-            throw ex;
-        }
-    }
-
-    public static async Awaitable<string> GetWebRequestResponseAsync(UnityWebRequest unityWebRequest)
-    {
-        await SendWebRequestAsync(unityWebRequest);
-        return unityWebRequest.downloadHandler?.text;
-    }
 }

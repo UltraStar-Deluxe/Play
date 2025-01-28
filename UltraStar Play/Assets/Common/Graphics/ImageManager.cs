@@ -100,7 +100,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
         try
         {
             using UnityWebRequest webRequest = ImageUtils.CreateTextureRequest(new Uri(uri));
-            await AwaitableUtils.SendWebRequestAsync(webRequest);
+            await WebRequestUtils.SendWebRequestAsync(webRequest);
 
             Texture2D loadedTexture = (webRequest.downloadHandler as DownloadHandlerTexture).texture;
             Sprite sprite = ImageUtils.CreateUncachedSprite(loadedTexture);
