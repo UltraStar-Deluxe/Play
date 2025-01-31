@@ -74,23 +74,18 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
         try
         {
-            // (1) Run audio separation (vocals and instrumental audio)
-            Awaitable<AudioSeparationResult> audioSeparationResultTask =
-                audioSeparationManager.ProcessSongMetaAsync(songMeta, saveSongFile, audioSeparationJob);
-
+            // (0) Load speech recognition model
             SpeechRecognitionParameters speechRecognitionParameters = new(
                 SettingsUtils.GetSpeechRecognitionModelPath(settings),
                 SettingsUtils.GetSpeechRecognitionLanguage(settings),
                 settings.SongEditorSettings.SpeechRecognitionPrompt);
+            Awaitable<SpeechRecognizer> loadSpeechRecognizerAwaitable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizerAsync(speechRecognitionParameters, null);
 
-            // Load speech recognition model
-            Awaitable<SpeechRecognizer> loadSpeechRecognizerTask =
-                SpeechRecognitionUtils.GetOrCreateSpeechRecognizerAsync(speechRecognitionParameters, null);
+            // (1) Run audio separation (vocals and instrumental audio)
+            Awaitable<AudioSeparationResult> audioSeparationResultAwaitable = audioSeparationManager.ProcessSongMetaAsync(songMeta, saveSongFile, audioSeparationJob);
 
-            // TODO: load speech recognition model in parallel while doing audio separation.
-            // Continue when audio separation and loading speech recognition model have finished
-            AudioSeparationResult audioSeparationResult = await audioSeparationResultTask;
-            SpeechRecognizer speechRecognizer = await loadSpeechRecognizerTask;
+            // Continue when audio separation and loading speech recognition model have finished both
+            await Task.WhenAll(audioSeparationResultAwaitable.AsTask(), loadSpeechRecognizerAwaitable.AsTask());
 
             audioSeparationJob.SetResult(EJobResult.Ok);
 
