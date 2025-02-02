@@ -221,7 +221,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private readonly SongSearchControl songSearchControl = new();
 
-    public ReactiveProperty<bool> IsSongRepositorySearchRunning { get; private set; } = new(false);
+    public ReactiveProperty<int> RunningSongRepositorySearches { get; set; } = new(0);
 
     public SongMeta SelectedSong
     {
@@ -1305,22 +1305,23 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
     }
 
-    private void StartSongRepositorySearch()
+    private async void StartSongRepositorySearch()
     {
-        IsSongRepositorySearchRunning.Value = true;
-        SongRepositorySearchParameters searchParameters = new(songSearchControl.GetSearchText());
-        SongRepositoryUtils.SearchSongs(searchParameters)
-            .Buffer(TimeSpan.FromMilliseconds(500))
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-            })
-            .DoOnCompleted(() => IsSongRepositorySearchRunning.Value = false)
-            .Subscribe(songSearchResultEntries =>
-            {
-                songSearchResultEntries.ForEach(entry => AddSearchResultEntryToSongMetaManager(entry));
-                UpdateFilteredSongs();
-            });
+        string searchText = songSearchControl.GetSearchText();
+        Debug.Log($"StartSongRepositorySearch: searchText '{searchText}'");
+
+        try
+        {
+            RunningSongRepositorySearches.Value++;
+            SongRepositorySearchParameters searchParameters = new(searchText);
+            List<SongRepositorySearchResultEntry> searchResultEntries = await SongRepositoryUtils.SearchSongs(searchParameters);
+            searchResultEntries.ForEach(entry => AddSearchResultEntryToSongMetaManager(entry));
+        }
+        finally
+        {
+            RunningSongRepositorySearches.Value--;
+        }
+        UpdateFilteredSongs();
     }
 
     private void AddSearchResultEntryToSongMetaManager(SongRepositorySearchResultEntry searchResultEntry)

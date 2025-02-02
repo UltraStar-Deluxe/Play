@@ -212,8 +212,8 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
     private void UpdateHighScores(SongMeta songMeta)
     {
-        StatisticsUtils.GetLocalHighScoreEntries(statistics, songMeta)
-            .Subscribe(highScoreEntries => UpdateHighScores(highScoreEntries));
+        List<HighScoreEntry> highScoreEntries = StatisticsUtils.GetLocalHighScoreEntries(statistics, songMeta);
+        UpdateHighScores(highScoreEntries);
     }
 
     private void UpdateHighScores(List<HighScoreEntry> highScoreEntries)

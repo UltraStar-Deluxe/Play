@@ -1,6 +1,7 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public interface ISongRepository : IMod
 {
-    public IObservable<SongRepositorySearchResultEntry> SearchSongs(SongRepositorySearchParameters searchParameters);
+    public Awaitable<List<SongRepositorySearchResultEntry>> SearchSongsAsync(SongRepositorySearchParameters searchParameters);
 }

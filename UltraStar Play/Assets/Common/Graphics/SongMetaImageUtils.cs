@@ -34,7 +34,7 @@ public static class SongMetaImageUtils
 
         foreach (ISongBackgroundImageProvider songBackgroundImageProvider in songBackgroundImageProviders)
         {
-            string backgroundImageUri = await songBackgroundImageProvider.GetBackgroundImageUri(songMeta);
+            string backgroundImageUri = await songBackgroundImageProvider.GetBackgroundImageUriAsync(songMeta);
             if (!backgroundImageUri.IsNullOrEmpty())
             {
                 return backgroundImageUri;

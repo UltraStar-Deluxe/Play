@@ -38,18 +38,20 @@ public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
         SearchTxtFilesIfNotDoneYet();
     }
 
-    public IObservable<SongRepositorySearchResultEntry> SearchSongs(SongRepositorySearchParameters searchParameters)
+    public async Awaitable<List<SongRepositorySearchResultEntry>> SearchSongsAsync(SongRepositorySearchParameters searchParameters)
     {
         if (!DirectoryUtils.Exists(SongFolder)
             || searchParameters == null
             || searchParameters.SearchText.IsNullOrEmpty())
         {
-            return Observable.Empty<SongRepositorySearchResultEntry>();
+            return null;
         }
 
+        await Awaitable.BackgroundThreadAsync();
+        
         SearchTxtFilesIfNotDoneYet();
 
-        return ObservableUtils.RunOnNewTaskAsObservableElements(() => SearchSongList(searchParameters), Disposable.Empty);
+        return SearchSongList(searchParameters);
     }
 
     private void SearchTxtFilesIfNotDoneYet()
