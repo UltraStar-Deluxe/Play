@@ -309,7 +309,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
 
             if (remainingAudioSupportProviders.IsNullOrEmpty())
             {
-                throw new VideoSupportProviderException($"Failed to load audio and no remaining audio support providers: {audioUri}");
+                throw new AudioSupportProviderException($"Failed to load audio and no remaining audio support providers: {audioUri}");
             }
             return await DoLoadAndPlayAsync(audioUri, remainingAudioSupportProviders, streamAudio, startPositionInMillis);
         }

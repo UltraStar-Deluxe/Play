@@ -97,20 +97,22 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
             return cachedSprite.Sprite;
         }
 
+        Texture2D loadedTexture;
         try
         {
             using UnityWebRequest webRequest = ImageUtils.CreateTextureRequest(new Uri(uri));
             await WebRequestUtils.SendWebRequestAsync(webRequest);
 
-            Texture2D loadedTexture = (webRequest.downloadHandler as DownloadHandlerTexture).texture;
-            Sprite sprite = ImageUtils.CreateUncachedSprite(loadedTexture);
-            AddSpriteToCache(sprite, uri);
-            return sprite;
+            loadedTexture = (webRequest.downloadHandler as DownloadHandlerTexture).texture;
         }
         catch (Exception ex)
         {
             throw new LoadImageException($"Failed to load Texture2D from URI: '{uri}'", ex);
         }
+
+        Sprite sprite = ImageUtils.CreateUncachedSprite(loadedTexture);
+        AddSpriteToCache(sprite, uri);
+        return sprite;
     }
 
     private void AddSpriteToCache(Sprite sprite, string source)
