@@ -19,7 +19,7 @@ public class WebViewVideoSupportProvider : AbstractVideoSupportProvider
             new WaitForConditionConfig {description = $"load video '{videoUri}'", timeoutInMillis = 30000});
         if (!this)
         {
-            ExceptionUtils.LogThenThrow(new AudioSupportProviderException($"Failed to load video '{videoUri}': {nameof(WebViewVideoSupportProvider)} has been destroyed already."));
+            throw new AudioSupportProviderException($"Failed to load video '{videoUri}': {nameof(WebViewVideoSupportProvider)} has been destroyed already.");
         }
 
         return new VideoLoadedEvent(videoUri);

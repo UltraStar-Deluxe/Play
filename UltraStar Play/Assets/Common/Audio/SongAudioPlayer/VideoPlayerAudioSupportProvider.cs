@@ -31,7 +31,7 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
         if (videoPlayer.url.IsNullOrEmpty())
         {
             Unload();
-            ExceptionUtils.LogThenThrow(new SongAudioPlayerException($"Failed to load video from {audioUri}"));
+            throw new SongAudioPlayerException($"Failed to load video from {audioUri}");
         }
 
         // Must play the video to trigger loading.
@@ -43,7 +43,7 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
             new WaitForConditionConfig {description = $"load audio '{audioUri}'" });
         if (!this)
         {
-            ExceptionUtils.LogThenThrow(new AudioSupportProviderException($"Failed to load audio clip '{audioUri}': {nameof(VideoPlayerAudioSupportProvider)} has been destroyed already."));
+            throw new AudioSupportProviderException($"Failed to load audio clip '{audioUri}': {nameof(VideoPlayerAudioSupportProvider)} has been destroyed already.");
         }
 
         if (videoPlayerErrorMessages.Count > 0)

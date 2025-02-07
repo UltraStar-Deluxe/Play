@@ -99,8 +99,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         catch (Exception ex)
         {
             speechRecognitionJob?.SetResult(EJobResult.Error);
-            ExceptionUtils.LogThenThrow(new SpeechRecognitionException("Set text to analyzed speech failed", ex));
-            throw ex; // Never reached because of re-throw in above method.
+            throw new SpeechRecognitionException("Set text to analyzed speech failed", ex);
         }
     }
 
@@ -186,8 +185,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         catch (Exception ex)
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason, "reason", ex.Message));
-            ExceptionUtils.LogThenThrow(new SpeechRecognitionException($"Create notes from speech recognition failed", ex));
-            throw ex; // Never reached because of re-throw in above method.
+            throw new SpeechRecognitionException($"Create notes from speech recognition failed", ex);
         }
     }
 

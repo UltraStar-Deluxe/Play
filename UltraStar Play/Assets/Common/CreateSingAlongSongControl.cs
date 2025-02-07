@@ -102,8 +102,6 @@ public class CreateSingAlongSongControl : INeedInjection
             pitchDetectionJob?.SetResult(EJobResult.Error);
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                 "reason", ex.Message));
-
-            ExceptionUtils.LogThenThrow(new Exception($"Failed to create sing-along data", ex));
             throw ex;
         }
     }

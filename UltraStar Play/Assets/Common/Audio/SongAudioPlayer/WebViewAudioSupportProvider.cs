@@ -13,7 +13,7 @@ public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
         bool success = webViewManager.LoadUrl(audioUri);
         if (!success)
         {
-            ExceptionUtils.LogThenThrow(new SongAudioPlayerException($"Failed to load audio via WebView with URL {audioUri}"));
+            throw new SongAudioPlayerException($"Failed to load audio via WebView with URL {audioUri}");
         }
 
         // The WebView is loaded asynchronously. When the duration is available then the audio is loaded.
@@ -21,7 +21,7 @@ public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
             new WaitForConditionConfig {description = $"load audio '{audioUri}'", timeoutInMillis = 30000});
         if (!this)
         {
-            ExceptionUtils.LogThenThrow(new AudioSupportProviderException($"Failed to load audio clip '{audioUri}': {nameof(WebViewAudioSupportProvider)} has been destroyed already."));
+            throw new AudioSupportProviderException($"Failed to load audio clip '{audioUri}': {nameof(WebViewAudioSupportProvider)} has been destroyed already.");
         }
 
         PositionInMillis = startPositionInMillis;

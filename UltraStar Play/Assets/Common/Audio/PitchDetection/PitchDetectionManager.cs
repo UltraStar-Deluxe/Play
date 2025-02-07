@@ -97,8 +97,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         catch (Exception ex)
         {
             pitchDetectionJob?.SetResult(EJobResult.Error);
-            ExceptionUtils.LogThenThrow(new PitchDetectionException($"Pitch Detection failed: song '{songMeta.GetArtistDashTitle()}'", ex));
-            throw ex; // Never reached because of re-throw in above method.
+            throw new PitchDetectionException($"Pitch Detection failed: song '{songMeta.GetArtistDashTitle()}'", ex);
         }
     }
 

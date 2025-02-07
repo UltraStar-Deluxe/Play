@@ -17,7 +17,7 @@ public class MidiAudioSupportProvider : AbstractAudioSupportProvider
         AudioClip audioClip = midiManager.CreateAudioClip(audioUri);
         if (audioClip == null)
         {
-            ExceptionUtils.LogThenThrow(new SongAudioPlayerException($"Failed to load audio clip from MIDI file {audioUri}"));
+            throw new SongAudioPlayerException($"Failed to load audio clip from MIDI file {audioUri}");
         }
 
         audioSourceAudioSupportProvider.audioSource.clip = audioClip;

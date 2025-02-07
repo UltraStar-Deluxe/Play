@@ -239,7 +239,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             .FirstOrDefault(it => it.IsSupported(videoUri, videoEqualsAudio));
         if (videoSupportProvider == null)
         {
-            ExceptionUtils.LogThenThrow(new SongVideoPlayerException($"Unsupported video resource '{videoUri}'."));
+            throw new SongVideoPlayerException($"Unsupported video resource '{videoUri}'.");
         }
 
         Debug.Log($"Loading video '{videoUri}' via {videoSupportProvider}");
@@ -496,17 +496,17 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         if (videoUri.IsNullOrEmpty())
         {
-            ExceptionUtils.LogThenThrow(new SongVideoPlayerException($"Ignoring empty video resource"));
+            throw new SongVideoPlayerException($"Ignoring empty video resource");
         }
 
         if (ignoredVideoFiles.Contains(songMeta.Video))
         {
-            ExceptionUtils.LogThenThrow(new SongVideoPlayerException($"Ignoring video resource: '{videoUri}'"));
+            throw new SongVideoPlayerException($"Ignoring video resource: '{videoUri}'");
         }
 
         if (!SongMetaUtils.ResourceExists(songMeta, videoUri))
         {
-            ExceptionUtils.LogThenThrow(new SongVideoPlayerException($"Video resource does not exist: {videoUri}"));
+            throw new SongVideoPlayerException($"Video resource does not exist: {videoUri}");
         }
 
         VideoLoadedEvent evt = await DoLoadAndPlayVideoAsync(

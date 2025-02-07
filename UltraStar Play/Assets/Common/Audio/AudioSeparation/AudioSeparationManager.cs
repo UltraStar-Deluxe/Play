@@ -84,8 +84,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
         if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
         {
-            ExceptionUtils.LogThenThrow(new AudioSeparationException(
-                $"Vocals isolation not supported for this audio file. Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.JoinWith(", ")}"));
+            throw new AudioSeparationException($"Vocals isolation not supported for this audio file. Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.JoinWith(", ")}");
         }
 
         try
@@ -106,8 +105,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         catch (Exception ex)
         {
             audioSeparationJob.SetResult(EJobResult.Error);
-            ExceptionUtils.LogThenThrow(new AudioSeparationException($"Vocals isolation failed: song '{songMeta.GetArtistDashTitle()}'", ex));
-            throw ex; // Never reached because of re-throw in above method.
+            throw new AudioSeparationException($"Vocals isolation failed: song '{songMeta.GetArtistDashTitle()}'", ex);
         }
     }
 

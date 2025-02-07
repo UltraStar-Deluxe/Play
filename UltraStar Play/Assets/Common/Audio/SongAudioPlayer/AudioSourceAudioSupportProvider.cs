@@ -14,7 +14,7 @@ public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
         AudioClip loadedAudioClip = await AudioManager.LoadAudioClipFromUriAsync(audioUri, streamAudio);
         if (!this)
         {
-            ExceptionUtils.LogThenThrow(new AudioSupportProviderException($"Failed to load audio clip '{audioUri}': {nameof(AudioSourceAudioSupportProvider)} has been destroyed already."));
+            throw new AudioSupportProviderException($"Failed to load audio clip '{audioUri}': {nameof(AudioSourceAudioSupportProvider)} has been destroyed already.");
         }
 
         if (loadedAudioClip == null)

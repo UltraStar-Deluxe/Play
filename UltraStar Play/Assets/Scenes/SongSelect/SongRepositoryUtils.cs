@@ -25,7 +25,7 @@ public static class SongRepositoryUtils
             }
             catch (Exception ex)
             {
-                ExceptionUtils.LogExceptionAndError($"Failed to search songs with {songRepository}", ex);
+                ex.Log($"Failed to search songs with {songRepository}");
             }
         }
 

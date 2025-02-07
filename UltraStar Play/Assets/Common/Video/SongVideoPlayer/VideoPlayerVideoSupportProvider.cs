@@ -37,7 +37,7 @@ public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
         if (videoPlayer.url.IsNullOrEmpty() && !videoUri.IsNullOrEmpty())
         {
             // The url is empty if loading the video failed.
-            ExceptionUtils.LogThenThrow(new SongVideoPlayerException($"Unable to load video '{videoUri}' with Unity's VideoPlayer"));
+            throw new SongVideoPlayerException($"Unable to load video '{videoUri}' with Unity's VideoPlayer");
         }
 
         // Start VideoPlayer to trigger loading
@@ -50,13 +50,13 @@ public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
                                                     || videoPlayerErrorMessages.Count > 0);
         if (!this)
         {
-            ExceptionUtils.LogThenThrow(new VideoSupportProviderException($"Failed to load video '{videoUri}': {nameof(VideoPlayerVideoSupportProvider)} has been destroyed already."));
+            throw new VideoSupportProviderException($"Failed to load video '{videoUri}': {nameof(VideoPlayerVideoSupportProvider)} has been destroyed already.");
         }
 
         if (videoPlayerErrorMessages.Count > 0)
         {
             Unload();
-            ExceptionUtils.LogThenThrow(new VideoSupportProviderException($"Failed to load video: '{videoUri}'"));
+            throw new VideoSupportProviderException($"Failed to load video: '{videoUri}'");
         }
 
         return new VideoLoadedEvent(videoUri);

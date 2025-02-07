@@ -49,8 +49,7 @@ public static class PitchDetectionUtils
         catch (Exception ex)
         {
             pitchDetectionJob?.SetResult(EJobResult.Error);
-            ExceptionUtils.LogThenThrow(new PitchDetectionException("Pitch detection failed", ex));
-            throw ex; // Never reached because of re-throw in above method.
+            throw new PitchDetectionException("Pitch detection failed", ex);
         }
     }
 

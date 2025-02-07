@@ -260,7 +260,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
-            ExceptionUtils.LogThenThrow(new SongAudioPlayerException($"Audio resource does not exist: {audioUri}"));
+            throw new SongAudioPlayerException($"Audio resource does not exist: {audioUri}");
         }
 
         AudioLoadedEvent evt = await DoLoadAndPlayAsync(audioUri, audioSupportProviders, streamAudio, startPositionInMillis);
@@ -288,7 +288,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
             .FirstOrDefault(it => it.IsSupported(audioUri));
         if (audioSupportProvider == null)
         {
-            ExceptionUtils.LogThenThrow(new SongAudioPlayerException($"Unsupported audio resource '{audioUri}'."));
+            throw new SongAudioPlayerException($"Unsupported audio resource '{audioUri}'.");
         }
 
         Debug.Log($"Loading audio '{audioUri}' via {audioSupportProvider}");

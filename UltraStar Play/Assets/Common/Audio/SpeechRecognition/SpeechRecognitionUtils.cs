@@ -86,7 +86,7 @@ public static class SpeechRecognitionUtils
             speechRecognitionJob?.SetResult(EJobResult.Error);
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                 "reason", ex.Message));
-            ExceptionUtils.LogThenThrow(new SpeechRecognitionException($"Create notes from speech recognition failed", ex));
+            throw new SpeechRecognitionException($"Create notes from speech recognition failed", ex);
             throw ex; // Never reached because of re-throw in above method.
         }
     }
@@ -129,7 +129,7 @@ public static class SpeechRecognitionUtils
         catch (Exception ex)
         {
             loadSpeechRecognizerJob.SetResult(EJobResult.Error);
-            ExceptionUtils.LogThenThrow(new SpeechRecognitionException("Load speech recognizer failed", ex));
+            throw new SpeechRecognitionException("Load speech recognizer failed", ex);
             throw ex; // Never reached because of re-throw in above method.
         }
     }
