@@ -37,7 +37,23 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
 
     public async void ProcessSongMeta(SongMeta songMeta, Job pitchDetectionJob = null)
     {
-        await ProcessSongMetaAsync(songMeta, pitchDetectionJob);
+        try
+        {
+            await ProcessSongMetaAsync(songMeta, pitchDetectionJob);
+        }
+        catch (Exception ex)
+        {
+            ex.Log($"Pitch Detection failed: song '{songMeta.GetArtistDashTitle()}'");
+            if (ex is JobAlreadyRunningException)
+            {
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
+            }
+            else
+            {
+                NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_pitchDetection_errorWithReason,
+                    "reason", ex.Message)));
+            }
+        }
     }
 
     public async Awaitable<BasicPitchDetectionResult> ProcessSongMetaAsync(
@@ -97,7 +113,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         catch (Exception ex)
         {
             pitchDetectionJob?.SetResult(EJobResult.Error);
-            throw new PitchDetectionException($"Pitch Detection failed: song '{songMeta.GetArtistDashTitle()}'", ex);
+            throw ex;
         }
     }
 
@@ -109,8 +125,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         // Instant fail if already locked (timeout 0)
         if (!await pitchDetectionProcessSemaphore.WaitAsync(0, cancellationToken))
         {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
-            throw new PitchDetectionException("Already performing pitch detection");
+            throw new JobAlreadyRunningException(new PitchDetectionException("Already performing pitch detection"));
         }
 
         try

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using NHyphenator;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -19,7 +18,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         speechRecognitionProcessCount = 0;
     }
 
-    private static object lockObject = new();
     private static int speechRecognitionProcessCount;
 
     [Inject] private SongMetaChangeEventStream songMetaChangeEventStream;
@@ -198,13 +196,28 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         SpeechRecognitionParameters speechRecognitionParameters,
         bool continuous)
     {
-        await CreateNotesFromSpeechRecognitionAsync(startBeat,
-            lengthInBeats,
-            speechRecognitionSampleSource,
-            spaceBetweenNotesInMillis,
-            notify,
-            speechRecognitionParameters,
-            continuous);
+        try
+        {
+            await CreateNotesFromSpeechRecognitionAsync(startBeat,
+                lengthInBeats,
+                speechRecognitionSampleSource,
+                spaceBetweenNotesInMillis,
+                notify,
+                speechRecognitionParameters,
+                continuous);
+        }
+        catch (Exception ex)
+        {
+            if (ex is JobAlreadyRunningException)
+            {
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
+            }
+            else
+            {
+                NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_speechRecognition_errorWithReason,
+                    "reason", ex.Message)));
+            }
+        }
     }
 
     private async Awaitable<List<Note>> CreateNotesFromSpeechRecognitionAsync(

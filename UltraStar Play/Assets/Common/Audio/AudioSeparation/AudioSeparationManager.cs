@@ -42,10 +42,16 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
         catch (Exception ex)
         {
-            Debug.LogException(ex);
-            Debug.LogError($"Vocals isolation failed: {ex.Message}");
-            NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_audioSeparation_errorWithReason,
-                "reason", ex.Message)));
+            ex.Log($"Vocals isolation failed: song '{songMeta.GetArtistDashTitle()}'");
+            if (ex is JobAlreadyRunningException)
+            {
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
+            }
+            else
+            {
+                NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_audioSeparation_errorWithReason,
+                    "reason", ex.Message)));
+            }
         }
     }
 
@@ -105,7 +111,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         catch (Exception ex)
         {
             audioSeparationJob.SetResult(EJobResult.Error);
-            throw new AudioSeparationException($"Vocals isolation failed: song '{songMeta.GetArtistDashTitle()}'", ex);
+            throw ex;
         }
     }
 
@@ -118,8 +124,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         // Instant fail if already locked (timeout 0)
         if (!await audioSeparationProcessSemaphore.WaitAsync(0, cancellationToken))
         {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
-            throw new AudioSeparationException("Already performing vocals isolation");
+            throw new JobAlreadyRunningException(new AudioSeparationException("Already performing vocals isolation"));
         }
 
         try

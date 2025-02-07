@@ -250,6 +250,7 @@ public static partial class R
         public static readonly string job_pitchDetectionWithName = "job_pitchDetectionWithName";
         public static readonly string job_searchSongIssues = "job_searchSongIssues";
         public static readonly string job_speechRecognition = "job_speechRecognition";
+        public static readonly string job_speechRecognition_errorWithReason = "job_speechRecognition_errorWithReason";
         public static readonly string language = "language";
         public static readonly string language_de = "language_de";
         public static readonly string language_en = "language_en";

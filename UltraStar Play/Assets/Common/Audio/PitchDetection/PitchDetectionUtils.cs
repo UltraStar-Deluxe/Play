@@ -49,7 +49,7 @@ public static class PitchDetectionUtils
         catch (Exception ex)
         {
             pitchDetectionJob?.SetResult(EJobResult.Error);
-            throw new PitchDetectionException("Pitch detection failed", ex);
+            throw ex;
         }
     }
 

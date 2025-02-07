@@ -86,8 +86,7 @@ public static class SpeechRecognitionUtils
             speechRecognitionJob?.SetResult(EJobResult.Error);
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                 "reason", ex.Message));
-            throw new SpeechRecognitionException($"Create notes from speech recognition failed", ex);
-            throw ex; // Never reached because of re-throw in above method.
+            throw ex;
         }
     }
 
@@ -130,7 +129,6 @@ public static class SpeechRecognitionUtils
         {
             loadSpeechRecognizerJob.SetResult(EJobResult.Error);
             throw new SpeechRecognitionException("Load speech recognizer failed", ex);
-            throw ex; // Never reached because of re-throw in above method.
         }
     }
 
@@ -147,8 +145,7 @@ public static class SpeechRecognitionUtils
         // Instant fail if already locked (timeout 0)
         if (!await speechRecognitionProcessSemaphore.WaitAsync(0, cancellationToken))
         {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
-            throw new SpeechRecognitionException("Already performing speech recognition");
+            throw new JobAlreadyRunningException(new SpeechRecognitionException("Already performing speech recognition"));
         }
 
         if (startIndex < 0)
@@ -193,8 +190,7 @@ public static class SpeechRecognitionUtils
         // Instant fail if already locked (timeout 0)
         if (!await speechRecognitionProcessSemaphore.WaitAsync(0))
         {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
-            throw new SpeechRecognitionException("Already performing speech recognition");
+            throw new JobAlreadyRunningException(new SpeechRecognitionException("Already performing speech recognition"));
         }
 
         SpeechRecognitionManager speechRecognitionManager = SpeechRecognitionManager.Instance;
