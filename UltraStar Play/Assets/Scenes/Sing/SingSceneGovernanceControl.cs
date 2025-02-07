@@ -423,7 +423,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         else
         {
             contextMenuPopup.AddButton(Translation.Get(R.Messages.action_separateAudio), "call_split",
-                () => audioSeparationManager.ProcessSongMeta(singSceneControl.SongMeta, true));
+                () => audioSeparationManager.ProcessSongMetaInJobAsync(singSceneControl.SongMeta, true));
         }
     }
 

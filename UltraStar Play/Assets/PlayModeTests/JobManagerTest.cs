@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using UniInject;
 using UnityEngine;
@@ -11,27 +12,27 @@ public class JobManagerTest : AbstractPlayModeTest
     [Inject]
     private JobManager jobManager;
 
-    private Job parentJob;
-    private Job childJob1;
-    private Job childJob2;
-    private Job childJob3;
-    private Job childChildJob1;
+    private Job<VoidEvent> parentJob;
+    private Job<string> childJob1ThrowsException;
+    private Job<string> childJob2;
+    private Job<string> childJob3;
+    private Job<string> childJob3ChildJob;
 
     [UnityTest]
     public IEnumerator ShouldFailParentJob() => ShouldFailParentJobAsync();
     private async Awaitable ShouldFailParentJobAsync()
     {
         LogAssertUtils.IgnoreFailingMessages();
-        await EnqueueJobsAsync(true);
-        await WaitForSecondsAsync(0.5f);
 
-        await StartJobAsync(childJob1);
-        await WaitForSecondsAsync(0.5f);
+        // Given: Job with child job
+        EnqueueJobs(true);
+        await WaitForSecondsAsync(1);
 
-        await FailJobAsync(childJob1);
-        await WaitForSecondsAsync(0.5f);
+        // When: Job started
+        await RunJobsAsync();
 
-        await ExpectJobResultAsync(EJobResult.Error, childJob1, parentJob);
+        // Then
+        await ExpectJobResultAsync(EJobResult.Error, childJob1ThrowsException, parentJob);
     }
 
     [UnityTest]
@@ -39,53 +40,70 @@ public class JobManagerTest : AbstractPlayModeTest
     private async Awaitable ShouldNotFailParentAsync()
     {
         LogAssertUtils.IgnoreFailingMessages();
-        await EnqueueJobsAsync(false);
-        await WaitForSecondsAsync(0.5f);
 
-        await StartJobAsync(childJob1);
-        await WaitForSecondsAsync(0.5f);
+        // Given: Job with child job
+        EnqueueJobs(false);
+        await WaitForSecondsAsync(1);
 
-        await FailJobAsync(childJob1);
-        await WaitForSecondsAsync(0.5f);
+        // When: Job started
+        await RunJobsAsync();
 
-        await ExpectJobResultAsync(EJobResult.Error, childJob1);
-        await ExpectJobResultAsync(EJobResult.Pending, parentJob);
+        // Then
+        await ExpectJobResultAsync(EJobResult.Error, childJob1ThrowsException);
+        await ExpectJobResultAsync(EJobResult.Ok, parentJob, childJob2, childJob3, childJob3ChildJob);
     }
 
-    private async Awaitable EnqueueJobsAsync(bool adoptChildJobError)
+    private async Awaitable RunJobsAsync()
     {
-        parentJob = new Job(Translation.Of(nameof(parentJob)));
+        try
+        {
+            await parentJob.RunAsync();
+        }
+        catch (Exception ex)
+        {
+            // Exception is expected here because childJob1 throws an exception
+            ex.Log();
+        }
+    }
+
+    private void EnqueueJobs(bool adoptChildJobError)
+    {
+        parentJob = new Job<VoidEvent>(Translation.Of(nameof(parentJob)));
         parentJob.AdoptChildJobError = adoptChildJobError;
 
-        childJob1 = new Job(Translation.Of(nameof(childJob1)), parentJob);
-        childJob2 = new Job(Translation.Of(nameof(childJob2)), parentJob);
-        childJob3 = new Job(Translation.Of(nameof(childJob3)), parentJob);
-        childChildJob1 = new Job(Translation.Of(nameof(childChildJob1)), childJob3);
+        childJob1ThrowsException = CreateJob(nameof(childJob1ThrowsException), "dummy exception", parentJob);
+        childJob2 = CreateJob(nameof(childJob2), null, parentJob);
+        childJob3 = CreateJob(nameof(childJob3), null, parentJob);
+        childJob3ChildJob = CreateJob(nameof(childJob3ChildJob), null, childJob3);
 
         jobManager.AddJob(parentJob);
-
-        await WaitForSecondsAsync(0.5f);
     }
 
-    private async Awaitable StartJobAsync(Job job)
-    {
-        Debug.Log($"Start job {job.Name}");
-        childJob1.SetStatus(EJobStatus.Running);
-        await WaitForSecondsAsync(0.5f);
-    }
-
-    private async Awaitable FailJobAsync(Job job)
-    {
-        Debug.Log($"Fail job {job.Name}");
-        job.SetResult(EJobResult.Error);
-        await WaitForSecondsAsync(0.5f);
-    }
-
-    private async Awaitable ExpectJobResultAsync(EJobResult jobResult, params Job[] jobs)
+    private async Awaitable ExpectJobResultAsync(EJobResult jobResult, params IJob[] jobs)
     {
         string jobNameCsv = jobs.Select(job => job.Name).JoinWith(",");
         await WaitForConditionAsync(
             () => jobs.AllMatch(job => job.Result.Value == jobResult),
             new WaitForConditionConfig { description = $"Expect job result {jobResult} for {jobNameCsv}" });
+    }
+
+    private static Job<string> CreateJob(string name, string exceptionMessage, IJob parentJob)
+    {
+        return new Job<string>(
+            Translation.Of(name),
+            DummyTaskAsync(name, exceptionMessage),
+            null,
+            parentJob);
+    }
+
+    private static async Awaitable<string> DummyTaskAsync(string name, string exceptionMessage = null)
+    {
+        await WaitForSecondsAsync(1);
+        if (!exceptionMessage.IsNullOrEmpty())
+        {
+            throw new Exception(exceptionMessage);
+        }
+
+        return $"done doing something for {name}";
     }
 }

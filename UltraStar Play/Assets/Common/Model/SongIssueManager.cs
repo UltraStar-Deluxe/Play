@@ -120,36 +120,39 @@ public class SongIssueManager : AbstractSingletonBehaviour
 
     private async void ScanSongIssues()
     {
+        await ScanSongIssuesInJobAsync();
+    }
+
+    private async Awaitable<List<SongIssue>> ScanSongIssuesInJobAsync()
+    {
         if (IsSongIssueScanStarted)
         {
             throw new IllegalStateException("Already started song issue scan");
         }
 
-        IReadOnlyCollection<SongMeta> songMetas = songMetaManager.GetSongMetas();
         songIssueScanCancellationTokenSource?.Cancel();
         songIssueScanCancellationTokenSource = new();
 
-        Job job = JobManager.CreateAndAddJob(Translation.Get(R.Messages.job_searchSongIssues));
-        job.OnCancel = () => songIssueScanCancellationTokenSource.Cancel();
-        job.SetStatus(EJobStatus.Running);
+        Translation jobName = Translation.Get(R.Messages.job_searchSongIssues);
+        JobProgress jobProgress = new(songIssueScanCancellationTokenSource);
+        Job<List<SongIssue>> job = new(jobName, ScanSongIssuesAsync(songIssueScanCancellationTokenSource.Token, jobProgress), jobProgress);
+        job.Progress = jobProgress;
+        return await job.GetResultAsync();
+    }
 
-        try
-        {
-            await Awaitable.BackgroundThreadAsync();
-            List<SongIssue> songIssues = new SongIssueScanner().ScanSongIssues(settings, songMetas, job, songIssueScanCancellationTokenSource.Token);
-            AddSongIssues(songIssues);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            job.SetResult(EJobResult.Error);
-        }
+    private async Awaitable<List<SongIssue>> ScanSongIssuesAsync(
+        CancellationToken cancellationToken,
+        JobProgress jobProgress)
+    {
+        IReadOnlyCollection<SongMeta> songMetas = songMetaManager.GetSongMetas();
+
+        await Awaitable.BackgroundThreadAsync();
+        List<SongIssue> songIssues = await new SongIssueScanner().ScanSongIssuesAsync(settings, songMetas, cancellationToken, jobProgress);
+        AddSongIssues(songIssues);
 
         await Awaitable.MainThreadAsync();
         songIssueScanFinishedEventStream.OnNext(new SongIssueScanFinishedEvent());
-        if (job.Status.Value is EJobStatus.Running)
-        {
-            job.SetResult(EJobResult.Ok);
-        }
+
+        return songIssues;
     }
 }

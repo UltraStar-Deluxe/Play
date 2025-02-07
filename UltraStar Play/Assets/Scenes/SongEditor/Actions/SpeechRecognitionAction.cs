@@ -52,42 +52,25 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         int minBeat = SongMetaUtils.MinBeat(selectedNotes);
         int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
-        double lengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta) * lengthInBeats;
-        Job speechRecognitionJob = new(Translation.Get(R.Messages.job_speechRecognition));
-        jobManager.AddJob(speechRecognitionJob);
-        speechRecognitionJob.EstimatedTotalDurationInMillis =
-            SpeechRecognitionUtils.GetEstimatedSpeechRecognitionDurationInMillis(lengthInMillis);
-
-        CancellationTokenSource cancellationTokenSource = new();
-        speechRecognitionJob.OnCancel = () => cancellationTokenSource.Cancel();
-
-        Action<double> onProgress = progressInPercent =>
-            speechRecognitionJob.EstimatedCurrentProgressInPercent = progressInPercent;
 
         SpeechRecognitionParameters speechRecognitionParameters = CreateSpeechRecognizerParameters();
 
         try
         {
-            SpeechRecognizer speechRecognizer = await SpeechRecognitionUtils.GetOrCreateSpeechRecognizerAsync(speechRecognitionParameters, speechRecognitionJob);
-            speechRecognitionJob.SetStatus(EJobStatus.Running);
+            SpeechRecognizer speechRecognizer = await SpeechRecognitionUtils.GetOrCreateSpeechRecognizerInJobAsync(speechRecognitionParameters);
 
             float[] monoAudioSamples =
                 AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, minBeat, lengthInBeats, true);
 
             await Awaitable.BackgroundThreadAsync();
-            SpeechRecognitionResult speechRecognitionResult = await SpeechRecognitionUtils.DoSpeechRecognitionAsync(
+            SpeechRecognitionResult speechRecognitionResult = await SpeechRecognitionUtils.RecognizeSpeechInJobAsync(
                 monoAudioSamples,
                 0,
                 monoAudioSamples.Length - 1,
                 audioClip.frequency,
-                cancellationTokenSource.Token,
-                onProgress,
-                speechRecognizer,
-                false);
+                speechRecognizer);
 
             await Awaitable.MainThreadAsync();
-
-            speechRecognitionJob.SetResult(EJobResult.Ok);
             SpeechRecognitionUtils.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words, selectedNotes, minBeat);
             if (notify)
             {
@@ -96,7 +79,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         }
         catch (Exception ex)
         {
-            speechRecognitionJob?.SetResult(EJobResult.Error);
             throw new SpeechRecognitionException("Set text to analyzed speech failed", ex);
         }
     }
@@ -109,7 +91,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int spaceBetweenNotesInMillis,
         bool notify,
         SpeechRecognitionParameters speechRecognitionParameters,
-        bool continuous,
         int offsetInBeats)
     {
         await CreateNotesFromSpeechRecognitionAsync(
@@ -120,7 +101,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             spaceBetweenNotesInMillis,
             notify,
             speechRecognitionParameters,
-            continuous,
             offsetInBeats);
     }
 
@@ -132,7 +112,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int spaceBetweenNotesInMillis,
         bool notify,
         SpeechRecognitionParameters speechRecognitionParameters,
-        bool continuous,
         int offsetInBeats)
     {
         int lengthInSamples = endIndex - startIndex;
@@ -154,8 +133,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                     endIndex,
                     sampleRate,
                     speechRecognitionParameters,
-                    null,
-                    continuous,
                     settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                     songMeta,
                     offsetInBeats,
@@ -193,8 +170,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         ESongEditorSamplesSource speechRecognitionSampleSource,
         int spaceBetweenNotesInMillis,
         bool notify,
-        SpeechRecognitionParameters speechRecognitionParameters,
-        bool continuous)
+        SpeechRecognitionParameters speechRecognitionParameters)
     {
         try
         {
@@ -203,8 +179,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 speechRecognitionSampleSource,
                 spaceBetweenNotesInMillis,
                 notify,
-                speechRecognitionParameters,
-                continuous);
+                speechRecognitionParameters);
         }
         catch (Exception ex)
         {
@@ -226,8 +201,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         ESongEditorSamplesSource speechRecognitionSampleSource,
         int spaceBetweenNotesInMillis,
         bool notify,
-        SpeechRecognitionParameters speechRecognitionParameters,
-        bool continuous)
+        SpeechRecognitionParameters speechRecognitionParameters)
     {
         AudioClip audioClip = await GetAudioClip(speechRecognitionSampleSource);
         if (audioClip == null
@@ -258,8 +232,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 monoAudioSamples.Length - 1,
                 audioClip.frequency,
                 speechRecognitionParameters,
-                JobManager.CreateAndAddJob(Translation.Get(R.Messages.job_speechRecognition)),
-                continuous,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
                 startBeat,

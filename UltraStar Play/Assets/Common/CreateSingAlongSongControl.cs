@@ -32,7 +32,7 @@ public class CreateSingAlongSongControl : INeedInjection
     [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
 
-    private Job lastProcessSongJob;
+    private IJob lastProcessSongJob;
 
     private readonly Subject<SongMeta> createdSingAlongVersionEventStream = new();
     public IObservable<SongMeta> CreatedSingAlongVersionEventStream => createdSingAlongVersionEventStream;
@@ -58,22 +58,17 @@ public class CreateSingAlongSongControl : INeedInjection
         }
         Debug.Log($"Creating sing-along data song '{songMeta.GetArtistDashTitle()}'");
 
-        Job processSongJob = new(Translation.Get(R.Messages.job_createSingAlongDataWithName, "name", Path.GetFileName(songMeta.Audio)));
-        Job audioSeparationJob = new(Translation.Get(R.Messages.job_audioSeparation), processSongJob);
-        Job speechRecognitionJob = new(Translation.Get(R.Messages.job_speechRecognition), processSongJob);
-        Job pitchDetectionJob = new(Translation.Get(R.Messages.job_pitchDetection), processSongJob);
-
-        lastProcessSongJob = processSongJob;
-
-        jobManager.AddJob(processSongJob);
+        IJob parentJob = new Job<VoidEvent>(Translation.Get(R.Messages.job_createSingAlongDataWithName, "name", Path.GetFileName(songMeta.Audio)));
+        lastProcessSongJob = parentJob;
+        jobManager.AddJob(parentJob);
 
         try
         {
             // Load speech recognition model and run vocals isolation in parallel
-            SpeechRecognitionParameters speechRecognitionParameters = await LoadSpeechRecognitionModelAndRunAudioSeparationAsync(songMeta, saveSongFile, audioSeparationJob);
+            SpeechRecognitionParameters speechRecognitionParameters = await LoadSpeechRecognitionModelAndRunAudioSeparationAsync(songMeta, saveSongFile, parentJob);
 
             // Run speech recognition
-            List<Note> createdNotes = await RunSpeechRecognitionAsync(songMeta, speechRecognitionParameters, speechRecognitionJob);
+            List<Note> createdNotes = await RunSpeechRecognitionAsync(songMeta, speechRecognitionParameters, parentJob);
 
             // Split created notes into sentences and assign to first player
             AssignNotesToFirstPlayer(songMeta, createdNotes);
@@ -82,10 +77,10 @@ public class CreateSingAlongSongControl : INeedInjection
             SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
 
             // Run pitch detection on vocals audio
-            List<Note> loadedPitchDetectionNotes = await RunPitchDetectionAsync(songMeta, pitchDetectionJob);
+            List<Note> loadedPitchDetectionNotes = await RunPitchDetectionAsync(songMeta, parentJob);
 
             // Move notes of first player to detected pitch
-            MoveNotesToDetectedPitch(songMeta, createdNotes, loadedPitchDetectionNotes, pitchDetectionJob);
+            MoveNotesToDetectedPitch(songMeta, createdNotes, loadedPitchDetectionNotes);
 
             // Save
             if (saveSongFile)
@@ -97,16 +92,13 @@ public class CreateSingAlongSongControl : INeedInjection
         }
         catch (Exception ex)
         {
-            audioSeparationJob?.SetResult(EJobResult.Error);
-            speechRecognitionJob?.SetResult(EJobResult.Error);
-            pitchDetectionJob?.SetResult(EJobResult.Error);
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                 "reason", ex.Message));
             throw ex;
         }
     }
 
-    private static void MoveNotesToDetectedPitch(SongMeta songMeta, List<Note> createdNotes, List<Note> loadedPitchDetectionNotes, Job pitchDetectionJob)
+    private static void MoveNotesToDetectedPitch(SongMeta songMeta, List<Note> createdNotes, List<Note> loadedPitchDetectionNotes)
     {
         try
         {
@@ -114,7 +106,6 @@ public class CreateSingAlongSongControl : INeedInjection
                 songMeta,
                 createdNotes,
                 loadedPitchDetectionNotes);
-            pitchDetectionJob.SetResult(EJobResult.Ok);
         }
         catch (Exception ex)
         {
@@ -125,27 +116,31 @@ public class CreateSingAlongSongControl : INeedInjection
         }
     }
 
-    private async Awaitable<SpeechRecognitionParameters> LoadSpeechRecognitionModelAndRunAudioSeparationAsync(SongMeta songMeta, bool saveSongFile, Job audioSeparationJob)
+    private async Awaitable<SpeechRecognitionParameters> LoadSpeechRecognitionModelAndRunAudioSeparationAsync(
+        SongMeta songMeta,
+        bool saveSongFile,
+        IJob parentJob)
     {
         // (0) Load speech recognition model
         SpeechRecognitionParameters speechRecognitionParameters = new(
             SettingsUtils.GetSpeechRecognitionModelPath(settings),
             SettingsUtils.GetSpeechRecognitionLanguage(settings),
             settings.SongEditorSettings.SpeechRecognitionPrompt);
-        Awaitable<SpeechRecognizer> loadSpeechRecognizerAwaitable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizerAsync(speechRecognitionParameters, null);
+        Awaitable<SpeechRecognizer> loadSpeechRecognizerAwaitable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizerInJobAsync(speechRecognitionParameters);
 
         // (1) Run audio separation (vocals and instrumental audio)
-        Awaitable<AudioSeparationResult> audioSeparationResultAwaitable = audioSeparationManager.ProcessSongMetaAsync(songMeta, saveSongFile, audioSeparationJob);
+        Awaitable<AudioSeparationResult> audioSeparationResultAwaitable = audioSeparationManager.ProcessSongMetaInJobAsync(songMeta, saveSongFile, parentJob);
 
         // Continue when audio separation and loading speech recognition model have finished both
         await Task.WhenAll(audioSeparationResultAwaitable.AsTask(), loadSpeechRecognizerAwaitable.AsTask());
 
-        audioSeparationJob.SetResult(EJobResult.Ok);
-
         return speechRecognitionParameters;
     }
 
-    private async Awaitable<List<Note>> RunSpeechRecognitionAsync(SongMeta songMeta, SpeechRecognitionParameters speechRecognitionParameters, Job speechRecognitionJob)
+    private async Awaitable<List<Note>> RunSpeechRecognitionAsync(
+        SongMeta songMeta,
+        SpeechRecognitionParameters speechRecognitionParameters,
+        IJob parentJob)
     {
         // Load vocals audio
         AudioClip vocalsAudioClip = await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
@@ -159,33 +154,25 @@ public class CreateSingAlongSongControl : INeedInjection
             monoAudioSamples.Length - 1,
             vocalsAudioClip.frequency,
             speechRecognitionParameters,
-            speechRecognitionJob,
-            false,
             settings.SongEditorSettings.DefaultPitchForCreatedNotes,
             songMeta,
             0,
             SettingsUtils.CreateHyphenator(settings),
-            settings.SongEditorSettings.SpaceBetweenNotesInMillis);
-
-        speechRecognitionJob.SetResult(EJobResult.Ok);
+            settings.SongEditorSettings.SpaceBetweenNotesInMillis,
+            parentJob);
 
         return createdNotes;
     }
 
-    private async Task<List<Note>> RunPitchDetectionAsync(SongMeta songMeta, Job pitchDetectionJob)
+    private async Task<List<Note>> RunPitchDetectionAsync(SongMeta songMeta, IJob parentJob)
     {
-        pitchDetectionJob.SetStatus(EJobStatus.Running);
         List<Note> loadedPitchDetectionNotes = await PitchDetectionUtils.CreateNotesUsingBasicPitchAsync(
             pitchDetectionManager,
             songMeta,
-            pitchDetectionJob);
-
+            parentJob);
         if (loadedPitchDetectionNotes.IsNullOrEmpty())
         {
-            pitchDetectionJob.SetResult(EJobResult.Error);
-            Debug.LogError($"Failed to load pitch detection result");
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
-            return loadedPitchDetectionNotes;
+            throw new PitchDetectionException("Failed to load pitch detection result");
         }
 
         return loadedPitchDetectionNotes;

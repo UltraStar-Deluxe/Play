@@ -31,14 +31,23 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     private readonly Subject<AudioSeparationFinishedEvent> audioSeparationFinishedEventStream = new();
     public Subject<AudioSeparationFinishedEvent> AudioSeparationFinishedEventStream => audioSeparationFinishedEventStream;
 
-    public async void ProcessSongMeta(
+    public async Awaitable<AudioSeparationResult> ProcessSongMetaInJobAsync(
         SongMeta songMeta,
         bool saveSong,
-        Job audioSeparationJob = null)
+        IJob parentJob = null)
     {
         try
         {
-            await ProcessSongMetaAsync(songMeta, saveSong, audioSeparationJob);
+            JobProgress jobProgress = new(new CancellationTokenSource());
+            Translation jobName = Translation.Get(R.Messages.job_audioSeparationWithName,
+                "name", Path.GetFileName(songMeta.Audio));
+            Job<AudioSeparationResult> job = new(jobName,
+                ProcessSongMetaAsync(songMeta, saveSong, jobProgress),
+                jobProgress,
+                parentJob);
+            jobManager.AddJob(job);
+
+            return await job.GetResultAsync();
         }
         catch (Exception ex)
         {
@@ -52,35 +61,26 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                 NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_audioSeparation_errorWithReason,
                     "reason", ex.Message)));
             }
+
+            throw ex;
         }
     }
 
-    public async Awaitable<AudioSeparationResult> ProcessSongMetaAsync(
+    private async Awaitable<AudioSeparationResult> ProcessSongMetaAsync(
         SongMeta songMeta,
         bool saveSong,
-        Job audioSeparationJob = null)
+        JobProgress jobProgress)
     {
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
 
-        // Create job to show in UI
-        if (audioSeparationJob == null)
-        {
-            audioSeparationJob = new Job(Translation.Get(R.Messages.job_audioSeparationWithName,
-                "name", Path.GetFileName(songMeta.Audio)));
-            jobManager.AddJob(audioSeparationJob);
-        }
-        audioSeparationJob.SetStatus(EJobStatus.Running);
-
+        // Estimate duration
         if (ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(audioUri)))
         {
             AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(audioUri, false);
             int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
-            audioSeparationJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
+            jobProgress.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
         }
-
-        CancellationTokenSource cancellationTokenSource = new();
-        audioSeparationJob.OnCancel = () => cancellationTokenSource.Cancel();
 
         // Set path to Spleeter executable if needed
         string fallbackAudioSeparationCommand = PlatformUtils.IsWindows
@@ -93,29 +93,21 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             throw new AudioSeparationException($"Vocals isolation not supported for this audio file. Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.JoinWith(", ")}");
         }
 
-        try
-        {
-            await Awaitable.BackgroundThreadAsync();
-            AudioSeparationResult audioSeparationResult = await DoProcessSongMetaAsync(
-                songMeta,
-                generatedSongFolderAbsolutePath,
-                cancellationTokenSource.Token,
-                fallbackAudioSeparationCommand,
-                saveSong);
+        await Awaitable.BackgroundThreadAsync();
+        AudioSeparationResult audioSeparationResult = await ProcessSongMetaWithSpleeterAsync(
+            songMeta,
+            generatedSongFolderAbsolutePath,
+            jobProgress.CancellationTokenSource.Token,
+            fallbackAudioSeparationCommand,
+            saveSong);
 
-            await Awaitable.MainThreadAsync();
-            audioSeparationJob.SetResult(EJobResult.Ok);
-            audioSeparationFinishedEventStream.OnNext(new AudioSeparationFinishedEvent(songMeta));
-            return audioSeparationResult;
-        }
-        catch (Exception ex)
-        {
-            audioSeparationJob.SetResult(EJobResult.Error);
-            throw ex;
-        }
+        await Awaitable.MainThreadAsync();
+        audioSeparationFinishedEventStream.OnNext(new AudioSeparationFinishedEvent(songMeta));
+        return audioSeparationResult;
     }
 
-    private async Awaitable<AudioSeparationResult> DoProcessSongMetaAsync(SongMeta songMeta,
+    private async Awaitable<AudioSeparationResult> ProcessSongMetaWithSpleeterAsync(
+        SongMeta songMeta,
         string generatedSongFolderAbsolutePath,
         CancellationToken cancellationToken,
         string fallbackAudioSeparationCommand,

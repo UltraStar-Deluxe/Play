@@ -9,11 +9,11 @@ public class SongIssueScanner
     private static string UnitySupportedVideoFileExtensionsCsv => ApplicationUtils.unitySupportedVideoFiles.JoinWith(", ");
     private static string UnitySupportedAudioFileExtensionsCsv => ApplicationUtils.unitySupportedAudioFiles.JoinWith(", ");
 
-    public List<SongIssue> ScanSongIssues(
+    public async Awaitable<List<SongIssue>> ScanSongIssuesAsync(
         Settings settings,
         IReadOnlyCollection<SongMeta> songMetas,
-        Job job,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        JobProgress jobProgress)
     {
         List<SongIssue> result = new();
 
@@ -21,7 +21,7 @@ public class SongIssueScanner
         foreach (SongMeta songMeta in songMetas)
         {
             doneSongMetas++;
-            job.EstimatedCurrentProgressInPercent = (double)doneSongMetas / songMetas.Count;
+            jobProgress.EstimatedCurrentProgressInPercent = (double)doneSongMetas / songMetas.Count;
 
             if (songMeta == null)
             {
@@ -67,7 +67,6 @@ public class SongIssueScanner
         }
 
         Debug.Log($"Finished song issue scan. Found {result.Count} issues in {songMetas.Count} songs.");
-        job.SetResult(EJobResult.Ok);
         return result;
     }
 

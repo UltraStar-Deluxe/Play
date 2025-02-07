@@ -36,26 +36,12 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
     public async void CreateNotesUsingBasicPitch(bool notify)
     {
-        string fileName = Path.GetFileName(songMeta.Audio);
-        Job pitchDetectionJob = JobManager.CreateAndAddJob(Translation.Get(R.Messages.job_pitchDetectionWithName,
-            "name", fileName));
+        BasicPitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaInJobAsync(songMeta);
+        ImportBasicPitchMidiFile(pitchDetectionResult.MidiFilePath);
 
-        try
+        if (notify)
         {
-            BasicPitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaAsync(songMeta, pitchDetectionJob);
-            pitchDetectionJob.SetResult(EJobResult.Ok);
-            ImportBasicPitchMidiFile(pitchDetectionResult.MidiFilePath);
-
-            if (notify)
-            {
-                songMetaChangeEventStream.OnNext(new NotesChangedEvent());
-            }
-        }
-        catch (Exception ex)
-        {
-            pitchDetectionJob.SetResult(EJobResult.Error);
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.job_pitchDetection_errorWithReason,
-                "reason", ex.Message));
+            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
         }
     }
 

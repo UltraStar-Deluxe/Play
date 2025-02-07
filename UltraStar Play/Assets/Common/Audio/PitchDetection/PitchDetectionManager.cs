@@ -30,16 +30,24 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
     [Inject]
     private SongMetaManager songMetaManager;
 
-    private readonly List<Job> pitchDetectionJobs = new();
-
     private readonly Subject<PitchDetectionFinishedEvent> pitchDetectionFinishedEventStream = new();
     public Subject<PitchDetectionFinishedEvent> PitchDetectionFinishedEventStream => pitchDetectionFinishedEventStream;
 
-    public async void ProcessSongMeta(SongMeta songMeta, Job pitchDetectionJob = null)
+    public async Awaitable<BasicPitchDetectionResult> ProcessSongMetaInJobAsync(SongMeta songMeta, IJob parentJob = null)
     {
         try
         {
-            await ProcessSongMetaAsync(songMeta, pitchDetectionJob);
+            CancellationTokenSource cancellationTokenSource = new();
+            JobProgress jobProgress = new(cancellationTokenSource);
+            Translation jobName = Translation.Get(R.Messages.job_pitchDetectionWithName,
+                "name", Path.GetFileName(songMeta.Audio));
+            Job<BasicPitchDetectionResult> job = new(jobName,
+                ProcessSongMetaAsync(songMeta, jobProgress),
+                jobProgress,
+                parentJob);
+            jobManager.AddJob(job);
+
+            return await job.GetResultAsync();
         }
         catch (Exception ex)
         {
@@ -53,12 +61,14 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
                 NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_pitchDetection_errorWithReason,
                     "reason", ex.Message)));
             }
+
+            throw ex;
         }
     }
 
-    public async Awaitable<BasicPitchDetectionResult> ProcessSongMetaAsync(
+    private async Awaitable<BasicPitchDetectionResult> ProcessSongMetaAsync(
         SongMeta songMeta,
-        Job pitchDetectionJob = null)
+        JobProgress jobProgress)
     {
         string vocalsAudioUri = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
         if (!FileUtils.Exists(vocalsAudioUri))
@@ -73,48 +83,27 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
 
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
 
-        // Create job to show in UI
-        if (pitchDetectionJob == null)
-        {
-            pitchDetectionJob = new Job(Translation.Get(R.Messages.job_pitchDetectionWithName,
-                "name", Path.GetFileName(songMeta.Audio)));
-            jobManager.AddJob(pitchDetectionJob);
-        }
-        pitchDetectionJob.SetStatus(EJobStatus.Running);
-
+        // Estimate duration
         AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(vocalsAudioUri);
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
-        pitchDetectionJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 3.0);
-
-        CancellationTokenSource cancellationTokenSource = new();
-        pitchDetectionJob.OnCancel = () => cancellationTokenSource.Cancel();
-        pitchDetectionJobs.Add(pitchDetectionJob);
+        jobProgress.EstimatedCurrentProgressInPercent = (int)Math.Ceiling(lengthInMillis / 3.0);
 
         // Set path to Basic Pitch executable if needed
         string fallbackPitchDetectionCommand = PlatformUtils.IsWindows
             ? $"\"{ApplicationUtils.GetStreamingAssetsPath("BasicPitchExe/basic_pitch_exe.exe").Replace("/", "\\")}\" --onset_threshold 0.3 --frame_threshold 0.3"
             : "";
 
-        try
-        {
-            await Awaitable.BackgroundThreadAsync();
-            BasicPitchDetectionResult pitchDetectionResult = await DoProcessSongMetaAsync(
-                songMeta,
-                generatedSongFolderAbsolutePath,
-                cancellationTokenSource.Token,
-                fallbackPitchDetectionCommand);
+        await Awaitable.BackgroundThreadAsync();
+        BasicPitchDetectionResult pitchDetectionResult = await DoProcessSongMetaAsync(
+            songMeta,
+            generatedSongFolderAbsolutePath,
+            jobProgress.CancellationTokenSource.Token,
+            fallbackPitchDetectionCommand);
 
-            await Awaitable.MainThreadAsync();
-            pitchDetectionJob.SetResult(EJobResult.Ok);
+        await Awaitable.MainThreadAsync();
 
-            pitchDetectionFinishedEventStream.OnNext(new PitchDetectionFinishedEvent(songMeta));
-            return pitchDetectionResult;
-        }
-        catch (Exception ex)
-        {
-            pitchDetectionJob?.SetResult(EJobResult.Error);
-            throw ex;
-        }
+        pitchDetectionFinishedEventStream.OnNext(new PitchDetectionFinishedEvent(songMeta));
+        return pitchDetectionResult;
     }
 
     private async Awaitable<BasicPitchDetectionResult> DoProcessSongMetaAsync(SongMeta songMeta,
@@ -221,10 +210,5 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
             .SetBasicPitchCommand(basicPitchCommand)
             .SetIsWindows(PlatformUtils.IsWindows)
             .SetLogAction(message => Debug.Log($"BasicPitchRunner: {message}"));
-    }
-
-    private void OnApplicationQuit()
-    {
-        pitchDetectionJobs.ForEach(job => job.Cancel());
     }
 }

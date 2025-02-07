@@ -12,7 +12,7 @@ public static class ExceptionExtensions
     public static Exception Log(this Exception ex, string message)
     {
         Debug.LogException(ex);
-        Debug.LogError($"${message}: {ex.Message}");
+        Debug.LogError($"{message}: {ex.Message}");
         return ex;
     }
 }
