@@ -174,7 +174,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     {
         try
         {
-            string response = await WebRequestUtils.GetWebRequestResponseAsync(UnityWebRequest.Get(new Uri(songArchiveInfoJsonUrl)));
+            using UnityWebRequest webRequest = UnityWebRequest.Get(new Uri(songArchiveInfoJsonUrl));
+            string response = await WebRequestUtils.GetWebRequestResponseAsync(webRequest);
             downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(response);
         }
         catch (Exception ex)
