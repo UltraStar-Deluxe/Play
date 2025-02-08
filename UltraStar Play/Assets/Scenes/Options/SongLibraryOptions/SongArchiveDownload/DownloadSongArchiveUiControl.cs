@@ -52,13 +52,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
 
     private MessageDialogControl urlChooserDialogControl;
 
-    public string TargetFolder => downloadAndExtractSongArchiveControl != null
-        ? downloadAndExtractSongArchiveControl.TargetFolder
-        : "";
-
     private DownloadAndExtractSongArchiveControl downloadAndExtractSongArchiveControl;
-
-    public ReactiveProperty<bool> IsDoneWithoutError { get; private set; } = new();
 
     private List<SongArchiveEntry> songArchiveEntries = new();
     public List<SongArchiveEntry> SongArchiveEntries
@@ -73,6 +67,9 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
 
     private readonly Subject<VoidEvent> deleteEventStream = new();
     public IObservable<VoidEvent> DeleteEventStream => deleteEventStream;
+
+    private readonly Subject<string> finishEventStream = new();
+    public IObservable<string> FinishEventStream => finishEventStream;
 
     public void OnInjectionFinished()
     {
@@ -90,10 +87,69 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         cancelIcon.HideByDisplay();
     }
 
+    public async void StartDownload()
+    {
+        if (urlTextField.value.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        if (downloadAndExtractSongArchiveControl != null)
+        {
+            throw new Exception("Already started download");
+        }
+
+        startIcon.HideByDisplay();
+        cancelIcon.ShowByDisplay();
+
+        try
+        {
+            downloadAndExtractSongArchiveControl = new(urlTextField.value.Trim());
+            await downloadAndExtractSongArchiveControl.DownloadAndExtractAsync();
+
+            SetFinishedStatus();
+            finishEventStream.OnNext(downloadAndExtractSongArchiveControl.ExtractedArchiveTargetFolder);
+        }
+        catch (Exception ex)
+        {
+            ex.Log("Failed to download and extract song archive");
+            SetErrorStatus(ex.Message);
+        }
+        finally
+        {
+            downloadAndExtractSongArchiveControl = null;
+        }
+
+        startIcon.ShowByDisplay();
+        cancelIcon.HideByDisplay();
+    }
+
+    public void CancelDownload()
+    {
+        downloadAndExtractSongArchiveControl?.Cancel();
+        SetCanceledStatus();
+    }
+
+    public void UpdateProgress()
+    {
+        if (downloadAndExtractSongArchiveControl == null)
+        {
+            return;
+        }
+
+        if (downloadAndExtractSongArchiveControl.ExtractionProgress.ProgressInPercent > 0)
+        {
+            UpdateExtractArchiveProgressText(downloadAndExtractSongArchiveControl.ExtractionProgress);
+        }
+        else
+        {
+            UpdateDownloadProgressText(downloadAndExtractSongArchiveControl.DownloadProgress);
+        }
+    }
+
     private void ToggleStartAndCancel()
     {
-        if (downloadAndExtractSongArchiveControl == null
-            || downloadAndExtractSongArchiveControl.IsDone.Value)
+        if (downloadAndExtractSongArchiveControl == null)
         {
             StartDownload();
         }
@@ -101,62 +157,6 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         {
             CancelDownload();
         }
-    }
-
-    private void StartDownload()
-    {
-        if (urlTextField.value.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        if (downloadAndExtractSongArchiveControl != null
-            && !downloadAndExtractSongArchiveControl.IsDone.Value)
-        {
-            return;
-        }
-
-        startIcon.HideByDisplay();
-        cancelIcon.ShowByDisplay();
-
-        downloadAndExtractSongArchiveControl = new(urlTextField.value.Trim(), gameObject.transform);
-        downloadAndExtractSongArchiveControl.ErrorMessage.ObserveOnMainThread()
-            .Subscribe(newValue =>
-            {
-                if (!newValue.IsNullOrEmpty())
-                {
-                    SetErrorStatus(newValue);
-                }
-            });
-        downloadAndExtractSongArchiveControl.IsDone.ObserveOnMainThread()
-            .Subscribe(newValue =>
-            {
-                if (newValue)
-                {
-                    startIcon.ShowByDisplay();
-                    cancelIcon.HideByDisplay();
-                }
-            });
-        downloadAndExtractSongArchiveControl.IsDoneWithoutError.ObserveOnMainThread()
-            .Subscribe(newValue =>
-            {
-                if (newValue)
-                {
-                    IsDoneWithoutError.Value = true;
-                    SetFinishedStatus();
-                }
-            });
-        downloadAndExtractSongArchiveControl.DownloadProgressEventStream.ObserveOnMainThread()
-            .Subscribe(evt => UpdateDownloadProgressText(evt));
-        downloadAndExtractSongArchiveControl.ExtractProgressEventStream.ObserveOnMainThread()
-            .Subscribe(evt => UpdateExtractArchiveProgressText(evt));
-        downloadAndExtractSongArchiveControl.Start();
-    }
-
-    public void CancelDownload()
-    {
-        downloadAndExtractSongArchiveControl?.Cancel();
-        SetCanceledStatus();
     }
 
     private void ShowUrlChooserDialog()
@@ -211,7 +211,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         statusLabel.SetTranslatedText(Translation.Get(R.Messages.options_songLibrary_archiveDownload_status_canceled));
     }
 
-    private void UpdateDownloadProgressText(FileDownloadControl.DownloadProgressEvent evt)
+    private void UpdateDownloadProgressText(DownloadProgress evt)
     {
         ByteSizeUtils.TryGetHumanReadableByteSize((long)evt.DownloadedByteCount, out double size, out string unit);
         if (unit is "B" or "KB" or "MB")
@@ -231,7 +231,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
-    private void UpdateExtractArchiveProgressText(ExtractArchiveControl.ExtractArchiveProgressEvent evt)
+    private void UpdateExtractArchiveProgressText(ExtractArchiveProgress evt)
     {
         if (evt.ProgressInPercent >= 100)
         {

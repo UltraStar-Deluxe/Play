@@ -125,7 +125,12 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 #endif
     }
 
-    private void CreateDownloadSongArchiveUiControl()
+    private void Update()
+    {
+        downloadSongArchiveUiControls.ForEach(it => it.UpdateProgress());
+    }
+
+    private async void CreateDownloadSongArchiveUiControl()
     {
         VisualElement visualElement = downloadSongArchiveUi.CloneTreeAndGetFirstChild();
 
@@ -133,26 +138,22 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .WithRootVisualElement(visualElement)
             .CreateAndInject<DownloadSongArchiveUiControl>();
 
-        downloadSongArchiveUiControl.IsDoneWithoutError.Subscribe(newValue =>
+        downloadSongArchiveUiControl.FinishEventStream.Subscribe(targetFolder =>
         {
-            if (newValue)
+            downloadSongArchiveUiControls.Remove(downloadSongArchiveUiControl);
+
+            // Add new song folder if needed
+            if (!targetFolder.IsNullOrEmpty()
+                && !settings.SongDirs.Contains(targetFolder))
             {
-                downloadSongArchiveUiControls.Remove(downloadSongArchiveUiControl);
-
-                // Add new song folder if needed
-                string targetFolder = downloadSongArchiveUiControl.TargetFolder;
-                if (!targetFolder.IsNullOrEmpty()
-                    && !settings.SongDirs.Contains(targetFolder))
-                {
-                    settings.SongDirs.Add(targetFolder);
-                }
-
-                // Fade out the download UI, then remove it
-                LeanTween
-                    .value(gameObject, visualElement.resolvedStyle.opacity, 0, 1f)
-                    .setOnUpdate(interpolatedValue => visualElement.style.opacity = interpolatedValue)
-                    .setOnComplete(_ => UpdateSongFolderList());
+                settings.SongDirs.Add(targetFolder);
             }
+
+            // Fade out the download UI, then remove it
+            LeanTween
+                .value(gameObject, visualElement.resolvedStyle.opacity, 0, 1f)
+                .setOnUpdate(interpolatedValue => visualElement.style.opacity = interpolatedValue)
+                .setOnComplete(_ => UpdateSongFolderList());
         });
 
         downloadSongArchiveUiControl.DeleteEventStream.Subscribe(_ =>
@@ -166,7 +167,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         UpdateSongFolderList();
 
-        UpdateSongArchiveEntriesAsync(downloadSongArchiveUiControl);
+        await UpdateSongArchiveEntriesAsync(downloadSongArchiveUiControl);
     }
 
     private async Awaitable UpdateSongArchiveEntriesAsync(DownloadSongArchiveUiControl downloadSongArchiveUiControl)
@@ -593,6 +594,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     protected override void OnDestroy()
     {
         base.OnDestroy();
+
+        // Cancel downloads
+        downloadSongArchiveUiControls.ForEach(it => it.CancelDownload());
 
         issuesIcon.RemoveFromClassList("error");
         issuesIcon.RemoveFromClassList("warning");
