@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public static class WebRequestUtils
 {
-    public static async Awaitable SendWebRequestAsync(UnityWebRequest unityWebRequest)
+    public static async Awaitable SendWebRequestAsync(UnityWebRequest unityWebRequest, CancellationToken cancellationToken = default)
     {
         void LogSuccess()
         {
@@ -19,7 +20,7 @@ public static class WebRequestUtils
 
         try
         {
-            await unityWebRequest.SendWebRequest();
+            await SendWebRequestWithCancellationAsync(unityWebRequest, cancellationToken);
 
             if (unityWebRequest.result is UnityWebRequest.Result.Success)
             {
@@ -37,6 +38,25 @@ public static class WebRequestUtils
         {
             LogError(ex);
             throw ex;
+        }
+    }
+
+    private static async Awaitable SendWebRequestWithCancellationAsync(UnityWebRequest request, CancellationToken cancellationToken)
+    {
+        UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+
+        // Poll the WebRequest at intervals to support cancellation
+        while (!operation.isDone)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                Debug.Log($"Cancellation requested, aborting request {request.method} '{request.uri}'");
+                request.Abort();
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            // Do not use CancellationToken for NextFrameAsync. Otherwise, above handling of the cancellation will be skipped.
+            await Awaitable.NextFrameAsync();
         }
     }
 
