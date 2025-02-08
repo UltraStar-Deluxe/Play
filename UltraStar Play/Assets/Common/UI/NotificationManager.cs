@@ -41,7 +41,7 @@ public class NotificationManager : AbstractSingletonBehaviour, INeedInjection
         notificationOverlay.Add(notification);
 
         // Fade out then remove
-        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, NotificationFadeOutDelayInSeconds, NotificationFadeOutDurationInSeconds));
+        AnimationUtils.FadeOutThenRemoveVisualElementAsync(notification, NotificationFadeOutDelayInSeconds, NotificationFadeOutDurationInSeconds);
     }
 
     public static void CreateNotification(VisualElement content)

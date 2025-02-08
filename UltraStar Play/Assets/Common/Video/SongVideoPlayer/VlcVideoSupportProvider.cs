@@ -2,6 +2,7 @@
 using LibVLCSharp;
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 {
@@ -52,7 +53,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
                && !videoEqualsAudio;
     }
 
-    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis)
+    public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {
         // Instantiate new vlc player
         if (mediaPlayer == null)
@@ -78,17 +79,14 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
-        return Observable.Create<VideoLoadedEvent>(o =>
+        await ConditionUtils.WaitForConditionAsync(() => !this || mediaPlayer?.Media?.Duration > 0);
+        if (!this)
         {
-            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => mediaPlayer.Media != null && mediaPlayer.Media.Duration > 0,
-                () =>
-                {
-                    mediaPlayer.SetPause(!shouldBePlaying);
-                    o.OnNext(new VideoLoadedEvent(videoUri));
-                }));
-            return Disposable.Empty;
-        });
+            throw new VideoSupportProviderException($"Failed to load video '{videoUri}': {nameof(VlcVideoSupportProvider)} has been destroyed already.");
+        }
+
+        mediaPlayer.SetPause(!shouldBePlaying);
+        return new VideoLoadedEvent(videoUri);
     }
 
     public override void Unload()

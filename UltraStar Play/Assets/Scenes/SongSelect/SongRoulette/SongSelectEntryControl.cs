@@ -310,7 +310,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         VisualElement buttonContainer = contextMenuPopup.AddButton(Translation.Get(R.Messages.action_separateAudio), "call_split",
             () =>
             {
-                audioSeparationManager.ProcessSongMeta(songEntry.SongMeta, true);
+                audioSeparationManager.ProcessSongMetaInJobAsync(songEntry.SongMeta, true);
             });
 
         // Disable button if vocals and instrumental audio already exist.
@@ -368,7 +368,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void UpdateSongCover(SongSelectSongEntry songEntry)
+    private async void UpdateSongCover(SongSelectSongEntry songEntry)
     {
         SongMeta songMeta = songEntry.SongMeta;
         lastSongMetaCover = songMeta.Cover;
@@ -377,51 +377,45 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         folderImage.HideByDisplay();
         folderPreviewImage.HideByDisplay();
 
-        SongMetaImageUtils.GetCoverOrBackgroundImageUri(songMeta)
-            .SelectMany(uri =>
-            {
-                if (SongEntryChanged(songMeta))
-                {
-                    // The entry changed in the meantime
-                    return Observable.Return<Sprite>(null);
-                }
-
-                if (uri.IsNullOrEmpty())
-                {
-                    return Observable.Return<Sprite>(null);
-                }
-
-                return ImageManager.LoadSpriteFromUri(uri);
-            })
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-
-                if (SongEntryChanged(songMeta))
-                {
-                    // The entry changed in the meantime
-                    return;
-                }
-                SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
-            })
-            .Subscribe(sprite =>
-            {
-                if (SongEntryChanged(songMeta))
-                {
-                    // The entry changed in the meantime
-                    return;
-                }
-
-                if (sprite == null)
-                {
-                    SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
-                    return;
-                }
-
-                SongMetaImageUtils.SetCoverOrBackgroundImage(sprite, songImageOuter, songImageInner);
-            });
-
         notAvailableInOnlineGameIcon.HideByDisplay();
+
+        try
+        {
+            string uri = await SongMetaImageUtils.GetCoverOrBackgroundImageUriAsync(songMeta);
+            if (SongEntryChanged(songMeta))
+            {
+                return;
+            }
+
+            if (uri.IsNullOrEmpty())
+            {
+                SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
+                return;
+            }
+
+            Sprite sprite = await ImageManager.LoadSpriteFromUriAsync(uri);
+            if (SongEntryChanged(songMeta))
+            {
+                return;
+            }
+
+            if (sprite == null)
+            {
+                SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
+                return;
+            }
+            SongMetaImageUtils.SetCoverOrBackgroundImageAsync(sprite, songImageOuter, songImageInner);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+
+            if (SongEntryChanged(songMeta))
+            {
+                return;
+            }
+            SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
+        }
     }
 
     public void ShowNotAvailableInOnlineGameIcon()
@@ -465,7 +459,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         }
 
         await Awaitable.MainThreadAsync();
-        Sprite sprite = await ImageManager.LoadSpriteFromUri(imageUri);
+        Sprite sprite = await ImageManager.LoadSpriteFromUriAsync(imageUri);
         if (sprite == null)
         {
             return;

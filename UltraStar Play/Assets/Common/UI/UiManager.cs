@@ -248,11 +248,11 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
         }
     }
 
-    public IObservable<Sprite> LoadPlayerProfileImage(string imagePath)
+    public async Awaitable<Sprite> LoadPlayerProfileImageAsync(string imagePath)
     {
         if (imagePath.IsNullOrEmpty())
         {
-            return Observable.Return<Sprite>(fallbackPlayerProfileImage);
+            return fallbackPlayerProfileImage;
         }
 
         string relativePathNormalized = PathUtils.NormalizePath(imagePath);
@@ -265,10 +265,10 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
         if (matchingFullPath.IsNullOrEmpty())
         {
             Debug.LogWarning($"Cannot load player profile image with path '{imagePath}' (normalized: '{relativePathNormalized}'), no corresponding image file found.");
-            return Observable.Return(fallbackPlayerProfileImage);
+            return fallbackPlayerProfileImage;
         }
 
-        return ImageManager.LoadSpriteFromUri(matchingFullPath);
+        return await ImageManager.LoadSpriteFromUriAsync(matchingFullPath);
     }
 
     public List<string> GetAbsolutePlayerProfileImagePaths()

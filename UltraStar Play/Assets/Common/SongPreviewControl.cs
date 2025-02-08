@@ -112,7 +112,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         return audioFadeInFactorEased;
     }
 
-    public virtual void StartSongPreview(SongMeta songMeta)
+    public virtual async void StartSongPreview(SongMeta songMeta)
     {
         if (!gameObject.activeInHierarchy)
         {
@@ -133,13 +133,12 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         if (songMeta != null
             && delayInMillis > 0)
         {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(
-                delayInMillis / 1000f,
-                () => DoStartSongPreview(songMeta)));
+            await Awaitable.WaitForSecondsAsync(delayInMillis / 1000f);
+            await DoStartSongPreviewAsync(songMeta);
         }
         else
         {
-            DoStartSongPreview(songMeta);
+            await DoStartSongPreviewAsync(songMeta);
         }
     }
 
@@ -189,7 +188,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         stopSongPreviewEventStream.OnNext(currentPreviewSongMeta);
     }
 
-    protected virtual void DoStartSongPreview(SongMeta songMeta)
+    protected virtual async Awaitable DoStartSongPreviewAsync(SongMeta songMeta)
     {
         if (songMeta == null
             || currentPreviewSongMeta != songMeta)
@@ -202,13 +201,13 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         videoFadeInStartTimeInSeconds = Time.time;
         isFadeInStarted = true;
         int previewStartInMillis = GetPreviewStartInMillis(songMeta);
-        StartAudioPreview(songMeta, previewStartInMillis)
-            .Subscribe(_ => StartVideoPreview(songMeta));
+        await StartAudioPreviewAsync(songMeta, previewStartInMillis);
+        await StartVideoPreviewAsync(songMeta);
 
         startSongPreviewEventStream.OnNext(songMeta);
     }
 
-    protected virtual void StartVideoPreview(SongMeta songMeta)
+    protected virtual async Awaitable StartVideoPreviewAsync(SongMeta songMeta)
     {
         if (!gameObject.activeInHierarchy
             || songVideoPlayer == null
@@ -233,29 +232,28 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(songMeta);
     }
 
-    protected virtual IObservable<SongAudioLoadedEvent> StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
+    protected virtual async Awaitable StartAudioPreviewAsync(SongMeta songMeta, int previewStartInMillis)
     {
         if (!gameObject.activeInHierarchy)
         {
-            return Observable.Empty<SongAudioLoadedEvent>();
+            return;
         }
 
         Log.Debug(() => $"StartAudioPreview '{songMeta.GetArtistDashTitle()}'");
 
-        return songAudioPlayer.LoadAndPlayAsObservable(songMeta, previewStartInMillis)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                    "reason", ex.Message));
-            })
-            .Select(evt =>
-            {
-                songAudioPlayer.VolumeFactor = 0;
-                songAudioPlayer.PlayAudio();
-                return evt;
-            });
+        try
+        {
+            await songAudioPlayer.LoadAndPlayAsync(songMeta, previewStartInMillis);
+            songAudioPlayer.VolumeFactor = 0;
+            songAudioPlayer.PlayAudio();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", ex.Message));
+        }
     }
 
     protected virtual float GetFinalPreviewVolume()

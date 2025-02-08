@@ -1,100 +1,91 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UniRx;
 using UnityEngine;
 
-public class Job
+public class Job<T> : IJob
 {
-	public Translation Name { get; private set; }
+    private readonly Awaitable<T> awaitable;
+    public Translation Name { get; }
+    public JobProgress Progress { get; set; }
+    public CancellationTokenSource CancellationTokenSource => Progress?.CancellationTokenSource;
+    public bool IsCancellationRequested => CancellationTokenSource != null && CancellationTokenSource.IsCancellationRequested;
 
     public ReactiveProperty<EJobStatus> Status { get; private set; } = new(EJobStatus.Pending);
     public ReactiveProperty<EJobResult> Result { get; private set; }  = new (EJobResult.Pending);
 
-    private readonly List<Job> childJobs = new();
-    public IReadOnlyList<Job> ChildJobs => childJobs;
-    public Job ParentJob { get; private set; }
+    private readonly List<IJob> childJobs = new();
+    public IReadOnlyList<IJob> ChildJobs => childJobs;
+    public IJob ParentJob { get; set; }
 
     public bool AdoptChildJobError { get; set; }
 
-    public long EstimatedTotalDurationInMillis { get; set; }
-    public double EstimatedCurrentProgressInPercent
-    {
-        get
-        {
-            if (endTimeInMillis > 0)
-            {
-                return 100;
-            }
+    public ReactiveProperty<bool> IsCanceled { get; }
+    public ReactiveProperty<bool> IsCancelable { get; }
 
-            if (EstimatedTotalDurationInMillis <= 0
-                || startTimeInMillis == 0)
-            {
-                return 0;
-            }
-
-            double progressInPercent = 100.0 * (double)CurrentDurationInMillis / EstimatedTotalDurationInMillis;
-            if (progressInPercent > 99)
-            {
-                progressInPercent = 99;
-            }
-            return progressInPercent;
-        }
-
-        set
-        {
-            double progressFactor = value / 100.0;
-            if (progressFactor <= 0)
-            {
-                return;
-            }
-            EstimatedTotalDurationInMillis = (long)(CurrentDurationInMillis * (1 / progressFactor));
-        }
-    }
-
-    public long CurrentDurationInMillis
-    {
-        get
-        {
-            if (startTimeInMillis == 0)
-            {
-                return 0;
-            }
-            if (endTimeInMillis > 0)
-            {
-                return endTimeInMillis - startTimeInMillis;
-            }
-            return TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis;
-        }
-    }
-
-    private long startTimeInMillis;
-    private long endTimeInMillis;
-
-    private Action onCancel;
-    public Action OnCancel {
-        get
-        {
-            return onCancel;
-        }
-        set
-        {
-            onCancel = value;
-            IsCancelable.Value = onCancel != null;
-        }
-    }
-    public ReactiveProperty<bool> IsCanceled { get; private set; } = new(false);
-    public ReactiveProperty<bool> IsCancelable { get; private set; } = new(false);
-
-    public Job(Translation name, Job parentJob = null)
+    public Job(
+        Translation name,
+        Awaitable<T> awaitable = null,
+        JobProgress jobProgress = null,
+        IJob parentJob = null)
     {
         Name = name;
+        this.awaitable = awaitable;
+        this.Progress = jobProgress ?? new JobProgress(null);
+        IsCanceled = new ReactiveProperty<bool>(false);
+        IsCancelable = new ReactiveProperty<bool>(IsCancellationRequested);
         if (parentJob != null)
         {
             parentJob.AddChildJob(this);
         }
     }
 
-    private void AddChildJob(Job childJob)
+    public async Awaitable RunAsync()
+    {
+        await GetResultAsync();
+    }
+
+    public async Awaitable<T> GetResultAsync()
+    {
+        if (Status.Value != EJobStatus.Pending)
+        {
+            throw new InvalidOperationException($"Can only start a job that is in a pending state: job '{Name}', status {Status.Value}");
+        }
+
+        try
+        {
+            T result = default;
+            SetStatus(EJobStatus.Running);
+
+            if (awaitable != null)
+            {
+                result = await awaitable;
+            }
+            await RunChildJobsAsync();
+
+            CancellationTokenSource?.Token.ThrowIfCancellationRequested();
+            SetResult(EJobResult.Ok);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Job '{Name}' failed: {ex.Message}");
+            SetResult(EJobResult.Error);
+            throw ex;
+        }
+        finally
+        {
+            if (Status.Value != EJobStatus.Finished)
+            {
+                SetStatus(EJobStatus.Finished);
+            }
+        }
+    }
+
+    public void AddChildJob(IJob childJob)
     {
         childJob.ParentJob = this;
         childJobs.Add(childJob);
@@ -103,12 +94,37 @@ public class Job
         childJob.Status.Subscribe(_ => OnChildJobChanged());
     }
 
+    private async Awaitable RunChildJobsAsync()
+    {
+        if (AdoptChildJobError)
+        {
+            foreach (IJob childJob in childJobs)
+            {
+                await childJob.RunAsync();
+            }
+        }
+        else
+        {
+            foreach (IJob childJob in childJobs)
+            {
+                try
+                {
+                    await childJob.RunAsync();
+                }
+                catch (Exception ex)
+                {
+                    ex.Log($"Child job failed, continuing with remaining child jobs: parent job '{Name}', failed child job '{childJob.Name}'");
+                }
+            }
+        }
+    }
+
     private void OnChildJobChanged()
     {
         bool anyChildHasError = false;
         bool anyChildRunning = false;
         bool allChildrenFinished = true;
-        foreach (Job childJob in childJobs)
+        foreach (IJob childJob in childJobs)
         {
             if (childJob.Result.Value == EJobResult.Error)
             {
@@ -141,7 +157,7 @@ public class Job
         }
     }
 
-    public void SetStatus(EJobStatus newStatus)
+    private void SetStatus(EJobStatus newStatus)
     {
         if (Status.Value == newStatus)
         {
@@ -159,7 +175,7 @@ public class Job
 
         if (newStatus == EJobStatus.Running)
         {
-            startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+            Progress.StartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         }
 
         Status.Value = newStatus;
@@ -170,7 +186,7 @@ public class Job
         }
     }
 
-    public void SetResult(EJobResult newResult)
+    private void SetResult(EJobResult newResult)
     {
         if (Result.Value == newResult)
         {
@@ -201,39 +217,24 @@ public class Job
         }
 
         Result.Value = newResult;
-        endTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        Progress.EndTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         if (Status.Value != EJobStatus.Finished)
         {
             SetStatus(EJobStatus.Finished);
         }
     }
 
-    public void SetResultIfPending(EJobResult newResult)
-    {
-        if (Result.Value == EJobResult.Pending)
-        {
-            SetResult(newResult);
-        }
-    }
-
     public void Cancel()
     {
         if (IsCanceled.Value
-            || !IsCancelable.Value)
+            || !IsCancelable.Value
+            || IsCancellationRequested)
         {
             return;
         }
 
+        Debug.Log($"Cancelling job '{Name}'");
         IsCanceled.Value = true;
-        try
-        {
-            Debug.Log($"Cancelling job '{Name}'");
-            onCancel?.Invoke();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to cancel job '{Name}': {ex.Message}");
-        }
+        CancellationTokenSource?.Cancel();
     }
 }

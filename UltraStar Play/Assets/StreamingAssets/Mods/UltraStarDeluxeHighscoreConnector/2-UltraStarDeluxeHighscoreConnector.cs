@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 using UniInject;
-using UniRx;
 using UnityEngine;
 
 public class UltraStarDeluxeHighscoreConnector : IHighScoreReader, IOnDisableMod
@@ -31,38 +29,36 @@ public class UltraStarDeluxeHighscoreConnector : IHighScoreReader, IOnDisableMod
         }
     }
 
-    public IObservable<HighScoreRecord> ReadHighScoreRecord(SongMeta songMeta)
+    public async Awaitable<HighScoreRecord> ReadHighScoreRecordAsync(SongMeta songMeta)
     {
         if (songMeta == null
             || modSettings.dbPath.IsNullOrEmpty())
         {
-            return Observable.Empty<HighScoreRecord>();
+            return null;
         }
 
         if (songMetaToHighScoreRecordCache.TryGetValue(songMeta, out HighScoreRecord cachedHighScoreRecord))
         {
-            return Observable.Return<HighScoreRecord>(cachedHighScoreRecord);
+            return cachedHighScoreRecord;
         }
 
         Debug.Log($"Searching USDX highscore database for song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
-        return ObservableUtils.RunOnNewTaskAsObservable(
-            async () =>
-            {
-                HighScoreRecord highScoreRecord = await ReadHighScoreRecordAsync(songMeta);
-                if (highScoreRecord == null)
-                {
-                    songMetaToHighScoreRecordCache[songMeta] = new HighScoreRecord();
-                }
-                else 
-                {
-                    songMetaToHighScoreRecordCache[songMeta] = highScoreRecord;
-                }
-                return highScoreRecord;
-            },
-            Disposable.Empty);
+
+        await Awaitable.BackgroundThreadAsync();
+
+        HighScoreRecord highScoreRecord = ReadHighScoreRecordUncachedAsync(songMeta);
+        if (highScoreRecord == null)
+        {
+            songMetaToHighScoreRecordCache[songMeta] = new HighScoreRecord();
+        }
+        else 
+        {
+            songMetaToHighScoreRecordCache[songMeta] = highScoreRecord;
+        }
+        return highScoreRecord;
     }
 
-    private async Task<HighScoreRecord> ReadHighScoreRecordAsync(SongMeta songMeta)
+    private HighScoreRecord ReadHighScoreRecordUncachedAsync(SongMeta songMeta)
     {
         string artistEscaped = EscapeSqlStringArgument(songMeta.Artist);
         string titleEscaped = EscapeSqlStringArgument(songMeta.Title);

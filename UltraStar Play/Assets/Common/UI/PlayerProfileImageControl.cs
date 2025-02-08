@@ -62,7 +62,7 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
         UpdatePlayerProfileImage();
     }
 
-    private void UpdatePlayerProfileImage()
+    private async void UpdatePlayerProfileImage()
     {
         if (playerProfile == null)
         {
@@ -74,22 +74,22 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
         if (lobbyMember == null)
         {
             string finalImagePath = uiManager.GetFinalPlayerProfileImagePath(playerProfile);
-            uiManager.LoadPlayerProfileImage(finalImagePath)
-                .Subscribe(loadedSprite => image.style.backgroundImage = new StyleBackground(loadedSprite));
+            Sprite loadedSprite = await uiManager.LoadPlayerProfileImageAsync(finalImagePath);
+            image.style.backgroundImage = new StyleBackground(loadedSprite);
         }
         else if (lobbyMember is SteamLobbyMember steamLobbyMember)
         {
-            SteamOnlineMultiplayerUtils.GetAvatarTextureAsObservable(steamLobbyMember.SteamId)
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError(
-                        $"Failed to get avatar image of player with Steam id {steamLobbyMember.SteamId}: {ex.Message}");
-                })
-                .Subscribe(texture =>
-                {
-                    image.style.backgroundImage = new StyleBackground(texture);
-                });
+            try
+            {
+                Texture2D texture = await SteamAvatarImageUtils.GetAvatarTextureAsync(steamLobbyMember.SteamId);
+                image.style.backgroundImage = new StyleBackground(texture);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError(
+                    $"Failed to get avatar image of player with Steam id {steamLobbyMember.SteamId}: {ex.Message}");
+            }
         }
     }
 

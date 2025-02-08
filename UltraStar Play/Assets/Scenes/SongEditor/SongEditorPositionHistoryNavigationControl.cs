@@ -4,6 +4,7 @@ using System.Linq;
 using PrimeInputActions;
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 public class SongEditorPositionHistoryNavigationControl : INeedInjection, IInjectionFinishedListener
 {
@@ -38,11 +39,11 @@ public class SongEditorPositionHistoryNavigationControl : INeedInjection, IInjec
         AddInitialNavigationPositionToHistory();
     }
 
-    private void AddInitialNavigationPositionToHistory()
+    private async void AddInitialNavigationPositionToHistory()
     {
         // Short delay because initial position may not be set yet.
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.1f,
-            () => AddNavigationPositionToHistory(songAudioPlayer.PositionInMillis)));
+        await Awaitable.WaitForSecondsAsync(0.1f);
+        AddNavigationPositionToHistory(songAudioPlayer.PositionInMillis);
     }
 
     private void NavigateBackwardInHistory()

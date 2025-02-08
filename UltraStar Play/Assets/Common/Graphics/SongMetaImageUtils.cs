@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -9,48 +10,52 @@ public static class SongMetaImageUtils
 {
     private static YouTubeCoverImageProvider youTubeCoverImageProvider = new();
 
-    public static IObservable<string> GetBackgroundOrCoverImageUri(SongMeta songMeta)
+    public static async Awaitable<string> GetBackgroundOrCoverImageUriAsync(SongMeta songMeta)
     {
         string uri = SongMetaUtils.GetBackgroundUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return Observable.Return(uri);
+            return uri;
         }
 
         // Try the cover image as fallback
         uri = SongMetaUtils.GetCoverUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return Observable.Return(uri);
+            return uri;
         }
 
         // Try to find an image via mods
         List<ISongBackgroundImageProvider> songBackgroundImageProviders = ModManager.GetModObjects<ISongBackgroundImageProvider>();
         if (songBackgroundImageProviders.IsNullOrEmpty())
         {
-            return Observable.Return("");
+            return "";
         }
-        return songBackgroundImageProviders
-            .Select(songBackgroundImageProvider => songBackgroundImageProvider.GetBackgroundImageUri(songMeta))
-            .Merge()
-            .Where(it => !it.IsNullOrEmpty())
-            .FirstOrDefault()
-            .ObserveOnMainThread();
+
+        foreach (ISongBackgroundImageProvider songBackgroundImageProvider in songBackgroundImageProviders)
+        {
+            string backgroundImageUri = await songBackgroundImageProvider.GetBackgroundImageUriAsync(songMeta);
+            if (!backgroundImageUri.IsNullOrEmpty())
+            {
+                return backgroundImageUri;
+            }
+        }
+        return "";
     }
 
-    public static IObservable<string> GetCoverOrBackgroundImageUri(SongMeta songMeta)
+    public static async Awaitable<string> GetCoverOrBackgroundImageUriAsync(SongMeta songMeta)
     {
         string uri = SongMetaUtils.GetCoverUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return Observable.Return(uri);
+            return uri;
         }
 
         // Try the background image as fallback
         uri = SongMetaUtils.GetBackgroundUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return Observable.Return(uri);
+            return uri;
         }
 
         // Try to find an image via mods
@@ -59,37 +64,36 @@ public static class SongMetaImageUtils
             .ToList();
         if (songCoverImageProviders.IsNullOrEmpty())
         {
-            return Observable.Return("");
+            return "";
         }
-        return songCoverImageProviders
-            .Select(songCoverImageProvider => songCoverImageProvider.GetCoverImageUri(songMeta))
-            .Merge()
-            .Where(it => !it.IsNullOrEmpty())
-            .FirstOrDefault()
-            .ObserveOnMainThread();
-    }
 
-    public static IDisposable SetCoverOrBackgroundImage(SongMeta songMeta, params VisualElement[] visualElements)
-    {
-        IDisposable getUriDisposable = null;
-        IDisposable setImageFromUriDisposable = null;
-
-        getUriDisposable = GetCoverOrBackgroundImageUri(songMeta)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                SetDefaultSongImageAndColor(songMeta, visualElements);
-            })
-            .Subscribe(uri => setImageFromUriDisposable = SetCoverOrBackgroundImageFromUri(songMeta, uri, visualElements));
-
-        return Disposable.Create(() =>
+        foreach (ISongCoverImageProvider songCoverImageProvider in songCoverImageProviders)
         {
-            getUriDisposable?.Dispose();
-            setImageFromUriDisposable?.Dispose();
-        });
+            string coverImageUri = await songCoverImageProvider.GetCoverImageUriAsync(songMeta);
+            if (!coverImageUri.IsNullOrEmpty())
+            {
+                return coverImageUri;
+            }
+        }
+
+        return "";
     }
 
-    public static void SetCoverOrBackgroundImage(Sprite sprite, params VisualElement[] visualElements)
+    public static async Awaitable SetCoverOrBackgroundImageAsync(CancellationToken cancellationToken, SongMeta songMeta, params VisualElement[] visualElements)
+    {
+        try
+        {
+            string uri = await GetCoverOrBackgroundImageUriAsync(songMeta);
+            await SetCoverOrBackgroundImageFromUriAsync(cancellationToken, songMeta, uri, visualElements);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            SetDefaultSongImageAndColor(songMeta, visualElements);
+        }
+    }
+
+    public static void SetCoverOrBackgroundImageAsync(Sprite sprite, params VisualElement[] visualElements)
     {
         foreach (VisualElement visualElement in visualElements)
         {
@@ -98,24 +102,29 @@ public static class SongMetaImageUtils
         }
     }
 
-    public static IDisposable SetCoverOrBackgroundImageFromUri(SongMeta songMeta, string uri, params VisualElement[] visualElements)
+    public static async Awaitable SetCoverOrBackgroundImageFromUriAsync(CancellationToken cancellationToken, SongMeta songMeta, string uri, params VisualElement[] visualElements)
     {
         if (uri.IsNullOrEmpty())
         {
             SetDefaultSongImageAndColor(songMeta, visualElements);
-            return Disposable.Empty;
+            return;
         }
 
-        return ImageManager.LoadSpriteFromUri(uri)
-            .CatchIgnore((Exception ex) =>
+        try
+        {
+            Sprite loadedSprite = await ImageManager.LoadSpriteFromUriAsync(uri);
+            if (cancellationToken.IsCancellationRequested)
             {
-                Debug.LogException(ex);
-                SetDefaultSongImageAndColor(songMeta, visualElements);
-            })
-            .Subscribe(loadedSprite =>
-            {
-                SetCoverOrBackgroundImage(loadedSprite, visualElements);
-            });
+                return;
+            }
+
+            SetCoverOrBackgroundImageAsync(loadedSprite, visualElements);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            SetDefaultSongImageAndColor(songMeta, visualElements);
+        }
     }
 
     public static void SetDefaultSongImageAndColor(SongMeta songMeta, params VisualElement[] visualElements)

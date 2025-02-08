@@ -2,6 +2,7 @@ using System;
 using Steamworks;
 using UniInject;
 using UniRx;
+using Unity.Netcode;
 using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -72,9 +73,13 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         }
         catch (Exception e)
         {
-            Debug.LogException(e);
-            Debug.LogError($"Failed to initialize Steam, maybe not connected to Steam client: {e.Message}");
             IsConnectedToSteam = false;
+            if (NetworkManager.Singleton == null
+                || NetworkManager.Singleton.LogLevel <= LogLevel.Error)
+            {
+                Debug.LogException(e);
+                Debug.LogError($"Failed to initialize Steam, maybe not connected to Steam client: {e.Message}");
+            }
         }
     }
 

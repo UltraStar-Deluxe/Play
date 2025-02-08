@@ -130,11 +130,11 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         Debug.Log($"Scanning playlists in folder '{folder}'");
         using DisposableStopwatch d2 = new($"Scanning playlists in folder '{folder}' took <ms> ms");
 
-        await ScanUltraStarPlaylistsInFolder(folder);
-        await ScanM3UPlaylistsInFolder(folder);
+        await ScanUltraStarPlaylistsInFolderAsync(folder);
+        await ScanM3UPlaylistsInFolderAsync(folder);
     }
 
-    private async Task ScanM3UPlaylistsInFolder(string folder)
+    private async Task ScanM3UPlaylistsInFolderAsync(string folder)
     {
         FileScanner scanner = new($"*.{ApplicationUtils.M3uPlaylistFileExtension}", true, true);
         List<string> playlistFilePaths = scanner.GetFiles(folder, true);
@@ -153,7 +153,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private async Task ScanUltraStarPlaylistsInFolder(string folder)
+    private async Task ScanUltraStarPlaylistsInFolderAsync(string folder)
     {
         string ultraStarPlaylistFileExtensionPattern = $"*.{ApplicationUtils.UltraStarPlaylistFileExtension}";
         FileScanner scanner = new(ultraStarPlaylistFileExtensionPattern, true, true);

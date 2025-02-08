@@ -11,19 +11,24 @@ public static class SongRepositoryUtils
         return ModManager.GetModObjects<ISongRepository>();
     }
 
-    public static IObservable<SongRepositorySearchResultEntry> SearchSongs(SongRepositorySearchParameters searchParameters)
+    public static async Awaitable<List<SongRepositorySearchResultEntry>> SearchSongs(SongRepositorySearchParameters searchParameters)
     {
-        return GetSongRepositories()
-            .Select(songRepository =>
+        List<SongRepositorySearchResultEntry> result = new();
+
+        List<ISongRepository> songRepositories = GetSongRepositories();
+        foreach (ISongRepository songRepository in songRepositories)
+        {
+            try
             {
-                return songRepository.SearchSongs(searchParameters)
-                    .CatchIgnore((Exception ex) =>
-                    {
-                        Debug.LogException(ex);
-                        Debug.LogError($"Failed to search songs with {songRepository}: {ex.Message}");
-                    });
-            })
-            .Merge()
-            .ObserveOnMainThread();
+                List<SongRepositorySearchResultEntry> searchResultEntry = await songRepository.SearchSongsAsync(searchParameters);
+                result.AddRange(searchResultEntry);
+            }
+            catch (Exception ex)
+            {
+                ex.Log($"Failed to search songs with {songRepository}");
+            }
+        }
+
+        return result;
     }
 }

@@ -276,8 +276,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             settings.SongEditorSettings.SpeechRecognitionSamplesSource,
             150,
             true,
-            speechRecognitionParameters,
-            false);
+            speechRecognitionParameters);
     }
 
     private void UpdateRecordingButton()

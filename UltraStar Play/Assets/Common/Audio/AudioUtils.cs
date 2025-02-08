@@ -33,14 +33,6 @@ public static class AudioUtils
         SetPitchWithPitchShifter(audioSource, 1);
     }
 
-    public static UnityWebRequest CreateAudioClipRequest(Uri uriHandle, bool streamAudio)
-    {
-        UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uriHandle, AudioType.UNKNOWN);
-        DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
-        downloadHandler.streamAudio = streamAudio;
-        return webRequest;
-    }
-
     public static float[] ToMonoAudioSamples(float[] originalSamples, int channelCount)
     {
         if (channelCount <= 1)

@@ -8,7 +8,7 @@ public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjecti
     [Inject]
     protected Settings settings;
 
-    public abstract IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis);
+    public abstract Awaitable<AudioLoadedEvent> LoadAsync(string audioUri, bool streamAudio, double startPositionInMillis);
     public abstract bool IsSupported(string audioUri);
     public abstract void Unload();
     public abstract void Play();

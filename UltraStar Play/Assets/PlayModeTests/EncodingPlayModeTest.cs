@@ -36,7 +36,7 @@ public class EncodingPlayModeTest
         [UnityTest]
         public IEnumerator SongsShouldHaveExpectedTitle()
         {
-            LogAssert.ignoreFailingMessages = true;
+            LogAssertUtils.IgnoreFailingMessages();
             yield return null;
 
             foreach (TestCase testCase in testCases)

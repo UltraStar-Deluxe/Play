@@ -241,8 +241,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
         searchOverlay.HideByDisplay();
         // Move focus away from search text field
         searchTextField.Blur();
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
-            () => searchTextField.GetRootVisualElement().Q<Button>().Focus()));
+        AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () => searchTextField.GetRootVisualElement().Q<Button>().Focus());
     }
 
     private class NoteSearchData

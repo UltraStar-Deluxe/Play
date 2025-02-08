@@ -427,7 +427,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingInstrumentalAudio));
                 return;
             }
-            audioSeparationManager.ProcessSongMeta(songMeta, true);
+            audioSeparationManager.ProcessSongMetaInJobAsync(songMeta, true);
             audioSeparationButton.SetEnabled(false);
         });
         if (SongMetaUtils.VocalsAudioResourceExists(songMeta)

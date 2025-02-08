@@ -74,67 +74,19 @@ public static class AnimationUtils
     public static async Awaitable TransitionBackgroundImageGradientAsync(VisualElement visualElement,
         GradientConfig fromGradientConfig, GradientConfig toGradientConfig, float animTimeInSeconds)
     {
-        List<GradientConfig> gradientConfigs =
-            GradientManager.GetGradientConfigsForTransition(fromGradientConfig, toGradientConfig, animTimeInSeconds);
+        List<GradientConfig> gradientConfigs = GradientManager.GetGradientConfigsForTransition(fromGradientConfig, toGradientConfig, animTimeInSeconds);
         await TransitionBackgroundImageGradientAsync(visualElement, gradientConfigs, animTimeInSeconds);
     }
 
     private static async Awaitable TransitionBackgroundImageGradientAsync(VisualElement visualElement,
         List<GradientConfig> gradientConfigs, float animTimeInSeconds)
     {
+        await Awaitable.MainThreadAsync();
+
         foreach (GradientConfig gradientConfig in gradientConfigs)
         {
             visualElement.style.backgroundImage = GradientManager.GetGradientTexture(gradientConfig);
             await Awaitable.WaitForSecondsAsync(animTimeInSeconds / gradientConfigs.Count);
-        }
-    }
-
-
-    [Obsolete("use async instead")]
-    public static IEnumerator FadeOutThenRemoveVisualElementCoroutine(
-        VisualElement visualElement,
-        float solidTimeInSeconds,
-        float fadeOutTimeInSeconds)
-    {
-        yield return new WaitForSeconds(solidTimeInSeconds);
-        float startOpacity = visualElement.resolvedStyle.opacity;
-        float startTime = Time.time;
-        while (visualElement.resolvedStyle.opacity > 0)
-        {
-            float newOpacity = Mathf.Lerp(startOpacity, 0, (Time.time - startTime) / fadeOutTimeInSeconds);
-            if (newOpacity < 0)
-            {
-                newOpacity = 0;
-            }
-
-            visualElement.style.opacity = newOpacity;
-            yield return null;
-        }
-
-        // Remove VisualElement
-        if (visualElement.parent != null)
-        {
-            visualElement.parent.Remove(visualElement);
-        }
-    }
-
-    [Obsolete("use async instead")]
-    public static IEnumerator TransitionBackgroundImageGradientCoroutine(VisualElement visualElement,
-        GradientConfig fromGradientConfig, GradientConfig toGradientConfig, float animTimeInSeconds)
-    {
-        List<GradientConfig> gradientConfigs = GradientManager.GetGradientConfigsForTransition(
-            fromGradientConfig, toGradientConfig, animTimeInSeconds);
-        return TransitionBackgroundImageGradientCoroutine(visualElement, gradientConfigs, animTimeInSeconds);
-    }
-
-    [Obsolete("use async instead")]
-    public static IEnumerator TransitionBackgroundImageGradientCoroutine(VisualElement visualElement,
-        List<GradientConfig> gradientConfigs, float animTimeInSeconds)
-    {
-        foreach (GradientConfig gradientConfig in gradientConfigs)
-        {
-            visualElement.style.backgroundImage = GradientManager.GetGradientTexture(gradientConfig);
-            yield return new WaitForSeconds(animTimeInSeconds / gradientConfigs.Count);
         }
     }
 }

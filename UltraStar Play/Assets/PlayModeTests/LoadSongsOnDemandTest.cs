@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Responsible;
-using Serilog.Events;
+using UnityEngine;
 using UnityEngine.TestTools;
-using static Responsible.Responsibly;
-using static ResponsibleLogAssertUtils;
+using static UnityEngine.Awaitable;
+using static ConditionUtils;
+using static SceneConditionTestUtils;
+using static VisualElementTestUtils;
 
 public class LoadSongsOnDemandTest : AbstractPlayModeTest
 {
@@ -47,36 +48,47 @@ public class LoadSongsOnDemandTest : AbstractPlayModeTest
     }
 
     [UnityTest]
-    public IEnumerator ShouldLoadSongsOnDemand() => IgnoreFailingMessages()
-        .ContinueWith(ExpectSongScanFinished())
-        .ContinueWith(ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount))
-        .ContinueWith(SelectNextSong())
-        .ContinueWith(ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 1))
-        .ContinueWith(SelectNextSong())
-        .ContinueWith(SelectNextSong())
-        .ContinueWith(ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 3))
-        .ContinueWith(SelectPreviousSong())
-        .ContinueWith(SelectPreviousSong())
-        .ContinueWith(SelectPreviousSong())
-        .ContinueWith(ExpectSongCountNotLoadedYet(TotalSongCount - InitiallyVisibleSongCount - 3))
-        .ToYieldInstruction(Executor);
+    public IEnumerator ShouldLoadSongsOnDemand() => ShouldLoadSongsOnDemandAsync();
+    private async Awaitable ShouldLoadSongsOnDemandAsync()
+    {
+        LogAssertUtils.IgnoreFailingMessages();
+        await ExpectSongScanFinishedAsync();
+        await ExpectSongCountNotLoadedYetAsync(TotalSongCount - InitiallyVisibleSongCount);
+        await SelectNextSongAsync();
+        await ExpectSongCountNotLoadedYetAsync(TotalSongCount - InitiallyVisibleSongCount - 1);
+        await SelectNextSongAsync();
+        await SelectNextSongAsync();
+        await ExpectSongCountNotLoadedYetAsync(TotalSongCount - InitiallyVisibleSongCount - 3);
+        await SelectPreviousSongAsync();
+        await SelectPreviousSongAsync();
+        await SelectPreviousSongAsync();
+        await ExpectSongCountNotLoadedYetAsync(TotalSongCount - InitiallyVisibleSongCount - 3);
+    }
 
-    private static ITestInstruction<object> ExpectSongScanFinished()
-        => WaitForCondition("wait for song scan finished", () => SongMetaManager.Instance.IsSongScanFinished)
-            .ExpectWithinSeconds(5f);
+    private static async Awaitable ExpectSongScanFinishedAsync()
+    {
+        await WaitForConditionAsync(() => SongMetaManager.Instance.IsSongScanFinished,
+            new WaitForConditionConfig { description = "wait for song scan finished" });
+    }
 
-    private static ITestInstruction<object> ExpectSongCountNotLoadedYet(int count)
-        => WaitForCondition($"expect {count} songs to be not loaded yet", () => GetSongsCountNotLoadedYet() == count,
-                stateStringBuilder => stateStringBuilder.AddDetails($"songs not loaded yet: {GetSongsCountNotLoadedYet()}"))
-    .ExpectWithinSeconds(1f);
+    private static async Awaitable ExpectSongCountNotLoadedYetAsync(int count)
+    {
+        await WaitForConditionAsync(
+            () => GetSongsCountNotLoadedYet() == count,
+            new WaitForConditionConfig { description = $"expect {count} songs to be not loaded yet, songs not loaded yet: {GetSongsCountNotLoadedYet()}" });
+    }
 
-    private ITestInstruction<object> SelectNextSong()
-        => Do($"select next song",
-            () => InputFixture.PressAndRelease(Keyboard.rightArrowKey));
+    private async Awaitable SelectNextSongAsync()
+    {
+        InputFixture.PressAndRelease(Keyboard.rightArrowKey);
+        await WaitForSecondsAsync(0.1f);
+    }
 
-    private ITestInstruction<object> SelectPreviousSong()
-        => Do($"select previous song",
-            () => InputFixture.PressAndRelease(Keyboard.leftArrowKey));
+    private async Awaitable SelectPreviousSongAsync()
+    {
+        InputFixture.PressAndRelease(Keyboard.leftArrowKey);
+        await WaitForSecondsAsync(0.1f);
+    }
 
     private static int GetSongsCountNotLoadedYet()
     {

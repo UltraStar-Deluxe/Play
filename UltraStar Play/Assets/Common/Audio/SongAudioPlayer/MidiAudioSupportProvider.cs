@@ -12,19 +12,18 @@ public class MidiAudioSupportProvider : AbstractAudioSupportProvider
     [Inject]
     private MidiManager midiManager;
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
+    public override async Awaitable<AudioLoadedEvent> LoadAsync(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         AudioClip audioClip = midiManager.CreateAudioClip(audioUri);
         if (audioClip == null)
         {
-            return ObservableUtils.LogExceptionThenThrow<AudioLoadedEvent>(
-                new SongAudioPlayerException($"Failed to load audio clip from MIDI file {audioUri}"));
+            throw new SongAudioPlayerException($"Failed to load audio clip from MIDI file {audioUri}");
         }
 
         audioSourceAudioSupportProvider.audioSource.clip = audioClip;
         PositionInMillis = startPositionInMillis;
         Play();
-        return Observable.Return<AudioLoadedEvent>(new AudioLoadedEvent(audioUri));
+        return new AudioLoadedEvent(audioUri);
     }
 
     public override bool IsSupported(string audioUri)

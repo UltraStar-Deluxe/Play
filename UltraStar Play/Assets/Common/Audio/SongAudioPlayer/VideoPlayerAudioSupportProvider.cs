@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -26,14 +25,13 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
         videoPlayer.errorReceived -= OnVideoPlayerErrorReceived;
     }
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
+    public override async Awaitable<AudioLoadedEvent> LoadAsync(string audioUri, bool streamAudio, double startPositionInMillis)
     {
         videoPlayer.url = audioUri;
         if (videoPlayer.url.IsNullOrEmpty())
         {
             Unload();
-            return ObservableUtils.LogExceptionThenThrow<AudioLoadedEvent>(
-                new SongAudioPlayerException($"Failed to load video from {audioUri}"));
+            throw new SongAudioPlayerException($"Failed to load video from {audioUri}");
         }
 
         // Must play the video to trigger loading.
@@ -41,41 +39,29 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
         PositionInMillis = startPositionInMillis;
 
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
-        return Observable.Create<AudioLoadedEvent>(o =>
+        await ConditionUtils.WaitForConditionAsync(() => !this || videoPlayer.length > 0 || videoPlayerErrorMessages.Count > 0,
+            new WaitForConditionConfig {description = $"load audio '{audioUri}'" });
+        if (!this)
         {
-            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => this == null
-                      || videoPlayer.length > 0
-                      || videoPlayerErrorMessages.Count > 0,
-                () =>
-                {
-                    if (this == null)
-                    {
-                        string errorMessage = $"Failed to load audio clip '{audioUri}': {nameof(VideoPlayerAudioSupportProvider)} has been destroyed already.";
-                        Debug.LogError(errorMessage);
-                        throw new AudioSupportProviderException(errorMessage);
-                    }
+            throw new AudioSupportProviderException($"Failed to load audio clip '{audioUri}': {nameof(VideoPlayerAudioSupportProvider)} has been destroyed already.");
+        }
 
-                    if (videoPlayerErrorMessages.Count > 0)
-                    {
-                        Unload();
-                        o.OnError(new AudioSupportProviderException($"Failed to load audio '{audioUri}'. VideoPlayer received error messages."));
-                        return;
-                    }
+        if (videoPlayerErrorMessages.Count > 0)
+        {
+            Unload();
+            throw new AudioSupportProviderException($"Failed to load audio '{audioUri}'. VideoPlayer received error messages.");
+        }
 
-                    // Play the audio of the video player through the AudioSource.
-                    videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
-                    for (ushort trackIndex = 0; trackIndex < videoPlayer.audioTrackCount; trackIndex++)
-                    {
-                        Debug.Log($"videoPlayer.SetTargetAudioSource: trackIndex: {trackIndex}, audioSource: {audioSourceAudioSupportProvider.audioSource}");
-                        videoPlayer.SetTargetAudioSource(trackIndex, audioSourceAudioSupportProvider.audioSource);
-                    }
-                    audioSourceAudioSupportProvider.audioSource.Play();
+        // Play the audio of the video player through the AudioSource.
+        videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+        for (ushort trackIndex = 0; trackIndex < videoPlayer.audioTrackCount; trackIndex++)
+        {
+            Debug.Log($"videoPlayer.SetTargetAudioSource: trackIndex: {trackIndex}, audioSource: {audioSourceAudioSupportProvider.audioSource}");
+            videoPlayer.SetTargetAudioSource(trackIndex, audioSourceAudioSupportProvider.audioSource);
+        }
+        audioSourceAudioSupportProvider.audioSource.Play();
 
-                    o.OnNext(new AudioLoadedEvent(audioUri));
-                }));
-            return Disposable.Empty;
-        });
+        return new AudioLoadedEvent(audioUri);
     }
 
     public override bool IsSupported(string audioUri)

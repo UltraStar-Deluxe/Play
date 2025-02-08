@@ -70,8 +70,8 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
 
             // Reload scene.
             // The RenderTextures (UI, scene transition) are recreated when the Screen resolution does not match anymore.
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2,
-                () => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.OptionsGraphicsScene))));
+            AwaitableUtils.ExecuteAfterDelayInFramesAsync(2,
+                () => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.OptionsGraphicsScene)));
         }
         else
         {

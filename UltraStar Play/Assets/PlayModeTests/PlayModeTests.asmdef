@@ -2,6 +2,7 @@
     "name": "PlayModeTests",
     "rootNamespace": "",
     "references": [
+        "Unity.Netcode.Runtime",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Unity.InputSystem",

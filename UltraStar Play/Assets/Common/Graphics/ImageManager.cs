@@ -54,10 +54,10 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
 
     public static void ReloadImage(string uri, UIDocument uiDocument)
     {
-        Instance.DoReloadImage(uri, uiDocument);
+        Instance.ReloadImageAsync(uri, uiDocument);
     }
 
-    private void DoReloadImage(string uri, UIDocument uiDocument)
+    private async void ReloadImageAsync(string uri, UIDocument uiDocument)
     {
         if (!spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
             || cachedSprite.Sprite == null)
@@ -75,79 +75,44 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
         // Remove from cache before reloading.
         RemoveCachedSprite(cachedSprite);
 
-        LoadSpriteFromUri(uri)
-            .Subscribe(sprite =>
-            {
-                visualElementsUsingTheSprite.ForEach(it => it.style.backgroundImage = new StyleBackground(sprite));
-            });
+        Sprite sprite = await LoadSpriteFromUriAsync(uri);
+        visualElementsUsingTheSprite.ForEach(it => it.style.backgroundImage = new StyleBackground(sprite));
     }
 
-    public static Sprite LoadSpriteFromUriImmediately(string uri)
+    public static async Awaitable<Sprite> LoadSpriteFromUriAsync(string uri)
     {
-        Sprite result = null;
-        // Load with busy waiting
-        Instance.DoLoadSpriteFromUri(uri, true)
-            .Subscribe(sprite => result = sprite);
-        return result;
+        return await Instance.DoLoadSpriteFromUriAsync(uri);
     }
 
-    public static IObservable<Sprite> LoadSpriteFromUri(string uri)
-    {
-        return Instance.DoLoadSpriteFromUri(uri, false);
-    }
-
-    private IObservable<Sprite> DoLoadSpriteFromUri(string uri, bool busyWaiting)
+    private async Awaitable<Sprite> DoLoadSpriteFromUriAsync(string uri)
     {
         if (uri.IsNullOrEmpty())
         {
-            return ObservableUtils.LogExceptionThenThrow<Sprite>(new NullReferenceException("Cannot load Sprite, URI is null or empty"));
+            throw new NullReferenceException("Failed to load Sprite, URI is null or empty");
         }
 
         if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
             && cachedSprite?.Sprite != null)
         {
-            return Observable.Return<Sprite>(cachedSprite.Sprite);
+            return cachedSprite.Sprite;
         }
 
-        return Observable.Create<Sprite>(o =>
+        Texture2D loadedTexture;
+        try
         {
-            CancellationTokenSource cancellationTokenSource = new();
+            using UnityWebRequest webRequest = ImageUtils.CreateTextureRequest(new Uri(uri));
+            await WebRequestUtils.SendWebRequestAsync(webRequest);
 
-            // Send web request
-            UnityWebRequest webRequest = ImageUtils.CreateTextureRequest(new Uri(uri));
-            webRequest.SendWebRequest();
+            loadedTexture = (webRequest.downloadHandler as DownloadHandlerTexture).texture;
+        }
+        catch (Exception ex)
+        {
+            throw new LoadImageException($"Failed to load Texture2D from URI: '{uri}'", ex);
+        }
 
-            // Check web request result in coroutine
-            Instance.StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
-                downloadHandler =>
-                {
-                    if (webRequest.downloadHandler is DownloadHandlerTexture downloadHandlerTexture
-                        && downloadHandlerTexture.texture != null)
-                    {
-                        Texture2D loadedTexture = downloadHandlerTexture.texture;
-                        Sprite sprite = ImageUtils.CreateUncachedSprite(loadedTexture);
-                        AddSpriteToCache(sprite, uri);
-
-                        if (!cancellationTokenSource.IsCancellationRequested)
-                        {
-                            o.OnNext(sprite);
-                        }
-                        o.OnCompleted();
-                    }
-                    else if (!cancellationTokenSource.IsCancellationRequested)
-                    {
-                        o.OnError(new LoadImageException($"Failed to load Texture2D from URI: '{uri}'."));
-                    }
-                },
-                ex =>
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to load Texture2D from URI: '{uri}': {ex.Message}");
-                    o.OnError(ex);
-                },
-                busyWaiting));
-            return Disposable.Create(() => cancellationTokenSource.Cancel());
-        });
+        Sprite sprite = ImageUtils.CreateUncachedSprite(loadedTexture);
+        AddSpriteToCache(sprite, uri);
+        return sprite;
     }
 
     private void AddSpriteToCache(Sprite sprite, string source)

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using UnityEngine;
 
 public interface IAudioSupportProvider
 {
-    public IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis);
+    public Awaitable<AudioLoadedEvent> LoadAsync(string audioUri, bool streamAudio, double startPositionInMillis);
     public bool IsSupported(string audioUri);
     public void Unload();
     public void Play();

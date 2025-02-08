@@ -176,19 +176,16 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         steamWorkshopManager.OpenSteamWorkshopOverlay(LoadedOptionsSceneControl.SteamWorkshopUri);
     }
 
-    private void UpdateSteamWorkshopItems()
+    private async void UpdateSteamWorkshopItems()
     {
-        steamWorkshopManager.DownloadWorkshopItemsAsObservable()
-            .Subscribe(_ =>
-            {
-                if (GameObjectUtils.IsDestroyed(this))
-                {
-                    return;
-                }
+        await steamWorkshopManager.DownloadWorkshopItemsAsync();
+        if (GameObjectUtils.IsDestroyed(this))
+        {
+            return;
+        }
 
-                Debug.Log("Reloading current options scene because Steam Workshop items update finished");
-                ReloadCurrentOptionsScene();
-            });
+        Debug.Log("Reloading current options scene because Steam Workshop items update finished");
+        ReloadCurrentOptionsScene();
     }
 
     private void ReloadCurrentOptionsScene()
@@ -304,13 +301,13 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
             modSettingsProblemHintIcon,
             SettingsProblemHintControl.GetModSettingsProblems(modManager));
 
-        StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.5f, () =>
+        AwaitableUtils.ExecuteRepeatedlyInSecondsAsync(gameObject, 0.5f, () =>
         {
             songSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songIssueManager));
             recordingSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetRecordingSettingsProblems(settings));
             playerProfileSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetPlayerSettingsProblems(settings));
             modSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetModSettingsProblems(modManager));
-        }));
+        });
     }
 
     public void UpdateTranslation()

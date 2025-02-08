@@ -31,7 +31,7 @@ public class SpeechRecognizer
         }
     }
 
-    public SpeechRecognitionResult GetSpeechRecognitionResult(
+    public async Awaitable<SpeechRecognitionResult> GetSpeechRecognitionResult(
         float[] monoSamples,
         int startIndex,
         int endIndex,
@@ -44,7 +44,7 @@ public class SpeechRecognizer
         {
             throw new Exception("Speech recognition model is not yet initialized.");
         }
-        
+
         int lengthInSamples = endIndex - startIndex;
         float[] audioSamplesForSpeechRecognition = new float[lengthInSamples];
         Array.Copy(monoSamples, startIndex, audioSamplesForSpeechRecognition, 0, lengthInSamples);
@@ -55,8 +55,7 @@ public class SpeechRecognizer
             onProgressCallbacks.Add(onProgress);
 
             // Blocking call to GetTextAsync
-            whisperResult = whisperManager.GetTextAsync(audioSamplesForSpeechRecognition, sampleRate, 1)
-                .Result;
+            whisperResult = await whisperManager.GetTextAsync(audioSamplesForSpeechRecognition, sampleRate, 1);
         }
         finally
         {
@@ -64,7 +63,7 @@ public class SpeechRecognizer
         }
 
         cancellationToken.ThrowIfCancellationRequested();
-        
+
         if (whisperResult != null
             && !whisperResult.Segments.IsNullOrEmpty())
         {

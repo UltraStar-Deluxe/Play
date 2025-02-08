@@ -1,69 +1,46 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using AudioSynthesis.Midi;
 using AudioSynthesis.Midi.Event;
-using UniRx;
 using UnityEngine;
 
 public static class PitchDetectionUtils
 {
-    public static IObservable<List<Note>> CreateNotesUsingBasicPitch(
+    public static async Awaitable<List<Note>> CreateNotesUsingBasicPitchAsync(
         PitchDetectionManager pitchDetectionManager,
         SongMeta songMeta,
-        Job pitchDetectionJob = null)
+        IJob parentJob = null)
     {
         if (!SongMetaUtils.VocalsAudioResourceExists(songMeta))
         {
-            return Observable.Throw<List<Note>>(new Exception("Vocals audio not found. Split the audio first."));
+            throw new PitchDetectionException("Vocals audio not found. Split the audio first.");
         }
 
-        string fileName = Path.GetFileName(songMeta.Audio);
-        if (pitchDetectionJob == null)
-        {
-            pitchDetectionJob = JobManager.CreateAndAddJob(Translation.Get(R.Messages.job_pitchDetectionWithName, "name", fileName));
-        }
+        BasicPitchDetectionResult basicPitchDetectionResult = await pitchDetectionManager.ProcessSongMetaInJobAsync(songMeta, parentJob);
+        MidiFile midiFile = MidiFileUtils.LoadMidiFile(basicPitchDetectionResult.MidiFilePath);
 
-        return pitchDetectionManager.ProcessSongMetaAsObservable(songMeta, pitchDetectionJob)
-            .CatchIgnore((Exception ex) =>
-            {
-                pitchDetectionJob.SetResult(EJobResult.Error);
-                Debug.LogException(ex);
-                Debug.LogError("Pitch detection failed");
-                throw ex;
-            })
-            .Select(basicPitchDetectionResult =>
-            {
-                try
-                {
-                    MidiFile midiFile = MidiFileUtils.LoadMidiFile(basicPitchDetectionResult.MidiFilePath);
+        MidiFileUtils.CalculateMidiEventTimesInMillis(
+            midiFile,
+            out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
+            out Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis);
 
-                    MidiFileUtils.CalculateMidiEventTimesInMillis(
-                        midiFile,
-                        out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
-                        out Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis);
-
-                    List<Note> loadedNotes = MidiToSongMetaUtils.LoadNotesFromMidiFile(
-                        songMeta,
-                        midiFile,
-                        1,
-                        0,
-                        false,
-                        true,
-                        midiEventToDeltaTimeInMillis,
-                        midiEventToAbsoluteDeltaTimeInMillis);
-                    return loadedNotes;
-                }
-                catch (Exception ex)
-                {
-                    pitchDetectionJob.SetResult(EJobResult.Error);
-                    throw ex;
-                }
-            });
+        List<Note> loadedNotes = MidiToSongMetaUtils.LoadNotesFromMidiFile(
+            songMeta,
+            midiFile,
+            1,
+            0,
+            false,
+            true,
+            midiEventToDeltaTimeInMillis,
+            midiEventToAbsoluteDeltaTimeInMillis);
+        return loadedNotes;
     }
 
-    public static void MoveNotesToDetectedPitchUsingPitchDetectionLayer(SongMeta songMeta, List<Note> notes, List<Note> pitchDetectionLayerNotes)
+    public static void MoveNotesToDetectedPitchUsingPitchDetectionLayer(
+        SongMeta songMeta,
+        List<Note> notes,
+        List<Note> pitchDetectionLayerNotes)
     {
         int minBeat = SongMetaUtils.MinBeat(notes);
         int maxBeat = SongMetaUtils.MaxBeat(notes);
