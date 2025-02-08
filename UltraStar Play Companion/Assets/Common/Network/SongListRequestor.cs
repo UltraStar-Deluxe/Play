@@ -28,7 +28,7 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
 
         try
         {
-            string response = await mainGameHttpClient.GetRequest(HttpApiEndpointPaths.Songs);
+            string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.Songs);
             HandleSongListResponse(response);
         }
         catch (Exception e)

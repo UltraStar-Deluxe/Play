@@ -68,16 +68,17 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
         return $"http://{serverIPEndPoint.Address}:{httpServerPort}{path}";
     }
 
-    public async Awaitable<string> GetRequest(string path)
+    public async Awaitable<string> GetRequestAsync(string path)
     {
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
         Log.Debug(() => $"Sending GET request to '{uri}'");
-        return await SendRequest(UnityWebRequest.Get(uri));
+        using UnityWebRequest webRequest = UnityWebRequest.Get(uri);
+        return await SendWebRequestAsync(webRequest);
     }
 
-    public async Awaitable<string> PostRequest(
+    public async Awaitable<string> PostRequestAsync(
         string path,
         string body = "{}",
         string contentType = "application/json")
@@ -86,23 +87,25 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
 
         string uri = GetUri(path);
         Log.Debug(() => $"Sending POST request to '{uri}'");
-        return await SendRequest(UnityWebRequest.Post(uri, body, contentType));
+        using UnityWebRequest webRequest = UnityWebRequest.Post(uri, body, contentType);
+        return await SendWebRequestAsync(webRequest);
     }
 
-    public async Awaitable<string> DeleteRequest(string path)
+    public async Awaitable<string> DeleteRequestAsync(string path)
     {
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
         Log.Debug(() => $"Sending DELETE request to {uri}");
-        return await SendRequest(UnityWebRequest.Delete(uri));
+        using UnityWebRequest webRequest = UnityWebRequest.Delete(uri);
+        return await SendWebRequestAsync(webRequest);
     }
 
-    private async Awaitable<string> SendRequest(UnityWebRequest unityWebRequest)
+    private async Awaitable<string> SendWebRequestAsync(UnityWebRequest unityWebRequest)
     {
         AddHeaders(unityWebRequest);
-        DownloadHandler downloadHandler = await AwaitableUtils.SendWebRequest(unityWebRequest);
-        return downloadHandler?.text;
+        await WebRequestUtils.SendWebRequestAsync(unityWebRequest);
+        return unityWebRequest.downloadHandler?.text;
     }
 
     private void AddHeaders(UnityWebRequest unityWebRequest)

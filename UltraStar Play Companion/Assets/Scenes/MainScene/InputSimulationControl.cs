@@ -421,25 +421,25 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         lastMousePadAreaPos = localPosition;
     }
 
-    private void SendSimulateInputRequest(string inputControl)
+    private async void SendSimulateInputRequest(string inputControl)
     {
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.Input
+        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.Input
             .ReplaceOrThrow("{inputControl}", inputControl));
     }
 
-    private void SendSimulateScrollWheelRequest(Vector2 scrollDelta)
+    private async void SendSimulateScrollWheelRequest(Vector2 scrollDelta)
     {
         if (scrollDelta == Vector2.zero)
         {
             return;
         }
 
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.InputScrollWheel
+        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.InputScrollWheel
             .ReplaceOrThrow("{deltaX}", scrollDelta.x.ToString(CultureInfo.InvariantCulture))
             .ReplaceOrThrow("{deltaY}", scrollDelta.y.ToString(CultureInfo.InvariantCulture)));
     }
 
-    private void SendSimulateMouseDeltaRequest(Vector2 mouseDelta)
+    private async void SendSimulateMouseDeltaRequest(Vector2 mouseDelta)
     {
         if (mouseDelta == Vector2.zero)
         {
@@ -452,7 +452,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.InputMouseDelta
+        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.InputMouseDelta
             .ReplaceOrThrow("{deltaX}", mouseDelta.x.ToStringInvariantCulture())
             .ReplaceOrThrow("{deltaY}", mouseDelta.y.ToStringInvariantCulture()));
     }

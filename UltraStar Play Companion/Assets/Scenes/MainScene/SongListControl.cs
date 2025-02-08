@@ -167,7 +167,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
     {
         try
         {
-            await mainGameHttpClient.DeleteRequest(HttpApiEndpointPaths.SongQueueEntryIndex
+            await mainGameHttpClient.DeleteRequestAsync(HttpApiEndpointPaths.SongQueueEntryIndex
                 .ReplaceOrThrow("{index}", songQueueEntryDtos.IndexOf(entry).ToString()));
         }
         finally
@@ -181,7 +181,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
         entry.IsMedleyWithPreviousEntry = !entry.IsMedleyWithPreviousEntry;
         try
         {
-            await mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntryIndex
+            await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.SongQueueEntryIndex
                     .ReplaceOrThrow("{index}", songQueueEntryDtos.IndexOf(entry).ToString()),
                 entry.ToJson());
         }
@@ -191,11 +191,11 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
         }
     }
 
-    private void OnSongQueueItemIndexChanged(SongQueueUiControl.ItemIndexChangedEvent evt)
+    private async void OnSongQueueItemIndexChanged(SongQueueUiControl.ItemIndexChangedEvent evt)
     {
         Debug.Log($"OnSongQueueItemIndexChanged: {evt.OldIndex}, {evt.NewIndex}");
         string json = new ListDto<SongQueueEntryDto>(evt.UpdatedItems.ToList()).ToJson();
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueue, json);
+        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.SongQueue, json);
     }
 
     private async void UpdateSongQueue()
@@ -209,7 +209,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
 
         try
         {
-            string response = await mainGameHttpClient.GetRequest(HttpApiEndpointPaths.SongQueue);
+            string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.SongQueue);
             ListDto<SongQueueEntryDto> listDto = JsonConverter.FromJson<ListDto<SongQueueEntryDto>>(response);
             if (listDto == null)
             {

@@ -125,7 +125,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         enqueueSettingsAccordionItem.SetVisibleByDisplay(permissions.Contains(HttpApiPermission.WriteSongQueue));
     }
 
-    private void EnqueueSong()
+    private async void EnqueueSong()
     {
         List<PlayerSelectPlayerEntryControl> selectedPlayerControls = GetSelectedPlayerControls();
         if (selectedPlayerControls.IsNullOrEmpty())
@@ -134,17 +134,16 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             NotificationManager.CreateNotification(Translation.Of("Select a player first"));
             return;
         }
+
+        HideSongDetails();
+        NotificationManager.CreateNotification(Translation.Of($"Enqueued Song '{SongDto.Title}'"));
 
         SongQueueEntryDto dto = CreateSongQueueEntryDto(selectedPlayerControls, false);
         string json = JsonConverter.ToJson(dto);
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
-
-        HideSongDetails();
-
-        NotificationManager.CreateNotification(Translation.Of($"Enqueued Song '{dto.SongDto.Title}'"));
+        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.SongQueueEntry, json);
     }
 
-    private void EnqueueSongAsMedley()
+    private async void EnqueueSongAsMedley()
     {
         List<PlayerSelectPlayerEntryControl> selectedPlayerControls = GetSelectedPlayerControls();
         if (selectedPlayerControls.IsNullOrEmpty())
@@ -154,13 +153,12 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             return;
         }
 
+        HideSongDetails();
+        NotificationManager.CreateNotification(Translation.Of($"Enqueued Medley Song '{SongDto.Title}'"));
+
         SongQueueEntryDto dto = CreateSongQueueEntryDto(selectedPlayerControls, true);
         string json = JsonConverter.ToJson(dto);
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
-
-        HideSongDetails();
-
-        NotificationManager.CreateNotification(Translation.Of($"Enqueued Medley Song '{dto.SongDto.Title}'"));
+        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.SongQueueEntry, json);
     }
 
     public List<PlayerSelectPlayerEntryControl> GetSelectedPlayerControls()
@@ -214,20 +212,20 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         return dto;
     }
 
-    private void ToggleFavorite()
+    private async void ToggleFavorite()
     {
         isFavorite = !isFavorite;
+        UpdateFavoriteButton();
         if (isFavorite)
         {
-            mainGameHttpClient.PostRequest(HttpApiEndpointPaths.PlaylistFavoritesEntry
+            await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.PlaylistFavoritesEntry
                 .ReplaceOrThrow("{songId}", songDto.Hash));
         }
         else
         {
-            mainGameHttpClient.DeleteRequest(HttpApiEndpointPaths.PlaylistFavoritesEntry
+            await mainGameHttpClient.DeleteRequestAsync(HttpApiEndpointPaths.PlaylistFavoritesEntry
                     .ReplaceOrThrow("{songId}", songDto.Hash));
         }
-        UpdateFavoriteButton();
     }
 
     private void UpdateControls()
@@ -277,7 +275,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     {
         try
         {
-            string response = await mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailableMicrophones);
+            string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.AvailableMicrophones);
             ListDto<MicProfile> listDto = JsonConverter.FromJson<ListDto<MicProfile>>(response);
             if (listDto == null
                 || listDto.Items == null)
@@ -305,7 +303,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     {
         try
         {
-            string response = await mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailablePlayers);
+            string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.AvailablePlayers);
             ListDto<string> listDto = JsonConverter.FromJson<ListDto<string>>(response);
             if (listDto == null
                 || listDto.Items == null)
@@ -474,7 +472,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         try
         {
-            string response = await mainGameHttpClient.GetRequest(HttpApiEndpointPaths.SongImage
+            string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.SongImage
                 .ReplaceOrThrow("{songId}", songDto.Hash));
 
             ImageDto imageDto = JsonConverter.FromJson<ImageDto>(response);
@@ -508,7 +506,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     {
         SetLyrics("Loading lyrics...");
 
-        string response = await mainGameHttpClient.GetRequest(HttpApiEndpointPaths.Song
+        string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.Song
             .ReplaceOrThrow("{songId}", songDto.Hash));
 
         try
