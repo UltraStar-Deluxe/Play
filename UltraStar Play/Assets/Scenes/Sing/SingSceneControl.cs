@@ -372,7 +372,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private async Awaitable StartAudioAndVideoAsync()
     {
         await StartAudioPlaybackAsync();
-        await StartVideoOrShowBackgroundImageAsync();
+        StartVideoOrShowBackgroundImage();
     }
 
     private void CreateGameRoundModifiers()
@@ -657,7 +657,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         lastLeadingPlayerControl = leadingPlayerControl;
     }
 
-    private async Awaitable StartVideoOrShowBackgroundImageAsync()
+    private void StartVideoOrShowBackgroundImage()
     {
         try
         {

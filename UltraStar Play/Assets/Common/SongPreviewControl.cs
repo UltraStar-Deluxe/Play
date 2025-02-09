@@ -114,7 +114,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     public virtual async void StartSongPreview(SongMeta songMeta)
     {
-        if (!gameObject.activeInHierarchy)
+        if (GameObjectUtils.IsDestroyed(this)
+            || !gameObject.activeInHierarchy)
         {
             return;
         }
@@ -170,7 +171,6 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     public virtual void StopSongPreview()
     {
-        StopAllCoroutines();
         if (songAudioPlayer != null)
         {
             songAudioPlayer.UnloadAudio();
@@ -209,7 +209,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     protected virtual async Awaitable StartVideoPreviewAsync(SongMeta songMeta)
     {
-        if (!gameObject.activeInHierarchy
+        if (GameObjectUtils.IsDestroyed(this)
+            || !gameObject.activeInHierarchy
             || songVideoPlayer == null
             || songMeta == null)
         {
@@ -234,7 +235,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     protected virtual async Awaitable StartAudioPreviewAsync(SongMeta songMeta, int previewStartInMillis)
     {
-        if (!gameObject.activeInHierarchy)
+        if (GameObjectUtils.IsDestroyed(this)
+            || !gameObject.activeInHierarchy)
         {
             return;
         }

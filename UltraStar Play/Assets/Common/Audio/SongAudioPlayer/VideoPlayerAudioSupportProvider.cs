@@ -43,7 +43,7 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
             new WaitForConditionConfig {description = $"load audio '{audioUri}'" });
         if (!this)
         {
-            throw new AudioSupportProviderException($"Failed to load audio clip '{audioUri}': {nameof(VideoPlayerAudioSupportProvider)} has been destroyed already.");
+            throw new DestroyedAlreadyException($"Failed to load audio clip '{audioUri}': {nameof(VideoPlayerAudioSupportProvider)} has been destroyed already.");
         }
 
         if (videoPlayerErrorMessages.Count > 0)

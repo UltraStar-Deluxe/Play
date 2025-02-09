@@ -82,7 +82,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         await ConditionUtils.WaitForConditionAsync(() => !this || mediaPlayer?.Media?.Duration > 0);
         if (!this)
         {
-            throw new VideoSupportProviderException($"Failed to load video '{videoUri}': {nameof(VlcVideoSupportProvider)} has been destroyed already.");
+            throw new DestroyedAlreadyException($"Failed to load video '{videoUri}': {nameof(VlcVideoSupportProvider)} has been destroyed already.");
         }
 
         mediaPlayer.SetPause(!shouldBePlaying);

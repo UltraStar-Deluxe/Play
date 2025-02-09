@@ -233,8 +233,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         UnloadVideo();
 
-        Log.Debug(() => $"SongVideoPlayer.DoLoadAndPlayAsObservable '{videoUri}'");
-
         IVideoSupportProvider videoSupportProvider = availableVideoSupportProviders
             .FirstOrDefault(it => it.IsSupported(videoUri, videoEqualsAudio));
         if (videoSupportProvider == null)
@@ -253,8 +251,16 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         catch (Exception ex)
         {
             Debug.LogException(ex);
+            if (ex is DestroyedAlreadyException)
+            {
+                // Stuff is being destroyed, so do not try to use other provers.
+                throw ex;
+            }
+
+            // Try to load it with another provider.
             IVideoSupportProvider[] remainingVideoSupportProviders = availableVideoSupportProviders
                 .Except(new List<IVideoSupportProvider>() { videoSupportProvider })
+                .Where(it => it != null) // Objects can be null when they have been destroyed already.
                 .ToArray();
             Debug.LogError($"Failed to load video '{videoUri}' via {videoSupportProvider}. Using one of {remainingVideoSupportProviders.JoinWith(", ")} as fallback: {ex.Message}");
 
@@ -279,7 +285,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     public void UnloadVideo()
     {
         Log.Debug(() => $"SongVideoPlayer.UnloadAudio '{loadedSongMeta.GetArtistDashTitle()}'");
-        StopAllCoroutines();
         StopVideo();
 
         currentVideoSupportProvider?.Unload();
@@ -465,6 +470,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to load video of '{songMeta.GetArtistDashTitle()}': {ex.Message}");
+
+            if (ex is DestroyedAlreadyException)
+            {
+                return;
+            }
+
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                 "reason",
                 ex.Message));

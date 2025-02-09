@@ -126,7 +126,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         }
     }
 
-    public void StartSceneChangeAnimation(EScene currentScene, EScene nextScene)
+    public async void StartSceneChangeAnimation(EScene currentScene, EScene nextScene)
     {
         bool skipSceneChangeAnimationSound = nextScene == EScene.SingScene
                                              || currentScene == EScene.SingingResultsScene;
@@ -149,8 +149,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
 
         if (TryGetBackgroundVisualElementOrIsIrrelevant(out VisualElement background))
         {
-            StopAllCoroutines();
-            SceneChangeAnimationAsync(animationTimeInSeconds, background);
+            await SceneChangeAnimationAsync(animationTimeInSeconds, background);
         }
     }
 

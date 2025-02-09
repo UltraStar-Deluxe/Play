@@ -50,7 +50,7 @@ public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
                                                     || videoPlayerErrorMessages.Count > 0);
         if (!this)
         {
-            throw new VideoSupportProviderException($"Failed to load video '{videoUri}': {nameof(VideoPlayerVideoSupportProvider)} has been destroyed already.");
+            throw new DestroyedAlreadyException($"Failed to load video '{videoUri}': {nameof(VideoPlayerVideoSupportProvider)} has been destroyed already.");
         }
 
         if (videoPlayerErrorMessages.Count > 0)

@@ -242,6 +242,12 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
+
+            if (ex is DestroyedAlreadyException)
+            {
+                return;
+            }
+
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
                 "reason", ex.Message));
         }
@@ -302,6 +308,14 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         catch (Exception ex)
         {
             Debug.LogException(ex);
+
+            if (ex is DestroyedAlreadyException)
+            {
+                // Stuff is being destroyed, so do not try to use other provers.
+                throw ex;
+            }
+
+            // Try to load it with another provider.
             IAudioSupportProvider[] remainingAudioSupportProviders = availableAudioSupportProviders
                 .Except(new List<IAudioSupportProvider>() { audioSupportProvider })
                 .ToArray();
@@ -318,7 +332,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
     public void UnloadAudio()
     {
         Log.Debug(() => $"SongAudioPlayer.UnloadAudio '{loadedSongMeta.GetArtistDashTitle()}'");
-        StopAllCoroutines();
         StopAudio();
 
         currentAudioSupportProvider?.Unload();

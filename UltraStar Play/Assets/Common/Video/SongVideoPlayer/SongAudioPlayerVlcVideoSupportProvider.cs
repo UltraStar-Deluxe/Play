@@ -32,7 +32,7 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
             new WaitForConditionConfig { description = "libVLC MediaPlayer has loaded audio with valid duration" });
         if (!this)
         {
-            throw new VideoSupportProviderException($"Failed to load video '{videoUri}': {nameof(SongAudioPlayerVlcVideoSupportProvider)} has been destroyed already.");
+            throw new DestroyedAlreadyException($"Failed to load video '{videoUri}': {nameof(SongAudioPlayerVlcVideoSupportProvider)} has been destroyed already.");
         }
 
         mediaPlayer = SongAudioPlayerVlcMediaPlayer;

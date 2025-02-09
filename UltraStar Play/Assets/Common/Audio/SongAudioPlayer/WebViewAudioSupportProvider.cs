@@ -21,7 +21,7 @@ public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
             new WaitForConditionConfig {description = $"load audio '{audioUri}'", timeoutInMillis = 30000});
         if (!this)
         {
-            throw new AudioSupportProviderException($"Failed to load audio clip '{audioUri}': {nameof(WebViewAudioSupportProvider)} has been destroyed already.");
+            throw new DestroyedAlreadyException($"Failed to load audio clip '{audioUri}': {nameof(WebViewAudioSupportProvider)} has been destroyed already.");
         }
 
         PositionInMillis = startPositionInMillis;
