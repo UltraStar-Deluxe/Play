@@ -424,7 +424,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             item.Name = folderEntry.DirectoryInfo.Name;
         }
 
-        item.ClickOnSongImageEventStream.Subscribe(_ => OnEntryClicked(entry));
+        item.ClickEventStream.Subscribe(_ => OnEntryClicked(entry));
 
         entryControls.Add(item);
 

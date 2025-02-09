@@ -111,8 +111,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private bool isPopupMenuOpen;
     private float popupMenuClosedTimeInSeconds;
 
-    private readonly Subject<VoidEvent> clickOnSongImageEventStream = new();
-    public IObservable<VoidEvent> ClickOnSongImageEventStream => clickOnSongImageEventStream;
+    private readonly Subject<VoidEvent> clickEventStream = new();
+    public IObservable<VoidEvent> ClickEventStream => clickEventStream;
 
     private bool isInitialized;
 
@@ -132,16 +132,14 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private void RegisterCallbacks()
     {
         VisualElement.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
-        songImageOuter.RegisterCallback<PointerDownEvent>(OnPointerDownOnSongImage, TrickleDown.TrickleDown);
-        songImageOuter.RegisterCallback<PointerUpEvent>(OnPointerUpOnSongImage, TrickleDown.TrickleDown);
+        VisualElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         openSongMenuButton.RegisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
     }
 
     private void UnregisterCallbacks()
     {
         VisualElement.UnregisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
-        songImageOuter.UnregisterCallback<PointerDownEvent>(OnPointerDownOnSongImage, TrickleDown.TrickleDown);
-        songImageOuter.UnregisterCallback<PointerUpEvent>(OnPointerUpOnSongImage, TrickleDown.TrickleDown);
+        VisualElement.UnregisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         openSongMenuButton.UnregisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
     }
 
@@ -186,18 +184,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         contextMenuControl.ContextMenuClosedEventStream.Subscribe(OnContextMenuClosed);
     }
 
-    private void OnPointerDownOnSongImage(PointerDownEvent evt)
+    private void OnPointerDown(PointerDownEvent evt)
     {
         pointerDownMousePosition = evt.position;
-    }
-
-    private void OnPointerUpOnSongImage(PointerUpEvent evt)
-    {
-        if (evt.button == 0
-            && Vector2.Distance(pointerDownMousePosition ,evt.position) < MaxClickDistanceThresholdInPx)
-        {
-            clickOnSongImageEventStream.OnNext(VoidEvent.instance);
-        }
     }
 
     private void OnPointerUp(PointerUpEvent evt)
@@ -208,6 +197,15 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             && TimeUtils.IsDurationAboveThresholdInSeconds(popupMenuClosedTimeInSeconds, 0.1f))
         {
             contextMenuControl.OpenContextMenu(evt.position, this);
+            return;
+        }
+
+        // Fire click event when not clicking a button
+        if (evt.button == 0
+            && Vector2.Distance(pointerDownMousePosition ,evt.position) < MaxClickDistanceThresholdInPx
+            && evt.target != openSongMenuButton)
+        {
+            clickEventStream.OnNext(VoidEvent.instance);
         }
     }
 
