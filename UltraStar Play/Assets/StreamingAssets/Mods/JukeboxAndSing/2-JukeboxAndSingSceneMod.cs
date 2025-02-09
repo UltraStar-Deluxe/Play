@@ -16,7 +16,7 @@ public class JukeboxAndSingSceneMod : ISceneMod
         Debug.Log("JukeboxAndSingSceneMod - entered sing scene");
 
         // Wait one frame for scene setup to finish
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => 
+        AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () => 
         {
             GameObject gameObject = new GameObject();
             JukeboxAndSingControl monoBehaviour = gameObject.AddComponent<JukeboxAndSingControl>();
@@ -24,6 +24,6 @@ public class JukeboxAndSingSceneMod : ISceneMod
             sceneEnteredContext.SceneInjector
               .WithBindingForInstance(modSettings)
               .Inject(monoBehaviour);
-        }));
+        });
     }
 }

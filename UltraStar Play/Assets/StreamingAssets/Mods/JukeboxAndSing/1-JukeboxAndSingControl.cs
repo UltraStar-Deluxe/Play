@@ -64,7 +64,7 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
 
         // Hide SingingUIElement initially. Show them after fade-out animation has finished
         singingUiElements.ForEach(elem => elem.HideByVisibility());
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(FadeTimeInSeconds, () => singingUiElements.ForEach(elem => elem.ShowByVisibility())));
+        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(FadeTimeInSeconds, () => singingUiElements.ForEach(elem => elem.ShowByVisibility()));
         FadeOutSingingUiElements();
 
         // Show UI when any new notes have been recorded
@@ -165,7 +165,7 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             Debug.Log($"{nameof(JukeboxAndSingControl)} - End of song detected. Starting next song soon.");
             isFinishing = true;
             float timeBeforeEndInSeconds = timeBeforeEndInMillis / 1000f;
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(timeBeforeEndInSeconds, StartNextSong));
+            AwaitableUtils.ExecuteAfterDelayInSecondsAsync(timeBeforeEndInSeconds, StartNextSong);
             return;
         }
     }

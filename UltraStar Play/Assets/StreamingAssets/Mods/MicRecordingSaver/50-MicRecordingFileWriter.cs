@@ -25,7 +25,7 @@ public class MicRecordingFileWriter : INeedInjection
         ApplicationUtils.OpenDirectory(GetTargetDirectory());
     }
 
-    private void Save(PlayerProfile playerProfile, MicRecordingData micRecordingData)
+    private async void Save(PlayerProfile playerProfile, MicRecordingData micRecordingData)
     {
         int micSampleRate = micRecordingData.MicSampleRate;
         if (micSampleRate <= 0)
@@ -34,7 +34,10 @@ public class MicRecordingFileWriter : INeedInjection
         }
 
         // Try to get instrumental audio to save a mix with the mic recording (must happen on main thread because of Unity API)
-        bool hasInstrumentalSamples = TryLoadInstrumentalSamples(songMeta, out float[] instrumentalSamples, out int instrumentalSampleRate);
+        LoadInstrumentalSamplesResult loadInstrumentalSamplesResult = await TryLoadInstrumentalSamplesAsync(songMeta);
+        bool hasInstrumentalSamples = loadInstrumentalSamplesResult.hasInstrumentalSamples;
+        float[] instrumentalSamples = loadInstrumentalSamplesResult.instrumentalSamples;
+        int instrumentalSampleRate = loadInstrumentalSamplesResult.instrumentalSampleRate;
 
         // Create array with only the written samples
         float[] writtenMicSamples = new float[micRecordingData.WrittenMicSampleCount];
@@ -71,30 +74,29 @@ public class MicRecordingFileWriter : INeedInjection
         }
     }
 
-    private bool TryLoadInstrumentalSamples(SongMeta songMeta, out float[] instrumentalSamples, out int instrumentalSampleRate)
+    private async Awaitable<LoadInstrumentalSamplesResult> TryLoadInstrumentalSamplesAsync(SongMeta songMeta)
     {
         string instrumentalAudioFilePath = SongMetaUtils.GetInstrumentalAudioUri(songMeta);
         if(!File.Exists(instrumentalAudioFilePath))
         {
-            instrumentalSamples = null;
-            instrumentalSampleRate = 0;
-            return false;
+            return new LoadInstrumentalSamplesResult();
         }
 
         try
         {
-            AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(instrumentalAudioFilePath, false);
-            instrumentalSamples = GetMonoSamples(audioClip);
-            instrumentalSampleRate = audioClip.frequency;
-            return true;
+            AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(instrumentalAudioFilePath, false);
+            return new LoadInstrumentalSamplesResult()
+            {
+                hasInstrumentalSamples = true,
+                instrumentalSamples = GetMonoSamples(audioClip),
+                instrumentalSampleRate = audioClip.frequency,
+            };
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to load instrumental audio from '{instrumentalAudioFilePath}': {ex.Message}");
-            instrumentalSamples = null;
-            instrumentalSampleRate = 0;
-            return false;
+            return new LoadInstrumentalSamplesResult();
         }
     }
 
@@ -121,5 +123,12 @@ public class MicRecordingFileWriter : INeedInjection
     private string GetTargetFilePath(string fileBaseName)
     {
         return $"{GetTargetDirectory()}/{fileBaseName}.wav";
+    }
+
+    private class LoadInstrumentalSamplesResult
+    {
+        public bool hasInstrumentalSamples;
+        public float[] instrumentalSamples;
+        public int instrumentalSampleRate;
     }
 }
