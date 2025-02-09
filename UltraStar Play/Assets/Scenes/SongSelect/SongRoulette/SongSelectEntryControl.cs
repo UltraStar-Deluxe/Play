@@ -64,6 +64,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.notAvailableInOnlineGameIcon)]
     private VisualElement notAvailableInOnlineGameIcon;
 
+    [Inject(UxmlName = R.UxmlNames.innerSongEntryUi)]
+    private VisualElement innerSongEntryUi;
+
     [Inject]
     private CreateSingAlongSongControl createSingAlongSongControl;
 
@@ -131,15 +134,15 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     private void RegisterCallbacks()
     {
-        VisualElement.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
-        VisualElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        innerSongEntryUi.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
+        innerSongEntryUi.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         openSongMenuButton.RegisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
     }
 
     private void UnregisterCallbacks()
     {
-        VisualElement.UnregisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
-        VisualElement.UnregisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        innerSongEntryUi.UnregisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
+        innerSongEntryUi.UnregisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         openSongMenuButton.UnregisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
     }
 
