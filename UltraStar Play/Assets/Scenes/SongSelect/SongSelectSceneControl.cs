@@ -1277,8 +1277,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.OnSearchTextChanged");
 
-        StartSongRepositorySearch();
-
         string rawSearchText = songSearchControl.GetRawSearchText();
         if (!rawSearchText.IsNullOrEmpty()
             && lastRawSearchText.IsNullOrEmpty())
@@ -1288,21 +1286,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
         lastRawSearchText = rawSearchText;
 
+        StartSongRepositorySearch();
+
         if (TryExecuteSpecialSearchSyntax(rawSearchText))
         {
             // Special search syntax used. Do not perform normal filtering.
             return;
         }
         UpdateFilteredSongs();
-
-        if (rawSearchText.IsNullOrEmpty())
-        {
-            // Restore selection from before search
-            if (selectedEntryBeforeSearch != null)
-            {
-                songRouletteControl.SelectEntry(selectedEntryBeforeSearch);
-            }
-        }
     }
 
     private async void StartSongRepositorySearch()
@@ -1623,16 +1614,21 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void OnSubmitSearch()
     {
-        // Continue browsing songs from the currently selected entry.
-        selectedEntryBeforeSearch = songRouletteControl.SelectedEntry;
         songSearchControl.ResetSearchText();
         songRouletteControl.Focus();
+
+        // Continue browsing songs from the currently selected entry.
+        selectedEntryBeforeSearch = null;
     }
 
     public void OnCancelSearch()
     {
         songSearchControl.ResetSearchText();
         songRouletteControl.Focus();
+
+        // Continue browsing songs from the entry that was selected before starting the search.
+        songRouletteControl.SelectEntry(selectedEntryBeforeSearch);
+        selectedEntryBeforeSearch = null;
     }
 
     public void ShowCannotUseJokerMessage()
