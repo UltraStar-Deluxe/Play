@@ -587,9 +587,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         VisualElement primaryLyricsContainer = settings.StaticLyricsDisplayMode is EStaticLyricsDisplayMode.Bottom
             ? bottomLyricsContainer
             : topLyricsContainer;
-        VisualElement secondaryLyricsContainer = settings.StaticLyricsDisplayMode is EStaticLyricsDisplayMode.Bottom
-            ? topLyricsContainer
-            : bottomLyricsContainer;
+        VisualElement secondaryLyricsContainer = primaryLyricsContainer == topLyricsContainer
+            ? bottomLyricsContainer
+            : topLyricsContainer;
 
         List<PlayerControl> playerControlsUsingFirstVoice = GetPlayerControlsOfVoice(EVoiceId.P1);
         List<PlayerControl> playerControlsUsingSecondVoice = GetPlayerControlsOfVoice(EVoiceId.P2);
@@ -597,8 +597,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             && !playerControlsUsingSecondVoice.IsNullOrEmpty())
         {
             // There are two different sets of lyrics that need to be displayed
-            singingLyricsControls.Add(CreateSingingLyricsControl(secondaryLyricsContainer, playerControlsUsingFirstVoice.FirstOrDefault()));
-            singingLyricsControls.Add(CreateSingingLyricsControl(primaryLyricsContainer, playerControlsUsingSecondVoice.FirstOrDefault()));
+            VisualElement firstVoiceLyricsContainer = settings.StaticLyricsDisplayMode is EStaticLyricsDisplayMode.Bottom
+                ? secondaryLyricsContainer
+                : primaryLyricsContainer;
+            VisualElement secondVoiceLyricsContainer = firstVoiceLyricsContainer == primaryLyricsContainer
+                ? secondaryLyricsContainer
+                : primaryLyricsContainer;
+
+            singingLyricsControls.Add(CreateSingingLyricsControl(firstVoiceLyricsContainer, playerControlsUsingFirstVoice.FirstOrDefault()));
+            singingLyricsControls.Add(CreateSingingLyricsControl(secondVoiceLyricsContainer, playerControlsUsingSecondVoice.FirstOrDefault()));
         }
         else
         {
