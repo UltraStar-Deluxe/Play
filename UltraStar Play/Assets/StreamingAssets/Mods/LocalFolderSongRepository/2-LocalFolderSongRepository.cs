@@ -38,7 +38,7 @@ public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
         SearchTxtFilesIfNotDoneYet();
     }
 
-    public async Awaitable<List<SongRepositorySearchResultEntry>> SearchSongsAsync(SongRepositorySearchParameters searchParameters)
+    public async Awaitable<SongRepositorySearchResult> SearchSongsAsync(SongRepositorySearchParameters searchParameters)
     {
         if (!DirectoryUtils.Exists(SongFolder)
             || searchParameters == null
@@ -51,7 +51,7 @@ public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
         
         SearchTxtFilesIfNotDoneYet();
 
-        return SearchSongList(searchParameters);
+        return new SongRepositorySearchResult() { Entries = SearchSongList(searchParameters) };
     }
 
     private void SearchTxtFilesIfNotDoneYet()
