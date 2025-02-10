@@ -34,19 +34,20 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     public async Awaitable<AudioSeparationResult> ProcessSongMetaInJobAsync(
         SongMeta songMeta,
         bool saveSong,
-        IJob parentJob = null)
+        Job<AudioSeparationResult> existingJob = null)
     {
+        Job<AudioSeparationResult> job = existingJob;
+        if (job == null)
+        {
+            job = new Job<AudioSeparationResult>(
+                Translation.Get(R.Messages.job_audioSeparationWithName, "name", Path.GetFileName(songMeta.Audio)),
+                new CancellationTokenSource());
+            jobManager.AddJob(job);
+        }
+        job.SetAwaitable(() => ProcessSongMetaAsync(songMeta, saveSong, job.Progress));
+
         try
         {
-            JobProgress jobProgress = new(new CancellationTokenSource());
-            Translation jobName = Translation.Get(R.Messages.job_audioSeparationWithName,
-                "name", Path.GetFileName(songMeta.Audio));
-            Job<AudioSeparationResult> job = new(jobName,
-                ProcessSongMetaAsync(songMeta, saveSong, jobProgress),
-                jobProgress,
-                parentJob);
-            jobManager.AddJob(job);
-
             return await job.GetResultAsync();
         }
         catch (Exception ex)

@@ -71,10 +71,10 @@ public class JobManagerTest : AbstractPlayModeTest
         parentJob = new Job<VoidEvent>(Translation.Of(nameof(parentJob)));
         parentJob.AdoptChildJobError = adoptChildJobError;
 
-        childJob1ThrowsException = CreateJob(nameof(childJob1ThrowsException), "dummy exception", parentJob);
-        childJob2 = CreateJob(nameof(childJob2), null, parentJob);
-        childJob3 = CreateJob(nameof(childJob3), null, parentJob);
-        childJob3ChildJob = CreateJob(nameof(childJob3ChildJob), null, childJob3);
+        childJob1ThrowsException = CreateChildJob(nameof(childJob1ThrowsException), parentJob, "dummy exception");
+        childJob2 = CreateChildJob(nameof(childJob2), parentJob);
+        childJob3 = CreateChildJob(nameof(childJob3), parentJob);
+        childJob3ChildJob = CreateChildJob(nameof(childJob3ChildJob), childJob3);
 
         jobManager.AddJob(parentJob);
     }
@@ -87,13 +87,13 @@ public class JobManagerTest : AbstractPlayModeTest
             new WaitForConditionConfig { description = $"Expect job result {jobResult} for {jobNameCsv}" });
     }
 
-    private static Job<string> CreateJob(string name, string exceptionMessage, IJob parentJob)
+    private static Job<string> CreateChildJob(string name, IJob parentJob, string exceptionMessage = null)
     {
-        return new Job<string>(
+        Job<string> childJob = new Job<string>(
             Translation.Of(name),
-            DummyTaskAsync(name, exceptionMessage),
-            null,
-            parentJob);
+            () => DummyTaskAsync(name, exceptionMessage));
+        parentJob.AddChildJob(childJob);
+        return childJob;
     }
 
     private static async Awaitable<string> DummyTaskAsync(string name, string exceptionMessage = null)

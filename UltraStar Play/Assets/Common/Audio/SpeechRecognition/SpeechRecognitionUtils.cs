@@ -40,9 +40,10 @@ public static class SpeechRecognitionUtils
         int offsetInBeats,
         Hyphenator hyphenator,
         int spaceInMillisBetweenNotes,
-        IJob parentJob = null)
+        Job<SpeechRecognizer> createSpeechRecognizerJob = null,
+        Job<SpeechRecognitionResult> recognizeSpeechJob = null)
     {
-        SpeechRecognizer speechRecognizer = await GetOrCreateSpeechRecognizerInJobAsync(speechRecognitionParameters);
+        SpeechRecognizer speechRecognizer = await GetOrCreateSpeechRecognizerInJobAsync(speechRecognitionParameters, createSpeechRecognizerJob);
 
         await Awaitable.BackgroundThreadAsync();
         SpeechRecognitionResult speechRecognitionResult = await RecognizeSpeechInJobAsync(
@@ -51,7 +52,7 @@ public static class SpeechRecognitionUtils
             endIndex,
             sampleRate,
             speechRecognizer,
-            parentJob);
+            recognizeSpeechJob);
 
         await Awaitable.MainThreadAsync();
         List<Note> createdNotes = CreateNotesFromSpeechRecognitionResult(speechRecognitionResult, songMeta, offsetInBeats, midiNote, hyphenator, spaceInMillisBetweenNotes);
@@ -60,12 +61,17 @@ public static class SpeechRecognitionUtils
     }
 
     public static async Awaitable<SpeechRecognizer> GetOrCreateSpeechRecognizerInJobAsync(
-        SpeechRecognitionParameters parameters)
+        SpeechRecognitionParameters parameters,
+        Job<SpeechRecognizer> existingJob = null)
     {
-        Translation jobName = Translation.Get(R.Messages.job_loadSpeechRecognitionModel);
-        Job<SpeechRecognizer> job = new(jobName, GetOrCreateSpeechRecognizerAsync(parameters));
+        Job<SpeechRecognizer> job = existingJob;
+        if (job == null)
+        {
+            job = new Job<SpeechRecognizer>(Translation.Get(R.Messages.job_loadSpeechRecognitionModel));
+            JobManager.Instance.AddJob(job);
+        }
+        job.SetAwaitable(() => GetOrCreateSpeechRecognizerAsync(parameters));
         job.Progress.EstimatedTotalDurationInMillis = 60000;
-        JobManager.Instance.AddJob(job);
 
         return await job.GetResultAsync();
     }
@@ -92,18 +98,18 @@ public static class SpeechRecognitionUtils
         int endIndex,
         int sampleRate,
         SpeechRecognizer speechRecognizer,
-        IJob parentJob = null)
+        Job<SpeechRecognitionResult> existingJob = null)
     {
         double lengthInMillis = ((double)(endIndex - startIndex) / sampleRate) * 1000.0;
 
-        Translation jobName = Translation.Get(R.Messages.job_speechRecognition);
-        JobProgress jobProgress = new(new CancellationTokenSource());
-        Job<SpeechRecognitionResult> job = new(jobName,
-            RecognizeSpeechAsync(monoSamples, startIndex, endIndex, sampleRate, jobProgress, speechRecognizer),
-            jobProgress,
-            parentJob);
+        Job<SpeechRecognitionResult> job = existingJob;
+        if (job == null)
+        {
+            job = new Job<SpeechRecognitionResult>(Translation.Get(R.Messages.job_speechRecognition), new CancellationTokenSource());
+            JobManager.Instance.AddJob(job);
+        }
+        job.SetAwaitable(() => RecognizeSpeechAsync(monoSamples, startIndex, endIndex, sampleRate, job.Progress, speechRecognizer));
         job.Progress.EstimatedTotalDurationInMillis = GetEstimatedSpeechRecognitionDurationInMillis(lengthInMillis);
-        JobManager.Instance.AddJob(job);
 
         return await job.GetResultAsync();
     }

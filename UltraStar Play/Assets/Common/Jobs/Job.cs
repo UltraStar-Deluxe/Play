@@ -6,39 +6,74 @@ using UnityEngine;
 
 public class Job<T> : IJob
 {
-    private readonly Awaitable<T> awaitable;
+    /**
+     * Getter for the Awaitable that should be executed.
+     * A Getter is used instead of the Awaitable directly to avoid premature execution.
+     */
+    private Func<Awaitable<T>> awaitableProvider;
+
     public Translation Name { get; }
-    public JobProgress Progress { get; set; }
-    public CancellationTokenSource CancellationTokenSource => Progress?.CancellationTokenSource;
-    public bool IsCancellationRequested => CancellationTokenSource != null && CancellationTokenSource.IsCancellationRequested;
+    public JobProgress Progress { get; }
+
+    public bool AdoptChildJobError { get; set; }
+
+    private CancellationTokenSource CancellationTokenSource => Progress?.CancellationTokenSource;
+    private bool IsCancellationRequested => CancellationTokenSource != null && CancellationTokenSource.IsCancellationRequested;
 
     public ReactiveProperty<EJobStatus> Status { get; private set; } = new(EJobStatus.Pending);
     public ReactiveProperty<EJobResult> Result { get; private set; }  = new (EJobResult.Pending);
 
     private readonly List<IJob> childJobs = new();
     public IReadOnlyList<IJob> ChildJobs => childJobs;
-    public IJob ParentJob { get; set; }
 
-    public bool AdoptChildJobError { get; set; }
+    private IJob parentJob;
+
+    public IJob ParentJob
+    {
+        get => parentJob;
+        set
+        {
+            if (Status.Value is not EJobStatus.Pending)
+            {
+                throw new IllegalStateException("Job has already been started. Cannot change parent job.");
+            }
+
+            if (parentJob == value)
+            {
+                return;
+            }
+            if (parentJob != null)
+            {
+                throw new IllegalStateException("Cannot change parent job");
+            }
+            parentJob = value;
+            parentJob.AddChildJob(this);
+        }
+    }
 
     public ReactiveProperty<bool> IsCanceled { get; }
     public ReactiveProperty<bool> IsCancelable { get; }
 
+    /**
+     * Constructor intended to set the Awaitable later.
+     */
     public Job(
         Translation name,
-        Awaitable<T> awaitable = null,
-        JobProgress jobProgress = null,
-        IJob parentJob = null)
+        CancellationTokenSource cancellationTokenSource)
+        : this(name, null, cancellationTokenSource)
+    {
+    }
+
+    public Job(
+        Translation name,
+        Func<Awaitable<T>> awaitableProvider = null,
+        CancellationTokenSource cancellationTokenSource = null)
     {
         Name = name;
-        this.awaitable = awaitable;
-        this.Progress = jobProgress ?? new JobProgress(null);
+        this.awaitableProvider = awaitableProvider;
+        this.Progress = new JobProgress(cancellationTokenSource);
         IsCanceled = new ReactiveProperty<bool>(false);
-        IsCancelable = new ReactiveProperty<bool>(IsCancellationRequested);
-        if (parentJob != null)
-        {
-            parentJob.AddChildJob(this);
-        }
+        IsCancelable = new ReactiveProperty<bool>(CancellationTokenSource != null);
     }
 
     public async Awaitable RunAsync()
@@ -58,11 +93,22 @@ public class Job<T> : IJob
             T result = default;
             SetStatus(EJobStatus.Running);
 
+            Awaitable<T> awaitable = awaitableProvider?.Invoke();
+
+            if (awaitable == null
+                && childJobs.IsNullOrEmpty())
+            {
+                throw new IllegalStateException($"Job is missing awaitable to be executed: job '{Name}'");
+            }
+
             if (awaitable != null)
             {
                 result = await awaitable;
             }
-            await RunChildJobsAsync();
+            if (!childJobs.IsNullOrEmpty())
+            {
+                await RunChildJobsAsync();
+            }
 
             CancellationTokenSource?.Token.ThrowIfCancellationRequested();
             SetResult(EJobResult.Ok);
@@ -85,10 +131,36 @@ public class Job<T> : IJob
         }
     }
 
+    public void SetAwaitable(Func<Awaitable<T>> newValue)
+    {
+        if (Status.Value is not EJobStatus.Pending)
+        {
+            throw new IllegalStateException("Job has already been started. Cannot change awaitable.");
+        }
+
+        awaitableProvider = newValue;
+    }
+
     public void AddChildJob(IJob childJob)
     {
-        childJob.ParentJob = this;
+        if (Status.Value is not EJobStatus.Pending)
+        {
+            throw new IllegalStateException("Job has already been started. Cannot add child jobs.");
+        }
+
+        if (this == childJob)
+        {
+            throw new IllegalArgumentException("Cannot add self as child job.");
+        }
+
+        if (childJobs.Contains(childJob))
+        {
+            // Avoid recursion with setting parentJob
+            return;
+        }
+
         childJobs.Add(childJob);
+        childJob.ParentJob = this;
 
         childJob.Result.Subscribe(_ => OnChildJobChanged());
         childJob.Status.Subscribe(_ => OnChildJobChanged());
@@ -101,6 +173,7 @@ public class Job<T> : IJob
             foreach (IJob childJob in childJobs)
             {
                 await childJob.RunAsync();
+                CancellationTokenSource?.Token.ThrowIfCancellationRequested();
             }
         }
         else
@@ -115,6 +188,7 @@ public class Job<T> : IJob
                 {
                     ex.Log($"Child job failed, continuing with remaining child jobs: parent job '{Name}', failed child job '{childJob.Name}'");
                 }
+                CancellationTokenSource?.Token.ThrowIfCancellationRequested();
             }
         }
     }
@@ -236,5 +310,15 @@ public class Job<T> : IJob
         Debug.Log($"Cancelling job '{Name}'");
         IsCanceled.Value = true;
         CancellationTokenSource?.Cancel();
+
+        CancelChildJobs();
+    }
+
+    private void CancelChildJobs()
+    {
+        foreach (IJob childJob in childJobs)
+        {
+            childJob?.Cancel();
+        }
     }
 }

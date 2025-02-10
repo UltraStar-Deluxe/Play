@@ -33,20 +33,20 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
     private readonly Subject<PitchDetectionFinishedEvent> pitchDetectionFinishedEventStream = new();
     public Subject<PitchDetectionFinishedEvent> PitchDetectionFinishedEventStream => pitchDetectionFinishedEventStream;
 
-    public async Awaitable<BasicPitchDetectionResult> ProcessSongMetaInJobAsync(SongMeta songMeta, IJob parentJob = null)
+    public async Awaitable<BasicPitchDetectionResult> ProcessSongMetaInJobAsync(SongMeta songMeta, Job<BasicPitchDetectionResult> existingJob = null)
     {
+        Job<BasicPitchDetectionResult> job = existingJob;
+        if (job == null)
+        {
+            job = new Job<BasicPitchDetectionResult>(
+                Translation.Get(R.Messages.job_pitchDetectionWithName, "name", Path.GetFileName(songMeta.Audio)),
+                new CancellationTokenSource());
+            jobManager.AddJob(job);
+        }
+        job.SetAwaitable(() => ProcessSongMetaAsync(songMeta, job.Progress));
+
         try
         {
-            CancellationTokenSource cancellationTokenSource = new();
-            JobProgress jobProgress = new(cancellationTokenSource);
-            Translation jobName = Translation.Get(R.Messages.job_pitchDetectionWithName,
-                "name", Path.GetFileName(songMeta.Audio));
-            Job<BasicPitchDetectionResult> job = new(jobName,
-                ProcessSongMetaAsync(songMeta, jobProgress),
-                jobProgress,
-                parentJob);
-            jobManager.AddJob(job);
-
             return await job.GetResultAsync();
         }
         catch (Exception ex)

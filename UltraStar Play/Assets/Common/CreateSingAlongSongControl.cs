@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using UniInject;
 using UniRx;
@@ -52,35 +53,17 @@ public class CreateSingAlongSongControl : INeedInjection
         if (lastProcessSongJob != null
             && lastProcessSongJob.Result.Value == EJobResult.Pending)
         {
-            Debug.LogError("Already processing a song");
             NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
-            return null;
+            throw new JobAlreadyRunningException("Already creating sing along data for another song");
         }
-        Debug.Log($"Creating sing-along data song '{songMeta.GetArtistDashTitle()}'");
-
-        IJob parentJob = new Job<VoidEvent>(Translation.Get(R.Messages.job_createSingAlongDataWithName, "name", Path.GetFileName(songMeta.Audio)));
-        lastProcessSongJob = parentJob;
-        jobManager.AddJob(parentJob);
+        Debug.Log($"Creating sing-along data for song '{songMeta.GetArtistDashTitle()}'");
 
         try
         {
-            // Load speech recognition model and run vocals isolation in parallel
-            SpeechRecognitionParameters speechRecognitionParameters = await LoadSpeechRecognitionModelAndRunAudioSeparationAsync(songMeta, saveSongFile, parentJob);
+            IJob parentJob = CreateSingAlongDataJobPipeline(songMeta, saveSongFile);
+            jobManager.AddJob(parentJob);
 
-            // Run speech recognition
-            List<Note> createdNotes = await RunSpeechRecognitionAsync(songMeta, speechRecognitionParameters, parentJob);
-
-            // Split created notes into sentences and assign to first player
-            AssignNotesToFirstPlayer(songMeta, createdNotes);
-
-            // Add Space between notes
-            SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
-
-            // Run pitch detection on vocals audio
-            List<Note> loadedPitchDetectionNotes = await RunPitchDetectionAsync(songMeta, parentJob);
-
-            // Move notes of first player to detected pitch
-            MoveNotesToDetectedPitch(songMeta, createdNotes, loadedPitchDetectionNotes);
+            await parentJob.RunAsync();
 
             // Save
             if (saveSongFile)
@@ -96,6 +79,53 @@ public class CreateSingAlongSongControl : INeedInjection
                 "reason", ex.Message));
             throw ex;
         }
+    }
+
+    private IJob CreateSingAlongDataJobPipeline(SongMeta songMeta, bool saveSongFile)
+    {
+        IJob parentJob = new Job<VoidEvent>(Translation.Get(R.Messages.job_createSingAlongDataWithName,
+            "name", Path.GetFileName(songMeta.Audio)));
+        lastProcessSongJob = parentJob;
+
+        // Run vocals isolation
+        Job<AudioSeparationResult> audioSeparationJob = new(Translation.Of("Vocals isolation"), new CancellationTokenSource());
+        audioSeparationJob.SetAwaitable(() => RunVocalsIsolationAsync(songMeta, saveSongFile, audioSeparationJob));
+        parentJob.AddChildJob(audioSeparationJob);
+
+        // Run speech recognition
+        List<Note> createdNotes = new();
+        // TODO: How to include child jobs for creating speech recognizer and doing speech recognition?
+        Job<VoidEvent> createSpeechRecognizerAndRunSpeechRecognitionJob = new(Translation.Of("Speech recognition"), new CancellationTokenSource());
+        createSpeechRecognizerAndRunSpeechRecognitionJob.SetAwaitable(async () =>
+            {
+                createdNotes = await RunSpeechRecognitionAsync(songMeta);
+
+                // Split created notes into sentences and assign to first player
+                AssignNotesToFirstPlayer(songMeta, createdNotes);
+
+                // Add Space between notes
+                SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
+
+                return VoidEvent.instance;
+            });
+        parentJob.AddChildJob(createSpeechRecognizerAndRunSpeechRecognitionJob);
+
+        // Run pitch detection on vocals audio
+        // TODO: include child job to run pitch detection?
+        List<Note> loadedPitchDetectionNotes;
+        Job<VoidEvent> pitchDetectionJob = new Job<VoidEvent>(Translation.Of("Run pitch detection"));
+        pitchDetectionJob.SetAwaitable(async () =>
+        {
+            loadedPitchDetectionNotes = await RunPitchDetectionAsync(songMeta);
+
+            // Move notes of first player to detected pitch
+            MoveNotesToDetectedPitch(songMeta, createdNotes, loadedPitchDetectionNotes);
+
+            return VoidEvent.instance;
+        });
+        parentJob.AddChildJob(pitchDetectionJob);
+
+        return parentJob;
     }
 
     private static void MoveNotesToDetectedPitch(SongMeta songMeta, List<Note> createdNotes, List<Note> loadedPitchDetectionNotes)
@@ -116,32 +146,23 @@ public class CreateSingAlongSongControl : INeedInjection
         }
     }
 
-    private async Awaitable<SpeechRecognitionParameters> LoadSpeechRecognitionModelAndRunAudioSeparationAsync(
+    private async Awaitable<AudioSeparationResult> RunVocalsIsolationAsync(
         SongMeta songMeta,
         bool saveSongFile,
-        IJob parentJob)
+        Job<AudioSeparationResult> audioSeparationJob)
     {
-        // (0) Load speech recognition model
+        return await audioSeparationManager.ProcessSongMetaInJobAsync(songMeta, saveSongFile, audioSeparationJob);
+    }
+
+    private async Awaitable<List<Note>> RunSpeechRecognitionAsync(
+        SongMeta songMeta)
+    {
+        // Load speech recognition model
         SpeechRecognitionParameters speechRecognitionParameters = new(
             SettingsUtils.GetSpeechRecognitionModelPath(settings),
             SettingsUtils.GetSpeechRecognitionLanguage(settings),
             settings.SongEditorSettings.SpeechRecognitionPrompt);
-        Awaitable<SpeechRecognizer> loadSpeechRecognizerAwaitable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizerInJobAsync(speechRecognitionParameters);
 
-        // (1) Run audio separation (vocals and instrumental audio)
-        Awaitable<AudioSeparationResult> audioSeparationResultAwaitable = audioSeparationManager.ProcessSongMetaInJobAsync(songMeta, saveSongFile, parentJob);
-
-        // Continue when audio separation and loading speech recognition model have finished both
-        await Task.WhenAll(audioSeparationResultAwaitable.AsTask(), loadSpeechRecognizerAwaitable.AsTask());
-
-        return speechRecognitionParameters;
-    }
-
-    private async Awaitable<List<Note>> RunSpeechRecognitionAsync(
-        SongMeta songMeta,
-        SpeechRecognitionParameters speechRecognitionParameters,
-        IJob parentJob)
-    {
         // Load vocals audio
         AudioClip vocalsAudioClip = await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
         int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * SongMetaBpmUtils.BeatsPerSecond(songMeta));
@@ -158,18 +179,16 @@ public class CreateSingAlongSongControl : INeedInjection
             songMeta,
             0,
             SettingsUtils.CreateHyphenator(settings),
-            settings.SongEditorSettings.SpaceBetweenNotesInMillis,
-            parentJob);
+            settings.SongEditorSettings.SpaceBetweenNotesInMillis);
 
         return createdNotes;
     }
 
-    private async Task<List<Note>> RunPitchDetectionAsync(SongMeta songMeta, IJob parentJob)
+    private async Task<List<Note>> RunPitchDetectionAsync(SongMeta songMeta)
     {
         List<Note> loadedPitchDetectionNotes = await PitchDetectionUtils.CreateNotesUsingBasicPitchAsync(
             pitchDetectionManager,
-            songMeta,
-            parentJob);
+            songMeta);
         if (loadedPitchDetectionNotes.IsNullOrEmpty())
         {
             throw new PitchDetectionException("Failed to load pitch detection result");

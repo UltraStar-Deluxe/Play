@@ -10,14 +10,14 @@ public static class PitchDetectionUtils
     public static async Awaitable<List<Note>> CreateNotesUsingBasicPitchAsync(
         PitchDetectionManager pitchDetectionManager,
         SongMeta songMeta,
-        IJob parentJob = null)
+        Job<BasicPitchDetectionResult> existingJob = null)
     {
         if (!SongMetaUtils.VocalsAudioResourceExists(songMeta))
         {
             throw new PitchDetectionException("Vocals audio not found. Split the audio first.");
         }
 
-        BasicPitchDetectionResult basicPitchDetectionResult = await pitchDetectionManager.ProcessSongMetaInJobAsync(songMeta, parentJob);
+        BasicPitchDetectionResult basicPitchDetectionResult = await pitchDetectionManager.ProcessSongMetaInJobAsync(songMeta, existingJob);
         MidiFile midiFile = MidiFileUtils.LoadMidiFile(basicPitchDetectionResult.MidiFilePath);
 
         MidiFileUtils.CalculateMidiEventTimesInMillis(
