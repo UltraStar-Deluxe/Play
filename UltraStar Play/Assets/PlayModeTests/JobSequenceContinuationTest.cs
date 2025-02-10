@@ -7,7 +7,7 @@ using UnityEngine.TestTools;
 using static UnityEngine.Awaitable;
 using static ConditionUtils;
 
-public class JobManagerTest : AbstractPlayModeTest
+public class JobSequenceContinuationTest : AbstractPlayModeTest
 {
     [Inject]
     private JobManager jobManager;
