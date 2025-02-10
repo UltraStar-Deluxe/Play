@@ -187,10 +187,20 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private async void CreateSingAlongDataViaAiTools()
     {
-        CreateSingAlongSongControl createSingAlongSongControl = injector
-            .CreateAndInject<CreateSingAlongSongControl>();
+        try
+        {
+            CreateSingAlongSongControl createSingAlongSongControl = injector
+                .CreateAndInject<CreateSingAlongSongControl>();
+            await createSingAlongSongControl.CreateSingAlongSongAsync(SongMeta, true);
+        }
+        catch (Exception ex)
+        {
+            ex.Log();
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                "reason", ex.Message));
+            return;
+        }
 
-        await createSingAlongSongControl.CreateSingAlongSongAsync(SongMeta, true);
         Debug.Log($"Created sing-along data for song '{SongMeta.GetArtistDashTitle()}'");
         editorNoteDisplayer.ClearNoteControls();
         songMetaChangeEventStream.OnNext(new NotesChangedEvent());

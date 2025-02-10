@@ -31,40 +31,39 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     private readonly Subject<AudioSeparationFinishedEvent> audioSeparationFinishedEventStream = new();
     public Subject<AudioSeparationFinishedEvent> AudioSeparationFinishedEventStream => audioSeparationFinishedEventStream;
 
-    public async Awaitable<AudioSeparationResult> ProcessSongMetaInJobAsync(
+    public Job<AudioSeparationResult> ProcessSongMetaJob(
         SongMeta songMeta,
-        bool saveSong,
-        Job<AudioSeparationResult> existingJob = null)
+        bool saveSong)
     {
-        Job<AudioSeparationResult> job = existingJob;
-        if (job == null)
-        {
-            job = new Job<AudioSeparationResult>(
-                Translation.Get(R.Messages.job_audioSeparationWithName, "name", Path.GetFileName(songMeta.Audio)),
-                new CancellationTokenSource());
-            jobManager.AddJob(job);
-        }
-        job.SetAwaitable(() => ProcessSongMetaAsync(songMeta, saveSong, job.Progress));
+        Job<AudioSeparationResult> job = new Job<AudioSeparationResult>(
+            Translation.Get(R.Messages.job_audioSeparationWithName, "name", Path.GetFileName(songMeta.Audio)),
+            new CancellationTokenSource());
+        jobManager.AddJob(job);
 
-        try
+        job.SetAwaitable(async () =>
         {
-            return await job.GetResultAsync();
-        }
-        catch (Exception ex)
-        {
-            ex.Log($"Vocals isolation failed: song '{songMeta.GetArtistDashTitle()}'");
-            if (ex is JobAlreadyRunningException)
+            try
             {
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
+                return await ProcessSongMetaAsync(songMeta, saveSong, job.Progress);
             }
-            else
+            catch (Exception ex)
             {
-                NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_audioSeparation_errorWithReason,
-                    "reason", ex.Message)));
-            }
+                ex.Log($"Vocals isolation failed: song '{songMeta.GetArtistDashTitle()}'");
+                if (ex is JobAlreadyRunningException)
+                {
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
+                }
+                else
+                {
+                    NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_audioSeparation_errorWithReason,
+                        "reason", ex.Message)));
+                }
 
-            throw ex;
-        }
+                throw ex;
+            }
+        });
+
+        return job;
     }
 
     private async Awaitable<AudioSeparationResult> ProcessSongMetaAsync(

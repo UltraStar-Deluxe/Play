@@ -87,32 +87,11 @@ public class BatchIsolateVocalsModSettings : IModSettings
         for (int i = 0; i < songMetas.Count; i++)
         {
             SongMeta songMeta = songMetas[i];
-
-            new Job<VoidEvent>(
-                Translation.Of($"Batch isolate vocals of '{SongMetaUtils.GetArtistDashTitle(songMeta)}'"),
-                StartVocalsIsolationOfSongAsync(songMeta, batchJob),
-                new JobProgress(new CancellationTokenSource()),
-                batchJob);
+            batchJob.AddChildJob(audioSeparationManager.ProcessSongMetaJob(songMeta, true));
         }
 
         // Start the batch job
         await batchJob.RunAsync();
-    }
-
-    private async Awaitable<VoidEvent> StartVocalsIsolationOfSongAsync(SongMeta songMeta, IJob parentJob)
-    {
-        // TODO: these jobs start all at the same time, even though the parent job starts them correctly one after another.
-        long startTime = TimeUtils.GetUnixTimeMilliseconds();
-        Debug.Log($"StartVocalsIsolationOfSongAsync '{songMeta.GetArtistDashTitle()}' startTime {startTime}");
-        while (!TimeUtils.IsDurationAboveThresholdInMillis(startTime, 4000))
-        {
-            await Awaitable.NextFrameAsync();
-        }
-        Debug.Log($"StartVocalsIsolationOfSongAsync '{songMeta.GetArtistDashTitle()}' endTime {TimeUtils.GetUnixTimeMilliseconds()}");
-        throw new Exception($"dummy exception StartVocalsIsolationOfSongAsync '{songMeta.GetArtistDashTitle()}'");
-
-        await audioSeparationManager.ProcessSongMetaInJobAsync(songMeta, true, parentJob);
-        return VoidEvent.instance;
     }
 
     private class SongListModSettingControl : IModSettingControl

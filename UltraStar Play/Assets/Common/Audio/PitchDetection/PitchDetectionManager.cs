@@ -33,37 +33,36 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
     private readonly Subject<PitchDetectionFinishedEvent> pitchDetectionFinishedEventStream = new();
     public Subject<PitchDetectionFinishedEvent> PitchDetectionFinishedEventStream => pitchDetectionFinishedEventStream;
 
-    public async Awaitable<BasicPitchDetectionResult> ProcessSongMetaInJobAsync(SongMeta songMeta, Job<BasicPitchDetectionResult> existingJob = null)
+    public Job<BasicPitchDetectionResult> ProcessSongMetaJob(SongMeta songMeta)
     {
-        Job<BasicPitchDetectionResult> job = existingJob;
-        if (job == null)
-        {
-            job = new Job<BasicPitchDetectionResult>(
-                Translation.Get(R.Messages.job_pitchDetectionWithName, "name", Path.GetFileName(songMeta.Audio)),
-                new CancellationTokenSource());
-            jobManager.AddJob(job);
-        }
-        job.SetAwaitable(() => ProcessSongMetaAsync(songMeta, job.Progress));
+        Job<BasicPitchDetectionResult> job = new Job<BasicPitchDetectionResult>(
+            Translation.Get(R.Messages.job_pitchDetectionWithName, "name", Path.GetFileName(songMeta.Audio)),
+            new CancellationTokenSource());
+        jobManager.AddJob(job);
 
-        try
+        job.SetAwaitable(async () =>
         {
-            return await job.GetResultAsync();
-        }
-        catch (Exception ex)
-        {
-            ex.Log($"Pitch Detection failed: song '{songMeta.GetArtistDashTitle()}'");
-            if (ex is JobAlreadyRunningException)
+            try
             {
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
+                return await ProcessSongMetaAsync(songMeta, job.Progress);
             }
-            else
+            catch (Exception ex)
             {
-                NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_pitchDetection_errorWithReason,
-                    "reason", ex.Message)));
-            }
+                ex.Log($"Pitch Detection failed: song '{songMeta.GetArtistDashTitle()}'");
+                if (ex is JobAlreadyRunningException)
+                {
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.job_error_alreadyInProgress));
+                }
+                else
+                {
+                    NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_pitchDetection_errorWithReason,
+                        "reason", ex.Message)));
+                }
 
-            throw ex;
-        }
+                throw ex;
+            }
+        });
+        return job;
     }
 
     private async Awaitable<BasicPitchDetectionResult> ProcessSongMetaAsync(

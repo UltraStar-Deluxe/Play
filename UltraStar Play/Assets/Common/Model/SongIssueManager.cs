@@ -120,11 +120,10 @@ public class SongIssueManager : AbstractSingletonBehaviour
 
     private async void ScanSongIssues()
     {
-        await ScanSongIssuesInJobAsync();
+        await ScanSongIssuesJob().GetResultAsync();
     }
 
-    private async Awaitable<SongIssueScanResult> ScanSongIssuesInJobAsync(
-        Job<SongIssueScanResult> existingJob = null)
+    private Job<SongIssueScanResult> ScanSongIssuesJob()
     {
         if (IsSongIssueScanStarted)
         {
@@ -135,14 +134,10 @@ public class SongIssueManager : AbstractSingletonBehaviour
         songIssueScanCancellationTokenSource = new();
 
         JobProgress jobProgress = new(songIssueScanCancellationTokenSource);
-        Job<SongIssueScanResult> job = existingJob;
-        if (job == null)
-        {
-            job = new Job<SongIssueScanResult>(Translation.Get(R.Messages.job_searchSongIssues), songIssueScanCancellationTokenSource);
-            JobManager.Instance.AddJob(job);
-        }
+        Job<SongIssueScanResult> job = new(Translation.Get(R.Messages.job_searchSongIssues), songIssueScanCancellationTokenSource);
+        JobManager.Instance.AddJob(job);
         job.SetAwaitable(() => ScanSongIssuesAsync(songIssueScanCancellationTokenSource.Token, jobProgress));
-        return await job.GetResultAsync();
+        return job;
     }
 
     private async Awaitable<SongIssueScanResult> ScanSongIssuesAsync(

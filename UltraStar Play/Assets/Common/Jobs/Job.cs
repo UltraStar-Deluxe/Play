@@ -15,7 +15,7 @@ public class Job<T> : IJob
     public Translation Name { get; }
     public JobProgress Progress { get; }
 
-    public bool AdoptChildJobError { get; set; }
+    public bool AdoptChildJobError { get; set; } = true;
 
     private CancellationTokenSource CancellationTokenSource => Progress?.CancellationTokenSource;
     private bool IsCancellationRequested => CancellationTokenSource != null && CancellationTokenSource.IsCancellationRequested;
@@ -172,7 +172,10 @@ public class Job<T> : IJob
         {
             foreach (IJob childJob in childJobs)
             {
-                await childJob.RunAsync();
+                if (childJob.Result.Value is EJobResult.Pending)
+                {
+                    await childJob.RunAsync();
+                }
                 CancellationTokenSource?.Token.ThrowIfCancellationRequested();
             }
         }
@@ -182,7 +185,10 @@ public class Job<T> : IJob
             {
                 try
                 {
-                    await childJob.RunAsync();
+                    if (childJob.Result.Value is EJobResult.Pending)
+                    {
+                        await childJob.RunAsync();
+                    }
                 }
                 catch (Exception ex)
                 {

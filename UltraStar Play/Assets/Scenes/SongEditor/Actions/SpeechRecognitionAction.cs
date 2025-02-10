@@ -57,18 +57,20 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         try
         {
-            SpeechRecognizer speechRecognizer = await SpeechRecognitionUtils.GetOrCreateSpeechRecognizerInJobAsync(speechRecognitionParameters);
+            SpeechRecognizer speechRecognizer = await SpeechRecognitionUtils.GetOrCreateSpeechRecognizerJob(speechRecognitionParameters)
+                .GetResultAsync();
 
             float[] monoAudioSamples =
                 AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, minBeat, lengthInBeats, true);
 
             await Awaitable.BackgroundThreadAsync();
-            SpeechRecognitionResult speechRecognitionResult = await SpeechRecognitionUtils.RecognizeSpeechInJobAsync(
+            SpeechRecognitionResult speechRecognitionResult = await SpeechRecognitionUtils.RecognizeSpeechJob(
                 monoAudioSamples,
                 0,
                 monoAudioSamples.Length - 1,
                 audioClip.frequency,
-                speechRecognizer);
+                speechRecognizer)
+                .GetResultAsync();
 
             await Awaitable.MainThreadAsync();
             SpeechRecognitionUtils.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words, selectedNotes, minBeat);
@@ -127,7 +129,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         try
         {
-            List<Note> createdNotes = await SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionAsync(
+            List<Note> createdNotes = await SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionJob(
                     monoAudioSamples,
                     startIndex,
                     endIndex,
@@ -137,7 +139,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                     songMeta,
                     offsetInBeats,
                     hyphenator,
-                    settings.SongEditorSettings.SpaceBetweenNotesInMillis);
+                    settings.SongEditorSettings.SpaceBetweenNotesInMillis)
+                .GetResultAsync();
 
             createdNotes.ForEach(createdNote =>
             {
@@ -226,7 +229,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             ? SettingsUtils.CreateHyphenator(settings)
             : null;
 
-        List<Note> createdNotes = await SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionAsync(
+        List<Note> createdNotes = await SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionJob(
                 monoAudioSamples,
                 0,
                 monoAudioSamples.Length - 1,
@@ -236,7 +239,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 songMeta,
                 startBeat,
                 hyphenator,
-                settings.SongEditorSettings.SpaceBetweenNotesInMillis);
+                settings.SongEditorSettings.SpaceBetweenNotesInMillis)
+            .GetResultAsync();
 
         createdNotes.ForEach(createdNote =>
         {
