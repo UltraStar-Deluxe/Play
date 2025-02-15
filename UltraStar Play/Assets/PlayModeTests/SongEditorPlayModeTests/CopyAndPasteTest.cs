@@ -15,6 +15,9 @@ public class CopyAndPasteTest : AbstractSongEditorActionTest
 {
     private float waitTimeInSeconds = 0.1f;
 
+    // Skip initialization because this test loads the SongEditor in a custom way
+    protected override string TestSceneName => "";
+
     private static readonly List<TestCaseData> testCases = new List<TestCaseData>()
     {
         new TestCaseData("SongEditorTestSongs/Copy-Note.txt", "SongEditorTestSongs/Copy-Note-Pasted.txt").Returns(null),

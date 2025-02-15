@@ -35,6 +35,11 @@ public class SettingsManager : AbstractSingletonBehaviour
     {
         get
         {
+            if (Instance != this)
+            {
+                throw new IllegalStateException("Settings can only be accessed from the singleton instance");
+            }
+
             if (settings == null)
             {
                 LoadSettings();
