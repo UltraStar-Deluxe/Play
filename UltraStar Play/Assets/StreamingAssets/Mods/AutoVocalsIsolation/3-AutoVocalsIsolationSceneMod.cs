@@ -31,7 +31,7 @@ public class AutoVocalsIsolationSceneMod : ISceneMod
             return;
         }
 
-        await audioSeparationManager.ProcessSongMetaInJobAsync(songMeta, true);
+        await audioSeparationManager.ProcessSongMetaJob(songMeta, true).RunAsync();
     }
 }
 
