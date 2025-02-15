@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class SongQueueRestControl : AbstractRestControl, INeedInjection
 {
-    public static SongQueueRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongQueueRestControl>();
+    public static SongQueueRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SongQueueRestControl>();
 
     [Inject]
     private ServerSideCompanionClientManager serverSideCompanionClientManager;

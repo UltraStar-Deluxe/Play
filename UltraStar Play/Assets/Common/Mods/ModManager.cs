@@ -13,7 +13,7 @@ using UnityEngine;
 
 public class ModManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static ModManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ModManager>();
+    public static ModManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ModManager>();
 
     public const string ModInfoFileName = "modinfo.yml";
     private const string ModsPersistentDataFolderName = "ModsPersistentData";

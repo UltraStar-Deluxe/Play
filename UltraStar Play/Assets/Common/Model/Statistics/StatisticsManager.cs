@@ -27,7 +27,7 @@ public class StatisticsManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public static StatisticsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StatisticsManager>();
+    public static StatisticsManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<StatisticsManager>();
 
     private float lastSaveTimeInMillis;
 

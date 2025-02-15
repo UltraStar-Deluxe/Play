@@ -22,7 +22,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private const string StaticBackgroundImageElementName = "staticBackgroundImage";
     private readonly Color defaultGoldenColor = Colors.CreateColor("#DACD4A");
 
-    public static ThemeManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ThemeManager>();
+    public static ThemeManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ThemeManager>();
 
     [InjectedInInspector]
     public Material backgroundMaterial;

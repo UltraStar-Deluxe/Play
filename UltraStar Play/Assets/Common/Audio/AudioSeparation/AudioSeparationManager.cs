@@ -12,7 +12,7 @@ using UnityEngine;
 
 public class AudioSeparationManager : MonoBehaviour, INeedInjection
 {
-    public static AudioSeparationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioSeparationManager>();
+    public static AudioSeparationManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<AudioSeparationManager>();
 
     private readonly SemaphoreSlim audioSeparationProcessSemaphore = new(1, 1);
 

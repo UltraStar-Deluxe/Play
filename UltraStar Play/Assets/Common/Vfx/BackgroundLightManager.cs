@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class BackgroundLightManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static BackgroundLightManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<BackgroundLightManager>();
+    public static BackgroundLightManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<BackgroundLightManager>();
 
     [InjectedInInspector]
     public RenderTexture backgroundLightRenderTexture;

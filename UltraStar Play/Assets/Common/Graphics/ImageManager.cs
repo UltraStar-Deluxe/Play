@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
  */
 public class ImageManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static ImageManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ImageManager>();
+    public static ImageManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ImageManager>();
 
     private readonly HashSet<ISpriteHolder> spriteHolders = new();
 

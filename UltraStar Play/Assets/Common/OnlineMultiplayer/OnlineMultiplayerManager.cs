@@ -10,7 +10,7 @@ namespace CommonOnlineMultiplayer
 {
     public class OnlineMultiplayerManager : AbstractSingletonBehaviour, INeedInjection, IInjectionFinishedListener
     {
-        public static OnlineMultiplayerManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<OnlineMultiplayerManager>();
+        public static OnlineMultiplayerManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<OnlineMultiplayerManager>();
 
         [Inject]
         private NetworkManager networkManager;

@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static BackgroundMusicManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<BackgroundMusicManager>();
+    public static BackgroundMusicManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<BackgroundMusicManager>();
 
     private static readonly int timeInSecondsBeforeRestartingBackgroundMusic = 20;
     private static readonly List<EScene> scenesWithoutBackgroundMusic = new()

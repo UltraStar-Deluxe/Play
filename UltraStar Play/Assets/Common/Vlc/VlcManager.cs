@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class VlcManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static VlcManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<VlcManager>();
+    public static VlcManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<VlcManager>();
 
     [Inject]
     private Settings settings;

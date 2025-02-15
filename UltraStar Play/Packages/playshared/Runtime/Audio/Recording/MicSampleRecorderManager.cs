@@ -11,7 +11,7 @@ using UnityEngine;
 
 public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static MicSampleRecorderManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MicSampleRecorderManager>();
+    public static MicSampleRecorderManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<MicSampleRecorderManager>();
 
     [Inject]
     private ISettings settings;

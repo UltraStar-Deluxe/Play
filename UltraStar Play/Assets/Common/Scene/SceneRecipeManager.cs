@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static SceneRecipeManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SceneRecipeManager>();
+    public static SceneRecipeManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SceneRecipeManager>();
 
     [InjectedInInspector]
     public GameObject inputManagerPrefab;

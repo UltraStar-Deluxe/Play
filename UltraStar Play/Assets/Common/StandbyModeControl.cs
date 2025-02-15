@@ -9,7 +9,7 @@ using UnityEngine.Video;
 
 public class StandbyModeControl : AbstractSingletonBehaviour, INeedInjection
 {
-    public static StandbyModeControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StandbyModeControl>();
+    public static StandbyModeControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<StandbyModeControl>();
 
     [Inject]
     private ApplicationManager applicationManager;

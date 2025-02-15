@@ -14,7 +14,7 @@ public class VolumeControl : AbstractSingletonBehaviour, INeedInjection
     }
     private static int volumeBeforeMute = -1;
 
-    public static VolumeControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<VolumeControl>();
+    public static VolumeControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<VolumeControl>();
 
     [Inject]
     private Settings settings;

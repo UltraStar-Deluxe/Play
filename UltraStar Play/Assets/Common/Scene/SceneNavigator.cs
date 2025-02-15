@@ -13,7 +13,7 @@ using Debug = UnityEngine.Debug;
 
 public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 {
-    public static SceneNavigator Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SceneNavigator>();
+    public static SceneNavigator Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SceneNavigator>();
 
     private readonly Dictionary<Type, SceneData> sceneDataTypeToSceneData = new();
     private readonly Dictionary<EScene, SceneData> sceneEnumToSceneData = new();

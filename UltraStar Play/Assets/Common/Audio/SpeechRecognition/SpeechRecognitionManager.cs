@@ -10,7 +10,7 @@ using Whisper;
 
 public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
 {
-    public static SpeechRecognitionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SpeechRecognitionManager>();
+    public static SpeechRecognitionManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SpeechRecognitionManager>();
 
     [InjectedInInspector]
     public WhisperManager whisperManagerPrefab;

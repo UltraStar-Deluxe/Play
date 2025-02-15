@@ -13,7 +13,7 @@ using UnityEngine;
 
 public class SongDetailsRestControl : AbstractRestControl, INeedInjection
 {
-    public static SongDetailsRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongDetailsRestControl>();
+    public static SongDetailsRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SongDetailsRestControl>();
 
     [Inject]
     private SongMetaManager songMetaManager;

@@ -13,7 +13,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
 {
     private readonly List<IJob> jobsWithoutParent = new();
 
-    public static JobManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<JobManager>();
+    public static JobManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<JobManager>();
 
     public bool AllJobsFinished => AllJobs
         .AllMatch(job => job.Status.Value is EJobStatus.Finished);

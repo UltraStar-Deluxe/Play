@@ -13,7 +13,7 @@ using UnityEngine.Networking;
  */
 public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static AudioManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioManager>();
+    public static AudioManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<AudioManager>();
 
     private const int CriticalCacheSize = 10;
     private readonly Dictionary<string, CachedAudioClip> audioClipCache = new();

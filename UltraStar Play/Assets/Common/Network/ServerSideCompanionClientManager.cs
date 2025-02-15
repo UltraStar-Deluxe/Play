@@ -15,7 +15,7 @@ using UnityEngine;
 
 public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INeedInjection, IServerSideCompanionClientManager, INetEventListener
 {
-    public static ServerSideCompanionClientManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ServerSideCompanionClientManager>();
+    public static ServerSideCompanionClientManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ServerSideCompanionClientManager>();
 
     public int CompanionClientCount => liteNetLibServer.ConnectedPeersCount;
 

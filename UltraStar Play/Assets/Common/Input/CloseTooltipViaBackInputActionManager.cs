@@ -5,7 +5,7 @@ using UniRx;
 
 public class CloseTooltipViaBackInputActionManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static CloseTooltipViaBackInputActionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<CloseTooltipViaBackInputActionManager>();
+    public static CloseTooltipViaBackInputActionManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<CloseTooltipViaBackInputActionManager>();
 
     protected override object GetInstance()
     {

@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 public class NotificationManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static NotificationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<NotificationManager>();
+    public static NotificationManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<NotificationManager>();
 
     private const float NotificationFadeOutDelayInSeconds = 4;
     private const float NotificationFadeOutDurationInSeconds = 1;

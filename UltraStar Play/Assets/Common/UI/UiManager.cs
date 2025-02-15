@@ -19,7 +19,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
         relativePlayerProfileImagePathToAbsolutePath = new();
     }
 
-    public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
+    public static UiManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<UiManager>();
 
     private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
 

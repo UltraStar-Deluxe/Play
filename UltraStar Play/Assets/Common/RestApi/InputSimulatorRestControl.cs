@@ -12,7 +12,7 @@ using UnityEngine.InputSystem.LowLevel;
 
 public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
 {
-    public static InputSimulatorRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<InputSimulatorRestControl>();
+    public static InputSimulatorRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<InputSimulatorRestControl>();
 
     private Keyboard virtualKeyboard;
     private Mouse virtualMouse;

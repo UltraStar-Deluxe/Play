@@ -12,7 +12,7 @@ namespace SteamOnlineMultiplayer
 {
     public class SteamLobbyManager : AbstractSingletonBehaviour, INeedInjection, ILobbyManager
     {
-        public static SteamLobbyManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamLobbyManager>();
+        public static SteamLobbyManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SteamLobbyManager>();
 
         public const string EmptyPassword = "EMPTY_PASSWORD";
 

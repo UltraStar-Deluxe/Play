@@ -10,7 +10,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         SettingsLoaderSaver = null;
     }
 
-    public static SettingsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SettingsManager>();
+    public static SettingsManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SettingsManager>();
 
     public static ISettingsLoaderSaver settingsLoaderSaver;
     public static ISettingsLoaderSaver SettingsLoaderSaver

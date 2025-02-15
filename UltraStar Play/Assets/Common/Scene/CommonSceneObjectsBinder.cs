@@ -68,7 +68,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(SteamLobbyManager.Instance);
         bb.BindExistingInstance(SteamLobbyMemberManager.Instance);
         bb.BindExistingInstance(SteamOnlineMultiplayerBackendConfigurator.Instance);
-        bb.BindExistingInstance(DontDestroyOnLoadManager.Instance.FindComponentOrThrow<FacepunchTransport>());
+        bb.BindExistingInstance(DontDestroyOnLoadManager.FindComponentOrThrow<FacepunchTransport>());
 
         bb.BindExistingInstance(NetworkManager.Singleton);
 

@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static PlaylistManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PlaylistManager>();
+    public static PlaylistManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<PlaylistManager>();
 
     private List<IPlaylist> playlists = new();
 

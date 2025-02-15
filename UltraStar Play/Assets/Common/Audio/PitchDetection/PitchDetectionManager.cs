@@ -14,7 +14,7 @@ using UnityEngine;
 
 public class PitchDetectionManager : MonoBehaviour, INeedInjection
 {
-    public static PitchDetectionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PitchDetectionManager>();
+    public static PitchDetectionManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<PitchDetectionManager>();
 
     private readonly SemaphoreSlim pitchDetectionProcessSemaphore = new(1, 1);
 

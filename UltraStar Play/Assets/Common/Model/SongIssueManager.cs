@@ -14,7 +14,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
     private ConcurrentBag<SongIssue> allSongIssues = new();
     public bool HasSongIssues => allSongIssues.Count > 0;
 
-    public static SongIssueManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongIssueManager>();
+    public static SongIssueManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SongIssueManager>();
 
     private CancellationTokenSource songIssueScanCancellationTokenSource;
     public bool IsSongIssueScanStarted => songIssueScanCancellationTokenSource != null;

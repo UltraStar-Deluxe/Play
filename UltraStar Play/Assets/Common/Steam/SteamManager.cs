@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static SteamManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamManager>();
+    public static SteamManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SteamManager>();
 
     public bool IsConnectedToSteam { get; private set; }
     public SteamId PlayerSteamId { get; private set; }

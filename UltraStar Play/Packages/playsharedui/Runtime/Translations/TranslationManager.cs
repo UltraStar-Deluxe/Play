@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
  */
 public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
-    public static TranslationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<TranslationManager>();
+    public static TranslationManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<TranslationManager>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()

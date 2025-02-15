@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class WebViewScriptFileSystemWatcher : AbstractSingletonBehaviour, INeedInjection
 {
-    public WebViewScriptFileSystemWatcher Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<WebViewScriptFileSystemWatcher>();
+    public WebViewScriptFileSystemWatcher Instance => DontDestroyOnLoadManager.FindComponentOrThrow<WebViewScriptFileSystemWatcher>();
 
     [Inject]
     private WebViewManager webViewManager;

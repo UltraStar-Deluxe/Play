@@ -11,7 +11,7 @@ namespace CommonOnlineMultiplayer
 {
     public class NetcodeLobbyMemberManager : AbstractSingletonBehaviour, INeedInjection, ILobbyMemberManager
     {
-        public static NetcodeLobbyMemberManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<NetcodeLobbyMemberManager>();
+        public static NetcodeLobbyMemberManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<NetcodeLobbyMemberManager>();
 
         private const int MaxConnectionDataLength = 2048;
 

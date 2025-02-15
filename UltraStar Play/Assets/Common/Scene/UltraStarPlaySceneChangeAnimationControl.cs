@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour, INeedInjection
 {
-    public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
+    public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
 
     private const string UiCopyRenderTextureName = "SceneChangeAnimationControl.UiCopyRenderTexture";
 

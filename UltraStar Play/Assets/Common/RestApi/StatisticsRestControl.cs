@@ -6,7 +6,7 @@ using UniInject;
 
 public class StatisticsRestControl : AbstractRestControl, INeedInjection
 {
-    public static StatisticsRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StatisticsRestControl>();
+    public static StatisticsRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<StatisticsRestControl>();
 
     [Inject]
     private Statistics statistics;

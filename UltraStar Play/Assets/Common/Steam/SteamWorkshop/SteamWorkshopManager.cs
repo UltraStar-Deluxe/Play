@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, IInjectionFinishedListener
 {
-    public static SteamWorkshopManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamWorkshopManager>();
+    public static SteamWorkshopManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SteamWorkshopManager>();
 
     private readonly UseSteamWorkshopItemsControl useSteamWorkshopItemsControl = new();
     private readonly Subject<VoidEvent> finishDownloadWorkshopItemsEventStream = new();

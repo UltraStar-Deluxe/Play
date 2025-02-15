@@ -11,7 +11,7 @@ using UnityEngine;
 
 public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static ApplicationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ApplicationManager>();
+    public static ApplicationManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ApplicationManager>();
 
     public List<string> simulatedCommandLineArguments = new();
 

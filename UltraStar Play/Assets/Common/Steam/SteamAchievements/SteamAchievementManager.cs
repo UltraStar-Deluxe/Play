@@ -11,7 +11,7 @@ using UnityEngine;
 
 public class SteamAchievementManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static SteamAchievementManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamAchievementManager>();
+    public static SteamAchievementManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SteamAchievementManager>();
 
     [Inject]
     private AchievementEventStream achievementEventStream;

@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 {
-    public static GlobalInputControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<GlobalInputControl>();
+    public static GlobalInputControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<GlobalInputControl>();
 
     [Inject]
     private Settings settings;

@@ -8,7 +8,7 @@ using Vuplex.WebView;
 
 public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static WebViewManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<WebViewManager>();
+    public static WebViewManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<WebViewManager>();
 
     private static bool isWebConfigInitialized;
 

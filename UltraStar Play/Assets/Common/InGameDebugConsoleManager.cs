@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class InGameDebugConsoleManager : AbstractInGameDebugConsoleManager, INeedInjection
 {
-    public static InGameDebugConsoleManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<InGameDebugConsoleManager>();
+    public static InGameDebugConsoleManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<InGameDebugConsoleManager>();
 
     [Inject]
     private SceneNavigator sceneNavigator;

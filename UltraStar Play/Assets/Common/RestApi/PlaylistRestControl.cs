@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class PlaylistRestControl : AbstractRestControl, INeedInjection
 {
-    public static PlaylistRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PlaylistRestControl>();
+    public static PlaylistRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<PlaylistRestControl>();
 
     [Inject]
     private SongMetaManager songMetaManager;

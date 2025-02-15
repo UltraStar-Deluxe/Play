@@ -8,7 +8,7 @@ using Cursor = UnityEngine.Cursor;
 
 public class CursorManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static CursorManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<CursorManager>();
+    public static CursorManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<CursorManager>();
 
     private static readonly int cursorWidth = 32;
     private static readonly int cursorHeight = 32;
