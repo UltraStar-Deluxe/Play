@@ -115,7 +115,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private float popupMenuClosedTimeInSeconds;
 
     private readonly Subject<VoidEvent> clickEventStream = new();
-    public IObservable<VoidEvent> ClickEventStream => clickEventStream;
+    public IObservable<VoidEvent> ClickEventStream => clickEventStream
+        // Prevent accidental double click
+        .ThrottleFirst(TimeSpan.FromMilliseconds(300));
 
     private bool isInitialized;
 
