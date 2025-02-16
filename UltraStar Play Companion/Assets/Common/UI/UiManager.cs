@@ -8,7 +8,7 @@ using IBinding = UniInject.IBinding;
 
 public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 {
-    public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
+    public static UiManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<UiManager>();
 
     [InjectedInInspector]
     public VisualTreeAsset messageDialogUi;

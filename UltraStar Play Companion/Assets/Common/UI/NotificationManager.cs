@@ -8,7 +8,7 @@ public class NotificationManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static NotificationManager Instance
     {
-        get => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<NotificationManager>();
+        get => DontDestroyOnLoadManager.FindComponentOrThrow<NotificationManager>();
     }
 
     private const float NotificationFadeOutDelayInSeconds = 4;

@@ -12,7 +12,7 @@ using UnityEngine;
 
 public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INeedInjection, INetEventListener
 {
-    public static ClientSideCompanionClientManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ClientSideCompanionClientManager>();
+    public static ClientSideCompanionClientManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ClientSideCompanionClientManager>();
 
     [Inject]
     private Settings settings;

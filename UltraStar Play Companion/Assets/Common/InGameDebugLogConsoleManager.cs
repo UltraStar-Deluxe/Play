@@ -5,7 +5,7 @@ using UniInject;
 
 public class InGameDebugConsoleManager : AbstractInGameDebugConsoleManager, INeedInjection
 {
-    public static InGameDebugConsoleManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<InGameDebugConsoleManager>();
+    public static InGameDebugConsoleManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<InGameDebugConsoleManager>();
 
     protected override object GetInstance()
     {
