@@ -138,6 +138,12 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         UpdateMouseDragSimulation();
     }
 
+    protected override void OnDestroySingleton()
+    {
+        InputSystem.RemoveDevice(virtualKeyboard);
+        InputSystem.RemoveDevice(virtualMouse);
+    }
+
     private void UpdateMouseDragSimulation()
     {
         // TODO: Simulating drag does not seem to work.
