@@ -63,8 +63,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     [Inject(UxmlName = R.UxmlNames.audioWaveForm)]
     private VisualElement audioWaveForm;
 
+    [Inject(UxmlName = R.UxmlNames.connectionTroubleshootingAlert)]
+    private VisualElement connectionTroubleshootingAlert;
+
     [Inject(UxmlName = R.UxmlNames.connectionThroubleshootingText)]
     private Label connectionThroubleshootingText;
+
+    [Inject(UxmlName = R.UxmlNames.serverErrorAlert)]
+    private VisualElement serverErrorAlert;
 
     [Inject(UxmlName = R.UxmlNames.serverErrorResponseText)]
     private Label serverErrorResponseText;
@@ -197,7 +203,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         onlyVisibleWhenConnected.ForEach(it => it.HideByDisplay());
         onlyVisibleWhenNotConnected.ForEach(it => it.ShowByDisplay());
         connectionThroubleshootingText.HideByDisplay();
+        connectionTroubleshootingAlert.HideByDisplay();
         serverErrorResponseText.HideByDisplay();
+        serverErrorAlert.HideByDisplay();
 
         toggleRecordingButton.RegisterCallbackButtonTriggered(_ => ToggleRecording());
 
@@ -511,12 +519,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     {
         connectionThroubleshootingText.text = text;
         connectionThroubleshootingText.SetVisibleByDisplay(!text.IsNullOrEmpty());
+        connectionTroubleshootingAlert.SetVisibleByDisplay(!text.IsNullOrEmpty());
     }
 
     private void SetErrorResponseTextAndVisibility(string text)
     {
         serverErrorResponseText.text = text;
         serverErrorResponseText.SetVisibleByDisplay(!text.IsNullOrEmpty());
+        serverErrorAlert.SetVisibleByDisplay(!text.IsNullOrEmpty());
     }
 
     private void ToggleRecording()
