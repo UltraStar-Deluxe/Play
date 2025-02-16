@@ -80,7 +80,6 @@ public class SongSelectPlaylistTest : AbstractPlayModeTest
                 new WaitForConditionConfig { description = "entry added to playlist" });
 
             // When: Select playlist
-            await ClickButtonAsync(R.UxmlNames.searchPropertyButton);
             await SetElementValueAsync(R.UxmlNames.playlistDropdownField, TestPlaylistName);
 
             // Then: Playlist selected and songs filtered by playlist

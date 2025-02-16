@@ -162,7 +162,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
         InitSongMenu();
 
-        playlistManager.PlaylistChangeEventStream
+        playlistManager.PlaylistChangedEventStream
             .Subscribe(evt => UpdateIcons());
 
         settings.ObserveEveryValueChanged(it => it.Difficulty)

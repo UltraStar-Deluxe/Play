@@ -358,7 +358,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                 }
             });
 
-        playlistManager.PlaylistChangeEventStream.Subscribe(playlistChangeEvent =>
+        playlistManager.PlaylistChangedEventStream.Subscribe(playlistChangeEvent =>
         {
             if (playlistChangeEvent.Playlist == SongSelectionPlaylistChooserControl.Selection.Value)
             {

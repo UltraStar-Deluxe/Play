@@ -149,7 +149,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         filterActiveIcon.HideByDisplay();
         nonPersistentSettings.PlaylistName
             .Subscribe(_ => UpdateAnyFiltersActive());
-        playlistManager.PlaylistChangeEventStream
+        playlistManager.PlaylistChangedEventStream
             .Subscribe(_ => UpdateAnyFiltersActive());
         songSelectFilterControl.FiltersChangedEventStream
             .Subscribe(_ => UpdateAnyFiltersActive());
