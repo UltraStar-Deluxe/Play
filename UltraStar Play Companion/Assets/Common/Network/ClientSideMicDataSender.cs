@@ -219,6 +219,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         newMicProfile.DelayInMillis = micProfileMessageDto.DelayInMillis;
         newMicProfile.Color = Colors.CreateColor(micProfileMessageDto.HexColor);
 
+        MicProfile = newMicProfile;
         companionAppSettings.MicProfile = newMicProfile;
         micProfileChangedEventStream.OnNext(newMicProfile);
     }
