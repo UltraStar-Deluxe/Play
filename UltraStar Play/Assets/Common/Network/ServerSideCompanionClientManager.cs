@@ -178,15 +178,23 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
         peer.Send(connectResponseDto, DeliveryMethod.ReliableOrdered);
 
         // Send MicProfile
+        MicProfile micProfileOfClient = GetOrCreateMicProfile(connectRequestDto);
+        Debug.Log($"Sending MicProfile to {peer.EndPoint}");
+        peer.Send(new MicProfileMessageDto(micProfileOfClient), DeliveryMethod.ReliableOrdered);
+    }
+
+    private MicProfile GetOrCreateMicProfile(ConnectRequestDto connectRequestDto)
+    {
         MicProfile micProfileOfClient = settings.MicProfiles
             .FirstOrDefault(micProfile => micProfile.ConnectedClientId == connectRequestDto.ClientId);
         if (micProfileOfClient == null)
         {
-            micProfileOfClient = new MicProfile();
+            micProfileOfClient = new MicProfile(connectRequestDto.ClientName, 0, connectRequestDto.ClientId);
+            micProfileOfClient.Color = ColorGenerationUtils.FromString(Guid.NewGuid().ToString());
+            settings.MicProfiles.Add(micProfileOfClient);
         }
 
-        Debug.Log($"Sending MicProfile to {peer.EndPoint}");
-        peer.Send(new MicProfileMessageDto(micProfileOfClient), DeliveryMethod.ReliableOrdered);
+        return micProfileOfClient;
     }
 
     public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)

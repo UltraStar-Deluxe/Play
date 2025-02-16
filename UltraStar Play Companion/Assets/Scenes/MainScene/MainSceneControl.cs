@@ -246,7 +246,19 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     private void Start()
     {
         settings.ObserveEveryValueChanged(it => it.MicProfile)
-            .Subscribe(_ => OnMicProfileChanged());
+            .Subscribe(_ => UpdateRecordingDeviceInfo());
+
+        clientSideMicDataSender.MicProfileChangedEventStream
+            .Subscribe(newMicProfile =>
+            {
+                if (newMicProfile == null)
+                {
+                    return;
+                }
+
+                settings.MicProfile = newMicProfile;
+                UpdateRecordingDeviceInfo();
+            });
     }
 
     private void UpdateDevModeControlsVisibility()
@@ -429,23 +441,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             // Reconnect to let the main know about the new clientName.
             clientSideCompanionClientManager.DisconnectFromServer();
         }
-    }
-
-    private void OnMicProfileChanged()
-    {
-        // Update MicProfile of sample recorder.
-        int newFinalSampleRate = MicSampleRecorder.GetFinalSampleRate(settings.MicProfile.Name, settings.MicProfile.SampleRate);
-        if (clientSideMicDataSender.MicProfile == null
-            || settings.MicProfile.Name != clientSideMicDataSender.MicProfile.Name
-            || newFinalSampleRate != clientSideMicDataSender.FinalSampleRate.Value
-            || settings.MicProfile.DelayInMillis != clientSideMicDataSender.MicProfile.DelayInMillis
-            || settings.MicProfile.Amplification != clientSideMicDataSender.MicProfile.Amplification
-            || settings.MicProfile.NoiseSuppression != clientSideMicDataSender.MicProfile.NoiseSuppression)
-        {
-            clientSideMicDataSender.MicProfile = settings.MicProfile;
-        }
-
-        UpdateRecordingDeviceInfo();
     }
 
     private void UpdateRecordingDeviceInfo()
