@@ -307,8 +307,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
         }
         catch (Exception ex)
         {
-            Debug.LogException(ex);
-            Debug.LogError("Failed to read additional info from disconnect message");
+            ex.Log("Failed to read additional info from disconnect message");
             disconnectInfoAdditionalData = "";
         }
         Debug.Log($"Disconnected: reason: {disconnectInfo.Reason}, additional info: {disconnectInfoAdditionalData}, socket error code: {disconnectInfo.SocketErrorCode}");

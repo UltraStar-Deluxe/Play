@@ -236,9 +236,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
                 "main scene audio wave form visualization");
         });
 
-        mouseSensitivityFloatField.value = settings.MousePadSensitivity;
-        mouseSensitivityFloatField.RegisterValueChangedCallback(evt => settings.MousePadSensitivity = evt.newValue);
-
         // Only show some controls when dev mode is enabled.
         UpdateDevModeControlsVisibility();
         settings.ObserveEveryValueChanged(it => it.IsDevModeEnabled)
@@ -344,6 +341,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         FieldBindingUtils.Bind(micDataDeliveryMethodField,
             () => settings.MicDataDeliveryMethod,
             newValue => settings.MicDataDeliveryMethod = (DeliveryMethod)newValue);
+
+        // Mouse sensitivity
+        FieldBindingUtils.Bind(mouseSensitivityFloatField,
+            () => settings.MousePadSensitivity,
+            newValue => settings.MousePadSensitivity = newValue);
 
         // Show/hide menu overlay
         HideMenu();
