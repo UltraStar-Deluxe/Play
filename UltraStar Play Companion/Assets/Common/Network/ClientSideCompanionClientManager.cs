@@ -136,7 +136,8 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     private void StartLiteNetLibClient()
     {
-        if (liteNetLibClient.IsRunning)
+        if (liteNetLibClient == null
+            || liteNetLibClient.IsRunning)
         {
             return;
         }
@@ -148,7 +149,8 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     private void StopLiteNetLibClient()
     {
-        if (!liteNetLibClient.IsRunning)
+        if (liteNetLibClient == null
+            || !liteNetLibClient.IsRunning)
         {
             return;
         }
