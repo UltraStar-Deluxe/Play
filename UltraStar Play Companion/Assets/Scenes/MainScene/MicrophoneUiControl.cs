@@ -5,6 +5,9 @@ using UnityEngine.UIElements;
 
 public class MicrophoneUiControl : INeedInjection, IInjectionFinishedListener
 {
+    private const int AudioWaveFormTextureWidth = 256;
+    private const int AudioWaveFormTextureHeight = 128;
+
     [Inject]
     private Settings settings;
 
@@ -16,6 +19,9 @@ public class MicrophoneUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private GameObject gameObject;
+
+    [Inject(UxmlName = R.UxmlNames.toggleRecordingButtonContainer)]
+    private VisualElement toggleRecordingButtonContainer;
 
     [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
@@ -47,6 +53,12 @@ public class MicrophoneUiControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.recordingDeviceColorIndicator)]
     private VisualElement recordingDeviceColorIndicator;
 
+    [Inject(UxmlName = R.UxmlNames.noMicrophoneAlert)]
+    private VisualElement noMicrophoneAlert;
+
+    [Inject(UxmlName = R.UxmlNames.noMicrophoneText)]
+    private Label noMicrophoneText;
+
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
     public void OnInjectionFinished()
@@ -73,13 +85,11 @@ public class MicrophoneUiControl : INeedInjection, IInjectionFinishedListener
 
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
-            int textureWidth = 256;
-            int textureHeight = 128;
             audioWaveFormVisualization = new AudioWaveFormVisualization(
                 gameObject,
                 audioWaveForm,
-                textureWidth,
-                textureHeight,
+                AudioWaveFormTextureWidth,
+                AudioWaveFormTextureHeight,
                 "main scene audio wave form visualization");
         });
 
@@ -98,7 +108,16 @@ public class MicrophoneUiControl : INeedInjection, IInjectionFinishedListener
                 UpdateRecordingDeviceInfo();
             });
 
+        UpdateNoMicrophoneAlert();
+
         UpdateTranslation();
+    }
+
+    private void UpdateNoMicrophoneAlert()
+    {
+        bool hasMicrophone = Microphone.devices.Length > 0;
+        toggleRecordingButtonContainer.SetVisibleByDisplay(hasMicrophone);
+        noMicrophoneAlert.SetVisibleByDisplay(!hasMicrophone);
     }
 
     public void Update()
@@ -108,6 +127,12 @@ public class MicrophoneUiControl : INeedInjection, IInjectionFinishedListener
             && audioWaveFormVisualization != null)
         {
             audioWaveFormVisualization.DrawAudioWaveForm(clientSideMicDataSender.MicSamples);
+        }
+
+        if ((IMicrophoneAdapter.Instance.Devices.Length > 0 && !toggleRecordingButtonContainer.IsVisibleByDisplay())
+            || (IMicrophoneAdapter.Instance.Devices.Length <= 0 && toggleRecordingButtonContainer.IsVisibleByDisplay()))
+        {
+            UpdateNoMicrophoneAlert();
         }
     }
 
