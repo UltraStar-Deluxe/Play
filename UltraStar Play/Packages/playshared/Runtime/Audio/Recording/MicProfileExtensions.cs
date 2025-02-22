@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using PortAudioForUnity;
 
 public static class MicProfileExtensions
 {
