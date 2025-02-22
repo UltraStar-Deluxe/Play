@@ -9,30 +9,25 @@ public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
     [InjectedInInspector]
     public AudioSource audioSource;
 
-    public override IObservable<AudioLoadedEvent> LoadAsObservable(string audioUri, bool streamAudio, double startPositionInMillis)
+    public override async Awaitable<AudioLoadedEvent> LoadAsync(string audioUri, bool streamAudio, double startPositionInMillis)
     {
-        return AudioManager.LoadAudioClipFromUri(audioUri, streamAudio)
-            .Select(loadedAudioClip =>
-            {
-                if (this == null)
-                {
-                    string errorMessage = $"Failed to load audio clip '{audioUri}': {nameof(AudioSourceAudioSupportProvider)} has been destroyed already.";
-                    Debug.LogError(errorMessage);
-                    throw new AudioSupportProviderException(errorMessage);
-                }
+        AudioClip loadedAudioClip = await AudioManager.LoadAudioClipFromUriAsync(audioUri, streamAudio);
+        if (!this)
+        {
+            throw new DestroyedAlreadyException($"Failed to load audio clip '{audioUri}': {nameof(AudioSourceAudioSupportProvider)} has been destroyed already.");
+        }
 
-                if (loadedAudioClip == null)
-                {
-                    audioSource.Stop();
-                    string errorMessage = $"Failed to load audio clip from {audioUri}";
-                    Debug.LogError(errorMessage);
-                    throw new AudioSupportProviderException(errorMessage);
-                }
+        if (loadedAudioClip == null)
+        {
+            audioSource.Stop();
+            string errorMessage = $"Failed to load audio clip from {audioUri}";
+            Debug.LogError(errorMessage);
+            throw new AudioSupportProviderException(errorMessage);
+        }
 
-                audioSource.clip = loadedAudioClip;
-                PositionInMillis = startPositionInMillis;
-                return new AudioLoadedEvent(audioUri);
-            });
+        audioSource.clip = loadedAudioClip;
+        PositionInMillis = startPositionInMillis;
+        return new AudioLoadedEvent(audioUri);
     }
 
     public override bool IsSupported(string audioUri)

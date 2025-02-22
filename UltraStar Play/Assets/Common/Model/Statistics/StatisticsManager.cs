@@ -12,6 +12,8 @@ public class StatisticsManager : AbstractSingletonBehaviour, INeedInjection
         StatisticsLoaderSaver = null;
     }
 
+    public static StatisticsManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<StatisticsManager>();
+
     public static IStatisticsLoaderSaver StatisticsLoaderSaver { get; set; }
 
     private Statistics statistics;
@@ -19,6 +21,11 @@ public class StatisticsManager : AbstractSingletonBehaviour, INeedInjection
     {
         get
         {
+            if (Instance != this)
+            {
+                throw new IllegalStateException("Statistics can only be accessed from the singleton instance");
+            }
+
             if (statistics == null)
             {
                 LoadStatistics();
@@ -26,8 +33,6 @@ public class StatisticsManager : AbstractSingletonBehaviour, INeedInjection
             return statistics;
         }
     }
-
-    public static StatisticsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StatisticsManager>();
 
     private float lastSaveTimeInMillis;
 

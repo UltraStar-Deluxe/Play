@@ -4,6 +4,7 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
@@ -29,6 +30,9 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
     private UIDocument uiDocument;
 
     [Inject]
+    private SongQueueManager songQueueManager;
+
+    [Inject]
     private JukeboxAndSingModSettings modSettings;
 
     private List<VisualElement> singingUiElements = new List<VisualElement>();
@@ -45,6 +49,7 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
         Debug.Log($"{nameof(JukeboxAndSingControl)} - OnInjectionFinished");
 
         isInjectionFinished = true;
+
         singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.playerUiContainer).ToList());
         singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.playerInfoContainer).ToList());
         if (modSettings.HideLyrics)
@@ -52,12 +57,14 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.bottomLyricsContainer).ToList());
             singingUiElements.AddRange(uiDocument.rootVisualElement.Query(R.UxmlNames.topLyricsContainer).ToList());
         }
+        
+        DisableVfxCamera();
 
         CreateModInfoLabel();
 
         // Hide SingingUIElement initially. Show them after fade-out animation has finished
         singingUiElements.ForEach(elem => elem.HideByVisibility());
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(FadeTimeInSeconds, () => singingUiElements.ForEach(elem => elem.ShowByVisibility())));
+        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(FadeTimeInSeconds, () => singingUiElements.ForEach(elem => elem.ShowByVisibility()));
         FadeOutSingingUiElements();
 
         // Show UI when any new notes have been recorded
@@ -89,8 +96,42 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             return;
         }
 
+        UpdateSkipSong();
         UpdateUiElementsFadeOut();
         UpdateFinishingScene();
+    }
+
+    private void UpdateSkipSong()
+    {
+        // Skip song with button
+        if (InputUtils.IsKeyboardShiftPressed()
+            && Keyboard.current != null 
+            && (Keyboard.current.sKey.wasReleasedThisFrame
+                || Keyboard.current.rightArrowKey.wasReleasedThisFrame))
+        {
+            StartNextSong();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        EnableVfxCamera();
+    }
+
+    private void DisableVfxCamera()
+    {
+        foreach (Transform vfxCamera in Camera.main.transform)
+        {
+            vfxCamera.GetComponent<Camera>().enabled = false;
+        }
+    }
+
+    private void EnableVfxCamera()
+    {
+        foreach (Transform vfxCamera in Camera.main.transform)
+        {
+            vfxCamera.GetComponent<Camera>().enabled = true;
+        }
     }
 
     private void UpdateUiElementsFadeOut()
@@ -124,7 +165,7 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             Debug.Log($"{nameof(JukeboxAndSingControl)} - End of song detected. Starting next song soon.");
             isFinishing = true;
             float timeBeforeEndInSeconds = timeBeforeEndInMillis / 1000f;
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(timeBeforeEndInSeconds, StartNextSong));
+            AwaitableUtils.ExecuteAfterDelayInSecondsAsync(timeBeforeEndInSeconds, StartNextSong);
             return;
         }
     }
@@ -175,6 +216,22 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
     }
 
     private SongMeta GetNextSongMeta()
+    {
+        SongMeta nextSongQueueSongMeta = GetNextSongQueueSongMeta();
+        if (nextSongQueueSongMeta != null) {
+            return nextSongQueueSongMeta;
+        }
+
+        return GetNextRandomSongMeta();
+    }
+
+    private SongMeta GetNextSongQueueSongMeta()
+    {
+        SingSceneData singSceneData = songQueueManager.CreateNextSingSceneData(singSceneControl.PartyModeSceneData);
+        return singSceneData?.SongMetas?.FirstOrDefault();
+    }
+
+    private SongMeta GetNextRandomSongMeta()
     {
         List<SongMeta> unseenSongMetas = songMetaManager.GetSongMetas()
             .Except(seenSongMetas)

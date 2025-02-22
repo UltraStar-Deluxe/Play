@@ -6,7 +6,7 @@ using UniInject;
 
 public class FolderPreviewImageManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static FolderPreviewImageManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<FolderPreviewImageManager>();
+    public static FolderPreviewImageManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<FolderPreviewImageManager>();
 
     private readonly Dictionary<string, string> folderPathToPreviewImageUri = new();
 

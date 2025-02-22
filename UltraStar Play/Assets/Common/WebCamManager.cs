@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class WebCamManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static WebCamManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<WebCamManager>();
+    public static WebCamManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<WebCamManager>();
 
     [Inject]
     private Settings settings;

@@ -12,7 +12,7 @@
 
     public static string GetAbsoluteFilePath(ThemeMeta themeMeta, string path)
     {
-        return PathUtils.GetAbsoluteFilePath(themeMeta.AbsoluteFilePath, path);
+        return PathUtils.GetAbsoluteFilePath(themeMeta.AbsoluteFolderPath, path);
     }
 
     public static bool HasStaticBackground(ThemeMeta themeMeta, Settings settings, EScene scene)

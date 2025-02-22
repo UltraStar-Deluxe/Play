@@ -12,7 +12,7 @@ using UnityEngine;
 
 public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INeedInjection, INetEventListener
 {
-    public static ClientSideCompanionClientManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ClientSideCompanionClientManager>();
+    public static ClientSideCompanionClientManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ClientSideCompanionClientManager>();
 
     [Inject]
     private Settings settings;
@@ -136,7 +136,8 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     private void StartLiteNetLibClient()
     {
-        if (liteNetLibClient.IsRunning)
+        if (liteNetLibClient == null
+            || liteNetLibClient.IsRunning)
         {
             return;
         }
@@ -148,7 +149,8 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     private void StopLiteNetLibClient()
     {
-        if (!liteNetLibClient.IsRunning)
+        if (liteNetLibClient == null
+            || !liteNetLibClient.IsRunning)
         {
             return;
         }
@@ -307,8 +309,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
         }
         catch (Exception ex)
         {
-            Debug.LogException(ex);
-            Debug.LogError("Failed to read additional info from disconnect message");
+            ex.Log("Failed to read additional info from disconnect message");
             disconnectInfoAdditionalData = "";
         }
         Debug.Log($"Disconnected: reason: {disconnectInfo.Reason}, additional info: {disconnectInfoAdditionalData}, socket error code: {disconnectInfo.SocketErrorCode}");

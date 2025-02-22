@@ -7,7 +7,7 @@ using UniRx;
 
 public class SceneModManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static SceneModManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SceneModManager>();
+    public static SceneModManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SceneModManager>();
 
     [Inject]
     private SceneNavigator sceneNavigator;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInjection
 {
-    public static ApplicationStutterMonitor Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ApplicationStutterMonitor>();
+    public static ApplicationStutterMonitor Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ApplicationStutterMonitor>();
     
     private const float ThresholdInMillis = 100;
     private const float ThresholdInSeconds = ThresholdInMillis / 1000f;

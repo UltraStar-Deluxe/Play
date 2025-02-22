@@ -34,6 +34,9 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
 
     private IDisposable receivedMessageStreamDisposable;
 
+    private readonly Subject<MicProfile> micProfileChangedEventStream = new();
+    public IObservable<MicProfile> MicProfileChangedEventStream => micProfileChangedEventStream;
+
     private void Start()
     {
         ResetPositionInSong();
@@ -192,7 +195,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
             return null;
         }
 
-        PitchEvent pitchEvent = AbstractMicPitchTracker.AnalyzeBeat(
+        PitchEvent pitchEvent = AnalyzeBeat(
             songMeta,
             beat,
             positionInSongInMillis,
@@ -216,7 +219,9 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         newMicProfile.DelayInMillis = micProfileMessageDto.DelayInMillis;
         newMicProfile.Color = Colors.CreateColor(micProfileMessageDto.HexColor);
 
+        MicProfile = newMicProfile;
         companionAppSettings.MicProfile = newMicProfile;
+        micProfileChangedEventStream.OnNext(newMicProfile);
     }
 
     private void HandlePositionInSongMessage(PositionInSongDto positionInSongDto)

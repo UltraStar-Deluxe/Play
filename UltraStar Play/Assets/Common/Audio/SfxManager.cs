@@ -9,7 +9,7 @@ public class SfxManager : AbstractSingletonBehaviour, INeedInjection
     private const string SfxAudioMixerName = "Sfx";
     private const string VolumeParameterName = "Volume";
 
-    public static SfxManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SfxManager>();
+    public static SfxManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SfxManager>();
 
     private readonly Dictionary<AudioClip, int> audioClipToLastPlayedFrameCount = new();
 

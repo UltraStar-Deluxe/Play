@@ -7,7 +7,7 @@ using UniRx;
 
 public class ContextMenuModManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static ContextMenuModManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ContextMenuModManager>();
+    public static ContextMenuModManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ContextMenuModManager>();
 
     protected override object GetInstance()
     {

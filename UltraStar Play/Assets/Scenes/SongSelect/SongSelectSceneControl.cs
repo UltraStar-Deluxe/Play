@@ -221,7 +221,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private readonly SongSearchControl songSearchControl = new();
 
-    public ReactiveProperty<bool> IsSongRepositorySearchRunning { get; private set; } = new(false);
+    public ReactiveProperty<int> RunningSongRepositorySearches { get; set; } = new(0);
 
     public SongMeta SelectedSong
     {
@@ -358,7 +358,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                 }
             });
 
-        playlistManager.PlaylistChangeEventStream.Subscribe(playlistChangeEvent =>
+        playlistManager.PlaylistChangedEventStream.Subscribe(playlistChangeEvent =>
         {
             if (playlistChangeEvent.Playlist == SongSelectionPlaylistChooserControl.Selection.Value)
             {
@@ -753,11 +753,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(firstVoiceLyrics));
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(secondVoiceLyrics));
         }
-
-        // Add attribution and license info
-        AccordionItem attributionAccordionItem = new(Translation.Get(R.Messages.action_showAttribution));
-        attributionAccordionItem.Add(AttributionUtils.CreateAttributionVisualElement(songMeta));
-        lyricsDialogControl.AddVisualElement(attributionAccordionItem);
     }
 
     public void InitSongMetas()
@@ -1024,7 +1019,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         songRouletteControl.SelectEntryBySongMeta(randomSongMeta);
     }
 
-    private void CheckAudioThenStartSingScene(SongMeta songMeta)
+    private async void CheckAudioThenStartSingScene(SongMeta songMeta)
     {
         if (songMeta == null)
         {
@@ -1056,16 +1051,19 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
 
         // Check that the used audio format can be loaded.
-        songAudioPlayer.LoadAndPlayAsObservable(songMeta)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError( $"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
-                    "name", songMeta.Audio,
-                    "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
-            })
-            .Subscribe(_ => StartSingSceneWithGivenSongAndSettings(songMeta, false, true));
+        try
+        {
+            await songAudioPlayer.LoadAndPlayAsync(songMeta);
+            StartSingSceneWithGivenSongAndSettings(songMeta, false, true);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError( $"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
+                "name", songMeta.Audio,
+                "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
+        }
     }
 
     private void ShowFailedToLoadVoicesDialog(SongMeta songMeta)
@@ -1279,8 +1277,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.OnSearchTextChanged");
 
-        StartSongRepositorySearch();
-
         string rawSearchText = songSearchControl.GetRawSearchText();
         if (!rawSearchText.IsNullOrEmpty()
             && lastRawSearchText.IsNullOrEmpty())
@@ -1290,39 +1286,33 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
         lastRawSearchText = rawSearchText;
 
+        StartSongRepositorySearch();
+
         if (TryExecuteSpecialSearchSyntax(rawSearchText))
         {
             // Special search syntax used. Do not perform normal filtering.
             return;
         }
         UpdateFilteredSongs();
-
-        if (rawSearchText.IsNullOrEmpty())
-        {
-            // Restore selection from before search
-            if (selectedEntryBeforeSearch != null)
-            {
-                songRouletteControl.SelectEntry(selectedEntryBeforeSearch);
-            }
-        }
     }
 
-    private void StartSongRepositorySearch()
+    private async void StartSongRepositorySearch()
     {
-        IsSongRepositorySearchRunning.Value = true;
-        SongRepositorySearchParameters searchParameters = new(songSearchControl.GetSearchText());
-        SongRepositoryUtils.SearchSongs(searchParameters)
-            .Buffer(TimeSpan.FromMilliseconds(500))
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-            })
-            .DoOnCompleted(() => IsSongRepositorySearchRunning.Value = false)
-            .Subscribe(songSearchResultEntries =>
-            {
-                songSearchResultEntries.ForEach(entry => AddSearchResultEntryToSongMetaManager(entry));
-                UpdateFilteredSongs();
-            });
+        string searchText = songSearchControl.GetSearchText();
+        Debug.Log($"StartSongRepositorySearch: searchText '{searchText}'");
+
+        try
+        {
+            RunningSongRepositorySearches.Value++;
+            SongRepositorySearchParameters searchParameters = new(searchText);
+            List<SongRepositorySearchResult> searchResults = await SongRepositoryUtils.SearchSongsAsync(searchParameters);
+            searchResults.SelectMany(result => result.Entries).ForEach(resultEntry => AddSearchResultEntryToSongMetaManager(resultEntry));
+        }
+        finally
+        {
+            RunningSongRepositorySearches.Value--;
+        }
+        UpdateFilteredSongs();
     }
 
     private void AddSearchResultEntryToSongMetaManager(SongRepositorySearchResultEntry searchResultEntry)
@@ -1624,16 +1614,21 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void OnSubmitSearch()
     {
-        // Continue browsing songs from the currently selected entry.
-        selectedEntryBeforeSearch = songRouletteControl.SelectedEntry;
         songSearchControl.ResetSearchText();
         songRouletteControl.Focus();
+
+        // Continue browsing songs from the currently selected entry.
+        selectedEntryBeforeSearch = null;
     }
 
     public void OnCancelSearch()
     {
         songSearchControl.ResetSearchText();
         songRouletteControl.Focus();
+
+        // Continue browsing songs from the entry that was selected before starting the search.
+        songRouletteControl.SelectEntry(selectedEntryBeforeSearch);
+        selectedEntryBeforeSearch = null;
     }
 
     public void ShowCannotUseJokerMessage()

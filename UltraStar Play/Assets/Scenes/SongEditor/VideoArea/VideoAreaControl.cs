@@ -1,6 +1,7 @@
 ﻿using System;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
@@ -156,18 +157,18 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(songMeta);
     }
 
-    private void UpdateCoverAndBackgroundImage()
+    private async void UpdateCoverAndBackgroundImage()
     {
         if (SongMetaUtils.BackgroundResourceExists(songMeta))
         {
-            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta))
-                .Subscribe(sprite => songBackgroundImage.style.backgroundImage = new StyleBackground(sprite));
+            Sprite sprite = await ImageManager.LoadSpriteFromUriAsync(SongMetaUtils.GetBackgroundUri(songMeta));
+            songBackgroundImage.style.backgroundImage = new StyleBackground(sprite);
         }
 
         if (SongMetaUtils.CoverResourceExists(songMeta))
         {
-            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta))
-                .Subscribe(sprite => songCoverImage.style.backgroundImage = new StyleBackground(sprite));
+            Sprite sprite = await ImageManager.LoadSpriteFromUriAsync(SongMetaUtils.GetCoverUri(songMeta));
+            songCoverImage.style.backgroundImage = new StyleBackground(sprite);
         }
     }
 

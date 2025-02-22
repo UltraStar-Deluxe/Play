@@ -84,7 +84,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
             _ => UpdateAudioWaveForm());
     }
 
-    public void UpdateAudioWaveForm()
+    public async void UpdateAudioWaveForm()
     {
         if (!settings.SongEditorSettings.ShowAudioWaveformInBackground)
         {
@@ -119,7 +119,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
             audioWaveFormVisualization.AudioWaveFormCalculator = new PrecalculatingAudioWaveFormCalculator();
         }
 
-        AudioClip audioClip = SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
+        AudioClip audioClip = await SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
         if (audioClip == null)
         {
             return;

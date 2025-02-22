@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using CommonOnlineMultiplayer;
 using UniInject;
 using UniInject.Extensions;
@@ -248,7 +249,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         ActivateLayout();
         FillLayout();
 
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => InitVfx()));
+        AwaitableUtils.ExecuteAfterDelayInFramesAsync(gameObject, 1, () => InitVfx());
     }
 
     private void InitSongPreview()
@@ -364,7 +365,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
         artistLabel.SetTranslatedText(Translation.Of(songMeta.Artist));
         titleLabel.SetTranslatedText(Translation.Of(songMeta.Title));
-        SongMetaImageUtils.SetCoverOrBackgroundImage(songMeta, coverImage);
+        SongMetaImageUtils.SetCoverOrBackgroundImageAsync(new CancellationToken(), songMeta, coverImage);
     }
 
     private void FillLayout()

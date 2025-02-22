@@ -6,7 +6,7 @@ using UniInject;
 
 public class EditSettingsRestControl : AbstractRestControl, INeedInjection
 {
-    public static EditSettingsRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<EditSettingsRestControl>();
+    public static EditSettingsRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<EditSettingsRestControl>();
 
     protected override object GetInstance()
     {

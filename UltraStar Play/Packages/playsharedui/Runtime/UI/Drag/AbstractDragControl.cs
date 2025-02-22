@@ -39,19 +39,19 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
     protected bool IsPointerOver { get; private set; }
     protected bool IsPointerDown { get; private set; }
-    
+
     private readonly List<IDisposable> disposables = new();
 
     public IReadOnlyCollection<int> ButtonFilter { get; set; } = new List<int> { 0, 1, 2 };
-    
+
     public bool RequirePointerDirectlyOnTargetElement { get; set; }
-    
+
     /**
      * Jump back with the pointer to the other end of the VisualElement when reaching a side to enable endless dragging.
      */
     public bool EnableEndlessDrag { get; set; }
     private Vector2 endlessDragOffset = Vector2.zero;
-    
+
     public virtual void OnInjectionFinished()
     {
         this.panelHelper = new PanelHelper(uiDocument);
@@ -77,7 +77,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     {
         IsPointerOver = true;
     }
-    
+
     private void OnPointerLeave(PointerLeaveEvent evt)
     {
         IsPointerOver = false;
@@ -149,7 +149,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         float jumpFactor = 0.9f;
         float localPositionX = evt.position.x - worldBound.xMin;
         float localPositionY = evt.position.y - worldBound.yMin;
-        
+
         if (localPositionX >= width - EndlessDragBorderThresholdInPx)
         {
             // Jump to left side
@@ -164,7 +164,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
             MoveMousePointer(new Vector2(jumpDistance, 0));
             endlessDragOffset.x -= jumpDistance;
         }
-        
+
         if (localPositionY < EndlessDragBorderThresholdInPx)
         {
             // Jump to bottom side
@@ -181,12 +181,12 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         }
     }
 
-    private void MoveMousePointerDelayed(Vector2 delta)
+    private async void MoveMousePointerDelayed(Vector2 delta)
     {
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
-            () => MoveMousePointer(delta)));
+        await Awaitable.NextFrameAsync();
+        MoveMousePointer(delta);
     }
-    
+
     private void MoveMousePointer(Vector2 delta)
     {
         if (Mouse.current == null)

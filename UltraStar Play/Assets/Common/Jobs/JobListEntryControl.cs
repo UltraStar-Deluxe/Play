@@ -39,7 +39,7 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
     private ProgressBar jobProgressBar;
 
     [Inject]
-    private Job job;
+    private IJob job;
 
     public void OnInjectionFinished()
     {
@@ -108,13 +108,13 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
 
     private void UpdateDurationLabel()
     {
-        jobDurationLabel.SetTranslatedText(Translation.Of(TimeUtils.GetMinutesAndSecondsDurationString(job.CurrentDurationInMillis)));
+        jobDurationLabel.SetTranslatedText(Translation.Of(TimeUtils.GetMinutesAndSecondsDurationString(job.Progress.CurrentDurationInMillis)));
     }
 
     private void UpdateProgressBar()
     {
-        jobProgressBar.SetVisibleByDisplay(job.EstimatedTotalDurationInMillis > 0);
-        jobProgressBar.value = (int)Math.Floor(job.EstimatedCurrentProgressInPercent);
+        jobProgressBar.SetVisibleByDisplay(job.Progress.EstimatedTotalDurationInMillis > 0);
+        jobProgressBar.value = (int)Math.Floor(job.Progress.EstimatedCurrentProgressInPercent);
     }
 
     private void UpdateIconRotation()

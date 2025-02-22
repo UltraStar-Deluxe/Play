@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 
 public class RuntimeUiInspectionManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static RuntimeUiInspectionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<RuntimeUiInspectionManager>();
+    public static RuntimeUiInspectionManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<RuntimeUiInspectionManager>();
 
     [Inject]
     private UIDocument uiDocument;

@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class RenderTextureManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static RenderTextureManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<RenderTextureManager>();
+    public static RenderTextureManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<RenderTextureManager>();
 
     [Inject]
     private ApplicationManager applicationManager;

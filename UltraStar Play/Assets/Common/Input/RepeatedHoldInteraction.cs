@@ -124,7 +124,7 @@ public class RepeatedHoldInteraction : IInputInteraction
      */
     private float Accelerated(float pauseTimeInSeconds)
     {
-        float inputDurationInSeconds = Time.time - inputStartTime;
+        float inputDurationInSeconds = Time.time - inputStartTime - initialPause;
         if (inputDurationInSeconds > 16)
         {
             return pauseTimeInSeconds / 12;
@@ -135,12 +135,12 @@ public class RepeatedHoldInteraction : IInputInteraction
             return pauseTimeInSeconds / 8;
         }
 
-        if (inputDurationInSeconds > 8)
+        if (inputDurationInSeconds > 6)
         {
             return pauseTimeInSeconds / 4;
         }
 
-        if (inputDurationInSeconds > 4)
+        if (inputDurationInSeconds > 3)
         {
             return pauseTimeInSeconds / 2;
         }

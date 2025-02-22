@@ -267,12 +267,13 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
         if (!InputUtils.IsPointerDown())
         {
-            isPointerDownOnListView = false;
+            // Reset the transition time on pointer up.
             if (isPointerDownOnListView)
             {
-                // Reset the transition time on pointer up.
                 StartTransition();
             }
+            isPointerDownOnListView = false;
+
             UpdateScrollSelectedListViewItemToCenter();
         }
 
@@ -424,7 +425,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             item.Name = folderEntry.DirectoryInfo.Name;
         }
 
-        item.ClickOnSongImageEventStream.Subscribe(_ => OnEntryClicked(entry));
+        item.ClickEventStream.Subscribe(_ => OnEntryClicked(entry));
 
         entryControls.Add(item);
 

@@ -163,45 +163,42 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
         return songListEntry;
     }
 
-    private void DeleteSongQueueEntry(SongQueueEntryDto entry)
+    private async void DeleteSongQueueEntry(SongQueueEntryDto entry)
     {
-        mainGameHttpClient.DeleteRequest(HttpApiEndpointPaths.SongQueueEntryIndex
-                .ReplaceOrThrow("{index}", songQueueEntryDtos.IndexOf(entry).ToString()),
-            response =>
-            {
-                UpdateSongQueue();
-            },
-            ex =>
-            {
-                UpdateSongQueue();
-            });
+        try
+        {
+            await mainGameHttpClient.DeleteRequestAsync(HttpApiEndpointPaths.SongQueueEntryIndex
+                .ReplaceOrThrow("{index}", songQueueEntryDtos.IndexOf(entry).ToString()));
+        }
+        finally
+        {
+            UpdateSongQueue();
+        }
     }
 
-    private void ToggleMedley(SongQueueEntryDto entry)
+    private async void ToggleMedley(SongQueueEntryDto entry)
     {
         entry.IsMedleyWithPreviousEntry = !entry.IsMedleyWithPreviousEntry;
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntryIndex
-                .ReplaceOrThrow("{index}", songQueueEntryDtos.IndexOf(entry).ToString()),
-            entry.ToJson(),
-            MimeTypeUtils.ApplicationJson,
-            response =>
-            {
-                UpdateSongQueue();
-            },
-            ex =>
-            {
-                UpdateSongQueue();
-            });
+        try
+        {
+            await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.SongQueueEntryIndex
+                    .ReplaceOrThrow("{index}", songQueueEntryDtos.IndexOf(entry).ToString()),
+                entry.ToJson());
+        }
+        finally
+        {
+            UpdateSongQueue();
+        }
     }
 
-    private void OnSongQueueItemIndexChanged(SongQueueUiControl.ItemIndexChangedEvent evt)
+    private async void OnSongQueueItemIndexChanged(SongQueueUiControl.ItemIndexChangedEvent evt)
     {
         Debug.Log($"OnSongQueueItemIndexChanged: {evt.OldIndex}, {evt.NewIndex}");
         string json = new ListDto<SongQueueEntryDto>(evt.UpdatedItems.ToList()).ToJson();
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueue, json);
+        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.SongQueue, json);
     }
 
-    private void UpdateSongQueue()
+    private async void UpdateSongQueue()
     {
         songQueueUiControl.Clear();
 
@@ -210,26 +207,26 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
             return;
         }
 
-        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.SongQueue,
-            response =>
-            {
-                ListDto<SongQueueEntryDto> listDto = JsonConverter.FromJson<ListDto<SongQueueEntryDto>>(response);
-                if (listDto == null)
-                {
-                    songQueueContainer.Add(new Label("Failed to load song queue."));
-                    return;
-                }
-
-                songQueueUiControl.HasWriteSongQueuePermission = mainGameHttpClient.Permissions.Value.Contains(HttpApiPermission.WriteSongQueue);
-
-                songQueueEntryDtos = listDto.Items;
-                songQueueUiControl.SetSongQueueEntryDtos(songQueueEntryDtos);
-            },
-            ex =>
+        try
+        {
+            string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.SongQueue);
+            ListDto<SongQueueEntryDto> listDto = JsonConverter.FromJson<ListDto<SongQueueEntryDto>>(response);
+            if (listDto == null)
             {
                 songQueueContainer.Add(new Label("Failed to load song queue."));
-                Debug.LogException(ex);
-            });
+                return;
+            }
+
+            songQueueUiControl.HasWriteSongQueuePermission = mainGameHttpClient.Permissions.Value.Contains(HttpApiPermission.WriteSongQueue);
+
+            songQueueEntryDtos = listDto.Items;
+            songQueueUiControl.SetSongQueueEntryDtos(songQueueEntryDtos);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            songQueueContainer.Add(new Label("Failed to load song queue."));
+        }
     }
 
     private void UpdateSongListViewItems()

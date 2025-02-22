@@ -8,7 +8,7 @@ namespace CommonOnlineMultiplayer
 {
     public class StartSongRequestManager : AbstractOnlineMultiplayerRequestManager
     {
-        public static StartSongRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StartSongRequestManager>();
+        public static StartSongRequestManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<StartSongRequestManager>();
 
         [Inject]
         private SceneNavigator sceneNavigator;

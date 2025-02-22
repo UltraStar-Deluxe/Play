@@ -75,7 +75,7 @@ public class VisualElementSlideInControl
         visualElement.style.transitionProperty = new(new List<StylePropertyName>());
     }
 
-    public void UpdatePositionWithoutTransition()
+    public async void UpdatePositionWithoutTransition()
     {
         DisableTransition();
 
@@ -88,7 +88,9 @@ public class VisualElementSlideInControl
             DoSlideOut();
         }
 
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2, () => EnableTransition()));
+        await Awaitable.NextFrameAsync();
+        await Awaitable.NextFrameAsync();
+        EnableTransition();
     }
 
     private void DoSlideOut()

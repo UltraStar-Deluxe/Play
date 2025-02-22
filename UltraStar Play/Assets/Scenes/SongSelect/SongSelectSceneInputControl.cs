@@ -287,7 +287,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             }
             songSelectSceneControl.DoFuzzySearch(fuzzySearchText.Value);
 
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(fuzzySearchResetTimeInSeconds, () => CheckResetFuzzySearchText()));
+            AwaitableUtils.ExecuteAfterDelayInSecondsAsync(gameObject, fuzzySearchResetTimeInSeconds, () => CheckResetFuzzySearchText());
         }
     }
 

@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -29,8 +29,8 @@ public class TooltipControl
     private bool isPointerOver;
 
     private Label label;
-    private IEnumerator showTooltipCoroutine;
-    private IEnumerator closeTooltipCoroutine;
+    private CancellationTokenSource showTooltipCancellationTokenSource;
+    private CancellationTokenSource closeTooltipCancellationTokenSource;
     private bool tooltipVisibleWithAutoClose;
 
     public bool ShowTooltipOnPointerDown { get; set; } = true;
@@ -74,21 +74,25 @@ public class TooltipControl
             return;
         }
 
-        if (closeTooltipCoroutine != null)
+        ShowTooltipAfterDelayAsync();
+    }
+
+    private async void ShowTooltipAfterDelayAsync()
+    {
+        closeTooltipCancellationTokenSource?.Cancel();
+
+        showTooltipCancellationTokenSource?.Cancel();
+        showTooltipCancellationTokenSource = new CancellationTokenSource();
+
+        await Awaitable.WaitForSecondsAsync(ShowDelayInSeconds);
+        if (showTooltipCancellationTokenSource.IsCancellationRequested
+            || tooltipVisibleWithAutoClose
+            || !isPointerOver)
         {
-            GetUiDocument().StopCoroutine(closeTooltipCoroutine);
+            return;
         }
 
-        showTooltipCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(ShowDelayInSeconds, () =>
-        {
-            if (tooltipVisibleWithAutoClose
-                || !isPointerOver)
-            {
-                return;
-            }
-            ShowTooltip();
-        });
-        GetUiDocument().StartCoroutine(showTooltipCoroutine);
+        ShowTooltip();
     }
 
     private void OnPointerExit()
@@ -100,13 +104,24 @@ public class TooltipControl
             return;
         }
 
-        if (showTooltipCoroutine != null)
+        CloseTooltipAfterDelayAsync();
+    }
+
+    private async void CloseTooltipAfterDelayAsync()
+    {
+        showTooltipCancellationTokenSource?.Cancel();
+
+        closeTooltipCancellationTokenSource?.Cancel();
+        closeTooltipCancellationTokenSource = new CancellationTokenSource();
+        await Awaitable.WaitForSecondsAsync(CloseDelayInSeconds);
+        if (closeTooltipCancellationTokenSource.IsCancellationRequested
+            || tooltipVisibleWithAutoClose
+            || isPointerOver)
         {
-            GetUiDocument().StopCoroutine(showTooltipCoroutine);
+            return;
         }
 
-        closeTooltipCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(CloseDelayInSeconds, () => CloseTooltip());
-        GetUiDocument().StartCoroutine(closeTooltipCoroutine);
+        CloseTooltip();
     }
 
     public void CloseTooltip()
@@ -157,15 +172,20 @@ public class TooltipControl
         ShowTooltipWithAutoClose(GetDefaultTooltipPosition());
     }
 
-    public void ShowTooltipWithAutoClose(Vector2 pos)
+    public async void ShowTooltipWithAutoClose(Vector2 pos)
     {
-        tooltipVisibleWithAutoClose = true;
-        ShowTooltip(pos);
-        GetUiDocument().StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(showTooltipOnPointerDownTimeInSeconds, () =>
+        try
+        {
+            tooltipVisibleWithAutoClose = true;
+            ShowTooltip(pos);
+
+            await Awaitable.WaitForSecondsAsync(showTooltipOnPointerDownTimeInSeconds);
+            CloseTooltip();
+        }
+        finally
         {
             tooltipVisibleWithAutoClose = false;
-            CloseTooltip();
-        }));
+        }
     }
 
     private Vector2 GetDefaultTooltipPosition()

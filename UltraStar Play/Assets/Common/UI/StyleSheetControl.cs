@@ -14,7 +14,7 @@ public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
         printScreenSize = true;
     }
 
-    public static StyleSheetControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StyleSheetControl>();
+    public static StyleSheetControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<StyleSheetControl>();
 
     private static bool printScreenSize = true;
 

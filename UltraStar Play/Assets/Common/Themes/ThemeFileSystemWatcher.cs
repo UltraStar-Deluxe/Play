@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class ThemeFileSystemWatcher : AbstractSingletonBehaviour, INeedInjection
 {
-    public ThemeFileSystemWatcher Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ThemeFileSystemWatcher>();
+    public ThemeFileSystemWatcher Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ThemeFileSystemWatcher>();
 
     [Inject]
     private ThemeManager themeManager;

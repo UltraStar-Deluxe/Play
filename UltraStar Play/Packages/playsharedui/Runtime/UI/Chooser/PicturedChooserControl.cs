@@ -11,7 +11,7 @@ abstract public class PicturedChooserControl<T> : ListedChooserControl<T>
         Items = items;
     }
 
-    public virtual void UpdateImageElement(T item)
+    public virtual async void UpdateImageElement(T item)
     {
         Chooser.ItemLabel.text = "";
         Chooser.ItemLabel.style.backgroundImage = GetBackgroundImageValue(item);

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -68,7 +70,7 @@ public class BatchIsolateVocalsModSettings : IModSettings
         return result;
     }
 
-    private void BatchIsolateVocals(List<SongMeta> songMetas)
+    private async void BatchIsolateVocals(List<SongMeta> songMetas)
     {
         if (songMetas.IsNullOrEmpty())
         {
@@ -77,65 +79,19 @@ public class BatchIsolateVocalsModSettings : IModSettings
 
         Debug.Log($"BatchIsolateVocals - Batch isolating vocals of {songMetas.Count} songs");
 
-        Job batchJob = new Job(Translation.Of("Batch isolate vocals"));
+        Job<VoidEvent> batchJob = new Job<VoidEvent>(Translation.Of("Batch isolate vocals"));
         batchJob.AdoptChildJobError = false; // Continue with other jobs, even if one fails.
         jobManager.AddJob(batchJob);
 
-        // Create jobs for every song, but only start the first job
-        List<Job> audioSeparationJobs = new List<Job>();
+        // Create jobs for every song
         for (int i = 0; i < songMetas.Count; i++)
         {
             SongMeta songMeta = songMetas[i];
-            Job audioSeparationJob = new Job(Translation.Of($"Isolate vocals of '{SongMetaUtils.GetArtistDashTitle(songMeta)}'"), batchJob);
-            jobManager.AddJob(audioSeparationJob);
-            audioSeparationJobs.Add(audioSeparationJob);
+            batchJob.AddChildJob(audioSeparationManager.ProcessSongMetaJob(songMeta, true));
         }
-        StartNextSongInBatch(songMetas, audioSeparationJobs, 0);
-    }
 
-    private void StartNextSongInBatch(List<SongMeta> songMetas, List<Job> audioSeparationJobs, int i)
-    {
-        if (i >= songMetas.Count
-            || i >= audioSeparationJobs.Count)
-        {
-            return;
-        }
-        Debug.Log($"Starting vocals isolation of batch song {i + 1} / {songMetas.Count}: '{SongMetaUtils.GetArtistDashTitle(songMetas[i])}'.");
-
-        SongMeta songMeta = songMetas[i];
-        Job audioSeparationJob = audioSeparationJobs[i];
-
-        audioSeparationManager.ProcessSongMetaAsObservable(songMeta, true, audioSeparationJob)
-            // Start next job on failure
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogError($"Failed to separate audio of batch song {i + 1} / {songMetas.Count}: {ex.Message}.");
-                Debug.LogException(ex); 
-                
-                int nextIndex = i + 1;
-                if (nextIndex < songMetas.Count)
-                {
-                    StartNextSongInBatch(songMetas, audioSeparationJobs, nextIndex);
-                }
-                else
-                {
-                    Debug.Log($"Finished batch isolation of vocals.");
-                }
-            })
-            // Start next job on success
-            .Subscribe(evt =>
-            {
-                Debug.Log($"Successfully separated audio of batch song {i + 1} / {songMetas.Count}: {evt}.");
-                int nextIndex = i + 1;
-                if (nextIndex < songMetas.Count)
-                {
-                    StartNextSongInBatch(songMetas, audioSeparationJobs, nextIndex);
-                }
-                else
-                {
-                    Debug.Log($"Finished batch isolation of vocals.");
-                }
-            });
+        // Start the batch job
+        await batchJob.RunAsync();
     }
 
     private class SongListModSettingControl : IModSettingControl

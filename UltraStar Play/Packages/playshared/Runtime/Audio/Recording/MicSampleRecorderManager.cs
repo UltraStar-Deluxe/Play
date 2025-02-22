@@ -11,7 +11,7 @@ using UnityEngine;
 
 public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static MicSampleRecorderManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MicSampleRecorderManager>();
+    public static MicSampleRecorderManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<MicSampleRecorderManager>();
 
     [Inject]
     private ISettings settings;
@@ -23,7 +23,13 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
     public IObservable<ConnectedMicDevicesChangedEvent> ConnectedMicDevicesChangesStream => connectedMicDevicesChangesStream;
 
     private string[] CurrentConnectedMicDevices => Microphone.devices;
+
     private string[] lastConnectedMicDevices;
+    private string[] LastConnectedMicDevices
+    {
+        get => lastConnectedMicDevices;
+        set => lastConnectedMicDevices = value?.ToArray();
+    }
 
     protected override object GetInstance()
     {
@@ -48,6 +54,9 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
 
     protected override void StartSingleton()
     {
+        Debug.Log($"Initial connected mic devices: {JsonConverter.ToJson(CurrentConnectedMicDevices)}");
+        LastConnectedMicDevices = CurrentConnectedMicDevices;
+
         settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
             .Subscribe(newValue =>
             {
@@ -80,9 +89,6 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
             {
                 micSampleRecorders.ForEach(it => it.PortAudioOutputDeviceName = newValue);
             });
-
-        Debug.Log($"Initial connected mic devices: {JsonConverter.ToJson(CurrentConnectedMicDevices)}");
-        SetLastConnectedMicDevices(CurrentConnectedMicDevices);
     }
 
     private void Update()
@@ -119,24 +125,32 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         return micSampleRecorder;
     }
 
-    private void SetLastConnectedMicDevices(string[] devices)
-    {
-        // Create copy of array
-        lastConnectedMicDevices = devices.ToArray();
-    }
-
     private void UpdateConnectedMicDevices()
     {
-        if (CurrentConnectedMicDevices == null
-            || lastConnectedMicDevices == null
-            || CurrentConnectedMicDevices.SequenceEqual(lastConnectedMicDevices))
+        if (ArraysEqual(CurrentConnectedMicDevices, LastConnectedMicDevices))
         {
             return;
         }
+        Debug.Log($"Connected mic devices changed, new: {JsonConverter.ToJson(CurrentConnectedMicDevices)}, old: {JsonConverter.ToJson(LastConnectedMicDevices)}");
+        LastConnectedMicDevices = CurrentConnectedMicDevices;
 
-        Debug.Log($"Connected mic devices changed, new: {JsonConverter.ToJson(CurrentConnectedMicDevices)}, old: {JsonConverter.ToJson(lastConnectedMicDevices)}");
-        ConnectedMicDevicesChangedEvent evt = new(CurrentConnectedMicDevices, lastConnectedMicDevices);
-        SetLastConnectedMicDevices(CurrentConnectedMicDevices);
+        ConnectedMicDevicesChangedEvent evt = new(CurrentConnectedMicDevices, LastConnectedMicDevices);
         connectedMicDevicesChangesStream.OnNext(evt);
+    }
+
+    private static bool ArraysEqual(string[] array1, string[] array2)
+    {
+        if (array1 == array2)
+        {
+            // Both are null or same reference
+            return true;
+        }
+
+        if (array1 == null || array2 == null){
+            // One is null, the other isn't
+            return false;
+        }
+
+        return array1.SequenceEqual(array2);
     }
 }

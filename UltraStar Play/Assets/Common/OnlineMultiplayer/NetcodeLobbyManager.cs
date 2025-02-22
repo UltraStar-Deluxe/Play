@@ -7,7 +7,7 @@ namespace CommonOnlineMultiplayer
 {
     public class NetcodeLobbyManager : AbstractSingletonBehaviour, INeedInjection, ILobbyManager
     {
-        public static NetcodeLobbyManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<NetcodeLobbyManager>();
+        public static NetcodeLobbyManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<NetcodeLobbyManager>();
 
         [Inject]
         private NetworkManager networkManager;

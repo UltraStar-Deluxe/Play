@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static BackgroundMusicManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<BackgroundMusicManager>();
+    public static BackgroundMusicManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<BackgroundMusicManager>();
 
     private static readonly int timeInSecondsBeforeRestartingBackgroundMusic = 20;
     private static readonly List<EScene> scenesWithoutBackgroundMusic = new()
@@ -111,29 +111,26 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private void UpdateAudioClip()
+    private async void UpdateAudioClip()
     {
         ThemeMeta currentTheme = themeManager.GetCurrentTheme();
         string backgroundMusicPath = currentTheme?.ThemeJson?.backgroundMusic;
         if (!backgroundMusicPath.IsNullOrEmpty())
         {
             string absolutePath = ThemeMetaUtils.GetAbsoluteFilePath(currentTheme, backgroundMusicPath);
-            AudioManager.LoadAudioClipFromUri(absolutePath)
-                .Subscribe(loadedAudioClip =>
-                {
-                    if (loadedAudioClip != null
-                        && backgroundMusicAudioSource.clip != loadedAudioClip)
-                    {
-                        backgroundMusicAudioSource.clip = loadedAudioClip;
-                    }
-                    else if (loadedAudioClip == null
-                             && backgroundMusicAudioSource.clip != defaultBackgroundMusicAudioClip)
-                    {
-                        backgroundMusicAudioSource.clip = defaultBackgroundMusicAudioClip;
-                    }
+            AudioClip loadedAudioClip = await AudioManager.LoadAudioClipFromUriAsync(absolutePath);
+            if (loadedAudioClip != null
+                && backgroundMusicAudioSource.clip != loadedAudioClip)
+            {
+                backgroundMusicAudioSource.clip = loadedAudioClip;
+            }
+            else if (loadedAudioClip == null
+                     && backgroundMusicAudioSource.clip != defaultBackgroundMusicAudioClip)
+            {
+                backgroundMusicAudioSource.clip = defaultBackgroundMusicAudioClip;
+            }
 
-                    UpdatePlayPause();
-                });
+            UpdatePlayPause();
         }
     }
 }

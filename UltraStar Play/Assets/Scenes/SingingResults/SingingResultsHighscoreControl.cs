@@ -75,21 +75,18 @@ public class SingingResultsHighscoreControl : INeedInjection
         UpdateHighScores();
     }
 
-    private void UpdateHighScores()
+    private async void UpdateHighScores()
     {
         currentDifficultyLabel.SetTranslatedText(Translation.Get(currentDifficulty));
 
         highscoreEntryList.Clear();
 
         SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
-        StatisticsUtils.GetLocalAndRemoteHighScoreEntriesAllAtOnce(statistics, songMeta)
-            .Subscribe(scoreEntries =>
-            {
-                List<HighScoreEntry> scoreEntriesOfCurrentDifficulty = scoreEntries
-                    .Where(entry => entry.Difficulty == currentDifficulty)
-                    .ToList();
-                UpdateHighScores(scoreEntriesOfCurrentDifficulty);
-            });
+        List<HighScoreEntry> highScoreEntries = await StatisticsUtils.GetLocalAndRemoteHighScoreEntriesAllAtOnce(statistics, songMeta);
+        List<HighScoreEntry> scoreEntriesOfCurrentDifficulty = highScoreEntries
+            .Where(entry => entry.Difficulty == currentDifficulty)
+            .ToList();
+        UpdateHighScores(scoreEntriesOfCurrentDifficulty);
     }
 
     private void UpdateHighScores(List<HighScoreEntry> highScoreEntries)

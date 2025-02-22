@@ -9,7 +9,7 @@ using UniInject;
 
 public class TranslationRestControl : AbstractRestControl, INeedInjection
 {
-    public static TranslationRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<TranslationRestControl>();
+    public static TranslationRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<TranslationRestControl>();
 
     protected override object GetInstance()
     {

@@ -149,7 +149,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         filterActiveIcon.HideByDisplay();
         nonPersistentSettings.PlaylistName
             .Subscribe(_ => UpdateAnyFiltersActive());
-        playlistManager.PlaylistChangeEventStream
+        playlistManager.PlaylistChangedEventStream
             .Subscribe(_ => UpdateAnyFiltersActive());
         songSelectFilterControl.FiltersChangedEventStream
             .Subscribe(_ => UpdateAnyFiltersActive());
@@ -174,7 +174,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
 
         songRouletteControl.EntryListChangedEventStream
             .Subscribe(_ => UpdateSearchTextFieldStyle());
-        songSelectSceneControl.IsSongRepositorySearchRunning
+        songSelectSceneControl.RunningSongRepositorySearches
             .Subscribe(_ => UpdateSearchTextFieldStyle());
     }
 
@@ -182,8 +182,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     {
         if (songRouletteControl.Entries.IsNullOrEmpty()
             && !GetRawSearchText().IsNullOrEmpty()
-            && !songSelectSceneControl.IsSongRepositorySearchRunning.Value)
+            && songSelectSceneControl.RunningSongRepositorySearches.Value <= 0)
         {
+            // No more running searches and no results found, so highlight this in the UI.
             searchTextField.AddToClassList("noSearchResults");
         }
         else

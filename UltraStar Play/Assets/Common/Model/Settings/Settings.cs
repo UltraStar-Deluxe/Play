@@ -102,7 +102,7 @@ public class Settings : ISettings
 
     // Sing scene settings
     public ENoteDisplayMode NoteDisplayMode { get; set; } = ENoteDisplayMode.SentenceBySentence;
-    public int NoteDisplayLineCount { get; set; } = 10;
+    public int NoteDisplayLineCount { get; set; } = 0; // 0 for 'auto'
     public EStaticLyricsDisplayMode StaticLyricsDisplayMode { get; set; } = EStaticLyricsDisplayMode.Bottom;
     public bool WipeLyrics { get; set; } = true;
     public bool ShowPitchIndicator { get; set; }

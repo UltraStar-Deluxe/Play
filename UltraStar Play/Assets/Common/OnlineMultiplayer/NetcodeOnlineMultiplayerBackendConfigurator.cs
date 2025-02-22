@@ -4,7 +4,7 @@ namespace CommonOnlineMultiplayer
 {
     public class NetcodeOnlineMultiplayerBackendConfigurator : AbstractSingletonBehaviour, INeedInjection
     {
-        public static NetcodeOnlineMultiplayerBackendConfigurator Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<NetcodeOnlineMultiplayerBackendConfigurator>();
+        public static NetcodeOnlineMultiplayerBackendConfigurator Instance => DontDestroyOnLoadManager.FindComponentOrThrow<NetcodeOnlineMultiplayerBackendConfigurator>();
 
         [Inject]
         private OnlineMultiplayerManager onlineMultiplayerManager;

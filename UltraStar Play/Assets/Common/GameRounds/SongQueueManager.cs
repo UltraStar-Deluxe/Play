@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static SongQueueManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongQueueManager>();
+    public static SongQueueManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SongQueueManager>();
 
     private readonly List<SongQueueEntryDto> songQueueEntryDtos = new();
 

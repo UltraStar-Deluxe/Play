@@ -1,29 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using UniRx;
 using UnityEngine;
 
 public static class SongRepositoryUtils
 {
-    public static List<ISongRepository> GetSongRepositories()
+    public static async Awaitable<List<SongRepositorySearchResult>> SearchSongsAsync(SongRepositorySearchParameters searchParameters)
     {
-        return ModManager.GetModObjects<ISongRepository>();
-    }
+        List<SongRepositorySearchResult> result = new();
 
-    public static IObservable<SongRepositorySearchResultEntry> SearchSongs(SongRepositorySearchParameters searchParameters)
-    {
-        return GetSongRepositories()
-            .Select(songRepository =>
+        List<ISongRepository> songRepositories = ModManager.GetModObjects<ISongRepository>();
+        foreach (ISongRepository songRepository in songRepositories)
+        {
+            try
             {
-                return songRepository.SearchSongs(searchParameters)
-                    .CatchIgnore((Exception ex) =>
-                    {
-                        Debug.LogException(ex);
-                        Debug.LogError($"Failed to search songs with {songRepository}: {ex.Message}");
-                    });
-            })
-            .Merge()
-            .ObserveOnMainThread();
+                SongRepositorySearchResult searchResultEntry = await songRepository.SearchSongsAsync(searchParameters);
+                result.Add(searchResultEntry);
+            }
+            catch (Exception ex)
+            {
+                ex.Log($"Failed to search songs with {songRepository}");
+            }
+        }
+
+        await Awaitable.MainThreadAsync();
+        return result;
     }
 }

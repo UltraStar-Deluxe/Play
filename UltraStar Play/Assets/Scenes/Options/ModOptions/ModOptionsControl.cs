@@ -47,7 +47,7 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
             () => settings.ReloadModsOnFileChange,
             newValue => settings.ReloadModsOnFileChange = newValue);
 
-        List<string> modFolders = ModManager.GetModFolders();
+        List<ModFolder> modFolders = ModManager.GetModFolders();
         if (modFolders.IsNullOrEmpty())
         {
             modList.Add(new Label("No mods found."));
@@ -62,13 +62,13 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
         });
     }
 
-    private ModListEntryControl CreateModListEntry(string modFolder)
+    private ModListEntryControl CreateModListEntry(ModFolder modFolder)
     {
         VisualElement modEntryVisualElement = modEntryUi.CloneTreeAndGetFirstChild();
         ModListEntryControl modListEntryControl = injector
             .CreateChildInjector()
             .WithRootVisualElement(modEntryVisualElement)
-            .WithBinding(new UniInjectBinding("modFolder", new ExistingInstanceProvider<string>(modFolder)))
+            .WithBindingForInstance(modFolder)
             .CreateAndInject<ModListEntryControl>();
 
         return modListEntryControl;

@@ -34,30 +34,15 @@ public class PitchDetectionAction : AbstractAudioClipAction
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
     private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
 
-    public void CreateNotesUsingBasicPitch(bool notify)
+    public async void CreateNotesUsingBasicPitch(bool notify)
     {
-        string fileName = Path.GetFileName(songMeta.Audio);
-        Job pitchDetectionJob = JobManager.CreateAndAddJob(Translation.Get(R.Messages.job_pitchDetectionWithName,
-            "name", fileName));
-        IObservable<BasicPitchDetectionResult> pitchDetectionObservable = pitchDetectionManager.ProcessSongMetaAsObservable(songMeta, pitchDetectionJob);
+        BasicPitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta).GetResultAsync();
+        ImportBasicPitchMidiFile(pitchDetectionResult.MidiFilePath);
 
-        pitchDetectionObservable
-            .CatchIgnore((Exception ex) =>
-            {
-                pitchDetectionJob.SetResult(EJobResult.Error);
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.job_pitchDetection_errorWithReason,
-                    "reason", ex.Message));
-            })
-            .Subscribe(result =>
-            {
-                pitchDetectionJob.SetResult(EJobResult.Ok);
-                ImportBasicPitchMidiFile(result.MidiFilePath);
-
-                if (notify)
-                {
-                    songMetaChangeEventStream.OnNext(new NotesChangedEvent());
-                }
-            });
+        if (notify)
+        {
+            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        }
     }
 
     private void ImportBasicPitchMidiFile(string midiFilePath)

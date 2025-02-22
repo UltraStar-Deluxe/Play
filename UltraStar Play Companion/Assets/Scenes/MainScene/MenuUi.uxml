@@ -4,14 +4,14 @@
             <ui:VisualElement name="content" class="child-mb-4" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                 <ui:DropdownField name="languageChooser" noPreviousButton="true" wrapAround="true" label="Language" class="controlWithLabelVertical" />
                 <Chooser name="recordingDeviceChooser" noPreviousButton="true" wrapAround="true" label="Recording Device" class="controlWithLabelVertical" />
-                <ui:FloatField label="Mouse sensitivity" value="1" name="mouseSensitivityFloatField" style="flex-direction: column;" />
+                <ui:FloatField label="Mouse sensitivity" value="1" name="mouseSensitivityFloatField" style="flex-direction: column; align-items: stretch;" />
                 <ui:Toggle name="devModeToggle" label="Developer Mode" />
                 <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="onlyVisibleWhenDevModeEnabled" />
                 <ui:Button text="View Log" display-tooltip-when-elided="true" name="viewLogButton" class="onlyVisibleWhenDevModeEnabled" />
                 <Chooser name="minimumLogLevelChooser" noPreviousButton="true" wrapAround="true" wrap-around="true" label="Minimum Log Level" class="controlWithLabelVertical onlyVisibleWhenDevModeEnabled" />
                 <Chooser name="targetFpsChooser" noPreviousButton="true" wrapAround="true" wrap-around="true" label="FPS" class="controlWithLabelVertical onlyVisibleWhenDevModeEnabled" />
-                <ui:IntegerField label="Connection Port on Main Game&#10;(default 34567)" value="34567" name="connectionServerPortTextField" is-delayed="true" class="onlyVisibleWhenDevModeEnabled" style="flex-direction: column;" />
-                <ui:TextField label="IP Address of Main Game&#10;(leave empty for automatic connection)" name="connectionServerAddressTextField" is-delayed="true" class="onlyVisibleWhenDevModeEnabled" style="flex-direction: column;" />
+                <ui:IntegerField label="Connection Port on Main Game&#10;(default 34567)" value="34567" name="connectionServerPortTextField" class="onlyVisibleWhenDevModeEnabled" style="flex-direction: column; align-items: stretch;" />
+                <ui:TextField label="IP Address of Main Game&#10;(leave empty for automatic connection)" name="connectionServerAddressTextField" class="onlyVisibleWhenDevModeEnabled" style="flex-direction: column;" />
                 <ui:EnumField label="Mic Data Delivery Method" type="LiteNetLib.DeliveryMethod, LiteNetLib" name="micDataDeliveryMethodField" value="ReliableOrdered" class="onlyVisibleWhenDevModeEnabled" style="flex-direction: column;" />
             </ui:VisualElement>
         </ui:ScrollView>

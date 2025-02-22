@@ -19,11 +19,8 @@ public class SongSelectSongRatingIconControl : INeedInjection
 
     public void UpdateSongRatingIcons(SongMeta songMeta, EDifficulty difficulty)
     {
-        StatisticsUtils.GetLocalHighScoreEntries(statistics, songMeta)
-            .Subscribe(highScoreEntries =>
-            {
-                UpdateSongRatingIcons(highScoreEntries, difficulty);
-            });
+        List<HighScoreEntry> highScoreEntries = StatisticsUtils.GetLocalHighScoreEntries(statistics, songMeta);
+        UpdateSongRatingIcons(highScoreEntries, difficulty);
     }
 
     private void UpdateSongRatingIcons(

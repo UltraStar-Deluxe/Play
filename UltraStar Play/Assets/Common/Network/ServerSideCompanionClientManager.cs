@@ -13,9 +13,9 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INeedInjection, IServerSideCompanionClientManager, INetEventListener, INetLogger
+public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INeedInjection, IServerSideCompanionClientManager, INetEventListener
 {
-    public static ServerSideCompanionClientManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ServerSideCompanionClientManager>();
+    public static ServerSideCompanionClientManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ServerSideCompanionClientManager>();
 
     public int CompanionClientCount => liteNetLibServer.ConnectedPeersCount;
 
@@ -49,7 +49,7 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
             return;
         }
 
-        NetDebug.Logger = this;
+        NetDebug.Logger = new CustomNetLogger(gameObject);
         liteNetLibServer = new NetManager(this);
         liteNetLibServer.BroadcastReceiveEnabled = true;
         // 16 ms are approx. 60 FPS
@@ -178,15 +178,23 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
         peer.Send(connectResponseDto, DeliveryMethod.ReliableOrdered);
 
         // Send MicProfile
+        MicProfile micProfileOfClient = GetOrCreateMicProfile(connectRequestDto);
+        Debug.Log($"Sending MicProfile to {peer.EndPoint}");
+        peer.Send(new MicProfileMessageDto(micProfileOfClient), DeliveryMethod.ReliableOrdered);
+    }
+
+    private MicProfile GetOrCreateMicProfile(ConnectRequestDto connectRequestDto)
+    {
         MicProfile micProfileOfClient = settings.MicProfiles
             .FirstOrDefault(micProfile => micProfile.ConnectedClientId == connectRequestDto.ClientId);
         if (micProfileOfClient == null)
         {
-            micProfileOfClient = new MicProfile();
+            micProfileOfClient = new MicProfile(connectRequestDto.ClientName, 0, connectRequestDto.ClientId);
+            micProfileOfClient.Color = ColorGenerationUtils.FromString(Guid.NewGuid().ToString());
+            settings.MicProfiles.Add(micProfileOfClient);
         }
 
-        Debug.Log($"Sending MicProfile to {peer.EndPoint}");
-        peer.Send(new MicProfileMessageDto(micProfileOfClient), DeliveryMethod.ReliableOrdered);
+        return micProfileOfClient;
     }
 
     public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -306,14 +314,32 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
         }
     }
 
-    public void WriteNet(NetLogLevel level, string str, params object[] args)
-    {
-        Debug.LogFormat(level.ToUnityLogType(), LogOption.NoStacktrace, this, str, args);
-    }
-
     public IPEndPoint GetConnectionEndpoint()
     {
         IPAddress localIpAddress = IpAddressUtils.GetLocalIpAddress();
         return new IPEndPoint(localIpAddress, liteNetLibServer.LocalPort);
+    }
+
+    public class CustomNetLogger : INetLogger
+    {
+        public static bool ErrorToWarning { get; set; }
+
+        private readonly GameObject context;
+
+        public CustomNetLogger(GameObject context)
+        {
+            this.context = context;
+        }
+
+        public void WriteNet(NetLogLevel level, string str, params object[] args)
+        {
+            if (ErrorToWarning
+                && level == NetLogLevel.Error)
+            {
+                level = NetLogLevel.Warning;
+            }
+
+            Debug.LogFormat(level.ToUnityLogType(), LogOption.NoStacktrace, context, str, args);
+        }
     }
 }

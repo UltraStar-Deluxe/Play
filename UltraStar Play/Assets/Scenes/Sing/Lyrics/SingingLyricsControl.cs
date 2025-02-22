@@ -82,7 +82,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             positionBeforeLyricsIndicator.style.color = new StyleColor(color);
             positionBeforeLyricsIndicator.style.unityBackgroundImageTintColor = new StyleColor(color);
         });
-        themeManager.GetCurrentTheme().ThemeJson.beforeLyricsIndicatorImage.IfNotNull(path =>
+        themeManager.GetCurrentTheme().ThemeJson.beforeLyricsIndicatorImage.IfNotNull(async path =>
         {
             if (path.IsNullOrEmpty())
             {
@@ -90,12 +90,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             }
 
             string absolutePath = ThemeMetaUtils.GetAbsoluteFilePath(themeManager.GetCurrentTheme(), path);
-            ImageManager.LoadSpriteFromUri(absolutePath)
-                .Subscribe(loadedSprite =>
-                {
-                    positionBeforeLyricsIndicator.style.backgroundImage = new StyleBackground(loadedSprite);
-                    positionBeforeLyricsIndicator.Icon = "";
-                });
+            Sprite loadedSprite = await ImageManager.LoadSpriteFromUriAsync(absolutePath);
+            positionBeforeLyricsIndicator.style.backgroundImage = new StyleBackground(loadedSprite);
+            positionBeforeLyricsIndicator.Icon = "";
         });
     }
 

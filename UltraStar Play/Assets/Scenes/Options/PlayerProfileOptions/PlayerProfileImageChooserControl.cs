@@ -36,7 +36,7 @@ public class PlayerProfileImageChooserControl : PicturedChooserControl<string>
         UpdateImageElement(Selection);
     }
 
-    public override void UpdateImageElement(string imagePath)
+    public override async void UpdateImageElement(string imagePath)
     {
         base.UpdateImageElement(imagePath);
         Chooser.ItemImage.image = null;
@@ -57,8 +57,8 @@ public class PlayerProfileImageChooserControl : PicturedChooserControl<string>
                 takeWebCamImageButton.HideByDisplay();
                 removeWebCamImageButton.ShowByDisplay();
 
-                uiManager.LoadPlayerProfileImage(webCamImagePath)
-                    .Subscribe(loadedSprite => Chooser.ItemLabel.style.backgroundImage = new StyleBackground(loadedSprite));
+                Sprite loadedWebCamImage = await uiManager.LoadPlayerProfileImageAsync(webCamImagePath);
+                Chooser.ItemLabel.style.backgroundImage = new StyleBackground(loadedWebCamImage);
             }
             else
             {
@@ -73,8 +73,8 @@ public class PlayerProfileImageChooserControl : PicturedChooserControl<string>
 
         takeWebCamImageButton.HideByDisplay();
         removeWebCamImageButton.HideByDisplay();
-        uiManager.LoadPlayerProfileImage(imagePath)
-            .Subscribe(loadedSprite => Chooser.ItemLabel.style.backgroundImage = new StyleBackground(loadedSprite));
+        Sprite loadedImage = await uiManager.LoadPlayerProfileImageAsync(imagePath);
+        Chooser.ItemLabel.style.backgroundImage = new StyleBackground(loadedImage);
     }
 
     protected override StyleBackground GetBackgroundImageValue(string item)

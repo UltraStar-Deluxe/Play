@@ -1,4 +1,4 @@
-﻿using System;using UniInject;
+﻿using UniInject;
 using UniRx;
 using UnityEngine;
 
@@ -10,7 +10,7 @@ public abstract class AbstractVideoSupportProvider : MonoBehaviour, INeedInjecti
     [Inject]
     protected SceneNavigator sceneNavigator;
 
-    public abstract IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis);
+    public abstract Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis);
     public abstract bool IsSupported(string videoUri, bool videoEqualsAudio);
     public abstract void Unload();
     public abstract void Play();

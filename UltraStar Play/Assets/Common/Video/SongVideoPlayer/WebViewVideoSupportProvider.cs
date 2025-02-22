@@ -13,15 +13,16 @@ public class WebViewVideoSupportProvider : AbstractVideoSupportProvider
         return WebViewUtils.CanHandleWebViewUrl(videoUri);
     }
 
-    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis)
+    public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {
-        return Observable.Create<VideoLoadedEvent>(o =>
+        await ConditionUtils.WaitForConditionAsync(() => !this || webViewManager.DurationInMillis > 0,
+            new WaitForConditionConfig {description = $"load video '{videoUri}'", timeoutInMillis = 30000});
+        if (!this)
         {
-            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => webViewManager.DurationInMillis > 0,
-                () => o.OnNext(new VideoLoadedEvent(videoUri))));
-            return Disposable.Empty;
-        });
+            throw new DestroyedAlreadyException($"Failed to load video '{videoUri}': {nameof(WebViewVideoSupportProvider)} has been destroyed already.");
+        }
+
+        return new VideoLoadedEvent(videoUri);
     }
 
     public override void Unload()

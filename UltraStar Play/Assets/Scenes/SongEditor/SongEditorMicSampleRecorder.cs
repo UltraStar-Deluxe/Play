@@ -227,7 +227,6 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
             150,
             true,
             speechRecognitionAction.CreateSpeechRecognizerParameters(),
-            true,
             -(int)gapShiftInBeats);
     }
 

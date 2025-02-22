@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -42,12 +43,13 @@ public static class AnimationUtils
             .id;
     }
 
-    public static IEnumerator FadeOutThenRemoveVisualElementCoroutine(
+    public static async Awaitable FadeOutThenRemoveVisualElementAsync(
         VisualElement visualElement,
         float solidTimeInSeconds,
         float fadeOutTimeInSeconds)
     {
-        yield return new WaitForSeconds(solidTimeInSeconds);
+        await Awaitable.WaitForSecondsAsync(solidTimeInSeconds);
+
         float startOpacity = visualElement.resolvedStyle.opacity;
         float startTime = Time.time;
         while (visualElement.resolvedStyle.opacity > 0)
@@ -59,7 +61,7 @@ public static class AnimationUtils
             }
 
             visualElement.style.opacity = newOpacity;
-            yield return null;
+            await Awaitable.NextFrameAsync();
         }
 
         // Remove VisualElement
@@ -69,18 +71,22 @@ public static class AnimationUtils
         }
     }
 
-    public static IEnumerator TransitionBackgroundImageGradientCoroutine(VisualElement visualElement, GradientConfig fromGradientConfig, GradientConfig toGradientConfig, float animTimeInSeconds)
+    public static async Awaitable TransitionBackgroundImageGradientAsync(VisualElement visualElement,
+        GradientConfig fromGradientConfig, GradientConfig toGradientConfig, float animTimeInSeconds)
     {
         List<GradientConfig> gradientConfigs = GradientManager.GetGradientConfigsForTransition(fromGradientConfig, toGradientConfig, animTimeInSeconds);
-        return TransitionBackgroundImageGradientCoroutine(visualElement, gradientConfigs, animTimeInSeconds);
+        await TransitionBackgroundImageGradientAsync(visualElement, gradientConfigs, animTimeInSeconds);
     }
 
-    public static IEnumerator TransitionBackgroundImageGradientCoroutine(VisualElement visualElement, List<GradientConfig> gradientConfigs, float animTimeInSeconds)
+    private static async Awaitable TransitionBackgroundImageGradientAsync(VisualElement visualElement,
+        List<GradientConfig> gradientConfigs, float animTimeInSeconds)
     {
+        await Awaitable.MainThreadAsync();
+
         foreach (GradientConfig gradientConfig in gradientConfigs)
         {
             visualElement.style.backgroundImage = GradientManager.GetGradientTexture(gradientConfig);
-            yield return new WaitForSeconds(animTimeInSeconds / gradientConfigs.Count);
+            await Awaitable.WaitForSecondsAsync(animTimeInSeconds / gradientConfigs.Count);
         }
     }
 }

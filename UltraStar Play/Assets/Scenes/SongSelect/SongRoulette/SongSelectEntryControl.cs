@@ -64,6 +64,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.notAvailableInOnlineGameIcon)]
     private VisualElement notAvailableInOnlineGameIcon;
 
+    [Inject(UxmlName = R.UxmlNames.innerSongEntryUi)]
+    private VisualElement innerSongEntryUi;
+
     [Inject]
     private CreateSingAlongSongControl createSingAlongSongControl;
 
@@ -111,8 +114,10 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private bool isPopupMenuOpen;
     private float popupMenuClosedTimeInSeconds;
 
-    private readonly Subject<VoidEvent> clickOnSongImageEventStream = new();
-    public IObservable<VoidEvent> ClickOnSongImageEventStream => clickOnSongImageEventStream;
+    private readonly Subject<VoidEvent> clickEventStream = new();
+    public IObservable<VoidEvent> ClickEventStream => clickEventStream
+        // Prevent accidental double click
+        .ThrottleFirst(TimeSpan.FromMilliseconds(300));
 
     private bool isInitialized;
 
@@ -131,17 +136,15 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     private void RegisterCallbacks()
     {
-        VisualElement.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
-        songImageOuter.RegisterCallback<PointerDownEvent>(OnPointerDownOnSongImage, TrickleDown.TrickleDown);
-        songImageOuter.RegisterCallback<PointerUpEvent>(OnPointerUpOnSongImage, TrickleDown.TrickleDown);
+        innerSongEntryUi.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
+        innerSongEntryUi.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         openSongMenuButton.RegisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
     }
 
     private void UnregisterCallbacks()
     {
-        VisualElement.UnregisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
-        songImageOuter.UnregisterCallback<PointerDownEvent>(OnPointerDownOnSongImage, TrickleDown.TrickleDown);
-        songImageOuter.UnregisterCallback<PointerUpEvent>(OnPointerUpOnSongImage, TrickleDown.TrickleDown);
+        innerSongEntryUi.UnregisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
+        innerSongEntryUi.UnregisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         openSongMenuButton.UnregisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
     }
 
@@ -159,7 +162,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
         InitSongMenu();
 
-        playlistManager.PlaylistChangeEventStream
+        playlistManager.PlaylistChangedEventStream
             .Subscribe(evt => UpdateIcons());
 
         settings.ObserveEveryValueChanged(it => it.Difficulty)
@@ -186,18 +189,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         contextMenuControl.ContextMenuClosedEventStream.Subscribe(OnContextMenuClosed);
     }
 
-    private void OnPointerDownOnSongImage(PointerDownEvent evt)
+    private void OnPointerDown(PointerDownEvent evt)
     {
         pointerDownMousePosition = evt.position;
-    }
-
-    private void OnPointerUpOnSongImage(PointerUpEvent evt)
-    {
-        if (evt.button == 0
-            && Vector2.Distance(pointerDownMousePosition ,evt.position) < MaxClickDistanceThresholdInPx)
-        {
-            clickOnSongImageEventStream.OnNext(VoidEvent.instance);
-        }
     }
 
     private void OnPointerUp(PointerUpEvent evt)
@@ -208,6 +202,15 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             && TimeUtils.IsDurationAboveThresholdInSeconds(popupMenuClosedTimeInSeconds, 0.1f))
         {
             contextMenuControl.OpenContextMenu(evt.position, this);
+            return;
+        }
+
+        // Fire click event when not clicking a button
+        if (evt.button == 0
+            && Vector2.Distance(pointerDownMousePosition ,evt.position) < MaxClickDistanceThresholdInPx
+            && evt.target != openSongMenuButton)
+        {
+            clickEventStream.OnNext(VoidEvent.instance);
         }
     }
 
@@ -310,7 +313,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         VisualElement buttonContainer = contextMenuPopup.AddButton(Translation.Get(R.Messages.action_separateAudio), "call_split",
             () =>
             {
-                audioSeparationManager.ProcessSongMeta(songEntry.SongMeta, true);
+                audioSeparationManager.ProcessSongMetaJob(songEntry.SongMeta, true);
             });
 
         // Disable button if vocals and instrumental audio already exist.
@@ -368,7 +371,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void UpdateSongCover(SongSelectSongEntry songEntry)
+    private async void UpdateSongCover(SongSelectSongEntry songEntry)
     {
         SongMeta songMeta = songEntry.SongMeta;
         lastSongMetaCover = songMeta.Cover;
@@ -377,51 +380,45 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         folderImage.HideByDisplay();
         folderPreviewImage.HideByDisplay();
 
-        SongMetaImageUtils.GetCoverOrBackgroundImageUri(songMeta)
-            .SelectMany(uri =>
-            {
-                if (SongEntryChanged(songMeta))
-                {
-                    // The entry changed in the meantime
-                    return Observable.Return<Sprite>(null);
-                }
-
-                if (uri.IsNullOrEmpty())
-                {
-                    return Observable.Return<Sprite>(null);
-                }
-
-                return ImageManager.LoadSpriteFromUri(uri);
-            })
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-
-                if (SongEntryChanged(songMeta))
-                {
-                    // The entry changed in the meantime
-                    return;
-                }
-                SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
-            })
-            .Subscribe(sprite =>
-            {
-                if (SongEntryChanged(songMeta))
-                {
-                    // The entry changed in the meantime
-                    return;
-                }
-
-                if (sprite == null)
-                {
-                    SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
-                    return;
-                }
-
-                SongMetaImageUtils.SetCoverOrBackgroundImage(sprite, songImageOuter, songImageInner);
-            });
-
         notAvailableInOnlineGameIcon.HideByDisplay();
+
+        try
+        {
+            string uri = await SongMetaImageUtils.GetCoverOrBackgroundImageUriAsync(songMeta);
+            if (SongEntryChanged(songMeta))
+            {
+                return;
+            }
+
+            if (uri.IsNullOrEmpty())
+            {
+                SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
+                return;
+            }
+
+            Sprite sprite = await ImageManager.LoadSpriteFromUriAsync(uri);
+            if (SongEntryChanged(songMeta))
+            {
+                return;
+            }
+
+            if (sprite == null)
+            {
+                SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
+                return;
+            }
+            SongMetaImageUtils.SetCoverOrBackgroundImageAsync(sprite, songImageOuter, songImageInner);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+
+            if (SongEntryChanged(songMeta))
+            {
+                return;
+            }
+            SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
+        }
     }
 
     public void ShowNotAvailableInOnlineGameIcon()
@@ -465,7 +462,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         }
 
         await Awaitable.MainThreadAsync();
-        Sprite sprite = await ImageManager.LoadSpriteFromUri(imageUri);
+        Sprite sprite = await ImageManager.LoadSpriteFromUriAsync(imageUri);
         if (sprite == null)
         {
             return;

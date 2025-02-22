@@ -1,0 +1,9 @@
+name: Mic Recording Saver
+version: 1.0.0
+description: |
+  Adds a button to the singing results
+  that saves microphone recording of all players to file.
+
+  TIP: Use a headset to only record your microphone input.
+authors:
+  - email@melodymania.org

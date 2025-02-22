@@ -35,7 +35,6 @@ public static partial class R
         public static readonly string action_replay = "action_replay";
         public static readonly string action_restart = "action_restart";
         public static readonly string action_separateAudio = "action_separateAudio";
-        public static readonly string action_showAttribution = "action_showAttribution";
         public static readonly string action_showHighscores = "action_showHighscores";
         public static readonly string action_showInfo = "action_showInfo";
         public static readonly string action_showOwnResults = "action_showOwnResults";
@@ -76,6 +75,7 @@ public static partial class R
         public static readonly string companionApp_connecting = "companionApp_connecting";
         public static readonly string companionApp_connectingWithFailedAttempts = "companionApp_connectingWithFailedAttempts";
         public static readonly string companionApp_devMode = "companionApp_devMode";
+        public static readonly string companionApp_noMicrophoneHints = "companionApp_noMicrophoneHints";
         public static readonly string companionApp_songList_error_general = "companionApp_songList_error_general";
         public static readonly string companionApp_songList_error_noSongsFound = "companionApp_songList_error_noSongsFound";
         public static readonly string companionApp_songList_error_notConnected = "companionApp_songList_error_notConnected";
@@ -251,6 +251,7 @@ public static partial class R
         public static readonly string job_pitchDetectionWithName = "job_pitchDetectionWithName";
         public static readonly string job_searchSongIssues = "job_searchSongIssues";
         public static readonly string job_speechRecognition = "job_speechRecognition";
+        public static readonly string job_speechRecognition_errorWithReason = "job_speechRecognition_errorWithReason";
         public static readonly string language = "language";
         public static readonly string language_de = "language_de";
         public static readonly string language_en = "language_en";
@@ -408,6 +409,7 @@ public static partial class R
         public static readonly string options_songLibrary_noSongFoldersFoundInfo = "options_songLibrary_noSongFoldersFoundInfo";
         public static readonly string options_songLibrary_refreshIssues = "options_songLibrary_refreshIssues";
         public static readonly string options_songLibrary_songFolder_duplicate = "options_songLibrary_songFolder_duplicate";
+        public static readonly string options_songLibrary_songFolder_hiddenFoldersAreIgnored = "options_songLibrary_songFolder_hiddenFoldersAreIgnored";
         public static readonly string options_songLibrary_songFolder_missingValue = "options_songLibrary_songFolder_missingValue";
         public static readonly string options_songLibrary_songFolder_noFolder = "options_songLibrary_songFolder_noFolder";
         public static readonly string options_songLibrary_songFolder_notFound = "options_songLibrary_songFolder_notFound";
@@ -492,7 +494,6 @@ public static partial class R
         public static readonly string singingResultsScene_scores_notes = "singingResultsScene_scores_notes";
         public static readonly string singingResultsScene_scores_perfectSentencesBonus = "singingResultsScene_scores_perfectSentencesBonus";
         public static readonly string singScene_action_openAppearanceSubmenu = "singScene_action_openAppearanceSubmenu";
-        public static readonly string singScene_action_openAttributionSubmenu = "singScene_action_openAttributionSubmenu";
         public static readonly string singScene_action_requiresRestart = "singScene_action_requiresRestart";
         public static readonly string singScene_action_restart = "singScene_action_restart";
         public static readonly string singScene_missingMicrophones_message = "singScene_missingMicrophones_message";

@@ -1,58 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UniRx;
 using UnityEngine;
 
 public static class StatisticsUtils
 {
-    public static IObservable<List<HighScoreEntry>> GetLocalHighScoreEntries(
+    public static List<HighScoreEntry> GetLocalHighScoreEntries(
         Statistics statistics,
         SongMeta songMeta)
     {
         SongStatistics localSongStatistics = GetLocalSongStatistics(statistics, songMeta);
         SortedSet<HighScoreEntry> highScoreEntries = localSongStatistics?.HighScoreRecord?.HighScoreEntries;
-        if (highScoreEntries.IsNullOrEmpty())
-        {
-            return Observable.Return(new List<HighScoreEntry>());
-        }
-
-        List<HighScoreEntry> highScoreEntriesAsList = highScoreEntries.ToList();
-        return Observable.Return(highScoreEntriesAsList);
+        return highScoreEntries?.ToList() ?? new List<HighScoreEntry>();
     }
 
-    public static IObservable<List<HighScoreEntry>> GetLocalAndRemoteHighScoreEntriesAllAtOnce(
+    public static async Awaitable<List<HighScoreEntry>> GetLocalAndRemoteHighScoreEntriesAllAtOnce(
         Statistics statistics,
         SongMeta songMeta)
     {
         if (songMeta == null)
         {
-            return Observable.Return(new List<HighScoreEntry>());
+            return new List<HighScoreEntry>();
         }
 
-        IObservable<HighScoreEntry> highScoreRecordObservable = GetLocalAndRemoteHighScoreRecords(statistics, songMeta)
+        List<HighScoreRecord> localAndRemoteHighScoreRecords = await GetLocalAndRemoteHighScoreRecords(statistics, songMeta);
+        return localAndRemoteHighScoreRecords
             .SelectMany(highScoreRecord => highScoreRecord.HighScoreEntries)
-            .ObserveOnMainThread();
-        return ObservableUtils.AllAtOnceUntilErrorOrCompleted(highScoreRecordObservable);
+            .ToList();
     }
 
-    private static IObservable<HighScoreRecord> GetLocalAndRemoteHighScoreRecords(
+    private static async Awaitable<List<HighScoreRecord>> GetLocalAndRemoteHighScoreRecords(
         Statistics statistics,
         SongMeta songMeta)
     {
+        List<HighScoreRecord> highScoreRecords = new();
+
         HighScoreRecord localHighScoreRecord = GetLocalSongStatistics(statistics, songMeta)?.HighScoreRecord;
-        List<IHighScoreReader> highscoreReaders = ModManager.GetModObjects<IHighScoreReader>();
-        IObservable<HighScoreRecord> localHighScoreRecordObservable = localHighScoreRecord != null
-            ? Observable.Return(localHighScoreRecord)
-            : Observable.Empty<HighScoreRecord>();
+        if (localHighScoreRecord != null)
+        {
+            highScoreRecords.Add(localHighScoreRecord);
+        }
 
-        IObservable<HighScoreRecord> remoteHighScoreRecordObservables = highscoreReaders
-            .Select(highscoreReader => highscoreReader.ReadHighScoreRecord(songMeta))
-            .Merge();
+        List<IHighScoreReader> highScoreReaders = ModManager.GetModObjects<IHighScoreReader>();
+        foreach (IHighScoreReader highScoreReader in highScoreReaders)
+        {
+            HighScoreRecord highScoreRecord = await highScoreReader.ReadHighScoreRecordAsync(songMeta);
+            if (highScoreRecord != null)
+            {
+                highScoreRecords.Add(highScoreRecord);
+            }
+        }
 
-        return localHighScoreRecordObservable
-            .Concat(remoteHighScoreRecordObservables)
-            .ObserveOnMainThread();
+        return highScoreRecords;
     }
 
     public static SongStatistics GetLocalSongStatistics(Statistics statistics, SongMeta songMeta)

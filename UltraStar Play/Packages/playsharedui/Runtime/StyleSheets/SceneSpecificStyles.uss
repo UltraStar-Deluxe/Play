@@ -1,9 +1,12 @@
 /**************************************************/
 /* SONG SELECT SCENE */
 /**************************************************/
+#folderPreviewImage {
+    width: 65%;
+    height: 65%;
+}
+
 .songSelectSongEntryIcon {
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(32, 32, 32, 0.35);
     font-size: var(--font-size-l);
 }
 

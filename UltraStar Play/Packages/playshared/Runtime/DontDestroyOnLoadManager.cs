@@ -21,6 +21,13 @@ public class DontDestroyOnLoadManager : AbstractSingletonBehaviour
                     return instanceInScene;
                 }
             }
+
+            // Return proper null value when GameObject has been destroyed (otherwise, Assert.IsNull fails)
+            if (instance == null)
+            {
+                return null;
+            }
+
             return instance;
         }
     }
@@ -32,7 +39,16 @@ public class DontDestroyOnLoadManager : AbstractSingletonBehaviour
         return Instance;
     }
 
-    public T FindComponentOrThrow<T>() where T : Component
+    public static T FindComponentOrThrow<T>() where T : Component
+    {
+        if (Instance == null)
+        {
+            return null;
+        }
+        return Instance.DoFindComponentOrThrow<T>();
+    }
+
+    public T DoFindComponentOrThrow<T>() where T : Component
     {
         // Search in cache
         Type typeOfT = typeof(T);

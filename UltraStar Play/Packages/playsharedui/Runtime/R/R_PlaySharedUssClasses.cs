@@ -134,6 +134,7 @@ public static partial class R_PlayShared
         public const string radial_progress_bar__label = "radial-progress-bar__label";
         public const string roundCorners = "roundCorners";
         public const string rounded = "rounded";
+        public const string row = "row";
         public const string scoreRow = "scoreRow";
         public const string scrollingNoteStreamSentenceSeparator = "scrollingNoteStreamSentenceSeparator";
         public const string searchFilterLabel = "searchFilterLabel";

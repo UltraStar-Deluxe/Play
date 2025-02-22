@@ -7,7 +7,7 @@ using Debug = UnityEngine.Debug;
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
 public class SongMetaManager : AbstractSingletonBehaviour
 {
-    public static SongMetaManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongMetaManager>();
+    public static SongMetaManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SongMetaManager>();
 
     public int LoadedSongsCount => songMetaScanner.LoadedSongsCount;
     public double LoadedSongsPercent => songMetaScanner.LoadedSongsPercent;

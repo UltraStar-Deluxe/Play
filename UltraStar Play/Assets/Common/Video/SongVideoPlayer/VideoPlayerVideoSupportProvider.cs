@@ -30,14 +30,14 @@ public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
             && ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(videoUri));
     }
 
-    public override IObservable<VideoLoadedEvent> LoadAsObservable(string videoUri, double startPositionInMillis)
+    public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {
         videoPlayerErrorMessages.Clear();
         videoPlayer.url = videoUri;
         if (videoPlayer.url.IsNullOrEmpty() && !videoUri.IsNullOrEmpty())
         {
             // The url is empty if loading the video failed.
-            return ObservableUtils.LogExceptionThenThrow<VideoLoadedEvent>(new SongVideoPlayerException($"Unable to load video '{videoUri}' with Unity's VideoPlayer"));
+            throw new SongVideoPlayerException($"Unable to load video '{videoUri}' with Unity's VideoPlayer");
         }
 
         // Start VideoPlayer to trigger loading
@@ -45,25 +45,21 @@ public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
         PositionInMillis = startPositionInMillis;
 
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
-        return Observable.Create<VideoLoadedEvent>(o =>
+        await ConditionUtils.WaitForConditionAsync(() => !this
+                                                    || videoPlayer.length > 0
+                                                    || videoPlayerErrorMessages.Count > 0);
+        if (!this)
         {
-            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => this == null
-                      || videoPlayer.length > 0
-                      || videoPlayerErrorMessages.Count > 0,
-                () =>
-                {
-                    if (videoPlayerErrorMessages.Count > 0)
-                    {
-                        Unload();
-                        o.OnError(new VideoSupportProviderException($"Failed to load video: '{videoUri}'"));
-                        return;
-                    }
+            throw new DestroyedAlreadyException($"Failed to load video '{videoUri}': {nameof(VideoPlayerVideoSupportProvider)} has been destroyed already.");
+        }
 
-                    o.OnNext(new VideoLoadedEvent(videoUri));
-                }));
-            return Disposable.Empty;
-        });
+        if (videoPlayerErrorMessages.Count > 0)
+        {
+            Unload();
+            throw new VideoSupportProviderException($"Failed to load video: '{videoUri}'");
+        }
+
+        return new VideoLoadedEvent(videoUri);
     }
 
     public override void Unload()

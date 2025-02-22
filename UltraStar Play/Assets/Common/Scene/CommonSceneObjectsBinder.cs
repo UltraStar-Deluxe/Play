@@ -68,12 +68,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(SteamLobbyManager.Instance);
         bb.BindExistingInstance(SteamLobbyMemberManager.Instance);
         bb.BindExistingInstance(SteamOnlineMultiplayerBackendConfigurator.Instance);
-        bb.BindExistingInstance(DontDestroyOnLoadManager.Instance.FindComponentOrThrow<FacepunchTransport>());
+        bb.BindExistingInstance(DontDestroyOnLoadManager.FindComponentOrThrow<FacepunchTransport>());
 
-        if (NetworkManager.Singleton == null)
-        {
-            FindOrCreateNetworkManager().SetSingleton();
-        }
         bb.BindExistingInstance(NetworkManager.Singleton);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
@@ -105,26 +101,5 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstanceLazy(() => StatisticsManager.Instance.Statistics);
 
         return bb.GetBindings();
-    }
-
-    private NetworkManager FindOrCreateNetworkManager()
-    {
-        NetworkManager networkManager = NetworkManager.Singleton;
-        if (networkManager != null)
-        {
-            return networkManager;
-        }
-
-        networkManager = FindObjectOfType<NetworkManager>();
-        if (networkManager != null)
-        {
-            return networkManager;
-        }
-
-        GameObject networkManagerGameObject = new GameObject();
-        networkManagerGameObject.name = "NetworkManager-RuntimeCreated";
-        networkManager = networkManagerGameObject.AddComponent<NetworkManager>();
-        return networkManager;
-
     }
 }

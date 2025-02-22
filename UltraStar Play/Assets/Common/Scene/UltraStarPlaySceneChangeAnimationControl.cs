@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour, INeedInjection
 {
-    public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
+    public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
 
     private const string UiCopyRenderTextureName = "SceneChangeAnimationControl.UiCopyRenderTexture";
 
@@ -27,13 +27,13 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
 
     [Inject]
     private UIDocument uiDocument;
-    
+
     [Inject]
     private RenderTextureManager renderTextureManager;
-    
+
     [Inject]
     private ApplicationManager applicationManager;
-    
+
     protected override object GetInstance()
     {
         return Instance;
@@ -60,7 +60,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             }
         }
     }
-    
+
     private void UpdateSceneTexturesAndTransition()
     {
         renderTextureManager.GetOrCreateScreenSizedRenderTexture(UiCopyRenderTextureName,
@@ -75,13 +75,13 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     public void AnimateChangeToScene(Action doLoadSceneAction, Action doAnimateAction)
     {
         animateAction = doAnimateAction;
-        
+
         if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
         {
             // Take "screenshot" of "old" scene.
             RenderTexture uiRenderTexture = renderTextureManager.GetExistingRenderTexture(ThemeManager.UiRenderTextureName);
             RenderTexture uiCopyRenderTexture = renderTextureManager.GetExistingRenderTexture(UiCopyRenderTextureName);
-            
+
             if (uiRenderTexture == null)
             {
                 Debug.LogWarning($"uiRenderTexture of ThemeManager is null. Not animating scene transition.");
@@ -126,7 +126,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         }
     }
 
-    public void StartSceneChangeAnimation(EScene currentScene, EScene nextScene)
+    public async void StartSceneChangeAnimation(EScene currentScene, EScene nextScene)
     {
         bool skipSceneChangeAnimationSound = nextScene == EScene.SingScene
                                              || currentScene == EScene.SingingResultsScene;
@@ -149,12 +149,11 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
 
         if (TryGetBackgroundVisualElementOrIsIrrelevant(out VisualElement background))
         {
-            StopAllCoroutines();
-            StartCoroutine(SceneChangeAnimationCoroutine(animationTimeInSeconds, background));
+            await SceneChangeAnimationAsync(animationTimeInSeconds, background);
         }
     }
 
-    private IEnumerator SceneChangeAnimationCoroutine(
+    private async Awaitable SceneChangeAnimationAsync(
         float animationTimeInSeconds,
         VisualElement background,
         Action onComplete = null)
@@ -162,21 +161,21 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         if (animationTimeInSeconds <= 0)
         {
             onComplete?.Invoke();
-            yield break;
+            return;
         }
 
         if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
         {
             themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(true);
-        }   
-        
+        }
+
         float timeInSeconds = 0;
         float timeInPercent = 0;
         while(timeInSeconds < 1
               && timeInPercent < 1)
         {
             float interpolatedValue = LeanTween.easeInSine(0, 1, timeInPercent);
-            
+
             if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
             {
                 // Scale and fade out the snapshot of the old UIDocument.
@@ -195,16 +194,16 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             float deltaTimeInSeconds = Mathf.Min(Time.deltaTime, maxDeltaTimeInSeconds);
             timeInSeconds += deltaTimeInSeconds;
             timeInPercent = timeInSeconds / animationTimeInSeconds;
-            yield return new WaitForEndOfFrame();
+            await Awaitable.NextFrameAsync();
         }
-        
+
         if (settings != null
             && themeManager != null
             && settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
         {
             themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(false);
         }
-        
+
         onComplete?.Invoke();
     }
 

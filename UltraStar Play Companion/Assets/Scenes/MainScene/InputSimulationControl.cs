@@ -220,7 +220,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void OnPointerDownOnMousePadArea(PointerDownEvent evt)
+    private async void OnPointerDownOnMousePadArea(PointerDownEvent evt)
     {
         Log.Debug(() => "OnPointerDownOnMousePadArea");
         UpdateClickCountOnPointerDownOnMousePadArea();
@@ -231,34 +231,29 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         mousePadAreaStartPos = evt.localPosition;
         lastMousePadAreaPos = evt.localPosition;
 
-        // Check for single click, i.e. released all fingers after single click
         if (mousePadAreaPointerDownEventClickCount == 1)
         {
-            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(ClickTimeThresholdInSeconds, () =>
+            // Check for single click, i.e. released all fingers after single click
+            await Awaitable.WaitForSecondsAsync(ClickTimeThresholdInSeconds);
+            if (!isPointerDownOnMousePadArea
+                && mousePadAreaPointerDownEventClickCount == 1
+                && !isMousePadAreaTotalPointerDeltaAboveThreshold
+                && !awaitingDragEnd)
             {
-                if (!isPointerDownOnMousePadArea
-                    && mousePadAreaPointerDownEventClickCount == 1
-                    && !isMousePadAreaTotalPointerDeltaAboveThreshold
-                    && !awaitingDragEnd)
-                {
-                    SendSimulateLeftMouseButtonClickRequest();
-                }
-            }));
+                SendSimulateLeftMouseButtonClickRequest();
+            }
         }
-
-        // Check for double click, i.e. released all fingers after double click
-        if (mousePadAreaPointerDownEventClickCount == 2)
+        else if (mousePadAreaPointerDownEventClickCount == 2)
         {
-            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(DoubleClickTimeThresholdInSeconds, () =>
+            // Check for double click, i.e. released all fingers after double click
+            await Awaitable.WaitForSecondsAsync(DoubleClickTimeThresholdInSeconds);
+            if (!isPointerDownOnMousePadArea
+                && mousePadAreaPointerDownEventClickCount == 2
+                && !isMousePadAreaTotalPointerDeltaAboveThreshold
+                && !awaitingDragEnd)
             {
-                if (!isPointerDownOnMousePadArea
-                    && mousePadAreaPointerDownEventClickCount == 2
-                    && !isMousePadAreaTotalPointerDeltaAboveThreshold
-                    && !awaitingDragEnd)
-                {
-                    SendSimulateLeftMouseButtonDoubleClickRequest();
-                }
-            }));
+                SendSimulateLeftMouseButtonDoubleClickRequest();
+            }
         }
     }
 
@@ -426,25 +421,25 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         lastMousePadAreaPos = localPosition;
     }
 
-    private void SendSimulateInputRequest(string inputControl)
+    private async void SendSimulateInputRequest(string inputControl)
     {
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.Input
+        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.Input
             .ReplaceOrThrow("{inputControl}", inputControl));
     }
 
-    private void SendSimulateScrollWheelRequest(Vector2 scrollDelta)
+    private async void SendSimulateScrollWheelRequest(Vector2 scrollDelta)
     {
         if (scrollDelta == Vector2.zero)
         {
             return;
         }
 
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.InputScrollWheel
+        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.InputScrollWheel
             .ReplaceOrThrow("{deltaX}", scrollDelta.x.ToString(CultureInfo.InvariantCulture))
             .ReplaceOrThrow("{deltaY}", scrollDelta.y.ToString(CultureInfo.InvariantCulture)));
     }
 
-    private void SendSimulateMouseDeltaRequest(Vector2 mouseDelta)
+    private async void SendSimulateMouseDeltaRequest(Vector2 mouseDelta)
     {
         if (mouseDelta == Vector2.zero)
         {
@@ -457,7 +452,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.InputMouseDelta
+        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.InputMouseDelta
             .ReplaceOrThrow("{deltaX}", mouseDelta.x.ToStringInvariantCulture())
             .ReplaceOrThrow("{deltaY}", mouseDelta.y.ToStringInvariantCulture()));
     }

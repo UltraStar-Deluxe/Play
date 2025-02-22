@@ -2,6 +2,7 @@
 using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -17,12 +18,15 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
 
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
+
+    [Inject]
+    private GameObject gameObject;
 
     private List<IPlaylist> items = new();
 
@@ -51,9 +55,15 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
                     playlistDropdownField.value = newPlaylistName;
                 }
             });
-        
-        playlistManager.PlaylistChangeEventStream
-            .Subscribe(_ => UpdateItems());
+
+        playlistManager.PlaylistChangedEventStream
+            .Subscribe(_ => UpdateItems())
+            .AddTo(gameObject);
+
+        playlistManager.PlaylistsLoadedEventStream
+            .Subscribe(_ => UpdateItems())
+            .AddTo(gameObject);
+
     }
 
     private void UpdateItems()

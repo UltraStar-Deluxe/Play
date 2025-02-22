@@ -15,7 +15,7 @@ public class AbstractAudioClipAction : INeedInjection
     [Inject]
     protected SongEditorMicSampleRecorder songEditorMicSampleRecorder;
 
-    protected AudioClip GetAudioClip(ESongEditorSamplesSource samplesSource)
+    protected async Awaitable<AudioClip> GetAudioClip(ESongEditorSamplesSource samplesSource)
     {
         if (samplesSource == ESongEditorSamplesSource.Recording)
         {
@@ -33,7 +33,7 @@ public class AbstractAudioClipAction : INeedInjection
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingVocalsAudio));
                 return null;
             }
-            return AudioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
+            return await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
         }
         else if (samplesSource == ESongEditorSamplesSource.Instrumental)
         {
@@ -42,11 +42,11 @@ public class AbstractAudioClipAction : INeedInjection
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingInstrumentalAudio));
                 return null;
             }
-            return AudioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetInstrumentalAudioUri(songMeta), false);
+            return await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetInstrumentalAudioUri(songMeta), false);
         }
 
         // Use the song's audio.
         // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
-        return AudioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetAudioUri(songMeta), false);
+        return await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetAudioUri(songMeta), false);
     }
 }

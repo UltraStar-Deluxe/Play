@@ -5,7 +5,7 @@
     <ui:Template name="ImportLrcDialogUi" src="project://database/Assets/Scenes/SongEditor/ImportLrcDialogUi.uxml?fileID=9197481963319205126&amp;guid=42c32785af42b57418f728546c04b525&amp;type=3#ImportLrcDialogUi" />
     <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
     <ui:VisualElement name="background">
-        <ui:VisualElement name="songEditorRoot" class="songEditorRoot overlay" style="width: 100%; height: 100%; align-items: flex-start;">
+        <ui:VisualElement name="songEditorRoot" class="songEditorRoot overlay" style="width: 100%; height: 100%; align-items: stretch;">
             <ui:VisualElement name="row" style="flex-direction: row; flex-grow: 1;">
                 <ui:VisualElement name="leftSideBar" style="flex-direction: row;">
                     <ui:Instance template="SongEditorSideBarMainColumnUi" name="sideBarMainColumnUi" />
@@ -39,7 +39,7 @@
                 <ui:VisualElement name="rightSideBar" style="height: 100%; min-width: 150px; max-width: 450px; width: 25%;">
                     <ui:VisualElement name="lyricsArea" class="panel" style="border-top-width: 0; border-right-width: 0; flex-grow: 1; height: auto;">
                         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" class="fullMinHeightUnityContentContainer" style="width: 100%; height: auto; flex-grow: 1;">
-                            <ui:TextField multiline="true" name="lyricsAreaTextField" text="Lorem ipsum dolor sit " value="Lorem ipsum dolor sit " class="smallFont multiline" style="flex-shrink: 1; flex-grow: 1; white-space: normal;" />
+                            <ui:TextField multiline="true" name="lyricsAreaTextField" value="Lorem ipsum dolor sit " class="smallFont multiline" style="flex-shrink: 1; flex-grow: 1; white-space: normal;" />
                         </ui:ScrollView>
                         <ui:VisualElement name="lyricsAreaButtonRow" style="flex-direction: row; flex-shrink: 0;">
                             <ToggleButton display-tooltip-when-elided="true" name="toggleLyricsAreaEditModeButton" class="squareButton mr-1">
@@ -55,14 +55,14 @@
                     <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; height: 90px; align-items: center; justify-content: center; flex-shrink: 0; flex-direction: row;">
                         <ui:VisualElement name="videoAreaContent" picking-mode="Ignore" style="flex-grow: 1; width: auto; height: 100%; justify-content: center; align-items: center;">
                             <MaterialIcon name="noVideoImage" icon="ondemand_video" style="position: absolute; font-size: 75px;" />
-                            <ui:VisualElement name="videoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&apos;); -unity-background-scale-mode: scale-and-crop;" />
+                            <ui:VisualElement name="videoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&quot;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&quot;); -unity-background-scale-mode: scale-and-crop;" />
                             <ui:VisualElement name="songBackgroundImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit; display: none;">
-                                <ui:Label text="Background" display-tooltip-when-elided="true" name="songBackgroundLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center; -unity-font-style: normal; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;);" />
+                                <ui:Label text="Background" display-tooltip-when-elided="true" name="songBackgroundLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center; -unity-font-style: normal; -unity-font-definition: url(&quot;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&quot;);" />
                             </ui:VisualElement>
                             <ui:VisualElement name="songCoverImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit; display: none;">
-                                <ui:Label text="Cover" display-tooltip-when-elided="true" name="songCoverLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;); -unity-font-style: normal;" />
+                                <ui:Label text="Cover" display-tooltip-when-elided="true" name="songCoverLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center; -unity-font-definition: url(&quot;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&quot;); -unity-font-style: normal;" />
                             </ui:VisualElement>
-                            <ui:Label text="Video gap: -99" display-tooltip-when-elided="true" name="videoAreaLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center; -unity-font-style: normal; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;);" />
+                            <ui:Label text="Video gap: -99" display-tooltip-when-elided="true" name="videoAreaLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center; -unity-font-style: normal; -unity-font-definition: url(&quot;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&quot;);" />
                         </ui:VisualElement>
                         <ui:VisualElement name="buttonContainer" style="flex-direction: column; width: auto; height: 100%;">
                             <ui:Button display-tooltip-when-elided="true" name="showVideoButton" class="squareButton" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; margin-bottom: 5px;">
@@ -111,7 +111,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="editLyricsPopup" class="panel" style="position: absolute; height: 30px; min-width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; justify-content: center; top: -1000px;">
-                <ui:TextField picking-mode="Ignore" value="The lyrics" text="The lyrics" name="editLyricsPopupTextField" style="position: absolute; height: 100%; display: flex; width: 100%; min-height: 20px;" />
+                <ui:TextField picking-mode="Ignore" value="The lyrics" name="editLyricsPopupTextField" style="position: absolute; height: 100%; display: flex; width: 100%; min-height: 20px;" />
             </ui:VisualElement>
             <ui:VisualElement name="importMidiFileDialogOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">
                 <ui:Instance template="ImportMidiFileDialogUi" name="ImportMidiFileDialogUi" class="overlayDialog" style="min-width: 50%;" />
