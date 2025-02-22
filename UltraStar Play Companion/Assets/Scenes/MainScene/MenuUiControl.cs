@@ -27,6 +27,9 @@ public class MenuUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private GameObject gameObject;
 
+    [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
+
     [Inject(UxmlName = R.UxmlNames.connectionInfoLabel)]
     private Label connectionInfoLabel;
 
@@ -77,6 +80,8 @@ public class MenuUiControl : INeedInjection, IInjectionFinishedListener
 
     private LabeledChooserControl<string> recordingDeviceChooserControl;
 
+    private List<string> SortedDeviceNames => Microphone.devices.OrderBy(device => device).ToList();
+
     public void OnInjectionFinished()
     {
         menuOverlay.ShowByDisplay();
@@ -89,13 +94,12 @@ public class MenuUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         // Recording device
-        List<string> deviceNames = Microphone.devices.ToList();
-        deviceNames.Sort();
-        recordingDeviceChooserControl = new(recordingDeviceChooser, deviceNames,
-            item => Translation.Of(item));
+        recordingDeviceChooserControl = new(recordingDeviceChooser, SortedDeviceNames, item => Translation.Of(item));
         recordingDeviceChooserControl.AutoSmallFont = false;
-        recordingDeviceChooserControl.Selection = settings.MicProfile.Name;
-        recordingDeviceChooserControl.SelectionAsObservable.Subscribe(newValue => settings.SetMicProfileName(newValue));
+        recordingDeviceChooserControl.Bind(() => settings.MicProfile?.Name ?? "", newValue => settings.SetMicProfileName(newValue));
+
+        UpdateRecordingDeviceList();
+        micSampleRecorderManager.ConnectedMicDevicesChangesStream.Subscribe(_ => UpdateRecordingDeviceList());
 
         // Language
         LanguageChooserControl languageChooserControl = new LanguageChooserControl(languageChooser);
@@ -163,6 +167,13 @@ public class MenuUiControl : INeedInjection, IInjectionFinishedListener
             .AddTo(gameObject);
 
         UpdateTranslation();
+    }
+
+    private void UpdateRecordingDeviceList()
+    {
+        Debug.Log($"Updating recording device list. Available devices: {Microphone.devices.JoinWith(",")}");
+        recordingDeviceChooserControl.Items = SortedDeviceNames;
+        recordingDeviceChooserControl.Selection = settings.MicProfile.Name;
     }
 
     private void ShowMenu()

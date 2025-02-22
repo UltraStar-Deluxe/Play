@@ -5,8 +5,8 @@ using UnityEngine.UIElements;
 
 public class MicrophoneUiControl : INeedInjection, IInjectionFinishedListener
 {
-    private const int AudioWaveFormTextureWidth = 256;
-    private const int AudioWaveFormTextureHeight = 128;
+    private const int AudioWaveFormTextureWidth = 64;
+    private const int AudioWaveFormTextureHeight = 64;
 
     [Inject]
     private Settings settings;
@@ -20,8 +20,8 @@ public class MicrophoneUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private GameObject gameObject;
 
-    [Inject(UxmlName = R.UxmlNames.toggleRecordingButtonContainer)]
-    private VisualElement toggleRecordingButtonContainer;
+    [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
 
     [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
@@ -109,15 +109,9 @@ public class MicrophoneUiControl : INeedInjection, IInjectionFinishedListener
             });
 
         UpdateNoMicrophoneAlert();
+        micSampleRecorderManager.ConnectedMicDevicesChangesStream.Subscribe(_ => UpdateNoMicrophoneAlert());
 
         UpdateTranslation();
-    }
-
-    private void UpdateNoMicrophoneAlert()
-    {
-        bool hasMicrophone = Microphone.devices.Length > 0;
-        toggleRecordingButtonContainer.SetVisibleByDisplay(hasMicrophone);
-        noMicrophoneAlert.SetVisibleByDisplay(!hasMicrophone);
     }
 
     public void Update()
@@ -128,17 +122,22 @@ public class MicrophoneUiControl : INeedInjection, IInjectionFinishedListener
         {
             audioWaveFormVisualization.DrawAudioWaveForm(clientSideMicDataSender.MicSamples);
         }
+    }
 
-        if ((IMicrophoneAdapter.Instance.Devices.Length > 0 && !toggleRecordingButtonContainer.IsVisibleByDisplay())
-            || (IMicrophoneAdapter.Instance.Devices.Length <= 0 && toggleRecordingButtonContainer.IsVisibleByDisplay()))
-        {
-            UpdateNoMicrophoneAlert();
-        }
+    private void UpdateNoMicrophoneAlert()
+    {
+        bool hasMicrophone = Microphone.devices.Length > 0;
+        Log.Debug(() => $"{nameof(UpdateNoMicrophoneAlert)} - hasMicrophone: {hasMicrophone}, devices {Microphone.devices.JoinWith(",")}");
+
+        toggleRecordingButton.SetVisibleByDisplay(hasMicrophone);
+        visualizeAudioToggle.SetVisibleByDisplay(hasMicrophone);
+        noMicrophoneAlert.SetVisibleByDisplay(!hasMicrophone);
     }
 
     private void UpdateTranslation()
     {
         visualizeAudioToggle.label = Translation.Get(R.Messages.companionApp_visualizeMicInput);
+        noMicrophoneText.text = Translation.Get(R.Messages.companionApp_noMicrophoneHints);
     }
 
     private void UpdateRecordingDeviceInfo()
