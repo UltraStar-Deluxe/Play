@@ -419,7 +419,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.PitchDetectionSamplesSource,
             newValue => settings.SongEditorSettings.PitchDetectionSamplesSource = newValue);
 
-        audioSeparationButton.RegisterCallbackButtonTriggered(_ =>
+        audioSeparationButton.RegisterCallbackButtonTriggered(async _ =>
         {
             if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
                 && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
@@ -427,7 +427,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingInstrumentalAudio));
                 return;
             }
-            audioSeparationManager.ProcessSongMetaJob(songMeta, true);
+            await audioSeparationManager.ProcessSongMetaJob(songMeta, true).GetResultAsync();
             audioSeparationButton.SetEnabled(false);
         });
         if (SongMetaUtils.VocalsAudioResourceExists(songMeta)

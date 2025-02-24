@@ -311,9 +311,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             });
 
         VisualElement buttonContainer = contextMenuPopup.AddButton(Translation.Get(R.Messages.action_separateAudio), "call_split",
-            () =>
+            async () =>
             {
-                audioSeparationManager.ProcessSongMetaJob(songEntry.SongMeta, true);
+                await audioSeparationManager.ProcessSongMetaJob(songEntry.SongMeta, true).GetResultAsync();
             });
 
         // Disable button if vocals and instrumental audio already exist.
