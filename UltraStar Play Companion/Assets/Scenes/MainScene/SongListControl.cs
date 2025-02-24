@@ -64,8 +64,6 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
     private readonly SongDetailsControl songDetailsControl = new();
     private readonly SongQueueUiControl songQueueUiControl = new();
 
-    private List<SongQueueEntryDto> songQueueEntryDtos = new();
-
     private ScrollView songListViewScrollView;
     private Vector2 songListViewScrollPosBeforeHide = new Vector2(-1, -1);
     private bool lastIsSongListVisibleByDisplay;
@@ -168,7 +166,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
         try
         {
             await mainGameHttpClient.DeleteRequestAsync(HttpApiEndpointPaths.SongQueueEntryIndex
-                .ReplaceOrThrow("{index}", songQueueEntryDtos.IndexOf(entry).ToString()));
+                .ReplaceOrThrow("{index}", songQueueUiControl.GetSongQueueEntryIndex(entry).ToString()));
         }
         finally
         {
@@ -182,7 +180,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
         try
         {
             await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.SongQueueEntryIndex
-                    .ReplaceOrThrow("{index}", songQueueEntryDtos.IndexOf(entry).ToString()),
+                    .ReplaceOrThrow("{index}", songQueueUiControl.GetSongQueueEntryIndex(entry).ToString()),
                 entry.ToJson());
         }
         finally
@@ -218,9 +216,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
             }
 
             songQueueUiControl.HasWriteSongQueuePermission = mainGameHttpClient.Permissions.Value.Contains(HttpApiPermission.WriteSongQueue);
-
-            songQueueEntryDtos = listDto.Items;
-            songQueueUiControl.SetSongQueueEntryDtos(songQueueEntryDtos);
+            songQueueUiControl.SetSongQueueEntryDtos(listDto.Items);
         }
         catch (Exception ex)
         {
