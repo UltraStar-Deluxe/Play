@@ -113,6 +113,11 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
         listView.itemsSource = this.songQueueEntryDtos.ToList();
     }
 
+    public int GetSongQueueEntryIndex(SongQueueEntryDto songQueueEntryDto)
+    {
+        return songQueueEntryDtos.IndexOf(songQueueEntryDto);
+    }
+
     public void Clear()
     {
         SetSongQueueEntryDtos(new List<SongQueueEntryDto>());

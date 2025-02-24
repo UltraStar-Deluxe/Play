@@ -75,6 +75,7 @@ public static partial class R
         public static readonly string companionApp_connecting = "companionApp_connecting";
         public static readonly string companionApp_connectingWithFailedAttempts = "companionApp_connectingWithFailedAttempts";
         public static readonly string companionApp_devMode = "companionApp_devMode";
+        public static readonly string companionApp_noMicrophoneHints = "companionApp_noMicrophoneHints";
         public static readonly string companionApp_songList_error_general = "companionApp_songList_error_general";
         public static readonly string companionApp_songList_error_noSongsFound = "companionApp_songList_error_noSongsFound";
         public static readonly string companionApp_songList_error_notConnected = "companionApp_songList_error_notConnected";
