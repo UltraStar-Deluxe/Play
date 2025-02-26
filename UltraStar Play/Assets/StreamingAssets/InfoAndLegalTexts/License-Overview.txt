@@ -4,6 +4,12 @@ This includes the Unity platform and related assets under the terms of Unity Tec
 
 Further, Melody Mania includes code and assets of the following projects, without claim on completeness:
 
+Steinberg ASIO SDK Licensing Agreement Version 2.0.3
+----------------------------------------------------
+See https://www.steinberg.net/developers/
+
+- This game includes a PortAudio build that is compatible with Steinberg ASIO audio drivers
+- ASIO is a registered trademark of Steinberg Media Technologies GmbH
 
 MIT License
 -----------

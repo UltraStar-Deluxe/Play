@@ -35,6 +35,7 @@ public static partial class R
         public const string artistLabel = "artistLabel";
         public const string artistPropertyToggle = "artistPropertyToggle";
         public const string artistTextField = "artistTextField";
+        public const string asioCompatibleLogo = "asioCompatibleLogo";
         public const string assignToPlayerDropdownField = "assignToPlayerDropdownField";
         public const string assignToPlayerToggle = "assignToPlayerToggle";
         public const string audioFileTextField = "audioFileTextField";

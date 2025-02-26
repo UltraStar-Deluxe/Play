@@ -18,6 +18,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
     {
         { "Melody Mania", "InfoAndLegalTexts/Melody-Mania.txt" },
         { "Licenses", "InfoAndLegalTexts/License-Overview.txt" },
+        { "ASIO", "InfoAndLegalTexts/ASIO-License.txt" },
         { "MIT License", "InfoAndLegalTexts/MIT-License.txt" },
         { "APL 2.0", "InfoAndLegalTexts/APL-2.0.txt" },
         { "MPL 1.1", "InfoAndLegalTexts/MPL-1.1.txt" },
@@ -51,6 +52,9 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
 
     [Inject(UxmlName = R.UxmlNames.aboutTextsScrollView)]
     private ScrollView aboutTextsScrollView;
+
+    [Inject(UxmlName = R.UxmlNames.asioCompatibleLogo)]
+    private VisualElement asioCompatibleLogo;
 
     private int selectedTextIndex;
 
@@ -117,6 +121,8 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
 
     private void ShowAboutText(string title, string text)
     {
+        asioCompatibleLogo.SetVisibleByDisplay(title.ToLowerInvariant().Contains("asio"));
+
         aboutTextScrollView.Clear();
 
         // A Unity label has a maximum length. So the text needs to be split into multiple labels.
