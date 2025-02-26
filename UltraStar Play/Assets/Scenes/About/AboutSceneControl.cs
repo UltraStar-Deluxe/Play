@@ -53,6 +53,9 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.aboutTextsScrollView)]
     private ScrollView aboutTextsScrollView;
 
+    [Inject(UxmlName = R.UxmlNames.asioCompatibleLogo)]
+    private VisualElement asioCompatibleLogo;
+
     private int selectedTextIndex;
 
     private readonly List<ToggleButton> toggleButtons = new();
@@ -118,6 +121,8 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
 
     private void ShowAboutText(string title, string text)
     {
+        asioCompatibleLogo.SetVisibleByDisplay(title.ToLowerInvariant().Contains("asio"));
+
         aboutTextScrollView.Clear();
 
         // A Unity label has a maximum length. So the text needs to be split into multiple labels.
