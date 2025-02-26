@@ -18,6 +18,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
     {
         { "Melody Mania", "InfoAndLegalTexts/Melody-Mania.txt" },
         { "Licenses", "InfoAndLegalTexts/License-Overview.txt" },
+        { "ASIO", "InfoAndLegalTexts/ASIO-License.txt" },
         { "MIT License", "InfoAndLegalTexts/MIT-License.txt" },
         { "APL 2.0", "InfoAndLegalTexts/APL-2.0.txt" },
         { "MPL 1.1", "InfoAndLegalTexts/MPL-1.1.txt" },

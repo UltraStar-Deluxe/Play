@@ -1,0 +1,3 @@
+ASIO is a registered trademark of Steinberg Media Technologies GmbH
+
+See https://www.steinberg.net/developers/
