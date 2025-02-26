@@ -156,7 +156,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      ASIO-compatible-logo-Steinberg-TM-BW_0: 8620930622775406910
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
