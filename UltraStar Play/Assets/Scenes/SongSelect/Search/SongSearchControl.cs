@@ -296,53 +296,51 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
              return true;
         }
 
-        if (searchProperties.Contains(ESearchProperty.Artist)
-            && !songMeta.Artist.IsNullOrEmpty()
-            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Artist, searchText))
+        // Lyrics are a special case because these first need to be loaded, which is costly
+        foreach (ESearchProperty searchProperty in searchProperties.Except(new List<ESearchProperty> { ESearchProperty.Lyrics }))
         {
-            return true;
+            string propertyValue = GetPropertyValue(songMeta, searchProperty);
+            if (propertyValue.IsNullOrEmpty())
+            {
+                continue;
+            }
+
+            if (StringUtils.ContainsIgnoreCaseAndDiacritics(propertyValue, searchText))
+            {
+                return true;
+            }
         }
-        if (searchProperties.Contains(ESearchProperty.Title)
-            && !songMeta.Title.IsNullOrEmpty()
-            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Title, searchText))
-        {
-            return true;
-        }
-        if (searchProperties.Contains(ESearchProperty.Genre)
-            && !songMeta.Genre.IsNullOrEmpty()
-            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Genre, searchText))
-        {
-            return true;
-        }
-        if (searchProperties.Contains(ESearchProperty.Year)
-            && songMeta.Year.ToString().ToLowerInvariant().Contains(searchText))
-        {
-            return true;
-        }
-        if (searchProperties.Contains(ESearchProperty.Edition)
-            && !songMeta.Edition.IsNullOrEmpty()
-            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Edition, searchText))
-        {
-            return true;
-        }
-        if (searchProperties.Contains(ESearchProperty.Tags)
-            && !songMeta.Tag.IsNullOrEmpty()
-            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Tag, searchText))
-        {
-            return true;
-        }
-        if (searchProperties.Contains(ESearchProperty.Language)
-            && !songMeta.Language.IsNullOrEmpty()
-            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Language, searchText))
-        {
-            return true;
-        }
+
         if (searchProperties.Contains(ESearchProperty.Lyrics)
             && SongMetaMatchesLyrics(songMeta, searchText))
         {
             return true;
         }
+
         return false;
+    }
+
+    private string GetPropertyValue(SongMeta songMeta, ESearchProperty searchProperty)
+    {
+        switch (searchProperty)
+        {
+            case ESearchProperty.Artist:
+                return songMeta.Artist;
+            case ESearchProperty.Title:
+                return songMeta.Title;
+            case ESearchProperty.Language:
+                return songMeta.Language;
+            case ESearchProperty.Genre:
+                return songMeta.Genre;
+            case ESearchProperty.Tags:
+                return songMeta.Tag;
+            case ESearchProperty.Edition:
+                return songMeta.Edition;
+            case ESearchProperty.Year:
+                return songMeta.Year.ToString();
+            default:
+                throw new ArgumentOutOfRangeException(nameof(searchProperty), searchProperty, null);
+        }
     }
 
     private bool SongMetaMatchesLyrics(SongMeta songMeta, string searchText)
@@ -398,6 +396,125 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     public void SetSearchText(string newValue)
     {
         searchTextField.value = newValue;
+    }
+
+    public SongSelectEntry GetFuzzySearchMatch(string searchTextNoWhitespace)
+    {
+        string GetEntryTitle(SongSelectEntry songSelectEntry)
+        {
+            if (songSelectEntry is SongSelectSongEntry songEntry)
+            {
+                return songEntry.SongMeta.Title;
+            }
+            else if (songSelectEntry is SongSelectFolderEntry folderEntry)
+            {
+                return folderEntry.DirectoryInfo.Name;
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        string GetEntryArtist(SongSelectEntry songSelectEntry)
+        {
+            if (songSelectEntry is SongSelectSongEntry songEntry)
+            {
+                return songEntry.SongMeta.Artist;
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        if (searchTextNoWhitespace.Length == 1)
+        {
+            SongSelectEntry matchingEntry = GetFirstSongOfCurrentOrderThatStartsWith(searchTextNoWhitespace);
+            return matchingEntry;
+        }
+
+        // Search title that starts with the text
+        SongSelectEntry titleStartsWithMatch = songRouletteControl.Find(it =>
+        {
+            string titleNoWhitespace = GetEntryTitle(it).Replace(" ", "");
+            return StringUtils.StartsWithIgnoreCaseAndDiacritics(titleNoWhitespace, searchTextNoWhitespace);
+        });
+        if (titleStartsWithMatch != null)
+        {
+            return titleStartsWithMatch;
+        }
+
+        // Search artist that starts with the text
+        SongSelectEntry artistStartsWithMatch = songRouletteControl.Find(it =>
+        {
+            string artistNoWhitespace = GetEntryArtist(it).Replace(" ", "");
+            return StringUtils.StartsWithIgnoreCaseAndDiacritics(artistNoWhitespace, searchTextNoWhitespace);
+        });
+        if (artistStartsWithMatch != null)
+        {
+            return artistStartsWithMatch;
+        }
+
+        // Search title or artist contains the text
+        SongSelectEntry artistOrTitleContainsMatch = songRouletteControl.Find(it =>
+        {
+            string artistNoWhitespace = GetEntryArtist(it).Replace(" ", "");
+            string titleNoWhitespace = GetEntryTitle(it).Replace(" ", "");
+            return StringUtils.ContainsIgnoreCaseAndDiacritics(artistNoWhitespace, searchTextNoWhitespace)
+                   || StringUtils.ContainsIgnoreCaseAndDiacritics(titleNoWhitespace, searchTextNoWhitespace);
+        });
+        if (artistOrTitleContainsMatch != null)
+        {
+            return artistOrTitleContainsMatch;
+        }
+
+        return null;
+    }
+
+    private SongSelectEntry GetFirstSongOfCurrentOrderThatStartsWith(string searchTextNoWhitespace)
+    {
+        // search from the current entry in the current order
+        SongSelectSongEntry currentEntry = songRouletteControl.SelectedEntry as SongSelectSongEntry;
+        if (currentEntry == null)
+        {
+            return null;
+        }
+
+        ESearchProperty searchProperty = GetSearchProperty(settings.SongOrder);
+        string currentProperty = GetPropertyValue(currentEntry.SongMeta, searchProperty);
+
+        SongSelectEntry matchingEntry = songRouletteControl.Find(it =>
+        {
+            SongSelectSongEntry songEntry = it as SongSelectSongEntry;
+            if (songEntry?.SongMeta == null)
+            {
+                return false;
+            }
+
+            string property = GetPropertyValue(songEntry.SongMeta, searchProperty);
+            return currentProperty == null || StringUtils.StartsWithIgnoreCaseAndDiacritics(property, searchTextNoWhitespace);
+        });
+        return matchingEntry;
+    }
+
+    private ESearchProperty GetSearchProperty(ESongOrder songOrder)
+    {
+        switch (songOrder)
+        {
+            case ESongOrder.Artist:
+                return ESearchProperty.Artist;
+            case ESongOrder.Title:
+                return ESearchProperty.Title;
+            case ESongOrder.Genre:
+                return ESearchProperty.Genre;
+            case ESongOrder.Language:
+                return ESearchProperty.Language;
+            case ESongOrder.Year:
+                return ESearchProperty.Year;
+            default:
+                return ESearchProperty.Artist;
+        }
     }
 
     public void ResetSearchText()

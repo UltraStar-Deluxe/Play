@@ -334,7 +334,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         fuzzySearchTextLabel.ShowByDisplay();
         songSelectSceneInputControl.FuzzySearchText
-            .Subscribe(newValue => fuzzySearchTextLabel.SetTranslatedText(Translation.Of(newValue)));
+            .Subscribe(OnFuzzySearchTextChanged);
 
         songRouletteControl.SubmitEventStream.Subscribe(_ => OnSubmitSongRoulette());
         songRouletteControl.Focus();
@@ -385,6 +385,20 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         InitSceneMenu();
 
         UpdateSceneTitle();
+    }
+
+    private void OnFuzzySearchTextChanged(string newValue)
+    {
+        if (!newValue.IsNullOrEmpty()
+            && newValue.Length == 1)
+        {
+            // Single letter search jumps to the first song that matches current order property
+            string songOrderTranslation = Translation.Get(settings.SongOrder);
+            fuzzySearchTextLabel.SetTranslatedText(Translation.Of($"{songOrderTranslation}: {newValue}"));
+            return;
+        }
+
+        fuzzySearchTextLabel.SetTranslatedText(Translation.Of(newValue));
     }
 
     private void ResetCoopMode()
@@ -830,70 +844,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        string GetEntryTitle(SongSelectEntry songSelectEntry)
-        {
-            if (songSelectEntry is SongSelectSongEntry songEntry)
-            {
-                return songEntry.SongMeta.Title;
-            }
-            else if (songSelectEntry is SongSelectFolderEntry folderEntry)
-            {
-                return folderEntry.DirectoryInfo.Name;
-            }
-            else
-            {
-                return "";
-            }
-        }
-
-        string GetEntryArtist(SongSelectEntry songSelectEntry)
-        {
-            if (songSelectEntry is SongSelectSongEntry songEntry)
-            {
-                return songEntry.SongMeta.Artist;
-            }
-            else
-            {
-                return "";
-            }
-        }
-
-        // Search title that starts with the text
-        SongSelectEntry titleStartsWithMatch = songRouletteControl.Find(it =>
-        {
-            string titleNoWhitespace = GetEntryTitle(it).Replace(" ", "");
-            return StringUtils.StartsWithIgnoreCaseAndDiacritics(titleNoWhitespace, searchTextNoWhitespace);
-        });
-        if (titleStartsWithMatch != null)
-        {
-            songRouletteControl.SelectEntry(titleStartsWithMatch);
-            return;
-        }
-
-        // Search artist that starts with the text
-        SongSelectEntry artistStartsWithMatch = songRouletteControl.Find(it =>
-        {
-            string artistNoWhitespace = GetEntryArtist(it).Replace(" ", "");
-            return StringUtils.StartsWithIgnoreCaseAndDiacritics(artistNoWhitespace, searchTextNoWhitespace);
-        });
-        if (artistStartsWithMatch != null)
-        {
-            songRouletteControl.SelectEntry(artistStartsWithMatch);
-            return;
-        }
-
-        // Search title or artist contains the text
-        SongSelectEntry artistOrTitleContainsMatch = songRouletteControl.Find(it =>
-        {
-            string artistNoWhitespace = GetEntryArtist(it).Replace(" ", "");
-            string titleNoWhitespace = GetEntryTitle(it).Replace(" ", "");
-            return StringUtils.ContainsIgnoreCaseAndDiacritics(artistNoWhitespace, searchTextNoWhitespace)
-                || StringUtils.ContainsIgnoreCaseAndDiacritics(titleNoWhitespace, searchTextNoWhitespace);
-        });
-        if (artistOrTitleContainsMatch != null)
-        {
-            songRouletteControl.SelectEntry(artistOrTitleContainsMatch);
-        }
+        SongSelectEntry entry = songSearchControl.GetFuzzySearchMatch(searchTextNoWhitespace);
+        songRouletteControl.SelectEntry(entry);
     }
 
     private SingSceneData CreateSingSceneDataWithGivenSongAndSettings(SongMeta songMeta, bool startPaused)
@@ -1299,6 +1251,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     private async void StartSongRepositorySearch()
     {
         string searchText = songSearchControl.GetSearchText();
+        if (searchText.IsNullOrEmpty())
+        {
+            return;
+        }
         Debug.Log($"StartSongRepositorySearch: searchText '{searchText}'");
 
         try
