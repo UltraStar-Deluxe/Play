@@ -102,6 +102,18 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => songRouletteControl.SelectNextEntry());
         InputManager.GetInputAction(R.InputActions.usplay_previousSong).PerformedAsObservable()
             .Subscribe(_ => songRouletteControl.SelectPreviousEntry());
+        InputManager.GetInputAction(R.InputActions.usplay_nextSongByOrderProperty).PerformedAsObservable(1)
+            .Subscribe(_ =>
+            {
+                InputManager.GetInputAction(R.InputActions.usplay_nextSong).CancelNotifyForThisFrame();
+                songSearchControl.SelectNextEntryByOrderProperty();
+            });
+        InputManager.GetInputAction(R.InputActions.usplay_previousSongByOrderProperty).PerformedAsObservable(1)
+            .Subscribe(_ =>
+            {
+                InputManager.GetInputAction(R.InputActions.usplay_previousSong).CancelNotifyForThisFrame();
+                songSearchControl.SelectPreviousEntryByOrderProperty();
+            });
 
         // Navigate to parent folder
         InputManager.GetInputAction(R.InputActions.usplay_navigateToParentFolder).PerformedAsObservable()

@@ -322,6 +322,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
 
     private string GetPropertyValue(SongMeta songMeta, ESearchProperty searchProperty)
     {
+        if (songMeta == null)
+        {
+            return "";
+        }
+
         switch (searchProperty)
         {
             case ESearchProperty.Artist:
@@ -515,6 +520,68 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
             default:
                 return ESearchProperty.Artist;
         }
+    }
+
+    public void SelectNextEntryByOrderProperty()
+    {
+        SelectEntryByOrderProperty(1);
+    }
+
+    public void SelectPreviousEntryByOrderProperty()
+    {
+        SelectEntryByOrderProperty(-1);
+    }
+
+    private void SelectEntryByOrderProperty(int direction)
+    {
+        ESongOrder currentOrder = settings.SongOrder;
+        SongSelectSongEntry currentEntry = songRouletteControl.SelectedEntry as SongSelectSongEntry;
+        if (currentEntry == null)
+        {
+            return;
+        }
+
+        ESearchProperty currentOrderProperty = GetSearchProperty(currentOrder);
+        string currentOrderPropertyValue = GetPropertyValue(currentEntry.SongMeta, currentOrderProperty);
+        if (currentOrderPropertyValue.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        Func<Predicate<SongSelectEntry>,SongSelectEntry> findMethod = direction > 0
+            ? songRouletteControl.Find
+            : songRouletteControl.FindLast;
+
+        SongSelectEntry songSelectEntry = findMethod(entry => entry is SongSelectSongEntry songEntry
+                                                             && IsPropertyValueNextInDirection(currentOrderPropertyValue, GetPropertyValue(songEntry.SongMeta, currentOrderProperty), direction));
+        if (songSelectEntry != null)
+        {
+            songRouletteControl.SelectEntry(songSelectEntry);
+        }
+        else if (direction > 0)
+        {
+            songRouletteControl.SelectEntry(songRouletteControl.Entries.FirstOrDefault());
+        }
+        else if (direction < 0)
+        {
+            songRouletteControl.SelectEntry(songRouletteControl.Entries.LastOrDefault());
+        }
+    }
+
+    private bool IsPropertyValueNextInDirection(string current, string potentialNext, int direction)
+    {
+        if (current.IsNullOrEmpty()
+            || potentialNext.IsNullOrEmpty())
+        {
+            return false;
+        }
+
+        string currentNormalized = StringUtils.RemoveDiacritics(current).ToLowerInvariant();
+        string potentialNextNormalized = StringUtils.RemoveDiacritics(potentialNext).ToLowerInvariant();
+
+        return direction > 0
+            ? potentialNextNormalized[0] > currentNormalized[0]
+            : potentialNextNormalized[0] < currentNormalized[0];
     }
 
     public void ResetSearchText()

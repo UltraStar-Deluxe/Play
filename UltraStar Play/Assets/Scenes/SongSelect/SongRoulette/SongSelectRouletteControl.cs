@@ -390,6 +390,12 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     private void OnSongListViewSelectionIndexChanged(IEnumerable<int> selectedIndexes)
     {
+        if (InputUtils.IsKeyboardShiftPressed())
+        {
+            // Shift is used with arrow keys to select next resp. previous entry by order property
+            return;
+        }
+
         int selectedIndex = selectedIndexes.FirstOrDefault();
         if (selectedIndex < DummyScrollViewItemCountPerSide
             && entries.Count > 0)
@@ -636,6 +642,11 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     public SongSelectEntry Find(Predicate<SongSelectEntry> predicate)
     {
         return entries.Find(predicate);
+    }
+
+    public SongSelectEntry FindLast(Predicate<SongSelectEntry> predicate)
+    {
+        return entries.FindLast(predicate);
     }
 
     public void SelectNextEntry()
