@@ -6,6 +6,11 @@ VisualElement
 #logo {
     background-image: url("project://database/Packages/playshared/Runtime/Graphics/Logos/LogoLarge.png");
     -unity-background-scale-mode: scale-to-fit;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
 }
 
 #background {
