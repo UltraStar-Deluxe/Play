@@ -1321,14 +1321,26 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             .Where(PlaylistMatches)
             .Where(ActiveFiltersMatches)
             .Where(CurrentFolderMatches)
-            .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
+            .OrderBy(songMeta => GetPrimarySongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
+            .ThenBy(songMeta => GetSecondarySongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
             .ToList();
         return filteredSongs;
     }
 
-    private object GetSongMetaOrderByProperty(SongMeta songMeta)
+    private object GetPrimarySongMetaOrderByProperty(SongMeta songMeta)
     {
-        switch (settings.SongOrder)
+        return GetSongMetaOrderByProperty(songMeta, settings.SongOrder);
+    }
+
+    private object GetSecondarySongMetaOrderByProperty(SongMeta songMeta)
+    {
+        ESongOrder secondaryOrderProperty = settings.SongOrder == ESongOrder.Title ? ESongOrder.Artist : ESongOrder.Title;
+        return GetSongMetaOrderByProperty(songMeta, secondaryOrderProperty);
+    }
+
+    private object GetSongMetaOrderByProperty(SongMeta songMeta, ESongOrder songOrder)
+    {
+        switch (songOrder)
         {
             case ESongOrder.Artist:
                 return songMeta.Artist;
