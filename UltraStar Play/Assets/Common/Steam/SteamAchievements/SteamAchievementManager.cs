@@ -50,6 +50,18 @@ public class SteamAchievementManager : AbstractSingletonBehaviour, INeedInjectio
 
     private void TriggerAchievement(AchievementId achievementId)
     {
+        try
+        {
+            DoTriggerAchievement(achievementId);
+        }
+        catch (Exception e)
+        {
+            e.Log($"Failed to trigger achievement: '{achievementId.Id}'");
+        }
+    }
+
+    private void DoTriggerAchievement(AchievementId achievementId)
+    {
         if (triggeredAchievementsSinceAppStart.Contains(achievementId))
         {
             return;
