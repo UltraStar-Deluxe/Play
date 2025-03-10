@@ -19,10 +19,16 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     private Label companionClientCountLabel;
 
     [Inject(UxmlName = R.UxmlNames.companionClientList)]
-    private ScrollView companionClientList;
+    private VisualElement companionClientList;
 
     [Inject(UxmlName = R.UxmlNames.noCompanionClientsContainer)]
     private VisualElement noCompanionClientsContainer;
+
+    [Inject(UxmlName = R.UxmlNames.defaultPermissionsTitle)]
+    private VisualElement defaultPermissionsTitle;
+
+    [Inject(UxmlName = R.UxmlNames.defaultPermissionsContainer)]
+    private VisualElement defaultPermissionsContainer;
 
     [Inject]
     private ServerSideCompanionClientManager serverSideCompanionClientManager;
@@ -44,6 +50,8 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
             newValue =>
             {
                 settings.RequireCompanionClientPermission = newValue;
+                UpdateDefaultPermissions();
+
                 companionClientListEntryControls.ForEach(it => it.UpdatePermissions());
                 // Disconnect all such that they reconnect with new permissions.
                 serverSideCompanionClientManager.DisconnectAll();
@@ -53,6 +61,38 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
         serverSideCompanionClientManager.ClientConnectionChangedEventStream
             .Subscribe(_ => UpdateCompanionClients())
             .AddTo(gameObject);
+
+        UpdateDefaultPermissions();
+    }
+
+    private void UpdateDefaultPermissions()
+    {
+        defaultPermissionsContainer.Clear();
+        List<HttpApiPermission> permissions = new()
+        {
+            HttpApiPermission.WriteSongQueue,
+            HttpApiPermission.WriteConfig,
+            HttpApiPermission.WriteInputSimulation,
+        };
+
+        foreach (HttpApiPermission permission in permissions)
+        {
+            Toggle defaultPermissionToggle = new(PermissionUiUtils.GetPermissionName(permission));
+            defaultPermissionToggle.value = SettingsUtils.GetDefaultPermissions(settings).Contains(permission);
+            defaultPermissionToggle.RegisterValueChangedCallback(evt =>
+            {
+                if (evt.newValue)
+                {
+                    SettingsUtils.AddDefaultPermission(settings, permission);
+                }
+                else
+                {
+                    SettingsUtils.RemoveDefaultPermission(settings, permission);
+                }
+            });
+
+            defaultPermissionsContainer.Add(defaultPermissionToggle);
+        }
     }
 
     private void UpdateCompanionClients()
@@ -60,7 +100,6 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
         List<ICompanionClientHandler> allCompanionClientHandlers = serverSideCompanionClientManager.GetAllCompanionClientHandlers();
         allCompanionClientHandlers.Sort((a, b) => string.Compare(a.ClientName, b.ClientName, StringComparison.InvariantCultureIgnoreCase));
 
-        requireCompanionClientPermissionsToggle.SetVisibleByDisplay(!allCompanionClientHandlers.IsNullOrEmpty());
         noCompanionClientsContainer.SetVisibleByDisplay(allCompanionClientHandlers.IsNullOrEmpty());
         if (allCompanionClientHandlers.IsNullOrEmpty())
         {

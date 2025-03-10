@@ -39,7 +39,7 @@ public class CompanionClientListEntryControl : INeedInjection, IInjectionFinishe
 
         permissions.ForEach(permission =>
         {
-            Toggle permissionToggle = new(GetPermissionName(permission));
+            Toggle permissionToggle = new(PermissionUiUtils.GetPermissionName(permission));
             permissionToggle.value = givenPermissions.Contains(permission);
             permissionToggle.RegisterValueChangedCallback(evt =>
             {
@@ -52,30 +52,15 @@ public class CompanionClientListEntryControl : INeedInjection, IInjectionFinishe
                     SettingsUtils.RemovePermission(settings, clientHandler.ClientId, permission);
                 }
 
-                List <HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, clientHandler.ClientId);
+                List<HttpApiPermission> newPermissions = SettingsUtils.GetPermissions(settings, clientHandler.ClientId);
                 clientHandler.SendMessageToClient(new PermissionsMessageDto()
                 {
-                    Permissions = permissions,
+                    Permissions = newPermissions,
                 });
             });
 
             permissionsContainer.Add(permissionToggle);
         });
         permissionsContainer.SetVisibleByDisplay(settings.RequireCompanionClientPermission);
-    }
-
-    private string GetPermissionName(HttpApiPermission permission)
-    {
-        switch (permission)
-        {
-            case HttpApiPermission.WriteSongQueue:
-                return "Edit song queue";
-            case HttpApiPermission.WriteConfig:
-                return "Edit config";
-            case HttpApiPermission.WriteInputSimulation:
-                return "Simulate input";
-            default:
-                return StringUtils.ToTitleCase(permission.ToString());
-        }
     }
 }

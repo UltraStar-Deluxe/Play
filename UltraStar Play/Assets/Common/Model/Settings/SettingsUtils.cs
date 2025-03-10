@@ -86,7 +86,7 @@ public static class SettingsUtils
 
         if (clientId.IsNullOrEmpty())
         {
-            return new();
+            return GetDefaultPermissions(settings);
         }
 
         if (settings.HttpApiPermissions.TryGetValue(clientId, out List<HttpApiPermission> permissions))
@@ -94,7 +94,12 @@ public static class SettingsUtils
             return permissions;
         }
 
-        return new();
+        return GetDefaultPermissions(settings);
+    }
+
+    public static List<HttpApiPermission> GetDefaultPermissions(Settings settings)
+    {
+        return settings.DefaultHttpApiPermissions.ToList();
     }
 
     public static List<string> GetEnabledSongFolders(Settings settings)
@@ -290,5 +295,15 @@ public static class SettingsUtils
             default:
                 throw new IllegalArgumentException($"No mapping from upgrade version for save {upgradeVersion} to actual UltraStar format version");
         }
+    }
+
+    public static void AddDefaultPermission(Settings settings, HttpApiPermission permission)
+    {
+        settings.DefaultHttpApiPermissions.AddIfNotContains(permission);
+    }
+
+    public static void RemoveDefaultPermission(Settings settings, HttpApiPermission permission)
+    {
+        settings.DefaultHttpApiPermissions.Remove(permission);
     }
 }

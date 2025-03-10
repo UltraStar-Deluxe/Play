@@ -145,6 +145,7 @@ public class Settings : ISettings
     public int HttpServerPort { get; set; } = 6789;
     public string HttpServerHost { get; set; } = new("");
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
+    public List<HttpApiPermission> DefaultHttpApiPermissions { get; set; } = new();
     public int CompanionClientMessageBufferTimeInMillis { get; set; } = 150;
     public bool RequireCompanionClientPermission { get; set; }
 

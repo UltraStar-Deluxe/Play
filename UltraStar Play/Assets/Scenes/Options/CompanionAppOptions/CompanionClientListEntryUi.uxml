@@ -1,12 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="companionClientListEntryUiRoot" style="width: auto; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+    <ui:VisualElement name="companionClientListEntryUiRoot" class="staticPanel roundCorners p-3" style="width: auto; border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px;">
         <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); align-items: center;">
             <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                 <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                     <MaterialIcon name="clientIcon" icon="phone_iphone" />
                     <ui:Label text="My Connected App" name="clientNameLabel" class="noBackgroundInHierarchy" style="-unity-font-style: bold; font-size: 20px; overflow: hidden; margin-right: 20px; flex-grow: 1;" />
                 </ui:VisualElement>
-                <ui:VisualElement name="permissionsContainer" style="background-color: rgba(0, 0, 0, 0); flex-wrap: wrap; flex-direction: row; justify-content: space-between;">
+                <ui:VisualElement name="permissionsContainer" class="mt-3" style="background-color: rgba(0, 0, 0, 0); flex-wrap: wrap; flex-direction: row; justify-content: space-between;">
                     <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" class="noBackgroundInHierarchy" />
                     <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" class="noBackgroundInHierarchy" />
                     <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" class="noBackgroundInHierarchy" />

@@ -144,6 +144,8 @@ public static partial class R
         public const string dateLabel = "dateLabel";
         public const string defaultCloseDialogButton = "defaultCloseDialogButton";
         public const string defaultMedleyTargetDurationChooser = "defaultMedleyTargetDurationChooser";
+        public const string defaultPermissionsContainer = "defaultPermissionsContainer";
+        public const string defaultPermissionsTitle = "defaultPermissionsTitle";
         public const string defaultUltraStarFormatVersionForSave = "defaultUltraStarFormatVersionForSave";
         public const string delayChooser = "delayChooser";
         public const string deleteButton = "deleteButton";
