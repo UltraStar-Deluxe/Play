@@ -114,7 +114,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
         string absoluteFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
         try
         {
-            UltraStarSongParserResult parserResult = UltraStarSongParser.ParseFile(absoluteFilePath, songMeta.FileEncoding, false);
+            UltraStarSongParserResult parserResult = UltraStarSongParser.ParseFile(absoluteFilePath,
+                new UltraStarSongParserConfig { Encoding = songMeta.FileEncoding, UseUniversalCharsetDetector = false });
             songMeta.CopyValues(parserResult.SongMeta);
         }
         catch (Exception e)

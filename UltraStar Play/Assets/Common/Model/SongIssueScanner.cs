@@ -77,11 +77,8 @@ public class SongIssueScanner
         if (songMeta.FileInfo != null
             && songMeta.FileInfo.Exists)
         {
-            UltraStarSongParserResult parserResult = UltraStarSongParser.ParseFile(
-                songMeta.FileInfo.FullName,
-                songMeta.FileEncoding,
-                true,
-                false);
+            UltraStarSongParserResult parserResult = UltraStarSongParser.ParseFile(songMeta.FileInfo.FullName,
+                new UltraStarSongParserConfig {Encoding = songMeta.FileEncoding, UseUniversalCharsetDetector = true, LogIssues = false});
             result.AddRange(parserResult.SongIssues);
         }
 

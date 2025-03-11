@@ -8,21 +8,18 @@ using UnityEngine;
 
 public static class UltraStarSongParser
 {
-    public static UltraStarSongParserResult ParseFile(
-        string filePath,
-        Encoding encoding = null,
-        bool useUniversalCharsetDetector = true,
-        bool logIssues = true)
+    public static UltraStarSongParserResult ParseFile(string filePath, UltraStarSongParserConfig config = null)
     {
+        config = config ?? new UltraStarSongParserConfig();
+
         try
         {
-            using StreamReader reader = PlainTextReader.GetFileStreamReader(filePath, encoding, useUniversalCharsetDetector);
+            using StreamReader reader = PlainTextReader.GetFileStreamReader(filePath, config.Encoding, config.UseUniversalCharsetDetector);
             UltraStarSongParserResult result = ParseStreamReader(reader);
 
+            // Postprocess result
             result.SongMeta.SetFileInfo(filePath, reader.CurrentEncoding);
-
-            // Log issues
-            if (logIssues)
+            if (config.LogIssues)
             {
                 result.SongIssues.ForEach(songIssue => Debug.LogWarning($"{songIssue.Message} in file '{filePath}'"));
             }
@@ -42,17 +39,23 @@ public static class UltraStarSongParser
         }
         catch (ExplicitEncodingMismatchException ex)
         {
-            return ParseFile(filePath, ex.ExplicitlyDefinedEncoding, useUniversalCharsetDetector, logIssues);
+            UltraStarSongParserConfig newConfig = new(config)
+            {
+                Encoding = ex.ExplicitlyDefinedEncoding
+            };
+            return ParseFile(filePath, newConfig);
         }
     }
 
-    public static UltraStarSongParserResult ParseString(string text, bool logIssues = true)
+    public static UltraStarSongParserResult ParseString(string text, UltraStarSongParserConfig config = null)
     {
+        config = config ?? new UltraStarSongParserConfig();
+
         using MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
         using StreamReader streamReader = new StreamReader(memoryStream, Encoding.UTF8);
         UltraStarSongParserResult result = ParseStreamReader(streamReader);
 
-        if (logIssues)
+        if (config.LogIssues)
         {
             // Log issues
             result.SongIssues.ForEach(songIssue => Debug.LogWarning($"{songIssue.Message} in song '{result.SongMeta.GetArtistDashTitle()}'"));
