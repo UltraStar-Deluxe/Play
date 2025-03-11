@@ -29,12 +29,15 @@ public static class UltraStarSongParser
             result.SongMeta.DoLoadVoices = () =>
             {
                 using IDisposable d = new DisposableStopwatch($"Loading voices of '{filePath}' took <ms> ms", ELogEventLevel.Verbose);
-                List<Voice> voices = UltraStarSongVoicesParser.ParseFile(
+                UltraStarSongVoicesParserResult voicesParserResult = UltraStarSongVoicesParser.ParseFile(
                     result.SongMeta.FileInfo.FullName,
-                    result.SongMeta.FileEncoding,
-                    result.SongMeta.IsTxtFileRelative,
-                    false);
-                voices.ForEach(voice => result.SongMeta.AddVoice(voice));
+                    new UltraStarSongVoicesParserConfig
+                    {
+                        Encoding = result.SongMeta.FileEncoding,
+                        UseUniversalCharsetDetector = false,
+                        IsRelativeSongFormat = result.SongMeta.IsTxtFileRelative,
+                    });
+                voicesParserResult.Voices.ForEach(voice => result.SongMeta.AddVoice(voice));
             };
             return result;
         }
@@ -65,10 +68,10 @@ public static class UltraStarSongParser
         // Lazy load voices
         result.SongMeta.DoLoadVoices = () =>
         {
-            List<Voice> voices = UltraStarSongVoicesParser.ParseString(
+            UltraStarSongVoicesParserResult voicesParserResult = UltraStarSongVoicesParser.ParseString(
                 text,
-                result.SongMeta.IsTxtFileRelative);
-            voices.ForEach(voice => result.SongMeta.AddVoice(voice));
+                new UltraStarSongVoicesParserConfig { IsRelativeSongFormat = result.SongMeta.IsTxtFileRelative });
+            voicesParserResult.Voices.ForEach(voice => result.SongMeta.AddVoice(voice));
         };
 
         return result;

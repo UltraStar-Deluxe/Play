@@ -35,12 +35,15 @@ public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
         DoLoadVoices = () =>
         {
             using IDisposable d = new DisposableStopwatch($"Loading voices of '{fileInfo.Name}' took <ms> ms", ELogEventLevel.Verbose);
-            List<Voice> voices = UltraStarSongVoicesParser.ParseFile(
+            UltraStarSongVoicesParserResult voicesParserResult = UltraStarSongVoicesParser.ParseFile(
                 FileInfo.FullName,
-                FileEncoding,
-                false,
-                useUniversalCharsetDetector);
-            voices.ForEach(voice => AddVoice(voice));
+                new UltraStarSongVoicesParserConfig
+                {
+                    Encoding = FileEncoding,
+                    IsRelativeSongFormat = false,
+                    UseUniversalCharsetDetector = useUniversalCharsetDetector,
+                });
+            voicesParserResult.Voices.ForEach(voice => AddVoice(voice));
         };
 
         // Check whether the file name or its directory
