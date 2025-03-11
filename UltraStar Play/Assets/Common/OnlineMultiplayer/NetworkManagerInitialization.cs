@@ -5,12 +5,6 @@ namespace CommonOnlineMultiplayer
 {
     public static class NetworkManagerInitialization
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void StaticInit()
-        {
-            InitNetworkManagerSingleton();
-        }
-
         public static void InitNetworkManagerSingleton()
         {
             if (NetworkManager.Singleton != null)
@@ -19,10 +13,10 @@ namespace CommonOnlineMultiplayer
             }
 
             Debug.Log("Initializing NetworkManager.Singleton");
-            FindOrCreateNetworkManager().SetSingleton();
+            FindNetworkManager().SetSingleton();
         }
 
-        private static NetworkManager FindOrCreateNetworkManager()
+        private static NetworkManager FindNetworkManager()
         {
             NetworkManager networkManager = NetworkManager.Singleton;
             if (networkManager != null)
@@ -36,10 +30,7 @@ namespace CommonOnlineMultiplayer
                 return networkManager;
             }
 
-            GameObject networkManagerGameObject = new GameObject();
-            networkManagerGameObject.name = "NetworkManager-RuntimeCreated";
-            networkManager = networkManagerGameObject.AddComponent<NetworkManager>();
-            return networkManager;
+            throw new NetworkManagerNotFoundException();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using CommonOnlineMultiplayer;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -18,7 +17,7 @@ public class PlayModeTestSetUpFixture
         // Therefore, log nothing or warning instead of error.
         // See https://discussions.unity.com/t/logassert-ignorefailingmessages-does-not-work-still-unhandled-log-message/923329/2
         Debug.Log("Setting NetworkManager LogLevel to Nothing.");
-        NetworkManagerInitialization.InitNetworkManagerSingleton();
+        NetworkManagerInitializationTestUtils.InitNetworkManagerSingleton();
         NetworkManager.Singleton.LogLevel = LogLevel.Nothing;
         Debug.Log("Setting ServerSideCompanionClientManager.CustomNetLogger.ErrorToWarning to true.");
         ServerSideCompanionClientManager.CustomNetLogger.ErrorToWarning = true;
@@ -35,7 +34,7 @@ public class PlayModeTestSetUpFixture
         Debug.Log($"{this}.{nameof(OneTimeTearDown)}");
 
         Debug.Log("Setting NetworkManager LogLevel to Normal.");
-        NetworkManagerInitialization.InitNetworkManagerSingleton();
+        NetworkManagerInitializationTestUtils.InitNetworkManagerSingleton();
         NetworkManager.Singleton.LogLevel = LogLevel.Normal;
         Debug.Log("Setting ServerSideCompanionClientManager.CustomNetLogger.ErrorToWarning to false.");
         ServerSideCompanionClientManager.CustomNetLogger.ErrorToWarning = false;
