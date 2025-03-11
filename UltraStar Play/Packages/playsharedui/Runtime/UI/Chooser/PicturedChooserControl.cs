@@ -2,7 +2,7 @@
 using UniRx;
 using UnityEngine.UIElements;
 
-abstract public class PicturedChooserControl<T> : ListedChooserControl<T>
+public abstract class PicturedChooserControl<T> : ListedChooserControl<T>
 {
     protected PicturedChooserControl(Chooser chooser, List<T> items)
         : base(chooser)
@@ -11,7 +11,7 @@ abstract public class PicturedChooserControl<T> : ListedChooserControl<T>
         Items = items;
     }
 
-    public virtual async void UpdateImageElement(T item)
+    public virtual void UpdateImageElement(T item)
     {
         Chooser.ItemLabel.text = "";
         Chooser.ItemLabel.style.backgroundImage = GetBackgroundImageValue(item);

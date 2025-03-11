@@ -150,6 +150,11 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
         UpdateTranslation();
     }
 
+    private async void InitSongRatingSprite()
+    {
+        await InitSongRatingSpriteAsync();
+    }
+
     private async Awaitable InitSongRatingSpriteAsync()
     {
         Sprite songRatingSprite = await LoadSongRatingSpriteAsync(songRating.EnumValue);

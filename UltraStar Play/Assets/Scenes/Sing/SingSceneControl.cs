@@ -320,7 +320,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         InitSingingLyricsControls();
 
-        StartAudioAndVideoAsync();
+        StartAudioAndVideo();
 
         // Input legend (in pause overlay)
         UpdateInputLegend();
@@ -367,6 +367,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         TriggerAchievementsAtSongStart();
+    }
+
+    private async void StartAudioAndVideo()
+    {
+        await StartAudioAndVideoAsync();
     }
 
     private async Awaitable StartAudioAndVideoAsync()

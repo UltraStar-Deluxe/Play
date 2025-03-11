@@ -88,7 +88,7 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
         while (!jobManager.AllJobsFinished
                && !TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis))
         {
-            Awaitable.WaitForSecondsAsync(0.1f);
+            await Awaitable.WaitForSecondsAsync(0.1f);
         }
 
         if (TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis))

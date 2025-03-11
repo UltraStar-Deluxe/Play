@@ -1199,11 +1199,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return result;
     }
 
-    public void ReloadThemes()
+    public async void ReloadThemes()
     {
         themeMetas.Clear();
         failedToLoadThemeNames.Clear();
-        LoadCurrentThemeAsync();
+        await LoadCurrentThemeAsync();
     }
 
     private EScene GetCurrentScene()
