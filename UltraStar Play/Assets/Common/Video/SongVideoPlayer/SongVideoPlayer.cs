@@ -284,7 +284,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public void UnloadVideo()
     {
-        Log.Debug(() => $"SongVideoPlayer.UnloadAudio '{loadedSongMeta.GetArtistDashTitle()}'");
+        Log.Debug(() => $"SongVideoPlayer.UnloadVideo '{loadedSongMeta.GetArtistDashTitle()}'");
         StopVideo();
 
         currentVideoSupportProvider?.Unload();
