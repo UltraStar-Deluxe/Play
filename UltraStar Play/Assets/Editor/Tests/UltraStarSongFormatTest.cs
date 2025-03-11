@@ -89,6 +89,16 @@ public class UltraStarSongFormatTest
     }
 
     [Test]
+    public void ShouldHandleMixedCase()
+    {
+        Translation.InitTranslationConfig();
+        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/MixedCase.txt", out List<SongIssue> songIssues);
+        Assert.AreEqual(8, songMeta.TxtFileMedleyStartBeat);
+        Assert.AreEqual("cover.jpg", songMeta.Cover);
+        Assert.IsEmpty(songIssues);
+    }
+
+    [Test]
     public void ShouldHandleMissingTagName()
     {
         Translation.InitTranslationConfig();

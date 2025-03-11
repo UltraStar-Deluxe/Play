@@ -274,7 +274,7 @@ public static class UltraStarSongParser
             return false;
         }
 
-        key = line.Substring(1, indexOfSeparator -1).Trim();
+        key = line.Substring(1, indexOfSeparator -1).Trim().ToUpperInvariant();
         value = line.Substring(indexOfSeparator + 1, line.Length - indexOfSeparator - 1).Trim();
 
         return !key.IsNullOrEmpty() && !value.IsNullOrEmpty();
