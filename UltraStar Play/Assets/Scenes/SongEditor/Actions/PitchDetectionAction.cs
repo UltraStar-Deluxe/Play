@@ -36,7 +36,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
     public async void CreateNotesUsingBasicPitch(bool notify)
     {
-        BasicPitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta).GetResultAsync();
+        PitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta).GetResultAsync();
         ImportBasicPitchMidiFile(pitchDetectionResult.MidiFilePath);
 
         if (notify)

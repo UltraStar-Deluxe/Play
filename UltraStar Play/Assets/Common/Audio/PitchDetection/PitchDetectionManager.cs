@@ -33,9 +33,9 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
     private readonly Subject<PitchDetectionFinishedEvent> pitchDetectionFinishedEventStream = new();
     public Subject<PitchDetectionFinishedEvent> PitchDetectionFinishedEventStream => pitchDetectionFinishedEventStream;
 
-    public Job<BasicPitchDetectionResult> ProcessSongMetaJob(SongMeta songMeta)
+    public Job<PitchDetectionResult> ProcessSongMetaJob(SongMeta songMeta)
     {
-        Job<BasicPitchDetectionResult> job = new Job<BasicPitchDetectionResult>(
+        Job<PitchDetectionResult> job = new Job<PitchDetectionResult>(
             Translation.Get(R.Messages.job_pitchDetectionWithName, "name", Path.GetFileName(songMeta.Audio)),
             new CancellationTokenSource());
         jobManager.AddJob(job);
@@ -65,7 +65,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         return job;
     }
 
-    private async Awaitable<BasicPitchDetectionResult> ProcessSongMetaAsync(
+    private async Awaitable<PitchDetectionResult> ProcessSongMetaAsync(
         SongMeta songMeta,
         JobProgress jobProgress)
     {
@@ -93,7 +93,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
             : "";
 
         await Awaitable.BackgroundThreadAsync();
-        BasicPitchDetectionResult pitchDetectionResult = await DoProcessSongMetaAsync(
+        PitchDetectionResult pitchDetectionResult = await DoProcessSongMetaAsync(
             songMeta,
             generatedSongFolderAbsolutePath,
             jobProgress.CancellationTokenSource.Token,
@@ -105,7 +105,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         return pitchDetectionResult;
     }
 
-    private async Awaitable<BasicPitchDetectionResult> DoProcessSongMetaAsync(SongMeta songMeta,
+    private async Awaitable<PitchDetectionResult> DoProcessSongMetaAsync(SongMeta songMeta,
         string generatedSongFolderAbsolutePath,
         CancellationToken cancellationToken,
         string fallbackCommand)
@@ -133,7 +133,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
 
             if (TryMoveFilesOfBasicPitchResult(songMeta, generatedSongFolderAbsolutePath, basicPitchResult, out string midiFilePath))
             {
-                return new BasicPitchDetectionResult(midiFilePath);
+                return new PitchDetectionResult(midiFilePath);
             }
             else
             {

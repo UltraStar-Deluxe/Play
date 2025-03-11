@@ -19,9 +19,9 @@ public class PitchDetectionNotesCreator
             throw new PitchDetectionException("Vocals audio not found. Split the audio first.");
         }
 
-        BasicPitchDetectionResult basicPitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta)
+        PitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta)
             .GetResultAsync();
-        MidiFile midiFile = MidiFileUtils.LoadMidiFile(basicPitchDetectionResult.MidiFilePath);
+        MidiFile midiFile = MidiFileUtils.LoadMidiFile(pitchDetectionResult.MidiFilePath);
 
         MidiFileUtils.CalculateMidiEventTimesInMillis(
             midiFile,
