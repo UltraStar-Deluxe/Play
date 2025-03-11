@@ -29,8 +29,10 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
     private int connectRequestCount;
 
     private NetPeer ServerPeer => liteNetLibClient.FirstPeer;
+    private bool HasServerPeer => ServerPeer != null;
 
-    public bool IsConnected => ServerPeer != null;
+    public bool IsConnected => HasServerPeer
+                               && ServerPeer.ConnectionState is ConnectionState.Connected;
 
     private readonly Subject<JsonSerializable> receivedMessageStream = new();
     public IObservable<JsonSerializable> ReceivedMessageStream => receivedMessageStream;
@@ -64,7 +66,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     private void ConnectToServer()
     {
-        if (IsConnected)
+        if (HasServerPeer)
         {
             return;
         }
@@ -164,7 +166,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
         liteNetLibClient.PollEvents();
 
         // Try to connect to the server every second.
-        if (!IsConnected
+        if (!HasServerPeer
             && (lastConnectionAttemptTimeInSeconds == 0
                 || Time.time - lastConnectionAttemptTimeInSeconds > 1))
         {
@@ -200,7 +202,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
     public void SendMessageToServer(JsonSerializable jsonSerializable, DeliveryMethod deliveryMethod)
     {
         if (jsonSerializable == null
-            || !IsConnected)
+            || !HasServerPeer)
         {
             return;
         }
