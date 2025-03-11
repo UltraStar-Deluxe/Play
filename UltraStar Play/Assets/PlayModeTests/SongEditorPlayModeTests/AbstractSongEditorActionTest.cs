@@ -22,7 +22,7 @@ public abstract class AbstractSongEditorActionTest : AbstractSongEditorTest
     {
         await WaitForConditionAsync(() =>
         {
-            UltraStarSongMeta expectedSongMeta = UltraStarSongParser.ParseFile(GetAbsoluteTestSongFilePath(expectedResultSong), out List<SongIssue> _);
+            UltraStarSongMeta expectedSongMeta = UltraStarSongParser.ParseFile(GetAbsoluteTestSongFilePath(expectedResultSong)).SongMeta;
             SongMetaAssertUtils.AssertSongMetasAreEqual(expectedSongMeta, SongMeta);
         });
     }

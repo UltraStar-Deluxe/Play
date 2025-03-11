@@ -77,9 +77,12 @@ public class SongIssueScanner
         if (songMeta.FileInfo != null
             && songMeta.FileInfo.Exists)
         {
-            SongMeta _ = UltraStarSongParser.ParseFile(songMeta.FileInfo.FullName, out List<SongIssue> songIssuesInFile, songMeta.FileEncoding, true,
+            UltraStarSongParserResult parserResult = UltraStarSongParser.ParseFile(
+                songMeta.FileInfo.FullName,
+                songMeta.FileEncoding,
+                true,
                 false);
-            result.AddRange(songIssuesInFile);
+            result.AddRange(parserResult.SongIssues);
         }
 
         return result;

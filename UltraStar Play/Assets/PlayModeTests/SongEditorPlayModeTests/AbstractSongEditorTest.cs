@@ -17,7 +17,7 @@ public abstract class AbstractSongEditorTest : AbstractPlayModeTest
         // Add song
         Debug.Log($"add song '{fileName}'");
         string filePath = GetAbsoluteTestSongFilePath(fileName);
-        SongMeta songMeta = UltraStarSongParser.ParseFile(filePath, out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile(filePath).SongMeta;
         SongMeta existingSongMeta = SongMetaManager.GetSongMetaByTitle(songMeta.Title);
         if (existingSongMeta != null)
         {

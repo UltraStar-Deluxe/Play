@@ -25,10 +25,10 @@ public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
         DoLoadSong = () =>
         {
             using IDisposable d = new DisposableStopwatch($"Loading '{fileInfo.Name}' took <ms> ms", ELogEventLevel.Verbose);
-            UltraStarSongMeta loadedSongMeta = UltraStarSongParser.ParseFile(fileInfo.FullName, out List<SongIssue> songIssues, FileEncoding, useUniversalCharsetDetector);
-            CopyValues(loadedSongMeta);
+            UltraStarSongParserResult parserResult = UltraStarSongParser.ParseFile(fileInfo.FullName, FileEncoding, useUniversalCharsetDetector);
+            CopyValues(parserResult.SongMeta);
 
-            SongIssues = songIssues;
+            SongIssues = parserResult.SongIssues;
         };
 
         DoLoadVoices = () =>

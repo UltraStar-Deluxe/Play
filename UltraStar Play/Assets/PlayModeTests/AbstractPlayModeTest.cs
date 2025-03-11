@@ -141,7 +141,7 @@ public abstract class AbstractPlayModeTest : AbstractInputSystemTest, INeedInjec
 
     private void CopyTestSongMediaFilesToTargetFolder(string sourceSongFilePath, string targetSongFilePath)
     {
-        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(sourceSongFilePath, out List<SongIssue> songIssues);
+        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(sourceSongFilePath).SongMeta;
         CopyTestSongMediaFileToTargetFolder(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio), targetSongFilePath);
         CopyTestSongMediaFileToTargetFolder(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Video), targetSongFilePath);
         CopyTestSongMediaFileToTargetFolder(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Cover), targetSongFilePath);
