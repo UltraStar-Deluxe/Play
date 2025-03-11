@@ -10,11 +10,12 @@ public static class UltraStarSongParser
 {
     public static UltraStarSongParserResult ParseFile(string filePath, UltraStarSongParserConfig config = null)
     {
-        config = config ?? new UltraStarSongParserConfig();
+        config ??= new UltraStarSongParserConfig();
 
         try
         {
-            using StreamReader reader = PlainTextReader.GetFileStreamReader(filePath, config.Encoding, config.UseUniversalCharsetDetector);
+            using StreamReader reader = PlainTextReader.GetFileStreamReader(filePath,
+                new PlainTextReaderConfig { Encoding = config.Encoding, UseUniversalCharsetDetector = config.UseUniversalCharsetDetector });
             UltraStarSongParserResult result = ParseStreamReader(reader);
 
             // Postprocess result
@@ -49,7 +50,7 @@ public static class UltraStarSongParser
 
     public static UltraStarSongParserResult ParseString(string text, UltraStarSongParserConfig config = null)
     {
-        config = config ?? new UltraStarSongParserConfig();
+        config ??= new UltraStarSongParserConfig();
 
         using MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
         using StreamReader streamReader = new StreamReader(memoryStream, Encoding.UTF8);

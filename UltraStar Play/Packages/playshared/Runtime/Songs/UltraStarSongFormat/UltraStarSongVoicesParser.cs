@@ -24,7 +24,8 @@ public class UltraStarSongVoicesParser
 
     public static List<Voice> ParseFile(string filePath, Encoding fileEncoding, bool isRelativeSongFormat, bool useUniversalCharsetDetector)
     {
-        StreamReader reader = PlainTextReader.GetFileStreamReader(filePath, fileEncoding, useUniversalCharsetDetector);
+        StreamReader reader = PlainTextReader.GetFileStreamReader(filePath,
+            new PlainTextReaderConfig { Encoding = fileEncoding, UseUniversalCharsetDetector = useUniversalCharsetDetector });
         UltraStarSongVoicesParser parser = new(reader, isRelativeSongFormat, filePath);
         IReadOnlyList<Voice> voices = parser.Parse();
         return new List<Voice>(voices);
