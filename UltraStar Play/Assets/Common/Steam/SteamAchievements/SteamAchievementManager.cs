@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CommonOnlineMultiplayer;
+using Steamworks;
 using Steamworks.Data;
 using UniInject;
 using UniRx;
@@ -16,7 +18,6 @@ public class SteamAchievementManager : AbstractSingletonBehaviour, INeedInjectio
     [Inject]
     private AchievementEventStream achievementEventStream;
 
-    private readonly Dictionary<string, Achievement> achievementIdToAchievement = new();
     private readonly HashSet<AchievementId> triggeredAchievementsSinceAppStart = new();
 
     protected override object GetInstance()
@@ -38,14 +39,6 @@ public class SteamAchievementManager : AbstractSingletonBehaviour, INeedInjectio
                 TriggerAchievement(evt.AchievementId);
             })
             .AddTo(gameObject);
-    }
-
-    public void SetAvailableAchievements(IEnumerable<Achievement> achievements)
-    {
-        foreach (Achievement achievement in achievements)
-        {
-            achievementIdToAchievement[achievement.Identifier] = achievement;
-        }
     }
 
     private void TriggerAchievement(AchievementId achievementId)
@@ -97,6 +90,19 @@ public class SteamAchievementManager : AbstractSingletonBehaviour, INeedInjectio
 
     private bool TryGetAchievement(AchievementId achievementId, out Achievement achievement)
     {
-        return achievementIdToAchievement.TryGetValue(achievementId.Id, out achievement);
+        if (!SteamManager.Instance.IsConnectedToSteam)
+        {
+            achievement = default;
+            return false;
+        }
+
+        List<Achievement> achievements = SteamUserStats.Achievements.Where(achievement => achievementId.Id == achievement.Identifier).ToList();
+        if (achievements.IsNullOrEmpty())
+        {
+            achievement = default;
+            return false;
+        }
+        achievement = achievements[0];
+        return true;
     }
 }

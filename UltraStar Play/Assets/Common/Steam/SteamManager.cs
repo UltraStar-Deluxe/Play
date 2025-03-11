@@ -49,6 +49,10 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             }
 
             // SteamClient is initialized in FacepunchTransport.Awake()
+            if (!SteamClient.IsValid)
+            {
+                throw new SteamException("SteamClient.IsValid is false");
+            }
             if (!SteamClient.IsLoggedOn)
             {
                 throw new SteamException("SteamClient.IsLoggedOn is false");
@@ -63,8 +67,6 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             {
                 Debug.LogError("Connected to Steam but failed to request current stats");
             }
-
-            steamAchievementManager.SetAvailableAchievements(SteamUserStats.Achievements);
 
             steamWorkshopManager.DownloadWorkshopItems();
 
