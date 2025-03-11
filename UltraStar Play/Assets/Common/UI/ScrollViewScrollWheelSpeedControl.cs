@@ -66,7 +66,7 @@ public class ScrollViewScrollWheelSpeedControl : MonoBehaviour, INeedInjection, 
         // See https://github.com/achimmihca/ScrollViewScrollWheelSpeedInUnity
         if (PlatformUtils.IsWindows)
         {
-            scrollView.mouseWheelScrollSize = 40000;
+            scrollView.mouseWheelScrollSize = 800;
         }
     }
 }
