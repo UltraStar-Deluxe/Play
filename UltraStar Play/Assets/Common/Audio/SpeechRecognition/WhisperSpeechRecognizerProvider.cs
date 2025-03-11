@@ -20,7 +20,7 @@ public class WhisperSpeechRecognizerProvider : AbstractSingletonBehaviour, INeed
             config.ModelPath,
             config.SpeechRecognitionLanguage,
             config.Prompt);
-        SpeechRecognizer speechRecognizer = new(config, whisperManager);
+        SpeechRecognizer speechRecognizer = new WhisperSpeechRecognizer(config, whisperManager);
         return speechRecognizer;
     }
 

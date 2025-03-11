@@ -64,7 +64,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            SpeechRecognitionResult speechRecognitionResult = await speechRecognizer.GetSpeechRecognitionResult(
+            SpeechRecognitionResult speechRecognitionResult = await speechRecognizer.GetSpeechRecognitionResultAsync(
                 monoSamples,
                 startIndex,
                 endIndex,
