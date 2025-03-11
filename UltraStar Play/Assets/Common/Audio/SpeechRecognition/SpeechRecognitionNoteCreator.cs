@@ -24,7 +24,7 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         int startIndex,
         int endIndex,
         int sampleRate,
-        SpeechRecognitionParameters speechRecognitionParameters,
+        SpeechRecognizerConfig speechRecognizerConfig,
         int midiNote,
         SongMeta songMeta,
         int offsetInBeats,
@@ -36,7 +36,7 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
 
         job.SetAwaitable(async () =>
         {
-            SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(speechRecognitionParameters).GetResultAsync();
+            SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(speechRecognizerConfig).GetResultAsync();
 
             await Awaitable.BackgroundThreadAsync();
             SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(

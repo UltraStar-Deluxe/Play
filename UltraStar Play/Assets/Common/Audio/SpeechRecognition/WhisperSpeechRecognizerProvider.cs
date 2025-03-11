@@ -14,13 +14,13 @@ public class WhisperSpeechRecognizerProvider : AbstractSingletonBehaviour, INeed
         return Instance;
     }
 
-    public SpeechRecognizer CreateSpeechRecognizer(SpeechRecognitionParameters parameters)
+    public SpeechRecognizer CreateSpeechRecognizer(SpeechRecognizerConfig config)
     {
         WhisperManager whisperManager = CreateWhisperManager(
-            parameters.ModelPath,
-            parameters.SpeechRecognitionLanguage,
-            parameters.Prompt);
-        SpeechRecognizer speechRecognizer = new(parameters, whisperManager);
+            config.ModelPath,
+            config.SpeechRecognitionLanguage,
+            config.Prompt);
+        SpeechRecognizer speechRecognizer = new(config, whisperManager);
         return speechRecognizer;
     }
 

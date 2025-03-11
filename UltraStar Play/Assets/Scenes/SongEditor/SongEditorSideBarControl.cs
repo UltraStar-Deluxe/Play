@@ -269,14 +269,14 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             return;
         }
 
-        SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters();
+        SpeechRecognizerConfig speechRecognizerConfig = speechRecognitionAction.CreateSpeechRecognizerParameters();
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
             NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
             NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
             settings.SongEditorSettings.SpeechRecognitionSamplesSource,
             150,
             true,
-            speechRecognitionParameters);
+            speechRecognizerConfig);
     }
 
     private void UpdateRecordingButton()

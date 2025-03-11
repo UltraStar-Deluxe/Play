@@ -8,7 +8,7 @@ public class SpeechRecognizerProvider : AbstractSingletonBehaviour, INeedInjecti
 {
     public static SpeechRecognizerProvider Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SpeechRecognizerProvider>();
 
-    private readonly Dictionary<SpeechRecognitionParameters, SpeechRecognizer> parametersToSpeechRecognizer = new();
+    private readonly Dictionary<SpeechRecognizerConfig, SpeechRecognizer> parametersToSpeechRecognizer = new();
 
     private readonly SemaphoreSlim loadSpeechRecognizerSemaphore = new(1, 1);
 
@@ -17,26 +17,25 @@ public class SpeechRecognizerProvider : AbstractSingletonBehaviour, INeedInjecti
         return Instance;
     }
 
-    public Job<SpeechRecognizer> GetSpeechRecognizerJob(
-        SpeechRecognitionParameters parameters)
+    public Job<SpeechRecognizer> GetSpeechRecognizerJob(SpeechRecognizerConfig config)
     {
         Job<SpeechRecognizer> job = new(Translation.Get(R.Messages.job_loadSpeechRecognitionModel));
         JobManager.Instance.AddJob(job);
-        job.SetAwaitable(() => GetSpeechRecognizerAsync(parameters));
+        job.SetAwaitable(() => GetSpeechRecognizerAsync(config));
         job.Progress.EstimatedTotalDurationInMillis = 60000;
 
         return job;
     }
 
-    private async Awaitable<SpeechRecognizer> GetSpeechRecognizerAsync(SpeechRecognitionParameters parameters)
+    private async Awaitable<SpeechRecognizer> GetSpeechRecognizerAsync(SpeechRecognizerConfig config)
     {
-        if (parametersToSpeechRecognizer.TryGetValue(parameters, out SpeechRecognizer speechRecognizer))
+        if (parametersToSpeechRecognizer.TryGetValue(config, out SpeechRecognizer speechRecognizer))
         {
-            Log.Debug(() => $"Reusing cached speech recognizer for parameters {parameters}");
+            Log.Debug(() => $"Reusing cached speech recognizer for parameters {config}");
             return speechRecognizer;
         }
 
-        string modelPath = parameters.ModelPath;
+        string modelPath = config.ModelPath;
         if (modelPath.IsNullOrEmpty())
         {
             throw new SpeechRecognitionException("Set the speech recognition model path first.");
@@ -46,13 +45,13 @@ public class SpeechRecognizerProvider : AbstractSingletonBehaviour, INeedInjecti
             throw new SpeechRecognitionException($"Speech recognition model path is not a valid file path: '{modelPath}'");
         }
 
-        speechRecognizer = WhisperSpeechRecognizerProvider.Instance.CreateSpeechRecognizer(parameters);
+        speechRecognizer = WhisperSpeechRecognizerProvider.Instance.CreateSpeechRecognizer(config);
 
         await Awaitable.BackgroundThreadAsync();
         await InitSpeechRecognizerAsync(speechRecognizer);
         await Awaitable.MainThreadAsync();
 
-        parametersToSpeechRecognizer[parameters] = speechRecognizer;
+        parametersToSpeechRecognizer[config] = speechRecognizer;
         return speechRecognizer;
     }
 

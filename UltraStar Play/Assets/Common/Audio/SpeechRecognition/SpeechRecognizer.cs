@@ -7,7 +7,7 @@ using Whisper;
 
 public class SpeechRecognizer
 {
-    public SpeechRecognitionParameters SpeechRecognitionParameters { get; private set; }
+    public SpeechRecognizerConfig SpeechRecognizerConfig { get; private set; }
     public bool IsLoaded => whisperManager.IsLoaded;
     public bool IsLoading => whisperManager.IsLoading;
 
@@ -15,9 +15,9 @@ public class SpeechRecognizer
 
     private readonly List<Action<double>> onProgressCallbacks = new();
 
-    public SpeechRecognizer(SpeechRecognitionParameters speechRecognitionParameters, WhisperManager whisperManager)
+    public SpeechRecognizer(SpeechRecognizerConfig speechRecognizerConfig, WhisperManager whisperManager)
     {
-        this.SpeechRecognitionParameters = speechRecognitionParameters;
+        this.SpeechRecognizerConfig = speechRecognizerConfig;
         this.whisperManager = whisperManager;
         this.whisperManager.OnProgress += OnProgress;
     }

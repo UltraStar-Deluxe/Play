@@ -119,7 +119,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         speechRecognitionJob.SetAwaitable(async () =>
         {
             // Load speech recognition model
-            SpeechRecognitionParameters speechRecognitionParameters = new(
+            SpeechRecognizerConfig speechRecognizerConfig = new(
                 SettingsUtils.GetSpeechRecognitionModelPath(settings),
                 SettingsUtils.GetSpeechRecognitionLanguage(settings),
                 settings.SongEditorSettings.SpeechRecognitionPrompt);
@@ -135,7 +135,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 0,
                 monoAudioSamples.Length - 1,
                 vocalsAudioClip.frequency,
-                speechRecognitionParameters,
+                speechRecognizerConfig,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
                 0,
