@@ -51,10 +51,12 @@ public class UltraStarDeluxeHighscoreConnector : IHighScoreReader, IOnDisableMod
         {
             songMetaToHighScoreRecordCache[songMeta] = new HighScoreRecord();
         }
-        else 
+        else
         {
             songMetaToHighScoreRecordCache[songMeta] = highScoreRecord;
         }
+
+        await Awaitable.MainThreadAsync();
         return highScoreRecord;
     }
 

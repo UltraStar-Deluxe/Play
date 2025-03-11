@@ -185,6 +185,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         }
 
         Debug.Log("Reloading current options scene because Steam Workshop items update finished");
+        await Awaitable.MainThreadAsync();
         ReloadCurrentOptionsScene();
     }
 

@@ -48,9 +48,10 @@ public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
         }
 
         await Awaitable.BackgroundThreadAsync();
-        
+
         SearchTxtFilesIfNotDoneYet();
 
+        await Awaitable.MainThreadAsync();
         return new SongRepositorySearchResult() { Entries = SearchSongList(searchParameters) };
     }
 
@@ -65,7 +66,7 @@ public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
         songScanStarted = true;
         Task.Run(() => DoSearchTxtFiles());
     }
-    
+
     private void DoSearchTxtFiles()
     {
         Debug.Log($"Searching for txt files in '{SongFolder}'");

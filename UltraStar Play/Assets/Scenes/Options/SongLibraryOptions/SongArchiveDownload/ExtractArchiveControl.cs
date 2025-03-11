@@ -62,6 +62,8 @@ public class ExtractArchiveControl
         {
             await ExtractZipArchiveAsync();
         }
+
+        await Awaitable.MainThreadAsync();
     }
 
     private async Awaitable ExtractZipArchiveAsync()

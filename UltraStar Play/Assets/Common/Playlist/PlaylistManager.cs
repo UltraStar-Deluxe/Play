@@ -113,6 +113,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     private async Awaitable ScanPlaylistsAsync()
     {
         await Awaitable.BackgroundThreadAsync();
+
         Debug.Log($"Scanning playlists on thread {Thread.CurrentThread.ManagedThreadId}");
         using DisposableStopwatch d = new("Scanning playlists took <ms> ms");
 
@@ -125,6 +126,8 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         {
             await ScanPlaylistsInFolderAsync(songFolder);
         }
+
+        await Awaitable.MainThreadAsync();
     }
 
     private async Awaitable ScanPlaylistsInFolderAsync(string folder)

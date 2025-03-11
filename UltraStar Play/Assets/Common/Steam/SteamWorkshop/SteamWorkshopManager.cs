@@ -45,6 +45,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         {
             await Awaitable.BackgroundThreadAsync();
             List<Item> items = await DownloadSubscribedWorkshopItemsAsync();
+            await Awaitable.MainThreadAsync();
 
             Debug.Log($"Successfully downloaded {items.Count} Steam Workshop Items");
             DownloadedWorkshopItems = items;
