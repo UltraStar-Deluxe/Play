@@ -27,10 +27,7 @@ public class WhisperSpeechRecognizer : SpeechRecognizer
     }
 
     public override async Awaitable<SpeechRecognitionResult> GetSpeechRecognitionResultAsync(
-        float[] monoSamples,
-        int startIndex,
-        int endIndex,
-        int sampleRate,
+        SpeechRecognitionInputSamples samples,
         CancellationToken cancellationToken,
         Action<double> onProgress)
     {
@@ -40,9 +37,9 @@ public class WhisperSpeechRecognizer : SpeechRecognizer
             throw new Exception("Speech recognition model is not yet initialized.");
         }
 
-        int lengthInSamples = endIndex - startIndex;
+        int lengthInSamples = samples.EndIndex - samples.StartIndex;
         float[] audioSamplesForSpeechRecognition = new float[lengthInSamples];
-        Array.Copy(monoSamples, startIndex, audioSamplesForSpeechRecognition, 0, lengthInSamples);
+        Array.Copy(samples.MonoSamples, samples.StartIndex, audioSamplesForSpeechRecognition, 0, lengthInSamples);
 
         WhisperResult whisperResult;
         try
@@ -50,7 +47,7 @@ public class WhisperSpeechRecognizer : SpeechRecognizer
             onProgressCallbacks.Add(onProgress);
 
             // Blocking call to GetTextAsync
-            whisperResult = await whisperManager.GetTextAsync(audioSamplesForSpeechRecognition, sampleRate, 1);
+            whisperResult = await whisperManager.GetTextAsync(audioSamplesForSpeechRecognition, samples.SampleRate, 1);
         }
         finally
         {
@@ -62,7 +59,7 @@ public class WhisperSpeechRecognizer : SpeechRecognizer
         if (whisperResult != null
             && !whisperResult.Segments.IsNullOrEmpty())
         {
-            TimeSpan offsetToStartIndex = TimeSpan.FromSeconds((double)startIndex / sampleRate);
+            TimeSpan offsetToStartIndex = TimeSpan.FromSeconds((double)samples.StartIndex / samples.SampleRate);
             string textResult = whisperResult.Result;
             List<SpeechRecognitionWordResult> wordResults = whisperResult.Segments
                 // Whisper outputs special segments such as [Music], [BLANK_AUDIO], [NOISE], ♪, (sad music) etc. that are irrelevant for the lyrics.

@@ -20,10 +20,8 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         return Instance;
     }
 
-    public Job<List<Note>> CreateNotesFromSpeechRecognitionJob(float[] monoAudioSamples,
-        int startIndex,
-        int endIndex,
-        int sampleRate,
+    public Job<List<Note>> CreateNotesFromSpeechRecognitionJob(
+        SpeechRecognitionInputSamples samples,
         SpeechRecognizerConfig speechRecognizerConfig,
         int midiNote,
         SongMeta songMeta,
@@ -40,11 +38,9 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
 
             await Awaitable.BackgroundThreadAsync();
             SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
-                monoAudioSamples,
-                startIndex,
-                endIndex,
-                sampleRate,
-                speechRecognizer).GetResultAsync();
+                samples,
+                speechRecognizer)
+                .GetResultAsync();
 
             await Awaitable.MainThreadAsync();
             List<Note> createdNotes = CreateNotesFromSpeechRecognitionResult(speechRecognitionResult, songMeta, offsetInBeats, midiNote, hyphenator, spaceInMillisBetweenNotes);

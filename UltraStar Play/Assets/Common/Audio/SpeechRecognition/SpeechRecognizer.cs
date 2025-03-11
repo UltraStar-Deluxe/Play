@@ -16,10 +16,7 @@ public abstract class SpeechRecognizer
     public abstract void InitModel();
 
     public abstract Awaitable<SpeechRecognitionResult> GetSpeechRecognitionResultAsync(
-        float[] monoSamples,
-        int startIndex,
-        int endIndex,
-        int sampleRate,
+        SpeechRecognitionInputSamples samples,
         CancellationToken cancellationToken,
         Action<double> onProgress);
 }

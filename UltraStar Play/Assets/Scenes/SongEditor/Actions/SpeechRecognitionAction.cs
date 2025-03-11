@@ -69,10 +69,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
             await Awaitable.BackgroundThreadAsync();
             SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
-                monoAudioSamples,
-                0,
-                monoAudioSamples.Length - 1,
-                audioClipFrequency,
+                new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, audioClipFrequency),
                 speechRecognizer)
                 .GetResultAsync();
 
@@ -134,10 +131,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         try
         {
             List<Note> createdNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
-                    monoAudioSamples,
-                    startIndex,
-                    endIndex,
-                    sampleRate,
+                    new SpeechRecognitionInputSamples(monoAudioSamples, startIndex, endIndex, sampleRate),
                     speechRecognizerConfig,
                     settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                     songMeta,
@@ -234,10 +228,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             : null;
 
         List<Note> createdNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
-                monoAudioSamples,
-                0,
-                monoAudioSamples.Length - 1,
-                audioClip.frequency,
+                new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, audioClip.frequency),
                 speechRecognizerConfig,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,

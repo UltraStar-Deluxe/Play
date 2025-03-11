@@ -131,10 +131,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
             pipelineData.CreatedNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
-                monoAudioSamples,
-                0,
-                monoAudioSamples.Length - 1,
-                vocalsAudioClip.frequency,
+                new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, vocalsAudioClip.frequency),
                 speechRecognizerConfig,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
