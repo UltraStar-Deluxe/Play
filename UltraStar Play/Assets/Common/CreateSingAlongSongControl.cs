@@ -131,13 +131,17 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
             pipelineData.CreatedNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
-                new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, vocalsAudioClip.frequency),
-                speechRecognizerConfig,
-                settings.SongEditorSettings.DefaultPitchForCreatedNotes,
-                songMeta,
-                0,
-                SettingsUtils.CreateHyphenator(settings),
-                settings.SongEditorSettings.SpaceBetweenNotesInMillis).GetResultAsync();
+                new CreateNotesFromSpeechRecognitionConfig
+                {
+                    SpeechRecognizerConfig = speechRecognizerConfig,
+                    InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, vocalsAudioClip.frequency),
+                    MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
+                    SongMeta = songMeta,
+                    OffsetInBeats = 0,
+                    Hyphenator = SettingsUtils.CreateHyphenator(settings),
+                    SpaceInMillisBetweenNotes = settings.SongEditorSettings.SpaceBetweenNotesInMillis,
+                })
+                .GetResultAsync();
 
             // Split created notes into sentences and assign to first player
             AssignNotesToFirstPlayer(songMeta, pipelineData.CreatedNotes);

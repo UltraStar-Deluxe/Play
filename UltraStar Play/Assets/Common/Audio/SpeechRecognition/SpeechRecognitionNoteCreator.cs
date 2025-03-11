@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using NHyphenator;
 using UniInject;
 using UnityEngine;
 
@@ -20,30 +18,25 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         return Instance;
     }
 
-    public Job<List<Note>> CreateNotesFromSpeechRecognitionJob(
-        SpeechRecognitionInputSamples samples,
-        SpeechRecognizerConfig speechRecognizerConfig,
-        int midiNote,
-        SongMeta songMeta,
-        int offsetInBeats,
-        Hyphenator hyphenator,
-        int spaceInMillisBetweenNotes)
+    public Job<List<Note>> CreateNotesFromSpeechRecognitionJob(CreateNotesFromSpeechRecognitionConfig config)
     {
         Job<List<Note>> job = new(Translation.Of("Create notes from speech recognition"));
         JobManager.Instance.AddJob(job);
 
         job.SetAwaitable(async () =>
         {
-            SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(speechRecognizerConfig).GetResultAsync();
+            SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(config.SpeechRecognizerConfig).GetResultAsync();
 
             await Awaitable.BackgroundThreadAsync();
             SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
-                samples,
+                config.InputSamples,
                 speechRecognizer)
                 .GetResultAsync();
 
             await Awaitable.MainThreadAsync();
-            List<Note> createdNotes = CreateNotesFromSpeechRecognitionResult(speechRecognitionResult, songMeta, offsetInBeats, midiNote, hyphenator, spaceInMillisBetweenNotes);
+            List<Note> createdNotes = CreateNotesFromSpeechRecognitionResult(
+                speechRecognitionResult,
+                config);
 
             return createdNotes;
         });
@@ -51,13 +44,9 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         return job;
     }
 
-    private static List<Note> CreateNotesFromSpeechRecognitionResult(
+    private List<Note> CreateNotesFromSpeechRecognitionResult(
         SpeechRecognitionResult speechRecognitionResult,
-        SongMeta songMeta,
-        int offsetInBeats,
-        int midiNote,
-        Hyphenator hyphenator,
-        int spaceInMillisBetweenNotes)
+        CreateNotesFromSpeechRecognitionConfig config)
     {
         if (speechRecognitionResult == null
             || speechRecognitionResult.Words.IsNullOrEmpty())
@@ -65,28 +54,28 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
             return new List<Note>();
         }
 
-        double beatsPerSeconds = SongMetaBpmUtils.BeatsPerSecond(songMeta);
+        double beatsPerSeconds = SongMetaBpmUtils.BeatsPerSecond(config.SongMeta);
         List<Note> createdNotes = speechRecognitionResult.Words.Select(resultEntry =>
         {
-            int noteStartInBeats = offsetInBeats + (int)(resultEntry.Start.TotalSeconds * beatsPerSeconds);
-            int noteEndInBeats = offsetInBeats + (int)(resultEntry.End.TotalSeconds * beatsPerSeconds);
+            int noteStartInBeats = config.OffsetInBeats + (int)(resultEntry.Start.TotalSeconds * beatsPerSeconds);
+            int noteEndInBeats = config.OffsetInBeats + (int)(resultEntry.End.TotalSeconds * beatsPerSeconds);
             if (noteEndInBeats <= noteStartInBeats)
             {
                 noteEndInBeats = noteStartInBeats + 1;
             }
             int noteLengthInBeats = noteEndInBeats - noteStartInBeats;
             string text = resultEntry.Text;
-            Note createdNote = new(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(midiNote), text);
+            Note createdNote = new(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(config.MidiNote), text);
             return createdNote;
         }).ToList();
 
         // Shorten new notes left and right to give a little space
-        SpaceBetweenNotesUtils.ShortenNotesByMillis(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
+        SpaceBetweenNotesUtils.ShortenNotesByMillis(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, config.SongMeta);
 
         // Split syllables if hyphenation is enabled
-        if (hyphenator != null)
+        if (config.Hyphenator != null)
         {
-            Dictionary<Note,List<Note>> noteToNotesAfterSplit = HyphenateNotesUtils.HypenateNotes(songMeta, createdNotes, hyphenator);
+            Dictionary<Note,List<Note>> noteToNotesAfterSplit = HyphenateNotesUtils.HypenateNotes(config.SongMeta, createdNotes, config.Hyphenator);
             noteToNotesAfterSplit.ForEach(entry =>
             {
                 Note note = entry.Key;
@@ -98,9 +87,9 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         }
 
         // Shorten new notes left and right to give a little space
-        if (spaceInMillisBetweenNotes > 0)
+        if (config.SpaceInMillisBetweenNotes > 0)
         {
-            SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, spaceInMillisBetweenNotes, songMeta);
+            SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, config.SpaceInMillisBetweenNotes, config.SongMeta);
         }
 
         return createdNotes;

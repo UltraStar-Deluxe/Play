@@ -131,13 +131,16 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         try
         {
             List<Note> createdNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
-                    new SpeechRecognitionInputSamples(monoAudioSamples, startIndex, endIndex, sampleRate),
-                    speechRecognizerConfig,
-                    settings.SongEditorSettings.DefaultPitchForCreatedNotes,
-                    songMeta,
-                    offsetInBeats,
-                    hyphenator,
-                    settings.SongEditorSettings.SpaceBetweenNotesInMillis)
+                    new CreateNotesFromSpeechRecognitionConfig
+                    {
+                        SpeechRecognizerConfig = speechRecognizerConfig,
+                        InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, startIndex, endIndex, sampleRate),
+                        MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
+                        SongMeta = songMeta,
+                        OffsetInBeats = offsetInBeats,
+                        Hyphenator = hyphenator,
+                        SpaceInMillisBetweenNotes = settings.SongEditorSettings.SpaceBetweenNotesInMillis,
+                    })
                 .GetResultAsync();
 
             createdNotes.ForEach(createdNote =>
@@ -228,13 +231,16 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             : null;
 
         List<Note> createdNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
-                new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, audioClip.frequency),
-                speechRecognizerConfig,
-                settings.SongEditorSettings.DefaultPitchForCreatedNotes,
-                songMeta,
-                startBeat,
-                hyphenator,
-                settings.SongEditorSettings.SpaceBetweenNotesInMillis)
+                new CreateNotesFromSpeechRecognitionConfig
+                {
+                    SpeechRecognizerConfig = speechRecognizerConfig,
+                    InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, audioClip.frequency),
+                    MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
+                    SongMeta = songMeta,
+                    OffsetInBeats = startBeat,
+                    Hyphenator = hyphenator,
+                    SpaceInMillisBetweenNotes = settings.SongEditorSettings.SpaceBetweenNotesInMillis
+                })
             .GetResultAsync();
 
         createdNotes.ForEach(createdNote =>
