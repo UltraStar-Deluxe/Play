@@ -51,7 +51,11 @@ public class UseSteamWorkshopItemsControl : INeedInjection
                 items,
                 ModFolderUtils.ModsRootFolderName);
             Debug.Log($"Using Steam Workshop items for additional mod folders: {ModFolderUtils.AdditionalModRootFolders.JoinWith(", ")}");
+
+            // Can only load mods on the main thread
+            Awaitable.MainThreadAsync();
             ModManager.Instance.ReloadMods();
+            Awaitable.BackgroundThreadAsync();
         }
         catch (Exception ex)
         {

@@ -888,7 +888,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     public static string GetModPersistentDataFolder(ModFolder modFolder)
     {
-        return $"{Application.persistentDataPath}/{ModsPersistentDataFolderName}/{modFolder.ModName}";
+        return ApplicationUtils.GetPersistentDataPath($"{ModsPersistentDataFolderName}/{modFolder.ModName}");
     }
 
     public static string GetModSettingsPath(ModFolder modFolder)
