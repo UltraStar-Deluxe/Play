@@ -162,7 +162,8 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         });
     }
 
-    private void SendSimulateLeftMouseButtonClickRequest()
+    // Method is public to access it from test
+    public async Awaitable SendSimulateLeftMouseButtonClickRequestAsync()
     {
         if (awaitingDragEnd)
         {
@@ -170,10 +171,15 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         }
 
         Debug.Log("simulating left mouse button single click");
-        SendSimulateInputRequest("leftMouseButton");
+        await SendSimulateInputRequestAsync("leftMouseButton");
     }
 
-    private void SendSimulateLeftMouseButtonDoubleClickRequest()
+    private async void SendSimulateLeftMouseButtonClickRequest()
+    {
+        await SendSimulateLeftMouseButtonClickRequestAsync();
+    }
+
+    private async void SendSimulateLeftMouseButtonDoubleClickRequest()
     {
         if (awaitingDragEnd)
         {
@@ -181,11 +187,11 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         }
 
         Debug.Log("simulating left mouse button double click");
-        SendSimulateInputRequest("leftMouseButton");
-        SendSimulateInputRequest("leftMouseButton");
+        await SendSimulateInputRequestAsync("leftMouseButton");
+        await SendSimulateInputRequestAsync("leftMouseButton");
     }
 
-    private void SendSimulateDragStartRequest()
+    private async void SendSimulateDragStartRequest()
     {
         if (awaitingDragEnd)
         {
@@ -194,10 +200,10 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
         awaitingDragEnd = true;
         Debug.Log("simulating drag start");
-        SendSimulateInputRequest("dragStart");
+        await SendSimulateInputRequestAsync("dragStart");
     }
 
-    private void SendSimulateDragEndRequest()
+    private async void SendSimulateDragEndRequest()
     {
         if (!awaitingDragEnd)
         {
@@ -206,7 +212,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
         awaitingDragEnd = false;
         Debug.Log("simulating drag end");
-        SendSimulateInputRequest("dragEnd");
+        await SendSimulateInputRequestAsync("dragEnd");
     }
 
     private void OnPointerUpOnRootVisualElement(PointerUpEvent evt)
@@ -421,7 +427,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         lastMousePadAreaPos = localPosition;
     }
 
-    private async void SendSimulateInputRequest(string inputControl)
+    private async Awaitable SendSimulateInputRequestAsync(string inputControl)
     {
         await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.Input
             .ReplaceOrThrow("{inputControl}", inputControl));
@@ -459,7 +465,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
     private void RegisterCallbackToSendSimulationInputRequest(Button uiButton, string keyboardButton)
     {
-        uiButton.RegisterCallbackButtonTriggered(_ => SendSimulateInputRequest(keyboardButton));
+        uiButton.RegisterCallbackButtonTriggered(async _ => await SendSimulateInputRequestAsync(keyboardButton));
     }
 
     private class CustomPointerMoveEvent

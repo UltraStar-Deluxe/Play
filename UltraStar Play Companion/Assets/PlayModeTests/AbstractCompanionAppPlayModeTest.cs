@@ -24,7 +24,7 @@ public abstract class AbstractCompanionAppPlayModeTest : AbstractInputSystemTest
         await TearDownTestFixtureAsync();
     }
 
-    private async Awaitable SetUpTestFixtureAsync()
+    protected virtual async Awaitable SetUpTestFixtureAsync()
     {
         Debug.Log($"{this}.{nameof(SetUpTestFixtureAsync)}");
 
@@ -36,7 +36,7 @@ public abstract class AbstractCompanionAppPlayModeTest : AbstractInputSystemTest
         UltraStarPlaySceneInjectionManager.Instance.SceneInjector.Inject(this);
     }
 
-    private async Awaitable TearDownTestFixtureAsync()
+    protected virtual async Awaitable TearDownTestFixtureAsync()
     {
         Debug.Log($"{this}.{nameof(TearDownTestFixtureAsync)}");
         await DeleteAllGameObjectsAsync();
