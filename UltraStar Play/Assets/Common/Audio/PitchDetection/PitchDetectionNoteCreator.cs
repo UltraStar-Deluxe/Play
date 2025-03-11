@@ -3,11 +3,11 @@ using AudioSynthesis.Midi;
 using AudioSynthesis.Midi.Event;
 using UnityEngine;
 
-public class PitchDetectionNotesCreator
+public class PitchDetectionNoteCreator
 {
     private readonly PitchDetectionManager pitchDetectionManager;
 
-    public PitchDetectionNotesCreator(PitchDetectionManager pitchDetectionManager)
+    public PitchDetectionNoteCreator(PitchDetectionManager pitchDetectionManager)
     {
         this.pitchDetectionManager = pitchDetectionManager;
     }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class PitchDetectionNotesMover
+public class PitchDetectionNoteMover
 {
      public static void MoveNotesToDetectedPitchUsingPitchDetectionLayer(
         SongMeta songMeta,

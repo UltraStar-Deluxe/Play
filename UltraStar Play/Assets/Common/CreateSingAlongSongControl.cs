@@ -38,11 +38,11 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
     private readonly Subject<SongMeta> createdSingAlongVersionEventStream = new();
     public IObservable<SongMeta> CreatedSingAlongVersionEventStream => createdSingAlongVersionEventStream;
 
-    private PitchDetectionNotesCreator pitchDetectionNotesCreator;
+    private PitchDetectionNoteCreator pitchDetectionNoteCreator;
 
     public void OnInjectionFinished()
     {
-        pitchDetectionNotesCreator = new PitchDetectionNotesCreator(pitchDetectionManager);
+        pitchDetectionNoteCreator = new PitchDetectionNoteCreator(pitchDetectionManager);
     }
 
     public async void CreateSingAlongSong(SongMeta songMeta, bool saveSongFile)
@@ -105,7 +105,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         Job<VoidEvent> pitchDetectionJob = new(Translation.Of("Pitch detection"));
         pitchDetectionJob.SetAwaitable(async () =>
         {
-            List<Note> loadedPitchDetectionNotes = await pitchDetectionNotesCreator.CreateNotesUsingBasicPitchAsync(songMeta);
+            List<Note> loadedPitchDetectionNotes = await pitchDetectionNoteCreator.CreateNotesUsingBasicPitchAsync(songMeta);
 
             // Move notes of first player to detected pitch
             MoveNotesToDetectedPitch(songMeta, pipelineData.CreatedNotes, loadedPitchDetectionNotes);
@@ -170,7 +170,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
     {
         try
         {
-            PitchDetectionNotesMover.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
+            PitchDetectionNoteMover.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
                 songMeta,
                 createdNotes,
                 loadedPitchDetectionNotes);

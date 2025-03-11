@@ -74,7 +74,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
             return;
         }
 
-        PitchDetectionNotesMover.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
+        PitchDetectionNoteMover.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
             songMeta,
             notes,
             pitchDetectionLayerNotes);
