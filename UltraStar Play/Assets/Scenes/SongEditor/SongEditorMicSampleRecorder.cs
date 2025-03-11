@@ -202,11 +202,10 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         if (!settings.SongEditorSettings.SpeechRecognitionWhenRecording
             || !nonPersistentSettings.IsSongEditorRecordingEnabled.Value
             || !HasRecordedAudio
-            || SpeechRecognitionUtils.IsSpeechRecognitionRunning)
+            || speechRecognitionManager.IsSpeechRecognitionRunning)
         {
             return;
         }
-
 
         int sampleRate = FinalSampleRate.Value;
 

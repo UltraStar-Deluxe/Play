@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -31,7 +29,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
     private PitchDetectionManager pitchDetectionManager;
 
     [Inject]
-    private SpeechRecognitionManager speechRecognitionManager;
+    private SpeechRecognitionNoteCreator speechRecognitionNoteCreator;
 
     private IJob lastProcessSongJob;
 
@@ -132,7 +130,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
             float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
-            pipelineData.CreatedNotes = await SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionJob(
+            pipelineData.CreatedNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
                 monoAudioSamples,
                 0,
                 monoAudioSamples.Length - 1,
