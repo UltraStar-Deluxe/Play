@@ -10,7 +10,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class CreateSingAlongSongControl : INeedInjection
+public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private AudioSeparationManager audioSeparationManager;
@@ -37,6 +37,13 @@ public class CreateSingAlongSongControl : INeedInjection
 
     private readonly Subject<SongMeta> createdSingAlongVersionEventStream = new();
     public IObservable<SongMeta> CreatedSingAlongVersionEventStream => createdSingAlongVersionEventStream;
+
+    private PitchDetectionNotesCreator pitchDetectionNotesCreator;
+
+    public void OnInjectionFinished()
+    {
+        pitchDetectionNotesCreator = new PitchDetectionNotesCreator(pitchDetectionManager);
+    }
 
     public async void CreateSingAlongSong(SongMeta songMeta, bool saveSongFile)
     {
@@ -98,9 +105,7 @@ public class CreateSingAlongSongControl : INeedInjection
         Job<VoidEvent> pitchDetectionJob = new(Translation.Of("Pitch detection"));
         pitchDetectionJob.SetAwaitable(async () =>
         {
-            List<Note> loadedPitchDetectionNotes = await PitchDetectionUtils.CreateNotesUsingBasicPitchAsync(
-                pitchDetectionManager,
-                songMeta);
+            List<Note> loadedPitchDetectionNotes = await pitchDetectionNotesCreator.CreateNotesUsingBasicPitchAsync(songMeta);
 
             // Move notes of first player to detected pitch
             MoveNotesToDetectedPitch(songMeta, pipelineData.CreatedNotes, loadedPitchDetectionNotes);
@@ -165,7 +170,7 @@ public class CreateSingAlongSongControl : INeedInjection
     {
         try
         {
-            PitchDetectionUtils.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
+            PitchDetectionNotesMover.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
                 songMeta,
                 createdNotes,
                 loadedPitchDetectionNotes);

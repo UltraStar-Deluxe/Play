@@ -1,43 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AudioSynthesis.Midi;
-using AudioSynthesis.Midi.Event;
-using UnityEngine;
 
-public static class PitchDetectionUtils
+public class PitchDetectionNotesMover
 {
-    public static async Awaitable<List<Note>> CreateNotesUsingBasicPitchAsync(
-        PitchDetectionManager pitchDetectionManager,
-        SongMeta songMeta)
-    {
-        if (!SongMetaUtils.VocalsAudioResourceExists(songMeta))
-        {
-            throw new PitchDetectionException("Vocals audio not found. Split the audio first.");
-        }
-
-        BasicPitchDetectionResult basicPitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta)
-            .GetResultAsync();
-        MidiFile midiFile = MidiFileUtils.LoadMidiFile(basicPitchDetectionResult.MidiFilePath);
-
-        MidiFileUtils.CalculateMidiEventTimesInMillis(
-            midiFile,
-            out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
-            out Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis);
-
-        List<Note> loadedNotes = MidiToSongMetaUtils.LoadNotesFromMidiFile(
-            songMeta,
-            midiFile,
-            1,
-            0,
-            false,
-            true,
-            midiEventToDeltaTimeInMillis,
-            midiEventToAbsoluteDeltaTimeInMillis);
-        return loadedNotes;
-    }
-
-    public static void MoveNotesToDetectedPitchUsingPitchDetectionLayer(
+     public static void MoveNotesToDetectedPitchUsingPitchDetectionLayer(
         SongMeta songMeta,
         List<Note> notes,
         List<Note> pitchDetectionLayerNotes)
