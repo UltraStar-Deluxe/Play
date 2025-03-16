@@ -12,7 +12,7 @@ public class ConnectionTest : AbstractCompanionAppPlayModeTest
     public IEnumerator ShouldConnect() => ShouldConnectAsync();
     private async Awaitable ShouldConnectAsync()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
         await ConditionUtils.WaitForConditionAsync(
             () => clientSideCompanionClientManager.IsConnected,
             new WaitForConditionConfig { description = "is connected with main game"});

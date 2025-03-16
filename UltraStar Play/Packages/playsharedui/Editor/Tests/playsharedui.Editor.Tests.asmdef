@@ -2,12 +2,12 @@
   "name": "playsharedui.Editor.Tests",
   "references": [
     "playshared",
+    "playshared.Editor",
     "playshared.Editor.Tests",
-    "playsharedui"
+    "playsharedui",
+    "playsharedui.Editor"
   ],
-  "optionalUnityReferences": [
-    "TestAssemblies"
-  ],
+  "optionalUnityReferences": [],
   "includePlatforms": [
     "Editor"
   ],

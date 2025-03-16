@@ -12,7 +12,7 @@ public class InputSimulationTest : AbstractConnectedCompanionAppPlayModeTest
     public IEnumerator ShouldSendRequestSuccessfully() => ShouldSendRequestSuccessfullyAsync();
     private async Awaitable ShouldSendRequestSuccessfullyAsync()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         // Sending request should not throw exception
         await inputSimulationControl.SendSimulateLeftMouseButtonClickRequestAsync();
