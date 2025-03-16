@@ -1,16 +1,17 @@
 {
-    "name": "EditorTests",
+    "name": "Editor.Tests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Plugins",
         "UniRx",
-        "Responsible",
         "com.achimmihca.uniinject",
         "com.achimmihca.protrans",
         "playshared",
+        "playshared.Editor.Tests",
         "playsharedui",
+        "playsharedui.Editor.Tests",
         "Common",
         "Scenes",
         "SongEditorScene"

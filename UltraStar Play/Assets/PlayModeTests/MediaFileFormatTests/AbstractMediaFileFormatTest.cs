@@ -101,18 +101,19 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
 
     protected SongMeta LoadSongMeta(string songFilePath)
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile(songFilePath, out List<SongIssue> songIssues, Encoding.UTF8, false);
-        if (songMeta == null)
+        UltraStarSongParserResult parserResult = UltraStarSongParser.ParseFile(songFilePath,
+            new UltraStarSongParserConfig { Encoding = Encoding.UTF8, UseUniversalCharsetDetector = false });
+        if (parserResult.SongMeta == null)
         {
             Assert.Fail($"Failed to load song from path '{songFilePath}'");
         }
 
-        if (!songIssues.IsNullOrEmpty())
+        if (!parserResult.SongIssues.IsNullOrEmpty())
         {
-            string songIssuesCsv = songIssues.Select(songIssue => songIssue.Message).JoinWith("\n    - ");
+            string songIssuesCsv = parserResult.SongIssues.Select(songIssue => songIssue.Message).JoinWith("\n    - ");
             Assert.Fail($"Issues found with song at path '{songFilePath}':\n    - {songIssuesCsv}");
         }
 
-        return songMeta;
+        return parserResult.SongMeta;
     }
 }

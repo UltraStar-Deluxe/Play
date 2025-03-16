@@ -20,6 +20,6 @@ public class ComputeSongIdTest
 
     private UltraStarSongMeta LoadSong(string path)
     {
-        return UltraStarSongParser.ParseFile(path, out List<SongIssue> songIssues, null, true);
+        return UltraStarSongParser.ParseFile(path).SongMeta;
     }
 }

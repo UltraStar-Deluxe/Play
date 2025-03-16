@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using NHyphenator;
 using UniInject;
 using UnityEngine;
@@ -26,6 +25,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     [Inject] private SpeechRecognitionManager speechRecognitionManager;
 
+    [Inject] private SpeechRecognitionNoteCreator speechRecognitionNoteCreator;
+
     [Inject] private SongEditorLayerManager songEditorLayerManager;
 
     [Inject] private EditorNoteDisplayer editorNoteDisplayer;
@@ -33,6 +34,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     [Inject] private SpaceBetweenNotesAction spaceBetweenNotesAction;
 
     [Inject] private JobManager jobManager;
+
+    [Inject] private SpeechRecognizerProvider speechRecognizerProvider;
 
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
     private TextField speechRecognitionModelPathTextField;
@@ -50,30 +53,28 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             return;
         }
 
+        int audioClipFrequency = audioClip.frequency;
         int minBeat = SongMetaUtils.MinBeat(selectedNotes);
         int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
 
-        SpeechRecognitionParameters speechRecognitionParameters = CreateSpeechRecognizerParameters();
+        SpeechRecognizerConfig speechRecognizerConfig = CreateSpeechRecognizerParameters();
 
         try
         {
-            SpeechRecognizer speechRecognizer = await SpeechRecognitionUtils.GetOrCreateSpeechRecognizerJob(speechRecognitionParameters)
+            SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(speechRecognizerConfig)
                 .GetResultAsync();
 
             float[] monoAudioSamples =
                 AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, minBeat, lengthInBeats, true);
 
             await Awaitable.BackgroundThreadAsync();
-            SpeechRecognitionResult speechRecognitionResult = await SpeechRecognitionUtils.RecognizeSpeechJob(
-                monoAudioSamples,
-                0,
-                monoAudioSamples.Length - 1,
-                audioClip.frequency,
+            SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
+                new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, audioClipFrequency),
                 speechRecognizer)
                 .GetResultAsync();
 
             await Awaitable.MainThreadAsync();
-            SpeechRecognitionUtils.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words, selectedNotes, minBeat);
+            SpeechRecognitionResultTextToNotesMapper.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words, selectedNotes, minBeat);
             if (notify)
             {
                 songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
@@ -92,7 +93,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int sampleRate,
         int spaceBetweenNotesInMillis,
         bool notify,
-        SpeechRecognitionParameters speechRecognitionParameters,
+        SpeechRecognizerConfig speechRecognizerConfig,
         int offsetInBeats)
     {
         await CreateNotesFromSpeechRecognitionAsync(
@@ -102,7 +103,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             sampleRate,
             spaceBetweenNotesInMillis,
             notify,
-            speechRecognitionParameters,
+            speechRecognizerConfig,
             offsetInBeats);
     }
 
@@ -113,7 +114,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int sampleRate,
         int spaceBetweenNotesInMillis,
         bool notify,
-        SpeechRecognitionParameters speechRecognitionParameters,
+        SpeechRecognizerConfig speechRecognizerConfig,
         int offsetInBeats)
     {
         int lengthInSamples = endIndex - startIndex;
@@ -129,17 +130,17 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         try
         {
-            List<Note> createdNotes = await SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionJob(
-                    monoAudioSamples,
-                    startIndex,
-                    endIndex,
-                    sampleRate,
-                    speechRecognitionParameters,
-                    settings.SongEditorSettings.DefaultPitchForCreatedNotes,
-                    songMeta,
-                    offsetInBeats,
-                    hyphenator,
-                    settings.SongEditorSettings.SpaceBetweenNotesInMillis)
+            List<Note> createdNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
+                    new CreateNotesFromSpeechRecognitionConfig
+                    {
+                        SpeechRecognizerConfig = speechRecognizerConfig,
+                        InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, startIndex, endIndex, sampleRate),
+                        MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
+                        SongMeta = songMeta,
+                        OffsetInBeats = offsetInBeats,
+                        Hyphenator = hyphenator,
+                        SpaceInMillisBetweenNotes = settings.SongEditorSettings.SpaceBetweenNotesInMillis,
+                    })
                 .GetResultAsync();
 
             createdNotes.ForEach(createdNote =>
@@ -173,7 +174,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         ESongEditorSamplesSource speechRecognitionSampleSource,
         int spaceBetweenNotesInMillis,
         bool notify,
-        SpeechRecognitionParameters speechRecognitionParameters)
+        SpeechRecognizerConfig speechRecognizerConfig)
     {
         try
         {
@@ -182,7 +183,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 speechRecognitionSampleSource,
                 spaceBetweenNotesInMillis,
                 notify,
-                speechRecognitionParameters);
+                speechRecognizerConfig);
         }
         catch (Exception ex)
         {
@@ -204,7 +205,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         ESongEditorSamplesSource speechRecognitionSampleSource,
         int spaceBetweenNotesInMillis,
         bool notify,
-        SpeechRecognitionParameters speechRecognitionParameters)
+        SpeechRecognizerConfig speechRecognizerConfig)
     {
         AudioClip audioClip = await GetAudioClip(speechRecognitionSampleSource);
         if (audioClip == null
@@ -229,17 +230,17 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             ? SettingsUtils.CreateHyphenator(settings)
             : null;
 
-        List<Note> createdNotes = await SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionJob(
-                monoAudioSamples,
-                0,
-                monoAudioSamples.Length - 1,
-                audioClip.frequency,
-                speechRecognitionParameters,
-                settings.SongEditorSettings.DefaultPitchForCreatedNotes,
-                songMeta,
-                startBeat,
-                hyphenator,
-                settings.SongEditorSettings.SpaceBetweenNotesInMillis)
+        List<Note> createdNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
+                new CreateNotesFromSpeechRecognitionConfig
+                {
+                    SpeechRecognizerConfig = speechRecognizerConfig,
+                    InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, audioClip.frequency),
+                    MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
+                    SongMeta = songMeta,
+                    OffsetInBeats = startBeat,
+                    Hyphenator = hyphenator,
+                    SpaceInMillisBetweenNotes = settings.SongEditorSettings.SpaceBetweenNotesInMillis
+                })
             .GetResultAsync();
 
         createdNotes.ForEach(createdNote =>
@@ -261,9 +262,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         return createdNotes;
     }
 
-    public SpeechRecognitionParameters CreateSpeechRecognizerParameters()
+    public SpeechRecognizerConfig CreateSpeechRecognizerParameters()
     {
-        return new SpeechRecognitionParameters(
+        return new SpeechRecognizerConfig(
             SettingsUtils.GetSpeechRecognitionModelPath(settings),
             SettingsUtils.GetSpeechRecognitionLanguage(settings),
             settings.SongEditorSettings.SpeechRecognitionPrompt);

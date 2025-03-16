@@ -22,26 +22,31 @@ public class UltraStarSongVoicesParser
     // The last beat is only relevant for relative song files. Any beat will be relative to this.
     private int lastBeat;
 
-    public static List<Voice> ParseFile(string filePath, Encoding fileEncoding, bool isRelativeSongFormat, bool useUniversalCharsetDetector)
+    public static UltraStarSongVoicesParserResult ParseFile(string filePath, UltraStarSongVoicesParserConfig config = null)
     {
-        StreamReader reader = PlainTextReader.GetFileStreamReader(filePath, fileEncoding, useUniversalCharsetDetector);
-        UltraStarSongVoicesParser parser = new(reader, isRelativeSongFormat, filePath);
+        config ??= new UltraStarSongVoicesParserConfig();
+
+        StreamReader reader = PlainTextReader.GetFileStreamReader(filePath,
+            new PlainTextReaderConfig { Encoding = config.Encoding, UseUniversalCharsetDetector = config.UseUniversalCharsetDetector });
+        UltraStarSongVoicesParser parser = new(reader, config.IsRelativeSongFormat, filePath);
         IReadOnlyList<Voice> voices = parser.Parse();
-        return new List<Voice>(voices);
+        return new UltraStarSongVoicesParserResult(new List<Voice>(voices));
     }
 
-    public static List<Voice> ParseString(string text, bool isRelativeSongFormat)
+    public static UltraStarSongVoicesParserResult ParseString(string text, UltraStarSongVoicesParserConfig config = null)
     {
+        config ??= new UltraStarSongVoicesParserConfig();
+
         MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
         StreamReader streamReader = new StreamReader(memoryStream, Encoding.UTF8);
-        return ParseStreamReader(streamReader, isRelativeSongFormat);
+        return ParseStreamReader(streamReader, config.IsRelativeSongFormat);
     }
 
-    private static List<Voice> ParseStreamReader(StreamReader reader, bool isRelativeSongFormat)
+    private static UltraStarSongVoicesParserResult ParseStreamReader(StreamReader reader, bool isRelativeSongFormat)
     {
         UltraStarSongVoicesParser parser = new(reader, isRelativeSongFormat);
         IReadOnlyList<Voice> voices = parser.Parse();
-        return new List<Voice>(voices);
+        return new UltraStarSongVoicesParserResult(new List<Voice>(voices));
     }
 
     private UltraStarSongVoicesParser(

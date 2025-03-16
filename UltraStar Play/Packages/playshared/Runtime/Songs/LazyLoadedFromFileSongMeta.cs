@@ -25,21 +25,25 @@ public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
         DoLoadSong = () =>
         {
             using IDisposable d = new DisposableStopwatch($"Loading '{fileInfo.Name}' took <ms> ms", ELogEventLevel.Verbose);
-            UltraStarSongMeta loadedSongMeta = UltraStarSongParser.ParseFile(fileInfo.FullName, out List<SongIssue> songIssues, FileEncoding, useUniversalCharsetDetector);
-            CopyValues(loadedSongMeta);
+            UltraStarSongParserResult parserResult = UltraStarSongParser.ParseFile(fileInfo.FullName,
+                new UltraStarSongParserConfig { Encoding = FileEncoding, UseUniversalCharsetDetector = useUniversalCharsetDetector, });
+            CopyValues(parserResult.SongMeta);
 
-            SongIssues = songIssues;
+            SongIssues = parserResult.SongIssues;
         };
 
         DoLoadVoices = () =>
         {
             using IDisposable d = new DisposableStopwatch($"Loading voices of '{fileInfo.Name}' took <ms> ms", ELogEventLevel.Verbose);
-            List<Voice> voices = UltraStarSongVoicesParser.ParseFile(
+            UltraStarSongVoicesParserResult voicesParserResult = UltraStarSongVoicesParser.ParseFile(
                 FileInfo.FullName,
-                FileEncoding,
-                false,
-                useUniversalCharsetDetector);
-            voices.ForEach(voice => AddVoice(voice));
+                new UltraStarSongVoicesParserConfig
+                {
+                    Encoding = FileEncoding,
+                    IsRelativeSongFormat = false,
+                    UseUniversalCharsetDetector = useUniversalCharsetDetector,
+                });
+            voicesParserResult.Voices.ForEach(voice => AddVoice(voice));
         };
 
         // Check whether the file name or its directory

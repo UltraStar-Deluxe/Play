@@ -12,6 +12,8 @@
         "Unity.InputSystem",
         "playshared",
         "playshared.Editor",
+        "playsharedui",
+        "playsharedui.Editor",
         "Plugins",
         "Common",
         "Common.OnlineMultiplayer.Editor",

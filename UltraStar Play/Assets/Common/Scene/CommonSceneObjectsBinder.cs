@@ -74,6 +74,9 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(NetworkManager.Singleton);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
+        bb.BindExistingInstance(SpeechRecognizerProvider.Instance);
+        bb.BindExistingInstance(WhisperSpeechRecognizerProvider.Instance);
+        bb.BindExistingInstance(SpeechRecognitionNoteCreator.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);
         bb.BindExistingInstance(PitchDetectionManager.Instance);
         bb.BindExistingInstance(SongQueueManager.Instance);

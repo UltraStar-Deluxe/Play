@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -10,7 +8,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class CreateSingAlongSongControl : INeedInjection
+public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private AudioSeparationManager audioSeparationManager;
@@ -31,12 +29,19 @@ public class CreateSingAlongSongControl : INeedInjection
     private PitchDetectionManager pitchDetectionManager;
 
     [Inject]
-    private SpeechRecognitionManager speechRecognitionManager;
+    private SpeechRecognitionNoteCreator speechRecognitionNoteCreator;
 
     private IJob lastProcessSongJob;
 
     private readonly Subject<SongMeta> createdSingAlongVersionEventStream = new();
     public IObservable<SongMeta> CreatedSingAlongVersionEventStream => createdSingAlongVersionEventStream;
+
+    private PitchDetectionNoteCreator pitchDetectionNoteCreator;
+
+    public void OnInjectionFinished()
+    {
+        pitchDetectionNoteCreator = new PitchDetectionNoteCreator(pitchDetectionManager);
+    }
 
     public async void CreateSingAlongSong(SongMeta songMeta, bool saveSongFile)
     {
@@ -98,9 +103,7 @@ public class CreateSingAlongSongControl : INeedInjection
         Job<VoidEvent> pitchDetectionJob = new(Translation.Of("Pitch detection"));
         pitchDetectionJob.SetAwaitable(async () =>
         {
-            List<Note> loadedPitchDetectionNotes = await PitchDetectionUtils.CreateNotesUsingBasicPitchAsync(
-                pitchDetectionManager,
-                songMeta);
+            List<Note> loadedPitchDetectionNotes = await pitchDetectionNoteCreator.CreateNotesUsingBasicPitchAsync(songMeta);
 
             // Move notes of first player to detected pitch
             MoveNotesToDetectedPitch(songMeta, pipelineData.CreatedNotes, loadedPitchDetectionNotes);
@@ -116,7 +119,7 @@ public class CreateSingAlongSongControl : INeedInjection
         speechRecognitionJob.SetAwaitable(async () =>
         {
             // Load speech recognition model
-            SpeechRecognitionParameters speechRecognitionParameters = new(
+            SpeechRecognizerConfig speechRecognizerConfig = new(
                 SettingsUtils.GetSpeechRecognitionModelPath(settings),
                 SettingsUtils.GetSpeechRecognitionLanguage(settings),
                 settings.SongEditorSettings.SpeechRecognitionPrompt);
@@ -127,17 +130,18 @@ public class CreateSingAlongSongControl : INeedInjection
 
             float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
-            pipelineData.CreatedNotes = await SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionJob(
-                monoAudioSamples,
-                0,
-                monoAudioSamples.Length - 1,
-                vocalsAudioClip.frequency,
-                speechRecognitionParameters,
-                settings.SongEditorSettings.DefaultPitchForCreatedNotes,
-                songMeta,
-                0,
-                SettingsUtils.CreateHyphenator(settings),
-                settings.SongEditorSettings.SpaceBetweenNotesInMillis).GetResultAsync();
+            pipelineData.CreatedNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
+                new CreateNotesFromSpeechRecognitionConfig
+                {
+                    SpeechRecognizerConfig = speechRecognizerConfig,
+                    InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, vocalsAudioClip.frequency),
+                    MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
+                    SongMeta = songMeta,
+                    OffsetInBeats = 0,
+                    Hyphenator = SettingsUtils.CreateHyphenator(settings),
+                    SpaceInMillisBetweenNotes = settings.SongEditorSettings.SpaceBetweenNotesInMillis,
+                })
+                .GetResultAsync();
 
             // Split created notes into sentences and assign to first player
             AssignNotesToFirstPlayer(songMeta, pipelineData.CreatedNotes);
@@ -165,7 +169,7 @@ public class CreateSingAlongSongControl : INeedInjection
     {
         try
         {
-            PitchDetectionUtils.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
+            PitchDetectionNoteMover.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
                 songMeta,
                 createdNotes,
                 loadedPitchDetectionNotes);

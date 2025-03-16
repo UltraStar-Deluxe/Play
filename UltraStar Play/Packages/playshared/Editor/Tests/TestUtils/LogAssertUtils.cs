@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.TestTools;
-using Exception = System.Exception;
 
 public static class LogAssertUtils
 {
