@@ -2,20 +2,24 @@
   "name": "PlayModeTests",
   "rootNamespace": "",
   "references": [
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner",
+    "Unity.InputSystem",
+    "Unity.InputSystem.TestFramework",
+    "Unity.InputSystem.IntegrationTests",
     "Serilog",
     "UniRx",
     "com.achimmihca.uniinject",
     "com.achimmihca.primeinputactions",
     "playshared",
+    "playshared.Editor",
+    "playshared.Editor.Tests",
     "playsharedui",
+    "playsharedui.Editor",
+    "playsharedui.Editor.Tests",
     "Common",
     "Scenes",
-    "EditorTests",
-    "UnityEngine.TestRunner",
-    "UnityEditor.TestRunner",
-    "Unity.InputSystem",
-    "Unity.InputSystem.TestFramework",
-    "Unity.InputSystem.IntegrationTests"
+    "Editor.Tests"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
@@ -26,6 +30,7 @@
   ],
   "autoReferenced": false,
   "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
   ],
   "versionDefines": [],
   "noEngineReferences": false

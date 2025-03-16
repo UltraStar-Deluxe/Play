@@ -37,6 +37,9 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
     private readonly Subject<MicProfile> micProfileChangedEventStream = new();
     public IObservable<MicProfile> MicProfileChangedEventStream => micProfileChangedEventStream;
 
+    private readonly Subject<BeatPitchEventsDto> beatPitchEventsDtoEventStream = new();
+    public IObservable<BeatPitchEventsDto> BeatPitchEventsDtoEventStream => beatPitchEventsDtoEventStream;
+
     private void Start()
     {
         ResetPositionInSong();
@@ -141,6 +144,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
             UnixTimeMilliseconds = TimeUtils.GetUnixTimeMilliseconds(),
         };
 
+        beatPitchEventsDtoEventStream.OnNext(beatPitchEventsDto);
         SendMessageToServer(beatPitchEventsDto);
 
         lastAnalyzedBeat = currentBeatConsideringMicDelay;
@@ -164,10 +168,13 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         int midiNote = pitchEvent?.MidiNote ?? -1;
         float frequency = pitchEvent?.Frequency ?? -1;
         BeatPitchEventDto beatPitchEventDto = new(midiNote, -1, frequency);
-        SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDto)
+        BeatPitchEventsDto beatPitchEventsDto = new(beatPitchEventDto)
         {
             UnixTimeMilliseconds = TimeUtils.GetUnixTimeMilliseconds(),
-        });
+        };
+
+        beatPitchEventsDtoEventStream.OnNext(beatPitchEventsDto);
+        SendMessageToServer(beatPitchEventsDto);
     }
 
     private void SendMessageToServer(JsonSerializable jsonSerializable)

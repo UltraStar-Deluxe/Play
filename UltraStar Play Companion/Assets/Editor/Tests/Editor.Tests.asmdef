@@ -1,22 +1,24 @@
 {
-    "name": "EditorTests",
+    "name": "Editor.Tests",
     "rootNamespace": "",
     "references": [
+        "UnityEngine.TestRunner",
+        "Unity.InputSystem",
         "Serilog",
         "Plugins",
         "UniRx",
         "com.achimmihca.protrans",
         "com.achimmihca.uniinject",
         "com.achimmihca.primeinputactions",
-        "Unity.InputSystem",
         "playshared",
         "playshared.Editor",
+        "playshared.Editor.Tests",
         "playsharedui",
+        "playsharedui.Editor",
+        "playsharedui.Editor.Tests",
         "LiteNetLib",
         "Common",
-        "Scenes",
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "Scenes"
     ],
     "includePlatforms": [
         "Editor"

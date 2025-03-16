@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UniInject;
+using UniInject.Extensions;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -33,7 +35,20 @@ public abstract class AbstractCompanionAppPlayModeTest : AbstractInputSystemTest
 
         await LoadTestSceneAsync();
 
-        UltraStarPlaySceneInjectionManager.Instance.SceneInjector.Inject(this);
+        Injector testInjector = UltraStarPlaySceneInjectionManager.Instance.SceneInjector.CreateChildInjector();
+        AddPageObjectBindings(testInjector);
+        testInjector.Inject(this);
+    }
+
+    private void AddPageObjectBindings(Injector injector)
+    {
+        // injector.AddBindingForInstance(injector.CreateAndInject<SongListPageObject>(), RebindingBehavior.Throw);
+        // injector.AddBindingForInstance(injector.CreateAndInject<SongDetailsPageObject>(), RebindingBehavior.Throw);
+        // injector.AddBindingForInstance(injector.CreateAndInject<SongQueuePageObject>(), RebindingBehavior.Throw);
+
+        injector.AddBinding(new Binding(typeof(SongListPageObject), new NewInstancesProvider(typeof(SongListPageObject))), RebindingBehavior.Throw);
+        injector.AddBinding(new Binding(typeof(SongDetailsPageObject), new NewInstancesProvider(typeof(SongDetailsPageObject))), RebindingBehavior.Throw);
+        injector.AddBinding(new Binding(typeof(SongQueuePageObject), new NewInstancesProvider(typeof(SongQueuePageObject))), RebindingBehavior.Throw);
     }
 
     protected virtual async Awaitable TearDownTestFixtureAsync()

@@ -1,9 +1,8 @@
 ﻿{
   "name": "playshared.Editor.Tests",
   "references": [
-  ],
-  "optionalUnityReferences": [
-    "TestAssemblies"
+    "playshared",
+    "playshared.Editor"
   ],
   "includePlatforms": [
     "Editor"

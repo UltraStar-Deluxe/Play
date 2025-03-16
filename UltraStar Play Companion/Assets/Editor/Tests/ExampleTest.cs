@@ -1,13 +1,12 @@
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 public class ExampleTest
 {
     [Test]
     public void ShouldRun()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
         Debug.Log("Test did run");
     }
 }

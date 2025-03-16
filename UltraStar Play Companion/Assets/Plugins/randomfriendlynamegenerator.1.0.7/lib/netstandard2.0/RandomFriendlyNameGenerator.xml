@@ -1,0 +1,383 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RandomFriendlyNameGenerator</name>
+    </assembly>
+    <members>
+        <member name="T:RandomFriendlyNameGenerator.Data.Adjectives">
+            <summary>
+            Class Adjectives.
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.Data.Adjectives.Values">
+            <summary>
+            The values
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.Data.Nationalities">
+            <summary>
+            Class Nationalities.
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.Data.Nationalities.Values">
+            <summary>
+            The values
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.Data.FemaleFirstNames">
+            <summary>
+            Class FemaleFirstNames.
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.Data.FemaleFirstNames.Values">
+            <summary>
+            THe values
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.Data.FirstNames">
+            <summary>
+            Class FirstNames.
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.Data.FirstNames.Values">
+            <summary>
+            The values
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.Data.LastNames">
+            <summary>
+            Class LastNames.
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.Data.LastNames.Values">
+            <summary>
+            The values
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.Data.MaleFirstNames">
+            <summary>
+            Class MaleFirstNames.
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.Data.MaleFirstNames.Values">
+            <summary>
+            The values
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.Data.Animals">
+            <summary>
+            Class Animals.
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.Data.Animals.Values">
+            <summary>
+            The values
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.Data.Nouns">
+            <summary>
+            Class Nouns.
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.Data.Nouns.Values">
+            <summary>
+            The values
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.Data.Professions">
+            <summary>
+            Class Professions.
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.Data.Professions.Values">
+            <summary>
+            The values/
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.NameGenerator">
+            <summary>
+            Simple but flexible and powerful utility for generating random names
+            <para>- human like, e.g. Jim Deam, Constance Calaxa, Rick Abraham Hoferle, Betsey Bataller</para>
+            <para>- or identifiers, like Sympathetic_Alligator, Dusty Doctor, Undetected_Noodle, Electrifying Minister</para>
+            <para>- or anything in between, with configurable number of components, separators, length and structure</para>
+            <para>like Bob_The_Builder, Well-dressed-Entertainer, Medium-rare SeaTurtle Eldon, RoannaTheJoblessComputer</para>
+            </summary>
+        </member>
+        <member name="P:RandomFriendlyNameGenerator.NameGenerator.PersonNames">
+            <summary>
+            Gets the real person names like Constance Calaxa, Rick Abraham Hoferle etc
+            </summary>
+            <value>The person names.</value>
+        </member>
+        <member name="P:RandomFriendlyNameGenerator.NameGenerator.Identifiers">
+            <summary>
+            Gets the identifiers, like Sympathetic_Alligator, Medium-rare SeaTurtle Eldon, Undetected_Noodle, RoannaTheJoblessComputer
+            </summary>
+            <value>The identifiers.</value>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.GeneratorOptions">
+            <summary>
+            Specifies the settings for the generator
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.GeneratorOptions.Default">
+            <summary>
+            The default options set
+            </summary>
+        </member>
+        <member name="P:RandomFriendlyNameGenerator.GeneratorOptions.Separator">
+            <summary>
+            Gets or sets the separator.
+            </summary>
+            <value>The separator.</value>
+        </member>
+        <member name="P:RandomFriendlyNameGenerator.GeneratorOptions.ForceSingleCharacter">
+            <summary>
+            Gets or sets a value indicating whether [force single character].
+            </summary>
+            <value><c>true</c> if [force single character]; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:RandomFriendlyNameGenerator.GeneratorOptions.NameLengthRestriction">
+            <summary>
+            Gets or sets the name length restriction.
+            </summary>
+            <value>The name length restriction.</value>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.IdentifierComponents">
+            <summary>
+            Determines how many (and which) components should be included in an identifier e.g.: <para/>
+            <para>AggressiveChinchillaBilly or</para>
+            <para>SillyChimneySweeper or</para>
+            <para>FrenchForkSteve etc.</para>
+            <para>The more parts you add, the longer the identifiers will be (but they might become a bit clumsy, e.g. AbnormalChineseEarthDrillerVanessa)</para>
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierComponents.Adjective">
+            <summary>
+            Pompous, Meandering, Former, Saddened
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierComponents.Nationality">
+            <summary>
+            Nigerian, Estonian, Gabonese,Yemenite
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierComponents.Noun">
+            <summary>
+            Nightgown, Ink, Justification
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierComponents.Animal">
+            <summary>
+            Beaver, SavannaBaboon, Sturgeon
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierComponents.Profession">
+            <summary>
+            Optometrist,  FilmEditor, SalesEngineer, GamingDealer, Dietitian
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierComponents.FirstName">
+            <summary>
+            Austin, Hildegaard, Meggie, Prunella, Gideon
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.IdentifiersGenerator">
+            <summary>
+            Generates non-human identifier strings
+            </summary>
+        </member>
+        <member name="M:RandomFriendlyNameGenerator.IdentifiersGenerator.Get(System.Int32,RandomFriendlyNameGenerator.IdentifierTemplate,RandomFriendlyNameGenerator.NameOrderingStyle,System.String,System.Boolean,System.Int32)">
+            <summary>
+            Gets a random identifier based on the specified template.
+            <para>Bear in mind that enumerating the result set multiple times will yield different results</para>
+            </summary>
+            <param name="numberOfNamesToReturn"></param>
+            <param name="template">The template.</param>
+            <param name="order">The order.</param>
+            <param name="separator">The separator.</param>
+            <param name="forceSingleLetter">if set to <c>true</c> [force single letter].</param>
+            <param name="lengthRestriction">The length restriction.</param>
+            <returns>System.String.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">template - null</exception>
+        </member>
+        <member name="M:RandomFriendlyNameGenerator.IdentifiersGenerator.Get(RandomFriendlyNameGenerator.IdentifierTemplate,RandomFriendlyNameGenerator.NameOrderingStyle,System.String,System.Boolean,System.Int32)">
+            <summary>
+            Gets a random identifier based on the specified template.
+            </summary>
+            <param name="template">The template.</param>
+            <param name="order">The order.</param>
+            <param name="separator">The separator.</param>
+            <param name="forceSingleLetter">if set to <c>true</c> [force single letter].</param>
+            <param name="lengthRestriction">The length restriction.</param>
+            <returns>System.String.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">template - null</exception>
+        </member>
+        <member name="M:RandomFriendlyNameGenerator.IdentifiersGenerator.Get(System.Int32,RandomFriendlyNameGenerator.IdentifierComponents,RandomFriendlyNameGenerator.NameOrderingStyle,System.String,System.Boolean,System.Int32)">
+            <summary>
+            Gets an IEnumerable of random identifiers based on the settings
+            <para>Bear in mind that enumerating the result set multiple times will yield different results</para>
+            </summary>
+            <param name="numberOfNamesToReturn">How many outputs to get</param>
+            <param name="components">The components.</param>
+            <param name="orderStyle">The order style.</param>
+            <param name="separator">The separator between the words.</param>
+            <param name="forceSingleLetter">if set to <c>true</c> all words of the result will start with the same letter, e.g. Irena The Idiosyncratic, Tammara The Twinkly or Quintana The Qualified</param>
+            <param name="lengthRestriction">Maximum number of characters in the returned string</param>
+            <returns>System.String.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">orderStyle - null</exception>
+        </member>
+        <member name="M:RandomFriendlyNameGenerator.IdentifiersGenerator.Get(RandomFriendlyNameGenerator.IdentifierComponents,RandomFriendlyNameGenerator.NameOrderingStyle,System.String,System.Boolean,System.Int32)">
+            <summary>
+            Gets a random identifier based on the settings
+            </summary>
+            <param name="components">The components.</param>
+            <param name="orderStyle">The order style.</param>
+            <param name="separator">The separator between the words.</param>
+            <param name="forceSingleLetter">if set to <c>true</c> all words of the result will start with the same letter, e.g. Irena The Idiosyncratic, Tammara The Twinkly or Quintana The Qualified</param>
+            <param name="lengthRestriction">Maximum number of characters in the returned string</param>
+            <returns>System.String.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">orderStyle - null</exception>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.IdentifierTemplate">
+            <summary>
+            Predefined identifier styles
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierTemplate.AnyTwoComponents">
+            <summary>
+            Random combination of any two components.
+            <para>The possible combinations are limited to be meaningful (E.g you won't get two adjectives or two first names)</para>
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierTemplate.AnyThreeComponents">
+            <summary>
+            Random combination of any three components.
+            <para>The possible combinations are limited to be meaningful (E.g you won't get two adjectives or two first names)</para>
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierTemplate.BobTheBuilder">
+            <summary>
+            Name and profession
+            <para>the order pattern depends on the NameOrderingStyle parameter (it can be either Bob The Builder or Builder Bob)</para>
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierTemplate.PeppaPig">
+            <summary>
+            Animal and name - the order pattern depends on the NameOrderingStyle parameter (it can be either Peppa The Pig or Peppa Pig)
+            <para>the order pattern depends on the NameOrderingStyle parameter (it can be either Peppa The Pig or Peppa Pig)</para>
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierTemplate.SilentBob">
+            <summary>
+            Adjective and name
+            <para>the order pattern depends on the NameOrderingStyle parameter (it can be either Silent Bob or Bob The Silent)</para>
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.IdentifierTemplate.GitHub">
+            <summary>
+            Adjective and noun (like GitHub repo names suggestions, e.g. Unclean Tool, Vigorous Housewife, Undifferentiated Wok, 
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.NameComponents">
+            <summary>
+            Which parts of the name should be provided
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.NameComponents.FirstNameLastName">
+            <summary>
+            e.g. John Doe
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.NameComponents.FirstNameMiddleNameLastName">
+            <summary>
+            e.g. John Barnaby Doe
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.NameComponents.FirstNameOnly">
+            <summary>
+            e.g. John
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.NameComponents.LastNameOnly">
+            <summary>
+            e.g. Doe
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.NameComponents.LastNameFirstName">
+            <summary>
+            Doe John
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.NameGender">
+            <summary>
+            Specifies the name gender
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.NameGender.Any">
+            <summary>
+            Any, either John or Jane
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.NameGender.Female">
+            <summary>
+            The female names 
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.NameGender.Male">
+            <summary>
+            The male names
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.NameOrderingStyle">
+            <summary>
+            Determines the order in which the name part should occur in the phrase
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.NameOrderingStyle.SilentBobStyle">
+            <summary>
+            <para>The Silent Bob style - name comes last, then the noun, profession or animal</para>
+            <para>e.g. Crouching Journalist Hildegaard</para>
+            <para>or Sophisticated Albanian MountainGoat Helga</para>
+            </summary>
+        </member>
+        <member name="F:RandomFriendlyNameGenerator.NameOrderingStyle.BobTheBuilderStyle">
+            <summary>
+            <para>The Bob The Builder style - name comes first, then a 'The' article, and then the noun, profession or animal</para>
+            <para>e.g. Hildegaard The Crouching Journalist</para>
+            <para>or Helga The Sophisticated Albanian MountainGoat</para>
+            </summary>
+        </member>
+        <member name="T:RandomFriendlyNameGenerator.PersonNamesGenerator">
+            <summary>
+            Generates human-like names based on random first names and last names combinations from all countries.
+            </summary>
+        </member>
+        <member name="M:RandomFriendlyNameGenerator.PersonNamesGenerator.Get(System.Int32,RandomFriendlyNameGenerator.NameGender,RandomFriendlyNameGenerator.NameComponents,System.String,System.Boolean,System.Int32)">
+            <summary>
+            Gets an IEnumerable of random name based on the specified settings.
+            <para>Enumerating the same result set multiple times will yield different results</para>
+            </summary>
+            <param name="numberOfNamesToReturn"></param>
+            <param name="gender">The gender.</param>
+            <param name="components">The components.</param>
+            <param name="separator">The separator.</param>
+            <param name="forceSingleLetter">if set to <c>true</c> [force single letter].</param>
+            <param name="lengthRestriction">Maximum number of characters in the returned string</param>
+            <returns>System.String.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">components - null</exception>
+        </member>
+        <member name="M:RandomFriendlyNameGenerator.PersonNamesGenerator.Get(RandomFriendlyNameGenerator.NameGender,RandomFriendlyNameGenerator.NameComponents,System.String,System.Boolean,System.Int32)">
+            <summary>
+            Gets a random name based on the specified settings
+            </summary>
+            <param name="gender">The gender.</param>
+            <param name="components">The components.</param>
+            <param name="separator">The separator.</param>
+            <param name="forceSingleLetter">if set to <c>true</c> [force single letter].</param>
+            <param name="lengthRestriction">Maximum number of characters in the returned string</param>
+            <returns>System.String.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">components - null</exception>
+        </member>
+    </members>
+</doc>
