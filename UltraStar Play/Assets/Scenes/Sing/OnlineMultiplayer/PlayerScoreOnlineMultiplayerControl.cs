@@ -71,7 +71,7 @@ public class PlayerScoreOnlineMultiplayerControl : MonoBehaviour, INeedInjection
     {
         if (playerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
         {
-            throw new IllegalStateException("Failed to construct online multiplayer message name because player is not a lobby member.");
+            throw new InvalidOperationException("Failed to construct online multiplayer message name because player is not a lobby member.");
         }
 
         return $"{nameof(SingingResultsPlayerScoreRequestDto)}-{lobbyMemberPlayerProfile.Name}-{lobbyMemberPlayerProfile.UnityNetcodeClientId}";

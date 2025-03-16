@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
 using UniInject;
@@ -125,7 +126,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         EVoiceId voiceId = voiceLayer.VoiceId;
         if (!songMeta.TryGetVoice(voiceId, out Voice voice))
         {
-            throw new IllegalStateException("Failed to find voice for copied sentence");
+            throw new InvalidOperationException("Failed to find voice for copied sentence");
         }
 
         Sentence createdSentence = null;
@@ -256,7 +257,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
         // public ESongEditorLayer LayerEnum => layer is SongEditorEnumLayer songEditorEnumLayer
         //     ? songEditorEnumLayer.LayerEnum
-        //     : throw new IllegalStateException("Copied sentence has no layer enum");
+        //     : throw new InvalidOperationException("Copied sentence has no layer enum");
     }
 
     private class NoteCopy

@@ -35,7 +35,7 @@ public class Job<T> : IJob
         {
             if (Status.Value is not EJobStatus.Pending)
             {
-                throw new IllegalStateException("Job has already been started. Cannot change parent job.");
+                throw new InvalidOperationException("Job has already been started. Cannot change parent job.");
             }
 
             if (parentJob == value)
@@ -44,7 +44,7 @@ public class Job<T> : IJob
             }
             if (parentJob != null)
             {
-                throw new IllegalStateException("Cannot change parent job");
+                throw new InvalidOperationException("Cannot change parent job");
             }
             parentJob = value;
             parentJob.AddChildJob(this);
@@ -98,7 +98,7 @@ public class Job<T> : IJob
             if (awaitable == null
                 && childJobs.IsNullOrEmpty())
             {
-                throw new IllegalStateException($"Job is missing awaitable to be executed: job '{Name}'");
+                throw new InvalidOperationException($"Job is missing awaitable to be executed: job '{Name}'");
             }
 
             if (awaitable != null)
@@ -135,7 +135,7 @@ public class Job<T> : IJob
     {
         if (Status.Value is not EJobStatus.Pending)
         {
-            throw new IllegalStateException("Job has already been started. Cannot change awaitable.");
+            throw new InvalidOperationException("Job has already been started. Cannot change awaitable.");
         }
 
         awaitableProvider = newValue;
@@ -145,7 +145,7 @@ public class Job<T> : IJob
     {
         if (Status.Value is not EJobStatus.Pending)
         {
-            throw new IllegalStateException("Job has already been started. Cannot add child jobs.");
+            throw new InvalidOperationException("Job has already been started. Cannot add child jobs.");
         }
 
         if (this == childJob)
@@ -250,7 +250,7 @@ public class Job<T> : IJob
             || Status.Value is EJobStatus.Running
             && newStatus != EJobStatus.Finished)
         {
-            throw new IllegalStateException($"Cannot change state from {Status.Value} to {newStatus}");
+            throw new InvalidOperationException($"Cannot change state from {Status.Value} to {newStatus}");
         }
 
         if (newStatus == EJobStatus.Running)
@@ -278,7 +278,7 @@ public class Job<T> : IJob
                 && newResult != EJobResult.Error)
             || Result.Value is EJobResult.Ok or EJobResult.Error)
         {
-            throw new IllegalStateException($"Cannot change result from {Result.Value} to {newResult}");
+            throw new InvalidOperationException($"Cannot change result from {Result.Value} to {newResult}");
         }
 
         // Cancel job if the result is set to error

@@ -37,7 +37,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         {
             if (Instance != this)
             {
-                throw new IllegalStateException("Settings can only be accessed from the singleton instance");
+                throw new InvalidOperationException("Settings can only be accessed from the singleton instance");
             }
 
             if (settings == null)
@@ -104,7 +104,7 @@ public class SettingsManager : AbstractSingletonBehaviour
     {
         if (settings != null)
         {
-            throw new IllegalStateException("Settings have been loaded already");
+            throw new InvalidOperationException("Settings have been loaded already");
         }
 
         InitSettingsLoaderSaverIfNotDoneYet();

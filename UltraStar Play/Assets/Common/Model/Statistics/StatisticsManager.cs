@@ -23,7 +23,7 @@ public class StatisticsManager : AbstractSingletonBehaviour, INeedInjection
         {
             if (Instance != this)
             {
-                throw new IllegalStateException("Statistics can only be accessed from the singleton instance");
+                throw new InvalidOperationException("Statistics can only be accessed from the singleton instance");
             }
 
             if (statistics == null)
@@ -90,7 +90,7 @@ public class StatisticsManager : AbstractSingletonBehaviour, INeedInjection
     {
         if (statistics != null)
         {
-            throw new IllegalStateException("Statistics have been loaded already");
+            throw new InvalidOperationException("Statistics have been loaded already");
         }
         InitStatisticsLoaderSaverIfNotDoneYet();
 

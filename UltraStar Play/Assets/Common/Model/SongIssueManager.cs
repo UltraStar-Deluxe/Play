@@ -127,7 +127,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
     {
         if (IsSongIssueScanStarted)
         {
-            throw new IllegalStateException("Already started song issue scan");
+            throw new InvalidOperationException("Already started song issue scan");
         }
 
         songIssueScanCancellationTokenSource?.Cancel();
