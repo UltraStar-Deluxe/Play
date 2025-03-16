@@ -1,4 +1,6 @@
-﻿using UniInject;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -32,5 +34,10 @@ public class SongListPageObject : INeedInjection
     public Button GetFirstSongEntryButton()
     {
         return songListView.Q<Button>(R.UxmlNames.songListEntryButton);
+    }
+
+    public IList GetEntries()
+    {
+        return songListView.itemsSource;
     }
 }

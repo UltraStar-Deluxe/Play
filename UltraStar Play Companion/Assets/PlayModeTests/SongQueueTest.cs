@@ -3,7 +3,6 @@ using NUnit.Framework;
 using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
-using UnityEngine.UIElements;
 
 public class SongQueueTest : AbstractConnectedCompanionAppPlayModeTest
 {
@@ -14,9 +13,6 @@ public class SongQueueTest : AbstractConnectedCompanionAppPlayModeTest
 
     [Inject]
     private SongDetailsPageObject songDetailsPageObject;
-
-    [Inject(UxmlName = R_PlayShared.UxmlNames.songQueueEntriesListView)]
-    private ListView songQueueEntriesListView;
 
     [UnityTest]
     [Order(1)]
@@ -31,7 +27,7 @@ public class SongQueueTest : AbstractConnectedCompanionAppPlayModeTest
         await songQueuePageObject.OpenAsync();
 
         // Then
-        await ConditionUtils.WaitForConditionAsync(() => songQueueEntriesListView.itemsSource.Count > 0,
+        await ConditionUtils.WaitForConditionAsync(() => songQueuePageObject.GetEntries().Count > 0,
             new WaitForConditionConfig { description = "song queue has an entry" });
     }
 
@@ -47,7 +43,7 @@ public class SongQueueTest : AbstractConnectedCompanionAppPlayModeTest
         await songQueuePageObject.RemoveAllAsync();
 
         // Then
-        await ConditionUtils.WaitForConditionAsync(() => songQueueEntriesListView.itemsSource.Count == 0,
+        await ConditionUtils.WaitForConditionAsync(() => songQueuePageObject.GetEntries().Count == 0,
             new WaitForConditionConfig { description = "song queue is empty" });
     }
 }

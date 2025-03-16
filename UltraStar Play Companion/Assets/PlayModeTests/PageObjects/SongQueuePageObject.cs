@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UniInject;
 using UnityEngine;
@@ -37,5 +38,10 @@ public class SongQueuePageObject : INeedInjection
 
         await ConditionUtils.WaitForConditionAsync(() => songQueueEntriesListView.itemsSource.Count == 0,
             new WaitForConditionConfig { description = "song queue is empty" });
+    }
+
+    public IList GetEntries()
+    {
+        return songQueueEntriesListView.itemsSource;
     }
 }

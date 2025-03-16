@@ -4,7 +4,6 @@ using NUnit.Framework;
 using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
-using UnityEngine.UIElements;
 
 public class SongListTest : AbstractConnectedCompanionAppPlayModeTest
 {
@@ -23,15 +22,6 @@ public class SongListTest : AbstractConnectedCompanionAppPlayModeTest
         new TestCaseData("Kryptònîté").Returns(null),
     };
 
-    [Inject(UxmlName = R.UxmlNames.showSongViewButton)]
-    private Button showSongViewButton;
-
-    [Inject(UxmlName = R.UxmlNames.songListView)]
-    private ListView songListView;
-
-    [Inject(UxmlName = R.UxmlNames.songSearchTextField)]
-    private TextField songSearchTextField;
-
     [Inject]
     private SongListPageObject songListPageObject;
 
@@ -44,12 +34,12 @@ public class SongListTest : AbstractConnectedCompanionAppPlayModeTest
 
         // When
         await songListPageObject.OpenAsync();
-        await ConditionUtils.WaitForConditionAsync(() => songListView.itemsSource.Count > 1,
+        await ConditionUtils.WaitForConditionAsync(() => songListPageObject.GetEntries().Count > 0,
             new WaitForConditionConfig { description = "song list has multiple entries" });
         songListPageObject.SetSearchText(searchText);
 
         // Then
-        await ConditionUtils.WaitForConditionAsync(() => songListView.itemsSource.Count == 1,
+        await ConditionUtils.WaitForConditionAsync(() => songListPageObject.GetEntries().Count == 1,
             new WaitForConditionConfig { description = $"song list has single entry matching '{searchText}'" });
     }
 }

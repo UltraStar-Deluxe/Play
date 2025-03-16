@@ -16,6 +16,24 @@ public class SongDetailsPageObject : INeedInjection
     [Inject(UxmlName = R.UxmlNames.enqueueButton)]
     private Button enqueueButton;
 
+    [Inject(UxmlName = R.UxmlNames.favoriteButton)]
+    private Button favoriteButton;
+
+    [Inject(UxmlName = R.UxmlNames.favoriteIcon)]
+    private VisualElement favoriteIcon;
+
+    [Inject(UxmlName = R.UxmlNames.noFavoriteIcon)]
+    private VisualElement noFavoriteIcon;
+
+    [Inject(UxmlName = R.UxmlNames.songImage)]
+    private VisualElement songImage;
+
+    [Inject(UxmlName = R.UxmlNames.songArtistLabel)]
+    private Label songArtistLabel;
+
+    [Inject(UxmlName = R.UxmlNames.songTitleLabel)]
+    private Label songTitleLabel;
+
     public async Awaitable OpenAsync(string songTitle)
     {
         await songListPageObject.OpenAsync();
@@ -28,5 +46,31 @@ public class SongDetailsPageObject : INeedInjection
     public void Enqueue()
     {
         enqueueButton.SendClickEvent();
+    }
+
+    public string GetArtist()
+    {
+        return songArtistLabel.text;
+    }
+
+    public string GetTitle()
+    {
+        return songTitleLabel.text;
+    }
+
+    public Sprite GetImage()
+    {
+        return songImage.resolvedStyle.backgroundImage.sprite;
+    }
+
+    public void ToggleFavorite()
+    {
+        favoriteButton.SendClickEvent();
+    }
+
+    public bool IsFavoriteIconShown()
+    {
+        return favoriteIcon.IsVisibleByDisplay()
+            && !noFavoriteIcon.IsVisibleByDisplay();
     }
 }
