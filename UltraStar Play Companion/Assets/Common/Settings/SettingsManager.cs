@@ -83,8 +83,9 @@ public class SettingsManager : AbstractSingletonBehaviour
             string loadedSettingsPath = GetSettingsPath();
             if (!File.Exists(loadedSettingsPath))
             {
-                UnityEngine.Debug.LogWarning($"Settings file not found. Creating default settings at {loadedSettingsPath}.");
+                Debug.LogWarning($"Settings file not found. Creating default settings at {loadedSettingsPath}.");
                 settings = new Settings();
+                settings.ClientName = SettingsUtils.GetInitialClientName();
                 // Create unique device identifier
                 settings.CreateAndSetClientId();
                 Save();

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using LiteNetLib;
-using RandomFriendlyNameGenerator;
 
 [Serializable]
 public class Settings : ISettings
@@ -12,7 +10,7 @@ public class Settings : ISettings
      */
     public string ClientId { get; private set; }
 
-    public string ClientName { get; set; } = GetRandomClientName();
+    public string ClientName { get; set; } = "MyCompanionApp";
 
     public string CultureInfoName { get; set; } = "en";
     public MicProfile MicProfile { get; set; } = new MicProfile();
@@ -54,17 +52,5 @@ public class Settings : ISettings
     {
         get => IsDevModeEnabled;
         set => IsDevModeEnabled = value;
-    }
-
-    private static string GetRandomClientName()
-    {
-        return NameGenerator.Identifiers.Get(
-                numberOfNamesToReturn: 10,
-                components: IdentifierComponents.Adjective | IdentifierComponents.Animal,
-                orderStyle: NameOrderingStyle.SilentBobStyle,
-                separator: null,
-                forceSingleLetter: true)
-            // Take the shortest name
-            .FindMinElement(name => name.Length);
     }
 }
