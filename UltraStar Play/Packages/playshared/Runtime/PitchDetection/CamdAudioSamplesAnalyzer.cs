@@ -104,7 +104,7 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 
         int midiNote = bestCandidate.halftone + MinNote;
         midiNoteToFrequency.TryGetValue(midiNote, out float frequency);
-        
+
         if (midiNote < MidiUtils.SingableNoteMin || midiNote > MidiUtils.SingableNoteMax)
         {
             // This pitch is impossible to sing.

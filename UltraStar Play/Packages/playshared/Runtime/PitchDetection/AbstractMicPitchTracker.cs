@@ -10,10 +10,6 @@ using UnityEngine;
 
 public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
-    // Longest period of singable notes (C2) requires 674 samples at 44100 Hz sample rate.
-    // Thus, 1024 samples should be sufficient.
-    protected const int MaxSampleCountToUse = 2048;
-
     [Range(0, 1)]
     public float halftoneContinuationBias = 0.1f;
 
@@ -44,7 +40,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
             micSampleRecorderDisposables.Add(MicSampleRecorder.RecordingEventStream.Subscribe(evt => recordingEventStream.OnNext(evt)));
 
             // The sample rate could have changed, which means a new analyzer is needed.
-            AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
+            AudioSamplesAnalyzer = AudioSamplesAnalyzerFactory.Create(settings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
         }
     }
 
@@ -122,7 +118,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
             return;
         }
 
-        AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(newValue, MicSampleRecorder.FinalSampleRate.Value);
+        AudioSamplesAnalyzer = AudioSamplesAnalyzerFactory.Create(newValue, MicSampleRecorder.FinalSampleRate.Value);
     }
 
     public virtual void StartRecording()
@@ -185,21 +181,6 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
 
         PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleBuffer, startIndex, endIndex, micAmplificationFactor, micNoiseSuppression);
         return pitchEvent;
-    }
-
-    public static IAudioSamplesAnalyzer CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm pitchDetectionAlgorithm, int sampleRateHz)
-    {
-        switch (pitchDetectionAlgorithm)
-        {
-            case EPitchDetectionAlgorithm.Camd:
-                CamdAudioSamplesAnalyzer camdAudioSamplesAnalyzer = new(sampleRateHz, MaxSampleCountToUse);
-                return camdAudioSamplesAnalyzer;
-            case EPitchDetectionAlgorithm.Dywa:
-                DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer = new(sampleRateHz, MaxSampleCountToUse);
-                return dywaAudioSamplesAnalyzer;
-            default:
-                throw new UnityException("Unknown pitch detection algorithm:" + pitchDetectionAlgorithm);
-        }
     }
 
     protected virtual void OnDestroy()

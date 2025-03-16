@@ -31,9 +31,6 @@ public class PitchDetectionAction : AbstractAudioClipAction
     [Inject]
     private SongEditorMidiFileImporter songEditorMidiFileImporter;
 
-    private IAudioSamplesAnalyzer audioSamplesAnalyzer;
-    private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
-
     public async void CreateNotesUsingBasicPitch(bool notify)
     {
         PitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta).GetResultAsync();

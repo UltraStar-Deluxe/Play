@@ -126,7 +126,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker
         MicSampleRecorder.StartRecording();
 
         // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
-        audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(mainGameSettings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
+        audioSamplesAnalyzer = AudioSamplesAnalyzerFactory.Create(mainGameSettings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
     }
 
     private void InitPitchDetectionFromCompanionClient()

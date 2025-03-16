@@ -45,9 +45,9 @@ public class NewestSamplesMicPitchTracker : AbstractMicPitchTracker
         }
 
         // Do not analyze more than necessary
-        if (bufferedNotAnalyzedSampleCount > MaxSampleCountToUse)
+        if (bufferedNotAnalyzedSampleCount > PitchDetectionConstants.LongestSingableNoteSampleCount)
         {
-            bufferedNotAnalyzedSampleCount = MaxSampleCountToUse;
+            bufferedNotAnalyzedSampleCount = PitchDetectionConstants.LongestSingableNoteSampleCount;
         }
 
         // Analyze the newest portion of the not-yet-analyzed MicSamples
