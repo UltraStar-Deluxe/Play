@@ -1,4 +1,4 @@
-public static class ProtocolVersions
+public static class CompanionClientProtocolVersion
 {
     /**
      * Number identifying the protocol used by the main game and companion app.

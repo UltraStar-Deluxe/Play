@@ -274,10 +274,10 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
             }
 
             ConnectRequestDto connectRequestDto = JsonConverter.FromJson<ConnectRequestDto>(message);
-            if (connectRequestDto.ProtocolVersion != ProtocolVersions.ProtocolVersion)
+            if (connectRequestDto.ProtocolVersion != CompanionClientProtocolVersion.ProtocolVersion)
             {
                 throw new ConnectRequestException($"Malformed connection request: protocol version does not match"
-                                                  + $" (server (main game): {ProtocolVersions.ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
+                                                  + $" (server (main game): {CompanionClientProtocolVersion.ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
             }
 
             if (connectRequestDto.ClientId.IsNullOrEmpty())
