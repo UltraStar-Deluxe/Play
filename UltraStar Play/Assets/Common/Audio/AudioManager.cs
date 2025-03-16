@@ -45,12 +45,12 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
         if (!ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))
         {
-            throw new IllegalArgumentException($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.JoinWith(", ")}");
+            throw new ArgumentException($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.JoinWith(", ")}");
         }
 
         if (!TryGetUri(uri, out Uri uriObject))
         {
-            throw new IllegalArgumentException($"URI is invalid. Maybe the file does not exist. URI: '{uri}'");
+            throw new ArgumentException($"URI is invalid. Maybe the file does not exist. URI: '{uri}'");
         }
 
         if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)

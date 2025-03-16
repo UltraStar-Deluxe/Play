@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
 
 public class FileScanner
 {
@@ -16,15 +16,14 @@ public class FileScanner
 
     public FileScanner(IReadOnlyCollection<string> fileExtensionPatterns, bool excludeHiddenFolders, bool excludeHiddenFiles)
     {
+        if (fileExtensionPatterns.IsNullOrEmpty())
+        {
+            throw new ArgumentException(nameof(fileExtensionPatterns));
+        }
+
         this.fileExtensionPatterns = fileExtensionPatterns;
         this.excludeHiddenFolders = excludeHiddenFolders;
         this.excludeHiddenFiles = excludeHiddenFiles;
-
-        // Checks
-        if (this.fileExtensionPatterns.IsNullOrEmpty())
-        {
-            throw new UnityException("Can not scan for files. No file extensions specified.");
-        }
     }
 
     public List<string> GetFiles(string folder, bool recursive)

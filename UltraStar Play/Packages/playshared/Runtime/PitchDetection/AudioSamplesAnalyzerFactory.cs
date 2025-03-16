@@ -1,4 +1,6 @@
-﻿public class AudioSamplesAnalyzerFactory
+﻿using System;
+
+public class AudioSamplesAnalyzerFactory
 {
     public static IAudioSamplesAnalyzer Create(EPitchDetectionAlgorithm pitchDetectionAlgorithm, int sampleRateHz)
     {
@@ -11,7 +13,7 @@
                 DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer = new(sampleRateHz, PitchDetectionConstants.LongestSingableNoteSampleCount);
                 return dywaAudioSamplesAnalyzer;
             default:
-                throw new IllegalArgumentException($"Unknown pitch detection algorithm: {pitchDetectionAlgorithm}");
+                throw new ArgumentException($"Unknown pitch detection algorithm: {pitchDetectionAlgorithm}");
         }
     }
 }

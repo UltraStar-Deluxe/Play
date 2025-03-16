@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -10,7 +11,7 @@ public static class UltraStarFormatWriter
     {
         if (version.EnumValue is EUltraStarSongFormatVersion.Unknown)
         {
-            throw new IllegalArgumentException("Must specify a known UltraStar format version");
+            throw new ArgumentException("Must specify a known UltraStar format version");
         }
 
         if (songMeta is not UltraStarSongMeta ultraStarSongMeta)

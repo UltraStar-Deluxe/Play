@@ -46,11 +46,11 @@ namespace CommonOnlineMultiplayer
         {
             if (messageName.IsNullOrEmpty())
             {
-                return Observable.Throw<NamedMessage>(new IllegalArgumentException($"{nameof(messageName)} cannot be empty"));
+                return Observable.Throw<NamedMessage>(new ArgumentException($"{nameof(messageName)} cannot be empty"));
             }
             if (targetNetcodeClientIds.IsNullOrEmpty())
             {
-                return Observable.Throw<NamedMessage>(new IllegalArgumentException($"{nameof(targetNetcodeClientIds)} cannot be empty"));
+                return Observable.Throw<NamedMessage>(new ArgumentException($"{nameof(targetNetcodeClientIds)} cannot be empty"));
             }
 
             string requestId = Guid.NewGuid().ToString();
@@ -173,7 +173,7 @@ namespace CommonOnlineMultiplayer
                 case EReliableNetworkDelivery.Reliable: return NetworkDelivery.Reliable;
                 case EReliableNetworkDelivery.ReliableSequenced: return NetworkDelivery.ReliableSequenced;
                 case EReliableNetworkDelivery.ReliableFragmentedSequenced: return NetworkDelivery.ReliableFragmentedSequenced;
-                default: throw new IllegalArgumentException($"Cannot convert {reliableNetworkDelivery} to Netcode NetworkDelivery");
+                default: throw new ArgumentException($"Cannot convert {reliableNetworkDelivery} to Netcode NetworkDelivery");
             }
         }
 

@@ -280,7 +280,7 @@ public static class SettingsUtils
             case EKnownUltraStarSongFormatVersion.V120: return UltraStarSongFormatVersion.v120;
             case EKnownUltraStarSongFormatVersion.V200: return UltraStarSongFormatVersion.v200;
             default:
-                throw new IllegalArgumentException($"No mapping from default version for save {defaultVersion} to actual UltraStar format version");
+                throw new ArgumentException($"No mapping from default version for save {defaultVersion} to actual UltraStar format version");
         }
     }
 
@@ -293,7 +293,7 @@ public static class SettingsUtils
             case EUpgradeUltraStarSongFormatVersion.V120: return UltraStarSongFormatVersion.v120;
             case EUpgradeUltraStarSongFormatVersion.V200: return UltraStarSongFormatVersion.v200;
             default:
-                throw new IllegalArgumentException($"No mapping from upgrade version for save {upgradeVersion} to actual UltraStar format version");
+                throw new ArgumentException($"No mapping from upgrade version for save {upgradeVersion} to actual UltraStar format version");
         }
     }
 

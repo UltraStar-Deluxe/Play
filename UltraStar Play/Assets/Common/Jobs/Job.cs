@@ -150,7 +150,7 @@ public class Job<T> : IJob
 
         if (this == childJob)
         {
-            throw new IllegalArgumentException("Cannot add self as child job.");
+            throw new ArgumentException("Cannot add self as child job.");
         }
 
         if (childJobs.Contains(childJob))

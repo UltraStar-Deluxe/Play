@@ -17,7 +17,7 @@ public class LazyLoadedFromFileSongMeta : UltraStarSongMeta, IHasSongIssues
         if (fileInfo == null
             || !fileInfo.Exists)
         {
-            throw new IllegalArgumentException($"File does not exist: {fileInfo}");
+            throw new ArgumentException($"File does not exist: {fileInfo}");
         }
 
         SetFileInfo(fileInfo, encoding);
