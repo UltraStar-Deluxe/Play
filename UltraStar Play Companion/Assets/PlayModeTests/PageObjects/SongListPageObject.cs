@@ -7,15 +7,19 @@ public class SongListPageObject : INeedInjection
     [Inject(UxmlName = R.UxmlNames.showSongViewButton)]
     private Button showSongViewButton;
 
+    [Inject(UxmlName = R.UxmlNames.showSongSearchButton)]
+    private Button showSongSearchButton;
+
     [Inject(UxmlName = R.UxmlNames.songListView)]
     private ListView songListView;
 
     [Inject(UxmlName = R.UxmlNames.songSearchTextField)]
     private TextField songSearchTextField;
 
-    public async Awaitable OpenSongListAsync()
+    public async Awaitable OpenAsync()
     {
         showSongViewButton.SendClickEvent();
+        showSongSearchButton.SendClickEvent();
         await ConditionUtils.WaitForConditionAsync(() => songListView.itemsSource.Count > 1,
             new WaitForConditionConfig { description = "song list has multiple entries" });
     }

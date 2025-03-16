@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
 
-public class SongListTest : AbstractConnectedCompanionAppPlayModeTest, IInjectionFinishedListener
+public class SongListTest : AbstractConnectedCompanionAppPlayModeTest
 {
     private static readonly List<TestCaseData> filterSongListTestCases = new List<TestCaseData>()
     {
@@ -33,24 +33,7 @@ public class SongListTest : AbstractConnectedCompanionAppPlayModeTest, IInjectio
     private TextField songSearchTextField;
 
     [Inject]
-    private Injector injector;
-
     private SongListPageObject songListPageObject;
-
-    public void OnInjectionFinished()
-    {
-        songListPageObject = injector.CreateAndInject<SongListPageObject>();
-    }
-
-    [UnityTest]
-    public IEnumerator ShouldLoadSongList() => ShouldLoadSongListAsync();
-    private async Awaitable ShouldLoadSongListAsync()
-    {
-        LogAssertUtils.IgnoreFailingMessages();
-
-        // The page object already has an assertion that the song list has been opened
-        await songListPageObject.OpenSongListAsync();
-    }
 
     [UnityTest]
     [TestCaseSource("filterSongListTestCases")]
@@ -60,7 +43,9 @@ public class SongListTest : AbstractConnectedCompanionAppPlayModeTest, IInjectio
         LogAssertUtils.IgnoreFailingMessages();
 
         // When
-        await songListPageObject.OpenSongListAsync();
+        await songListPageObject.OpenAsync();
+        await ConditionUtils.WaitForConditionAsync(() => songListView.itemsSource.Count > 1,
+            new WaitForConditionConfig { description = "song list has multiple entries" });
         songListPageObject.SetSearchText(searchText);
 
         // Then

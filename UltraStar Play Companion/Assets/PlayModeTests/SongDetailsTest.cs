@@ -4,13 +4,10 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
 
-public class SongDetailsTest : AbstractConnectedCompanionAppPlayModeTest, IInjectionFinishedListener
+public class SongDetailsTest : AbstractConnectedCompanionAppPlayModeTest
 {
     private readonly string songTitle = "Kryptonite";
     private readonly string songArtist = "3 Doors Down";
-
-    [Inject]
-    private Injector injector;
 
     [Inject(UxmlName = R.UxmlNames.songImage)]
     private VisualElement songImage;
@@ -30,12 +27,8 @@ public class SongDetailsTest : AbstractConnectedCompanionAppPlayModeTest, IInjec
     [Inject(UxmlName = R.UxmlNames.noFavoriteIcon)]
     private VisualElement noFavoriteIcon;
 
+    [Inject]
     private SongDetailsPageObject songDetailsPageObject;
-
-    public void OnInjectionFinished()
-    {
-        songDetailsPageObject = injector.CreateAndInject<SongDetailsPageObject>();
-    }
 
     [UnityTest]
     public IEnumerator ShouldOpenSongDetails() => ShouldOpenSongDetailsAsync();
@@ -44,7 +37,7 @@ public class SongDetailsTest : AbstractConnectedCompanionAppPlayModeTest, IInjec
         LogAssertUtils.IgnoreFailingMessages();
 
         // When
-        await songDetailsPageObject.OpenSongDetailsAsync(songTitle);
+        await songDetailsPageObject.OpenAsync(songTitle);
 
         // Then
         await ConditionUtils.WaitForConditionAsync(() => songTitleLabel.text == songTitle,
@@ -66,7 +59,7 @@ public class SongDetailsTest : AbstractConnectedCompanionAppPlayModeTest, IInjec
         bool noFavoriteIconVisibleByDisplay = noFavoriteIcon.IsVisibleByDisplay();
 
         // When
-        await songDetailsPageObject.OpenSongDetailsAsync(songTitle);
+        await songDetailsPageObject.OpenAsync(songTitle);
         favoriteButton.SendClickEvent();
 
         // Then

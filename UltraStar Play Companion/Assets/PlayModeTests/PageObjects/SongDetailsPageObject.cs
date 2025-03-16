@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class SongDetailsPageObject : INeedInjection, IInjectionFinishedListener
+public class SongDetailsPageObject : INeedInjection
 {
     [Inject]
     private Injector injector;
@@ -10,20 +10,23 @@ public class SongDetailsPageObject : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.songDetailsContainer)]
     private VisualElement songDetailsContainer;
 
+    [Inject]
     private SongListPageObject songListPageObject;
 
-    public void OnInjectionFinished()
-    {
-        songListPageObject = injector.CreateAndInject<SongListPageObject>();
-    }
+    [Inject(UxmlName = R.UxmlNames.enqueueButton)]
+    private Button enqueueButton;
 
-    public async Awaitable OpenSongDetailsAsync(string songTitle)
+    public async Awaitable OpenAsync(string songTitle)
     {
-        await songListPageObject.OpenSongListAsync();
-
+        await songListPageObject.OpenAsync();
         songListPageObject.SetSearchText(songTitle);
         songListPageObject.GetFirstSongEntryButton().SendClickEvent();
         await ConditionUtils.WaitForConditionAsync(() => songDetailsContainer.IsVisibleByDisplay(),
             new WaitForConditionConfig { description = "shows song details" });
+    }
+
+    public void Enqueue()
+    {
+        enqueueButton.SendClickEvent();
     }
 }
