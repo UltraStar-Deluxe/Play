@@ -356,13 +356,13 @@
       "url": "https://packages.unity.com"
     },
     "nuget.moq": {
-      "version": "https://github.com/needle-mirror/nuget.moq.git#2.0.0-pre.2",
+      "version": "https://github.com/needle-mirror/nuget.moq.git#2.0.0",
       "depth": 0,
       "source": "git",
       "dependencies": {
-        "nuget.castle-core": "2.0.0-pre.4"
+        "nuget.castle-core": "2.0.0"
       },
-      "hash": "097a28dbb4ed7f1a138d65d09ef1f780b41bdb01"
+      "hash": "9a546d7684ec914c9de22a4e19bfea2290ef14c4"
     },
     "playshared": {
       "version": "file:playshared",
