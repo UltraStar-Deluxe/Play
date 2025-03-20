@@ -117,7 +117,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
         {
             ClientId = settings.ClientId,
             ClientName = settings.ClientName,
-            ProtocolVersion = ProtocolVersions.ProtocolVersion
+            ProtocolVersion = CompanionClientProtocolVersion.ProtocolVersion
         };
         NetDataWriter netDataWriter = new NetDataWriter();
         netDataWriter.Put(connectRequestDto.ToJson());
