@@ -33,7 +33,7 @@ public class SongEditorIssueAnalyzerControl : INeedInjection, IInjectionFinished
 
     private void UpdateIssues()
     {
-        IReadOnlyCollection<SongIssue> issues = SongMetaAnalyzer.AnalyzeIssues(songMeta, MaxSongIssueCountPerMessage);
+        IReadOnlyCollection<SongIssue> issues = SongIssueAnalyzer.Analyze(songMeta, MaxSongIssueCountPerMessage);
         List<Pair<SongIssue>> zipped = issues
             .Zip(Issues, (a, b) => new Pair<SongIssue>(a,b))
             .ToList();

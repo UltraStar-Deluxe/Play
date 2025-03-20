@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-public static class SongMetaAnalyzer
+public static class SongIssueAnalyzer
 {
-    public static IReadOnlyCollection<SongIssue> AnalyzeIssues(
+    public static IReadOnlyCollection<SongIssue> Analyze(
         SongMeta songMeta,
         int maxSongIssueCountPerMessage)
     {
