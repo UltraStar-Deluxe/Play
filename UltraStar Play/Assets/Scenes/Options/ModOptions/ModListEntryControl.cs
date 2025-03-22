@@ -14,7 +14,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
     private ModManager modManager;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private GameObject gameObject;
@@ -129,7 +129,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        modSettingsDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_mod_settingsDialog_title,
+        modSettingsDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.options_mod_settingsDialog_title,
             "modName", ModDisplayName));
         modSettingsDialogControl.AddButton(Translation.Get(R.Messages.action_close),
             _ => modSettingsDialogControl.CloseDialog());
@@ -156,7 +156,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        modInfoDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_mod_infoDialog_title,
+        modInfoDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.options_mod_infoDialog_title,
             "modName", ModDisplayName));
         modInfoDialogControl.AddButton(Translation.Get(R.Messages.action_close),
             _ => modInfoDialogControl.CloseDialog());

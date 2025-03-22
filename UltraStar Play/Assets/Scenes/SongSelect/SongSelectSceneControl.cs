@@ -45,7 +45,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     public NewestSamplesMicPitchTracker micPitchTrackerPrefab;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private UltraStarPlayInputManager inputManager;
@@ -740,7 +740,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             lyricsDialogControl.CloseDialog();
         }
 
-        lyricsDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_lyricsDialog_title,
+        lyricsDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_lyricsDialog_title,
             "songName", songMeta.Title));
         lyricsDialogControl.DialogClosedEventStream.Subscribe(_ => lyricsDialogControl = null);
 
@@ -1031,7 +1031,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             errorMessage = Translation.Empty;
         }
 
-        uiManager.CreateErrorInfoDialogControl(
+        dialogManager.CreateErrorInfoDialogControl(
             Translation.Get(R.Messages.songSelectScene_failedToLoadSongDialog_title),
             Translation.Get(R.Messages.songSelectScene_failedToLoadSongDialog_message),
             errorMessage);
@@ -1039,7 +1039,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void ShowAskToCreateSingAlongDataDialog(SongMeta songMeta)
     {
-        noSingAlongDataDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_noSingAlongDataDialog_title));
+        noSingAlongDataDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_noSingAlongDataDialog_title));
         noSingAlongDataDialogControl.Message = Translation.Get(R.Messages.songSelectScene_noSingAlongDataDialog_message);
         noSingAlongDataDialogControl.MessageElement.AddToClassList("my-2");
         Button defaultButton = noSingAlongDataDialogControl.AddButton(Translation.Get(R.Messages.songSelectScene_noSingAlongDataDialog_createSingAlongData), _ =>
@@ -1190,7 +1190,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         CloseAskToAssignMicsDialog();
 
-        askToAssignMicsDialog = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_missingMicDialog_title));
+        askToAssignMicsDialog = dialogManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_missingMicDialog_title));
         string playerNamesCsv = playerProfilesWithoutMics
             .Select(it => it.Name)
             .JoinWith(", ");
@@ -1643,7 +1643,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public void AskToRecreateSingAlongData(SongMeta songMeta)
     {
-        MessageDialogControl dialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_recreateSongDialog_title, "songName", songMeta.Title));
+        MessageDialogControl dialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_recreateSongDialog_title, "songName", songMeta.Title));
         dialogControl.Message = Translation.Get(R.Messages.songSelectScene_recreateSongDialog_message);
         dialogControl.AddButton(Translation.Get(R.Messages.songSelectScene_recreateSongDialog_recreateAndSave), evt =>
         {

@@ -95,7 +95,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     private ThemeManager themeManager;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private MicSampleRecorderManager micSampleRecorderManager;
@@ -216,7 +216,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             return;
         }
 
-        quitGameDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_quitDialog_title));
+        quitGameDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_quitDialog_title));
         quitGameDialogControl.DialogClosedEventStream.Subscribe(_ => quitGameDialogControl = null);
         quitGameDialogControl.Message = Translation.Get(R.Messages.mainScene_quitDialog_message);
 

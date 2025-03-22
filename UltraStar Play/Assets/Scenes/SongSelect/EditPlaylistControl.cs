@@ -48,7 +48,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
     private PlaylistManager playlistManager;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private Injector injector;
@@ -97,7 +97,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        createPlaylistDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_editPlaylistDialog_title));
+        createPlaylistDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_editPlaylistDialog_title));
         createPlaylistDialogControl.DialogClosedEventStream.Subscribe(_ => createPlaylistDialogControl = null);
 
         TextField newPlaylistNameTextField = new();

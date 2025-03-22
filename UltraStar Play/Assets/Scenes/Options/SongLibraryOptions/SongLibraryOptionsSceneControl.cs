@@ -33,7 +33,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     private UIDocument uiDocument;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject(UxmlName = R.UxmlNames.songFolderList)]
     private VisualElement songFolderList;
@@ -330,7 +330,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     private void CreateQuickFixAllDialog(Translation title, List<QuickFixAction> quickFixActions)
     {
-        MessageDialogControl quickFixAllDialog = uiManager.CreateDialogControl(title);
+        MessageDialogControl quickFixAllDialog = dialogManager.CreateDialogControl(title);
 
         ScrollView scrollView = new();
         scrollView.AddToClassList("child-mb-3");
@@ -573,7 +573,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             return;
         }
 
-        deleteSongFolderDialog = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_songLibrary_action_deleteSongFolderDialog_title));
+        deleteSongFolderDialog = dialogManager.CreateDialogControl(Translation.Get(R.Messages.options_songLibrary_action_deleteSongFolderDialog_title));
         deleteSongFolderDialog.DialogClosedEventStream.Subscribe(_ => deleteSongFolderDialog = null);
         deleteSongFolderDialog.Message = Translation.Get(R.Messages.options_songLibrary_action_deleteSongFolderDialog_message,
             "songFolder", settings.SongDirs[indexInList]);

@@ -125,7 +125,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     private SpeechRecognitionManager speechRecognitionManager;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     private readonly TabGroupControl sideBarTabGroupControl = new();
     private readonly SongEditorSideBarPropertiesControl propertiesControl = new();
@@ -244,7 +244,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             { Translation.Get(R.Messages.songEditor_helpDialog_layers_title),
                 Translation.Get(R.Messages.songEditor_helpDialog_layers) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(
+        helpDialogControl = dialogManager.CreateHelpDialogControl(
             Translation.Get(R.Messages.songEditor_helpDialog_title),
             titleToContentMap);
         helpDialogControl.DialogClosedEventStream.Subscribe(_ => helpDialogControl = null);

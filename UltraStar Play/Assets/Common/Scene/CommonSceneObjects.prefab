@@ -186,6 +186,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cca03c0d6eef6284fbacdc72a826ac43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &79569808322462877
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6157435121273185629}
+  - component: {fileID: 6902914680682917852}
+  m_Layer: 0
+  m_Name: DialogManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6157435121273185629
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 79569808322462877}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5483831765678408185}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6902914680682917852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 79569808322462877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c838767c2f745fdbfae2f2dcae9aef2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  messageDialogUi: {fileID: 9197481963319205126, guid: 9dd0037eeddfcb64ab006c7c01edb4e7,
+    type: 3}
 --- !u!1 &84413279455783563
 GameObject:
   m_ObjectHideFlags: 0
@@ -230,8 +276,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 158966a929f7d5c4d9079f5b306ff7cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  messageDialogUi: {fileID: 9197481963319205126, guid: 9dd0037eeddfcb64ab006c7c01edb4e7,
-    type: 3}
   micWithNameUi: {fileID: 9197481963319205126, guid: 633a1b5f196ee2f45beba597ffda0b45,
     type: 3}
   nextGameRoundInfoUi: {fileID: 9197481963319205126, guid: 4b0fc95be5bd7c84abec348087a5d4af,
@@ -969,6 +1013,7 @@ Transform:
   - {fileID: 8568522364055573128}
   - {fileID: 1726528158099047256}
   - {fileID: 2247980495390972918}
+  - {fileID: 6157435121273185629}
   - {fileID: 8045090455937701786}
   - {fileID: 136179686410441847}
   - {fileID: 6981507401744584904}

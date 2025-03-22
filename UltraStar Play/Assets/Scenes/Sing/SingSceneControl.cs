@@ -134,6 +134,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private ThemeManager themeManager;
 
     [Inject]
+    private DialogManager dialogManager;
+
+    [Inject]
     private AudioSeparationManager audioSeparationManager;
 
     [Inject]
@@ -447,7 +450,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             .ToList()
             .JoinWith(", ");
 
-        dialogControl = UiManager.Instance.CreateDialogControl(Translation.Get(R.Messages.singScene_missingMicrophones_title));
+        dialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.singScene_missingMicrophones_title));
         dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
         dialogControl.Message = Translation.Get(R.Messages.singScene_missingMicrophones_message,
             "playerNames", playerNameCsv);
