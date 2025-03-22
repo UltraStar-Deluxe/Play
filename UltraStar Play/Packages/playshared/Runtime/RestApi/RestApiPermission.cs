@@ -1,4 +1,4 @@
-﻿public enum HttpApiPermission
+﻿public enum RestApiPermission
 {
     WriteSongQueue,
     WriteConfig,

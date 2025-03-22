@@ -1,4 +1,4 @@
-﻿public static class HttpApiEndpointPaths
+﻿public static class RestApiEndpointPaths
 {
     public const string AvailableMicrophones = "api/rest/availableMicrophones";
     public const string AvailablePlayers = "api/rest/availablePlayers";

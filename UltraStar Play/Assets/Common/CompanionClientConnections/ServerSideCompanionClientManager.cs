@@ -164,7 +164,7 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
         Debug.Log($"Peer connected {peer.EndPoint} with ConnectRequest: {connectRequestDto.ToJson()}. Sending ConnectResponse.");
 
         // Send connect response
-        List<HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, connectRequestDto.ClientId);
+        List<RestApiPermission> permissions = SettingsUtils.GetPermissions(settings, connectRequestDto.ClientId);
         List<GameRoundModifierDto> availableGameRoundModifierDtos = DtoConverter.ToDto(GameRoundModifierRegistry.GetAll());
         ConnectResponseDto connectResponseDto = new()
         {

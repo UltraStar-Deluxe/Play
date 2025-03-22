@@ -11,7 +11,7 @@ public static class EndpointHandlerBuilderExtensions
         endpointHandlerBuilder.Add();
     }
 
-    public static EndpointHandlerBuilder SetRequiredPermission(this EndpointHandlerBuilder endpointHandlerBuilder, HttpApiPermission requiredPermission, Settings settings)
+    public static EndpointHandlerBuilder SetRequiredPermission(this EndpointHandlerBuilder endpointHandlerBuilder, RestApiPermission requiredPermission, Settings settings)
     {
         if (!settings.RequireCompanionClientPermission)
         {
@@ -24,7 +24,7 @@ public static class EndpointHandlerBuilderExtensions
             string clientId = requestData.Context.Request.Headers["client-id"];
             Settings settings = SettingsManager.Instance.Settings;
 
-            List<HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, clientId);
+            List<RestApiPermission> permissions = SettingsUtils.GetPermissions(settings, clientId);
             if (permissions.Contains(requiredPermission))
             {
                 return true;

@@ -43,12 +43,12 @@ public class UltraStarPlayHttpServer : HttpServer, INeedInjection
         NoEndpointFoundCallback = SendNoEndpointFound;
         StartHttpListener();
 
-        this.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Endpoints)
+        this.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.Endpoints)
             .SetDescription("Get currently registered endpoints")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(SendRegisteredEndpoints);
 
-        this.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Hello)
+        this.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.Hello)
             .SetDescription("Say hello (path-parameter example)")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(SendHello);
@@ -56,7 +56,7 @@ public class UltraStarPlayHttpServer : HttpServer, INeedInjection
 
     public string GetExampleEndpoint()
     {
-        return $"{host}:{port}/{HttpApiEndpointPaths.Songs}";
+        return $"{host}:{port}/{RestApiEndpointPaths.Songs}";
     }
     
     private void SendHello(EndpointRequestData requestData)

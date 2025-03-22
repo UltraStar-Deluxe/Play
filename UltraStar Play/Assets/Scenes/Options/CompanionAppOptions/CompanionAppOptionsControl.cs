@@ -68,14 +68,14 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     private void UpdateDefaultPermissions()
     {
         defaultPermissionsContainer.Clear();
-        List<HttpApiPermission> permissions = new()
+        List<RestApiPermission> permissions = new()
         {
-            HttpApiPermission.WriteSongQueue,
-            HttpApiPermission.WriteConfig,
-            HttpApiPermission.WriteInputSimulation,
+            RestApiPermission.WriteSongQueue,
+            RestApiPermission.WriteConfig,
+            RestApiPermission.WriteInputSimulation,
         };
 
-        foreach (HttpApiPermission permission in permissions)
+        foreach (RestApiPermission permission in permissions)
         {
             Toggle defaultPermissionToggle = new(PermissionUiUtils.GetPermissionName(permission));
             defaultPermissionToggle.value = SettingsUtils.GetDefaultPermissions(settings).Contains(permission);

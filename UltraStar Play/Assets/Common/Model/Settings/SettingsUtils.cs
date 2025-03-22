@@ -77,11 +77,11 @@ public static class SettingsUtils
                && ApplicationUtils.CanUsePortAudio();
     }
 
-    public static List<HttpApiPermission> GetPermissions(Settings settings, string clientId)
+    public static List<RestApiPermission> GetPermissions(Settings settings, string clientId)
     {
         if (!settings.RequireCompanionClientPermission)
         {
-            return EnumUtils.GetValuesAsList<HttpApiPermission>();
+            return EnumUtils.GetValuesAsList<RestApiPermission>();
         }
 
         if (clientId.IsNullOrEmpty())
@@ -89,7 +89,7 @@ public static class SettingsUtils
             return GetDefaultPermissions(settings);
         }
 
-        if (settings.HttpApiPermissions.TryGetValue(clientId, out List<HttpApiPermission> permissions))
+        if (settings.HttpApiPermissions.TryGetValue(clientId, out List<RestApiPermission> permissions))
         {
             return permissions;
         }
@@ -97,7 +97,7 @@ public static class SettingsUtils
         return GetDefaultPermissions(settings);
     }
 
-    public static List<HttpApiPermission> GetDefaultPermissions(Settings settings)
+    public static List<RestApiPermission> GetDefaultPermissions(Settings settings)
     {
         return settings.DefaultHttpApiPermissions.ToList();
     }
@@ -114,7 +114,7 @@ public static class SettingsUtils
             .ToList();
     }
 
-    public static void AddPermission(Settings settings, string clientId, HttpApiPermission permission)
+    public static void AddPermission(Settings settings, string clientId, RestApiPermission permission)
     {
         if (!settings.HttpApiPermissions.ContainsKey(clientId))
         {
@@ -123,7 +123,7 @@ public static class SettingsUtils
         settings.HttpApiPermissions[clientId].AddIfNotContains(permission);
     }
 
-    public static void RemovePermission(Settings settings, string clientId, HttpApiPermission permission)
+    public static void RemovePermission(Settings settings, string clientId, RestApiPermission permission)
     {
         if (!settings.HttpApiPermissions.ContainsKey(clientId))
         {
@@ -297,12 +297,12 @@ public static class SettingsUtils
         }
     }
 
-    public static void AddDefaultPermission(Settings settings, HttpApiPermission permission)
+    public static void AddDefaultPermission(Settings settings, RestApiPermission permission)
     {
         settings.DefaultHttpApiPermissions.AddIfNotContains(permission);
     }
 
-    public static void RemoveDefaultPermission(Settings settings, HttpApiPermission permission)
+    public static void RemoveDefaultPermission(Settings settings, RestApiPermission permission)
     {
         settings.DefaultHttpApiPermissions.Remove(permission);
     }
