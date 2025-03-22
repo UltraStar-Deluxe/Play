@@ -154,7 +154,7 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
         "path", outputFolder));
 
         // Reload songs, now with the newly added song.
-        string txtFile = FileScannerUtils.ScanForFiles(new List<string> { outputFolder }, new List<string>() { "*.txt" })
+        string txtFile = FileScanner.GetFiles(outputFolder, new FileScannerConfig("*.txt"))
             .FirstOrDefault();
         if (txtFile != null)
         {

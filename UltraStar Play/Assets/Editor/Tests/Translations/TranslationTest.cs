@@ -63,7 +63,7 @@ public class TranslationTest
         List<string> sourceFolders = new List<string>() { Application.dataPath, $"{Application.dataPath}/../Packages" }
             .Select(folder => new DirectoryInfo(folder).FullName)
             .ToList();
-        List<string> files = FileScannerUtils.ScanForFiles(sourceFolders, new List<string>() { "*.cs", "*.uxml" });
+        List<string> files = FileScanner.GetFiles(sourceFolders, new FileScannerConfig("*.cs", "*.uxml") { Recursive = true });
 
         foreach (string file in files)
         {

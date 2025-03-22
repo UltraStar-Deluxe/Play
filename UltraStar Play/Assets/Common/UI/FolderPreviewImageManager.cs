@@ -32,10 +32,8 @@ public class FolderPreviewImageManager : AbstractSingletonBehaviour, INeedInject
 
     private string DoGetFolderPreviewImageUri(DirectoryInfo directoryInfo)
     {
-        List<string> imageFiles = FileScannerUtils.ScanForFiles(
-            new List<string>() { directoryInfo.FullName },
-            ApplicationUtils.supportedImageFiles.Select(it => $"*.{it}").ToList(),
-            false);
+        List<string> imageFiles = FileScanner.GetFiles(directoryInfo.FullName,
+            new FileScannerConfig(ApplicationUtils.supportedImageFiles.Select(it => $"*.{it}").ToList()) { Recursive = false });
         if (imageFiles.IsNullOrEmpty())
         {
             return null;

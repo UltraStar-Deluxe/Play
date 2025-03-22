@@ -355,9 +355,8 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     {
         SetValueIfEmpty(workshopItemTitleTextField, StringUtils.ToTitleCase(PathUtils.GetFileName(folder)));
 
-        List<string> imageFiles = FileScannerUtils.ScanForFiles(
-            new List<string>() { folder },
-            ApplicationUtils.supportedImageFiles.Select(extension => $"*.{extension}").ToList());
+        List<string> imageFiles = FileScanner.GetFiles(folder,
+            new FileScannerConfig(ApplicationUtils.supportedImageFiles.Select(extension => $"*.{extension}").ToList()) { Recursive = true });
         string previewImagePath = imageFiles
             .FirstOrDefault(imageFile => PathUtils.GetFileName(imageFile).Contains("preview", StringComparison.InvariantCultureIgnoreCase))
             .OrIfNull(imageFiles.FirstOrDefault());

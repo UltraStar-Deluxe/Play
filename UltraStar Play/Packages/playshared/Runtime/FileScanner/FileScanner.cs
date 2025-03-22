@@ -3,31 +3,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-public class FileScanner
+public static class FileScanner
 {
-    private readonly IReadOnlyCollection<string> fileExtensionPatterns;
-    private readonly bool excludeHiddenFolders;
-    private readonly bool excludeHiddenFiles;
-
-    public FileScanner(string fileExtensionPattern, bool excludeHiddenFolders, bool excludeHiddenFiles)
-        : this(new List<string> { fileExtensionPattern }, excludeHiddenFolders, excludeHiddenFiles)
+    public static List<string> GetFiles(List<string> folders, FileScannerConfig config)
     {
+        return folders
+            .SelectMany(folder => GetFiles(folder, config))
+            .ToList();
     }
 
-    public FileScanner(IReadOnlyCollection<string> fileExtensionPatterns, bool excludeHiddenFolders, bool excludeHiddenFiles)
+    public static List<string> GetFiles(string folder, FileScannerConfig config)
     {
-        if (fileExtensionPatterns.IsNullOrEmpty())
+        if (config.FileExtensionPatterns.IsNullOrEmpty())
         {
-            throw new ArgumentException(nameof(fileExtensionPatterns));
+            throw new ArgumentException(nameof(config.FileExtensionPatterns));
         }
 
-        this.fileExtensionPatterns = fileExtensionPatterns;
-        this.excludeHiddenFolders = excludeHiddenFolders;
-        this.excludeHiddenFiles = excludeHiddenFiles;
-    }
-
-    public List<string> GetFiles(string folder, bool recursive)
-    {
         if (folder.IsNullOrEmpty()
             || !Directory.Exists(folder))
         {
@@ -36,25 +27,25 @@ public class FileScanner
 
         List<string> unfilteredResult = new();
 
-        SearchOption searchOption = recursive
+        SearchOption searchOption = config.Recursive
             ? SearchOption.AllDirectories
             : SearchOption.TopDirectoryOnly;
-        foreach (string fileExtensionPattern in fileExtensionPatterns)
+        foreach (string fileExtensionPattern in config.FileExtensionPatterns)
         {
             string[] filesOfPattern = Directory.GetFiles(folder, fileExtensionPattern, searchOption);
             unfilteredResult.AddRange(filesOfPattern);
         }
 
-        if (!excludeHiddenFolders
-            && !excludeHiddenFiles)
+        if (!config.ExcludeHiddenFolders
+            && !config.ExcludeHiddenFiles)
         {
             return unfilteredResult;
         }
 
         List<string> filteredResult = unfilteredResult
             // Ignore hidden files and folders
-            .Where(filePath => (!excludeHiddenFiles || !IsHiddenFile(filePath))
-                               && (!excludeHiddenFolders || !IsInsideHiddenFolder(filePath)))
+            .Where(filePath => (!config.ExcludeHiddenFiles || !IsHiddenFile(filePath))
+                               && (!config.ExcludeHiddenFolders || !IsInsideHiddenFolder(filePath)))
             .ToList();
 
         return filteredResult;

@@ -143,7 +143,7 @@ public class SongMetaScanner
 
     private async Task ScanTxtFilesAsync(string folder, CancellationToken cancellationToken)
     {
-        List<string> txtFiles = FileScannerUtils.ScanForFiles(new List<string> { folder }, new List<string> { "*.txt" });
+        List<string> txtFiles = FileScanner.GetFiles(folder, new FileScannerConfig("*.txt") { Recursive = true });
         cancellationToken.ThrowIfCancellationRequested();
 
         targetSongCount += txtFiles.Count;
@@ -170,7 +170,7 @@ public class SongMetaScanner
             return;
         }
 
-        List<string> midiFiles = FileScannerUtils.ScanForFiles(new List<string> { folder }, GetMidiFileExtensionPatterns());
+        List<string> midiFiles = FileScanner.GetFiles(folder, new FileScannerConfig(GetMidiFileExtensionPatterns()) { Recursive = true });
         await LoadMidiFilesAsync(midiFiles, cancellationToken);
     }
 
