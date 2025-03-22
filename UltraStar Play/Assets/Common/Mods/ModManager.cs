@@ -41,7 +41,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             if (appDomainTypesChanged)
             {
                 appDomainTypesChanged = false;
-                modTypes = GetModTypes(false);
+                modTypes = GetModTypes();
             }
 
             return modTypes;
@@ -567,7 +567,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         appDomainTypesChanged = true;
 
         // Find types that are loaded from this mod folder
-        List<Type> typesBefore = GetModTypes(false);
+        List<Type> typesBefore = GetModTypes();
 
         // Load libraries in folder
         string[] externalDllFiles = Directory.GetFiles(modFolder.Value, "*.dll", SearchOption.AllDirectories);
@@ -586,7 +586,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         // Find types that are loaded from this mod folder
-        List<Type> typesAfter = GetModTypes(false);
+        List<Type> typesAfter = GetModTypes();
         foreach (Type type in typesAfter.Except(typesBefore))
         {
             typeToModFolder[type] = modFolder;
@@ -639,9 +639,9 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             .ToList();
     }
 
-    private List<Type> GetModTypes(bool logExceptions)
+    private List<Type> GetModTypes()
     {
-        return ReflectionUtils.GetTypeInAppDomain<IMod>(logExceptions);
+        return GetTypeInAppDomain<IMod>();
     }
 
     private void UpdateModObjects()
@@ -981,5 +981,34 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             settings.EnabledMods
                 .RemoveAll(enabledModFolderName => enabledModFolderName == modName.Value);
         }
+    }
+
+    private static List<Type> GetTypeInAppDomain<T>()
+    {
+        Type parent = typeof(T);
+        Debug.Log($"Searching implementations of {parent} in app domain.");
+
+        using DisposableStopwatch d = new($"Searching implementations of {parent} in app domain took <ms> ms");
+
+        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        List<Type> types = assemblies.SelectMany(assembly =>
+        {
+            Type[] typesOfAssembly;
+            try
+            {
+                typesOfAssembly = assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                // Careful: types that could not be loaded are null in the array.
+                typesOfAssembly = ex.Types;
+            }
+
+            return typesOfAssembly.Where(type => type != null
+                                                 && !type.IsAbstract
+                                                 && !type.IsInterface
+                                                 && parent.IsAssignableFrom(type));
+        }).ToList();
+        return types;
     }
 }
