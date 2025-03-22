@@ -14,7 +14,7 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
     private SongAudioPlayer songAudioPlayer;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;

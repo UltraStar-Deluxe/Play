@@ -225,7 +225,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         }
 
         return await ugcEditor
-            .SubmitAsync(new ActionProgress(onProgress));
+            .SubmitAsync(new SteamWorkshopProgress(onProgress));
     }
 
     public async Awaitable SubscribeAndDownloadWorkshopItemAsync(ulong workshopItemFileId)

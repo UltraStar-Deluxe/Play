@@ -6,7 +6,7 @@ using UniInject;
 public class SpaceBetweenNotesAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private UiManager uiManager;
@@ -25,6 +25,6 @@ public class SpaceBetweenNotesAction : INeedInjection
     public void ExecuteAndNotify(SongMeta songMeta, IReadOnlyCollection<Note> selectedNotes, int spaceInMillis)
     {
         Execute(songMeta, selectedNotes, spaceInMillis);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 }

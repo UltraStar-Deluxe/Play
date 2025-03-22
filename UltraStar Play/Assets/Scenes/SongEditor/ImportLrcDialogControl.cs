@@ -23,7 +23,7 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
     private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SentenceFitToNoteAction sentenceFitToNoteAction;
@@ -121,7 +121,7 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
                 "count", importedNotes.Count));
         }
 
-        songMetaChangeEventStream.OnNext(new ImportedNotesEvent());
+        songMetaChangedEventStream.OnNext(new ImportedNotesEvent());
     }
 
     private void ImportLrcFormat(EVoiceId voiceId)
@@ -151,7 +151,7 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
                 "count", importedNotes.Count));
         }
 
-        songMetaChangeEventStream.OnNext(new ImportedNotesEvent());
+        songMetaChangedEventStream.OnNext(new ImportedNotesEvent());
     }
 
     public void OpenDialog()

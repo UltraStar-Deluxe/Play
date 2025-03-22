@@ -10,7 +10,8 @@ public static class CompileStyleSheetsMenuItems
     [MenuItem("Generate/Compile SCSS Style Sheets (Sass)")]
     public static void CompileScssStyleSheets()
     {
-        List<string> scssFiles = DirectoryUtils.GetFiles("Packages/playshared/Runtime", true, "*.scss");
+        List<string> scssFiles = FileScanner.GetFiles("Packages/playshared/Runtime",
+            new FileScannerConfig("*.scss") {Recursive = true});
 
         foreach (string scssFile in scssFiles)
         {

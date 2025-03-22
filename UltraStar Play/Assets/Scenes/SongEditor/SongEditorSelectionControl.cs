@@ -35,8 +35,8 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     private readonly HashSet<Note> selectedNotes = new();
 
-    private readonly Subject<NoteSelectionChangeEvent> noteSelectionChangeEventStream = new();
-    public IObservable<NoteSelectionChangeEvent> NoteSelectionChangeEventStream => noteSelectionChangeEventStream;
+    private readonly Subject<NoteSelectionChangedEvent> noteSelectionChangedEventStream = new();
+    public IObservable<NoteSelectionChangedEvent> NoteSelectionChangedEventStream => noteSelectionChangedEventStream;
     public bool IsSelectionEmpty => selectedNotes.IsNullOrEmpty();
 
     public List<Note> GetSelectedNotes()
@@ -215,7 +215,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     private void FireNoteSelectionChangedEvent()
     {
-        noteSelectionChangeEventStream.OnNext(new NoteSelectionChangeEvent(selectedNotes));
+        noteSelectionChangedEventStream.OnNext(new NoteSelectionChangedEvent(selectedNotes));
     }
 
     public void SelectNextNote(bool updatePosition = true)

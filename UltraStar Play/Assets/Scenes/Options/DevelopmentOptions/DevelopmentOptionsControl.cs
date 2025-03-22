@@ -91,7 +91,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     private ThemeManager themeManager;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private UIDocument uiDocument;
@@ -415,7 +415,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .WithRootVisualElement(visualElement)
             .CreateAndInject<UploadWorkshopItemUiControl>();
 
-        uploadWorkshopItemDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.steamWorkshop_uploadDialog_title));
+        uploadWorkshopItemDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.steamWorkshop_uploadDialog_title));
         uploadWorkshopItemDialogControl.AddVisualElement(visualElement);
         uploadWorkshopItemDialogControl.DialogClosedEventStream
             .Subscribe(evt =>

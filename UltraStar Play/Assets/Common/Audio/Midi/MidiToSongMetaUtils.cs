@@ -64,7 +64,7 @@ public static class MidiToSongMetaUtils
     {
         if (trackIndex >= midiFile.Tracks.Length)
         {
-            throw new UltraStarPlayException($"No track with index {trackIndex}");
+            throw new MidiToSongMetaException($"No track with index {trackIndex}");
         }
 
         using DisposableStopwatch d = new("LoadNotesFromMidiFile took <ms>");
@@ -94,7 +94,7 @@ public static class MidiToSongMetaUtils
 
         if (loadedNotes.IsNullOrEmpty())
         {
-            throw new UltraStarPlayException($"No notes found in channel {channelIndex} of track {trackIndex}");
+            throw new MidiToSongMetaException($"No notes found in channel {channelIndex} of track {trackIndex}");
         }
 
         Debug.Log($"Loaded {loadedNotes.Count} notes from midi file");
@@ -265,7 +265,7 @@ public static class MidiToSongMetaUtils
             .ToList();
         if (midiEventsOfChannel.IsNullOrEmpty())
         {
-            throw new UltraStarPlayException($"No midi event in channel {channelIndex}");
+            throw new MidiToSongMetaException($"No midi event in channel {channelIndex}");
         }
 
         Dictionary<int, Note> midiPitchToNoteUnderConstruction = new();

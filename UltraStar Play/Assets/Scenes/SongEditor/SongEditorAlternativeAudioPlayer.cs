@@ -66,7 +66,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
             AudioSource.Pause();
         });
-        songAudioPlayer.PlaybackSpeedChangedEventStream.Subscribe(newValue => AudioUtils.SetPitchWithPitchShifter(AudioSource, (float)newValue));
+        songAudioPlayer.PlaybackSpeedChangedEventStream.Subscribe(newValue => PitchShifterUtils.SetPitchWithPitchShifter(AudioSource, (float)newValue));
 
         // Update AudioClip (instrumental, vocals) when corresponding settings change
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource)

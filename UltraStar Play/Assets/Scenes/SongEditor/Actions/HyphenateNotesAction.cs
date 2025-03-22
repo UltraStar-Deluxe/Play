@@ -5,7 +5,7 @@ using UniInject;
 public class HyphenateNotesAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongEditorLayerManager layerManager;
@@ -59,6 +59,6 @@ public class HyphenateNotesAction : INeedInjection
     public void ExecuteAndNotify(SongMeta songMeta, List<Note> selectedNotes, Hyphenator hyphenator)
     {
         Execute(songMeta, selectedNotes, hyphenator);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 }

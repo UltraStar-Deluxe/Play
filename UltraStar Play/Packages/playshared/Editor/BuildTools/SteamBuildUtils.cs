@@ -133,7 +133,7 @@ public class SteamBuildUtils
         MatchCollection vdfFilePathMatches = vdfFilePathRegex.Matches(appVdfFileContent);
         if (vdfFilePathMatches.Count != 1)
         {
-            throw new IllegalStateException($"Unable to determine VDF file of depot in '{appVdfFilePath}'");
+            throw new InvalidOperationException($"Unable to determine VDF file of depot in '{appVdfFilePath}'");
         }
         string depotVdfFile = vdfFilePathMatches.FirstOrDefault().Groups["path"].Value;
 
@@ -143,7 +143,7 @@ public class SteamBuildUtils
         MatchCollection contentRootFolderMatches = contentRootFolderRegex.Matches(depotVdfFileContent);
         if (contentRootFolderMatches.Count != 1)
         {
-            throw new IllegalStateException($"Unable to determine contentroot inf VDF file of depot in '{depotVdfFile}'");
+            throw new InvalidOperationException($"Unable to determine contentroot inf VDF file of depot in '{depotVdfFile}'");
         }
 
         return contentRootFolderMatches.FirstOrDefault().Groups["path"].Value;

@@ -203,7 +203,7 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
             return;
         }
 
-        Debug.Log($"{nameof(JukeboxAndSingControl)} - Starting next song '{SongMetaUtils.GetArtistDashTitle(nextSongMeta)}'");
+        Debug.Log($"{nameof(JukeboxAndSingControl)} - Starting next song '{nextSongMeta.GetArtistDashTitle()}'");
 
         SingSceneData currentSingSceneData = SceneNavigator.GetSceneDataOrThrow<SingSceneData>();
         SingSceneData nextSingSceneData = new SingSceneData();

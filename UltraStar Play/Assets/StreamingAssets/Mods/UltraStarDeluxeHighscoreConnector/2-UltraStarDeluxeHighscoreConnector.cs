@@ -42,7 +42,7 @@ public class UltraStarDeluxeHighscoreConnector : IHighScoreReader, IOnDisableMod
             return cachedHighScoreRecord;
         }
 
-        Debug.Log($"Searching USDX highscore database for song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+        Debug.Log($"Searching USDX highscore database for song '{songMeta.GetArtistDashTitle()}'");
 
         await Awaitable.BackgroundThreadAsync();
 
@@ -74,11 +74,11 @@ public class UltraStarDeluxeHighscoreConnector : IHighScoreReader, IOnDisableMod
         List<ScoreRecordQueryData> dbRecords = dbReader.ToList<ScoreRecordQueryData>();
         if (dbRecords.IsNullOrEmpty())
         {
-            Log.Verbose(() => $"No USDX high score found for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+            Log.Verbose(() => $"No USDX high score found for '{songMeta.GetArtistDashTitle()}'");
             return null;
         }
 
-        Log.Verbose(() => $"Found USDX high scores found for '{SongMetaUtils.GetArtistDashTitle(songMeta)}': {dbRecords.Count}, {JsonConverter.ToJson(dbRecords)}");
+        Log.Verbose(() => $"Found USDX high scores found for '{songMeta.GetArtistDashTitle()}': {dbRecords.Count}, {JsonConverter.ToJson(dbRecords)}");
         HighScoreRecord highScoreRecord = new HighScoreRecord();
         foreach(ScoreRecordQueryData dbRecord in dbRecords)
         {

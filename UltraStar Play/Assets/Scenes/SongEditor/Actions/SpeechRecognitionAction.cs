@@ -19,7 +19,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     private static int speechRecognitionProcessCount;
 
-    [Inject] private SongMetaChangeEventStream songMetaChangeEventStream;
+    [Inject] private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject] private SongAudioPlayer songAudioPlayer;
 
@@ -54,8 +54,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         }
 
         int audioClipFrequency = audioClip.frequency;
-        int minBeat = SongMetaUtils.MinBeat(selectedNotes);
-        int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
+        int minBeat = SongMetaUtils.GetMinBeat(selectedNotes);
+        int lengthInBeats = SongMetaUtils.GetLengthInBeats(selectedNotes);
 
         SpeechRecognizerConfig speechRecognizerConfig = CreateSpeechRecognizerParameters();
 
@@ -64,8 +64,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(speechRecognizerConfig)
                 .GetResultAsync();
 
-            float[] monoAudioSamples =
-                AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, minBeat, lengthInBeats, true);
+            float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, audioClip, minBeat, lengthInBeats);
 
             await Awaitable.BackgroundThreadAsync();
             SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
@@ -77,7 +76,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             SpeechRecognitionResultTextToNotesMapper.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words, selectedNotes, minBeat);
             if (notify)
             {
-                songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
+                songMetaChangedEventStream.OnNext(new LyricsChangedEvent());
             }
         }
         catch (Exception ex)
@@ -156,7 +155,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
             if (notify)
             {
-                songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+                songMetaChangedEventStream.OnNext(new NotesChangedEvent());
             }
 
             return createdNotes;
@@ -224,7 +223,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
             });
 
-        float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, startBeat, lengthInBeats, true);
+        float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, audioClip, startBeat, lengthInBeats);
 
         Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
             ? SettingsUtils.CreateHyphenator(settings)
@@ -256,7 +255,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         if (notify)
         {
-            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
         }
 
         return createdNotes;

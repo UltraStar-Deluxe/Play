@@ -7,7 +7,7 @@ using UniInject;
 public class ApplyBpmAndAdjustNoteLengthAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private UiManager uiManager;
@@ -61,6 +61,6 @@ public class ApplyBpmAndAdjustNoteLengthAction : INeedInjection
     public void ExecuteAndNotify(double newBpm)
     {
         Execute(newBpm);
-        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Bpm));
+        songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Bpm));
     }
 }

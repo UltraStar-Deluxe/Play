@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 public class PortAudioOptionsControl : IInjectionFinishedListener
 {
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private Settings settings;
@@ -72,7 +72,7 @@ public class PortAudioOptionsControl : IInjectionFinishedListener
     private void ShowPortAudioDeviceInfo()
     {
         MessageDialogControl messageDialogControl =
-            uiManager.CreateDialogControl(Translation.Get(R.Messages.options_development_portAudioDialog_title));
+            dialogManager.CreateDialogControl(Translation.Get(R.Messages.options_development_portAudioDialog_title));
         messageDialogControl.AddButton(Translation.Get(R.Messages.options_development_action_copyCsv),
             _ => CopyPortAudioDeviceListCsv());
         messageDialogControl.AddButton(Translation.Get(R.Messages.action_close),

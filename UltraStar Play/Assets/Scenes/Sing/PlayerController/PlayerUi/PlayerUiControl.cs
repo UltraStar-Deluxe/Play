@@ -251,7 +251,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void OnClientConnectionChanged(ClientConnectionChangedEvent connectionChangedEvent)
+    private void OnClientConnectionChanged(CompanionClientConnectionChangedEvent connectionChangedEvent)
     {
         if (micProfile == null
             || connectionChangedEvent.CompanionClientHandler.ClientId != micProfile.ConnectedClientId)

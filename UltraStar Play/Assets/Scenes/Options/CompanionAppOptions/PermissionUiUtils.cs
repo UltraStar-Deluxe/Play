@@ -1,14 +1,14 @@
 ﻿public static class PermissionUiUtils
 {
-    public static string GetPermissionName(HttpApiPermission permission)
+    public static string GetPermissionName(RestApiPermission permission)
     {
         switch (permission)
         {
-            case HttpApiPermission.WriteSongQueue:
+            case RestApiPermission.WriteSongQueue:
                 return "Edit song queue";
-            case HttpApiPermission.WriteConfig:
+            case RestApiPermission.WriteConfig:
                 return "Edit config";
-            case HttpApiPermission.WriteInputSimulation:
+            case RestApiPermission.WriteInputSimulation:
                 return "Simulate input";
             default:
                 return StringUtils.ToTitleCase(permission.ToString());

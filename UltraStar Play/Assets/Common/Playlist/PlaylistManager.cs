@@ -141,8 +141,8 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     private async Awaitable ScanM3UPlaylistsInFolderAsync(string folder)
     {
-        FileScanner scanner = new($"*.{ApplicationUtils.M3uPlaylistFileExtension}", true, true);
-        List<string> playlistFilePaths = scanner.GetFiles(folder, true);
+        List<string> playlistFilePaths = FileScanner.GetFiles(folder,
+            new FileScannerConfig($"*.{ApplicationUtils.M3uPlaylistFileExtension}") { Recursive = true });
         foreach (string filePath in playlistFilePaths)
         {
             try
@@ -161,8 +161,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     private async Awaitable ScanUltraStarPlaylistsInFolderAsync(string folder)
     {
         string ultraStarPlaylistFileExtensionPattern = $"*.{ApplicationUtils.UltraStarPlaylistFileExtension}";
-        FileScanner scanner = new(ultraStarPlaylistFileExtensionPattern, true, true);
-        List<string> playlistFilePaths = scanner.GetFiles(folder, true);
+        List<string> playlistFilePaths = FileScanner.GetFiles(folder, new FileScannerConfig(ultraStarPlaylistFileExtensionPattern) { Recursive = true });
         foreach (string filePath in playlistFilePaths)
         {
             try

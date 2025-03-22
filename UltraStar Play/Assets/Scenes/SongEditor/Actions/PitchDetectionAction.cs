@@ -11,7 +11,7 @@ using UnityEngine;
 public class PitchDetectionAction : AbstractAudioClipAction
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -31,9 +31,6 @@ public class PitchDetectionAction : AbstractAudioClipAction
     [Inject]
     private SongEditorMidiFileImporter songEditorMidiFileImporter;
 
-    private IAudioSamplesAnalyzer audioSamplesAnalyzer;
-    private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
-
     public async void CreateNotesUsingBasicPitch(bool notify)
     {
         PitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta).GetResultAsync();
@@ -41,7 +38,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
         if (notify)
         {
-            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
         }
     }
 
@@ -81,7 +78,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
         if (notify)
         {
-            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
         }
     }
 }

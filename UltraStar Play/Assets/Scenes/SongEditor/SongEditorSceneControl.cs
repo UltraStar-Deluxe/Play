@@ -94,7 +94,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private IDisposable autoSaveDisposable;
 
-    private readonly SongMetaChangeEventStream songMetaChangeEventStream = new();
+    private readonly SongMetaChangedEventStream songMetaChangedEventStream = new();
 
     private double positionInMillisWhenPlaybackStarted;
 
@@ -203,7 +203,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
         Debug.Log($"Created sing-along data for song '{SongMeta.GetArtistDashTitle()}'");
         editorNoteDisplayer.ClearNoteControls();
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 
     private void InitSongEditorStyleSheet()
@@ -219,7 +219,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private void InitSteamAchievement()
     {
-        songMetaChangeEventStream
+        songMetaChangedEventStream
             .Subscribe(evt =>
             {
                 if (evt is NotesChangedEvent)
@@ -266,7 +266,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     {
         UnregisterAutoSaveEvent();
 
-        autoSaveDisposable = songMetaChangeEventStream
+        autoSaveDisposable = songMetaChangedEventStream
             // When there has been no new event for a second, then save
             .Throttle(new TimeSpan(0, 0, 0, 0, 500))
             .Subscribe(evt => DoAutoSaveIfEnabled())
@@ -481,7 +481,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(sideBarControl);
         bb.BindExistingInstance(historyManager);
         bb.BindExistingInstance(overviewAreaControl);
-        bb.BindExistingInstance(songMetaChangeEventStream);
+        bb.BindExistingInstance(songMetaChangedEventStream);
         bb.BindExistingInstance(songEditorCopyPasteManager);
         bb.BindExistingInstance(songEditorSceneInputControl);
         bb.BindExistingInstance(issueAnalyzerControl);

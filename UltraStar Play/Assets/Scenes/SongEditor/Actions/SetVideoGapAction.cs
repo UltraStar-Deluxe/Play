@@ -16,7 +16,7 @@ public class SetVideoGapAction : INeedInjection
     private SongVideoPlayer songVideoPlayer;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     public void Execute(double newVideoGap)
     {
@@ -27,6 +27,6 @@ public class SetVideoGapAction : INeedInjection
     public void ExecuteAndNotify(double newVideoGap)
     {
         Execute(newVideoGap);
-        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.VideoGap));
+        songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.VideoGap));
     }
 }

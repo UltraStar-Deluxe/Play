@@ -28,13 +28,13 @@ public class CompanionClientListEntryControl : INeedInjection, IInjectionFinishe
     public void UpdatePermissions()
     {
         permissionsContainer.Clear();
-        List<HttpApiPermission> givenPermissions = SettingsUtils.GetPermissions(settings, clientHandler.ClientId);
+        List<RestApiPermission> givenPermissions = SettingsUtils.GetPermissions(settings, clientHandler.ClientId);
 
-        List<HttpApiPermission> permissions = new()
+        List<RestApiPermission> permissions = new()
         {
-            HttpApiPermission.WriteSongQueue,
-            HttpApiPermission.WriteConfig,
-            HttpApiPermission.WriteInputSimulation,
+            RestApiPermission.WriteSongQueue,
+            RestApiPermission.WriteConfig,
+            RestApiPermission.WriteInputSimulation,
         };
 
         permissions.ForEach(permission =>
@@ -52,7 +52,7 @@ public class CompanionClientListEntryControl : INeedInjection, IInjectionFinishe
                     SettingsUtils.RemovePermission(settings, clientHandler.ClientId, permission);
                 }
 
-                List<HttpApiPermission> newPermissions = SettingsUtils.GetPermissions(settings, clientHandler.ClientId);
+                List<RestApiPermission> newPermissions = SettingsUtils.GetPermissions(settings, clientHandler.ClientId);
                 clientHandler.SendMessageToClient(new PermissionsMessageDto()
                 {
                     Permissions = newPermissions,

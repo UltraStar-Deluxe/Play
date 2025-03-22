@@ -8,7 +8,7 @@ using UniInject;
 public class MoveNoteToOwnSentenceAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private DeleteSentencesAction deleteSentencesAction;
@@ -39,7 +39,7 @@ public class MoveNoteToOwnSentenceAction : INeedInjection
         notes.ForEach(note =>
         {
             // Prevent notes from merging into a single word
-            SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(note);
+            SongEditorSongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(note);
 
             note.SetSentence(newSentence);
         });
@@ -57,6 +57,6 @@ public class MoveNoteToOwnSentenceAction : INeedInjection
     public void MoveToOwnSentenceAndNotify(List<Note> notes)
     {
         MoveToOwnSentence(notes);
-        songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
+        songMetaChangedEventStream.OnNext(new SentencesChangedEvent());
     }
 }

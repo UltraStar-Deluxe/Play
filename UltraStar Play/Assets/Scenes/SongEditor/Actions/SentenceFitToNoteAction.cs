@@ -7,7 +7,7 @@ using UniInject;
 public class SentenceFitToNoteAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     public void Execute(IReadOnlyCollection<Sentence> selectedSentences)
     {
@@ -21,6 +21,6 @@ public class SentenceFitToNoteAction : INeedInjection
     public void ExecuteAndNotify(IReadOnlyCollection<Sentence> selectedSentences)
     {
         Execute(selectedSentences);
-        songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
+        songMetaChangedEventStream.OnNext(new SentencesChangedEvent());
     }
 }

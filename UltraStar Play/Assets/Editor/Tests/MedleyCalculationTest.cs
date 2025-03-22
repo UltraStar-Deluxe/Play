@@ -18,8 +18,8 @@ public class MedleyCalculationTest
     public void ShouldCalculateMedleyStartAndMedleyEnd(MedleyCalculationTestCase testCase)
     {
         UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + testCase.FileName).SongMeta;
-        Assert.AreEqual(SongMetaUtils.GetMedleyStartBeat(songMeta), testCase.ExpectedMedleyStartBeat);
-        Assert.AreEqual(SongMetaUtils.GetMedleyEndBeat(songMeta, 10), testCase.ExpectedMedleyEndBeat);
+        Assert.AreEqual(SongMetaMedleyUtils.GetMedleyStartBeat(songMeta), testCase.ExpectedMedleyStartBeat);
+        Assert.AreEqual(SongMetaMedleyUtils.GetMedleyEndBeat(songMeta, 10), testCase.ExpectedMedleyEndBeat);
     }
 
     public class MedleyCalculationTestCase

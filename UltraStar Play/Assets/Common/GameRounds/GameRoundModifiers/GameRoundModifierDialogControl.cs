@@ -61,7 +61,7 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     {
         modifierContainer.Clear();
         entryControls.Clear();
-        List<IGameRoundModifier> gameRoundModifiers = GameRoundModifierUtils.GetGameRoundModifiers()
+        List<IGameRoundModifier> gameRoundModifiers = GameRoundModifierRegistry.GetAll()
             .OrderBy(modifier => modifier.DisplayOrder)
             .ToList();
         foreach (IGameRoundModifier gameRoundModifier in gameRoundModifiers)

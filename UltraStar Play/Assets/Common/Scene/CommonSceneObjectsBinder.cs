@@ -24,6 +24,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(SongIssueManager.Instance);
         bb.BindExistingInstance(CursorManager.Instance);
         bb.BindExistingInstance(UiManager.Instance);
+        bb.BindExistingInstance(PlayerProfileImageManager.Instance);
+        bb.BindExistingInstance(DialogManager.Instance);
         bb.BindExistingInstance(MidiManager.Instance);
         bb.BindExistingInstance(ImageManager.Instance);
         bb.BindExistingInstance(FolderPreviewImageManager.Instance);
@@ -83,7 +85,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(JobManager.Instance);   bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.BindExistingInstance(ThemeManager.Instance);
         bb.BindExistingInstance(GlobalInputControl.Instance);
-        bb.BindExistingInstance(VolumeControl.Instance);
+        bb.BindExistingInstance(VolumeManager.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
         bb.BindExistingInstance(HttpServer.Instance as UltraStarPlayHttpServer);

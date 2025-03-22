@@ -72,7 +72,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     private SongEditorLayerManager songEditorLayerManager;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private Injector injector;
@@ -123,7 +123,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
         songAudioPlayer.PositionEventStream.Subscribe(SetPositionInMillis);
 
-        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+        songMetaChangedEventStream.Subscribe(OnSongMetaChanged);
 
         injector
             .WithRootVisualElement(VisualElement)
@@ -175,9 +175,9 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         selectionDragListener.Update();
     }
 
-    private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
+    private void OnSongMetaChanged(SongMetaChangedEvent changedEvent)
     {
-        if (changeEvent
+        if (changedEvent
             is SongPropertyChangedEvent { SongProperty: ESongProperty.Bpm }
             or LoadedMementoEvent)
         {

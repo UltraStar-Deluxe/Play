@@ -28,12 +28,12 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
 
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Songs)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.Songs)
             .SetDescription("Get loaded songs")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(SendLoadedSongs);
 
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Song)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.Song)
             .SetDescription($"Get song details.")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -60,7 +60,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(songDetailsDto);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.SongImage)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.SongImage)
             .SetDescription($"Get song cover image. Returns the background image if no cover image was found.")
             .SetRemoveOnDestroy(gameObject)
             .SetThread(ResponseThread.NewThread)

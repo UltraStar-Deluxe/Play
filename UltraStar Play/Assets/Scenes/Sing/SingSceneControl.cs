@@ -83,7 +83,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private Settings settings;
 
     [Inject]
-    private UiManager uiManager;
+    private PlayerProfileImageManager playerProfileImageManager;
 
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -132,6 +132,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     [Inject]
     private ThemeManager themeManager;
+
+    [Inject]
+    private DialogManager dialogManager;
 
     [Inject]
     private AudioSeparationManager audioSeparationManager;
@@ -324,7 +327,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         // Input legend (in pause overlay)
         UpdateInputLegend();
-        inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
+        inputManager.InputDeviceChangedEventStream.Subscribe(_ => UpdateInputLegend());
 
         // Progress bar to show time in song
         songTimeProgressBar.value = 0;
@@ -447,7 +450,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             .ToList()
             .JoinWith(", ");
 
-        dialogControl = UiManager.Instance.CreateDialogControl(Translation.Get(R.Messages.singScene_missingMicrophones_title));
+        dialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.singScene_missingMicrophones_title));
         dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
         dialogControl.Message = Translation.Get(R.Messages.singScene_missingMicrophones_message,
             "playerNames", playerNameCsv);
@@ -973,7 +976,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             EDifficulty easiestPlayerProfileDifficulty = PlayerControls
                 .FindMinElement(playerControl => (int)playerControl.PlayerProfile.Difficulty)
                 .PlayerProfile.Difficulty;
-            string commonProfileImagePath = uiManager.GetFinalPlayerProfileImagePath(PlayerControls.Select(it => it.PlayerProfile).FirstOrDefault());
+            string commonProfileImagePath = playerProfileImageManager.GetFinalPlayerProfileImagePath(PlayerControls.Select(it => it.PlayerProfile).FirstOrDefault());
             PlayerProfile commonPlayerProfile = new(commonPlayerProfileName, easiestPlayerProfileDifficulty, commonProfileImagePath);
             ISingingResultsPlayerScore commonScore = CreateAveragePlayerScoreControlData(scoreControlDatas);
             singingResultsSceneData.AddPlayerScores(commonPlayerProfile, commonScore);
@@ -1337,7 +1340,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         if (extendedVoiceId is EExtendedVoiceId.Merged)
         {
-            return SongMetaUtils.CreateMergedVoice(SongMeta.Voices.ToList());
+            return VoicesMerger.Merge(SongMeta.Voices.ToList());
         }
 
         if (extendedVoiceId.TryGetVoiceId(out EVoiceId voiceId))

@@ -11,7 +11,7 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedListener, IDragListener<NoteAreaDragEvent>
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongEditorSelectionControl selectionControl;
@@ -191,7 +191,7 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
         }
 
         noteUnderConstruction = null;
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 
     public void CancelDrag()

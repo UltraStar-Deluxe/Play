@@ -23,7 +23,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     private Button addButton;
 
     [Inject]
-    private UiManager uiManager;
+    private PlayerProfileImageManager playerProfileImageManager;
 
     [Inject]
     private WebCamManager webCamManager;
@@ -131,7 +131,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         });
         UpdatePlayerProfileInactiveOverlay(playerProfile, playerProfileInactiveOverlay);
 
-        PlayerProfileImageChooserControl playerProfileImageChooserControl = new PlayerProfileImageChooserControl(visualElement.Q<Chooser>(R.UxmlNames.playerProfileImageChooser), GetIndexInList(playerProfile), uiManager, webCamManager);
+        PlayerProfileImageChooserControl playerProfileImageChooserControl = new PlayerProfileImageChooserControl(visualElement.Q<Chooser>(R.UxmlNames.playerProfileImageChooser), GetIndexInList(playerProfile), playerProfileImageManager, webCamManager);
         playerProfileImageChooserControl.Bind(() => playerProfile.ImagePath,
                 newValue => playerProfile.ImagePath = newValue);
 

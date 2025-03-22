@@ -71,7 +71,7 @@ public class SongEditorStatusBarControl : INeedInjection, IInjectionFinishedList
         videoArea.RegisterCallback<PointerEnterEvent>(evt => IsPointerOverVideoArea = true, TrickleDown.TrickleDown);
         videoArea.RegisterCallback<PointerLeaveEvent>(evt => IsPointerOverVideoArea = false, TrickleDown.TrickleDown);
 
-        selectionControl.NoteSelectionChangeEventStream.Subscribe(_ => UpdateStatusBarControlHint());
+        selectionControl.NoteSelectionChangedEventStream.Subscribe(_ => UpdateStatusBarControlHint());
 
         InputManager.GetInputAction(R.InputActions.usplay_anyKeyboardModifierPressedOrReleased).PerformedAsObservable()
             .Subscribe(_ => UpdateStatusBarControlHint());

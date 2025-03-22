@@ -14,7 +14,7 @@ public class DeleteNotesAction : INeedInjection
     private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private DeleteSentencesAction deleteSentencesAction;
@@ -48,14 +48,14 @@ public class DeleteNotesAction : INeedInjection
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes)
     {
         List<Sentence> deletedSentences = Execute(selectedNotes);
-        songMetaChangeEventStream.OnNext(new NotesDeletedEvent
+        songMetaChangedEventStream.OnNext(new NotesDeletedEvent
         {
             Notes = selectedNotes
         });
 
         if (!deletedSentences.IsNullOrEmpty())
         {
-            songMetaChangeEventStream.OnNext(new SentencesDeletedEvent
+            songMetaChangedEventStream.OnNext(new SentencesDeletedEvent
             {
                 Sentences = deletedSentences
             });

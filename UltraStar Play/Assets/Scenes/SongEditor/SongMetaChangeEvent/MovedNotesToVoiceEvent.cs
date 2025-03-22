@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class MovedNotesToVoiceEvent : SongMetaChangeEvent
+public class MovedNotesToVoiceEvent : SongMetaChangedEvent
 {
     public IReadOnlyCollection<Note> Notes { get; private set; }
     public IReadOnlyCollection<Sentence> ChangedSentences { get; private set; }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Serilog.Events;
 using UnityEngine;
 
@@ -13,54 +11,6 @@ public static class DirectoryUtils
         {
             Directory.CreateDirectory(path);
         }
-    }
-
-    public static List<string> GetDirectories(string folderPath, bool recursive, params string[] searchPatterns)
-    {
-        SearchOption searchOption = recursive
-            ? SearchOption.AllDirectories
-            : SearchOption.TopDirectoryOnly;
-
-        if (searchPatterns.IsNullOrEmpty())
-        {
-            return Directory.GetDirectories(folderPath, "*", searchOption)
-                .ToList();
-        }
-
-        List<string> result = new();
-        foreach (string searchPattern in searchPatterns)
-        {
-             string[] paths = Directory.GetDirectories(folderPath, searchPattern, searchOption);
-            result.AddRange(paths);
-        }
-
-        return result
-            .Distinct()
-            .ToList();
-    }
-
-    public static List<string> GetFiles(string folderPath, bool recursive, params string[] searchPatterns)
-    {
-        SearchOption searchOption = recursive
-            ? SearchOption.AllDirectories
-            : SearchOption.TopDirectoryOnly;
-
-        if (searchPatterns.IsNullOrEmpty())
-        {
-            return Directory.GetFiles(folderPath, "*", searchOption)
-                .ToList();
-        }
-
-        List<string> result = new();
-        foreach (string searchPattern in searchPatterns)
-        {
-            string[] paths = Directory.GetFiles(folderPath, searchPattern, searchOption);
-            result.AddRange(paths);
-        }
-
-        return result
-            .Distinct()
-            .ToList();
     }
 
     public static bool IsSubDirectory(string potentialSubDirectory, string potentialAncestorDirectory)
@@ -187,44 +137,6 @@ public static class DirectoryUtils
                 Log.WithLevel(logEventLevel, () => $"Ignoring '{sourceSubDirectoryPath}'");
             }
         }
-    }
-
-    public static bool TryAddFilesRecursivelyUntilCount(
-        string folder,
-        FileScanner fileScanner,
-        int targetFileCount,
-        List<string> resultFiles,
-        Func<List<string>,
-        List<string>> subFolderSelector = null)
-    {
-        if (resultFiles.Count >= targetFileCount)
-        {
-            return true;
-        }
-
-        if (folder.IsNullOrEmpty())
-        {
-            return false;
-        }
-
-        List<string> txtFilesInFolder = fileScanner.GetFiles(folder, false);
-        if (CollectionUtils.TryAddUntilCount(resultFiles, txtFilesInFolder, targetFileCount))
-        {
-            return true;
-        }
-
-        List<string> subFolders = GetDirectories(folder, false, "*.txt");
-        List<string> subFolderSelection = subFolderSelector != null
-            ? subFolderSelector(subFolders)
-            : subFolders;
-        foreach (string subFolder in subFolderSelection)
-        {
-            if (TryAddFilesRecursivelyUntilCount(subFolder, fileScanner, targetFileCount, resultFiles, subFolderSelector))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static List<DirectoryInfo> GetParentDirectories(DirectoryInfo directory, bool includeInitialDirectory = false)

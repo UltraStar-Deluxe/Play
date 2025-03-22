@@ -43,8 +43,8 @@ public class PlayerPerformanceAssessmentControl : MonoBehaviour, INeedInjection,
             .Sentences
             .SelectMany(s => s.Notes)
             .ToList();
-        firstBeatToScoreInclusive = SongMetaUtils.MinBeat(notes);
-        lastBeatToScoreExclusive = SongMetaUtils.MaxBeat(notes);
+        firstBeatToScoreInclusive = SongMetaUtils.GetMinBeat(notes);
+        lastBeatToScoreExclusive = SongMetaUtils.GetMaxBeat(notes);
     }
 
     private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)
@@ -151,7 +151,7 @@ public class PlayerPerformanceAssessmentControl : MonoBehaviour, INeedInjection,
             if (!correctlySungBeats.AllMatch(beat =>
                     SongMetaUtils.IsBeatInNote(note, beat, true, false)))
             {
-                throw new IllegalArgumentException("correctly sung beats must be inside note");
+                throw new ArgumentException("correctly sung beats must be inside note");
             }
 
             Note = note;
@@ -180,7 +180,7 @@ public class PlayerPerformanceAssessmentControl : MonoBehaviour, INeedInjection,
                     sentence.Notes.AnyMatch(note =>
                         SongMetaUtils.IsBeatInNote(note, beat, true, false))))
             {
-                throw new IllegalArgumentException("correctly sung beats must be inside note");
+                throw new ArgumentException("correctly sung beats must be inside note");
             }
 
             Sentence = sentence;

@@ -69,7 +69,7 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
         void FillRounds()
         {
             GameRoundSettings roundSettings = new();
-            roundSettings.modifiers = GameRoundModifierUtils.GetGameRoundModifiersById(modifierIds);
+            roundSettings.modifiers = GameRoundModifierRegistry.GetAllById(modifierIds);
             nonPersistentSettings.GameRoundSettings = roundSettings;
 
             partyModeSettings.RoundCount = 2;

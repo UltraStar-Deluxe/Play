@@ -1,3 +1,3 @@
-public class NotesMergedEvent : SongMetaChangeEvent
+public class NotesMergedEvent : SongMetaChangedEvent
 {
 }

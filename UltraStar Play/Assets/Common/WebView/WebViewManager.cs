@@ -34,7 +34,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     private SceneNavigator sceneNavigator;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private Settings settings;
@@ -490,7 +490,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
         Debug.LogWarning($"Asking to accept host before loading URI into WebView. host: '{host}', uri: '{url}'");
 
-        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.webView_askToOpenWebsiteDialog_title));
+        MessageDialogControl messageDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.webView_askToOpenWebsiteDialog_title));
         messageDialogControl.Message = Translation.Get(R.Messages.webView_askToOpenWebsiteDialog_message,
             "host", host);
 
