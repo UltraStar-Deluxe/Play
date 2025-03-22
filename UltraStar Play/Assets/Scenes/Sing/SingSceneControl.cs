@@ -327,7 +327,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         // Input legend (in pause overlay)
         UpdateInputLegend();
-        inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
+        inputManager.InputDeviceChangedEventStream.Subscribe(_ => UpdateInputLegend());
 
         // Progress bar to show time in song
         songTimeProgressBar.value = 0;

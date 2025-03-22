@@ -198,7 +198,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private HyphenateNotesAction hyphenateNotesAction;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     private LabeledChooserControl<MicProfile> micDeviceChooserControl;
     private EnumChooserControl<ESongEditorSamplesSource> playbackAudioChooserControl;
@@ -516,7 +516,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         }
 
         hyphenateNotesAction.ExecuteAndNotify(songMeta, selectedNotes, hyphenator);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 
     private void AddSpaceBetweenNotesInSelection()

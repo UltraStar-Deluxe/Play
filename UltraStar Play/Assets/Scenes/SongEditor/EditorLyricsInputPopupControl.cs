@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
-    protected SongMetaChangeEventStream songMetaChangeEventStream;
+    protected SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     protected SongEditorSceneControl songEditorSceneControl;

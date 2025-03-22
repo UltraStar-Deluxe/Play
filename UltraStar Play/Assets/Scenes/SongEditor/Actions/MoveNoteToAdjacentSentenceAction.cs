@@ -8,7 +8,7 @@ using UniInject;
 public class MoveNoteToAdjacentSentenceAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     public bool CanMoveToNextSentence(List<Note> selectedNotes, Note targetNote)
     {
@@ -94,7 +94,7 @@ public class MoveNoteToAdjacentSentenceAction : INeedInjection
     public void MoveToPreviousSentenceAndNotify(List<Note> notes)
     {
         MoveToPreviousSentence(notes);
-        songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
+        songMetaChangedEventStream.OnNext(new SentencesChangedEvent());
     }
 
     public void MoveToNextSentence(List<Note> notes)
@@ -129,7 +129,7 @@ public class MoveNoteToAdjacentSentenceAction : INeedInjection
     public void MoveToNextSentenceAndNotify(List<Note> notes)
     {
         MoveToNextSentence(notes);
-        songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
+        songMetaChangedEventStream.OnNext(new SentencesChangedEvent());
     }
 
     private static Sentence GetNextSentence(Sentence sentence)

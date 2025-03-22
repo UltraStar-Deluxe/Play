@@ -21,7 +21,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
     private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private Settings settings;
@@ -166,7 +166,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
         {
             // Values have been directly applied to the notes. The snapshot can be cleared.
             noteToSnapshotOfNoteMap.Clear();
-            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
         }
     }
 

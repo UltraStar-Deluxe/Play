@@ -33,7 +33,7 @@ public class SongEditorMidiFileImporter : INeedInjection
     private SongAudioPlayer songAudioPlayer;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     public void ImportMidiFile(
         string midiFilePath,
@@ -100,7 +100,7 @@ public class SongEditorMidiFileImporter : INeedInjection
                 ShiftNotesToPlaybackPosition(loadedNotes);
             }
 
-            songMetaChangeEventStream.OnNext(new ImportedMidiFileEvent());
+            songMetaChangedEventStream.OnNext(new ImportedMidiFileEvent());
         }
         catch (Exception ex)
         {

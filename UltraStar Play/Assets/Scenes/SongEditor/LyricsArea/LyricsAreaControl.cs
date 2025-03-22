@@ -31,7 +31,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     private SongMeta songMeta;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -77,7 +77,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         });
         toggleLyricsAreaEditModeButton.RegisterCallbackButtonTriggered(_ => ToggleEditMode());
 
-        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+        songMetaChangedEventStream.Subscribe(OnSongMetaChanged);
 
         textField.doubleClickSelectsWord = true;
         textField.tripleClickSelectsLine = true;
@@ -198,10 +198,10 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
+    private void OnSongMetaChanged(SongMetaChangedEvent changedEvent)
     {
         if (lyricsAreaMode == LyricsAreaMode.ViewMode
-            && changeEvent
+            && changedEvent
                 is LyricsChangedEvent
                 or LoadedMementoEvent
                 or MovedNotesToVoiceEvent
@@ -216,7 +216,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             UpdateLyrics();
         }
 
-        if (changeEvent
+        if (changedEvent
             is MovedNotesToVoiceEvent
             or NotesAddedEvent)
         {
@@ -265,7 +265,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         // Map edit-mode text to lyrics of notes
         string text = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
         LyricsUtils.MapEditModeTextToNotes(text, Voice.Sentences);
-        songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
+        songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }
 
     private void SetInputFieldText(string text)

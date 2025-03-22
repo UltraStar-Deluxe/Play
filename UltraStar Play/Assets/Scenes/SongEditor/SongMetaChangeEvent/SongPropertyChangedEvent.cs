@@ -1,4 +1,4 @@
-public class SongPropertyChangedEvent : SongMetaChangeEvent
+public class SongPropertyChangedEvent : SongMetaChangedEvent
 {
     public ESongProperty SongProperty { get; private set; }
 

@@ -177,7 +177,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             .Subscribe(autoSave => saveButton.SetVisibleByDisplay(!autoSave))
             .AddTo(gameObject);
 
-        inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
+        inputManager.InputDeviceChangedEventStream.Subscribe(_ => UpdateInputLegend());
 
         issuesSideBarContainer.RegisterCallback<GeometryChangedEvent>(evt =>
         {

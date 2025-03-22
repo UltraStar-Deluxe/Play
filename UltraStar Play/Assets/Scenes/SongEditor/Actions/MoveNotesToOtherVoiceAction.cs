@@ -8,7 +8,7 @@ using UniInject;
 public class MoveNotesToOtherVoiceAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     // The notes can be moved if there exists a note
     // that is not yet inside a voice with one of the given voice names.
@@ -62,7 +62,7 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
     public void MoveNotesToVoiceAndNotify(SongMeta songMeta, List<Note> selectedNotes, EVoiceId voiceId)
     {
         MovedNotesToVoiceEvent movedNotesToVoiceEvent = MoveNotesToVoice(songMeta, selectedNotes, voiceId);
-        songMetaChangeEventStream.OnNext(movedNotesToVoiceEvent);
+        songMetaChangedEventStream.OnNext(movedNotesToVoiceEvent);
     }
 
     private static bool HasVoice(Note note, EVoiceId[] voiceIds)

@@ -8,7 +8,7 @@ using UniInject;
 public class MoveNoteToOwnSentenceAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private DeleteSentencesAction deleteSentencesAction;
@@ -57,6 +57,6 @@ public class MoveNoteToOwnSentenceAction : INeedInjection
     public void MoveToOwnSentenceAndNotify(List<Note> notes)
     {
         MoveToOwnSentence(notes);
-        songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
+        songMetaChangedEventStream.OnNext(new SentencesChangedEvent());
     }
 }

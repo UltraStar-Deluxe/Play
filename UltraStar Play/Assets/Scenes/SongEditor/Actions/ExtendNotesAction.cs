@@ -7,7 +7,7 @@ using UniInject;
 public class ExtendNotesAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     public void ExtendNotesLeft(int distanceInBeats, IEnumerable<Note> selectedNotes)
     {
@@ -40,12 +40,12 @@ public class ExtendNotesAction : INeedInjection
     public void ExtendNotesLeftAndNotify(int distanceInBeats, IEnumerable<Note> selectedNotes)
     {
         ExtendNotesLeft(distanceInBeats, selectedNotes);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 
     public void ExtendNotesRightAndNotify(int distanceInBeats, IEnumerable<Note> selectedNotes, IEnumerable<Note> followingNotes)
     {
         ExtendNotesRight(distanceInBeats, selectedNotes, followingNotes);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 }

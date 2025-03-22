@@ -7,7 +7,7 @@ using UniInject;
 public class ToggleNoteTypeAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     public void Execute(IEnumerable<Note> selectedNotes, ENoteType noteType)
     {
@@ -22,6 +22,6 @@ public class ToggleNoteTypeAction : INeedInjection
     public void ExecuteAndNotify(IEnumerable<Note> selectedNotes, ENoteType noteType)
     {
         Execute(selectedNotes, noteType);
-        songMetaChangeEventStream.OnNext(new NoteTypeChangeEvent());
+        songMetaChangedEventStream.OnNext(new NoteTypeChangedEvent());
     }
 }

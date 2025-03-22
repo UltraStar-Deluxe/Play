@@ -28,7 +28,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     private SongEditorLayerManager layerManager;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject(Optional = true)]
     private EventSystem eventSystem;
@@ -112,7 +112,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
         // Select notes
         selectionControl.SetSelection(pastedNotes.Values.ToList());
-        songMetaChangeEventStream.OnNext(new NotesPastedEvent());
+        songMetaChangedEventStream.OnNext(new NotesPastedEvent());
     }
 
     private bool IsLastNoteInSentence(Note note)
@@ -185,7 +185,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         }
         CopySelection();
         deleteNotesAction.Execute(selectedNotes);
-        songMetaChangeEventStream.OnNext(new NotesCutEvent());
+        songMetaChangedEventStream.OnNext(new NotesCutEvent());
     }
 
     public void CopySelection()

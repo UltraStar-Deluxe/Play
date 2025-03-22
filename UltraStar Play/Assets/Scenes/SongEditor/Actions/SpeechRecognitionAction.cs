@@ -19,7 +19,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     private static int speechRecognitionProcessCount;
 
-    [Inject] private SongMetaChangeEventStream songMetaChangeEventStream;
+    [Inject] private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject] private SongAudioPlayer songAudioPlayer;
 
@@ -76,7 +76,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             SpeechRecognitionResultTextToNotesMapper.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words, selectedNotes, minBeat);
             if (notify)
             {
-                songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
+                songMetaChangedEventStream.OnNext(new LyricsChangedEvent());
             }
         }
         catch (Exception ex)
@@ -155,7 +155,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
             if (notify)
             {
-                songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+                songMetaChangedEventStream.OnNext(new NotesChangedEvent());
             }
 
             return createdNotes;
@@ -255,7 +255,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         if (notify)
         {
-            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
         }
 
         return createdNotes;

@@ -16,7 +16,7 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
     private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private Settings settings;
@@ -104,7 +104,7 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
         {
             // Values have been directly applied to the notes. The snapshot can be cleared.
             noteToSnapshotOfNoteMap.Clear();
-            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
         }
     }
 
@@ -173,7 +173,7 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
             MoveNotesHorizontal(dragEvent, followingNotes, false);
         }
 
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 
     private void ChangeLinebreakBeat(NoteAreaDragEvent dragEvent)
@@ -184,7 +184,7 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
         }
 
         sentenceControl.Sentence.SetLinebreakBeat(linebreakBeatSnapshot + dragEvent.BeatDistance);
-        songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
+        songMetaChangedEventStream.OnNext(new SentencesChangedEvent());
     }
 
     public void Dispose()

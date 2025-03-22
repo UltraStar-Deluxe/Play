@@ -7,7 +7,7 @@ using UniInject;
 public class SplitNotesAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongEditorLayerManager layerManager;
@@ -52,6 +52,6 @@ public class SplitNotesAction : INeedInjection
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes)
     {
         Execute(selectedNotes);
-        songMetaChangeEventStream.OnNext(new NotesSplitEvent());
+        songMetaChangedEventStream.OnNext(new NotesSplitEvent());
     }
 }

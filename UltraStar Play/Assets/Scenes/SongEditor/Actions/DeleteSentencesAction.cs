@@ -13,7 +13,7 @@ public class DeleteSentencesAction : INeedInjection
     private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     public void Execute(List<Sentence> selectedSentences)
     {
@@ -33,7 +33,7 @@ public class DeleteSentencesAction : INeedInjection
     public void ExecuteAndNotify(List<Sentence> selectedSentences)
     {
         Execute(selectedSentences);
-        songMetaChangeEventStream.OnNext(new SentencesDeletedEvent
+        songMetaChangedEventStream.OnNext(new SentencesDeletedEvent
         {
             Sentences = selectedSentences
         });

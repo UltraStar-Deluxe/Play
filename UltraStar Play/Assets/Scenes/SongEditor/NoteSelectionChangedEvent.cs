@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-public class NoteSelectionChangeEvent
+public class NoteSelectionChangedEvent
 {
     public IReadOnlyCollection<Note> SelectedNotes { get; private set; }
 
-    public NoteSelectionChangeEvent(IReadOnlyCollection<Note> selectedNotes)
+    public NoteSelectionChangedEvent(IReadOnlyCollection<Note> selectedNotes)
     {
         SelectedNotes = selectedNotes;
     }

@@ -9,7 +9,7 @@ public class SongEditorIssueAnalyzerControl : INeedInjection, IInjectionFinished
     public const int MaxSongIssueCountPerMessage = 10;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongMeta songMeta;
@@ -24,7 +24,7 @@ public class SongEditorIssueAnalyzerControl : INeedInjection, IInjectionFinished
 
     public void OnInjectionFinished()
     {
-        songMetaChangeEventStream
+        songMetaChangedEventStream
             // When there is no new change to the song for some time, then update the issues.
             .Throttle(new TimeSpan(0, 0, 0, 0, 500))
             .Subscribe(_ => UpdateIssues());

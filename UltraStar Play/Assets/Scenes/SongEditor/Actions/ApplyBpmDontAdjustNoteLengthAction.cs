@@ -6,7 +6,7 @@
 public class ApplyBpmDontAdjustNoteLengthAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private UiManager uiManager;
@@ -34,6 +34,6 @@ public class ApplyBpmDontAdjustNoteLengthAction : INeedInjection
     public void ExecuteAndNotify(float newBpm)
     {
         Execute(newBpm);
-        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Bpm));
+        songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Bpm));
     }
 }

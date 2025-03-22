@@ -41,7 +41,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     private SongMeta songMeta;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private NoteAreaControl noteAreaControl;
@@ -124,7 +124,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                 lastViewportWidthInMillis = noteAreaControl.ViewportWidth;
             }).AddTo(gameObject);
 
-        songMetaChangeEventStream.Subscribe(evt =>
+        songMetaChangedEventStream.Subscribe(evt =>
         {
             if (evt is LoadedMementoEvent)
             {

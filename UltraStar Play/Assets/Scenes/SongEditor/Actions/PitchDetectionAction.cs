@@ -11,7 +11,7 @@ using UnityEngine;
 public class PitchDetectionAction : AbstractAudioClipAction
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -38,7 +38,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
         if (notify)
         {
-            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
         }
     }
 
@@ -78,7 +78,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
         if (notify)
         {
-            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
         }
     }
 }

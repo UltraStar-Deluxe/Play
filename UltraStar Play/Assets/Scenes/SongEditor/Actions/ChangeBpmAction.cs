@@ -7,18 +7,18 @@ using UniInject;
 public class ChangeBpmAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     public void ReduceBpmAndNotify(SongMeta songMeta)
     {
         ReduceBpm(songMeta);
-        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Bpm));
+        songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Bpm));
     }
 
     public void MultiplyBpmAndNotify(SongMeta songMeta, int factor)
     {
         MultiplyBpm(songMeta, factor);
-        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Bpm));
+        songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Bpm));
     }
 
     public static void ReduceBpm(SongMeta songMeta)

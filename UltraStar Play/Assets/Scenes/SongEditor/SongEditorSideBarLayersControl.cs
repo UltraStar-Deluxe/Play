@@ -16,7 +16,7 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
     private Injector injector;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongEditorLayerManager layerManager;
