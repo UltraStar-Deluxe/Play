@@ -9,8 +9,8 @@ public class PitchDetectionNoteMover
         List<Note> notes,
         List<Note> pitchDetectionLayerNotes)
     {
-        int minBeat = SongMetaUtils.MinBeat(notes);
-        int maxBeat = SongMetaUtils.MaxBeat(notes);
+        int minBeat = SongMetaUtils.GetMinBeat(notes);
+        int maxBeat = SongMetaUtils.GetMaxBeat(notes);
         List<Note> pitchDetectionLayerNotesInRange = pitchDetectionLayerNotes
             .Where(it => minBeat <= it.EndBeat && it.StartBeat <= maxBeat)
             .ToList();

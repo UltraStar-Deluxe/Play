@@ -391,7 +391,7 @@ public static class SongMetaUtils
         return notes.Select(note => note.MidiNote).Max();
     }
 
-    public static int MinBeat(List<Note> notes)
+    public static int GetMinBeat(List<Note> notes)
     {
         if (notes.IsNullOrEmpty())
         {
@@ -400,7 +400,7 @@ public static class SongMetaUtils
         return notes.Select(note => note.StartBeat).Min();
     }
 
-    public static int MaxBeat(List<Note> notes)
+    public static int GetMaxBeat(List<Note> notes)
     {
         if (notes.IsNullOrEmpty())
         {
@@ -409,12 +409,12 @@ public static class SongMetaUtils
         return notes.Select(note => note.EndBeat).Max();
     }
 
-    public static int LengthInBeats(List<Note> notes)
+    public static int GetLengthInBeats(List<Note> notes)
     {
-        return MaxBeat(notes) - MinBeat(notes);
+        return GetMaxBeat(notes) - GetMinBeat(notes);
     }
 
-    public static double NoteDistanceInMillis(SongMeta songMeta, Note noteA, Note noteB)
+    public static double GetNoteDistanceInMillis(SongMeta songMeta, Note noteA, Note noteB)
     {
         int noteDistanceInBeats = Math.Min(
             Math.Abs(noteA.EndBeat - noteB.StartBeat),

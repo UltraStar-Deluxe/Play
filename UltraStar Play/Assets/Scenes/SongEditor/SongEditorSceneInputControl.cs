@@ -246,14 +246,14 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private void JumpToEndOfSong()
     {
-        int endInBeats = SongMetaUtils.MaxBeat(songEditorSceneControl.GetAllNotes());
+        int endInBeats = SongMetaUtils.GetMaxBeat(songEditorSceneControl.GetAllNotes());
         double endInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, endInBeats);
         JumpToPosition(endInMillis, songAudioPlayer.DurationInMillis - 1);
     }
 
     private void JumpToStartOfSong()
     {
-        int startInBeats = SongMetaUtils.MinBeat(songEditorSceneControl.GetAllNotes());
+        int startInBeats = SongMetaUtils.GetMinBeat(songEditorSceneControl.GetAllNotes());
         double startInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, startInBeats);
         JumpToPosition(startInMillis, 0);
     }

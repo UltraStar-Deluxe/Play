@@ -96,8 +96,8 @@ public static class SongMetaMedleyUtils
     {
         // Search for lyrics about the middle of the song, approx. 20 seconds afterwards.
         List<Note> allNotes = SongMetaUtils.GetAllNotes(songMeta);
-        int minBeat = SongMetaUtils.MinBeat(allNotes);
-        int maxBeat = SongMetaUtils.MaxBeat(allNotes);
+        int minBeat = SongMetaUtils.GetMinBeat(allNotes);
+        int maxBeat = SongMetaUtils.GetMaxBeat(allNotes);
         return minBeat + ((maxBeat - minBeat) / 2);
     }
 }

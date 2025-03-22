@@ -161,7 +161,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
     {
         if (!IsMedley)
         {
-            return SongMetaUtils.MaxBeat(SongMetaUtils.GetAllNotes(singSceneControl.SongMeta));
+            return SongMetaUtils.GetMaxBeat(SongMetaUtils.GetAllNotes(singSceneControl.SongMeta));
         }
 
         return SongMetaMedleyUtils.GetMedleyEndBeat(singSceneControl.SongMeta, settings.DefaultMedleyTargetDurationInSeconds);

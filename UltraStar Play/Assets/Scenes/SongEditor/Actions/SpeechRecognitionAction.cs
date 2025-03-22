@@ -54,8 +54,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         }
 
         int audioClipFrequency = audioClip.frequency;
-        int minBeat = SongMetaUtils.MinBeat(selectedNotes);
-        int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
+        int minBeat = SongMetaUtils.GetMinBeat(selectedNotes);
+        int lengthInBeats = SongMetaUtils.GetLengthInBeats(selectedNotes);
 
         SpeechRecognizerConfig speechRecognizerConfig = CreateSpeechRecognizerParameters();
 

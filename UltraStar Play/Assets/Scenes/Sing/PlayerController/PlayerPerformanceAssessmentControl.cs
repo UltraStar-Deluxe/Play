@@ -43,8 +43,8 @@ public class PlayerPerformanceAssessmentControl : MonoBehaviour, INeedInjection,
             .Sentences
             .SelectMany(s => s.Notes)
             .ToList();
-        firstBeatToScoreInclusive = SongMetaUtils.MinBeat(notes);
-        lastBeatToScoreExclusive = SongMetaUtils.MaxBeat(notes);
+        firstBeatToScoreInclusive = SongMetaUtils.GetMinBeat(notes);
+        lastBeatToScoreExclusive = SongMetaUtils.GetMaxBeat(notes);
     }
 
     private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)
