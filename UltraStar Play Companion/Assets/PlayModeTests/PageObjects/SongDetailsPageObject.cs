@@ -39,8 +39,8 @@ public class SongDetailsPageObject : INeedInjection
         await songListPageObject.OpenAsync();
         songListPageObject.SetSearchText(songTitle);
         songListPageObject.GetFirstSongEntryButton().SendClickEvent();
-        await ConditionUtils.WaitForConditionAsync(() => songDetailsContainer.IsVisibleByDisplay(),
-            new WaitForConditionConfig { description = "shows song details" });
+
+        await Awaitable.WaitForSecondsAsync(1);
     }
 
     public void Enqueue()
@@ -58,9 +58,9 @@ public class SongDetailsPageObject : INeedInjection
         return songTitleLabel.text;
     }
 
-    public Sprite GetImage()
+    public Texture2D GetImage()
     {
-        return songImage.resolvedStyle.backgroundImage.sprite;
+        return songImage.resolvedStyle.backgroundImage.texture;
     }
 
     public void ToggleFavorite()

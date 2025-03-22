@@ -36,10 +36,10 @@ public class SongDetailsTest : AbstractConnectedCompanionAppPlayModeTest
     private async Awaitable ToggleFavoriteShouldChangeIconAsync()
     {
         // Given
+        await songDetailsPageObject.OpenAsync(songTitle);
         bool isFavoriteIconShown = songDetailsPageObject.IsFavoriteIconShown();
 
         // When
-        await songDetailsPageObject.OpenAsync(songTitle);
         songDetailsPageObject.ToggleFavorite();
 
         // Then

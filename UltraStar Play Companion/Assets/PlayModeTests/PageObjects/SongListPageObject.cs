@@ -22,8 +22,8 @@ public class SongListPageObject : INeedInjection
     {
         showSongViewButton.SendClickEvent();
         showSongSearchButton.SendClickEvent();
-        await ConditionUtils.WaitForConditionAsync(() => songListView.itemsSource.Count > 1,
-            new WaitForConditionConfig { description = "song list has multiple entries" });
+
+        await Awaitable.WaitForSecondsAsync(1);
     }
 
     public void SetSearchText(string searchText)

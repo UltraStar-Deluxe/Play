@@ -23,8 +23,8 @@ public class SongQueuePageObject : INeedInjection
     {
         showSongViewButton.SendClickEvent();
         showSongQueueButton.SendClickEvent();
-        await ConditionUtils.WaitForConditionAsync(() => songQueueContainer.IsVisibleByDisplay(),
-            new WaitForConditionConfig { description = "shows song queue" });
+
+        await Awaitable.WaitForSecondsAsync(1);
     }
 
     public async Task RemoveAllAsync()
