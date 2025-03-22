@@ -1439,7 +1439,7 @@ GameObject:
   - component: {fileID: 3855433877842653761}
   - component: {fileID: 2361833581611152655}
   m_Layer: 0
-  m_Name: VolumeControl
+  m_Name: VolumeManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

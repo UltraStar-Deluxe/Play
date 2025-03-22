@@ -27,7 +27,7 @@ public class ToggleMuteViaShortcutTest : AbstractPlayModeTest
 
     private async Awaitable ExpectNotMutedAndNonZeroVolumeAsync()
     {
-        await WaitForConditionAsync(() => !VolumeControl.Instance.IsMuted,
+        await WaitForConditionAsync(() => !VolumeManager.Instance.IsMuted,
                 new WaitForConditionConfig { description = "volume is not muted" });
         await WaitForConditionAsync(() => AudioListener.volume > 0,
                 new WaitForConditionConfig { description = "volume is non-zero" });
@@ -41,7 +41,7 @@ public class ToggleMuteViaShortcutTest : AbstractPlayModeTest
 
     private async Awaitable ExpectMutedAndZeroVolumeAsync()
     {
-        await WaitForConditionAsync(() => VolumeControl.Instance.IsMuted,
+        await WaitForConditionAsync(() => VolumeManager.Instance.IsMuted,
             new WaitForConditionConfig { description = "volume is muted" });
         await WaitForConditionAsync(() => AudioListener.volume <= 0,
             new WaitForConditionConfig { description = "volume is zero" });

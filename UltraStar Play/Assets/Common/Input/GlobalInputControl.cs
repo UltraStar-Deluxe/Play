@@ -13,7 +13,7 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
     private Settings settings;
 
     [Inject]
-    private VolumeControl volumeControl;
+    private VolumeManager volumeManager;
 
     [Inject]
     private SceneRecipeManager sceneRecipeManager;
@@ -62,8 +62,8 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 
     private void ToggleMuteAudio()
     {
-        volumeControl.ToggleMuteAudio();
-        if (volumeControl.IsMuted)
+        volumeManager.ToggleMuteAudio();
+        if (volumeManager.IsMuted)
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_mute));
         }

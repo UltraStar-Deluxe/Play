@@ -62,7 +62,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private SingSceneWebcamControl webcamControl;
 
     [Inject]
-    private VolumeControl volumeControl;
+    private VolumeManager volumeManager;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;

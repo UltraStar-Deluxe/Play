@@ -5,7 +5,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class VolumeControl : AbstractSingletonBehaviour, INeedInjection
+public class VolumeManager : AbstractSingletonBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -14,7 +14,7 @@ public class VolumeControl : AbstractSingletonBehaviour, INeedInjection
     }
     private static int volumeBeforeMute = -1;
 
-    public static VolumeControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<VolumeControl>();
+    public static VolumeManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<VolumeManager>();
 
     [Inject]
     private Settings settings;
