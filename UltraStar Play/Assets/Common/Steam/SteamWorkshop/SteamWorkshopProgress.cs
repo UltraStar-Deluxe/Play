@@ -1,10 +1,10 @@
 ﻿using System;
 
-public class ActionProgress : IProgress<float>
+public class SteamWorkshopProgress : IProgress<float>
 {
     private readonly Action<float> onProgress;
 
-    public ActionProgress(Action<float> onProgress)
+    public SteamWorkshopProgress(Action<float> onProgress)
     {
         this.onProgress = onProgress;
     }
