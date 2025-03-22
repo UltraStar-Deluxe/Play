@@ -128,7 +128,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
         if (lastAudioClip != audioClip)
         {
             lastAudioClip = audioClip;
-            audioWaveFormSamples = AudioUtils.GetAudioSamples(audioClip, 0);
+            audioWaveFormSamples = AudioSampleUtils.GetAudioSamples(audioClip, 0);
         }
 
         double minSampleSingleChannel = ((double)noteAreaControl.MinMillisecondsInViewport / 1000) * audioClip.frequency;

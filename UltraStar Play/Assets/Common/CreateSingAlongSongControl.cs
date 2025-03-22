@@ -128,7 +128,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             AudioClip vocalsAudioClip = await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
             int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * SongMetaBpmUtils.BeatsPerSecond(songMeta));
 
-            float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
+            float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, vocalsAudioClip, 0, lengthInBeats);
 
             pipelineData.CreatedNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
                 new CreateNotesFromSpeechRecognitionConfig

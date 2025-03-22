@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public static class AudioUtils
+public static class AudioSampleUtils
 {
     public static float[] ToMonoAudioSamples(float[] originalSamples, int channelCount)
     {
@@ -95,28 +95,6 @@ public static class AudioUtils
         }
 
         return singleChannelSamples;
-    }
-
-    public static float[] GetSamplesOfBeatRangeFromAudioClip(
-        SongMeta songMeta,
-        AudioClip audioClip,
-        int startBeat,
-        int lengthInBeats,
-        bool convertToMono)
-    {
-        using DisposableStopwatch ds = new("GetSamplesOfBeatRangeFromAudioClip took <ms>");
-
-        if (lengthInBeats <= 0)
-        {
-            return null;
-        }
-
-        double startBeatInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, startBeat);
-        double singleBeatLengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta);
-        double lengthInMillis = singleBeatLengthInMillis * lengthInBeats;
-
-        float[] monoAudioSamples = GetAudioSamples(audioClip, startBeatInMillis, lengthInMillis, convertToMono);
-        return monoAudioSamples;
     }
 
     public static float[] GetSamples(float[] samples, int startIndex, int endIndex)

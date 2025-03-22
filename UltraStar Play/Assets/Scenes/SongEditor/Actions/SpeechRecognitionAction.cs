@@ -64,8 +64,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(speechRecognizerConfig)
                 .GetResultAsync();
 
-            float[] monoAudioSamples =
-                AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, minBeat, lengthInBeats, true);
+            float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, audioClip, minBeat, lengthInBeats);
 
             await Awaitable.BackgroundThreadAsync();
             SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
@@ -224,7 +223,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
             });
 
-        float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, startBeat, lengthInBeats, true);
+        float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, audioClip, startBeat, lengthInBeats);
 
         Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
             ? SettingsUtils.CreateHyphenator(settings)
