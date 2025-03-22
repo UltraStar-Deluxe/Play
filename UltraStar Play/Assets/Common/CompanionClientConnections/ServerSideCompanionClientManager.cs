@@ -19,8 +19,8 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     public int CompanionClientCount => liteNetLibServer.ConnectedPeersCount;
 
-    private readonly Subject<ClientConnectionChangedEvent> clientConnectionChangedEventStream = new();
-    public IObservable<ClientConnectionChangedEvent> ClientConnectionChangedEventStream => clientConnectionChangedEventStream.ObserveOnMainThread();
+    private readonly Subject<CompanionClientConnectionChangedEvent> clientConnectionChangedEventStream = new();
+    public IObservable<CompanionClientConnectionChangedEvent> ClientConnectionChangedEventStream => clientConnectionChangedEventStream.ObserveOnMainThread();
 
     private readonly Subject<MicProfile> companionClientMicProfileChangedEventStream = new();
     public IObservable<MicProfile> CompanionClientMicProfileChangedEventStream => companionClientMicProfileChangedEventStream;
@@ -78,9 +78,9 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
         liteNetLibServer.PollEvents();
     }
 
-    public void OnClientConnectionChanged(ClientConnectionChangedEvent clientConnectionChangedEvent)
+    public void OnClientConnectionChanged(CompanionClientConnectionChangedEvent companionClientConnectionChangedEvent)
     {
-        if (!clientConnectionChangedEvent.IsConnected)
+        if (!companionClientConnectionChangedEvent.IsConnected)
         {
             return;
         }
@@ -89,10 +89,10 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
             .ForEach(micProfile =>
             {
                 if (micProfile.IsInputFromConnectedClient
-                    && micProfile.ConnectedClientId == clientConnectionChangedEvent.CompanionClientHandler.ClientId
-                    && micProfile.Name != clientConnectionChangedEvent.CompanionClientHandler.ClientName)
+                    && micProfile.ConnectedClientId == companionClientConnectionChangedEvent.CompanionClientHandler.ClientId
+                    && micProfile.Name != companionClientConnectionChangedEvent.CompanionClientHandler.ClientName)
                 {
-                    micProfile.Name = clientConnectionChangedEvent.CompanionClientHandler.ClientName;
+                    micProfile.Name = companionClientConnectionChangedEvent.CompanionClientHandler.ClientName;
                     companionClientMicProfileChangedEventStream.OnNext(micProfile);
                 }
             });
@@ -206,7 +206,7 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
         }
 
         peerToCompanionClientHandler.Remove(peer);
-        clientConnectionChangedEventStream.OnNext(new ClientConnectionChangedEvent(companionClientHandler, false));
+        clientConnectionChangedEventStream.OnNext(new CompanionClientConnectionChangedEvent(companionClientHandler, false));
     }
 
     public void OnNetworkError(IPEndPoint endPoint, SocketError socketError)
@@ -298,7 +298,7 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
             // Register client
             peerToConnectRequestDto[peer] = connectRequestDto;
             CompanionClientHandler newCompanionClientHandler = RegisterCompanionClient(peer, connectRequestDto.ClientName, connectRequestDto.ClientId);
-            clientConnectionChangedEventStream.OnNext(new ClientConnectionChangedEvent(newCompanionClientHandler, true));
+            clientConnectionChangedEventStream.OnNext(new CompanionClientConnectionChangedEvent(newCompanionClientHandler, true));
         }
         catch (Exception e)
         {
