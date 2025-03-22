@@ -165,7 +165,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
     {
         try
         {
-            await mainGameHttpClient.DeleteRequestAsync(HttpApiEndpointPaths.SongQueueEntryIndex
+            await mainGameHttpClient.DeleteRequestAsync(RestApiEndpointPaths.SongQueueEntryIndex
                 .ReplaceOrThrow("{index}", songQueueUiControl.GetSongQueueEntryIndex(entry).ToString()));
         }
         finally
@@ -179,7 +179,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
         entry.IsMedleyWithPreviousEntry = !entry.IsMedleyWithPreviousEntry;
         try
         {
-            await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.SongQueueEntryIndex
+            await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.SongQueueEntryIndex
                     .ReplaceOrThrow("{index}", songQueueUiControl.GetSongQueueEntryIndex(entry).ToString()),
                 entry.ToJson());
         }
@@ -193,7 +193,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
     {
         Debug.Log($"OnSongQueueItemIndexChanged: {evt.OldIndex}, {evt.NewIndex}");
         string json = new ListDto<SongQueueEntryDto>(evt.UpdatedItems.ToList()).ToJson();
-        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.SongQueue, json);
+        await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.SongQueue, json);
     }
 
     private async void UpdateSongQueue()
@@ -207,7 +207,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
 
         try
         {
-            string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.SongQueue);
+            string response = await mainGameHttpClient.GetRequestAsync(RestApiEndpointPaths.SongQueue);
             ListDto<SongQueueEntryDto> listDto = JsonConverter.FromJson<ListDto<SongQueueEntryDto>>(response);
             if (listDto == null)
             {
@@ -215,7 +215,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
                 return;
             }
 
-            songQueueUiControl.HasWriteSongQueuePermission = mainGameHttpClient.Permissions.Value.Contains(HttpApiPermission.WriteSongQueue);
+            songQueueUiControl.HasWriteSongQueuePermission = mainGameHttpClient.Permissions.Value.Contains(RestApiPermission.WriteSongQueue);
             songQueueUiControl.SetSongQueueEntryDtos(listDto.Items);
         }
         catch (Exception ex)

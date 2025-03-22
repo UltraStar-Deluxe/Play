@@ -118,11 +118,11 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         enqueueSettingsAccordionItem.ContentVisible = false;
     }
 
-    private void OnPermissionsChanged(List<HttpApiPermission> permissions)
+    private void OnPermissionsChanged(List<RestApiPermission> permissions)
     {
-        enqueueButton.SetVisibleByDisplay(permissions.Contains(HttpApiPermission.WriteSongQueue));
+        enqueueButton.SetVisibleByDisplay(permissions.Contains(RestApiPermission.WriteSongQueue));
         enqueueMedleyButton.SetVisibleByDisplay(enqueueButton.IsVisibleByDisplay());
-        enqueueSettingsAccordionItem.SetVisibleByDisplay(permissions.Contains(HttpApiPermission.WriteSongQueue));
+        enqueueSettingsAccordionItem.SetVisibleByDisplay(permissions.Contains(RestApiPermission.WriteSongQueue));
     }
 
     private async void EnqueueSong()
@@ -140,7 +140,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         SongQueueEntryDto dto = CreateSongQueueEntryDto(selectedPlayerControls, false);
         string json = JsonConverter.ToJson(dto);
-        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.SongQueueEntry, json);
+        await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.SongQueueEntry, json);
     }
 
     private async void EnqueueSongAsMedley()
@@ -158,7 +158,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         SongQueueEntryDto dto = CreateSongQueueEntryDto(selectedPlayerControls, true);
         string json = JsonConverter.ToJson(dto);
-        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.SongQueueEntry, json);
+        await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.SongQueueEntry, json);
     }
 
     public List<PlayerSelectPlayerEntryControl> GetSelectedPlayerControls()
@@ -218,12 +218,12 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         UpdateFavoriteButton();
         if (isFavorite)
         {
-            await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.PlaylistFavoritesEntry
+            await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.PlaylistFavoritesEntry
                 .ReplaceOrThrow("{songId}", songDto.Hash));
         }
         else
         {
-            await mainGameHttpClient.DeleteRequestAsync(HttpApiEndpointPaths.PlaylistFavoritesEntry
+            await mainGameHttpClient.DeleteRequestAsync(RestApiEndpointPaths.PlaylistFavoritesEntry
                     .ReplaceOrThrow("{songId}", songDto.Hash));
         }
     }
@@ -275,7 +275,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     {
         try
         {
-            string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.AvailableMicrophones);
+            string response = await mainGameHttpClient.GetRequestAsync(RestApiEndpointPaths.AvailableMicrophones);
             ListDto<MicProfile> listDto = JsonConverter.FromJson<ListDto<MicProfile>>(response);
             if (listDto == null
                 || listDto.Items == null)
@@ -303,7 +303,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     {
         try
         {
-            string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.AvailablePlayers);
+            string response = await mainGameHttpClient.GetRequestAsync(RestApiEndpointPaths.AvailablePlayers);
             ListDto<string> listDto = JsonConverter.FromJson<ListDto<string>>(response);
             if (listDto == null
                 || listDto.Items == null)
@@ -472,7 +472,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         try
         {
-            string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.SongImage
+            string response = await mainGameHttpClient.GetRequestAsync(RestApiEndpointPaths.SongImage
                 .ReplaceOrThrow("{songId}", songDto.Hash));
 
             ImageDto imageDto = JsonConverter.FromJson<ImageDto>(response);
@@ -506,7 +506,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     {
         SetLyrics("Loading lyrics...");
 
-        string response = await mainGameHttpClient.GetRequestAsync(HttpApiEndpointPaths.Song
+        string response = await mainGameHttpClient.GetRequestAsync(RestApiEndpointPaths.Song
             .ReplaceOrThrow("{songId}", songDto.Hash));
 
         try

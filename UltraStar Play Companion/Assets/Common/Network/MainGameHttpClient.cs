@@ -27,7 +27,7 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
     private readonly Subject<bool> connectionEventStream = new();
     public IObservable<bool> ConnectionEventStream => connectionEventStream;
 
-    public ReactiveProperty<List<HttpApiPermission>> Permissions { get; private set; } = new(new List<HttpApiPermission>());
+    public ReactiveProperty<List<RestApiPermission>> Permissions { get; private set; } = new(new List<RestApiPermission>());
 
     protected override object GetInstance()
     {

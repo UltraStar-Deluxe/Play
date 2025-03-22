@@ -50,9 +50,9 @@ public class MainSceneTabGroupUiControl : INeedInjection, IInjectionFinishedList
             .AddTo(gameObject);
     }
 
-    private void OnPermissionsChanged(List<HttpApiPermission> permissions)
+    private void OnPermissionsChanged(List<RestApiPermission> permissions)
     {
-        showInputSimulationButton.SetVisibleByDisplay(permissions.Contains(HttpApiPermission.WriteInputSimulation));
+        showInputSimulationButton.SetVisibleByDisplay(permissions.Contains(RestApiPermission.WriteInputSimulation));
         inputSimulationContainer.HideByDisplay();
     }
 

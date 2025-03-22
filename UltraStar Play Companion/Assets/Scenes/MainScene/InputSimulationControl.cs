@@ -429,7 +429,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
     private async Awaitable SendSimulateInputRequestAsync(string inputControl)
     {
-        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.Input
+        await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.Input
             .ReplaceOrThrow("{inputControl}", inputControl));
     }
 
@@ -440,7 +440,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.InputScrollWheel
+        await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.InputScrollWheel
             .ReplaceOrThrow("{deltaX}", scrollDelta.x.ToString(CultureInfo.InvariantCulture))
             .ReplaceOrThrow("{deltaY}", scrollDelta.y.ToString(CultureInfo.InvariantCulture)));
     }
@@ -458,7 +458,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        await mainGameHttpClient.PostRequestAsync(HttpApiEndpointPaths.InputMouseDelta
+        await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.InputMouseDelta
             .ReplaceOrThrow("{deltaX}", mouseDelta.x.ToStringInvariantCulture())
             .ReplaceOrThrow("{deltaY}", mouseDelta.y.ToStringInvariantCulture()));
     }
