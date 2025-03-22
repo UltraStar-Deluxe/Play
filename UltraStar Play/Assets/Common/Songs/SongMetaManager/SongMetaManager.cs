@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UniRx;
 using Debug = UnityEngine.Debug;
@@ -81,7 +82,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         SongIdManager.ClearSongIds(songMeta);
 
-        SongMetaUtils.CreateDirectory(songMeta);
+        CreateDirectory(songMeta);
         string songFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
         try
         {
@@ -177,5 +178,17 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
 
         return GetSongMetas().Contains(songMeta);
+    }
+
+    private static void CreateDirectory(SongMeta songMeta)
+    {
+        DirectoryInfo directoryInfo = SongMetaUtils.GetDirectoryInfo(songMeta);
+        if (directoryInfo == null
+            || directoryInfo.Exists)
+        {
+            return;
+        }
+
+        directoryInfo.Create();
     }
 }

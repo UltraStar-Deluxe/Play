@@ -187,7 +187,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
             {
                 // Create new voice
                 Voice voiceMementoClone = voiceMemento.CloneDeep();
-                SongMetaUtils.AddVoice(songMeta, voiceMementoClone);
+                SongEditorSongMetaUtils.AddVoice(songMeta, voiceMementoClone);
             }
             else
             {
@@ -209,7 +209,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
                 .FirstOrDefault(voice => voice.Id == voiceInSongMeta.Id);
             if (matchingVoiceMemento == null)
             {
-                SongMetaUtils.RemoveVoice(songMeta, voiceInSongMeta);
+                SongEditorSongMetaUtils.RemoveVoice(songMeta, voiceInSongMeta);
             }
         }
     }

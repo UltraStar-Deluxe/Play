@@ -895,7 +895,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public void StartSingSceneWithGivenSongAndSettings(SongMeta songMeta, bool startPaused, bool fireBeforeSongStartedEvent)
     {
-        if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
+        if (HasFailedToLoadVoices(songMeta))
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
             return;
@@ -929,7 +929,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
+        if (HasFailedToLoadVoices(songMeta))
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason, "reason", "Failed to load txt file"));
             return;
@@ -981,7 +981,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         // Check that there is associated sing-along data. If not, ask to open song editor.
         if (!SongMetaUtils.HasSingAlongData(songMeta))
         {
-            if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
+            if (HasFailedToLoadVoices(songMeta))
             {
                 ShowFailedToLoadVoicesDialog(songMeta);
                 return;
@@ -1661,5 +1661,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         });
 
         dialogControl.AddInformationMessage($"AI model parameters can be changed in the song editor");
+    }
+
+    private static bool HasFailedToLoadVoices(SongMeta songMeta)
+    {
+        return songMeta is LazyLoadedVoicesSongMeta lazyLoadedVoicesSongMeta
+               && lazyLoadedVoicesSongMeta.LoadVoicesPhase is LazyLoadedVoicesSongMeta.ELoadVoicesPhase.Failed;
     }
 }

@@ -39,7 +39,7 @@ public class MoveNoteToOwnSentenceAction : INeedInjection
         notes.ForEach(note =>
         {
             // Prevent notes from merging into a single word
-            SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(note);
+            SongEditorSongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(note);
 
             note.SetSentence(newSentence);
         });

@@ -126,7 +126,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
             return 0;
         }
         SongMeta songMeta = singSceneControl.SongMeta;
-        int medleyStartBeat = SongMetaUtils.GetMedleyStartBeat(songMeta);
+        int medleyStartBeat = SongMetaMedleyUtils.GetMedleyStartBeat(songMeta);
         return SongMetaBpmUtils.BeatsToMillis(songMeta, medleyStartBeat);
     }
 
@@ -137,7 +137,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
             return songAudioPlayer.DurationInMillis;
         }
         SongMeta songMeta = singSceneControl.SongMeta;
-        int medleyEndBeat = SongMetaUtils.GetMedleyEndBeat(songMeta, settings.DefaultMedleyTargetDurationInSeconds);
+        int medleyEndBeat = SongMetaMedleyUtils.GetMedleyEndBeat(songMeta, settings.DefaultMedleyTargetDurationInSeconds);
         return SongMetaBpmUtils.BeatsToMillis(songMeta, medleyEndBeat);
     }
 
@@ -154,7 +154,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
             return 0;
         }
 
-        return SongMetaUtils.GetMedleyStartBeat(singSceneControl.SongMeta);
+        return SongMetaMedleyUtils.GetMedleyStartBeat(singSceneControl.SongMeta);
     }
 
     private int CalculateMedleyEndBeat()
@@ -164,7 +164,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
             return SongMetaUtils.MaxBeat(SongMetaUtils.GetAllNotes(singSceneControl.SongMeta));
         }
 
-        return SongMetaUtils.GetMedleyEndBeat(singSceneControl.SongMeta, settings.DefaultMedleyTargetDurationInSeconds);
+        return SongMetaMedleyUtils.GetMedleyEndBeat(singSceneControl.SongMeta, settings.DefaultMedleyTargetDurationInSeconds);
     }
 
     public bool IsNoteInMedleyRange(Note note)

@@ -155,7 +155,7 @@ public static class SongMetaImageUtils
             return;
         }
 
-        Color32 color = SongMetaUtils.CreateColorForSongMeta(songMeta);
+        Color32 color = ColorGenerationUtils.FromString(songMeta.GetArtistDashTitle());
         foreach (VisualElement visualElement in visualElements)
         {
             visualElement.style.unityBackgroundImageTintColor = new StyleColor(color);

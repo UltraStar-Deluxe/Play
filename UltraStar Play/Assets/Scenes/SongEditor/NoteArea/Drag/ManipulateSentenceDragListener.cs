@@ -70,7 +70,7 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
 
         if (settings.SongEditorSettings.AdjustFollowingNotes)
         {
-            followingNotes = SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
+            followingNotes = SongEditorSongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
         }
         else
         {

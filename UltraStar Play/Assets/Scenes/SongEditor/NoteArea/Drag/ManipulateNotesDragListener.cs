@@ -99,7 +99,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
 
         if (settings.SongEditorSettings.AdjustFollowingNotes)
         {
-            followingNotes = SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
+            followingNotes = SongEditorSongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
         }
         else
         {

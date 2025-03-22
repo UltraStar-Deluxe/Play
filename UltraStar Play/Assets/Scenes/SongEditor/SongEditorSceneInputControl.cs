@@ -678,7 +678,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             // Special case: should still move following notes one octave up/down via Ctrl+Shift+Alt
             || (settings.SongEditorSettings.AdjustFollowingNotes && InputUtils.GetCurrentKeyboardModifier() is EKeyboardModifier.CtrlShiftAlt))
         {
-            return SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
+            return SongEditorSongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
         }
         else
         {

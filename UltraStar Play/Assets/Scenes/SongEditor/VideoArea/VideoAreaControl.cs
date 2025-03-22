@@ -118,7 +118,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
             () => songMeta.Cover,
             newValue =>
             {
-                songMeta.Cover = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                songMeta.Cover = GetRelativePath(songMeta, newValue);
                 UpdateCoverAndBackgroundImage();
             });
     }
@@ -132,7 +132,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
             () => songMeta.Background,
             newValue =>
             {
-                songMeta.Background = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                songMeta.Background = GetRelativePath(songMeta, newValue);
                 UpdateCoverAndBackgroundImage();
             });
     }
@@ -146,7 +146,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
             () => songMeta.Video,
             newValue =>
             {
-                songMeta.Video = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                songMeta.Video = GetRelativePath(songMeta, newValue);
                 UpdateVideo();
                 ShowVideoImage();
             });
@@ -262,5 +262,17 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     public void Dispose()
     {
         dragControl?.Dispose();
+    }
+
+    private static string GetRelativePath(SongMeta songMeta, string path)
+    {
+        string directoryPath = SongMetaUtils.GetDirectoryPath(songMeta);
+        if (directoryPath.IsNullOrEmpty())
+        {
+            return path;
+        }
+
+        string relativePath = PathUtils.MakeRelativePath(directoryPath, path);
+        return relativePath;
     }
 }

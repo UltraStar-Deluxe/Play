@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 
 public static class SongIdManager
@@ -36,7 +38,7 @@ public static class SongIdManager
             return scoreRelevantHash;
         }
 
-        scoreRelevantHash = SongMetaUtils.ComputeScoreRelevantSongHash(songMeta);
+        scoreRelevantHash = SongIdComputer.ComputeScoreRelevantSongHash(songMeta);
         songMetaToScoreRelevantHash.Set(songMeta, scoreRelevantHash);
         return scoreRelevantHash;
     }
@@ -59,7 +61,7 @@ public static class SongIdManager
 
         // Prefix with artist and title for an efficient check whether a song may equal the hash.
         string artistAndTitleHash = GetArtistAndTitleHash(songMeta);
-        string computedHash = SongMetaUtils.ComputeUniqueSongHash(songMeta);
+        string computedHash = SongIdComputer.ComputeUniqueSongHash(songMeta);
         string hashPrefixedWithArtistAndTitle = $"{artistAndTitleHash}:{computedHash}";
 
         songMetaToGloballyUniqueHash.Set(songMeta, hashPrefixedWithArtistAndTitle);
@@ -88,7 +90,7 @@ public static class SongIdManager
             // Using the file path is faster because is does not require to read the file content.
             // However, the file path can only be used to identify the song locally on this machine.
             ? HashingUtils.Md5Hash(songMeta.FileInfo.FullName)
-            : SongMetaUtils.ComputeUniqueSongHash(songMeta);
+            : SongIdComputer.ComputeUniqueSongHash(songMeta);
         string hashPrefixedWithArtistAndTitle = $"{artistAndTitleHash}:{computedHash}";
 
         songMetaToLocallyUniqueHash.Set(songMeta, hashPrefixedWithArtistAndTitle);

@@ -6,6 +6,6 @@
         {
             return "";
         }
-        return SongMetaUtils.GetArtistDashTitle(songMeta);
+        return SongMetaUtils.GetArtistAndTitle(songMeta, " - ");
     }
 }

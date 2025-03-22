@@ -32,7 +32,7 @@ public class MoveNoteToAdjacentSentenceAction : INeedInjection
         }
 
         // Check that there exists a following sentence
-        Sentence nextSentence = SongMetaUtils.GetNextSentence(currentSentence);
+        Sentence nextSentence = GetNextSentence(currentSentence);
         return (nextSentence != null);
     }
 
@@ -58,7 +58,7 @@ public class MoveNoteToAdjacentSentenceAction : INeedInjection
         }
 
         // Check that there exists a previous sentence
-        Sentence previousSentence = SongMetaUtils.GetPreviousSentence(currentSentence);
+        Sentence previousSentence = GetPreviousSentence(currentSentence);
         return (previousSentence != null);
     }
 
@@ -75,9 +75,9 @@ public class MoveNoteToAdjacentSentenceAction : INeedInjection
             return;
         }
 
-        Sentence previousSentence = SongMetaUtils.GetPreviousSentence(oldSentence);
-        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(oldSentence);
-        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(previousSentence);
+        Sentence previousSentence = GetPreviousSentence(oldSentence);
+        SongEditorSongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(oldSentence);
+        SongEditorSongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(previousSentence);
         notes.ForEach(note => note.SetSentence(previousSentence));
 
         // Remove old sentence if not more notes left
@@ -110,9 +110,9 @@ public class MoveNoteToAdjacentSentenceAction : INeedInjection
             return;
         }
 
-        Sentence nextSentence = SongMetaUtils.GetNextSentence(oldSentence);
-        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(oldSentence);
-        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(nextSentence);
+        Sentence nextSentence = GetNextSentence(oldSentence);
+        SongEditorSongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(oldSentence);
+        SongEditorSongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(nextSentence);
         notes.ForEach(note => note.SetSentence(nextSentence));
 
         // Remove old sentence if not more notes left
@@ -130,5 +130,47 @@ public class MoveNoteToAdjacentSentenceAction : INeedInjection
     {
         MoveToNextSentence(notes);
         songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
+    }
+
+    private static Sentence GetNextSentence(Sentence sentence)
+    {
+        if (sentence.Voice == null)
+        {
+            return null;
+        }
+
+        List<Sentence> sortedSentencesOfVoice = new(sentence.Voice.Sentences);
+        sortedSentencesOfVoice.Sort(Sentence.comparerByStartBeat);
+        Sentence lastSentence = null;
+        foreach (Sentence s in sortedSentencesOfVoice)
+        {
+            if (lastSentence == sentence)
+            {
+                return s;
+            }
+            lastSentence = s;
+        }
+        return null;
+    }
+
+    private static Sentence GetPreviousSentence(Sentence sentence)
+    {
+        if (sentence.Voice == null)
+        {
+            return null;
+        }
+
+        List<Sentence> sortedSentencesOfVoice = new(sentence.Voice.Sentences);
+        sortedSentencesOfVoice.Sort(Sentence.comparerByStartBeat);
+        Sentence lastSentence = null;
+        foreach (Sentence s in sortedSentencesOfVoice)
+        {
+            if (s == sentence)
+            {
+                return lastSentence;
+            }
+            lastSentence = s;
+        }
+        return null;
     }
 }

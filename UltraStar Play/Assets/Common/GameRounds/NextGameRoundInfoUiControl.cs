@@ -42,7 +42,7 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
             .Select(it => DtoConverter.FromDto(it.SongDto, songMetaManager))
             .ToList();
         nextGameRoundSongInfoLabel.SetTranslatedText(Translation.Get(R.Messages.songQueue_nextEntry,
-            "value", SongMetaUtils.GetMedleyName(songMetas)));
+            "value", GetMedleyName(songMetas)));
 
         nextGameRoundPlayerEntryList.RemoveTemplateContainers();
         SongQueueEntryDto songQueueEntryDto = songQueueEntryDtos.FirstOrDefault();
@@ -73,5 +73,22 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
     public void HideNextGameRoundUi()
     {
         nextGameRoundInfoUiRoot.HideByDisplay();
+    }
+
+    private static string GetMedleyName(List<SongMeta> songMetas)
+    {
+        if (songMetas.IsNullOrEmpty())
+        {
+            return "";
+        }
+
+        if (songMetas.Count == 1)
+        {
+            songMetas[0].GetArtistDashTitle();
+        }
+
+        return songMetas
+            .Select(songMeta => songMeta.Title)
+            .JoinWith(", ");
     }
 }

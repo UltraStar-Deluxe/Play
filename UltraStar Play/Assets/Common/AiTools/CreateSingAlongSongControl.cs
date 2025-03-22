@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -203,9 +204,15 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
     private static void AssignNotesToFirstPlayer(SongMeta songMeta, List<Note> createdNotes)
     {
-        SongMetaUtils.RemoveAllNotes(songMeta);
+        RemoveAllNotes(songMeta);
         List<List<Note>> noteBatches = MoveNotesToOtherVoiceUtils.SplitIntoSentences(songMeta, createdNotes);
         noteBatches.ForEach(noteBatch => MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, EVoiceId.P1));
+    }
+
+    private static void RemoveAllNotes(SongMeta songMeta)
+    {
+        songMeta.Voices.ForEach(voice =>
+            voice.Sentences.ToList().ForEach(sentence => voice.RemoveSentence(sentence)));
     }
 
     private class PipelineData
