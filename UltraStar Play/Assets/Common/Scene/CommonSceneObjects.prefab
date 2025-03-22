@@ -234,8 +234,6 @@ MonoBehaviour:
     type: 3}
   micWithNameUi: {fileID: 9197481963319205126, guid: 633a1b5f196ee2f45beba597ffda0b45,
     type: 3}
-  fallbackPlayerProfileImage: {fileID: 21300000, guid: ca1ea05bb403d964db23aec1e46b7f70,
-    type: 3}
   nextGameRoundInfoUi: {fileID: 9197481963319205126, guid: 4b0fc95be5bd7c84abec348087a5d4af,
     type: 3}
   nextGameRoundInfoPlayerEntryUi: {fileID: 9197481963319205126, guid: 1c1764560ee144247ab75c166154b2a3,
@@ -971,6 +969,7 @@ Transform:
   - {fileID: 8568522364055573128}
   - {fileID: 1726528158099047256}
   - {fileID: 2247980495390972918}
+  - {fileID: 8045090455937701786}
   - {fileID: 136179686410441847}
   - {fileID: 6981507401744584904}
   - {fileID: 6858925117782900906}
@@ -7585,6 +7584,52 @@ MonoBehaviour:
     prefab: {fileID: 1192747361093344, guid: aff6a710ec8f92c40a014dd9e63452bf, type: 3}
   - effectEnum: 18
     prefab: {fileID: 1181904839995218, guid: da3641b8950cf8e47acbcfa22869b53e, type: 3}
+--- !u!1 &4186165674895623315
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8045090455937701786}
+  - component: {fileID: 5505345422471978455}
+  m_Layer: 0
+  m_Name: PlayerProfileImageManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8045090455937701786
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4186165674895623315}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5483831765678408185}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5505345422471978455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4186165674895623315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065937c5580b4ef38b9b35d6a1a418f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fallbackPlayerProfileImage: {fileID: 21300000, guid: ca1ea05bb403d964db23aec1e46b7f70,
+    type: 3}
 --- !u!1 &4282200778323342461
 GameObject:
   m_ObjectHideFlags: 0

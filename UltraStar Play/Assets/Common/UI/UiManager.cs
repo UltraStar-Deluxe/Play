@@ -13,15 +13,7 @@ using IBinding = UniInject.IBinding;
 
 public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        relativePlayerProfileImagePathToAbsolutePath = new();
-    }
-
     public static UiManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<UiManager>();
-
-    private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
 
     private readonly Subject<ChildrenChangedEvent> childrenChangedEventStream = new();
     public IObservable<ChildrenChangedEvent> ChildrenChangedEventStream => childrenChangedEventStream;
@@ -36,9 +28,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
 
     [InjectedInInspector]
     public VisualTreeAsset micWithNameUi;
-
-    [InjectedInInspector]
-    public Sprite fallbackPlayerProfileImage;
 
     [InjectedInInspector]
     public VisualTreeAsset nextGameRoundInfoUi;
@@ -86,7 +75,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
     {
         lastScreenWidth = Screen.width;
         lastScreenHeight = Screen.height;
-        UpdatePlayerProfileImagePaths();
     }
 
     public void OnInjectionFinished()
@@ -131,17 +119,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
             lastScreenWidth = Screen.width;
             lastScreenHeight = Screen.height;
         }
-    }
-
-    public void ReloadPlayerProfileImages()
-    {
-        UpdatePlayerProfileImagePaths();
-    }
-
-    public void UpdatePlayerProfileImagePaths()
-    {
-        List<string> folders = PlayerProfileUtils.GetPlayerProfileImageFolders();
-        relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages(folders);
     }
 
     public MessageDialogControl CreateDialogControl(Translation dialogTitle)
@@ -254,63 +231,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
         titleToContentMap.ForEach(entry => AddChapter(entry.Key, entry.Value));
 
         return dialogControl;
-    }
-
-    public string GetFinalPlayerProfileImagePath(PlayerProfile playerProfile)
-    {
-        if (playerProfile.ImagePath == PlayerProfile.WebcamImagePath)
-        {
-            int playerProfileIndex = settings.PlayerProfiles.IndexOf(playerProfile);
-            string webCamImagePath = PlayerProfileUtils.GetAbsoluteWebCamImagePath(playerProfileIndex);
-            return webCamImagePath;
-        }
-        else
-        {
-            return playerProfile.ImagePath;
-        }
-    }
-
-    public async Awaitable<Sprite> LoadPlayerProfileImageAsync(string imagePath)
-    {
-        if (imagePath.IsNullOrEmpty())
-        {
-            return fallbackPlayerProfileImage;
-        }
-
-        string relativePathNormalized = PathUtils.NormalizePath(imagePath);
-        string matchingFullPath = GetAbsolutePlayerProfileImagePaths().FirstOrDefault(absolutePath =>
-        {
-            string absolutePathNormalized = PathUtils.NormalizePath(absolutePath);
-            return absolutePathNormalized.EndsWith(relativePathNormalized);
-        });
-
-        if (matchingFullPath.IsNullOrEmpty())
-        {
-            Debug.LogWarning($"Cannot load player profile image with path '{imagePath}' (normalized: '{relativePathNormalized}'), no corresponding image file found.");
-            return fallbackPlayerProfileImage;
-        }
-
-        return await ImageManager.LoadSpriteFromUriAsync(matchingFullPath);
-    }
-
-    public List<string> GetAbsolutePlayerProfileImagePaths()
-    {
-        return relativePlayerProfileImagePathToAbsolutePath.Values.ToList();
-    }
-
-    public List<string> GetRelativePlayerProfileImagePaths(bool includeWebCamImages)
-    {
-        if (includeWebCamImages)
-        {
-            return relativePlayerProfileImagePathToAbsolutePath.Keys.ToList();
-        }
-        else
-        {
-            return relativePlayerProfileImagePathToAbsolutePath.Keys
-                .Where(relativePath => !relativePath.Contains(PlayerProfileUtils.PlayerProfileWebCamImagesFolderName))
-                .ToList();
-        }
-
     }
 
     public List<IBinding> GetBindings()

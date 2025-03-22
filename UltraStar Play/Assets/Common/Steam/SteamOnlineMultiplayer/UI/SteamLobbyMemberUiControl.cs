@@ -35,7 +35,7 @@ namespace SteamOnlineMultiplayer
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to get avatar image of Steam user '{steamLobbyMember.DisplayName}' with id {steamLobbyMember.SteamId}");
-                itemElement.style.backgroundImage = new StyleBackground(UiManager.Instance.fallbackPlayerProfileImage);
+                itemElement.style.backgroundImage = new StyleBackground(PlayerProfileImageManager.Instance.fallbackPlayerProfileImage);
                 itemElement.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(steamLobbyMember.DisplayName));
             }
         }

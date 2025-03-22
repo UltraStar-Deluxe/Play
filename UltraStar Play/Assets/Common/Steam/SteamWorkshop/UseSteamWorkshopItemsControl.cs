@@ -73,7 +73,7 @@ public class UseSteamWorkshopItemsControl : INeedInjection
                 items,
                 PlayerProfileUtils.PlayerProfileImagesFolderName);
             Debug.Log($"Using Steam Workshop items for additional player profile image folders: {PlayerProfileUtils.AdditionalPlayerProfileImageFolders.JoinWith(", ")}");
-            UiManager.Instance.UpdatePlayerProfileImagePaths();
+            PlayerProfileImageManager.Instance.UpdatePlayerProfileImagePaths();
         }
         catch (Exception ex)
         {

@@ -2,7 +2,6 @@
 using CommonOnlineMultiplayer;
 using SteamOnlineMultiplayer;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -39,7 +38,7 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
     }
 
     [Inject]
-    private UiManager uiManager;
+    private PlayerProfileImageManager playerProfileImageManager;
 
     [Inject]
     private Settings settings;
@@ -73,8 +72,8 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
 
         if (lobbyMember == null)
         {
-            string finalImagePath = uiManager.GetFinalPlayerProfileImagePath(playerProfile);
-            Sprite loadedSprite = await uiManager.LoadPlayerProfileImageAsync(finalImagePath);
+            string finalImagePath = playerProfileImageManager.GetFinalPlayerProfileImagePath(playerProfile);
+            Sprite loadedSprite = await playerProfileImageManager.LoadPlayerProfileImageAsync(finalImagePath);
             image.style.backgroundImage = new StyleBackground(loadedSprite);
         }
         else if (lobbyMember is SteamLobbyMember steamLobbyMember)
