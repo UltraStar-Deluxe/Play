@@ -39,7 +39,7 @@ public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
 
     public override void Unload()
     {
-        AudioUtils.ResetPitchAndPitchShifter(audioSource);
+        PitchShifterUtils.ResetPitchAndPitchShifter(audioSource);
         audioSource.Stop();
         audioSource.clip = null;
     }
@@ -85,7 +85,7 @@ public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
     {
         if (changeTempoButKeepPitch)
         {
-            AudioUtils.SetPitchWithPitchShifter(audioSource, (float)newValue);
+            PitchShifterUtils.SetPitchWithPitchShifter(audioSource, (float)newValue);
         }
         else
         {
