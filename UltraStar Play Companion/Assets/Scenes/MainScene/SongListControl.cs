@@ -256,8 +256,8 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
     {
         string searchText = songSearchTextField.value.ToLowerInvariant();
         return searchText.IsNullOrEmpty()
-               || songDto.Title.ToLowerInvariant().Contains(searchText)
-               || songDto.Artist.ToLowerInvariant().Contains(searchText);
+               || StringUtils.ContainsIgnoreCaseAndDiacritics(songDto.Title, searchText)
+               || StringUtils.ContainsIgnoreCaseAndDiacritics(songDto.Artist, searchText);
     }
 
     private void HandleSongListEvent(SongListEvent evt)
