@@ -179,11 +179,11 @@ public class SongMetaScanner
         Log.Verbose(() => $"Load '{Path.GetFileName(midiFile)}' on thread {Thread.CurrentThread.ManagedThreadId}");
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (!AudioFileMetaTagUtils.TryGetArtist(midiFile, out string artist))
+        if (!TryGetArtist(midiFile, out string artist))
         {
             artist = "";
         }
-        if (!AudioFileMetaTagUtils.TryGetTitle(midiFile, out string title))
+        if (!TryGetTitle(midiFile, out string title))
         {
             title = Path.GetFileNameWithoutExtension(midiFile);
         }
@@ -276,5 +276,25 @@ public class SongMetaScanner
             .GroupBy(pair => pair.Index / chunkSize)
             .Select(grouping => grouping.Select(pair => pair.Value).ToList())
             .ToList();
+    }
+
+    private static bool TryGetArtist(string audioFile, out string artist)
+    {
+        // TODO: use https://github.com/Zeugma440/atldotnet to read tags from audio file
+        artist = Path.GetFileNameWithoutExtension(audioFile)
+            .Split("-")
+            .FirstOrDefault()
+            .Trim();
+        return true;
+    }
+
+    private static bool TryGetTitle(string audioFile, out string title)
+    {
+        // TODO: use https://github.com/Zeugma440/atldotnet to read tags from audio file
+        title = Path.GetFileNameWithoutExtension(audioFile)
+            .Split("-")
+            .LastOrDefault()
+            .Trim();
+        return true;
     }
 }
