@@ -165,7 +165,7 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
         // Send connect response
         List<HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, connectRequestDto.ClientId);
-        List<GameRoundModifierDto> availableGameRoundModifierDtos = DtoConverter.ToDto(GameRoundModifierUtils.GetGameRoundModifiers());
+        List<GameRoundModifierDto> availableGameRoundModifierDtos = DtoConverter.ToDto(GameRoundModifierRegistry.GetAll());
         ConnectResponseDto connectResponseDto = new()
         {
             ClientName = connectRequestDto.ClientName,

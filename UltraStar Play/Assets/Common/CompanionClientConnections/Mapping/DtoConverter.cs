@@ -136,7 +136,7 @@ public static class DtoConverter
         List<string> modifierIds = dtos
             .Select(dto => dto.Id)
             .ToList();
-        return GameRoundModifierUtils.GetGameRoundModifiersById(modifierIds);
+        return GameRoundModifierRegistry.GetAllById(modifierIds);
     }
 
     public static List<GameRoundModifierDto> ToDto(List<IGameRoundModifier> modifiers)
