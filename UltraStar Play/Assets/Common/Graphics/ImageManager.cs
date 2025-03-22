@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -100,7 +98,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
         Texture2D loadedTexture;
         try
         {
-            using UnityWebRequest webRequest = ImageUtils.CreateTextureRequest(new Uri(uri));
+            using UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(new Uri(uri));
             await WebRequestUtils.SendWebRequestAsync(webRequest);
 
             loadedTexture = (webRequest.downloadHandler as DownloadHandlerTexture).texture;
@@ -110,7 +108,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
             throw new LoadImageException($"Failed to load Texture2D from URI: '{uri}'", ex);
         }
 
-        Sprite sprite = ImageUtils.CreateUncachedSprite(loadedTexture);
+        Sprite sprite = CreateUncachedSprite(loadedTexture);
         AddSpriteToCache(sprite, uri);
         return sprite;
     }
@@ -191,6 +189,17 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
             }
             GameObjectUtils.Destroy(cachedSprite.Sprite);
         }
+    }
+
+    private static Sprite CreateUncachedSprite(Texture2D texture)
+    {
+        return Sprite.Create(
+            texture,
+            new Rect(0, 0, texture.width, texture.height),
+            new Vector2(0.5f, 0.5f),
+            100f,
+            0u,
+            SpriteMeshType.FullRect);
     }
 
     private class CachedSprite
