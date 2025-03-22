@@ -15,7 +15,7 @@ public static class CompanionAppMessageUtils
             }
             else
             {
-                throw new UltraStarPlayException("Could not determine message type.");
+                throw new CompanionClientException("Could not determine message type.");
             }
         }
         catch (Exception e)

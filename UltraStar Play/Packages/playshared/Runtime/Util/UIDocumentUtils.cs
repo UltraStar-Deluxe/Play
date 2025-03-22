@@ -1,4 +1,5 @@
-﻿using UnityEngine.UIElements;
+﻿using System;
+using UnityEngine.UIElements;
 
 public static class UIDocumentUtils
 {
@@ -10,10 +11,10 @@ public static class UIDocumentUtils
             // Try again, now also search inactive UIDocument
             uiDocument = GameObjectUtils.FindObjectOfType<UIDocument>(true);
         }
-        
+
         if (uiDocument == null)
         {
-            throw new UltraStarPlayException("No UIDocument found");
+            throw new NullReferenceException("No UIDocument found");
         }
 
         return uiDocument;

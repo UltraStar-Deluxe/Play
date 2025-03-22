@@ -107,4 +107,15 @@ public static class WebRequestUtils
         // See https://forum.unity.com/threads/unitywebrequest-file-protocol-not-working-with-plus-character-in-path-how-to-escape-the-uri.1364499/#post-8655012
         return absolutePath;
     }
+
+    private class UnityWebRequestException : Exception
+    {
+        public UnityWebRequest UnityWebRequest { get; private set; }
+
+        public UnityWebRequestException(UnityWebRequest unityWebRequest)
+            : base($"UnityWebRequest failed: method '{unityWebRequest.method}', url '{unityWebRequest.url}', result '{unityWebRequest.result}', error '{unityWebRequest.error}'")
+        {
+            UnityWebRequest = unityWebRequest;
+        }
+    }
 }

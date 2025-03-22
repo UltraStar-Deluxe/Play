@@ -123,13 +123,4 @@ public static class StringExtensions
             "$1 $2"
         );
     }
-
-    public static string ReplaceOrThrow(this string text, string pattern, string replacement)
-    {
-        if (!text.Contains(pattern))
-        {
-            throw new UltraStarPlayException($"Text '{text}' does not contain pattern '{pattern}'");
-        }
-        return text.Replace(pattern, replacement);
-    }
 }
