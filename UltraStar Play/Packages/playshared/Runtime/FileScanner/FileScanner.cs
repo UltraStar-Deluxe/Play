@@ -14,9 +14,9 @@ public static class FileScanner
 
     public static List<string> GetFiles(string folder, FileScannerConfig config)
     {
-        if (config.FileExtensionPatterns.IsNullOrEmpty())
+        if (config.SearchPatterns.IsNullOrEmpty())
         {
-            throw new ArgumentException(nameof(config.FileExtensionPatterns));
+            throw new ArgumentException(nameof(config.SearchPatterns));
         }
 
         if (folder.IsNullOrEmpty()
@@ -30,7 +30,7 @@ public static class FileScanner
         SearchOption searchOption = config.Recursive
             ? SearchOption.AllDirectories
             : SearchOption.TopDirectoryOnly;
-        foreach (string fileExtensionPattern in config.FileExtensionPatterns)
+        foreach (string fileExtensionPattern in config.SearchPatterns)
         {
             string[] filesOfPattern = Directory.GetFiles(folder, fileExtensionPattern, searchOption);
             unfilteredResult.AddRange(filesOfPattern);

@@ -2,6 +2,9 @@
 
 public class DirectoryScannerConfig
 {
+    /**
+     * Folder name patterns, e.g. "*Config"
+     */
     public IReadOnlyCollection<string> SearchPatterns { get; set; }
     public bool ExcludeHiddenFolders { get; set; } = true;
     public bool Recursive { get; set; }

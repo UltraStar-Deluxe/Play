@@ -2,18 +2,26 @@
 
 public class FileScannerConfig
 {
-    public IReadOnlyCollection<string> FileExtensionPatterns { get; set; }
+    /**
+     * File name patterns, e.g. "*.txt"
+     */
+    public IReadOnlyCollection<string> SearchPatterns { get; set; }
     public bool ExcludeHiddenFolders { get; set; } = true;
     public bool ExcludeHiddenFiles { get; set; } = true;
     public bool Recursive { get; set; }
 
-    public FileScannerConfig(IReadOnlyCollection<string> fileExtensionPatterns)
+    public FileScannerConfig()
     {
-        FileExtensionPatterns = fileExtensionPatterns;
+        SearchPatterns = new List<string> { "*" };
     }
 
-    public FileScannerConfig(params string[] fileExtensionPatterns)
+    public FileScannerConfig(IReadOnlyCollection<string> searchPatterns)
     {
-        FileExtensionPatterns = fileExtensionPatterns;
+        SearchPatterns = searchPatterns;
+    }
+
+    public FileScannerConfig(params string[] searchPatterns)
+    {
+        SearchPatterns = searchPatterns;
     }
 }
