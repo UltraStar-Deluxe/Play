@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class SongRepositoryUtils
+public static class SongRepositorySearcher
 {
     public static async Awaitable<List<SongRepositorySearchResult>> SearchSongsAsync(SongRepositorySearchParameters searchParameters)
     {

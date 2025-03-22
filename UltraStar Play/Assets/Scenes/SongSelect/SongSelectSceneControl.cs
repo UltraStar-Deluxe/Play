@@ -1261,7 +1261,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         {
             RunningSongRepositorySearches.Value++;
             SongRepositorySearchParameters searchParameters = new(searchText);
-            List<SongRepositorySearchResult> searchResults = await SongRepositoryUtils.SearchSongsAsync(searchParameters);
+            List<SongRepositorySearchResult> searchResults = await SongRepositorySearcher.SearchSongsAsync(searchParameters);
             searchResults.SelectMany(result => result.Entries).ForEach(resultEntry => AddSearchResultEntryToSongMetaManager(resultEntry));
         }
         finally
