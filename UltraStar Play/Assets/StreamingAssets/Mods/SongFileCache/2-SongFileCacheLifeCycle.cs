@@ -73,7 +73,7 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
         else
         {
             // Load already cached file content now
-            songMeta = UltraStarSongParser.ParseString(cachedSong.FileContent, out _);
+            songMeta = UltraStarSongParser.ParseString(cachedSong.FileContent).SongMeta;
             songMeta.SetFileInfo(cachedSong.FilePath);
         }
         songMetaManager.AddSongMeta(songMeta);
@@ -87,7 +87,7 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
             return new List<string>();
         }
 
-        List<string> txtFiles = DirectoryUtils.GetFiles(songFolder, true, "*.txt");
+        List<string> txtFiles = FileScanner.GetFiles(songFolder, new FileScannerConfig("*.txt") { Recursive = true } );
         Debug.Log($"{nameof(SongFileCacheLifeCycle)} - Found {txtFiles.Count} txt files in {songFolder}");
 
         return txtFiles;

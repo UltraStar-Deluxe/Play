@@ -115,7 +115,7 @@ public class BatchIsolateVocalsModSettings : IModSettings
             }
 
             List<SongMeta> sortedSongMetas = songMetas
-                .OrderBy(it => SongMetaUtils.GetArtistDashTitle(it))
+                .OrderBy(it => it.GetArtistDashTitle())
                 .ToList();
 
             VisualElement toggleContainer = new VisualElement();
@@ -124,7 +124,7 @@ public class BatchIsolateVocalsModSettings : IModSettings
             foreach (SongMeta songMeta in sortedSongMetas)
             {
                 Toggle toggle = new Toggle();
-                toggle.label = SongMetaUtils.GetArtistDashTitle(songMeta);
+                toggle.label = songMeta.GetArtistDashTitle();
                 toggle.value = false;
                 toggle.userData = songMeta;
 

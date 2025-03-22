@@ -52,7 +52,7 @@ public class SongCoverAndBackgroundImageProviderFromFolder : ISongCoverImageProv
             }
         }
 
-        List<string> imageFiles = FileScannerUtils.ScanForFiles(new List<string>() { directoryPath }, imageFileExtensionPatterns);
+        List<string> imageFiles = FileScanner.GetFiles(directoryPath, new FileScannerConfig(imageFileExtensionPatterns) { Recursive = true } );
         if (imageFiles.IsNullOrEmpty())
         {
             // Cache the value for following calls.

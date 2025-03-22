@@ -111,7 +111,7 @@ public class MicRecordingFileWriter : INeedInjection
         audioClip.GetData(multiChannelSamples, 0);
 
         // Convert to mono
-        float[] monoSamples = AudioUtils.ToMonoAudioSamples(multiChannelSamples, channels);
+        float[] monoSamples = AudioSampleUtils.ToMonoAudioSamples(multiChannelSamples, channels);
         return monoSamples;
     }
     
