@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Serilog.Events;
 using UnityEngine;
 
@@ -13,54 +11,6 @@ public static class DirectoryUtils
         {
             Directory.CreateDirectory(path);
         }
-    }
-
-    public static List<string> GetDirectories(string folderPath, bool recursive, params string[] searchPatterns)
-    {
-        SearchOption searchOption = recursive
-            ? SearchOption.AllDirectories
-            : SearchOption.TopDirectoryOnly;
-
-        if (searchPatterns.IsNullOrEmpty())
-        {
-            return Directory.GetDirectories(folderPath, "*", searchOption)
-                .ToList();
-        }
-
-        List<string> result = new();
-        foreach (string searchPattern in searchPatterns)
-        {
-             string[] paths = Directory.GetDirectories(folderPath, searchPattern, searchOption);
-            result.AddRange(paths);
-        }
-
-        return result
-            .Distinct()
-            .ToList();
-    }
-
-    public static List<string> GetFiles(string folderPath, bool recursive, params string[] searchPatterns)
-    {
-        SearchOption searchOption = recursive
-            ? SearchOption.AllDirectories
-            : SearchOption.TopDirectoryOnly;
-
-        if (searchPatterns.IsNullOrEmpty())
-        {
-            return Directory.GetFiles(folderPath, "*", searchOption)
-                .ToList();
-        }
-
-        List<string> result = new();
-        foreach (string searchPattern in searchPatterns)
-        {
-            string[] paths = Directory.GetFiles(folderPath, searchPattern, searchOption);
-            result.AddRange(paths);
-        }
-
-        return result
-            .Distinct()
-            .ToList();
     }
 
     public static bool IsSubDirectory(string potentialSubDirectory, string potentialAncestorDirectory)

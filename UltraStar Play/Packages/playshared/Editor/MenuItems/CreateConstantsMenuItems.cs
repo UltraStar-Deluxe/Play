@@ -193,7 +193,7 @@ public static class CreateConstantsMenuItems
 
     private static List<string> GetFilesInFolderRecursive(string folderPath, params string[] fileExtensions)
     {
-        return DirectoryUtils.GetFiles(folderPath, true, fileExtensions)
+        return FileScanner.GetFiles(folderPath, new FileScannerConfig(fileExtensions) { Recursive = true})
             .Where(file => !IsFileIgnored(file))
             .ToList();
     }
