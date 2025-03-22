@@ -26,6 +26,11 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
     private readonly Subject<ChildrenChangedEvent> childrenChangedEventStream = new();
     public IObservable<ChildrenChangedEvent> ChildrenChangedEventStream => childrenChangedEventStream;
 
+    private int lastScreenWidth;
+    private int lastScreenHeight;
+    private readonly Subject<ScreenSizeChangedEvent> screenSizeChangedEventStream = new();
+    public IObservable<ScreenSizeChangedEvent> ScreenSizeChangedEventStream => screenSizeChangedEventStream;
+
     [InjectedInInspector]
     public VisualTreeAsset messageDialogUi;
 
@@ -79,6 +84,8 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
 
     protected override void StartSingleton()
     {
+        lastScreenWidth = Screen.width;
+        lastScreenHeight = Screen.height;
         UpdatePlayerProfileImagePaths();
     }
 
@@ -109,6 +116,21 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
     {
         ContextMenuPopupControl.OpenContextMenuPopups
             .ForEach(contextMenuPopupControl => contextMenuPopupControl.Update());
+
+        UpdateScreenSize();
+    }
+
+    private void UpdateScreenSize()
+    {
+        if (lastScreenHeight != Screen.height
+            || lastScreenWidth != Screen.width)
+        {
+            screenSizeChangedEventStream.OnNext(new ScreenSizeChangedEvent(
+                new Vector2Int(lastScreenWidth, lastScreenHeight),
+                new Vector2Int(Screen.width, Screen.height)));
+            lastScreenWidth = Screen.width;
+            lastScreenHeight = Screen.height;
+        }
     }
 
     public void ReloadPlayerProfileImages()

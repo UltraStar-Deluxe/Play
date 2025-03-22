@@ -24,11 +24,6 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private MicSampleRecorderManager micSampleRecorderManager;
 
-    private int lastScreenWidth;
-    private int lastScreenHeight;
-    private readonly Subject<ScreenSizeChangedEvent> screenSizeChangedEventStream = new();
-    public IObservable<ScreenSizeChangedEvent> ScreenSizeChangedEventStream => screenSizeChangedEventStream;
-
     private int lastTargetFrameRate;
 
     protected override object GetInstance()
@@ -41,8 +36,6 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         targetFrameRate = settings.TargetFps;
         lastTargetFrameRate = targetFrameRate;
         ApplyTargetFrameRateAndVSync();
-        lastScreenWidth = Screen.width;
-        lastScreenHeight = Screen.height;
 
         settings.ObserveEveryValueChanged(it => it.TargetFps)
             .Subscribe(newValue => targetFrameRate = newValue)
@@ -93,16 +86,6 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         {
             lastTargetFrameRate = targetFrameRate;
             ApplyTargetFrameRateAndVSync();
-        }
-
-        if (lastScreenHeight != Screen.height
-            || lastScreenWidth != Screen.width)
-        {
-            screenSizeChangedEventStream.OnNext(new ScreenSizeChangedEvent(
-                new Vector2Int(lastScreenWidth, lastScreenHeight),
-                new Vector2Int(Screen.width, Screen.height)));
-            lastScreenWidth = Screen.width;
-            lastScreenHeight = Screen.height;
         }
     }
 
