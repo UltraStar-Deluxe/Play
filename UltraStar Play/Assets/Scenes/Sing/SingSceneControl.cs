@@ -1340,7 +1340,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         if (extendedVoiceId is EExtendedVoiceId.Merged)
         {
-            return SongMetaUtils.CreateMergedVoice(SongMeta.Voices.ToList());
+            return VoicesMerger.Merge(SongMeta.Voices.ToList());
         }
 
         if (extendedVoiceId.TryGetVoiceId(out EVoiceId voiceId))

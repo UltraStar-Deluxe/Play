@@ -715,54 +715,6 @@ public static class SongMetaUtils
         }.Where(it => !it.IsNullOrEmpty()).JoinWith("\n");
     }
 
-    public static Voice CreateMergedVoice(List<Voice> voices)
-    {
-        if (voices.IsNullOrEmpty())
-        {
-            return null;
-        }
-
-        if (voices.Count == 1)
-        {
-            return voices.FirstOrDefault();
-        }
-
-        MergedVoice mergedVoice = new(voices);
-        foreach (Voice voice in voices.ToList())
-        {
-            foreach (Sentence newSentence in voice.Sentences.ToList())
-            {
-                // Add the sentence if there is none yet.
-                Sentence overlappingSentence = mergedVoice.Sentences
-                    .FirstOrDefault(existingSentence => IsBeatInSentence(existingSentence, newSentence.MinBeat, true, false)
-                                                        || IsBeatInSentence(existingSentence, newSentence.MaxBeat, true, false));
-                if (overlappingSentence != null)
-                {
-                    Debug.Log($"{newSentence} overlaps with {overlappingSentence}");
-                }
-
-                if (overlappingSentence == null)
-                {
-                    Sentence newSentenceClone = newSentence.CloneDeep();
-                    mergedVoice.AddSentence(newSentenceClone);
-                }
-            }
-        }
-
-        // Minimize sentences to make sure that they do not overlap
-        foreach (Sentence mergedSentence in mergedVoice.Sentences)
-        {
-            mergedSentence.SetLinebreakBeat(0);
-        }
-
-        // Sort sentences
-        List<Sentence> sortedSentences = mergedVoice.Sentences.ToList();
-        sortedSentences.Sort(Sentence.comparerByStartBeat);
-        mergedVoice.SetSentences(sortedSentences);
-
-        return mergedVoice;
-    }
-
     public static void AddTrailingSpaceToLastNoteOfSentence(Sentence sentence)
     {
         if (sentence == null)
