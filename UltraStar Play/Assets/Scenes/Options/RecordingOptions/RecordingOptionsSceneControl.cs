@@ -491,8 +491,13 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 
         if (!SelectedMicProfile.IsConnected(serverSideCompanionClientManager))
         {
+            MicProfile nextSelection = settings.MicProfiles.GetElementBefore(SelectedMicProfile, false);
+            nextSelection ??= settings.MicProfiles.GetElementAfter(SelectedMicProfile, false);
+
             settings.MicProfiles.Remove(SelectedMicProfile);
             UpdateRecordingDevices();
+
+            deviceChooserControl.Selection = nextSelection;
         }
     }
 
