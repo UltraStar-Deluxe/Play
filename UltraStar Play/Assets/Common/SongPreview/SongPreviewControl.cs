@@ -253,8 +253,12 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                "reason", ex.Message));
+
+            if (ex is not DestroyedAlreadyException)
+            {
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
+            }
         }
     }
 

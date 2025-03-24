@@ -156,8 +156,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to load audio: {ex.Message}");
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                "reason", ex.Message));
+            if (ex is not DestroyedAlreadyException)
+            {
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
+            }
         }
 
         songAudioPlayer.PlaybackStartedEventStream

@@ -1270,8 +1270,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to load audio: {ex.Message}");
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                "reason", ex.Message));
+
+            if (ex is not DestroyedAlreadyException)
+            {
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
+            }
             PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
             sceneNavigator.LoadScene(EScene.SongSelectScene);
         }

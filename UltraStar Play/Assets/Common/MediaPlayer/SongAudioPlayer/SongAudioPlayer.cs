@@ -243,13 +243,11 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
             Debug.LogException(ex);
             Debug.LogError($"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
 
-            if (ex is DestroyedAlreadyException)
+            if (ex is not DestroyedAlreadyException)
             {
-                return;
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
             }
-
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                "reason", ex.Message));
         }
     }
 
@@ -311,7 +309,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
 
             if (ex is DestroyedAlreadyException)
             {
-                // Stuff is being destroyed, so do not try to use other provers.
+                // Stuff is being destroyed, so do not try to use other providers.
                 throw ex;
             }
 
@@ -323,7 +321,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
 
             if (remainingAudioSupportProviders.IsNullOrEmpty())
             {
-                throw new AudioSupportProviderException($"Failed to load audio and no remaining audio support providers: {audioUri}");
+                throw new AudioSupportProviderException($"Failed to load audio and no remaining audio support providers: {audioUri}", ex);
             }
             return await DoLoadAndPlayAsync(audioUri, remainingAudioSupportProviders, streamAudio, startPositionInMillis);
         }
