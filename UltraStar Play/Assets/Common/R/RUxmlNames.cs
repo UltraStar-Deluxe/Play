@@ -567,6 +567,7 @@ public static partial class R
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
         public const string performanceAndEffectsGroup = "performanceAndEffectsGroup";
+        public const string permissionsAccordionItem = "permissionsAccordionItem";
         public const string permissionsContainer = "permissionsContainer";
         public const string phraseBonusScore = "phraseBonusScore";
         public const string pitchDetectionAlgorithmChooser = "pitchDetectionAlgorithmChooser";
@@ -788,6 +789,7 @@ public static partial class R
         public const string singingResultsPlayerUiRoot = "singingResultsPlayerUiRoot";
         public const string singingResultsScoresContainer = "singingResultsScoresContainer";
         public const string skipButton = "skipButton";
+        public const string skipToNextLyricsTimeChooser = "skipToNextLyricsTimeChooser";
         public const string smallIcon = "smallIcon";
         public const string songArtist = "songArtist";
         public const string songBackgroundImage = "songBackgroundImage";

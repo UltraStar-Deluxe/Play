@@ -9,13 +9,16 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
+public class GameOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection
 {
     [Inject(UxmlName = R.UxmlNames.reduceAudioVolumeChooser)]
     private Chooser reduceAudioVolumeChooser;
 
     [Inject(UxmlName = R.UxmlNames.passTheMicTimeChooser)]
     private Chooser passTheMicTimeChooser;
+
+    [Inject(UxmlName = R.UxmlNames.skipToNextLyricsTimeChooser)]
+    private Chooser skipToNextLyricsTimeChooser;
 
     [Inject(UxmlName = R.UxmlNames.languageDropdownField)]
     private DropdownField languageDropdownField;
@@ -26,6 +29,12 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
     protected override void Start()
     {
         base.Start();
+
+        NumberChooserControl skipToNextLyricsTimeChooserControl = new NumberChooserControl(skipToNextLyricsTimeChooser, 20);
+        skipToNextLyricsTimeChooserControl.GetLabelTextFunction = newValue => $"{newValue} s";
+        skipToNextLyricsTimeChooserControl.Bind(
+            () => settings.SkipToNextLyricsTimeInSeconds,
+            newValue => settings.SkipToNextLyricsTimeInSeconds = (int)newValue);
 
         NumberChooserControl passTheMicTimeChooserControl = new NumberChooserControl(passTheMicTimeChooser, 20);
         passTheMicTimeChooserControl.GetLabelTextFunction = newValue => $"{newValue} s";

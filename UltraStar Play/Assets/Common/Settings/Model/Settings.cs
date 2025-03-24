@@ -51,6 +51,7 @@ public class Settings : ISettings
     public int DefaultMedleyTargetDurationInSeconds { get; set; } = 40;
     public int ReducedAudioVolumePercent { get; set; } = 1;
     public float PassTheMicTimeInSeconds { get; set; } = 20;
+    public float SkipToNextLyricsTimeInSeconds { get; set; } = 2;
     public bool JokerRuleEnabled { get; set; } = true;
 
     // Player profile settings

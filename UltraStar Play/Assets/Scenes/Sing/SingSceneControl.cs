@@ -773,7 +773,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         int nextStartBeat = nextSingableNotes.Min();
 
         // For debugging, go fast to next lyrics. In production, give the player some time to prepare.
-        double offsetInMillis = Application.isEditor ? 500 : 2000;
+        double offsetInMillis = settings.SkipToNextLyricsTimeInSeconds * 1000;
         double targetPositionInMillis = SongMetaBpmUtils.BeatsToMillis(SongMeta, nextStartBeat) - offsetInMillis;
         if (targetPositionInMillis > 0 && targetPositionInMillis > PositionInMillis)
         {
