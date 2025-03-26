@@ -59,9 +59,9 @@ public class SongEditorFileSystemWatcher : MonoBehaviour, INeedInjection
         { "*.aiff", "*.aif", "*.it", "*.mp3", "*.mod", "*.ogg",
             "*.s3m", "*.wav", "*.xm" };
         List<string> imageFilters = new() { "*.bmp", "*.jpg", "*.png", "*.psd", "*.tiff", "*.tga"};
-        videoFilters.ForEach(filter => CreateFileSystemWatcher(filter, OnVideoFileChanged));
-        imageFilters.ForEach(filter => CreateFileSystemWatcher(filter, OnImageFileChanged));
-        audioFilters.ForEach(filter => CreateFileSystemWatcher(filter, OnAudioFileChanged));
+        videoFilters.ForEach(filter => CreateFileSystemWatcher("SongEditorVideoWatcher", filter, OnVideoFileChanged));
+        imageFilters.ForEach(filter => CreateFileSystemWatcher("SongEditorImageWatcher", filter, OnImageFileChanged));
+        audioFilters.ForEach(filter => CreateFileSystemWatcher("SongEditorAudioWatcher", filter, OnAudioFileChanged));
 
         Debug.Log("Watching song media files in: " + FolderPath);
     }
@@ -135,9 +135,11 @@ public class SongEditorFileSystemWatcher : MonoBehaviour, INeedInjection
         Debug.Log($"Reloaded video because of changed files: {changedFileNamesCsv}");
     }
 
-    private void CreateFileSystemWatcher(string filter, FileSystemEventHandler fileSystemEventHandler)
+    private void CreateFileSystemWatcher(string description, string filter, FileSystemEventHandler fileSystemEventHandler)
     {
-        FileSystemWatcher fileSystemWatcher = FileSystemWatcherUtils.CreateFileSystemWatcher(FolderPath, filter, fileSystemEventHandler);
+        FileSystemWatcher fileSystemWatcher = FileSystemWatcherFactory.CreateFileSystemWatcher(FolderPath,
+            new FileSystemWatcherConfig(description, filter),
+            fileSystemEventHandler);
         disposables.Add(fileSystemWatcher);
     }
 

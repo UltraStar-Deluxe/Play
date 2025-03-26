@@ -32,9 +32,9 @@ public class WebViewScriptFileSystemWatcher : AbstractSingletonBehaviour, INeedI
                 continue;
             }
             Debug.Log($"Watching WebView script files in {folder}");
-            disposables.Add(FileSystemWatcherUtils.CreateFileSystemWatcher(
+            disposables.Add(FileSystemWatcherFactory.CreateFileSystemWatcher(
                 folder,
-                "*.js",
+                new FileSystemWatcherConfig("WebViewScriptsFolderWatcher", "*.js"),
                 OnWebViewScriptChanged));
         }
     }

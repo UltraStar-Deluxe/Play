@@ -28,9 +28,9 @@ public class ThemeFileSystemWatcher : AbstractSingletonBehaviour, INeedInjection
         foreach (string themeFolder in ThemeFolderUtils.GetThemeFolders())
         {
             Debug.Log($"Watching theme files in '{themeFolder}'");
-            disposables.Add(FileSystemWatcherUtils.CreateFileSystemWatcher(
+            disposables.Add(FileSystemWatcherFactory.CreateFileSystemWatcher(
                 themeFolder,
-                "*.json",
+                new FileSystemWatcherConfig("ThemeFolderWatcher", "*.json"),
                 OnThemeFileChanged));
         }
     }

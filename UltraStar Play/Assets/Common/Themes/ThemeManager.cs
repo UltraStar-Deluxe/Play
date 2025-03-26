@@ -322,9 +322,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
 
         Debug.Log($"Creating file system watcher for theme style sheet: {styleSheetFile}");
-        FileSystemWatcher fileSystemWatcher = FileSystemWatcherUtils.CreateFileSystemWatcher(
+        FileSystemWatcher fileSystemWatcher = FileSystemWatcherFactory.CreateFileSystemWatcher(
             Path.GetDirectoryName(styleSheetFile),
-            Path.GetFileName(styleSheetFile),
+            new FileSystemWatcherConfig("ThemeStyleSheetWatcher", Path.GetFileName(styleSheetFile)),
             OnThemeStyleSheetFileChanged);
         styleSheetFileSystemWatchers.Add(fileSystemWatcher);
     }

@@ -140,7 +140,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        FileSystemWatcher fileSystemWatcher = FileSystemWatcherUtils.CreateFileSystemWatcher(modFolder.Value, "*.cs",
+        FileSystemWatcher fileSystemWatcher = FileSystemWatcherFactory.CreateFileSystemWatcher(modFolder.Value,
+            new FileSystemWatcherConfig("ModFolderWatcher", "*.cs"),
             (sender, args) => OnCsFileChanged(modFolder, args.FullPath));
         modFolderToFileSystemWatcher[modFolder] = fileSystemWatcher;
     }
