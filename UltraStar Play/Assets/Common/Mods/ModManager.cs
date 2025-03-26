@@ -141,7 +141,10 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         FileSystemWatcher fileSystemWatcher = FileSystemWatcherFactory.CreateFileSystemWatcher(modFolder.Value,
-            new FileSystemWatcherConfig("ModFolderWatcher", "*.cs"),
+            new FileSystemWatcherConfig("ModFolderWatcher", "*.cs")
+            {
+                IncludeSubdirectories = true,
+            },
             (sender, args) => OnCsFileChanged(modFolder, args.FullPath));
         modFolderToFileSystemWatcher[modFolder] = fileSystemWatcher;
     }
