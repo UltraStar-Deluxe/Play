@@ -86,7 +86,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject]
     private SongSelectSceneData sceneData;
 
-    private List<SongMeta> songMetas = new();
     private List<SongMeta> lastSongMetasOfSongRouletteControl = new();
     private DirectoryInfo lastDirectoryInfoOfSongRouletteControl;
     private float lastSongMetaCountUpdateTimeInSeconds;
@@ -297,6 +296,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             })
             .AddTo(gameObject);
         songMetaManager.AddedSongMetaEventStream
+            .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
+            .Subscribe(_ => UpdateAvailableSongsAndUi(songMetaManager.IsSongScanFinished));
+        songMetaManager.RemovedSongMetaEventStream
             .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
             .Subscribe(_ => UpdateAvailableSongsAndUi(songMetaManager.IsSongScanFinished));
         UpdateSongScanLabels(songMetaManager.IsSongScanFinished);
@@ -778,11 +780,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitSongMetas");
 
-        songMetas = new List<SongMeta>(songMetaManager.GetSongMetas());
-        songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
-
         // Trigger achievement
-        if (songMetas.Count > 100)
+        if (songMetaManager.GetSongMetas().Count > 100)
         {
             achievementEventStream.OnNext(new AchievementEvent(AchievementId.browseMoreThan100Songs));
         }
@@ -1278,10 +1277,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             SongMeta songMeta = searchResultEntry.SongMeta;
             List<SongIssue> songIssues = searchResultEntry.SongIssues;
             if (songMeta != null
-                && !songMetas.Contains(songMeta)
                 && !songMetaManager.ContainsSongMeta(songMeta))
             {
-                songMetas.Add(songMeta);
                 songMetaManager.AddSongMeta(songMeta);
                 songIssueManager.AddSongIssues(songIssues);
             }
@@ -1317,7 +1314,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                        && SettingsUtils.IsSongFolderNavigationRootFolder(settings, nonPersistentSettings.SongSelectDirectoryInfo));
         }
 
-        List<SongMeta> filteredSongs = songSearchControl.GetFilteredSongMetas(songMetas)
+        List<SongMeta> filteredSongs = songSearchControl.GetFilteredSongMetas(songMetaManager.GetSongMetas())
             .Where(PlaylistMatches)
             .Where(ActiveFiltersMatches)
             .Where(CurrentFolderMatches)

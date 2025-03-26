@@ -228,7 +228,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
         searchPropertyButton.Focus();
     }
 
-    public List<SongMeta> GetFilteredSongMetas(List<SongMeta> songMetas)
+    public IReadOnlyCollection<SongMeta> GetFilteredSongMetas(IReadOnlyCollection<SongMeta> songMetas)
     {
         string searchExp = searchTextField.value;
         searchExpressionIcon.RemoveFromClassList("errorFontColor");
