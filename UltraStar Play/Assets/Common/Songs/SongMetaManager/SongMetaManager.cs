@@ -20,6 +20,17 @@ public class SongMetaManager : AbstractSingletonBehaviour
     public IObservable<SongMeta> AddedSongMetaEventStream => songMetaCollection.AddedSongMetaEventStream
         .ObserveOnMainThread();
 
+    public IObservable<SongMeta> RemovedSongMetaEventStream => songMetaCollection.RemovedSongMetaEventStream
+        .ObserveOnMainThread();
+
+    private readonly Subject<SongMeta> reloadedSongMetaEventStream = new();
+    public IObservable<SongMeta> ReloadedSongMetaEventStream => reloadedSongMetaEventStream
+        .ObserveOnMainThread();
+
+    private readonly Subject<SongMeta> beforeSongMetaSavedEventStream = new();
+    public IObservable<SongMeta> BeforeSongMetaSavedEventStream => beforeSongMetaSavedEventStream
+        .ObserveOnMainThread();
+
     [InjectedInAwake]
     private Settings settings;
 
@@ -80,6 +91,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
             return;
         }
 
+        beforeSongMetaSavedEventStream.OnNext(songMeta);
+
         SongIdManager.ClearSongIds(songMeta);
 
         CreateDirectory(songMeta);
@@ -108,8 +121,18 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
     }
 
+    public void RemoveSong(SongMeta songMeta)
+    {
+        songMetaCollection.RemoveUnsafe(songMeta);
+    }
+
     public void ReloadSong(SongMeta songMeta)
     {
+        if (songMeta == null)
+        {
+            return;
+        }
+
         SongIdManager.ClearSongIds(songMeta);
 
         string absoluteFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
@@ -118,6 +141,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
             UltraStarSongParserResult parserResult = UltraStarSongParser.ParseFile(absoluteFilePath,
                 new UltraStarSongParserConfig { Encoding = songMeta.FileEncoding, UseUniversalCharsetDetector = false });
             songMeta.CopyValues(parserResult.SongMeta);
+
+            reloadedSongMetaEventStream.OnNext(songMeta);
         }
         catch (Exception e)
         {
@@ -129,6 +154,16 @@ public class SongMetaManager : AbstractSingletonBehaviour
     public SongMeta GetSongMetaByTitle(string title)
     {
         return GetSongMetas().FirstOrDefault(songMeta => songMeta.Title == title);
+    }
+
+    public SongMeta GetSongMetaByTxtFilePath(string path)
+    {
+        if (path.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        return GetSongMetas().FirstOrDefault(songMeta => songMeta.FileInfo != null && songMeta.FileInfo.FullName == new FileInfo(path).FullName);
     }
 
     public SongMeta GetSongMetaByGloballyUniqueId(string songId)

@@ -271,7 +271,7 @@ public static class VisualElementUtils
 
     public static bool IsListViewFocused(ListViewH listView)
     {
-        return listView.focusController.focusedElement is VisualElement focusedElement
+        return listView.focusController?.focusedElement is VisualElement focusedElement
                && focusedElement.GetAncestors().Contains(listView);
     }
 }

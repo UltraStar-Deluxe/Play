@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using PrimeInputActions;
@@ -128,10 +129,13 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private string lastSongMetaCover;
     private string lastSongMetaBackground;
 
+    private readonly List<IDisposable> disposables = new();
+
     public void OnInjectionFinished()
     {
         Init();
         RegisterCallbacks();
+
     }
 
     private void RegisterCallbacks()
@@ -139,6 +143,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         innerSongEntryUi.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
         innerSongEntryUi.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         openSongMenuButton.RegisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
+        disposables.Add(songMetaManager.ReloadedSongMetaEventStream.Subscribe(songMeta => OnSongMetaReloaded(songMeta)));
     }
 
     private void UnregisterCallbacks()
@@ -146,6 +151,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         innerSongEntryUi.UnregisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
         innerSongEntryUi.UnregisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         openSongMenuButton.UnregisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
+        disposables.ForEach(it => it.Dispose());;
+        disposables.Clear();
     }
 
     private void Init()
@@ -177,6 +184,17 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         UpdateLabels();
         UpdateIcons();
         UpdateCover();
+    }
+
+    private void OnSongMetaReloaded(SongMeta songMeta)
+    {
+        if (SongSelectEntry is SongSelectSongEntry songEntry
+            && songEntry.SongMeta?.FileInfo != null
+            && songEntry.SongMeta?.FileInfo?.FullName == songMeta.FileInfo?.FullName)
+        {
+            Debug.Log($"Updating {nameof(SongSelectEntryControl)} because SongMeta was reloaded: path '{songMeta.FileInfo.FullName}'");
+            OnSongSelectEntryChanged(SongSelectEntry);
+        }
     }
 
     private void InitSongMenu()
