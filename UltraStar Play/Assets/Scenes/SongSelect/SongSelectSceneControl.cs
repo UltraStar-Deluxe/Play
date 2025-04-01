@@ -143,26 +143,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject(UxmlName = R.UxmlNames.selectRandomSongButton)]
     private Button selectRandomSongButton;
 
-    [Inject(UxmlName = R.UxmlNames.toggleSceneMenuButton)]
-    private Button toggleSceneMenuButton;
-
     [Inject(UxmlName = R.UxmlNames.toggleSongQueueOverlayButton)]
     private Button toggleSongQueueOverlayButton;
 
     [Inject(UxmlName = R.UxmlNames.closeSongQueueButton)]
     private Button closeSongQueueButton;
 
-    [Inject(UxmlName = R.UxmlNames.closeSongSelectSceneMenuButton)]
-    private Button closeSongSelectSceneMenuButton;
-
     [Inject(UxmlName = R.UxmlNames.songQueueLengthContainer)]
     private VisualElement songQueueLengthContainer;
 
     [Inject(UxmlName = R.UxmlNames.songQueueLengthLabel)]
     private Label songQueueLengthLabel;
-
-    [Inject(UxmlName = R.UxmlNames.sceneMenuOverlay)]
-    private VisualElement sceneMenuOverlay;
 
     [Inject(UxmlName = R.UxmlNames.songQueueOverlay)]
     private VisualElement songQueueOverlay;
@@ -182,9 +173,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject(UxmlName = R.UxmlNames.hiddenHideModifiersOverlayArea)]
     private VisualElement hiddenHideModifiersOverlayArea;
 
-    [Inject(UxmlName = R.UxmlNames.hiddenHideSceneMenuOverlayArea)]
-    private VisualElement hiddenHideSceneMenuOverlayArea;
-
     [Inject(UxmlName = R.UxmlNames.modifiersInactiveIcon)]
     private VisualElement modifiersInactiveIcon;
 
@@ -202,21 +190,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     [Inject(UxmlName = R.UxmlNames.previousDifficultyButton)]
     private Button previousDifficultyButton;
-
-    [Inject(UxmlName = R.UxmlNames.showScrollBarInSongSelectToggle)]
-    private Toggle showScrollBarInSongSelectToggle;
-
-    [Inject(UxmlName = R.UxmlNames.showSongIndexInSongSelectToggle)]
-    private Toggle showSongIndexInSongSelectToggle;
-
-    [Inject(UxmlName = R.UxmlNames.navigateFoldersInSongSelectToggle)]
-    private Toggle navigateFoldersInSongSelectToggle;
-
-    [Inject(UxmlName = R.UxmlNames.closeSongSelectSceneMenuButton2)]
-    private Button closeSongSelectSceneMenuButton2;
-
-    [Inject(UxmlName = R.UxmlNames.applySongSelectOptionsButton)]
-    private Button applySongSelectOptionsButton;
 
     private readonly SongSearchControl songSearchControl = new();
 
@@ -250,11 +223,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     private readonly SongQueueUiControl songQueueUiControl = new();
     private readonly SongSelectFilterControl songSelectFilterControl = new();
     private readonly SongSelectSelectedSongDetailsControl songSelectSelectedSongDetailsControl = new();
+    private readonly SongSelectMenuControl songSelectMenuControl = new();
 
     private MessageDialogControl askToAssignMicsDialog;
 
     public VisualElementSlideInControl SongQueueSlideInControl { get; private set; }
-    public VisualElementSlideInControl SceneMenuSlideInControl { get; private set; }
     public VisualElementSlideInControl ModifiersOverlaySlideInControl { get; private set; }
 
     private readonly Subject<BeforeSongStartedEvent> beforeSongStartedEventStream = new();
@@ -276,6 +249,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         injector.Inject(songSelectFilterControl);
         injector.Inject(songSearchControl);
         injector.Inject(songSelectSelectedSongDetailsControl);
+        injector.Inject(songSelectMenuControl);
     }
 
     private void Start()
@@ -384,8 +358,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         InitModifierDialog();
 
-        InitSceneMenu();
-
         UpdateSceneTitle();
     }
 
@@ -409,33 +381,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         {
             SettingsUtils.SetCoopModeEnabled(settings, false);
         }
-    }
-
-    private void InitSceneMenu()
-    {
-        FieldBindingUtils.Bind(showScrollBarInSongSelectToggle,
-            () => settings.ShowScrollBarInSongSelect,
-            newValue => settings.ShowScrollBarInSongSelect = newValue);
-
-        FieldBindingUtils.Bind(showSongIndexInSongSelectToggle,
-            () => settings.ShowSongIndexInSongSelect,
-            newValue => settings.ShowSongIndexInSongSelect = newValue);
-
-        FieldBindingUtils.Bind(navigateFoldersInSongSelectToggle,
-            () => settings.NavigateByFoldersInSongSelect,
-            newValue => settings.NavigateByFoldersInSongSelect = newValue);
-
-        applySongSelectOptionsButton.RegisterCallbackButtonTriggered(_ => ReloadScene());
-        closeSongSelectSceneMenuButton2.RegisterCallbackButtonTriggered(_ => SceneMenuSlideInControl.SlideOut());
-    }
-
-    private void ReloadScene()
-    {
-        sceneNavigator.LoadScene(EScene.SongSelectScene, new SongSelectSceneData()
-        {
-            SongMeta = SelectedSong,
-            partyModeSceneData = sceneData.partyModeSceneData,
-        });
     }
 
     private void UpdateAvailableSongsAndUi(bool isSongScanFinished)
@@ -471,14 +416,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void InitSlideInControls()
     {
-        SceneMenuSlideInControl = new(sceneMenuOverlay, ESide2D.Right, false);
-        InitSlideInControl(SceneMenuSlideInControl, toggleSceneMenuButton, closeSongSelectSceneMenuButton, sceneMenuOverlay, hiddenHideSceneMenuOverlayArea);
-
         ModifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
-        InitSlideInControl(ModifiersOverlaySlideInControl, toggleModifiersOverlayButton, closeModifiersOverlayButton, modifierDialogOverlay, hiddenHideModifiersOverlayArea);
+        SongSelectSlideInControlUtils.InitSlideInControl(ModifiersOverlaySlideInControl, toggleModifiersOverlayButton, closeModifiersOverlayButton, modifierDialogOverlay, hiddenHideModifiersOverlayArea);
 
         SongQueueSlideInControl = new(songQueueOverlay, ESide2D.Right, false);
-        InitSlideInControl(SongQueueSlideInControl, toggleSongQueueOverlayButton, closeSongQueueButton, songQueueOverlay, hiddenHideSongQueueOverlayArea);
+        SongSelectSlideInControlUtils.InitSlideInControl(SongQueueSlideInControl, toggleSongQueueOverlayButton, closeSongQueueButton, songQueueOverlay, hiddenHideSongQueueOverlayArea);
     }
 
     private void InitSlideInControl(
@@ -1391,6 +1333,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         bb.BindExistingInstance(songPreviewControl);
         bb.BindExistingInstance(songSearchControl);
         bb.BindExistingInstance(songSelectSelectedSongDetailsControl);
+        bb.BindExistingInstance(songSelectMenuControl);
         bb.Bind(nameof(micPitchTrackerPrefab)).ToExistingInstance(micPitchTrackerPrefab);
         return bb.GetBindings();
     }
