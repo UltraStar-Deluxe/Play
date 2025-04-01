@@ -307,9 +307,15 @@ public class Job<T> : IJob
     public void Cancel()
     {
         if (IsCanceled.Value
-            || !IsCancelable.Value
             || IsCancellationRequested)
         {
+            Debug.LogWarning($"Job is already canceled: name '{Name}'");
+            return;
+        }
+
+        if (!IsCancelable.Value)
+        {
+            Debug.LogWarning($"Job cannot be canceled: name '{Name}'");
             return;
         }
 
