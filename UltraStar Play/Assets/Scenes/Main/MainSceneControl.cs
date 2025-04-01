@@ -107,7 +107,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     private SongIssueManager songIssueManager;
 
     private MessageDialogControl quitGameDialogControl;
-    private NewSongDialogControl newSongDialogControl;
+    private CreateSongDialogControl createSongDialogControl;
     private OnlineMultiplayerConnectionDialogControl onlineMultiplayerConnectionDialogControl;
     private SettingsProblemHintControl settingsProblemHintControl;
     private readonly BuildInfoUiControl buildInfoUiControl = new();
@@ -226,7 +226,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     public void OpenNewSongDialog()
     {
-        if (newSongDialogControl != null)
+        if (createSongDialogControl != null)
         {
             return;
         }
@@ -234,14 +234,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         VisualElement visualElement = newSongDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(visualElement);
 
-        newSongDialogControl = injector
+        createSongDialogControl = injector
             .WithRootVisualElement(visualElement)
-            .CreateAndInject<NewSongDialogControl>();
+            .CreateAndInject<CreateSongDialogControl>();
 
-        newSongDialogControl.DialogClosedEventStream
+        createSongDialogControl.DialogClosedEventStream
             .Subscribe(_ =>
             {
-                newSongDialogControl = null;
+                createSongDialogControl = null;
                 createSongButton.Focus();
             });
     }
