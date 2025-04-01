@@ -45,7 +45,6 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
         Injector injector = UltraStarPlaySceneInjectionManager.Instance.SceneInjector;
         injector.Inject(createSingAlongSongControl);
 
-        bool createdSingAlongDataSuccessfully = false;
         SongMeta createdSongMeta = null;
         try
         {
@@ -60,7 +59,6 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
         Assert.IsNotNull(createdSongMeta, "Failed to create sing-along data, created song meta is null.");
 
         Debug.Log($"Created sing-along data for audio file '{audioFileName}'");
-        createdSingAlongDataSuccessfully = true;
 
         // Audio separation must have been executed, files must have been created.
         Assert.IsTrue(SongMetaUtils.VocalsAudioResourceExists(createdSongMeta), "Vocals audio resource does not exist after creating sing-along data");
@@ -94,11 +92,6 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
         if (TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis))
         {
             Assert.Fail($"Failed to create sing-along data within {maxWaitTimeInMillis} ms");
-        }
-
-        if (!createdSingAlongDataSuccessfully)
-        {
-            Assert.Fail($"Failed to create sing-along data. See log for errors.");
         }
     }
 }
