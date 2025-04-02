@@ -195,7 +195,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private readonly SingSceneMedleyControl medleyControl = new();
 
     // TODO: Should be created like other GameRoundModifiers, in PassTheMicGameRoundModifier.CreateControl
-    private readonly SingScenePassTheMicControl passTheMicControl = new();
+    private readonly PassTheMicControl passTheMicControl = new();
 
     public bool IsCommonScore => settings.ScoreMode == EScoreMode.CommonAverage
                                  && sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 2;
