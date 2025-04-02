@@ -1,3 +1,7 @@
+# Nuke build tool
+.nuke/
+
+# Project specific files
 IgnoredAssetsOfMobileBuild/
 Database.json
 persistentDataPath.lnk
