@@ -63,9 +63,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject(UxmlName = R.UxmlNames.songOrderDropdownField)]
     private DropdownField songOrderDropdownField;
 
-    [Inject(UxmlName = R.UxmlNames.coopModeToggle)]
-    private Toggle coopModeToggle;
-
     [Inject]
     private AchievementEventStream achievementEventStream;
 
@@ -126,15 +123,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject(UxmlName = R.UxmlNames.selectRandomSongButton)]
     private Button selectRandomSongButton;
 
-    [Inject(UxmlName = R.UxmlNames.currentDifficultyLabel)]
-    private Label currentDifficultyLabel;
-
-    [Inject(UxmlName = R.UxmlNames.nextDifficultyButton)]
-    private Button nextDifficultyButton;
-
-    [Inject(UxmlName = R.UxmlNames.previousDifficultyButton)]
-    private Button previousDifficultyButton;
-
     private readonly SongSearchControl songSearchControl = new();
 
     public ReactiveProperty<int> RunningSongRepositorySearches { get; set; } = new(0);
@@ -162,6 +150,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     private readonly SongSelectMenuControl songSelectMenuControl = new();
     private readonly SongSelectSongQueueControl songSelectSongQueueControl = new();
     private readonly SongSelectModifiersControl songSelectModifiersControl = new();
+    private readonly SongSelectDifficultyAndScoreModeControl songSelectDifficultyAndScoreModeControl = new();
 
     private MessageDialogControl askToAssignMicsDialog;
 
@@ -183,6 +172,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         injector.Inject(songSelectMenuControl);
         injector.Inject(songSelectSongQueueControl);
         injector.Inject(songSelectModifiersControl);
+        injector.Inject(songSelectDifficultyAndScoreModeControl);
     }
 
     private void Start()
@@ -217,8 +207,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         {
             partyModeControl.SelectRandomSong();
         }
-
-        InitDifficultyAndScoreMode();
 
         FieldBindingUtils.Bind(micCheckToggle,
             () => nonPersistentSettings.MicTestActive.Value,
@@ -305,111 +293,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         InitSongMetas();
         UpdateFilteredSongs();
         UpdateSongScanLabels(isSongScanFinished);
-    }
-
-    private void InitDifficultyAndScoreMode()
-    {
-        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitDifficultyAndScoreMode");
-
-        // Set difficulty for all players
-        settings.ObserveEveryValueChanged(it => it.Difficulty)
-            .Subscribe(newValue =>
-            {
-                settings.PlayerProfiles
-                    .Union(nonPersistentSettings.LobbyMemberPlayerProfiles)
-                    .ForEach(it => it.Difficulty = newValue);
-            });
-
-        nextDifficultyButton.RegisterCallbackButtonTriggered(_ => SetNextDifficulty());
-        previousDifficultyButton.RegisterCallbackButtonTriggered(_ => SetPreviousDifficulty());
-
-        UpdateDifficultyAndScoreModeControls();
-
-        FieldBindingUtils.Bind(
-            gameObject,
-            coopModeToggle,
-            () => SettingsUtils.IsCoopModeEnabled(settings),
-            newValue =>
-            {
-                SettingsUtils.SetCoopModeEnabled(settings, newValue);
-                UpdateDifficultyAndScoreModeControls();
-            });
-    }
-
-    private void SetPreviousDifficulty()
-    {
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            settings.ScoreMode = EScoreMode.Individual;
-            SetDifficulty(EDifficulty.Hard);
-        }
-        else
-        {
-            switch (settings.Difficulty)
-            {
-                case EDifficulty.Easy:
-                    SetNoScoreMode();
-                    break;
-                case EDifficulty.Medium:
-                    SetDifficulty(EDifficulty.Easy);
-                    break;
-                case EDifficulty.Hard:
-                    SetDifficulty(EDifficulty.Medium);
-                    break;
-            }
-        }
-    }
-
-    private void SetNextDifficulty()
-    {
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            settings.ScoreMode = EScoreMode.Individual;
-            SetDifficulty(EDifficulty.Easy);
-        }
-        else
-        {
-            switch (settings.Difficulty)
-            {
-                case EDifficulty.Easy:
-                    SetDifficulty(EDifficulty.Medium);
-                    break;
-                case EDifficulty.Medium:
-                    SetDifficulty(EDifficulty.Hard);
-                    break;
-                case EDifficulty.Hard:
-                    SetNoScoreMode();
-                    break;
-            }
-        }
-    }
-
-    private void SetNoScoreMode()
-    {
-        settings.ScoreMode = EScoreMode.None;
-        UpdateDifficultyAndScoreModeControls();
-    }
-
-    private void SetDifficulty(EDifficulty difficulty)
-    {
-        settings.Difficulty = difficulty;
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            settings.ScoreMode = EScoreMode.Individual;
-        }
-        UpdateDifficultyAndScoreModeControls();
-    }
-
-    private void UpdateDifficultyAndScoreModeControls()
-    {
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            currentDifficultyLabel.SetTranslatedText(Translation.Get(R.Messages.options_difficulty_noScores));
-        }
-        else
-        {
-            currentDifficultyLabel.SetTranslatedText(Translation.Get(settings.Difficulty));
-        }
     }
 
     public void QuitSongSelect()
@@ -1069,6 +952,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         bb.BindExistingInstance(songSelectMenuControl);
         bb.BindExistingInstance(songSelectSongQueueControl);
         bb.BindExistingInstance(songSelectModifiersControl);
+        bb.BindExistingInstance(songSelectDifficultyAndScoreModeControl);
         bb.Bind(nameof(micPitchTrackerPrefab)).ToExistingInstance(micPitchTrackerPrefab);
         return bb.GetBindings();
     }
