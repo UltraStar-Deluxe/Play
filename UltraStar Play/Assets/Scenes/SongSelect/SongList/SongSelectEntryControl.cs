@@ -24,6 +24,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private SongSelectSceneControl songSelectSceneControl;
 
     [Inject]
+    private SongSelectSongQueueControl songSelectSongQueueControl;
+
+    [Inject]
     private PlaylistManager playlistManager;
 
     [Inject(UxmlName = R.UxmlNames.songImageOuter)]
@@ -290,14 +293,14 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         VisualElement enqueueMenuEntry = contextMenuPopup.AddButton(Translation.Get(R.Messages.songQueue_action_add), "playlist_add",
             () =>
             {
-                songSelectSceneControl.AddSongToSongQueue(songEntry.SongMeta);
+                songSelectSongQueueControl.AddSongToSongQueue(songEntry.SongMeta);
             });
         enqueueMenuEntry.Q<Button>().name = "enqueueButton";
 
         VisualElement enqueueAsMenuEntry = contextMenuPopup.AddButton(Translation.Get(R.Messages.songQueue_action_addAsMedley), "link",
             () =>
             {
-                songSelectSceneControl.AddSongToSongQueueAsMedley(songEntry.SongMeta);
+                songSelectSongQueueControl.AddSongToSongQueueAsMedley(songEntry.SongMeta);
             });
         enqueueAsMenuEntry.Q<Button>().name = "enqueueAsMedleyButton";
 
