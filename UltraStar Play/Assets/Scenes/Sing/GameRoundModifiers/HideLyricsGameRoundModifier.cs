@@ -12,8 +12,8 @@ public class HideLyricsGameRoundModifier : GameRoundModifier
 
     public override GameRoundModifierControl CreateControl()
     {
-        HideNotesControl modifierControl = GameObjectUtils
-            .CreateGameObjectWithComponent<HideNotesControl>();
+        HideLyricsControl modifierControl = GameObjectUtils
+            .CreateGameObjectWithComponent<HideLyricsControl>();
         modifierControl.conditionSettings = conditionSettings;
         return modifierControl;
     }
@@ -23,7 +23,7 @@ public class HideLyricsGameRoundModifier : GameRoundModifier
         return conditionSettings.CreateConfigurationVisualElement();
     }
 
-    public class HideNotesControl : ClassicConditionGameRoundModifierControl
+    public class HideLyricsControl : ClassicConditionGameRoundModifierControl
     {
         public override void ActivateModifier(IReadOnlyCollection<PlayerControl> playerControls)
         {
