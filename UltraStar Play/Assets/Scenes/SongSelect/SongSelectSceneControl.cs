@@ -802,6 +802,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             && singSceneData.gameRoundSettings.modifiers.AnyMatch(modifier => modifier is ShortSongGameRoundModifier))
         {
             // Set as medley song to play shortened version
+            // TODO: This modification should happen in SingScene where the GameRoundModifier behaviors are defined.
             singSceneData.MedleySongIndex = 0;
         }
         return singSceneData;

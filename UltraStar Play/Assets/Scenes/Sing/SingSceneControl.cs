@@ -193,6 +193,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private readonly SingSceneCountdownControl countdownControl = new();
     private readonly SingSceneAudioFadeInControl audioFadeInControl = new();
     private readonly SingSceneMedleyControl medleyControl = new();
+
+    // TODO: Should be created like other GameRoundModifiers, in PassTheMicGameRoundModifier.CreateControl
     private readonly SingScenePassTheMicControl passTheMicControl = new();
 
     public bool IsCommonScore => settings.ScoreMode == EScoreMode.CommonAverage
