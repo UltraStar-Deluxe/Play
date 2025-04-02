@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -69,12 +68,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject]
     private SongSelectSceneData sceneData;
 
-    private List<SongMeta> lastSongMetasOfSongRouletteControl = new();
-    private DirectoryInfo lastDirectoryInfoOfSongRouletteControl;
-    private float lastSongMetaCountUpdateTimeInSeconds;
-    private string lastRawSearchText;
-    private SongSelectEntry selectedEntryBeforeSearch;
-
     [Inject]
     private Statistics statistics;
 
@@ -132,6 +125,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     private MessageDialogControl searchExpressionHelpDialogControl;
     private MessageDialogControl lyricsDialogControl;
     private MessageDialogControl noSingAlongDataDialogControl;
+    private MessageDialogControl askToAssignMicsDialog;
 
     public PartyModeSceneData PartyModeSceneData => sceneData.partyModeSceneData;
     public bool HasPartyModeSceneData => PartyModeSceneData != null;
@@ -152,12 +146,16 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     private readonly SongSelectModifiersControl songSelectModifiersControl = new();
     private readonly SongSelectDifficultyAndScoreModeControl songSelectDifficultyAndScoreModeControl = new();
 
-    private MessageDialogControl askToAssignMicsDialog;
-
     private readonly Subject<BeforeSongStartedEvent> beforeSongStartedEventStream = new();
     public IObservable<BeforeSongStartedEvent> BeforeSongStartedEventStream => beforeSongStartedEventStream;
 
     private DropdownFieldControl<ESongOrder> songOrderDropdownFieldControl;
+
+    private List<SongMeta> lastSongMetasOfSongRouletteControl = new();
+    private DirectoryInfo lastDirectoryInfoOfSongRouletteControl;
+    private float lastSongMetaCountUpdateTimeInSeconds;
+    private string lastRawSearchText;
+    private SongSelectEntry selectedEntryBeforeSearch;
 
     public void OnInjectionFinished()
     {
