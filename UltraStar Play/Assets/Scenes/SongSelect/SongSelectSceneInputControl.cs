@@ -19,6 +19,12 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private SongSelectMenuControl songSelectMenuControl;
 
     [Inject]
+    private SongSelectSongQueueControl songSelectSongQueueControl;
+
+    [Inject]
+    private SongSelectModifiersControl songSelectModifiersControl;
+
+    [Inject]
     private SongSearchControl songSearchControl;
 
     [Inject]
@@ -246,13 +252,13 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSelectMenuControl.SceneMenuSlideInControl.SlideOut();
         }
-        else if (songSelectSceneControl.SongQueueSlideInControl.Visible.Value)
+        else if (songSelectSongQueueControl.SongQueueSlideInControl.Visible.Value)
         {
-            songSelectSceneControl.SongQueueSlideInControl.SlideOut();
+            songSelectSongQueueControl.SongQueueSlideInControl.SlideOut();
         }
-        else if (songSelectSceneControl.ModifiersOverlaySlideInControl.Visible.Value)
+        else if (songSelectModifiersControl.ModifiersOverlaySlideInControl.Visible.Value)
         {
-            songSelectSceneControl.ModifiersOverlaySlideInControl.SlideOut();
+            songSelectModifiersControl.ModifiersOverlaySlideInControl.SlideOut();
         }
         else
         {

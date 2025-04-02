@@ -71,6 +71,22 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         playerEntryControls.ForEach(it => it.Update());
     }
 
+    public SingScenePlayerData CreateSingScenePlayerData()
+    {
+        SingScenePlayerData singScenePlayerData = new();
+
+        List<PlayerProfile> selectedPlayerProfiles = GetSelectedPlayerProfiles();
+        if (selectedPlayerProfiles.IsNullOrEmpty())
+        {
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_noPlayerSelected_title));
+            return null;
+        }
+        singScenePlayerData.SelectedPlayerProfiles = selectedPlayerProfiles;
+        singScenePlayerData.PlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
+        singScenePlayerData.PlayerProfileToVoiceIdMap = GetSelectedPlayerProfileToExtendedVoiceIdMap();
+        return singScenePlayerData;
+    }
+
     private void SelectMicsForPartyMode()
     {
         // Assign mics by re-selecting every player profile of this round.

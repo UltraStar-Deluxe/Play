@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -18,8 +17,6 @@ using IBinding = UniInject.IBinding;
 
 public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
-    private const float SongQueueItemHeightInPx = 65;
-
     private static readonly ProfilerMarker onInjectionFinishedProfilerMarker = new ProfilerMarker("SongSelectSceneControl.OnInjectionFinished");
     private readonly IComparer<object> songMetaPropertyComparer = new NullOrEmptyValueLastComparer();
 
@@ -65,32 +62,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject(UxmlName = R.UxmlNames.songOrderDropdownField)]
     private DropdownField songOrderDropdownField;
 
-    [Inject(UxmlName = R.UxmlNames.playerList)]
-    private VisualElement playerList;
-
-    [Inject(UxmlName = R.UxmlNames.addToSongQueueAsNewButton)]
-    private Button addToSongQueueAsNewButton;
-
-    [Inject(UxmlName = R.UxmlNames.addToSongQueueAsMedleyButton)]
-    private Button addToSongQueueAsMedleyButton;
-
-    [Inject(UxmlName = R.UxmlNames.startSongQueueButton)]
-    private Button startSongQueueButton;
-
-    [Inject(UxmlName = R.UxmlNames.coopModeToggle)]
-    private Toggle coopModeToggle;
-
     [Inject]
     private AchievementEventStream achievementEventStream;
 
     [Inject]
     private SongSelectSceneData sceneData;
-
-    private List<SongMeta> lastSongMetasOfSongRouletteControl = new();
-    private DirectoryInfo lastDirectoryInfoOfSongRouletteControl;
-    private float lastSongMetaCountUpdateTimeInSeconds;
-    private string lastRawSearchText;
-    private SongSelectEntry selectedEntryBeforeSearch;
 
     [Inject]
     private Statistics statistics;
@@ -116,9 +92,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject]
     private SongIssueManager songIssueManager;
 
-    [Inject]
-    private SongQueueManager songQueueManager;
-
     [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
     private VisualElement noSongsFoundContainer;
 
@@ -143,69 +116,16 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject(UxmlName = R.UxmlNames.selectRandomSongButton)]
     private Button selectRandomSongButton;
 
-    [Inject(UxmlName = R.UxmlNames.toggleSongQueueOverlayButton)]
-    private Button toggleSongQueueOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.closeSongQueueButton)]
-    private Button closeSongQueueButton;
-
-    [Inject(UxmlName = R.UxmlNames.songQueueLengthContainer)]
-    private VisualElement songQueueLengthContainer;
-
-    [Inject(UxmlName = R.UxmlNames.songQueueLengthLabel)]
-    private Label songQueueLengthLabel;
-
-    [Inject(UxmlName = R.UxmlNames.songQueueOverlay)]
-    private VisualElement songQueueOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.toggleModifiersOverlayButton)]
-    private Button toggleModifiersOverlayButton;
-
-    [Inject(UxmlName = R_PlayShared.UxmlNames.resetModifiersButton)]
-    private Button resetModifiersButton;
-
-    [Inject(UxmlName = R.UxmlNames.modifiersActiveIcon)]
-    private VisualElement modifiersActiveIcon;
-
-    [Inject(UxmlName = R.UxmlNames.hiddenHideSongQueueOverlayArea)]
-    private VisualElement hiddenHideSongQueueOverlayArea;
-
-    [Inject(UxmlName = R.UxmlNames.hiddenHideModifiersOverlayArea)]
-    private VisualElement hiddenHideModifiersOverlayArea;
-
-    [Inject(UxmlName = R.UxmlNames.modifiersInactiveIcon)]
-    private VisualElement modifiersInactiveIcon;
-
-    [Inject(UxmlName = R.UxmlNames.closeModifiersOverlayButton)]
-    private Button closeModifiersOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
-    private VisualElement modifierDialogOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.currentDifficultyLabel)]
-    private Label currentDifficultyLabel;
-
-    [Inject(UxmlName = R.UxmlNames.nextDifficultyButton)]
-    private Button nextDifficultyButton;
-
-    [Inject(UxmlName = R.UxmlNames.previousDifficultyButton)]
-    private Button previousDifficultyButton;
-
     private readonly SongSearchControl songSearchControl = new();
 
     public ReactiveProperty<int> RunningSongRepositorySearches { get; set; } = new(0);
 
-    public SongMeta SelectedSong
-    {
-        get
-        {
-            return (songRouletteControl.SelectedEntry as SongSelectSongEntry)?.SongMeta;
-        }
-    }
+    public SongMeta SelectedSong => (songRouletteControl.SelectedEntry as SongSelectSongEntry)?.SongMeta;
 
     private MessageDialogControl searchExpressionHelpDialogControl;
     private MessageDialogControl lyricsDialogControl;
     private MessageDialogControl noSingAlongDataDialogControl;
+    private MessageDialogControl askToAssignMicsDialog;
 
     public PartyModeSceneData PartyModeSceneData => sceneData.partyModeSceneData;
     public bool HasPartyModeSceneData => PartyModeSceneData != null;
@@ -219,24 +139,23 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     public SongSelectionPlaylistChooserControl SongSelectionPlaylistChooserControl { get; private set; } = new();
     private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
     private readonly SongSelectScenePartyModeControl partyModeControl = new();
-    private readonly GameRoundModifierDialogControl modifierDialogControl = new();
-    private readonly SongQueueUiControl songQueueUiControl = new();
     private readonly SongSelectFilterControl songSelectFilterControl = new();
     private readonly SongSelectSelectedSongDetailsControl songSelectSelectedSongDetailsControl = new();
     private readonly SongSelectMenuControl songSelectMenuControl = new();
-
-    private MessageDialogControl askToAssignMicsDialog;
-
-    public VisualElementSlideInControl SongQueueSlideInControl { get; private set; }
-    public VisualElementSlideInControl ModifiersOverlaySlideInControl { get; private set; }
+    private readonly SongSelectSongQueueControl songSelectSongQueueControl = new();
+    private readonly SongSelectModifiersControl songSelectModifiersControl = new();
+    private readonly SongSelectDifficultyAndScoreModeControl songSelectDifficultyAndScoreModeControl = new();
 
     private readonly Subject<BeforeSongStartedEvent> beforeSongStartedEventStream = new();
     public IObservable<BeforeSongStartedEvent> BeforeSongStartedEventStream => beforeSongStartedEventStream;
 
     private DropdownFieldControl<ESongOrder> songOrderDropdownFieldControl;
 
-    private bool AnyModifierOrCoopModeActive => nonPersistentSettings.GameRoundSettings.AnyModifierActive ||
-                                                SettingsUtils.IsCoopModeEnabled(settings);
+    private List<SongMeta> lastSongMetasOfSongRouletteControl = new();
+    private DirectoryInfo lastDirectoryInfoOfSongRouletteControl;
+    private float lastSongMetaCountUpdateTimeInSeconds;
+    private string lastRawSearchText;
+    private SongSelectEntry selectedEntryBeforeSearch;
 
     public void OnInjectionFinished()
     {
@@ -245,11 +164,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         injector.Inject(SongSelectionPlaylistChooserControl);
         injector.Inject(createSingAlongSongControl);
         injector.Inject(partyModeControl);
-        injector.Inject(songQueueUiControl);
         injector.Inject(songSelectFilterControl);
         injector.Inject(songSearchControl);
         injector.Inject(songSelectSelectedSongDetailsControl);
         injector.Inject(songSelectMenuControl);
+        injector.Inject(songSelectSongQueueControl);
+        injector.Inject(songSelectModifiersControl);
+        injector.Inject(songSelectDifficultyAndScoreModeControl);
     }
 
     private void Start()
@@ -285,8 +206,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             partyModeControl.SelectRandomSong();
         }
 
-        InitDifficultyAndScoreMode();
-
         FieldBindingUtils.Bind(micCheckToggle,
             () => nonPersistentSettings.MicTestActive.Value,
             newValue => nonPersistentSettings.MicTestActive.Value = newValue);
@@ -299,8 +218,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             settings.SongOrder = newValue;
             UpdateFilteredSongs();
         });
-
-        resetModifiersButton.RegisterCallbackButtonTriggered(_ => ResetCoopMode());
 
         selectRandomSongButton.RegisterCallbackButtonTriggered(_ => SelectRandomSong());
         FieldBindingUtils.Bind(searchExpressionToggle,
@@ -352,12 +269,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                 "name", Path.GetFileName(processedSongMeta.Audio)));
         });
 
-        InitSlideInControls();
-
-        InitSongQueue();
-
-        InitModifierDialog();
-
         UpdateSceneTitle();
     }
 
@@ -375,237 +286,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         fuzzySearchTextLabel.SetTranslatedText(Translation.Of(newValue));
     }
 
-    private void ResetCoopMode()
-    {
-        if (SettingsUtils.IsCoopModeEnabled(settings))
-        {
-            SettingsUtils.SetCoopModeEnabled(settings, false);
-        }
-    }
-
     private void UpdateAvailableSongsAndUi(bool isSongScanFinished)
     {
         InitSongMetas();
         UpdateFilteredSongs();
         UpdateSongScanLabels(isSongScanFinished);
-    }
-
-    private void InitSongQueue()
-    {
-        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitSongQueueOverlay");
-
-        songQueueLengthContainer.HideByDisplay();
-        songQueueManager.SongQueueChangedEventStream
-            .Subscribe(_ => UpdateSongQueue())
-            .AddTo(gameObject);
-        UpdateSongQueue();
-
-        addToSongQueueAsNewButton.RegisterCallbackButtonTriggered(_ => AddSongToSongQueue(SelectedSong));
-        addToSongQueueAsMedleyButton.RegisterCallbackButtonTriggered(_ => AddSongToSongQueueAsMedley(SelectedSong));
-        startSongQueueButton.RegisterCallbackButtonTriggered(_ => StartSingSceneWithNextSongQueueEntry());
-        songQueueUiControl.OnToggleMedley = songQueueEntryDto => songQueueManager.ToggleMedley(songQueueEntryDto);
-        songQueueUiControl.OnDelete = songQueueEntryDto => songQueueManager.RemoveSongQueueEntry(songQueueEntryDto);
-        songQueueUiControl.OnItemIndexChanged = OnItemIndexChanged;
-        songQueueUiControl.ItemHeight = SongQueueItemHeightInPx;
-    }
-
-    private void OnItemIndexChanged(SongQueueUiControl.ItemIndexChangedEvent evt)
-    {
-        songQueueManager.SetSongQueueEntries(evt.UpdatedItems.ToList());
-    }
-
-    private void InitSlideInControls()
-    {
-        ModifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
-        SongSelectSlideInControlUtils.InitSlideInControl(ModifiersOverlaySlideInControl, toggleModifiersOverlayButton, closeModifiersOverlayButton, modifierDialogOverlay, hiddenHideModifiersOverlayArea);
-
-        SongQueueSlideInControl = new(songQueueOverlay, ESide2D.Right, false);
-        SongSelectSlideInControlUtils.InitSlideInControl(SongQueueSlideInControl, toggleSongQueueOverlayButton, closeSongQueueButton, songQueueOverlay, hiddenHideSongQueueOverlayArea);
-    }
-
-    private void InitSlideInControl(
-        VisualElementSlideInControl slideInControl,
-        Button toggleOverlayButton,
-        Button closeOverlayButton,
-        VisualElement overlay,
-        VisualElement hideOverlayArea)
-    {
-        hideOverlayArea.HideByDisplay();
-        hideOverlayArea.RegisterCallback<PointerDownEvent>(_ => slideInControl.SlideOut());
-
-        toggleOverlayButton.RegisterCallbackButtonTriggered(_ => slideInControl.ToggleVisible());
-        closeOverlayButton.RegisterCallbackButtonTriggered(_ => slideInControl.SlideOut());
-
-        slideInControl.Visible.Subscribe(newValue =>
-        {
-            hideOverlayArea.SetVisibleByDisplay(newValue);
-            if (newValue)
-            {
-                closeOverlayButton.Focus();
-            }
-            else if (VisualElementUtils.IsDescendantFocused(overlay))
-            {
-                toggleOverlayButton.Focus();
-            }
-        });
-    }
-
-    private void InitModifierDialog()
-    {
-        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitModifierDialog");
-
-        // Modifier active icon
-        modifiersActiveIcon.HideByDisplay();
-        nonPersistentSettings.ObserveEveryValueChanged(_ => AnyModifierOrCoopModeActive)
-            .Subscribe(_ => UpdateModifiersActiveIcon());
-
-        // Delay initialization of modifier dialog control
-        bool initializedModifierDialogControl = false;
-        ModifiersOverlaySlideInControl.Visible.Subscribe(newValue =>
-        {
-            if (newValue
-                && !initializedModifierDialogControl)
-            {
-                initializedModifierDialogControl = true;
-                InitModifierDialogControl();
-            }
-        });
-    }
-
-    private void InitModifierDialogControl()
-    {
-        injector.WithRootVisualElement(modifierDialogOverlay)
-            .Inject(modifierDialogControl);
-        modifierDialogControl.OpenDialog(nonPersistentSettings.GameRoundSettings);
-        modifierDialogOverlay.Query(R_PlayShared.UxmlNames.closeModifierDialogButton).ForEach(it => it.HideByDisplay());
-    }
-
-    private void UpdateSongQueue()
-    {
-        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.UpdateSongQueue");
-
-        string newSongQueueLengthAsString = songQueueManager.SongQueueLength.ToString();
-        if (songQueueLengthLabel.text != newSongQueueLengthAsString)
-        {
-            songQueueLengthContainer.SetVisibleByDisplay(songQueueManager.SongQueueLength > 0);
-            songQueueLengthLabel.SetTranslatedText(Translation.Of(newSongQueueLengthAsString));
-            LeanTween.value(gameObject, Vector3.one * 1.5f, Vector3.one, 1.5f)
-                .setEaseOutBounce()
-                .setOnUpdate(s => songQueueLengthLabel.style.scale = new StyleScale(new Scale(new Vector2(s, s))));
-        }
-        songQueueUiControl.SetSongQueueEntryDtos(songQueueManager.GetSongQueueEntries());
-        startSongQueueButton.SetEnabled(!songQueueManager.IsSongQueueEmpty);
-    }
-
-    private void UpdateModifiersActiveIcon()
-    {
-        modifiersActiveIcon.SetVisibleByDisplay(AnyModifierOrCoopModeActive);
-        modifiersInactiveIcon.SetVisibleByDisplay(!AnyModifierOrCoopModeActive);
-    }
-
-    private void InitDifficultyAndScoreMode()
-    {
-        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitDifficultyAndScoreMode");
-
-        // Set difficulty for all players
-        settings.ObserveEveryValueChanged(it => it.Difficulty)
-            .Subscribe(newValue =>
-            {
-                settings.PlayerProfiles
-                    .Union(nonPersistentSettings.LobbyMemberPlayerProfiles)
-                    .ForEach(it => it.Difficulty = newValue);
-            });
-
-        nextDifficultyButton.RegisterCallbackButtonTriggered(_ => SetNextDifficulty());
-        previousDifficultyButton.RegisterCallbackButtonTriggered(_ => SetPreviousDifficulty());
-
-        UpdateDifficultyAndScoreModeControls();
-
-        FieldBindingUtils.Bind(
-            gameObject,
-            coopModeToggle,
-            () => SettingsUtils.IsCoopModeEnabled(settings),
-            newValue =>
-            {
-                SettingsUtils.SetCoopModeEnabled(settings, newValue);
-                UpdateDifficultyAndScoreModeControls();
-            });
-    }
-
-    private void SetPreviousDifficulty()
-    {
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            settings.ScoreMode = EScoreMode.Individual;
-            SetDifficulty(EDifficulty.Hard);
-        }
-        else
-        {
-            switch (settings.Difficulty)
-            {
-                case EDifficulty.Easy:
-                    SetNoScoreMode();
-                    break;
-                case EDifficulty.Medium:
-                    SetDifficulty(EDifficulty.Easy);
-                    break;
-                case EDifficulty.Hard:
-                    SetDifficulty(EDifficulty.Medium);
-                    break;
-            }
-        }
-    }
-
-    private void SetNextDifficulty()
-    {
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            settings.ScoreMode = EScoreMode.Individual;
-            SetDifficulty(EDifficulty.Easy);
-        }
-        else
-        {
-            switch (settings.Difficulty)
-            {
-                case EDifficulty.Easy:
-                    SetDifficulty(EDifficulty.Medium);
-                    break;
-                case EDifficulty.Medium:
-                    SetDifficulty(EDifficulty.Hard);
-                    break;
-                case EDifficulty.Hard:
-                    SetNoScoreMode();
-                    break;
-            }
-        }
-    }
-
-    private void SetNoScoreMode()
-    {
-        settings.ScoreMode = EScoreMode.None;
-        UpdateDifficultyAndScoreModeControls();
-    }
-
-    private void SetDifficulty(EDifficulty difficulty)
-    {
-        settings.Difficulty = difficulty;
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            settings.ScoreMode = EScoreMode.Individual;
-        }
-        UpdateDifficultyAndScoreModeControls();
-    }
-
-    private void UpdateDifficultyAndScoreModeControls()
-    {
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            currentDifficultyLabel.SetTranslatedText(Translation.Get(R.Messages.options_difficulty_noScores));
-        }
-        else
-        {
-            currentDifficultyLabel.SetTranslatedText(Translation.Get(settings.Difficulty));
-        }
     }
 
     public void QuitSongSelect()
@@ -620,51 +305,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         {
             sceneNavigator.LoadScene(EScene.MainScene);
         }
-    }
-
-    public void AddSongToSongQueue(SongMeta songMeta)
-    {
-        if (songMeta == null)
-        {
-            return;
-        }
-
-        SongQueueEntryDto songQueueEntryDto = CreateSongQueueEntryWithCurrentSettings(songMeta);
-        songQueueManager.AddSongQueueEntry(songQueueEntryDto);
-    }
-
-    public void AddSongToSongQueueAsMedley(SongMeta songMeta)
-    {
-        if (songMeta == null)
-        {
-            return;
-        }
-
-        if (songQueueManager.IsSongQueueEmpty)
-        {
-            // Cannot create medley with previous song when song queue is empty.
-            AddSongToSongQueue(songMeta);
-            return;
-        }
-
-        SongQueueEntryDto songQueueEntryDto = CreateSongQueueEntryWithCurrentSettings(songMeta);
-        if (songQueueEntryDto != null)
-        {
-            songQueueEntryDto.IsMedleyWithPreviousEntry = true;
-            songQueueManager.AddSongQueueEntry(songQueueEntryDto);
-        }
-    }
-
-    private SongQueueEntryDto CreateSongQueueEntryWithCurrentSettings(SongMeta songMeta)
-    {
-        SongQueueEntryDto songQueueEntryDto = new();
-        songQueueEntryDto.SongDto = DtoConverter.ToDto(songMeta);
-        songQueueEntryDto.SingScenePlayerDataDto = DtoConverter.ToDto(CreateSingScenePlayerData());
-        songQueueEntryDto.GameRoundSettingsDto = new GameRoundSettingsDto()
-        {
-            ModifierDtos = DtoConverter.ToDto(nonPersistentSettings.GameRoundSettings.modifiers),
-        };
-        return songQueueEntryDto;
     }
 
     private void ShowSearchExpressionHelp()
@@ -793,7 +433,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         SingSceneData singSceneData = new();
         singSceneData.SongMetas = new List<SongMeta> { songMeta };
-        singSceneData.SingScenePlayerData = CreateSingScenePlayerData();
+        singSceneData.SingScenePlayerData = playerListControl.CreateSingScenePlayerData();
         singSceneData.partyModeSceneData = sceneData.partyModeSceneData;
         singSceneData.gameRoundSettings = new(nonPersistentSettings.GameRoundSettings);
         singSceneData.StartPaused = startPaused;
@@ -806,33 +446,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             singSceneData.MedleySongIndex = 0;
         }
         return singSceneData;
-    }
-
-    private SingScenePlayerData CreateSingScenePlayerData()
-    {
-        SingScenePlayerData singScenePlayerData = new();
-
-        List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
-        if (selectedPlayerProfiles.IsNullOrEmpty())
-        {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_noPlayerSelected_title));
-            return null;
-        }
-        singScenePlayerData.SelectedPlayerProfiles = selectedPlayerProfiles;
-        singScenePlayerData.PlayerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
-        singScenePlayerData.PlayerProfileToVoiceIdMap = playerListControl.GetSelectedPlayerProfileToExtendedVoiceIdMap();
-        return singScenePlayerData;
-    }
-
-    public void StartSingSceneWithNextSongQueueEntry()
-    {
-        if (songQueueManager.IsSongQueueEmpty)
-        {
-            return;
-        }
-
-        SingSceneData singSceneData = songQueueManager.CreateNextSingSceneData(sceneData.partyModeSceneData);
-        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 
     public void StartSingSceneWithGivenSongAndSettings(SongMeta songMeta, bool startPaused, bool fireBeforeSongStartedEvent)
@@ -1335,6 +948,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         bb.BindExistingInstance(songSearchControl);
         bb.BindExistingInstance(songSelectSelectedSongDetailsControl);
         bb.BindExistingInstance(songSelectMenuControl);
+        bb.BindExistingInstance(songSelectSongQueueControl);
+        bb.BindExistingInstance(songSelectModifiersControl);
+        bb.BindExistingInstance(songSelectDifficultyAndScoreModeControl);
         bb.Bind(nameof(micPitchTrackerPrefab)).ToExistingInstance(micPitchTrackerPrefab);
         return bb.GetBindings();
     }
