@@ -9,6 +9,7 @@ namespace DefaultNamespace;
 
 class Build : NukeBuild
 {
+    [Parameter] readonly uint cloneDepth = 1000;
     [Parameter] readonly AbsolutePath buildOutput = RootDirectory / "Builds";
 
     private readonly AbsolutePath mainGameDir = RootDirectory / "UltraStar Play";
@@ -98,7 +99,7 @@ class Build : NukeBuild
             RemoteUrl = "https://github.com/achimmihca/OneJsRuntimeLoadedStyleSheets.git",
             CommitHash = "8259391b6bbdbd6a445515151bf4aae87e0ba57b",
             TargetDir = mainGameDir / "Assets" / "OneJS",
-            Depth = 100,
+            Depth = cloneDepth,
             SparseCheckoutPatterns =
             {
                 "Assets/OneJS/*",
