@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using Nuke.Common;
 using Nuke.Common.IO;
+using Nuke.Common.Tooling;
 using Nuke.Common.Tools.Unity;
 using static Nuke.Common.Tools.Unity.UnityTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
@@ -10,12 +12,27 @@ namespace DefaultNamespace;
 class Build : NukeBuild
 {
     [Parameter] readonly uint cloneDepth = 1000;
-    [Parameter] readonly AbsolutePath buildOutput = RootDirectory / "Builds";
+    [Parameter] readonly AbsolutePath buildOutput = RootDirectory / "Build";
+    [Parameter] readonly AbsolutePath unityExecutable = "C:/Program Files/Unity/Hub/Editor/2023.2.12f1/Editor/Unity.exe";
 
     private readonly AbsolutePath mainGameDir = RootDirectory / "UltraStar Play";
     private readonly AbsolutePath companionAppDir = RootDirectory / "UltraStar Play Companion";
 
     public static int Main() => Execute<Build>(x => x.BuildMainGameWindows64);
+
+    Target RunMainGameTests => _ => _
+        .Executes(() =>
+        {
+            RunUnityTests(mainGameDir, UnityTestPlatform.EditMode);
+            RunUnityTests(mainGameDir, UnityTestPlatform.PlayMode);
+        });
+
+    Target RunCompanionAppTests => _ => _
+        .Executes(() =>
+        {
+            RunUnityTests(companionAppDir, UnityTestPlatform.EditMode);
+            RunUnityTests(companionAppDir, UnityTestPlatform.PlayMode);
+        });
 
     Target RestoreMainGameDependencies => _ => _
         .DependsOn(RestoreMainGameNuGet)
@@ -66,29 +83,40 @@ class Build : NukeBuild
         return unityProjectDir / "Packages" / "NuGet";
     }
 
-    private void RunUnityBuildMainGame(string methodName)
+    void RunUnityBuildMainGame(string methodName)
     {
-        Console.WriteLine("🚀 Building Unity project of main game...");
+        RunUnityBuild(mainGameDir, $"MainGameBuildTools.{methodName}");
+    }
 
-        Unity(new UnitySettings()
-                .SetProjectPath(mainGameDir) // Path to Unity project
-                .SetBatchMode(true) // Run in batch mode
-                .SetQuit(true) // Quit Unity after build
-                .SetExecuteMethod($"MainGameBuildTools.{methodName}") // Specify the build method to execute
-                .SetLogFile(buildOutput / "NukeBuildMainGame.log") // Log file for Unity build
+    void RunUnityBuildCompanionApp(string methodName)
+    {
+        RunUnityBuild(companionAppDir, $"CompanionAppBuildTools.{methodName}");
+    }
+
+    private void RunUnityTests(AbsolutePath unityProjectDir, UnityTestPlatform unityTestPlatform)
+    {
+        Console.WriteLine($"🚀 Running Unity tests of '{unityProjectDir.Name}'...");
+
+        UnityRunTests(s => s
+            .SetProcessToolPath(unityExecutable)
+            .SetProjectPath(unityProjectDir)
+            .SetBatchMode(true)
+            .SetQuit(true)
+            .SetTestPlatform(unityTestPlatform)
+            .SetLogFile(buildOutput / $"NukeRunTests-{unityTestPlatform}.log")
         );
     }
 
-    private void RunUnityBuildCompanionApp(string methodName)
+    private void RunUnityBuild(AbsolutePath unityProjectDir, string executeMethod)
     {
-        Console.WriteLine("🚀 Building Unity project of companion app...");
+        Console.WriteLine($"🚀 Building Unity project '{unityProjectDir.Name}' ...");
 
         Unity(new UnitySettings()
                 .SetProjectPath(companionAppDir)
                 .SetBatchMode(true)
                 .SetQuit(true)
-                .SetExecuteMethod($"CompanionAppBuildTools.{methodName}") // Specify the build method to execute
-                .SetLogFile(buildOutput / "NukeBuildCompanionApp.log") // Log file for Unity build
+                .SetExecuteMethod(executeMethod)
+                .SetLogFile(buildOutput / "NukeBuildCompanionApp.log")
         );
     }
 
