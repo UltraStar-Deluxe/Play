@@ -1,6 +1,6 @@
 using UnityEditor;
 
-public static class UltraStarPlayCompanionBuildTools
+public static class CompanionAppBuildTools
 {
     private static readonly string appName = "Melody Mania Companion";
 
