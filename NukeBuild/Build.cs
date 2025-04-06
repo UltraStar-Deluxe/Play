@@ -33,17 +33,25 @@ class Build : NukeBuild
             RunUnityTests(companionAppDir, UnityTestPlatform.PlayMode);
         });
 
-    Target RestoreMainGameDependencies => _ => _
-        .DependsOn(RestoreMainGameNuGet)
-        .Executes(() => new MainGameDependencyDownloader(mainGameDir, cloneDepth).DownloadAsync());
-
-    Target RestoreMainGameNuGet => _ => _
+    Target RestoreMainGameNuGetDependencies => _ => _
         .Executes(() =>
         {
-            Console.WriteLine("🔄 Running dotnet restore with packages.config...");
-
             DotNet($"restore \"{GetPackagesConfigFile(mainGameDir)}\" --packages \"{GetPackagesTargetFolder(mainGameDir)}\"");
         });
+
+    Target RestoreMainGameDependencies => _ => _
+        .DependsOn(RestoreMainGameNuGetDependencies)
+        .Executes(() => new MainGameDependencyDownloader(mainGameDir, cloneDepth).DownloadAsync());
+
+    Target RestoreCompanionAppNuGetDependencies => _ => _
+        .Executes(() =>
+        {
+            DotNet($"restore \"{GetPackagesConfigFile(companionAppDir)}\" --packages \"{GetPackagesTargetFolder(companionAppDir)}\"");
+        });
+
+    Target RestoreCompanionAppDependencies => _ => _
+        .DependsOn(RestoreCompanionAppNuGetDependencies)
+        .Executes(() => new CompanionAppDependencyDownloader(companionAppDir, cloneDepth).DownloadAsync());
 
     Target BuildMainGameWindows64 => _ => _
         .Executes(() =>
