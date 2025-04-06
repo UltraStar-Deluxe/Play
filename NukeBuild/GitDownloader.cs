@@ -16,7 +16,7 @@ public class GitDownloader
     public Dictionary<string, string> MovePostprocess { get; set; } = new();
     public List<string> DeletePostprocess { get; set; } = new();
 
-    public void DownloadGitHubDependency()
+    public void Download()
     {
         string oldDir = Directory.GetCurrentDirectory();
         try

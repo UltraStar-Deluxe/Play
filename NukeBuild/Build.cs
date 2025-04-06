@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
@@ -36,10 +35,7 @@ class Build : NukeBuild
 
     Target RestoreMainGameDependencies => _ => _
         .DependsOn(RestoreMainGameNuGet)
-        .Executes(() =>
-        {
-            DownloadOneJs();
-        });
+        .Executes(() => new MainGameDependencyDownloader(mainGameDir, cloneDepth).DownloadAsync());
 
     Target RestoreMainGameNuGet => _ => _
         .Executes(() =>
@@ -118,31 +114,5 @@ class Build : NukeBuild
                 .SetExecuteMethod(executeMethod)
                 .SetLogFile(buildOutput / "NukeBuildCompanionApp.log")
         );
-    }
-
-    void DownloadOneJs()
-    {
-        new GitDownloader
-        {
-            RemoteUrl = "https://github.com/achimmihca/OneJsRuntimeLoadedStyleSheets.git",
-            CommitHash = "8259391b6bbdbd6a445515151bf4aae87e0ba57b",
-            TargetDir = mainGameDir / "Assets" / "OneJS",
-            Depth = cloneDepth,
-            SparseCheckoutPatterns =
-            {
-                "Assets/OneJS/*",
-                "Assets/OneJS.meta"
-            },
-            MovePostprocess =
-            {
-                { "Assets/OneJS/*", "." },
-                { "Assets/OneJS.meta", "." }
-            },
-            DeletePostprocess =
-            {
-                "Assets",
-                ".git"
-            }
-        }.DownloadGitHubDependency();
     }
 }
