@@ -1,5 +1,8 @@
 VERSION.txt
 
+NuGetPackages/
+NuGetPackages.meta
+
 ########################################
 ## Third-party assets
 

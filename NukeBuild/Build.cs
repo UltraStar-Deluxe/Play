@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
@@ -36,7 +37,10 @@ class Build : NukeBuild
     Target RestoreMainGameNuGetDependencies => _ => _
         .Executes(() =>
         {
-            DotNet($"restore \"{GetPackagesConfigFile(mainGameDir)}\" --packages \"{GetPackagesTargetFolder(mainGameDir)}\"");
+            DotNet($"build {GetNuGetPackagesProjectFolder(mainGameDir)}");
+            CopyDllFilesToUnityAssetsFolder(
+                GetNuGetPackagesProjectFolder(mainGameDir) / "bin",
+                mainGameDir / "Assets" / "NuGetPackages");
         });
 
     Target RestoreMainGameDependencies => _ => _
@@ -46,7 +50,10 @@ class Build : NukeBuild
     Target RestoreCompanionAppNuGetDependencies => _ => _
         .Executes(() =>
         {
-            DotNet($"restore \"{GetPackagesConfigFile(companionAppDir)}\" --packages \"{GetPackagesTargetFolder(companionAppDir)}\"");
+            DotNet($"build {GetNuGetPackagesProjectFolder(companionAppDir)}");
+            CopyDllFilesToUnityAssetsFolder(
+                GetNuGetPackagesProjectFolder(companionAppDir) / "bin",
+                companionAppDir / "Assets" / "NuGetPackages");
         });
 
     Target RestoreCompanionAppDependencies => _ => _
@@ -77,14 +84,14 @@ class Build : NukeBuild
             RunUnityBuildCompanionApp("BuildSignedAndroidApk");
         });
 
-    private AbsolutePath GetPackagesConfigFile(AbsolutePath unityProjectDir)
+    private AbsolutePath GetNuGetPackagesProjectFile(AbsolutePath unityProjectDir)
     {
-        return unityProjectDir / "Packages" / "packages.config";
+        return GetNuGetPackagesProjectFolder(unityProjectDir) / "NuGetPackages.csproj";
     }
 
-    private AbsolutePath GetPackagesTargetFolder(AbsolutePath unityProjectDir)
+    private AbsolutePath GetNuGetPackagesProjectFolder(AbsolutePath unityProjectDir)
     {
-        return unityProjectDir / "Packages" / "NuGet";
+        return unityProjectDir / "Packages" / "NuGetPackages";
     }
 
     void RunUnityBuildMainGame(string methodName)
@@ -122,5 +129,16 @@ class Build : NukeBuild
                 .SetExecuteMethod(executeMethod)
                 .SetLogFile(buildOutput / "NukeBuildCompanionApp.log")
         );
+    }
+
+    private void CopyDllFilesToUnityAssetsFolder(AbsolutePath source, AbsolutePath destination)
+    {
+        Directory.CreateDirectory(destination);
+
+        foreach (var dllFile in Directory.GetFiles(source, "*.dll", SearchOption.AllDirectories))
+        {
+            Console.WriteLine($"Copying DLL file: Source='{dllFile}', Target='{destination}'");
+            File.Copy(dllFile, $"{destination}/{Path.GetFileName(dllFile)}", true);
+        }
     }
 }
