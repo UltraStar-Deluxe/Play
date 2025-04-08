@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Nuke.Common;
 using Nuke.Common.IO;
@@ -38,9 +39,18 @@ class Build : NukeBuild
         .Executes(() =>
         {
             DotNet($"build {GetNuGetPackagesProjectFolder(mainGameDir)}");
-            CopyDllFilesToUnityAssetsFolder(
+
+            // Copy libraries for playshared
+            CopyFiles(
                 GetNuGetPackagesProjectFolder(mainGameDir) / "bin",
-                mainGameDir / "Assets" / "NuGetPackages");
+                mainGameDir / "Packages" / "playshared" / "Runtime" / "NuGetPackages",
+                "YamlDotNet.dll", "ICSharpCode.SharpZipLib.dll");
+
+            // Copy libraries for main game
+            CopyFiles(
+                GetNuGetPackagesProjectFolder(mainGameDir) / "bin",
+                mainGameDir / "Assets" / "NuGetPackages",
+                "*.dll");
         });
 
     Target RestoreMainGameDependencies => _ => _
@@ -51,9 +61,10 @@ class Build : NukeBuild
         .Executes(() =>
         {
             DotNet($"build {GetNuGetPackagesProjectFolder(companionAppDir)}");
-            CopyDllFilesToUnityAssetsFolder(
+            CopyFiles(
                 GetNuGetPackagesProjectFolder(companionAppDir) / "bin",
-                companionAppDir / "Assets" / "NuGetPackages");
+                companionAppDir / "Assets" / "NuGetPackages",
+                "*.dll");
         });
 
     Target RestoreCompanionAppDependencies => _ => _
@@ -131,14 +142,18 @@ class Build : NukeBuild
         );
     }
 
-    private void CopyDllFilesToUnityAssetsFolder(AbsolutePath source, AbsolutePath destination)
+    private void CopyFiles(AbsolutePath source, AbsolutePath destination, params string[] fileNamePatterns)
     {
         Directory.CreateDirectory(destination);
 
-        foreach (var dllFile in Directory.GetFiles(source, "*.dll", SearchOption.AllDirectories))
+        foreach (var pattern in fileNamePatterns)
         {
-            Console.WriteLine($"Copying DLL file: Source='{dllFile}', Target='{destination}'");
-            File.Copy(dllFile, $"{destination}/{Path.GetFileName(dllFile)}", true);
+            // Get files matching the current pattern
+            foreach (var file in Directory.GetFiles(source, pattern, SearchOption.AllDirectories))
+            {
+                Console.WriteLine($"Copying file: Source='{file}', Target='{destination}'");
+                File.Copy(file, $"{destination}/{Path.GetFileName(file)}", true);
+            }
         }
     }
 }
