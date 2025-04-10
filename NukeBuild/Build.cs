@@ -38,6 +38,8 @@ class Build : NukeBuild
     Target RestoreMainGameNuGetDependencies => _ => _
         .Executes(() =>
         {
+            DirectoryUtils.DeleteDirectory(mainGameDir / "Assets" / "NuGetPackages");
+
             DotNet($"build {GetNuGetPackagesProjectFolder(mainGameDir)}");
 
             // Copy libraries for playshared
@@ -61,6 +63,8 @@ class Build : NukeBuild
         .DependsOn(RestoreMainGameNuGetDependencies) // Restore main game dependencies for playshared
         .Executes(() =>
         {
+            DirectoryUtils.DeleteDirectory(companionAppDir / "Assets" / "NuGetPackages");
+
             DotNet($"build {GetNuGetPackagesProjectFolder(companionAppDir)}");
             CopyFiles(
                 GetNuGetPackagesProjectFolder(companionAppDir) / "bin",
