@@ -58,6 +58,7 @@ class Build : NukeBuild
         .Executes(() => new MainGameDependencyDownloader(mainGameDir, cloneDepth).DownloadAsync());
 
     Target RestoreCompanionAppNuGetDependencies => _ => _
+        .DependsOn(RestoreMainGameNuGetDependencies) // Restore main game dependencies for playshared
         .Executes(() =>
         {
             DotNet($"build {GetNuGetPackagesProjectFolder(companionAppDir)}");
