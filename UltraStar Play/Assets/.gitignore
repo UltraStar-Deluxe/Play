@@ -1,16 +1,13 @@
 VERSION.txt
 
-NuGetPackages/
-NuGetPackages.meta
+Plugins/NuGetPackages/
+Plugins/NuGetPackages.meta
 
 ########################################
 ## Third-party assets
 
 Vuplex/
 Vuplex.meta
-
-FfmpegUnity/
-FfmpegUnity.meta
 
 OneJS/
 OneJS.meta

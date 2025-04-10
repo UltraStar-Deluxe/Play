@@ -16,7 +16,6 @@ public abstract class BaseDependencyDownloader(
     {
         DownloadCompileTimeTracker();
         DownloadLeanTween();
-        DownloadSerilog();
         DownloadUniRx();
 
         CreateVersionTxtFile();

@@ -38,20 +38,30 @@ class Build : NukeBuild
     Target RestoreMainGameNuGetDependencies => _ => _
         .Executes(() =>
         {
-            DirectoryUtils.DeleteDirectory(mainGameDir / "Assets" / "NuGetPackages");
+            AbsolutePath mainGameNuGetPackagesSourceFolder = GetNuGetPackagesProjectFolder(mainGameDir) / "bin";
+            AbsolutePath mainGameNuGetPackagesTargetFolder = GetNuGetPackagesTargetFolder(mainGameDir);
+            AbsolutePath playsharedNuGetPackagesTargetFolder = mainGameDir / "Packages" / "playshared" / "Runtime" / "Plugins" / "NuGetPackages";
 
+            // Delete old packages
+            DirectoryUtils.DeleteDirectory(mainGameNuGetPackagesSourceFolder);
+            DirectoryUtils.DeleteDirectory(mainGameNuGetPackagesTargetFolder);
+
+            // Download new packages
             DotNet($"build {GetNuGetPackagesProjectFolder(mainGameDir)}");
 
             // Copy libraries for playshared
             CopyFiles(
-                GetNuGetPackagesProjectFolder(mainGameDir) / "bin",
-                mainGameDir / "Packages" / "playshared" / "Runtime" / "NuGetPackages",
-                "YamlDotNet.dll", "ICSharpCode.SharpZipLib.dll");
+                mainGameNuGetPackagesSourceFolder,
+                playsharedNuGetPackagesTargetFolder,
+                "YamlDotNet.dll",
+                "ICSharpCode.SharpZipLib.dll",
+                "Serilog.dll",
+                "Serilog.Sinks.File.dll");
 
             // Copy libraries for main game
             CopyFiles(
-                GetNuGetPackagesProjectFolder(mainGameDir) / "bin",
-                mainGameDir / "Assets" / "NuGetPackages",
+                mainGameNuGetPackagesSourceFolder,
+                mainGameNuGetPackagesTargetFolder,
                 "*.dll");
         });
 
@@ -63,12 +73,20 @@ class Build : NukeBuild
         .DependsOn(RestoreMainGameNuGetDependencies) // Restore main game dependencies for playshared
         .Executes(() =>
         {
-            DirectoryUtils.DeleteDirectory(companionAppDir / "Assets" / "NuGetPackages");
+            AbsolutePath companionAppNuGetPackagesSourceFolder = GetNuGetPackagesProjectFolder(companionAppDir) / "bin";
+            AbsolutePath companionAppNuGetPackagesTargetFolder = GetNuGetPackagesTargetFolder(companionAppDir);
 
+            // Delete old packages
+            DirectoryUtils.DeleteDirectory(companionAppNuGetPackagesSourceFolder);
+            DirectoryUtils.DeleteDirectory(companionAppNuGetPackagesTargetFolder);
+
+            // Download new packages
             DotNet($"build {GetNuGetPackagesProjectFolder(companionAppDir)}");
+
+            // Copy libraries for companion app
             CopyFiles(
-                GetNuGetPackagesProjectFolder(companionAppDir) / "bin",
-                companionAppDir / "Assets" / "NuGetPackages",
+                companionAppNuGetPackagesSourceFolder,
+                companionAppNuGetPackagesTargetFolder,
                 "*.dll");
         });
 
@@ -100,14 +118,14 @@ class Build : NukeBuild
             RunUnityBuildCompanionApp("BuildSignedAndroidApk");
         });
 
-    private AbsolutePath GetNuGetPackagesProjectFile(AbsolutePath unityProjectDir)
-    {
-        return GetNuGetPackagesProjectFolder(unityProjectDir) / "NuGetPackages.csproj";
-    }
-
     private AbsolutePath GetNuGetPackagesProjectFolder(AbsolutePath unityProjectDir)
     {
         return unityProjectDir / "Packages" / "NuGetPackages";
+    }
+
+    private AbsolutePath GetNuGetPackagesTargetFolder(AbsolutePath unityProjectDir)
+    {
+        return unityProjectDir / "Assets" / "Plugins" / "NuGetPackages";
     }
 
     void RunUnityBuildMainGame(string methodName)
