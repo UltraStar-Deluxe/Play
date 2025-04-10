@@ -63,7 +63,7 @@ public class GitDownloader
         if (SparseCheckoutPatterns.Count > 0)
         {
             Git("config core.sparsecheckout true", workingDirectory: TargetDir);
-            string sparseCheckoutFile = ".git/info/sparse-checkout";
+            AbsolutePath sparseCheckoutFile = TargetDir / ".git/info/sparse-checkout";
             Directory.CreateDirectory(Path.GetDirectoryName(sparseCheckoutFile));
             File.WriteAllLines(sparseCheckoutFile, SparseCheckoutPatterns);
         }
