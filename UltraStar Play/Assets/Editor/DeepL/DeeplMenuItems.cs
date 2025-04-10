@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Flurl.Http;
 using ProTrans;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public static class DeeplTranslationMenuItems
 {
@@ -253,12 +254,19 @@ public static class DeeplTranslationMenuItems
         ClipboardUtils.CopyToClipboard(jsonBody);
         Debug.Log($"Copied JSON body to clipboard:\n{jsonBody}");
 
-        return await "https://api-free.deepl.com/v2/translate"
-            .WithHeader("Authorization", $"DeepL-Auth-Key {authKey}")
-            .WithHeader("User-Agent", "MyApp/1.2.3")
-            .WithHeader("Content-Type", "application/json")
-            .PostJsonAsync(body)
-            .ReceiveJson<DeeplResponse>();
+        return await SendDeeplRequest(authKey, body);
+    }
+
+    private static async Task<DeeplResponse> SendDeeplRequest(string authKey, object body)
+    {
+        using UnityWebRequest request = new("https://api-free.deepl.com/v2/translate", "POST");
+        request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(JsonConverter.ToJson(body)));
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+        request.SetRequestHeader("Authorization", $"DeepL-Auth-Key {authKey}");
+        request.SetRequestHeader("User-Agent", "MyApp/1.2.3");
+        await WebRequestUtils.SendWebRequestAsync(request);
+        return JsonConverter.FromJson<DeeplResponse>(request.downloadHandler.text);
     }
 
     private class DeeplResponse
