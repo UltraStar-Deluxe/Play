@@ -14,7 +14,6 @@ public abstract class BaseDependencyDownloader(
 
     public virtual async Task DownloadAsync()
     {
-        DownloadCompileTimeTracker();
         DownloadLeanTween();
         DownloadUniRx();
 
