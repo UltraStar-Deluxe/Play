@@ -2,7 +2,6 @@
     "name": "Scenes",
     "rootNamespace": "",
     "references": [
-        "Serilog",
         "Plugins",
         "UniRx",
         "Common",
@@ -17,7 +16,10 @@
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "Serilog.dll",
+        "Serilog.Sinks.File.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
