@@ -10,6 +10,12 @@ public static class DirectoryUtils
     {
         if (Directory.Exists(directory))
         {
+            // To delete .git folder, some files need to be set from ReadOnly to Normal first
+            foreach (var file in Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories))
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+            }
+
             Directory.Delete(directory, true);
         }
     }

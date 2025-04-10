@@ -10,6 +10,7 @@ public class GitDownloader
 {
     public string RemoteUrl { get; set; }
     public string CommitHash { get; set; }
+    public string Branch { get; set; } = "main";
     public AbsolutePath TargetDir { get; set; }
     public uint Depth { get; set; }
     public List<string> SparseCheckoutPatterns { get; set; } = new();
@@ -26,42 +27,44 @@ public class GitDownloader
             MoveFiles();
             DeleteFiles();
 
-            Console.WriteLine($"Done downloading dependency from GitHub: RemoteUrl='{RemoteUrl}', CommitHash='{CommitHash}'");
+            Console.WriteLine($"Done downloading dependency from Git: RemoteUrl='{RemoteUrl}', CommitHash='{CommitHash}'");
         }
         finally
         {
-            Directory.SetCurrentDirectory(oldDir);
+            Console.WriteLine($"Done downloading dependency from Git: RemoteUrl='{RemoteUrl}', CommitHash='{CommitHash}'");
         }
     }
 
     private void PrepareTargetDirectory()
     {
         Console.WriteLine($"Removing old folder: TargetDir='{TargetDir}'");
-        Directory.SetCurrentDirectory(TargetDir.Parent.ToString());
         DirectoryUtils.DeleteDirectory(TargetDir);
+
+        Console.WriteLine($"Creating new folder: TargetDir='{TargetDir}'");
         DirectoryUtils.EnsureExistingDirectory(TargetDir);
-        Directory.SetCurrentDirectory(TargetDir.ToString());
     }
 
     private void CloneRepository()
     {
         Console.WriteLine($"Cloning from remote: RemoteUrl='{RemoteUrl}', CommitHash='{{CommitHash}}', Depth='{Depth}'");
-        Git("init");
-        Git($"remote add origin {RemoteUrl}");
+
+        Git($"init", workingDirectory: TargetDir);
+        Git($"remote add origin {RemoteUrl}", workingDirectory: TargetDir);
 
         ConfigureSparseCheckout();
 
-        string depthArgument = Depth > 0 ? $"--depth {Depth}" : "";
-        Git($"pull {depthArgument} origin main");
-        Git($"checkout {CommitHash}");
+        string depthArgument = Depth > 0 ? $"--depth={Depth}" : "";
+        Git($"pull {depthArgument} origin {Branch}", workingDirectory: TargetDir);
+        Git($"checkout {CommitHash}", workingDirectory: TargetDir);
     }
 
     private void ConfigureSparseCheckout()
     {
         if (SparseCheckoutPatterns.Count > 0)
         {
-            Git("config core.sparsecheckout true");
+            Git("config core.sparsecheckout true", workingDirectory: TargetDir);
             string sparseCheckoutFile = ".git/info/sparse-checkout";
+            Directory.CreateDirectory(Path.GetDirectoryName(sparseCheckoutFile));
             File.WriteAllLines(sparseCheckoutFile, SparseCheckoutPatterns);
         }
     }
@@ -81,6 +84,12 @@ public class GitDownloader
     private void MoveFileOrDirectory(string source, string destination)
     {
         Console.WriteLine($"Moving '{source}' to '{destination}'");
+        if (source.EndsWith("*"))
+        {
+            MoveDirectoryContents(source.Substring(0, source.Length - 1), destination);
+            return;
+        }
+
         if (File.Exists(source))
         {
             FileUtils.MoveFile(TargetDir / source, TargetDir / destination, new FileUtils.FileMoveSettings { Overwrite = true });
@@ -92,6 +101,35 @@ public class GitDownloader
         else
         {
             throw new FileNotFoundException(source);
+        }
+    }
+
+    private void MoveDirectoryContents(string sourceDir, string destinationDir)
+    {
+        AbsolutePath sourcePath = TargetDir / sourceDir;
+        AbsolutePath destPath = TargetDir / destinationDir;
+
+        if (!Directory.Exists(sourcePath))
+        {
+            throw new DirectoryNotFoundException($"Source directory '{sourceDir}' not found");
+        }
+
+        DirectoryUtils.EnsureExistingDirectory(destPath);
+
+        // Move all files
+        foreach (string file in Directory.GetFiles(sourcePath))
+        {
+            string fileName = Path.GetFileName(file);
+            string destFile = Path.Combine(destinationDir, fileName);
+            FileUtils.MoveFile(file, TargetDir / destFile, new FileUtils.FileMoveSettings { Overwrite = true });
+        }
+
+        // Move all subdirectories
+        foreach (string dir in Directory.GetDirectories(sourcePath))
+        {
+            string dirName = Path.GetFileName(dir);
+            string destDir = Path.Combine(destinationDir, dirName);
+            DirectoryUtils.MoveDirectory(dir, TargetDir / destDir, new DirectoryUtils.DirectoryMoveSettings { Overwrite = true });
         }
     }
 
@@ -109,17 +147,19 @@ public class GitDownloader
     private void DeleteFileOrDirectory(string path)
     {
         Console.WriteLine($"Deleting '{path}'");
-        if (File.Exists(path))
+        AbsolutePath absolutePath = TargetDir / path;
+
+        if (File.Exists(absolutePath))
         {
-            FileUtils.DeleteFile(TargetDir / path);
+            FileUtils.DeleteFile(absolutePath);
         }
-        else if (Directory.Exists(path))
+        else if (Directory.Exists(absolutePath))
         {
-            DirectoryUtils.DeleteDirectory(TargetDir / path);
+            DirectoryUtils.DeleteDirectory(absolutePath);
         }
         else
         {
-            throw new FileNotFoundException(path);
+            throw new FileNotFoundException(absolutePath);
         }
     }
 }

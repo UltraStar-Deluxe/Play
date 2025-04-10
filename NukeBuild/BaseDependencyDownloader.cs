@@ -39,6 +39,7 @@ public abstract class BaseDependencyDownloader(
         {
             RemoteUrl = "https://github.com/DarrenTsung/DTCompileTimeTracker",
             CommitHash = "276095b3b212d7c33106b53d71b93b5a72d1e1d3",
+            Branch = "master",
             TargetDir = targetDir,
             Depth = cloneDepth,
             SparseCheckoutPatterns =
@@ -67,6 +68,7 @@ public abstract class BaseDependencyDownloader(
         {
             RemoteUrl = "https://github.com/UltraStar-Deluxe/LeanTween.git",
             CommitHash = "ea745c3f94d8682327c912030dfc6b65cbe1ced5",
+            Branch = "master",
             TargetDir = unityProjectDir / "Assets" / "Plugins" / "LeanTween",
             Depth = cloneDepth,
             SparseCheckoutPatterns =
@@ -156,6 +158,7 @@ public abstract class BaseDependencyDownloader(
         {
             RemoteUrl = "https://github.com/neuecc/UniRx.git",
             CommitHash = "66205df49631860dd8f7c3314cb518b54c944d30",
+            Branch = "master",
             TargetDir = unityProjectDir / "Assets" / "Plugins" / "UniRx",
             Depth = cloneDepth,
             SparseCheckoutPatterns =
