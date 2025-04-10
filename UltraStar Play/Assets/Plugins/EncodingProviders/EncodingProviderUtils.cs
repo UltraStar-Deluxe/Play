@@ -7,7 +7,7 @@ using UnityEngine;
  * ("NotSupportedException: Encoding 1252 data could not be found."),
  * which is still used for many UltraStar txt files.
  * Thus, additional encodings are registered here via the DLL from the NuGet package
- * https://www.nuget.org/packages/System.Text.Encoding.CodePages/7.0.0
+ * https://www.nuget.org/packages/System.Text.Encoding.CodePages
  *
  * See also https://stackoverflow.com/questions/50858209/system-notsupportedexception-no-data-is-available-for-encoding-1252
  */
