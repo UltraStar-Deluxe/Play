@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ICSharpCode.SharpZipLib.dll" Version="0.85.4.369" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 
