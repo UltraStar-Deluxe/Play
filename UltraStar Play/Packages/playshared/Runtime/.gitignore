@@ -1,4 +1,4 @@
-Plugins/NuGetPackages/
+Plugins/NuGetPackages/*.dll
 Plugins/NuGetPackages.meta
 
 Plugins/LiteNetLib/
