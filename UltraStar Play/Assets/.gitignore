@@ -3,11 +3,14 @@ VERSION.txt
 ########################################
 ## Third-party assets from NuGet and GitHub
 
-Plugins/NuGetPackages/*.dll
+Plugins/NuGetPackages/
 Plugins/NuGetPackages.meta
 
 Plugins/CSharpSynthForUnity/
 Plugins/CSharpSynthForUnity.meta
+
+Plugins/LeanTween/
+Plugins/LeanTween.meta
 
 Plugins/SpleeterSharp/
 Plugins/SpleeterSharp.meta
