@@ -21,18 +21,42 @@ class Build : NukeBuild
 
     public static int Main() => Execute<Build>(x => x.BuildMainGameWindows64);
 
-    Target RunMainGameTests => _ => _
+    Target TestMainGame => _ => _
         .Executes(() =>
         {
             RunUnityTests(mainGameDir, UnityTestPlatform.EditMode);
             RunUnityTests(mainGameDir, UnityTestPlatform.PlayMode);
         });
 
-    Target RunCompanionAppTests => _ => _
+    Target TestCompanionApp => _ => _
         .Executes(() =>
         {
             RunUnityTests(companionAppDir, UnityTestPlatform.EditMode);
             RunUnityTests(companionAppDir, UnityTestPlatform.PlayMode);
+        });
+
+    Target BuildMainGameWindows64 => _ => _
+        .Executes(() =>
+        {
+            RunUnityBuildMainGame("BuildWindows64");
+        });
+
+    Target BuildCompanionAppAndroidApk => _ => _
+        .Executes(() =>
+        {
+            RunUnityBuildCompanionApp("BuildAndroidApk");
+        });
+
+    Target BuildAndRunCompanionAppAndroidApk => _ => _
+        .Executes(() =>
+        {
+            RunUnityBuildCompanionApp("BuildAndRunAndroidApk");
+        });
+
+    Target BuildCompanionAppSignedAndroidAppBundle => _ => _
+        .Executes(() =>
+        {
+            RunUnityBuildCompanionApp("BuildSignedAndroidAppBundle");
         });
 
     Target RestoreMainGameNuGetDependencies => _ => _
@@ -102,30 +126,6 @@ class Build : NukeBuild
         .DependsOn(RestoreCompanionAppNuGetDependencies)
         .Executes(() => new CompanionAppDependencyDownloader(companionAppDir, cloneDepth).DownloadAsync());
 
-    Target BuildMainGameWindows64 => _ => _
-        .Executes(() =>
-        {
-            RunUnityBuildMainGame("BuildWindows64");
-        });
-
-    Target BuildCompanionAppAndroidApk => _ => _
-        .Executes(() =>
-        {
-            RunUnityBuildCompanionApp("BuildAndroidApk");
-        });
-
-    Target BuildAndRunCompanionAppAndroidApk => _ => _
-        .Executes(() =>
-        {
-            RunUnityBuildCompanionApp("BuildAndRunAndroidApk");
-        });
-
-    Target BuildCompanionAppSignedAndroidAppBundle => _ => _
-        .Executes(() =>
-        {
-            RunUnityBuildCompanionApp("BuildSignedAndroidAppBundle");
-        });
-
     private AbsolutePath GetNuGetPackagesProjectFolder(AbsolutePath unityProjectDir)
     {
         return unityProjectDir / "Packages" / "NuGetPackages";
@@ -148,15 +148,15 @@ class Build : NukeBuild
 
     private void RunUnityTests(AbsolutePath unityProjectDir, UnityTestPlatform unityTestPlatform)
     {
-        Console.WriteLine($"🚀 Running Unity tests of '{unityProjectDir.Name}'...");
+        Console.WriteLine($"🧪 Testing Unity project '{unityProjectDir.Name}' ...");
 
-        UnityRunTests(s => s
+        UnityRunTests(new UnityRunTestsSettings()
             .SetProcessToolPath(unityExecutable)
-            .SetProjectPath(unityProjectDir)
             .SetBatchMode(true)
-            .SetQuit(true)
-            .SetTestPlatform(unityTestPlatform)
+            .SetSilentCrashes(true)
             .SetLogFile(buildOutput / $"NukeRunTests-{unityTestPlatform}.log")
+            .SetProjectPath(unityProjectDir)
+            .SetTestPlatform(unityTestPlatform)
         );
     }
 
@@ -164,12 +164,14 @@ class Build : NukeBuild
     {
         Console.WriteLine($"🚀 Building Unity project '{unityProjectDir.Name}' ...");
 
+        // See https://docs.unity3d.com/Manual/EditorCommandLineArguments.html
         Unity(new UnitySettings()
-                .SetProjectPath(companionAppDir)
-                .SetBatchMode(true)
-                .SetQuit(true)
-                .SetExecuteMethod(executeMethod)
-                .SetLogFile(buildOutput / "NukeBuildCompanionApp.log")
+            .SetProcessToolPath(unityExecutable)
+            .SetBatchMode(true)
+            .SetSilentCrashes(true)
+            .SetLogFile(buildOutput / "NukeBuildCompanionApp.log")
+            .SetProjectPath(companionAppDir)
+            .SetExecuteMethod(executeMethod)
         );
     }
 }
