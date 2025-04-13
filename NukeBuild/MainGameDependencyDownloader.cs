@@ -20,7 +20,6 @@ public class MainGameDependencyDownloader(
         DownloadSpleeterSharp();
         DownloadUnityStandaloneFileBrowser();
 
-        await DownloadSoundfontsAsync();
         await DownloadSpleeterMsvcExeAsync();
     }
 
@@ -48,29 +47,6 @@ public class MainGameDependencyDownloader(
         };
 
         downloader.Download();
-    }
-
-    private async Task DownloadSoundfontsAsync()
-    {
-        var targetDir = unityProjectDir / "Assets" / "Plugins" / "Soundfonts";
-        Console.WriteLine($"Downloading Soundfonts: TargetDir='{targetDir}'");
-
-        DirectoryUtils.DeleteDirectory(targetDir);
-        DirectoryUtils.CreateDirectory(targetDir);
-        var targetFile = targetDir / "MuseScore_General.sf2.bytes";
-
-        using (var client = new HttpClient())
-        {
-            using (var response = await client.GetAsync("https://ftp.osuosl.org/pub/musescore/soundfont/MuseScore_General/MuseScore_General.sf2"))
-            {
-                response.EnsureSuccessStatusCode();
-                await using (var fileStream = File.Create(targetFile))
-                {
-                    await response.Content.CopyToAsync(fileStream);
-                }
-            }
-        }
-        Console.WriteLine("Downloading Soundfonts done");
     }
 
     private async Task DownloadSpleeterMsvcExeAsync()
