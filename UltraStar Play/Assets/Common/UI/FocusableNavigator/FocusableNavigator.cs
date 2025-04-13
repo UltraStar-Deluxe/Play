@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
-using Serilog.Events;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -31,7 +30,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public bool focusLastElementIfNothingFocused;
 
-    public LogEventLevel logLevel = LogEventLevel.Debug;
+    public ELogEventLevel logLevel = ELogEventLevel.Debug;
 
     public VisualElement FocusedVisualElement => uiDocument != null
         ? uiDocument.rootVisualElement?.focusController?.focusedElement as VisualElement

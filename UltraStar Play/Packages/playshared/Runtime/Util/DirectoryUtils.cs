@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Serilog.Events;
 using UnityEngine;
 
 public static class DirectoryUtils
@@ -53,7 +52,7 @@ public static class DirectoryUtils
         string sourceDirectory,
         string targetDirectory,
         CopyDirectoryFilter filter = null,
-        LogEventLevel logEventLevel = LogEventLevel.Verbose)
+        ELogEventLevel logEventLevel = ELogEventLevel.Verbose)
     {
         if (sourceDirectory.IsNullOrEmpty()
             || targetDirectory.IsNullOrEmpty())
@@ -73,7 +72,7 @@ public static class DirectoryUtils
         DirectoryInfo source,
         DirectoryInfo target,
         CopyDirectoryFilter filter = null,
-        LogEventLevel logEventLevel = LogEventLevel.Verbose)
+        ELogEventLevel logEventLevel = ELogEventLevel.Verbose)
     {
         // https://stackoverflow.com/questions/58744/copy-the-entire-contents-of-a-directory-in-c-sharp
         if (source == null

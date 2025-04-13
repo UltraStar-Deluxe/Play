@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Serilog.Events;
 using UnityEditor;
 using UnityEngine;
 
@@ -101,8 +100,8 @@ public class SteamBuildUtils
                 $"+login \"{steamUsername}\" \"{steamPassword}\" \"{steamGuardCode}\" +run_app_build \"{vdfFilePath}\" +quit",
                 out string steamcmdOutput,
                 out string steamcmdErrorOutput,
-                LogEventLevel.Information,
-                LogEventLevel.Error)
+                ELogEventLevel.Information,
+                ELogEventLevel.Error)
             || !steamcmdErrorOutput.IsNullOrEmpty())
         {
             throw new Exception("Upload to Steam failed.\n" + steamcmdErrorOutput);

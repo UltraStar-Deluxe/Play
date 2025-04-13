@@ -111,10 +111,10 @@ public static class Log
         return logger;
     }
 
-    public static string GetLogHistoryAsText(LogEventLevel logEventLevel)
+    public static string GetLogHistoryAsText(ELogEventLevel logEventLevel)
     {
         List<string> logLines = GetLogHistory()
-            .Where(logEvent => (int)logEvent.Level >= (int)logEventLevel)
+            .Where(logEvent => (int)logEvent.Level >= (int)logEventLevel.ToSerilogLogEventLevel())
             .Select(logEvent =>
             {
                 using StringWriter stringWriter = new();
@@ -439,26 +439,26 @@ public static class Log
         }
     }
 
-    public static void WithLevel(LogEventLevel logLevel, Func<string> messageGetter)
+    public static void WithLevel(ELogEventLevel logLevel, Func<string> messageGetter)
     {
         switch (logLevel)
         {
-            case LogEventLevel.Verbose:
+            case ELogEventLevel.Verbose:
                 Verbose(messageGetter);
                 break;
-            case LogEventLevel.Debug:
+            case ELogEventLevel.Debug:
                 Debug(messageGetter);
                 break;
-            case LogEventLevel.Information:
+            case ELogEventLevel.Information:
                 Information(messageGetter);
                 break;
-            case LogEventLevel.Warning:
+            case ELogEventLevel.Warning:
                 Warning(messageGetter);
                 break;
-            case LogEventLevel.Error:
+            case ELogEventLevel.Error:
                 Error(messageGetter);
                 break;
-            case LogEventLevel.Fatal:
+            case ELogEventLevel.Fatal:
                 Error(messageGetter);
                 break;
             default:
