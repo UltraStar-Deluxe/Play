@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
@@ -14,49 +15,54 @@ class Build : NukeBuild
 {
     [Parameter] readonly uint cloneDepth = 1000;
     [Parameter] readonly AbsolutePath buildOutput = RootDirectory / "Build";
-    [Parameter] readonly AbsolutePath unityExecutable = "C:/Program Files/Unity/Hub/Editor/2023.2.12f1/Editor/Unity.exe";
+    [Parameter] readonly AbsolutePath unityExecutable;
+    [Parameter] readonly UnityTestPlatform testPlatform = UnityTestPlatform.EditMode;
 
     private readonly AbsolutePath mainGameDir = RootDirectory / "UltraStar Play";
     private readonly AbsolutePath companionAppDir = RootDirectory / "UltraStar Play Companion";
 
     public static int Main() => Execute<Build>(x => x.BuildMainGameWindows64);
 
+    public enum UnityProject
+    {
+        MainGame,
+        CompanionApp,
+    }
+
     Target TestMainGame => _ => _
         .Executes(() =>
         {
-            RunUnityTests(mainGameDir, UnityTestPlatform.EditMode);
-            RunUnityTests(mainGameDir, UnityTestPlatform.PlayMode);
+            TestUnityProject(UnityProject.MainGame, testPlatform);
         });
 
     Target TestCompanionApp => _ => _
         .Executes(() =>
         {
-            RunUnityTests(companionAppDir, UnityTestPlatform.EditMode);
-            RunUnityTests(companionAppDir, UnityTestPlatform.PlayMode);
+            TestUnityProject(UnityProject.CompanionApp, testPlatform);
         });
 
     Target BuildMainGameWindows64 => _ => _
         .Executes(() =>
         {
-            RunUnityBuildMainGame("BuildWindows64");
+            BuildMainGame("BuildWindows64");
         });
 
     Target BuildCompanionAppAndroidApk => _ => _
         .Executes(() =>
         {
-            RunUnityBuildCompanionApp("BuildAndroidApk");
+            BuildCompanionApp("BuildAndroidApk");
         });
 
     Target BuildAndRunCompanionAppAndroidApk => _ => _
         .Executes(() =>
         {
-            RunUnityBuildCompanionApp("BuildAndRunAndroidApk");
+            BuildCompanionApp("BuildAndRunAndroidApk");
         });
 
     Target BuildCompanionAppSignedAndroidAppBundle => _ => _
         .Executes(() =>
         {
-            RunUnityBuildCompanionApp("BuildSignedAndroidAppBundle");
+            BuildCompanionApp("BuildSignedAndroidAppBundle");
         });
 
     Target RestoreMainGameNuGetDependencies => _ => _
@@ -136,42 +142,65 @@ class Build : NukeBuild
         return unityProjectDir / "Assets" / "Plugins" / "NuGetPackages";
     }
 
-    void RunUnityBuildMainGame(string methodName)
+    private void TestUnityProject(UnityProject unityProject, UnityTestPlatform unityTestPlatform)
     {
-        RunUnityBuild(mainGameDir, $"MainGameBuildTools.{methodName}");
-    }
+        AbsolutePath unityProjectDir = GetUnityProjectDir(unityProject);
 
-    void RunUnityBuildCompanionApp(string methodName)
-    {
-        RunUnityBuild(companionAppDir, $"CompanionAppBuildTools.{methodName}");
-    }
-
-    private void RunUnityTests(AbsolutePath unityProjectDir, UnityTestPlatform unityTestPlatform)
-    {
         Console.WriteLine($"🧪 Testing Unity project '{unityProjectDir.Name}' ...");
 
         UnityRunTests(new UnityRunTestsSettings()
-            .SetProcessToolPath(unityExecutable)
+            .SetProcessToolPath(GetUnityExecutableOrDefault(unityExecutable, unityProjectDir))
             .SetBatchMode(true)
             .SetSilentCrashes(true)
-            .SetLogFile(buildOutput / $"NukeRunTests-{unityTestPlatform}.log")
+            .SetLogFile(buildOutput / $"Nuke-Test-{unityProject}-{unityTestPlatform}.log")
+            .SetTestResultFile(buildOutput / $"Nuke-TestResults-{unityProject}-{unityTestPlatform}.xml")
             .SetProjectPath(unityProjectDir)
             .SetTestPlatform(unityTestPlatform)
         );
     }
 
-    private void RunUnityBuild(AbsolutePath unityProjectDir, string executeMethod)
+    private void BuildMainGame(string methodName)
     {
+        BuildUnityProject(UnityProject.MainGame, $"MainGameBuildTools.{methodName}");
+    }
+
+    private void BuildCompanionApp(string methodName)
+    {
+        BuildUnityProject(UnityProject.CompanionApp, $"CompanionAppBuildTools.{methodName}");
+    }
+
+    private void BuildUnityProject(UnityProject unityProject, string executeMethod)
+    {
+        AbsolutePath unityProjectDir = GetUnityProjectDir(unityProject);
+
         Console.WriteLine($"🚀 Building Unity project '{unityProjectDir.Name}' ...");
 
         // See https://docs.unity3d.com/Manual/EditorCommandLineArguments.html
         Unity(new UnitySettings()
-            .SetProcessToolPath(unityExecutable)
+            .SetProcessToolPath(GetUnityExecutableOrDefault(unityExecutable, unityProjectDir))
             .SetBatchMode(true)
             .SetSilentCrashes(true)
-            .SetLogFile(buildOutput / "NukeBuildCompanionApp.log")
-            .SetProjectPath(companionAppDir)
+            .SetLogFile(buildOutput / $"Nuke-Build-{unityProject}-{executeMethod}.log")
+            .SetProjectPath(unityProjectDir)
             .SetExecuteMethod(executeMethod)
         );
+    }
+
+    private AbsolutePath GetUnityProjectDir(UnityProject unityProject)
+    {
+        return unityProject is UnityProject.MainGame ? mainGameDir : companionAppDir;
+    }
+
+    private string GetUnityExecutableOrDefault(AbsolutePath providedUnityExecutable, AbsolutePath unityProjectDir)
+    {
+        if (!string.IsNullOrEmpty(providedUnityExecutable))
+        {
+            return providedUnityExecutable;
+        }
+
+        string unityVersion = UnityUtils.GetUnityVersion(unityProjectDir);
+        Console.WriteLine($"Unity project '{unityProjectDir.Name}' is using Unity version {unityVersion}");
+
+        return UnityUtils.GetUnityExecutable(unityVersion);
     }
 }
