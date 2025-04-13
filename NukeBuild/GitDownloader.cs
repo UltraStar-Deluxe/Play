@@ -41,7 +41,7 @@ public class GitDownloader
         DirectoryUtils.DeleteDirectory(TargetDir);
 
         Console.WriteLine($"Creating new folder: TargetDir='{TargetDir}'");
-        DirectoryUtils.EnsureExistingDirectory(TargetDir);
+        DirectoryUtils.CreateDirectory(TargetDir);
     }
 
     private void CloneRepository()
@@ -114,7 +114,7 @@ public class GitDownloader
             throw new DirectoryNotFoundException($"Source directory '{sourceDir}' not found");
         }
 
-        DirectoryUtils.EnsureExistingDirectory(destPath);
+        DirectoryUtils.CreateDirectory(destPath);
 
         // Move all files
         foreach (string file in Directory.GetFiles(sourcePath))

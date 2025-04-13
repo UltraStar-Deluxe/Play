@@ -291,7 +291,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
         connectEventStream.OnNext(new ConnectEvent(
             connectResponseDto.HttpServerPort,
-            ServerPeer.EndPoint,
+            ServerPeer,
             connectResponseDto.Permissions,
             connectResponseDto.AvailableGameRoundModifierDtos));
         connectRequestCount = 0;
@@ -299,7 +299,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     public void OnPeerConnected(NetPeer peer)
     {
-        Debug.Log($"Connected to {peer.EndPoint}");
+        Debug.Log($"Connected to {peer}");
     }
 
     public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)

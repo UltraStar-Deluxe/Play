@@ -9,14 +9,14 @@
         "com.achimmihca.uniinject",
         "Unity.InputSystem",
         "playshared",
-        "playsharedui",
-        "LiteNetLib"
+        "playsharedui"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
+        "LiteNetLib.dll",
         "Serilog.dll",
         "Serilog.Sinks.File.dll"
     ],

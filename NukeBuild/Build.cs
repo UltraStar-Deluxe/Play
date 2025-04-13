@@ -45,23 +45,30 @@ class Build : NukeBuild
             // Delete old packages
             DirectoryUtils.DeleteDirectory(mainGameNuGetPackagesSourceFolder);
             DirectoryUtils.DeleteDirectory(mainGameNuGetPackagesTargetFolder);
+            DirectoryUtils.DeleteDirectory(playsharedNuGetPackagesTargetFolder);
 
             // Download new packages
             DotNet($"build {GetNuGetPackagesProjectFolder(mainGameDir)}");
 
             // Copy libraries for playshared
-            CopyFiles(
+            DirectoryUtils.MoveFiles(
                 mainGameNuGetPackagesSourceFolder,
                 playsharedNuGetPackagesTargetFolder,
-                "YamlDotNet.dll",
+                SearchOption.AllDirectories,
                 "ICSharpCode.SharpZipLib.dll",
+                "JsonNet.ContractResolvers.dll",
+                "LiteNetLib.dll",
                 "Serilog.dll",
-                "Serilog.Sinks.File.dll");
+                "Serilog.Sinks.File.dll",
+                "System.Diagnostics.DiagnosticSource.dll", // transitive dependency of Serilog
+                "System.Threading.Channels.dll", // transitive dependency of Serilog
+                "YamlDotNet.dll");
 
             // Copy libraries for main game
-            CopyFiles(
+            DirectoryUtils.MoveFiles(
                 mainGameNuGetPackagesSourceFolder,
                 mainGameNuGetPackagesTargetFolder,
+                SearchOption.AllDirectories,
                 "*.dll");
         });
 
@@ -84,9 +91,10 @@ class Build : NukeBuild
             DotNet($"build {GetNuGetPackagesProjectFolder(companionAppDir)}");
 
             // Copy libraries for companion app
-            CopyFiles(
+            DirectoryUtils.MoveFiles(
                 companionAppNuGetPackagesSourceFolder,
                 companionAppNuGetPackagesTargetFolder,
+                SearchOption.AllDirectories,
                 "*.dll");
         });
 
@@ -163,20 +171,5 @@ class Build : NukeBuild
                 .SetExecuteMethod(executeMethod)
                 .SetLogFile(buildOutput / "NukeBuildCompanionApp.log")
         );
-    }
-
-    private void CopyFiles(AbsolutePath source, AbsolutePath destination, params string[] fileNamePatterns)
-    {
-        Directory.CreateDirectory(destination);
-
-        foreach (var pattern in fileNamePatterns)
-        {
-            // Get files matching the current pattern
-            foreach (var file in Directory.GetFiles(source, pattern, SearchOption.AllDirectories))
-            {
-                Console.WriteLine($"Copying file: Source='{file}', Target='{destination}'");
-                File.Copy(file, $"{destination}/{Path.GetFileName(file)}", true);
-            }
-        }
     }
 }

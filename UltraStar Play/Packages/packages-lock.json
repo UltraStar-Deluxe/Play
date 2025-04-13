@@ -67,6 +67,13 @@
       },
       "hash": "7e6bee030f3f9fd32960f8d611aa5ec45bac7b8b"
     },
+    "com.darrentsung.dtcompiletimetracker": {
+      "version": "https://github.com/DarrenTsung/DTCompileTimeTracker.git#276095b3b212d7c33106b53d71b93b5a72d1e1d3",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "276095b3b212d7c33106b53d71b93b5a72d1e1d3"
+    },
     "com.singularitygroup.hotreload": {
       "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.5",
       "depth": 0,

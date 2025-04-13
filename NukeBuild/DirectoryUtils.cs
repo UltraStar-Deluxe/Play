@@ -20,9 +20,22 @@ public static class DirectoryUtils
         }
     }
 
-    public static void EnsureExistingDirectory(AbsolutePath directory)
+    public static void CreateDirectory(AbsolutePath directory)
     {
         Directory.CreateDirectory(directory);
+    }
+
+    public static void MoveFiles(AbsolutePath sourceDir, AbsolutePath destinationDir, SearchOption searchOption, params string[] fileNamePatterns)
+    {
+        foreach (var pattern in fileNamePatterns)
+        {
+            // Get files matching the current pattern
+            foreach (var file in Directory.GetFiles(sourceDir, pattern, searchOption))
+            {
+                Console.WriteLine($"Moving file: Source='{file}', Target='{destinationDir}'");
+                FileUtils.MoveFile(file, $"{destinationDir}/{Path.GetFileName(file)}", new FileUtils.FileMoveSettings() {Overwrite = true});
+            }
+        }
     }
 
     public static void MoveDirectory(AbsolutePath source, AbsolutePath destination, DirectoryMoveSettings settings)

@@ -101,7 +101,7 @@ public class CompanionClientHandler : ICompanionClientHandler
         {
             lastUpdateAverageJitterTimeInSeconds = Time.time;
             averageJitterInMillis = (long)jitterValuesInMillis.Average();
-            Log.Verbose(() => $"Average jitter with client {Peer.EndPoint}: {averageJitterInMillis} ms");
+            Log.Verbose(() => $"Average jitter with client {Peer}: {averageJitterInMillis} ms");
         }
     }
 }

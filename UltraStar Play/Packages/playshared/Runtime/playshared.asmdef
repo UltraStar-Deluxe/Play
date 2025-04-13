@@ -13,7 +13,6 @@
         "com.achimmihca.utfunknownunity",
         "com.achimmihca.portaudioforunity",
         "IngameDebugConsole.Runtime",
-        "LiteNetLib",
         "JsonNet.ContractResolvers"
     ],
     "includePlatforms": [],
@@ -21,11 +20,13 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "YamlDotNet.dll",
         "ICSharpCode.SharpZipLib.dll",
+        "JsonNet.ContractResolvers.dll",
+        "LiteNetLib.dll",
         "Newtonsoft.Json.dll",
         "Serilog.dll",
-        "Serilog.Sinks.File.dll"
+        "Serilog.Sinks.File.dll",
+        "YamlDotNet.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

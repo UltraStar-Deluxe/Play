@@ -20,6 +20,11 @@ public abstract class BaseDependencyDownloader(
         CreateVersionTxtFile();
     }
 
+    /**
+     * Creates an empty file if it does not exist.
+     * Reason is that VERSION.txt is not under version control because it changes frequently when the Unity project is built,
+     * but its .meta file is under version control to preserve references to the file.
+     */
     private void CreateVersionTxtFile()
     {
         var path = unityProjectDir / "Assets" / "VERSION.txt";
@@ -28,36 +33,6 @@ public abstract class BaseDependencyDownloader(
             Console.WriteLine("Create empty VERSION.txt file");
             File.WriteAllText(path, "");
         }
-    }
-
-    private void DownloadCompileTimeTracker()
-    {
-        AbsolutePath targetDir = unityProjectDir / "Assets" / "Plugins" / "CompileTimeTracker";
-        GitDownloader downloader = new GitDownloader
-        {
-            RemoteUrl = "https://github.com/DarrenTsung/DTCompileTimeTracker",
-            CommitHash = "276095b3b212d7c33106b53d71b93b5a72d1e1d3",
-            Branch = "master",
-            TargetDir = targetDir,
-            Depth = cloneDepth,
-            SparseCheckoutPatterns =
-            {
-                "CompileTimeTracker/*",
-                "README.md"
-            },
-            MovePostprocess =
-            {
-                { "CompileTimeTracker/*", "." }
-            },
-            DeletePostprocess =
-            {
-                "CompileTimeTracker",
-                ".git"
-            }
-        };
-        downloader.Download();
-
-        AsmdefFileUtils.Create(targetDir / "CompileTimeTrackerEditor.asmdef");
     }
 
     private void DownloadLeanTween()
@@ -90,68 +65,11 @@ public abstract class BaseDependencyDownloader(
         downloader.Download();
     }
 
-    private void DownloadSerilog()
-    {
-        DownloadSerilogCore();
-        DownloadSerilogSinksFile();
-    }
-
-    private void DownloadSerilogCore()
-    {
-        var downloader = new GitDownloader
-        {
-            RemoteUrl = "https://github.com/serilog/serilog.git",
-            CommitHash = "655778f74384f682d2c8705ab4883c39ef17e44d",
-            TargetDir = unityProjectDir / "Assets" / "Plugins" / "Serilog" / "Serilog",
-            Depth = cloneDepth,
-            SparseCheckoutPatterns =
-            {
-                "LICENSE",
-                "src/Serilog/*"
-            },
-            MovePostprocess =
-            {
-                { "src/Serilog/*", "." }
-            },
-            DeletePostprocess =
-            {
-                "src",
-                ".git",
-                "Properties/AssemblyInfo.cs"
-            }
-        };
-        downloader.Download();
-    }
-
-    private void DownloadSerilogSinksFile()
-    {
-        var downloader = new GitDownloader
-        {
-            RemoteUrl = "https://github.com/serilog/serilog-sinks-file.git",
-            CommitHash = "272085f4c9440e62448b65829ad35cc3dea15ab1",
-            TargetDir = unityProjectDir / "Assets" / "Plugins" / "Serilog" / "Serilog.Sinks.File",
-            Depth = cloneDepth,
-            SparseCheckoutPatterns =
-            {
-                "LICENSE",
-                "src/Serilog.Sinks.File/*"
-            },
-            MovePostprocess =
-            {
-                { "src/Serilog.Sinks.File/*", "." }
-            },
-            DeletePostprocess =
-            {
-                "src",
-                ".git",
-                "Properties/AssemblyInfo.cs"
-            }
-        };
-        downloader.Download();
-    }
-
     private void DownloadUniRx()
     {
+        // Download directly from GitHub because
+        // - Cannot use the NuGet version of UniRx because it is outdated
+        // - Cannot use prepared Unity package from GitHub because Unity dependency resolution inside a package (inside playshared) does not work with GitHub repositories
         var downloader = new GitDownloader
         {
             RemoteUrl = "https://github.com/neuecc/UniRx.git",

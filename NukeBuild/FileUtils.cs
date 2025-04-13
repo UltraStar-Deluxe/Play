@@ -8,17 +8,8 @@ public static class FileUtils
 {
     public static void MoveFile(AbsolutePath source, AbsolutePath destination, FileMoveSettings settings)
     {
-        if (!File.Exists(source))
-        {
-            throw new FileNotFoundException(source);
-        }
-
-        if (settings.Overwrite)
-        {
-            DeleteFile(destination);
-        }
-
-        File.Move(source, destination);
+        DirectoryUtils.CreateDirectory(destination.Parent);
+        File.Move(source, destination, settings.Overwrite);
     }
 
     public static void DeleteFile(AbsolutePath file)
