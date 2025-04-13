@@ -120,10 +120,10 @@ class Build : NukeBuild
             RunUnityBuildCompanionApp("BuildAndRunAndroidApk");
         });
 
-    Target BuildCompanionAppSignedAndroidApk => _ => _
+    Target BuildCompanionAppSignedAndroidAppBundle => _ => _
         .Executes(() =>
         {
-            RunUnityBuildCompanionApp("BuildSignedAndroidApk");
+            RunUnityBuildCompanionApp("BuildSignedAndroidAppBundle");
         });
 
     private AbsolutePath GetNuGetPackagesProjectFolder(AbsolutePath unityProjectDir)
