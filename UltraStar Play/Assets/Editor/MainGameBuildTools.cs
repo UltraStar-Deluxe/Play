@@ -4,17 +4,6 @@ public static class MainGameBuildTools
 {
     private static readonly string appName = "Melody Mania";
 
-    [MenuItem("Tools/Build/Build for release (Windows, macOS, Linux, signed apk, signed app bundle)")]
-    public static void BuildAllForRelease()
-    {
-        BuildWindows64();
-        BuildMacOS();
-        BuildLinux64();
-        BuildSignedAndroidApk();
-        BuildSignedAndroidAppBundle();
-        // BuildIOS();
-    }
-
     [MenuItem("Tools/Build/Windows64")]
     public static void BuildWindows64()
     {
@@ -34,15 +23,6 @@ public static class MainGameBuildTools
     public static void BuildWindows64AndSteamUpload()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
-        customBuildOptions.uploadToSteam = true;
-        BuildUtils.PerformCustomBuild(customBuildOptions);
-    }
-
-    [MenuItem("Tools/Build/Windows64 - Build and upload to Steam (dev build)")]
-    public static void BuildWindows64ForDevAndSteamUpload()
-    {
-        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
-        customBuildOptions.buildOptions |= BuildOptions.Development;
         customBuildOptions.uploadToSteam = true;
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
