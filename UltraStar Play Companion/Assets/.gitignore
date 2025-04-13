@@ -1,6 +1,6 @@
 VERSION.txt
 
-Plugins/NuGetPackages/*.dll
+Plugins/NuGetPackages/
 Plugins/NuGetPackages.meta
 
 Plugins/UniRx/
