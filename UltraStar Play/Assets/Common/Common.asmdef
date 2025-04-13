@@ -38,13 +38,13 @@
         "LibVLCSharp.dll",
         "LiteNetLib.dll",
         "NHyphenator.dll",
-        "DynamicQueryable.dll",
         "Mono.CSharp.dll",
         "Mono.Data.Sqlite.dll",
         "ICSharpCode.SharpZipLib.dll",
         "Newtonsoft.Json.dll",
         "Serilog.dll",
-        "Serilog.Sinks.File.dll"
+        "Serilog.Sinks.File.dll",
+        "System.Text.Encoding.CodePages.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
