@@ -12,7 +12,8 @@ Assets/AssetStoreTools*
 pretrained_models/
 
 # Generated classes
-# TODO: Cannot generate code in Unity from C#. Thus, all generated files need to be added to Git.
+# TODO: Cannot generate code in Unity from C# because compilation fails when the files to be generated are not present.
+#       Thus, all generated files need to be added to Git, or file generation must be done before, e.g., via Nuke build.
 #       See https://forum.unity.com/threads/generate-code-before-build-in-project-with-compiler-errors.1412511/#post-8878443.
 #R_PlaySharedUssClasses.cs
 #R_PlaySharedUxmlNames.cs

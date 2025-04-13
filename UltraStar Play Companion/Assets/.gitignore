@@ -6,11 +6,5 @@ Plugins/NuGetPackages.meta
 Plugins/UniRx/
 Plugins/UniRx.meta
 
-Plugins/CompileTimeTracker/
-Plugins/CompileTimeTracker.meta
-
 Plugins/LeanTween/
 Plugins/LeanTween.meta
-
-Plugins/LiteNetLib/
-Plugins/LiteNetLib.meta
