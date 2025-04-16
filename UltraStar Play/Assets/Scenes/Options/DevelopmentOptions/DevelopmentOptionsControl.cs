@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using CommonOnlineMultiplayer;
 using SimpleHttpServerForUnity;
 using UniInject;
@@ -136,6 +137,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlName = R.UxmlNames.logVlcOutputToggle)]
     private Toggle logVlcOutputToggle;
+
+    [Inject(UxmlName = R.UxmlNames.vlcOptionsTextField)]
+    private TextField vlcOptionsTextField;
 
     [Inject(UxmlName = R.UxmlNames.vfxEnabledToggle)]
     private Toggle vfxEnabledToggle;
@@ -373,6 +377,14 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(logVlcOutputToggle,
             () => settings.LogVlcOutput,
             newValue => settings.LogVlcOutput = newValue);
+
+        FieldBindingUtils.Bind(vlcOptionsTextField,
+            () => settings.VlcOptions.JoinWith("\n"),
+            newValue => settings.VlcOptions = Regex
+                .Split(newValue, @"\n")
+                .Select(it => it.Trim())
+                .Where(it => !it.IsNullOrEmpty())
+                .ToArray());
 
         // Wipe lyrics
         FieldBindingUtils.Bind(wipeLyricsEffectToggle,

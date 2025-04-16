@@ -82,11 +82,11 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
             throw new Exception("Not creating libVLC instance because VLC is not selected for media file playback.");
         }
 
-        Debug.Log("Creating LibVLC instance");
+        Debug.Log($"Creating LibVLC instance. options: {JsonConverter.ToJson(settings.VlcOptions)}");
         DisposeLibVlc();
 
-        Core.Initialize(Application.dataPath); // Load VLC dlls
-        libVLC = new LibVLC(enableDebugLogs: true);
+        Core.Initialize(Application.dataPath);
+        libVLC = new LibVLC(enableDebugLogs: true, settings.VlcOptions);
 
         Debug.Log($"Initialized libVLC, changeset: {libVLC.Changeset}, LibVLCSharp version: {typeof(LibVLC).Assembly.GetName().Version}");
 

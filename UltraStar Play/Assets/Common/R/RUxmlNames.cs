@@ -1005,6 +1005,7 @@ public static partial class R
         public const string viewMoreButton = "viewMoreButton";
         public const string vinylImage = "vinylImage";
         public const string virtualPiano = "virtualPiano";
+        public const string vlcOptionsTextField = "vlcOptionsTextField";
         public const string vocalsAudioVolumeChooser = "vocalsAudioVolumeChooser";
         public const string voiceIdLabel = "voiceIdLabel";
         public const string volumeChooser = "volumeChooser";
