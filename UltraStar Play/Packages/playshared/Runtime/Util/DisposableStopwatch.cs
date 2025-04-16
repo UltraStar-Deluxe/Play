@@ -51,7 +51,7 @@ public class DisposableStopwatch : IDisposable
             logText = $"{logText}: {millis} ms";
         }
 
-        Log.WithLevel(logEventLevel.ToSerilogLogEventLevel(), () => logText);
+        Log.WithLevel(logEventLevel, () => logText);
     }
 
     private static bool ContainsPlaceholder(string logText)

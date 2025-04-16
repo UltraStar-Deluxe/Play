@@ -3,7 +3,6 @@
     "rootNamespace": "",
     "references": [
         "playshared",
-        "Serilog",
         "Plugins",
         "UniRx",
         "com.achimmihca.uniinject",
@@ -20,7 +19,9 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "ICSharpCode.SharpZipLib.dll"
+        "ICSharpCode.SharpZipLib.dll",
+        "Serilog.dll",
+        "Serilog.Sinks.File.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

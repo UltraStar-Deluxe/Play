@@ -103,7 +103,7 @@ public class ExtractArchiveControl
     private async Awaitable ExtractTarArchiveAsync()
     {
         await using Stream archiveStream = File.OpenRead(archivePath);
-        using TarArchive archive = TarArchive.CreateInputTarArchive(archiveStream, Encoding.UTF8);
+        using TarArchive archive = TarArchive.CreateInputTarArchive(archiveStream);
         archive.ProgressMessageEvent += OnExtractTarArchiveProgress;
 
         totalTarFileSizeInBytes = new FileInfo(archivePath).Length;

@@ -1,13 +1,34 @@
 VERSION.txt
 
 ########################################
-## Third-party assets
+## Third-party assets from NuGet and GitHub
+
+Plugins/NuGetPackages/
+Plugins/NuGetPackages.meta
+
+Plugins/CSharpSynthForUnity/
+Plugins/CSharpSynthForUnity.meta
+
+Plugins/LeanTween/
+Plugins/LeanTween.meta
+
+Plugins/SpleeterSharp/
+Plugins/SpleeterSharp.meta
+
+Plugins/Soundfonts/
+Plugins/Soundfonts.meta
+
+Plugins/UniRx/
+Plugins/UniRx.meta
+
+Plugins/UnityStandaloneFileBrowser/
+Plugins/UnityStandaloneFileBrowser.meta
+
+########################################
+## Third-party assets from the Unity Asset Store
 
 Vuplex/
 Vuplex.meta
-
-FfmpegUnity/
-FfmpegUnity.meta
 
 OneJS/
 OneJS.meta

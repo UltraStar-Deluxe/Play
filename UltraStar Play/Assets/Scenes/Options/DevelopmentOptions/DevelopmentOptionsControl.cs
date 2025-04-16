@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CommonOnlineMultiplayer;
-using Serilog.Events;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
@@ -290,7 +289,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         reportIssueButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToReportIssues)));
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
-            ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
+            ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(ELogEventLevel.Verbose));
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
         });
 

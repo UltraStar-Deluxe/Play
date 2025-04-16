@@ -67,6 +67,13 @@
       },
       "hash": "7e6bee030f3f9fd32960f8d611aa5ec45bac7b8b"
     },
+    "com.darrentsung.dtcompiletimetracker": {
+      "version": "https://github.com/DarrenTsung/DTCompileTimeTracker.git#276095b3b212d7c33106b53d71b93b5a72d1e1d3",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "276095b3b212d7c33106b53d71b93b5a72d1e1d3"
+    },
     "com.singularitygroup.hotreload": {
       "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.5",
       "depth": 0,
@@ -347,22 +354,6 @@
       "source": "git",
       "dependencies": {},
       "hash": "464cdbbabb67661751cb73fd39c4e99e5b5eedb0"
-    },
-    "nuget.castle-core": {
-      "version": "2.0.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "nuget.moq": {
-      "version": "https://github.com/needle-mirror/nuget.moq.git#2.0.0",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "nuget.castle-core": "2.0.0"
-      },
-      "hash": "9a546d7684ec914c9de22a4e19bfea2290ef14c4"
     },
     "playshared": {
       "version": "file:playshared",

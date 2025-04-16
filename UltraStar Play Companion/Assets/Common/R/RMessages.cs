@@ -384,6 +384,7 @@ public static partial class R
         public static readonly string options_showIndexInSongSelect = "options_showIndexInSongSelect";
         public static readonly string options_showLyricsOnNotes = "options_showLyricsOnNotes";
         public static readonly string options_showScrollBarInSongSelect = "options_showScrollBarInSongSelect";
+        public static readonly string options_skipToNextLyricsTime = "options_skipToNextLyricsTime";
         public static readonly string options_songArchiveUrl_hint = "options_songArchiveUrl_hint";
         public static readonly string options_songBackgroundScaleMode = "options_songBackgroundScaleMode";
         public static readonly string options_songDataFetchType = "options_songDataFetchType";

@@ -157,11 +157,11 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
     {
         if (!peerToConnectRequestDto.TryGetValue(peer, out ConnectRequestDto connectRequestDto))
         {
-            Debug.LogError($"Peer connected without ConnectRequest data: {peer.EndPoint}");
+            Debug.LogError($"Peer connected without ConnectRequest data: {peer}");
             return;
         }
 
-        Debug.Log($"Peer connected {peer.EndPoint} with ConnectRequest: {connectRequestDto.ToJson()}. Sending ConnectResponse.");
+        Debug.Log($"Peer connected {peer} with ConnectRequest: {connectRequestDto.ToJson()}. Sending ConnectResponse.");
 
         // Send connect response
         List<RestApiPermission> permissions = SettingsUtils.GetPermissions(settings, connectRequestDto.ClientId);
@@ -174,12 +174,12 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
             Permissions = permissions,
             AvailableGameRoundModifierDtos = availableGameRoundModifierDtos,
         };
-        Debug.Log($"Sending ConnectResponse to {peer.EndPoint}");
+        Debug.Log($"Sending ConnectResponse to {peer}");
         peer.Send(connectResponseDto, DeliveryMethod.ReliableOrdered);
 
         // Send MicProfile
         MicProfile micProfileOfClient = GetOrCreateMicProfile(connectRequestDto);
-        Debug.Log($"Sending MicProfile to {peer.EndPoint}");
+        Debug.Log($"Sending MicProfile to {peer}");
         peer.Send(new MicProfileMessageDto(micProfileOfClient), DeliveryMethod.ReliableOrdered);
     }
 
@@ -199,7 +199,7 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
-        Debug.LogWarning($"Peer disconnected: {peer.EndPoint}, reason: {disconnectInfo.Reason}");
+        Debug.LogWarning($"Peer disconnected: {peer}, reason: {disconnectInfo.Reason}");
         if (!peerToCompanionClientHandler.TryGetValue(peer, out ICompanionClientHandler companionClientHandler))
         {
             return;
@@ -222,7 +222,7 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
             return;
         }
 
-        Log.Verbose(() => $"Received message from client {peer.EndPoint}: {message}");
+        Log.Verbose(() => $"Received message from client {peer}: {message}");
 
         if (peerToCompanionClientHandler.TryGetValue(peer, out ICompanionClientHandler companionClientHandler))
         {
@@ -230,7 +230,7 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
         }
         else
         {
-            Debug.LogError($"Received message from unknown peer {peer.EndPoint}: {message}");
+            Debug.LogError($"Received message from unknown peer {peer}: {message}");
         }
     }
 
@@ -247,7 +247,7 @@ public class ServerSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     public void OnNetworkLatencyUpdate(NetPeer peer, int latency)
     {
-        Log.Verbose(() => $"OnNetworkLatencyUpdate: {peer.EndPoint}, latency: {latency}");
+        Log.Verbose(() => $"OnNetworkLatencyUpdate: {peer}, latency: {latency}");
     }
 
     public void OnConnectionRequest(ConnectionRequest request)

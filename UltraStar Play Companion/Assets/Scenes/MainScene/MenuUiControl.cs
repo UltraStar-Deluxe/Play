@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using LiteNetLib;
 using ProTrans;
-using Serilog.Events;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -158,7 +157,7 @@ public class MenuUiControl : INeedInjection, IInjectionFinishedListener
         viewLogButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
-            ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
+            ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(ELogEventLevel.Verbose));
             NotificationManager.CreateNotification(Translation.Of("Copied log to clipboard"));
         });
 

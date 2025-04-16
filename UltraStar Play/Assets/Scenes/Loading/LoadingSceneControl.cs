@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using PrimeInputActions;
-using Serilog.Events;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -228,7 +226,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         viewMoreButton.RegisterCallbackButtonTriggered(_ => Application.OpenURL(Translation.Get(R.Messages.uri_logFiles)));
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
-            ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
+            ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(ELogEventLevel.Verbose));
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
         });
     }
