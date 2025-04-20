@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: 644870a8b59546c408b254ee3c64591e
+guid: 3c1ea802a4f8e9443bbffe0a737805d0
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/intf/telnet.luac
-  uploadId: 606875

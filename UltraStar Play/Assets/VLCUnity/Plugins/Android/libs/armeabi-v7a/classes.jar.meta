@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e5bf3ebc2bc94d14dbe20d47ff2d14b0
+guid: 4827bd3f399585948b3f76d5505884b9
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -31,10 +31,3 @@ PluginImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Android/libs/armeabi-v7a/classes.jar
-  uploadId: 606875

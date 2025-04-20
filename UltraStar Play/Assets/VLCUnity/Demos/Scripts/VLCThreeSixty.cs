@@ -6,143 +6,128 @@ using LibVLCSharp;
 public class VLCThreeSixty : MonoBehaviour
 {
     LibVLC _libVLC;
-    MediaPlayer _mediaPlayer;
+    MediaPlayer _mediaPlayerScreen;
+    MediaPlayer _mediaPlayerSphere;
     const int seekTimeDelta = 5000;
-    Texture2D tex = null;
+    Texture2D texScreen, texSphere;
+    Renderer screen, sphere;
     bool playing;
-    
-    float Yaw;
-    float Pitch;
-    float Roll;
+    float Yaw, Pitch, Roll;
 
     void Awake()
     {
         Core.Initialize(Application.dataPath);
-
         _libVLC = new LibVLC(enableDebugLogs: true);
 
-        Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-        //_libVLC.Log += (s, e) => UnityEngine.Debug.Log(e.FormattedLog); // enable this for logs in the editor
-
-        PlayPause();
+        screen = GameObject.Find("Screen").GetComponent<Renderer>();
+        sphere = GameObject.Find("Sphere").GetComponent<Renderer>();
     }
 
-    void OnDisable() 
-    {
-        _mediaPlayer?.Stop();
-        _mediaPlayer?.Dispose();
-        _mediaPlayer = null;
+    void Start() => PlayPause();
 
+    void OnDisable()
+    {
+        _mediaPlayerScreen?.Stop();
+        _mediaPlayerScreen?.Dispose();
+        _mediaPlayerSphere?.Dispose();
         _libVLC?.Dispose();
-        _libVLC = null;
     }
 
     public void PlayPause()
     {
-        Debug.Log ("[VLC] Toggling Play Pause !");
-        if (_mediaPlayer == null)
+        if (_mediaPlayerScreen == null)
         {
-            _mediaPlayer = new MediaPlayer(_libVLC);
+            // keep default projection for the screen, thus with viewpoint navigation enabled
+            _mediaPlayerScreen = new MediaPlayer(_libVLC);
         }
-        if (_mediaPlayer.IsPlaying)
+        if (_mediaPlayerSphere == null)
         {
-            _mediaPlayer.Pause();
+            // disable default projection for the sphere, no libvlc viewpoint navigation
+            _mediaPlayerSphere = new MediaPlayer(_libVLC);
+            _mediaPlayerSphere.SetProjectionMode(VideoProjection.Rectangular);
+        }
+
+        Debug.Log("[VLC] Toggling Play Pause!");
+
+        if (_mediaPlayerScreen.IsPlaying || _mediaPlayerSphere.IsPlaying)
+        {
+            _mediaPlayerScreen.Pause();
+            _mediaPlayerSphere.Pause();
         }
         else
         {
             playing = true;
-
-            if(_mediaPlayer.Media == null)
+            if (_mediaPlayerScreen.Media == null)
             {
-                // download https://streams.videolan.org/streams/360/eagle_360.mp4 
-                // to your computer (to avoid network requests for smoother navigation)
-                // and adjust the Uri to the local path
+                // better save the media locally to avoid slow networks
                 var media = new Media(new Uri("https://streams.videolan.org/streams/360/eagle_360.mp4"));
-                
-                Task.Run(async () => 
+                Task.Run(async () =>
                 {
                     var result = await media.ParseAsync(_libVLC, MediaParseOptions.ParseNetwork);
-                    var trackList = media.TrackList(TrackType.Video);
-                    var is360 = trackList[0].Data.Video.Projection == VideoProjection.Equirectangular;
-                    
-                    if(is360)
-                        Debug.Log("The video is a 360 video");
-                    else
-                        Debug.Log("The video was not identified as a 360 video by VLC, make sure it is properly tagged");
-
-                    trackList.Dispose();
+                    Debug.Log(media.TrackList(TrackType.Video)[0].Data.Video.Projection == VideoProjection.Equirectangular
+                        ? "The video is a 360 video" : "The video was not identified as a 360 video by VLC");
                 });
-                
-                _mediaPlayer.Media = media;
+                _mediaPlayerScreen.Media = _mediaPlayerSphere.Media = media;
             }
-
-            _mediaPlayer.Play();
+            _mediaPlayerScreen.Play();
+            _mediaPlayerSphere.Play();
         }
     }
 
     void Update()
     {
-        if(!playing) return;
-
-        if (tex == null)
-        {
-            // If received size is not null, it and scale the texture
-            uint i_videoHeight = 0;
-            uint i_videoWidth = 0;
-
-            _mediaPlayer.Size(0, ref i_videoWidth, ref i_videoHeight);
-            var texptr = _mediaPlayer.GetTexture(i_videoWidth, i_videoHeight, out bool updated);
-            if (i_videoWidth != 0 && i_videoHeight != 0 && updated && texptr != IntPtr.Zero)
-            {
-                Debug.Log("Creating texture with height " + i_videoHeight + " and width " + i_videoWidth);
-                tex = Texture2D.CreateExternalTexture((int)i_videoWidth,
-                    (int)i_videoHeight,
-                    TextureFormat.RGBA32,
-                    false,
-                    true,
-                    texptr);
-                GetComponent<Renderer>().material.mainTexture = tex;
-            }
-        }
-        else if (tex != null)
-        {
-            var texptr = _mediaPlayer.GetTexture((uint)tex.width, (uint)tex.height, out bool updated);
-            if (updated)
-            {
-                tex.UpdateExternalTexture(texptr);
-            }
-        }
+        if (!playing) return;
+        UpdateTexture(ref texScreen, _mediaPlayerScreen, screen);
+        UpdateTexture(ref texSphere, _mediaPlayerSphere, sphere);
     }
 
-    void OnGUI()
+    void UpdateTexture(ref Texture2D texture, MediaPlayer player, Renderer renderer)
     {
-        Do360Navigation();
+        if (texture == null)
+        {
+            uint width = 0, height = 0;
+            player.Size(0, ref width, ref height);
+            var texPtr = player.GetTexture(width, height, out bool updated);
+
+            if (width != 0 && height != 0 && updated && texPtr != IntPtr.Zero)
+            {
+                Debug.Log($"Creating texture with height {height} and width {width}");
+                texture = Texture2D.CreateExternalTexture((int)width, (int)height, TextureFormat.RGBA32, false, true, texPtr);
+                renderer.material.mainTexture = texture;
+            }
+        }
+        else
+        {
+            var texPtr = player.GetTexture((uint)texture.width, (uint)texture.height, out bool updated);
+            if (updated) texture.UpdateExternalTexture(texPtr);
+        }
     }
-    
+
+    void OnGUI() => Do360Navigation();
+
     void Do360Navigation()
     {
         var range = Math.Max(UnityEngine.Screen.width, UnityEngine.Screen.height);
-
-        Yaw = _mediaPlayer.Viewpoint.Yaw;
-        Pitch = _mediaPlayer.Viewpoint.Pitch;
-        Roll = _mediaPlayer.Viewpoint.Roll;
+        Yaw = _mediaPlayerScreen.Viewpoint.Yaw;
+        Pitch = _mediaPlayerScreen.Viewpoint.Pitch;
+        Roll = _mediaPlayerScreen.Viewpoint.Roll;
         var fov = 80;
 
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            _mediaPlayer.UpdateViewpoint(Yaw + (float)( 80 * + 40 / range), Pitch, Roll, fov);
-        }
-        else if(Input.GetKey(KeyCode.LeftArrow))
-        {
-            _mediaPlayer.UpdateViewpoint(Yaw - (float)( 80 * + 40 / range), Pitch, Roll, fov);
-        }
-        else if(Input.GetKey(KeyCode.DownArrow))
-        {
-            _mediaPlayer.UpdateViewpoint(Yaw, Pitch + (float)( 80 * + 20 / range), Roll, fov);
-        }
-        else if(Input.GetKey(KeyCode.UpArrow))
-        {
-            _mediaPlayer.UpdateViewpoint(Yaw, Pitch - (float)( 80 * + 20 / range), Roll, fov);
-        }
+        if (Input.GetKey(KeyCode.RightArrow)) RotateView(20f, 80 * 40 / range, 0);
+        else if (Input.GetKey(KeyCode.LeftArrow)) RotateView(-20f, -80 * 40 / range, 0);
+        else if (Input.GetKey(KeyCode.DownArrow)) RotateView(0, 0, 1);
+        else if (Input.GetKey(KeyCode.UpArrow)) RotateView(0, 0, -1);
     }
+
+    void RotateView(float sphereRotation, float yawDelta, float pitchDelta)
+    {
+        // no viewpoint changes for the sphere as the whole video is shown on the texture
+        // we can rotate the texture instead
+        sphere.transform.Rotate(Vector3.up * sphereRotation * Time.deltaTime);
+        sphere.transform.Rotate(Vector3.right * pitchDelta * 10 * Time.deltaTime);
+
+        Pitch = Mathf.Clamp(Pitch + pitchDelta, -90f, 90f);    
+        _mediaPlayerScreen.UpdateViewpoint(Yaw + yawDelta, Pitch, Roll, 80);
+    }
+
 }

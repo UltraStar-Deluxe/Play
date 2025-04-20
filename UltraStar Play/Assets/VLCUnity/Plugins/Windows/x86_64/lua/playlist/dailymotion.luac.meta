@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: 42e7bf0f1247f6b458f709779fae483c
+guid: 2880201bfd11f424aa6f498f07558860
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/playlist/dailymotion.luac
-  uploadId: 606875

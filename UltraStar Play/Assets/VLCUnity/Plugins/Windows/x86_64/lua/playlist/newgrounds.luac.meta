@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: e51ed82d3818a234ba710e289ef1b746
+guid: 56599bdf448e17a40b805d0fd092864c
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/playlist/newgrounds.luac
-  uploadId: 606875

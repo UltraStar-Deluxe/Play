@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: 84b04fce7b80d8a41a0de172f6e55c09
+guid: 0fe65673810aa9a40bb5e18acf006b54
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/playlist/anevia_xml.luac
-  uploadId: 606875

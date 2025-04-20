@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: 9f37e69e573d31b438e3d7fdcfc4a305
+guid: 55b61a572d36c3243809d7bc1e612127
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/sd/jamendo.luac
-  uploadId: 606875
