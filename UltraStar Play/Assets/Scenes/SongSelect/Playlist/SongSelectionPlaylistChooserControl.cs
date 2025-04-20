@@ -68,7 +68,9 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
 
     private void UpdateItems()
     {
-        items = playlistManager.GetPlaylists(true, true);
+        items = playlistManager.GetPlaylists(true, true)
+            .OrderBy(playlist => playlist.Name)
+            .ToList();
 
         playlistDropdownField.choices = items
             .Select(playlist => playlist.Name)
