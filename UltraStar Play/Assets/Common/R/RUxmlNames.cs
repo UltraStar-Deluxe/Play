@@ -656,6 +656,7 @@ public static partial class R
         public const string rem = "rem";
         public const string removeWebCamImageButton = "removeWebCamImageButton";
         public const string removeWebCamImageIcon = "removeWebCamImageIcon";
+        public const string replayGainLoudnessNormalizationChooser = "replayGainLoudnessNormalizationChooser";
         public const string reportIssueButton = "reportIssueButton";
         public const string reportIssueIcon = "reportIssueIcon";
         public const string reportIssueLabel = "reportIssueLabel";

@@ -167,7 +167,7 @@ public class Settings : ISettings
     public ESongVideoPlayback SongVideoPlayback { get; set; } = ESongVideoPlayback.AlwaysEnabled;
 
     // Vlc settings
-    public string[] VlcOptions { get; set; } = Array.Empty<string>();
+    public List<string> VlcOptions { get; set; } = new();
     public bool LogVlcOutput { get; set; }
     public EThirdPartyLibraryUsage VlcToPlayMediaFilesUsage { get; set; } = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
 

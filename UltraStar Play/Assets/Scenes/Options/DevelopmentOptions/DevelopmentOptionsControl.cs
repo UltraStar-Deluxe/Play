@@ -384,7 +384,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 .Split(newValue, @"\n")
                 .Select(it => it.Trim())
                 .Where(it => !it.IsNullOrEmpty())
-                .ToArray());
+                .ToList());
 
         // Wipe lyrics
         FieldBindingUtils.Bind(wipeLyricsEffectToggle,

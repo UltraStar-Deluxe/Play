@@ -375,6 +375,7 @@ public static partial class R
         public static readonly string options_recording_title = "options_recording_title";
         public static readonly string options_reduceAudioVolume = "options_reduceAudioVolume";
         public static readonly string options_reloadModsOnFileChange = "options_reloadModsOnFileChange";
+        public static readonly string options_replayGainLoudnessNormalization = "options_replayGainLoudnessNormalization";
         public static readonly string options_resolution = "options_resolution";
         public static readonly string options_sampleRate = "options_sampleRate";
         public static readonly string options_sampleRate_auto = "options_sampleRate_auto";

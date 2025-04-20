@@ -8,6 +8,7 @@
             <Chooser name="backgroundMusicVolumeChooser" label="$options_volume_backgroundMusic" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <Chooser name="animateSceneChangeVolumeChooser" label="$options_volume_sceneTransition" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <Chooser name="sfxVolumeChooser" label="$options_volume_soundEffects" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+            <Chooser name="replayGainLoudnessNormalizationChooser" label="$options_replayGainLoudnessNormalization" class="noBackgroundInHierarchy" />
             <ui:TextField picking-mode="Ignore" label="$options_soundFont_path" name="soundfontPathTextField" is-delayed="true" class="noBackgroundInHierarchy" style="align-items: center; flex-grow: 1; margin-bottom: 4px;">
                 <ui:Label tabindex="-1" text="$options_soundFont_path_hint" display-tooltip-when-elided="true" name="soundfontPathTextFieldHintLabel" class="textFieldHint secondaryFontColor" style="left: auto; right: 10px;" />
             </ui:TextField>

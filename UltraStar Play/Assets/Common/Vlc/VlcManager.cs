@@ -86,7 +86,7 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
         DisposeLibVlc();
 
         Core.Initialize(Application.dataPath);
-        libVLC = new LibVLC(enableDebugLogs: true, settings.VlcOptions);
+        libVLC = new LibVLC(enableDebugLogs: true, settings.VlcOptions.ToArray());
 
         Debug.Log($"Initialized libVLC, changeset: {libVLC.Changeset}, LibVLCSharp version: {typeof(LibVLC).Assembly.GetName().Version}");
 

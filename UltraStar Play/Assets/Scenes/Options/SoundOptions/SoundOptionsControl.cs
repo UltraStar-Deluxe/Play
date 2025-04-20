@@ -1,6 +1,8 @@
+using System.Linq;
 using AudioSynthesis.Midi;
 using UniInject;
 using UniRx;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -40,6 +42,9 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
     [Inject(UxmlName = R.UxmlNames.sfxVolumeChooser)]
     private Chooser sfxVolumeChooser;
 
+    [Inject(UxmlName = R.UxmlNames.replayGainLoudnessNormalizationChooser)]
+    private Chooser replayGainLoudnessNormalizationChooser;
+
     [Inject(UxmlName = R.UxmlNames.soundfontPathTextField)]
     private TextField soundfontPathTextField;
 
@@ -68,6 +73,10 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
         PercentNumberChooserControl backgroundMusicVolumeChooserControl = new(backgroundMusicVolumeChooser);
         backgroundMusicVolumeChooserControl.Bind(() => settings.BackgroundMusicVolumePercent,
             newValue => settings.BackgroundMusicVolumePercent = (int)newValue);
+
+        ReplayGainChooserControl replayGainChooserControl = new(replayGainLoudnessNormalizationChooser);
+        replayGainChooserControl.Bind(() => ReplayGainChooserControl.GetReplayGainEnumValue(settings.VlcOptions),
+            newValue => ReplayGainChooserControl.SetReplayGainEnumValue(settings.VlcOptions, newValue));
 
         // Volume can be changed via REST API
         settings.ObserveEveryValueChanged(it => it.VolumePercent)
