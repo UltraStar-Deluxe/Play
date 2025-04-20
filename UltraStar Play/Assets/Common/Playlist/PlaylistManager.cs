@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,7 +12,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static PlaylistManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<PlaylistManager>();
 
-    private List<IPlaylist> playlists = new();
+    private ConcurrentBag<IPlaylist> playlists = new();
 
     public IReadOnlyList<IPlaylist> Playlists
     {
@@ -22,7 +23,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
                 CreateFavoritePlaylistIfNotExist();
                 ScanPlaylists();
             }
-            return playlists;
+            return playlists.ToList();
         }
     }
 
@@ -117,7 +118,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         Debug.Log($"Scanning playlists on thread {Thread.CurrentThread.ManagedThreadId}");
         using DisposableStopwatch d = new("Scanning playlists took <ms> ms");
 
-        playlists = new List<IPlaylist>();
+        playlists = new ConcurrentBag<IPlaylist>();
 
         await ScanPlaylistsInFolderAsync(ApplicationUtils.PlaylistFolder);
 
@@ -340,7 +341,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             nonPersistentSettings.PlaylistName.Value = "";
         }
 
-        playlists.Remove(playlist);
+        playlists = new ConcurrentBag<IPlaylist>(playlists.Except(new List<IPlaylist> {playlist}));
 
         playlistChangedEventStream.OnNext(new PlaylistChangedEvent(playlist, null));
 
