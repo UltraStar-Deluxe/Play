@@ -111,7 +111,7 @@ public class SteamBuildUtils
 
     private static string GetSteamcmdExecutablePath()
     {
-        return new FileInfo($"{Application.dataPath}/../../tools/steamworks_sdk_157/sdk/tools/ContentBuilder/builder/steamcmd.exe").FullName;
+        return new FileInfo($"{Application.dataPath}/../../Tools/steamworks_sdk_157/sdk/tools/ContentBuilder/builder/steamcmd.exe").FullName;
     }
 
     /**
@@ -120,7 +120,7 @@ public class SteamBuildUtils
      */
     private static string GetSteamVdfFilePath()
     {
-        return new FileInfo($"{Application.dataPath}/../../tools/steamworks_sdk_157/vdf_files/app_2394070-private-beta.vdf").FullName;
+        return new FileInfo($"{Application.dataPath}/../../Tools/steamworks_sdk_157/vdf_files/app_2394070-private-beta.vdf").FullName;
     }
 
     private static string GetSteamUploadContentRootFolder(string appVdfFilePath)
