@@ -32,8 +32,15 @@ public static class FileScanner
             : SearchOption.TopDirectoryOnly;
         foreach (string fileExtensionPattern in config.SearchPatterns)
         {
-            string[] filesOfPattern = Directory.GetFiles(folder, fileExtensionPattern, searchOption);
-            unfilteredResult.AddRange(filesOfPattern);
+            try
+            {
+                string[] filesOfPattern = Directory.GetFiles(folder, fileExtensionPattern, searchOption);
+                unfilteredResult.AddRange(filesOfPattern);
+            }
+            catch (Exception e)
+            {
+                e.Log($"Failed to get files of pattern. Folder='{folder}', Pattern='{fileExtensionPattern}', SearchOption: '{searchOption}'");
+            }
         }
 
         if (!config.ExcludeHiddenFolders
