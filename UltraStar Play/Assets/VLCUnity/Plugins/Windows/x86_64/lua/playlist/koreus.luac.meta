@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: e7f9544a9627ab84e8024b80a900a94a
+guid: e77234985e32f0445a6ec9c49dc2d2ec
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/playlist/koreus.luac
-  uploadId: 606875

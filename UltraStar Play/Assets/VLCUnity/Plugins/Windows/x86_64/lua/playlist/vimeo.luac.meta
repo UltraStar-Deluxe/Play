@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: 56bf701f44951aa43855e599655c9bdc
+guid: 60a28bb550a3a054e8ad9fbac1dcdbbc
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/playlist/vimeo.luac
-  uploadId: 606875

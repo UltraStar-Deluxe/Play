@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: 31bea058bd414c54db631fbed74371e0
+guid: 87b47660a9a7a854b809e8c474cf3871
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/playlist/cue.luac
-  uploadId: 606875

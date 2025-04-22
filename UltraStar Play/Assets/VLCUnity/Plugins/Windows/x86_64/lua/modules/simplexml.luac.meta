@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: 328de1233280cb24092922797e5dd8b4
+guid: ef81af0eb7f76444a9fd36e1bac1caa6
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/modules/simplexml.luac
-  uploadId: 606875

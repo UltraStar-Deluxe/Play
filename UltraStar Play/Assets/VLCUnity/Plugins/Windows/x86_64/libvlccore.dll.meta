@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 7ba065d51df28e64d8374e7de4eb320e
+guid: 716adca6ecc28744bb0c50b8633c1fcc
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -31,10 +31,3 @@ PluginImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/libvlccore.dll
-  uploadId: 606875

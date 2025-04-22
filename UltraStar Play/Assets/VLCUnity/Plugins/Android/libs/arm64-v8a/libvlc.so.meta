@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 3fbb5972beab8f94da920a06f259fde7
+guid: 3ee4121c79c7b114e8bc8936b6bbdf36
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -31,10 +31,3 @@ PluginImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Android/libs/arm64-v8a/libvlc.so
-  uploadId: 606875

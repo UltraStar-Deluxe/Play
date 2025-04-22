@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f5c173866f5f2664ca6e1bfd3c547988
+guid: 7268b44ebfd94504f9e6dca656e319ae
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -31,10 +31,3 @@ PluginImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/libvlc.dll
-  uploadId: 606875

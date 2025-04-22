@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: 8957d6e18ba904748ab90087cd84e01b
+guid: 9a69a1218d8a66042b4ceddca70b0120
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 133979
-  packageName: VLC for Unity (Windows)
-  packageVersion: 0.1.8
-  assetPath: Assets/VLCUnity/Plugins/Windows/x86_64/lua/playlist/appletrailers.luac
-  uploadId: 606875

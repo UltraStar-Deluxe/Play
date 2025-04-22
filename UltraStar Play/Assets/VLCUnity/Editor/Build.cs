@@ -16,6 +16,7 @@ public class CopyLibVLCFiles : IPostprocessBuildWithReport
     const string plugins = "plugins";
     const string Data = "_Data";
     const string standaloneWindows = "StandaloneWindows64";
+    const string Windows = "Windows";
     public int callbackOrder => 0;
     
     public void OnPostprocessBuild(BuildReport report)
@@ -25,7 +26,7 @@ public class CopyLibVLCFiles : IPostprocessBuildWithReport
 
         var buildOutput = Path.GetDirectoryName(report.summary.outputPath);
         var libvlcBuildOutput = Path.Combine(buildOutput, $"{Application.productName}{Data}", Plugins, x64);
-        var sourceLibvlcLocation = Path.Combine(Application.dataPath, VLCUnity, Plugins, x64);
+        var sourceLibvlcLocation = Path.Combine(Path.GetFullPath(Application.dataPath), VLCUnity, Plugins, Windows, x64);
         var sourcePluginsLibvlcLocation = Path.Combine(sourceLibvlcLocation, plugins);
 
         CopyFolder(Path.Combine(sourceLibvlcLocation, lua), Path.Combine(libvlcBuildOutput, lua));

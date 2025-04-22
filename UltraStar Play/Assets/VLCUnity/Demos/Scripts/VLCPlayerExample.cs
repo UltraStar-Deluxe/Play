@@ -27,7 +27,7 @@ public class VLCPlayerExample : MonoBehaviour
 	public RenderTexture texture = null; //We copy it into this texture which we actually use in unity.
 
 
-	public string path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"; //Can be a web path or a local path
+	public string path = "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_stereo.avi"; //Can be a web path or a local path
 
 	// when copying native Texture2D textures to Unity RenderTextures, the orientation mapping is incorrect on Android, so we flip it over.
 	public bool flipTextureX = true;
