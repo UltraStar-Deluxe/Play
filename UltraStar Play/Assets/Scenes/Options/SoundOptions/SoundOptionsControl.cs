@@ -2,7 +2,6 @@ using System.Linq;
 using AudioSynthesis.Midi;
 using UniInject;
 using UniRx;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
