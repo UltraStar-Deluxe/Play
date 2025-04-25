@@ -489,7 +489,10 @@ PlayerSettings:
       m_Height: 1024
       m_Kind: 4
       m_SubKind: App Store
-  m_BuildTargetBatching: []
+  m_BuildTargetBatching:
+  - m_BuildTarget: Standalone
+    m_StaticBatching: 1
+    m_DynamicBatching: 0
   m_BuildTargetShaderSettings: []
   m_BuildTargetGraphicsJobs:
   - m_BuildTarget: MacStandaloneSupport
