@@ -108,8 +108,8 @@ public class MainGameDependencyDownloader(
     {
         var downloader = new GitDownloader
         {
-            RemoteUrl = "https://github.com/achimmihca/UnityStandaloneFileBrowser.git",
-            CommitHash = "e75bcc71eb721b8979de6f4653fb507b5dbc2172",
+            RemoteUrl = "https://github.com/gkngkc/UnityStandaloneFileBrowser.git",
+            CommitHash = "04a5d49ed2545556da8a7192e86c69bd47641f10",
             Branch = "master",
             TargetDir = unityProjectDir / "Assets" / "Plugins" / "UnityStandaloneFileBrowser",
             Depth = cloneDepth,
