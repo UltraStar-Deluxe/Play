@@ -294,12 +294,6 @@
 /* DROP DOWN */
 /**************************************************/
 
-.unity-base-dropdown__container-inner {
-    /* Workaround for playlist dropdown outside bottom of screen */
-    /* TODO: check if this is still needed with Unity 6.1 */
-    max-height: 300px;
-}
-
 .unity-base-dropdown__container-outer {
     border-width: 0;
     padding: 0;
