@@ -7,7 +7,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class PortAudioOptionsControl : IInjectionFinishedListener
+public class PortAudioOptionsControl : IInjectionFinishedListener, INeedInjection
 {
     [Inject]
     private DialogManager dialogManager;
