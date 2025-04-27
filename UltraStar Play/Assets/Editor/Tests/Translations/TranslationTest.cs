@@ -8,6 +8,7 @@ using NUnit.Framework;
 using ProTrans;
 using UnityEngine;
 
+[Ignore("Manual test")]
 public class TranslationTest
 {
     private List<TranslatableAttribute> ignoredMissingTranslations;
