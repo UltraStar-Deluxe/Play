@@ -185,10 +185,9 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
 
-        if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController, out VisualElement unityBaseDropdown))
+        if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController))
         {
-            // TODO: Submit does not work ( https://forum.unity.com/threads/navigation-and-dropdownfield.1195423/ )
-            FocusedVisualElement.SendEvent(new NavigationSubmitEvent() { target = FocusedVisualElement });
+            FocusedVisualElement.SendEvent(NavigationSubmitEvent.GetPooled());
             return;
         }
 
@@ -256,9 +255,9 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
 
-        if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController))
+        if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController)
+            && TryNavigateDropdownList(focusedVisualElement, navigationDirection))
         {
-            NavigateDropdownList(focusedVisualElement, navigationDirection);
             return;
         }
 
@@ -289,13 +288,18 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         }
 
         ScrollView parentScrollView = focusedVisualElement.GetFirstAncestorOfType<ScrollView>();
-        if (parentScrollView != null
-            && TryNavigateInVisualElement(parentScrollView, focusedVisualElement, navigationDirection))
+        if (TryNavigateInScrollView(parentScrollView, focusedVisualElement, navigationDirection))
         {
             return;
         }
 
         NavigateToBestMatchingNavigationTarget(focusedVisualElement, navigationDirection);
+    }
+
+    private bool TryNavigateInScrollView(ScrollView parentScrollView, VisualElement focusedVisualElement, Vector2 navigationDirection)
+    {
+        return parentScrollView != null
+               && TryNavigateInVisualElement(parentScrollView, focusedVisualElement, navigationDirection);
     }
 
     private bool TryNavigateInVisualElement(
@@ -437,14 +441,12 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    private void NavigateDropdownList(
-        VisualElement focusedVisualElement,
-        Vector2 navigationDirection)
+    private bool TryNavigateDropdownList(VisualElement focusedVisualElement, Vector2 navigationDirection)
     {
         Log.WithLevel(logLevel, () => "NavigateDropdownList");
 
-        ListView dropdownListView = focusedVisualElement.Q<ListView>(null, "unity-base-dropdown__container-inner");
-        TryNavigateListView(dropdownListView, navigationDirection);
+        focusedVisualElement.SendEvent(NavigationMoveEvent.GetPooled(navigationDirection));
+        return true;
     }
 
     private void NavigateToBestMatchingNavigationTarget(VisualElement focusedVisualElement, Vector2 navigationDirection)
