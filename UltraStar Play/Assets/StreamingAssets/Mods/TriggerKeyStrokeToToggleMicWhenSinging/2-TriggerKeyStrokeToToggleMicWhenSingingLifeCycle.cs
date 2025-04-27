@@ -4,7 +4,7 @@ using UniRx;
 using System;
 using System.Collections.Generic;
 using WindowsInput;
-using WindowsInput.Native;
+using WindowsInput.Events;
 
 public class TriggerKeyStrokeToToggleMicWhenSingingLifeCycle : IOnLoadMod, IOnDisableMod, IDisposable, IOnModInstanceBecomesObsolete, IAutoBoundMod
 {
@@ -25,19 +25,6 @@ public class TriggerKeyStrokeToToggleMicWhenSingingLifeCycle : IOnLoadMod, IOnDi
                 return $"CTRL+{modSettings.keyCode}";
             }
             return $"{modSettings.keyCode}";
-        }
-    }
-
-    private InputSimulator inputSimulator;
-    private InputSimulator InputSimulator {
-        get
-        {
-            if (inputSimulator == null)
-            {
-                inputSimulator = new InputSimulator();
-            }
-
-            return inputSimulator;
         }
     }
 
@@ -64,11 +51,11 @@ public class TriggerKeyStrokeToToggleMicWhenSingingLifeCycle : IOnLoadMod, IOnDi
         Debug.Log($"{nameof(TriggerKeyStrokeToToggleMicWhenSingingLifeCycle)}.TriggerKeyStroke '{ShortcutName}'");
         if (modSettings.requireControlModifier)
         {
-            InputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.LCONTROL, modSettings.keyCode);
+            Simulate.Events().Click(WindowsInput.Events.KeyCode.LControl, modSettings.keyCode).Invoke();
         }
         else
         {
-            InputSimulator.Keyboard.ModifiedKeyStroke(new List<VirtualKeyCode>(), modSettings.keyCode);
+            Simulate.Events().Click(modSettings.keyCode).Invoke();
         }
 
         if (modSettings.showNotificationOnTriggerKeyStroke)

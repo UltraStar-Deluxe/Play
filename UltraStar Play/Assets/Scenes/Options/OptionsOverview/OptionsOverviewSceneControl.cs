@@ -262,9 +262,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         // Scroll with mouse drag
         MouseEventScrollControl.RegisterMouseScrollEvents();
 
-        // Define usable scroll wheel increments for ScrollView.
-        ScrollViewScrollWheelSpeedControl.UpdateScrollWheelSpeedOfAllScrollViews(loadedSceneVisualElement);
-
         UpdateTranslation();
     }
 

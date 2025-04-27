@@ -98,15 +98,15 @@ public static class VisualElementUtils
     public static bool IsDropdownListFocused(FocusController focusController, out VisualElement unityBaseDropdown)
     {
         VisualElement focusedVisualElement = GetFocusedVisualElement(focusController);
-        if (focusedVisualElement == null
-            || !focusedVisualElement.ClassListContains("unity-base-dropdown__container-inner"))
+        if (focusedVisualElement != null
+            && focusedVisualElement.ClassListContains("unity-scroll-view__content-container"))
         {
-            unityBaseDropdown = null;
-            return false;
+            unityBaseDropdown = focusedVisualElement.GetParent(parent => parent.ClassListContains("unity-base-dropdown"));
+            return unityBaseDropdown != null;
         }
 
-        unityBaseDropdown = focusedVisualElement.GetParent(parent => parent.ClassListContains("unity-base-dropdown"));
-        return unityBaseDropdown != null;
+        unityBaseDropdown = null;
+        return false;
     }
 
     public static void RegisterDirectClickCallback(VisualElement visualElement, Action onDirectClick = null)

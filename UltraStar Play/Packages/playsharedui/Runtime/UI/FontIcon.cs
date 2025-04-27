@@ -36,6 +36,9 @@ public abstract class FontIcon : Label
     protected FontIcon()
     {
         Icon = "";
+
+        // Enable parsing of escape sequences in the text to handle \uXXXX as a single character.
+        parseEscapeSequences = true;
     }
 
     private void UpdateIcon()
