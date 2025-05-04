@@ -77,10 +77,22 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
 
         vlcMediaPlayer.Media = new Media(new Uri(audioUri));
 
-        // Play to trigger loading. PlayAsync to not block the main thread and avoid stutter.
+        // Set volume to 0 to avoid audio glitches. Needed because PlayAsync is used to trigger loading.
         vlcMediaPlayer.SetVolume(0);
+
+        // Because of VLC bug with play/pause time, shouldBePlaying needs to be in sync initially.
+        // Otherwise, the time sync workaround might restart the audio unexpectedly.
+        // PlayAsync is used to trigger loading, so set shouldBePlaying to true to be in sync initially.
+        shouldBePlaying = true;
+
+        // Play to trigger loading. PlayAsync to not block the main thread and avoid stutter.
         vlcMediaPlayer.PlayAsync();
-        PositionInMillis = startPositionInMillis;
+
+        // Avoid unnecessary time changes to avoid audio glitches and time synchronization mismatches.
+        if (startPositionInMillis > 0)
+        {
+            PositionInMillis = startPositionInMillis;
+        }
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
@@ -169,10 +181,10 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
                 : lastVlcMediaPlayerTimeInMillisWhenPlaying;
         }
 
-        // VLC MediaPlayer jumps to the end of the song when time is 0, so set 1 as minimum.
         set
         {
             lastVlcMediaPlayerTimeInMillisWhenPlaying = (long)value;
+            // VLC MediaPlayer jumps to the end of the song when time is 0, so set 1 as minimum.
             vlcMediaPlayer.SetTime((long)Math.Max(1, value));
         }
     }
