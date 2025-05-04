@@ -706,7 +706,9 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     private void OnEntryClicked(SongSelectEntry entry)
     {
         if (SelectedEntry != null
-            && SelectedEntry == entry)
+            && SelectedEntry == entry
+            // Prevent selectionClickedEvent immediately after selection changed
+            && Selection.Value.SelectionTime.AddMilliseconds(100) < DateTime.Now)
         {
             selectionClickedEventStream.OnNext(Selection.Value);
         }
