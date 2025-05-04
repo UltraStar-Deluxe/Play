@@ -299,6 +299,7 @@
     padding: 0;
     margin: 0;
     margin-top: 2px;
+    min-width: 220px;
 }
 
 .unity-base-dropdown__container-inner {
