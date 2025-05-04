@@ -46,8 +46,8 @@ public class CreateConstantsUxmlAndUssAssetPostprocessor : AssetPostprocessor
                 .ToList();
             string changedFileNamesCsv = changedFiles.Select(path => Path.GetFileName(path)).JoinWith(", ");
             Debug.Log($"Creating UXML and USS constants because of changed files: {changedFileNamesCsv}");
-            CreateConstantsMenuItems.CreateConstantsForUxmlNames();
-            CreateConstantsMenuItems.CreateConstantsForUssClasses();
+            CreateUiConstantsMenuItems.CreateConstantsForUxmlNames();
+            CreateUiConstantsMenuItems.CreateConstantsForUssClasses();
         }
     }
 }

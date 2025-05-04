@@ -26,6 +26,7 @@ public static partial class R
         public static readonly string action_open = "action_open";
         public static readonly string action_openContextMenu = "action_openContextMenu";
         public static readonly string action_openFolder = "action_openFolder";
+        public static readonly string action_openMerchandiseShop = "action_openMerchandiseShop";
         public static readonly string action_openSongEditor = "action_openSongEditor";
         public static readonly string action_openSteamWorkshop = "action_openSteamWorkshop";
         public static readonly string action_quit = "action_quit";
@@ -281,6 +282,8 @@ public static partial class R
         public static readonly string mainScene_newVersionDialog_title = "mainScene_newVersionDialog_title";
         public static readonly string mainScene_quitDialog_message = "mainScene_quitDialog_message";
         public static readonly string mainScene_quitDialog_title = "mainScene_quitDialog_title";
+        public static readonly string mainScene_supportTheProjectDialog_message = "mainScene_supportTheProjectDialog_message";
+        public static readonly string mainScene_supportTheProjectDialog_title = "mainScene_supportTheProjectDialog_title";
         public static readonly string mod_error_failedToLoad = "mod_error_failedToLoad";
         public static readonly string mod_error_nameConflict = "mod_error_nameConflict";
         public static readonly string mod_error_settingsEmpty = "mod_error_settingsEmpty";
@@ -750,6 +753,7 @@ public static partial class R
         public static readonly string uri_howToSteamWorkshop = "uri_howToSteamWorkshop";
         public static readonly string uri_howToThemes = "uri_howToThemes";
         public static readonly string uri_logFiles = "uri_logFiles";
+        public static readonly string uri_merchandiseShop = "uri_merchandiseShop";
         public static readonly string validation_missingValue = "validation_missingValue";
         public static readonly string webView_askToOpenWebsiteDialog_confirm = "webView_askToOpenWebsiteDialog_confirm";
         public static readonly string webView_askToOpenWebsiteDialog_message = "webView_askToOpenWebsiteDialog_message";

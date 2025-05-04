@@ -184,6 +184,7 @@ public static partial class R_PlayShared
         public const string transparentBackgroundColor = "transparentBackgroundColor";
         public const string transparentButton = "transparentButton";
         public const string unity_base_dropdown = "unity-base-dropdown";
+        public const string unity_base_dropdown__checkmark = "unity-base-dropdown__checkmark";
         public const string unity_base_dropdown__container_inner = "unity-base-dropdown__container-inner";
         public const string unity_base_dropdown__container_outer = "unity-base-dropdown__container-outer";
         public const string unity_base_dropdown__item = "unity-base-dropdown__item";

@@ -13,6 +13,15 @@ using IBinding = UniInject.IBinding;
 
 public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IBinder
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        lastSupportTheProjectIconHighlightTimeInSeconds = 0;
+    }
+
+    private const float SupportTheProjectIconHighlightThresholdTimeInSeconds = 60 * 15;
+    private static float lastSupportTheProjectIconHighlightTimeInSeconds;
+
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
@@ -85,6 +94,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     [Inject(UxmlName = R.UxmlNames.onlineGameButton)]
     private Button onlineGameButton;
 
+    [Inject(UxmlName = R.UxmlNames.supportTheProjectButton)]
+    private Button supportTheProjectButton;
+
+    [Inject(UxmlName = R.UxmlNames.supportTheProjectIcon)]
+    private VisualElement supportTheProjectIcon;
+
     [Inject]
     private Settings settings;
 
@@ -107,10 +122,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     private SongIssueManager songIssueManager;
 
     private MessageDialogControl quitGameDialogControl;
+    private MessageDialogControl supportTheProjectDialogControl;
     private CreateSongDialogControl createSongDialogControl;
     private OnlineMultiplayerConnectionDialogControl onlineMultiplayerConnectionDialogControl;
     private SettingsProblemHintControl settingsProblemHintControl;
     private readonly BuildInfoUiControl buildInfoUiControl = new();
+
+    private bool hasHighlightedShopButton;
 
     public void OnInjectionFinished()
     {
@@ -130,6 +148,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         creditsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.CreditsScene));
         quitButton.RegisterCallbackButtonTriggered(_ => OpenQuitGameDialog());
         createSongButton.RegisterCallbackButtonTriggered(_ => OpenNewSongDialog());
+        supportTheProjectButton.RegisterCallbackButtonTriggered(_ => OpenSupportTheProjectDialog());
+        HighlightSupportTheProjectButton();
 
         LeanTween.value(gameObject, 0, 1, 1f)
             .setOnUpdate(value =>
@@ -197,7 +217,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             .Subscribe(_ => OnBack());
     }
 
-    public void CloseQuitGameDialog()
+    private void CloseQuitGameDialog()
     {
         if (quitGameDialogControl == null)
         {
@@ -209,7 +229,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () => quitButton.Focus());
     }
 
-    public void OpenQuitGameDialog()
+    private void OpenQuitGameDialog()
     {
         if (quitGameDialogControl != null)
         {
@@ -224,7 +244,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_quit), _ => ApplicationUtils.QuitOrStopPlayMode());
     }
 
-    public void OpenNewSongDialog()
+    private void OpenNewSongDialog()
     {
         if (createSongDialogControl != null)
         {
@@ -244,6 +264,31 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
                 createSongDialogControl = null;
                 createSongButton.Focus();
             });
+    }
+
+    private void HighlightSupportTheProjectButton()
+    {
+        if (lastSupportTheProjectIconHighlightTimeInSeconds == 0
+            || TimeUtils.IsDurationAboveThresholdInSeconds(lastSupportTheProjectIconHighlightTimeInSeconds, SupportTheProjectIconHighlightThresholdTimeInSeconds))
+        {
+            lastSupportTheProjectIconHighlightTimeInSeconds = Time.time;
+            AnimationUtils.HighlightIconWithBounce(gameObject, supportTheProjectIcon);
+        }
+    }
+
+    private void OpenSupportTheProjectDialog()
+    {
+        if (supportTheProjectDialogControl != null)
+        {
+            return;
+        }
+
+        supportTheProjectDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_supportTheProjectDialog_title));
+        supportTheProjectDialogControl.DialogClosedEventStream.Subscribe(_ => supportTheProjectDialogControl = null);
+        supportTheProjectDialogControl.Message = Translation.Get(R.Messages.mainScene_supportTheProjectDialog_message);
+
+        supportTheProjectDialogControl.AddButton(Translation.Get(R.Messages.action_openMerchandiseShop),
+            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_merchandiseShop)));
     }
 
     public List<IBinding> GetBindings()
