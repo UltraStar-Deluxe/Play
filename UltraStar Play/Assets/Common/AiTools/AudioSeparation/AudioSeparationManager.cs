@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using SpleeterSharp;
+using SpleeterRunner;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -29,7 +29,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     private SongMetaManager songMetaManager;
 
     private readonly Subject<AudioSeparationFinishedEvent> audioSeparationFinishedEventStream = new();
-    public Subject<AudioSeparationFinishedEvent> AudioSeparationFinishedEventStream => audioSeparationFinishedEventStream;
+    public IObservable<AudioSeparationFinishedEvent> AudioSeparationFinishedEventStream => audioSeparationFinishedEventStream
+        .ObserveOnMainThread();
 
     public Job<AudioSeparationResult> ProcessSongMetaJob(
         SongMeta songMeta,
@@ -122,7 +123,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         try
         {
             Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
-            UpdateSpleeterSharpConfig(fallbackAudioSeparationCommand);
 
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
 
@@ -131,8 +131,10 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             spleeterParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}.ogg";
             spleeterParameters.Overwrite = true;
 
-            Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
-            SpleeterResult spleeterResult = await SpleeterUtils.SplitAsync(spleeterParameters, cancellationToken);
+            Debug.Log($"Calling SpleeterRunner with parameters {JsonConverter.ToJson(spleeterParameters)}");
+            SpleeterRunner.SpleeterRunner spleeterRunner = new(GetSpleeterCommand(fallbackAudioSeparationCommand), GetLogAction());
+            SpleeterResult spleeterResult = await spleeterRunner.RunAsync(spleeterParameters, cancellationToken);
+            Debug.Log($"Call to SpleeterRunner finished: ExitCode={spleeterResult.ExitCode}");
 
             UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult, saveSong);
 
@@ -248,15 +250,15 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void UpdateSpleeterSharpConfig(string fallbackAudioSeparationCommand)
+    private string GetSpleeterCommand(string fallbackAudioSeparationCommand)
     {
-        Debug.Log($"Updating spleeter config");
-        string audioSeparationCommand = !settings.SongEditorSettings.AudioSeparationCommand.IsNullOrEmpty()
+        return !settings.SongEditorSettings.AudioSeparationCommand.IsNullOrEmpty()
             ? settings.SongEditorSettings.AudioSeparationCommand
             : fallbackAudioSeparationCommand;
-        SpleeterSharpConfig.Create()
-            .SetSpleeterCommand(audioSeparationCommand)
-            .SetIsWindows(PlatformUtils.IsWindows)
-            .SetLogAction(message => Debug.Log($"SpleeterSharp: {message}"));
+    }
+
+    private Action<string> GetLogAction()
+    {
+        return message => Debug.Log($"SpleeterRunner: {message}");
     }
 }

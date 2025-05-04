@@ -13,7 +13,6 @@
         "Unity.InputSystem",
         "playshared",
         "playsharedui",
-        "SpleeterSharp",
         "UnityStandaloneFileBrowser",
         "com.whisper.unity"
     ],

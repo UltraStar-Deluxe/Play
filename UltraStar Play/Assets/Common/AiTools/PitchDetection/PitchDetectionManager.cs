@@ -119,7 +119,6 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         try
         {
             Debug.Log($"Running basic pitch on vocals audio: {songMeta.VocalsAudio}");
-            UpdateBasicPitchRunnerConfig(fallbackCommand);
 
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
 
@@ -129,7 +128,9 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
             DirectoryUtils.CreateDirectory(basicPitchParameters.OutputFolder);
 
             Debug.Log($"Calling BasicPitchRunner with parameters {JsonConverter.ToJson(basicPitchParameters)}");
-            BasicPitchResult basicPitchResult = await BasicPitchRunnerUtils.RunBasicPitch(basicPitchParameters, cancellationToken);
+            BasicPitchRunner.BasicPitchRunner basicPitchRunner = new(GetBasicPitchCommand(fallbackCommand), GetBasicPitchLogAction());
+            BasicPitchResult basicPitchResult = await basicPitchRunner.RunAsync(basicPitchParameters, cancellationToken);
+            Debug.Log($"Call to BasicPitchRunner finished: ExitCode={basicPitchResult.ExitCode}");
 
             if (TryMoveFilesOfBasicPitchResult(songMeta, generatedSongFolderAbsolutePath, basicPitchResult, out string midiFilePath))
             {
@@ -199,15 +200,15 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void UpdateBasicPitchRunnerConfig(string fallbackCommand)
+    private string GetBasicPitchCommand(string fallbackCommand)
     {
-        Debug.Log($"Updating basic pitch config");
-        string basicPitchCommand = !settings.SongEditorSettings.BasicPitchCommand.IsNullOrEmpty()
+        return !settings.SongEditorSettings.BasicPitchCommand.IsNullOrEmpty()
             ? settings.SongEditorSettings.BasicPitchCommand
             : fallbackCommand;
-        BasicPitchRunnerConfig.Create()
-            .SetBasicPitchCommand(basicPitchCommand)
-            .SetIsWindows(PlatformUtils.IsWindows)
-            .SetLogAction(message => Debug.Log($"BasicPitchRunner: {message}"));
+    }
+
+    private Action<string> GetBasicPitchLogAction()
+    {
+        return message => Debug.Log($"BasicPitchRunner: {message}");
     }
 }

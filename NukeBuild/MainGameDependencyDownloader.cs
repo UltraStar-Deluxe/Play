@@ -17,7 +17,6 @@ public class MainGameDependencyDownloader(
         await base.DownloadAsync();
 
         DownloadCSharpSynthForUnity();
-        DownloadSpleeterSharp();
         DownloadUnityStandaloneFileBrowser();
 
         await DownloadSpleeterMsvcExeAsync();
@@ -74,34 +73,6 @@ public class MainGameDependencyDownloader(
         File.Delete(zipFile);
 
         Console.WriteLine("Downloading SpleeterMsvcExe done");
-    }
-
-    private void DownloadSpleeterSharp()
-    {
-        var downloader = new GitDownloader
-        {
-            RemoteUrl = "https://github.com/achimmihca/SpleeterSharp",
-            CommitHash = "3949952a7eef90c31c86eeb0f59fb103abd4138f",
-            Branch = "anst/SpleeterMsvcExe",
-            TargetDir = unityProjectDir / "Assets" / "Plugins" / "SpleeterSharp",
-            Depth = cloneDepth,
-            SparseCheckoutPatterns =
-            {
-                "Source/SpleeterSharp/*"
-            },
-            MovePostprocess =
-            {
-                { "Source/SpleeterSharp/*", "." }
-            },
-            DeletePostprocess =
-            {
-                "Source",
-                ".git"
-            },
-        };
-        downloader.Download();
-
-        AsmdefFileUtils.Create(downloader.TargetDir / "SpleeterSharp.asmdef");
     }
 
     private void DownloadUnityStandaloneFileBrowser()

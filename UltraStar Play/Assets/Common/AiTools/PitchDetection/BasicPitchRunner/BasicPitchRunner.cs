@@ -2,25 +2,37 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using ShellCommandRunner;
 
 namespace BasicPitchRunner
 {
-    internal class BasicPitchCommandLineRunner
+    public class BasicPitchRunner
     {
         private static readonly Regex fileWrittenRegex = new Regex(@".+Saved to (.*)");
         private static readonly Regex errorRegex = new Regex(@"Error: (.*)");
 
-        public static async Task<BasicPitchResult> RunBasicPitchAsync(
+        private readonly string basicPitchExecutable;
+        private readonly Action<string> logAction;
+
+        public BasicPitchRunner(string basicPitchExecutable, Action<string> logAction)
+        {
+            this.logAction = logAction;
+            this.basicPitchExecutable = basicPitchExecutable;
+        }
+
+        public async Task<BasicPitchResult> RunAsync(
             BasicPitchParameters basicPitchParameters,
             CancellationToken cancellationToken)
         {
             List<string> parameterStringList = GetParameterStringList(basicPitchParameters);
-            string cmd = $"{BasicPitchRunnerConfig.Config.Command} {string.Join(' ', parameterStringList)}";
-            ShellExecutionResult shellExecutionResult = await ShellUtils.ExecuteAsync(cmd, cancellationToken);
-            return ParseBasicPitchProcessOutput(shellExecutionResult.ExitCode, shellExecutionResult.Output);
+            string fullCommand = $"{basicPitchExecutable} {string.Join(' ', parameterStringList)}";
+            ShellCommandRunner.ShellCommandRunner shellCommandRunner = new(logAction, Encoding.UTF8);
+            ShellCommandResult result = await shellCommandRunner.RunAsync(fullCommand, cancellationToken);
+            return ParseBasicPitchProcessOutput(result.ExitCode, result.Output);
         }
 
         private static BasicPitchResult ParseBasicPitchProcessOutput(int exitCode, string processOutput)
