@@ -8,11 +8,11 @@
       "hash": "25349c9dce2ea583c45d2247947e5e851bc2f7bf"
     },
     "com.achimmihca.primeinputactions": {
-      "version": "https://github.com/achimmihca/PrimeInputActions.git?path=PrimeInputActions/Packages/com.achimmihca.primeinputactions#v1.0.0",
+      "version": "https://github.com/achimmihca/PrimeInputActions.git?path=PrimeInputActions/Packages/com.achimmihca.primeinputactions#d0a9440d0c8e0df84f573f1dc9785bbda4c96b7a",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "3e338c7cbf22ac7df71d3949ee94855720899e59"
+      "hash": "d0a9440d0c8e0df84f573f1dc9785bbda4c96b7a"
     },
     "com.achimmihca.protrans": {
       "version": "https://github.com/achimmihca/ProTrans.git?path=ProTrans/Packages/com.achimmihca.ProTrans#1506e8dbedb71fefe47c1ffed9ea00c96e37a385",

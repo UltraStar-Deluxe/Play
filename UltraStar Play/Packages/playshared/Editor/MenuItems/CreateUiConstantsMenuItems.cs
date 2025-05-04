@@ -5,10 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using PrimeInputActions;
 using UnityEditor;
 
-public static class CreateConstantsMenuItems
+public static class CreateUiConstantsMenuItems
 {
     private static readonly Regex ussClassDeclarationRegex = new Regex(@"\.(?<ussClassName>[^\d][\w\-]+)");
 
@@ -22,17 +21,7 @@ public static class CreateConstantsMenuItems
 
     private static readonly string indentation = "    ";
 
-    [MenuItem("Generate/Create all C# constants")]
-    public static void CreateAllConstants()
-    {
-        EditorUtils.RefreshAssetsInStreamingAssetsFolder();
-
-        CreateConstantsForUxmlNamesAndUssClasses();
-        CreateTranslationConstantsMenuItems.CreateTranslationConstants();
-        CreateInputActionConstantsMenuItems.CreateInputActionConstants();
-    }
-
-    [MenuItem("Generate/Create C# constants for UXML names and classes")]
+    [MenuItem("Generate/C# Constants/UXML names and classes")]
     public static void CreateConstantsForUxmlNamesAndUssClasses()
     {
         CreateConstantsForUxmlNames();

@@ -21,7 +21,7 @@ public static class CreateTranslationConstantsMenuItems
 
     private static readonly string indentation = "    ";
 
-    [MenuItem("Generate/Generate C# constants for translation properties")]
+    [MenuItem("Generate/C# Constants/Translation properties")]
     public static void CreateTranslationConstants()
     {
         Translation.InitTranslationConfig();
