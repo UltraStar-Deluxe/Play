@@ -10,9 +10,9 @@
             <ui:Button name="versionInfoContainer" class="transparentButton focusableNavigatorIgnore" style="overflow: visible; align-items: flex-start; margin-right: auto;">
                 <ui:Label text="Version xx.yy.zz" name="semanticVersionLabel" style="font-size: 12px; -unity-text-align: upper-center; border-top-left-radius: 12px; border-bottom-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; height: auto;" />
                 <ui:VisualElement name="versionDetailsContainer" style="background-color: rgba(0, 0, 0, 0); bottom: 110%; position: absolute; display: none; align-items: flex-start;">
-                    <ui:Label text="Commit: 5e07588" name="commitHashLabel" style="font-size: 12px; -unity-text-align: middle-left;" />
-                    <ui:Label text="Unity version: abcd.x.yfz" name="unityVersionLabel" style="font-size: 12px; -unity-text-align: middle-left;" />
-                    <ui:Label text="Build timestamp: yyMMddHHmm" name="buildTimeStampLabel" style="font-size: 12px; -unity-text-align: middle-left;" />
+                    <ui:Label text="Commit: 5e07588" name="commitHashLabel" class="ignoreTheme" style="font-size: 12px; -unity-text-align: middle-left;" />
+                    <ui:Label text="Unity version: abcd.x.yfz" name="unityVersionLabel" class="ignoreTheme" style="font-size: 12px; -unity-text-align: middle-left;" />
+                    <ui:Label text="Build timestamp: yyMMddHHmm" name="buildTimeStampLabel" class="ignoreTheme" style="font-size: 12px; -unity-text-align: middle-left;" />
                 </ui:VisualElement>
             </ui:Button>
             <ui:Button name="createSongButton" class="transparentButton circleButton">
