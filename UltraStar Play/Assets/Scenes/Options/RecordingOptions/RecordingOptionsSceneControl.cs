@@ -43,7 +43,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
     private MicSampleRecorderManager micSampleRecorderManager;
 
     [Inject(UxmlName = R.UxmlNames.deviceChooser)]
-    private Chooser deviceChooser;
+    private DropdownField deviceChooser;
 
     [Inject(UxmlName = R.UxmlNames.amplificationChooser)]
     private Chooser amplificationChooser;
@@ -106,7 +106,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
     private Chooser systemAudioBackendDelayChooser;
 
     private SampleRateChooserControl sampleRateChooserControl;
-    private LabeledChooserControl<MicProfile> deviceChooserControl;
+    private DropdownFieldControl<MicProfile> deviceChooserControl;
     private LabeledChooserControl<int> amplificationChooserControl;
     private LabeledChooserControl<int> noiseSuppressionChooserControl;
     private NumberChooserControl delayChooserControl;
@@ -126,16 +126,13 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         List<MicProfile> micProfiles = CreateAndPersistMicProfiles();
         UpdateNoConnectedMicsContainer(micProfiles);
 
-        new AutoFitLabelControl(deviceChooser.ItemLabel, 10, 15);
+        // new AutoFitLabelControl(deviceChooser.Q<Label>(null, "unity-base-popup-file__text"), 10, 15);
 
-        deviceChooserControl = new LabeledChooserControl<MicProfile>(deviceChooser, micProfiles,
-            item => item != null ? Translation.Of(item.GetDisplayNameWithChannel()) : Translation.Empty);
-        deviceChooserControl.AutoSmallFont = false;
-        if (!TryReSelectLastMicProfile()
-            && !deviceChooserControl.Items.IsNullOrEmpty())
-        {
-            deviceChooserControl.Selection = deviceChooserControl.Items[0];
-        }
+        deviceChooserControl = new DropdownFieldControl<MicProfile>(
+            deviceChooser,
+            micProfiles,
+            GetInitialRecordingDeviceSelection(micProfiles),
+            GetRecordingDeviceDisplayText);
         deviceChooserControl.SelectionAsObservable.Subscribe(micProfile =>
             {
                 if (micProfile == null)
@@ -370,23 +367,29 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
         return Translation.Of($"{item} Hz");
     }
 
-    private bool TryReSelectLastMicProfile()
+    private string GetRecordingDeviceDisplayText(MicProfile item)
+    {
+        return item != null
+            ? item.GetDisplayNameWithChannel()
+            : "";
+    }
+
+    private MicProfile GetInitialRecordingDeviceSelection(List<MicProfile> micProfiles)
     {
         if (settings.LastMicProfileNameInRecordingOptionsScene.IsNullOrEmpty())
         {
-            return false;
+            return micProfiles.FirstOrDefault();
         }
 
-        MicProfile lastMicProfile = deviceChooserControl.Items
+        MicProfile lastMicProfile = micProfiles
             .FirstOrDefault(micProfile => micProfile.Name == settings.LastMicProfileNameInRecordingOptionsScene
                                           && micProfile.ChannelIndex == settings.LastMicProfileChannelIndexInRecordingOptionsScene);
         if (lastMicProfile == null)
         {
-            return false;
+            return micProfiles.FirstOrDefault();
         }
 
-        deviceChooserControl.Selection = lastMicProfile;
-        return true;
+        return lastMicProfile;
     }
 
     private void SetSelectedRecordingDeviceEnabled(bool isEnabled)

@@ -6,8 +6,8 @@
             <ui:Label text="$options_recording_noConnectedMic_hint" name="tryConnectMicLabel" class="secondaryFontColor mt-2 mb-1 noBackgroundInHierarchy" style="white-space: normal; -unity-text-align: middle-left;" />
         </ui:VisualElement>
         <ui:VisualElement name="micConfigurationContainer" style="flex-grow: 1;">
-            <ui:VisualElement name="row">
-                <Chooser name="deviceChooser" wrap-around="false" min-value="0" max-value="100" step-value="10" class="multiline mr-2" style="width: 100%;" />
+            <ui:VisualElement name="row" class="child-mr-2">
+                <ui:DropdownField name="deviceChooser" style="flex-grow: 1;" />
                 <SlideToggle name="enabledToggle" style="-unity-text-align: upper-center;" />
             </ui:VisualElement>
             <ui:VisualElement name="micVisualizationContainer" class="my-2" style="border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; align-items: flex-start; justify-content: center; flex-direction: row; height: 60px;">
