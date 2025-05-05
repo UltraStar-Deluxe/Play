@@ -19,7 +19,7 @@ public class MainGameDependencyDownloader(
         DownloadCSharpSynthForUnity();
         DownloadUnityStandaloneFileBrowser();
 
-        await DownloadSpleeterMsvcExeAsync();
+        // await DownloadSpleeterMsvcExeAsync();
     }
 
     private void DownloadCSharpSynthForUnity()
