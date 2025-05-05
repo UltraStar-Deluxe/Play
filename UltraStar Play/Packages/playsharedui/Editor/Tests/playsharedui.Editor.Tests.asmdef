@@ -1,0 +1,22 @@
+﻿{
+  "name": "playsharedui.Editor.Tests",
+  "references": [
+    "playshared",
+    "playshared.Editor",
+    "playshared.Editor.Tests",
+    "playsharedui",
+    "playsharedui.Editor"
+  ],
+  "optionalUnityReferences": [],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

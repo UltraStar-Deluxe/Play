@@ -18,10 +18,10 @@ public class VocalsAndInstrumentalAudioTest : AbstractPlayModeTest
     private Settings settings;
 
     [UnityTest]
-    [Ignore("AudioSource.time is returned as 0 although the synchronization seems to work")] // TODO: Fix this test
+    [Ignore("AudioSource.time is seem returned as 0 although the synchronization seems to work")] // TODO: Fix this test
     public IEnumerator ShouldBeInSyncWithSongAudioPlayer()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         // Given
         Assert.IsTrue(settings.GetType() == typeof(TestSettings));

@@ -23,7 +23,7 @@ public class AutoVocalsIsolationSceneMod : ISceneMod
         }
     }
 
-    private void StartVocalsIsolation(SongMeta songMeta)
+    private async void StartVocalsIsolation(SongMeta songMeta)
     {
         if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
             && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
@@ -31,7 +31,7 @@ public class AutoVocalsIsolationSceneMod : ISceneMod
             return;
         }
 
-        audioSeparationManager.ProcessSongMeta(songMeta, true);
+        await audioSeparationManager.ProcessSongMetaJob(songMeta, true).RunAsync();
     }
 }
 

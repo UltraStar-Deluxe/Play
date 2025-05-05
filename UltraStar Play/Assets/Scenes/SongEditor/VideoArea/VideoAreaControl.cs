@@ -1,6 +1,7 @@
 ﻿using System;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
@@ -117,7 +118,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
             () => songMeta.Cover,
             newValue =>
             {
-                songMeta.Cover = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                songMeta.Cover = GetRelativePath(songMeta, newValue);
                 UpdateCoverAndBackgroundImage();
             });
     }
@@ -131,7 +132,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
             () => songMeta.Background,
             newValue =>
             {
-                songMeta.Background = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                songMeta.Background = GetRelativePath(songMeta, newValue);
                 UpdateCoverAndBackgroundImage();
             });
     }
@@ -145,7 +146,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
             () => songMeta.Video,
             newValue =>
             {
-                songMeta.Video = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                songMeta.Video = GetRelativePath(songMeta, newValue);
                 UpdateVideo();
                 ShowVideoImage();
             });
@@ -156,18 +157,18 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(songMeta);
     }
 
-    private void UpdateCoverAndBackgroundImage()
+    private async void UpdateCoverAndBackgroundImage()
     {
         if (SongMetaUtils.BackgroundResourceExists(songMeta))
         {
-            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta))
-                .Subscribe(sprite => songBackgroundImage.style.backgroundImage = new StyleBackground(sprite));
+            Sprite sprite = await ImageManager.LoadSpriteFromUriAsync(SongMetaUtils.GetBackgroundUri(songMeta));
+            songBackgroundImage.style.backgroundImage = new StyleBackground(sprite);
         }
 
         if (SongMetaUtils.CoverResourceExists(songMeta))
         {
-            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta))
-                .Subscribe(sprite => songCoverImage.style.backgroundImage = new StyleBackground(sprite));
+            Sprite sprite = await ImageManager.LoadSpriteFromUriAsync(SongMetaUtils.GetCoverUri(songMeta));
+            songCoverImage.style.backgroundImage = new StyleBackground(sprite);
         }
     }
 
@@ -261,5 +262,17 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     public void Dispose()
     {
         dragControl?.Dispose();
+    }
+
+    private static string GetRelativePath(SongMeta songMeta, string path)
+    {
+        string directoryPath = SongMetaUtils.GetDirectoryPath(songMeta);
+        if (directoryPath.IsNullOrEmpty())
+        {
+            return path;
+        }
+
+        string relativePath = PathUtils.MakeRelativePath(directoryPath, path);
+        return relativePath;
     }
 }

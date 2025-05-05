@@ -1,3 +1,4 @@
+using System.Linq;
 using AudioSynthesis.Midi;
 using UniInject;
 using UniRx;
@@ -40,6 +41,9 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
     [Inject(UxmlName = R.UxmlNames.sfxVolumeChooser)]
     private Chooser sfxVolumeChooser;
 
+    [Inject(UxmlName = R.UxmlNames.replayGainLoudnessNormalizationChooser)]
+    private Chooser replayGainLoudnessNormalizationChooser;
+
     [Inject(UxmlName = R.UxmlNames.soundfontPathTextField)]
     private TextField soundfontPathTextField;
 
@@ -68,6 +72,10 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
         PercentNumberChooserControl backgroundMusicVolumeChooserControl = new(backgroundMusicVolumeChooser);
         backgroundMusicVolumeChooserControl.Bind(() => settings.BackgroundMusicVolumePercent,
             newValue => settings.BackgroundMusicVolumePercent = (int)newValue);
+
+        ReplayGainChooserControl replayGainChooserControl = new(replayGainLoudnessNormalizationChooser);
+        replayGainChooserControl.Bind(() => ReplayGainChooserControl.GetReplayGainEnumValue(settings.VlcOptions),
+            newValue => ReplayGainChooserControl.SetReplayGainEnumValue(settings.VlcOptions, newValue));
 
         // Volume can be changed via REST API
         settings.ObserveEveryValueChanged(it => it.VolumePercent)
@@ -125,8 +133,8 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
         midiManager.PlayMidiFile(demoMidiFile);
 
         float demoMidiFileDurationInSeconds = 4;
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(demoMidiFileDurationInSeconds,
-            () => backgroundMusicManager.BackgroundMusicAudioSource.mute = false));
+        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(demoMidiFileDurationInSeconds,
+            () => backgroundMusicManager.BackgroundMusicAudioSource.mute = false);
     }
 
     protected override void OnDestroy()

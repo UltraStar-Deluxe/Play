@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JsonNet.ContractResolvers;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.UnityConverters.Math;
 using UnityEngine;
 
@@ -30,6 +31,11 @@ public static class JsonConverter
     };
 
     private static bool isInitialized;
+
+    public static string Prettify(string json)
+    {
+        return JToken.Parse(json).ToString();
+    }
 
     public static string ToJson<T>(T obj, bool prettyPrint = false)
     {

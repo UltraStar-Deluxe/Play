@@ -16,10 +16,12 @@ public static partial class R
         public const string column = "column";
         public const string commitHashLabel = "commitHashLabel";
         public const string connectionInfoLabel = "connectionInfoLabel";
+        public const string connectionIssueIcon = "connectionIssueIcon";
         public const string connectionServerAddressTextField = "connectionServerAddressTextField";
         public const string connectionServerPortTextField = "connectionServerPortTextField";
         public const string connectionStatusText = "connectionStatusText";
         public const string connectionThroubleshootingText = "connectionThroubleshootingText";
+        public const string connectionTroubleshootingAlert = "connectionTroubleshootingAlert";
         public const string connectionViewContainer = "connectionViewContainer";
         public const string content = "content";
         public const string copyLogButton = "copyLogButton";
@@ -80,6 +82,9 @@ public static partial class R
         public const string nameLabel = "nameLabel";
         public const string noFavoriteIcon = "noFavoriteIcon";
         public const string noMicIcon = "noMicIcon";
+        public const string noMicrophoneAlert = "noMicrophoneAlert";
+        public const string noMicrophoneIcon = "noMicrophoneIcon";
+        public const string noMicrophoneText = "noMicrophoneText";
         public const string playerEntry = "playerEntry";
         public const string playersContainer = "playersContainer";
         public const string playersContainerTitle = "playersContainerTitle";
@@ -93,6 +98,7 @@ public static partial class R
         public const string searchIcon = "searchIcon";
         public const string selectedToggle = "selectedToggle";
         public const string semanticVersionLabel = "semanticVersionLabel";
+        public const string serverErrorAlert = "serverErrorAlert";
         public const string serverErrorResponseText = "serverErrorResponseText";
         public const string showInputSimulationButton = "showInputSimulationButton";
         public const string showKeyboardSimulationButton = "showKeyboardSimulationButton";

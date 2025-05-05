@@ -36,6 +36,6 @@ public class EditorSentenceLyricsInputControl : EditorLyricsInputPopupControl
         // Map edit-mode text to lyrics of notes
         string visibleWhiteSpaceText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
         LyricsUtils.MapEditModeTextToNotes(visibleWhiteSpaceText, new List<Sentence> { editorSentenceControl.Sentence });
-        songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
+        songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }
 }

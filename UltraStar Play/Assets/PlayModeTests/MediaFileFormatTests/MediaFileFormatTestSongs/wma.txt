@@ -1,5 +1,5 @@
-﻿#TITLE:WMA Format Test
-#ARTIST:Test Artist
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
 #MP3:wma.wma
 #BPM:200
 - 0

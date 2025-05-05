@@ -6,7 +6,7 @@ using UniInject;
 
 public class StatisticsRestControl : AbstractRestControl, INeedInjection
 {
-    public static StatisticsRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StatisticsRestControl>();
+    public static StatisticsRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<StatisticsRestControl>();
 
     [Inject]
     private Statistics statistics;
@@ -18,7 +18,7 @@ public class StatisticsRestControl : AbstractRestControl, INeedInjection
     
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Statistics)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.Statistics)
             .SetDescription($"Get statistics. This includes song scores, play count, etc.")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>

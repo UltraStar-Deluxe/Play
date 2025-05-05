@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 
 public class VfxManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static VfxManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<VfxManager>();
+    public static VfxManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<VfxManager>();
 
     public const string BackgroundVfxRenderTextureName = "VfxManager.BackgroundVfxRenderTexture";
     public const string ForegroundVfxRenderTextureName = "VfxManager.ForegroundVfxRenderTexture";

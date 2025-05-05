@@ -49,7 +49,7 @@ public class LoadMediaStressTest : AbstractPlayModeTest
     [Ignore(reason: "only for manual execution")] // TODO: prepare song folder for unit test
     public IEnumerator ShouldLoadSongsWithoutCrash()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         List<SongMeta> songMetas = songMetaManager.GetSongMetas().ToList();
         for (int i = 0; i < songMetas.Count; i++)

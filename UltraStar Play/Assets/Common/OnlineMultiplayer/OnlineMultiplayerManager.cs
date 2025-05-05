@@ -10,7 +10,7 @@ namespace CommonOnlineMultiplayer
 {
     public class OnlineMultiplayerManager : AbstractSingletonBehaviour, INeedInjection, IInjectionFinishedListener
     {
-        public static OnlineMultiplayerManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<OnlineMultiplayerManager>();
+        public static OnlineMultiplayerManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<OnlineMultiplayerManager>();
 
         [Inject]
         private NetworkManager networkManager;
@@ -222,11 +222,11 @@ namespace CommonOnlineMultiplayer
         public void OnLobbyMemberNetworkObjectDestroyed(ulong netcodeClientId)
         {
             // The object has not been destroyed yet. Wait one frame to finish destruction.
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () =>
+            AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () =>
             {
                 LobbyMemberManager.UpdateLobbyMemberRegistry();
                 lobbyMemberConnectionChangedEventSteam.OnNext(new LobbyMemberDisconnectedEvent(netcodeClientId));
-            }));
+            });
         }
 
         private void OnNetcodeClientConnectionApproval(

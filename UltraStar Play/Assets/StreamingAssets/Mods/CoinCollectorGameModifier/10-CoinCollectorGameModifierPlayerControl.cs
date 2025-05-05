@@ -49,12 +49,12 @@ public class CoinCollectorGameModifierPlayerControl : INeedInjection, IInjection
         CreateCoinsLabel();
     }
 
-    private void CreateCoinsLabel()
+    private async void CreateCoinsLabel()
     {
         coinCountContainer = new VisualElement();
         coinCountContainer.name = "coinCountContainer";
-        ImageManager.LoadSpriteFromUri($"{modFolder}/images/coins/Gold_1.png")
-            .Subscribe(sprite => coinCountContainer.style.backgroundImage = new StyleBackground(sprite));
+        Sprite sprite = await ImageManager.LoadSpriteFromUriAsync($"{modFolder}/images/coins/Gold_1.png");
+        coinCountContainer.style.backgroundImage = new StyleBackground(sprite);
 
         coinCountLabel = new Label();
         coinCountLabel.name = "coinCountLabel";

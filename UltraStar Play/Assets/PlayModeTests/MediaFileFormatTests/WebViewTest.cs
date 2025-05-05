@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
-[Ignore("No Vuplex.WebView present in the project")]
 public class WebViewTest : AbstractMediaFileFormatTest
 {
     private const long WebViewMaxWaitTimeInMillis = 30000;
@@ -34,14 +33,14 @@ public class WebViewTest : AbstractMediaFileFormatTest
     [UnityTest]
     public IEnumerator ShouldUseLocalAudioTest([ValueSource(nameof(shouldUseLocalAudioFiles))] string txtFilePath)
     {
-        yield return SongAudioPlayerShouldLoadFile(txtFilePath);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath);
         Assert.IsFalse(songAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
     }
 
     [UnityTest]
     public IEnumerator ShouldUseWebView([ValueSource(nameof(shouldUseWebViewFiles))] string txtFilePath)
     {
-        yield return SongAudioPlayerShouldLoadFile(txtFilePath, WebViewTargetDurationInMillis, WebViewMaxWaitTimeInMillis);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, WebViewTargetDurationInMillis, WebViewMaxWaitTimeInMillis);
         Assert.IsTrue(songAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
     }
 }

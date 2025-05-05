@@ -2,19 +2,24 @@
     "name": "Editor",
     "rootNamespace": "",
     "references": [
-        "playshared",
-        "playshared.Editor",
-        "Plugins",
-        "Common"
+      "com.achimmihca.uniinject",
+      "com.achimmihca.protrans",
+      "com.achimmihca.primeinputactions",
+      "Unity.InputSystem",
+      "playshared",
+      "playshared.Editor",
+      "playsharedui",
+      "playsharedui.Editor",
+      "Plugins",
+      "Common"
     ],
     "includePlatforms": [
-        "Editor"
+      "Editor"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        ""
     ],
     "autoReferenced": false,
     "defineConstraints": [],

@@ -126,7 +126,8 @@ public class EncodingTest
         List<string> wordsInLyrics = null)
     {
         string filePath = folderPath + fileName;
-        SongMeta songMeta = UltraStarSongParser.ParseFile(filePath, out List<SongIssue> _, null, useUniversalCharsetDetector);
+        SongMeta songMeta = UltraStarSongParser.ParseFile(filePath,
+            new UltraStarSongParserConfig { UseUniversalCharsetDetector = useUniversalCharsetDetector }).SongMeta;
         Assert.AreEqual(songArtist, songMeta.Artist);
         Assert.AreEqual(songTitle, songMeta.Title);
 

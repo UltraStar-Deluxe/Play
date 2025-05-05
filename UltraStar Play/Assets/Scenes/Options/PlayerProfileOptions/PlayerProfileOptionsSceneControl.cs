@@ -23,7 +23,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     private Button addButton;
 
     [Inject]
-    private UiManager uiManager;
+    private PlayerProfileImageManager playerProfileImageManager;
 
     [Inject]
     private WebCamManager webCamManager;
@@ -131,7 +131,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         });
         UpdatePlayerProfileInactiveOverlay(playerProfile, playerProfileInactiveOverlay);
 
-        PlayerProfileImageChooserControl playerProfileImageChooserControl = new PlayerProfileImageChooserControl(visualElement.Q<Chooser>(R.UxmlNames.playerProfileImageChooser), GetIndexInList(playerProfile), uiManager, webCamManager);
+        PlayerProfileImageChooserControl playerProfileImageChooserControl = new PlayerProfileImageChooserControl(visualElement.Q<Chooser>(R.UxmlNames.playerProfileImageChooser), GetIndexInList(playerProfile), playerProfileImageManager, webCamManager);
         playerProfileImageChooserControl.Bind(() => playerProfile.ImagePath,
                 newValue => playerProfile.ImagePath = newValue);
 
@@ -164,7 +164,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         return visualElement;
     }
 
-    private void UpdateOnlineMultiplayerPlayerImage(LobbyMemberPlayerProfile lobbyMemberPlayerProfile, PlayerProfileImageChooserControl playerProfileImageChooserControl)
+    private async void UpdateOnlineMultiplayerPlayerImage(LobbyMemberPlayerProfile lobbyMemberPlayerProfile, PlayerProfileImageChooserControl playerProfileImageChooserControl)
     {
         if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Netcode)
         {
@@ -178,17 +178,17 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
                 return;
             }
 
-            SteamOnlineMultiplayerUtils.GetAvatarTextureAsObservable(steamLobbyMember.SteamId)
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to get avatar image of Steam user '{steamLobbyMember.DisplayName}' with id {steamLobbyMember.SteamId}");
-                })
-                .Subscribe(texture =>
-                {
-                    playerProfileImageChooserControl.Chooser.ItemImage.image = texture;
-                    playerProfileImageChooserControl.Chooser.ItemLabel.HideByDisplay();
-                });
+            try
+            {
+                Texture2D texture = await SteamAvatarImageUtils.GetAvatarTextureAsync(steamLobbyMember.SteamId);
+                playerProfileImageChooserControl.Chooser.ItemImage.image = texture;
+                playerProfileImageChooserControl.Chooser.ItemLabel.HideByDisplay();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to get avatar image of Steam user '{steamLobbyMember.DisplayName}' with id {steamLobbyMember.SteamId}");
+            }
         }
     }
 

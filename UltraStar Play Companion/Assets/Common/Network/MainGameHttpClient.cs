@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 
 public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
 {
-    public static MainGameHttpClient Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MainGameHttpClient>();
+    public static MainGameHttpClient Instance => GameObjectUtils.FindComponentWithTag<MainGameHttpClient>("MainGameHttpClient");
 
     public bool IsConnected => serverIPEndPoint != null && httpServerPort > 0;
 
@@ -27,7 +27,7 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
     private readonly Subject<bool> connectionEventStream = new();
     public IObservable<bool> ConnectionEventStream => connectionEventStream;
 
-    public ReactiveProperty<List<HttpApiPermission>> Permissions { get; private set; } = new(new List<HttpApiPermission>());
+    public ReactiveProperty<List<RestApiPermission>> Permissions { get; private set; } = new(new List<RestApiPermission>());
 
     protected override object GetInstance()
     {
@@ -68,90 +68,50 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
         return $"http://{serverIPEndPoint.Address}:{httpServerPort}{path}";
     }
 
-    public void GetRequest(
-        string path,
-        Action<string> onSuccess = null,
-        Action<Exception> onError = null)
+    public async Awaitable<string> GetRequestAsync(string path)
     {
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
-        Log.Debug(() => $"Sending GET request to {uri}");
-        UnityWebRequest unityWebRequest = UnityWebRequest.Get(uri);
-        SendRequest(unityWebRequest, onSuccess, onError);
+        Log.Debug(() => $"Sending GET request to '{uri}'");
+        using UnityWebRequest webRequest = UnityWebRequest.Get(uri);
+        return await SendWebRequestAsync(webRequest);
     }
 
-    public void PostRequest(
+    public async Awaitable<string> PostRequestAsync(
         string path,
         string body = "{}",
-        string contentType = "application/json",
-        Action<string> onSuccess = null,
-        Action<Exception> onError = null)
+        string contentType = "application/json")
     {
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
         Log.Debug(() => $"Sending POST request to '{uri}'");
-        UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, body, contentType);
-        SendRequest(unityWebRequest, onSuccess, onError);
+        using UnityWebRequest webRequest = UnityWebRequest.Post(uri, body, contentType);
+        return await SendWebRequestAsync(webRequest);
     }
 
-    public void DeleteRequest(
-        string path,
-        Action<string> onSuccess = null,
-        Action<Exception> onError = null)
+    public async Awaitable<string> DeleteRequestAsync(string path)
     {
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
         Log.Debug(() => $"Sending DELETE request to {uri}");
-        UnityWebRequest unityWebRequest = UnityWebRequest.Delete(uri);
-        SendRequest(unityWebRequest, onSuccess, onError);
+        using UnityWebRequest webRequest = UnityWebRequest.Delete(uri);
+        return await SendWebRequestAsync(webRequest);
     }
 
-    private void SendRequest(
-        UnityWebRequest unityWebRequest,
-        Action<string> onSuccess,
-        Action<Exception> onError)
+    private async Awaitable<string> SendWebRequestAsync(UnityWebRequest unityWebRequest)
     {
         AddHeaders(unityWebRequest);
-        unityWebRequest.SendWebRequest();
-
-        void WrappedOnSuccess(DownloadHandler downloadHandler)
-        {
-            string response = downloadHandler?.text;
-            LogRequestSuccess(unityWebRequest);
-            onSuccess?.Invoke(response);
-        }
-
-        void WrappedOnError(Exception ex)
-        {
-            LogRequestError(unityWebRequest, ex);
-            onError?.Invoke(ex);
-        }
-
-        StartCoroutine(CoroutineUtils.WebRequestCoroutine(unityWebRequest,
-            WrappedOnSuccess,
-            ex => WrappedOnError(ex)));
+        await WebRequestUtils.SendWebRequestAsync(unityWebRequest);
+        return unityWebRequest.downloadHandler?.text;
     }
 
     private void AddHeaders(UnityWebRequest unityWebRequest)
     {
         unityWebRequest.SetRequestHeader("client-id", settings.ClientId);
         unityWebRequest.SetRequestHeader("client-name", settings.ClientName);
-    }
-
-    private void LogRequestError(UnityWebRequest unityWebRequest, Exception ex)
-    {
-        string responseBody = unityWebRequest.downloadHandler?.text;
-        Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' has failed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, error message: {ex.Message}, response body: {responseBody}");
-        Debug.LogException(ex);
-    }
-
-    private void LogRequestSuccess(UnityWebRequest unityWebRequest)
-    {
-        string responseBody = unityWebRequest.downloadHandler?.text;
-        Log.Debug(() => $"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, response body: {responseBody}");
     }
 
     private void ThrowIfNotConnected()

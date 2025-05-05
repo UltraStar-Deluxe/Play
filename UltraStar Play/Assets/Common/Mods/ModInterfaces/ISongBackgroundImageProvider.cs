@@ -1,6 +1,6 @@
-﻿using System;
+﻿using UnityEngine;
 
 public interface ISongBackgroundImageProvider : IMod
 {
-    public IObservable<string> GetBackgroundImageUri(SongMeta songMeta);
+    public Awaitable<string> GetBackgroundImageUriAsync(SongMeta songMeta);
 }

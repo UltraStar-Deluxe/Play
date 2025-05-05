@@ -8,7 +8,7 @@ using Vuplex.WebView;
 
 public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static WebViewManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<WebViewManager>();
+    public static WebViewManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<WebViewManager>();
 
     private static bool isWebConfigInitialized;
 
@@ -34,7 +34,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     private SceneNavigator sceneNavigator;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private Settings settings;
@@ -72,6 +72,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
+    private bool IsFullyLoaded => IsContentLoaded && DurationInMillis > 0;
 
     private long receivedPositionUpdatedTimeInMillis;
     private double receivedPositionInMillis;
@@ -114,7 +115,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
             // The embedded browser does not consider AudioListener.volume. Thus, this must be considered here explicitly.
             float jsVolume = AudioListener.volume * NumberUtils.PercentToFactor(volumeInPercent) * 100;
-            webView.ExecuteJavaScript($"setVolume({jsVolume})");
+            ExecuteSetVolume(jsVolume);
         }
     }
 
@@ -302,11 +303,17 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     private void SendPositionInMillisIfNeeded()
     {
+        if (!IsPlaying
+            || !IsFullyLoaded)
+        {
+            return;
+        }
+
         long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         long timeInMillisSinceLastUpdate = currentTimeInMillis - receivedPositionUpdatedTimeInMillis;
         if (timeInMillisSinceLastUpdate > 100)
         {
-            webView.ExecuteJavaScript("sendPlaybackPositionInMillis()");
+            ExecuteJavaScript("sendPlaybackPositionInMillis()");
         }
     }
 
@@ -483,7 +490,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
         Debug.LogWarning($"Asking to accept host before loading URI into WebView. host: '{host}', uri: '{url}'");
 
-        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.webView_askToOpenWebsiteDialog_title));
+        MessageDialogControl messageDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.webView_askToOpenWebsiteDialog_title));
         messageDialogControl.Message = Translation.Get(R.Messages.webView_askToOpenWebsiteDialog_message,
             "host", host);
 
@@ -550,8 +557,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             if (isContentLoaded && isLoadingUrlOfSameHost && javaScriptCanLoadUrl)
             {
                 Debug.Log("Loading new URL via JavaScript");
-                webView.ExecuteJavaScript($"setVolume(0)");
-                webView.ExecuteJavaScript($"loadUrl('{url}')");
+                ExecuteSetVolume(0);
+                ExecuteJavaScript($"loadUrl('{url}')");
             }
             else
             {
@@ -584,7 +591,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         isPlaying = true;
-        webView.ExecuteJavaScript("resumePlayback()");
+        ExecuteJavaScript("resumePlayback()");
         UpdateVolume();
     }
 
@@ -594,7 +601,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        webView.ExecuteJavaScript($"setPlaybackPositionInMillis({value})");
+        ExecuteJavaScript($"setPlaybackPositionInMillis({value})");
         receivedPositionInMillis = value;
         estimatedPositionInMillis = value;
         estimatedPositionUpdatedTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
@@ -609,8 +616,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         isPlaying = false;
-        webView.ExecuteJavaScript("pausePlayback()");
-        webView.ExecuteJavaScript("setVolume(0)");
+        ExecuteJavaScript("pausePlayback()");
+        ExecuteSetVolume(0);
     }
 
     public void StopPlayback()
@@ -621,7 +628,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         isPlaying = false;
-        webView.ExecuteJavaScript("stopPlayback()");
+        ExecuteJavaScript("stopPlayback()");
     }
 
     private void RunWhenWebViewInitialized(Action action)
@@ -661,5 +668,22 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     public void ResetWebViewRenderTexture()
     {
         SetWebViewRenderTexture(defaultRenderTexture);
+    }
+
+    private void ExecuteSetVolume(float volume)
+    {
+        ExecuteJavaScript($"setVolume({volume})");
+    }
+
+    private void ExecuteJavaScript(string javaScript)
+    {
+        if (!IsFullyLoaded)
+        {
+            Log.Verbose(() => $"Not executing JavaScript because WebView not fully loaded yet: '{javaScript}'");
+            return;
+        }
+
+        Log.Verbose(() => $"Executing JavaScript in WebView: '{javaScript}'");
+        webView.ExecuteJavaScript(javaScript, null);
     }
 }

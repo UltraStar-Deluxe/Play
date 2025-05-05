@@ -391,28 +391,4 @@ public static class VisualElementExtensions
         }
         return sb.ToString();
     }
-
-    public static void Click(this Button button)
-    {
-        SendNavigationSubmitEvent(button);
-    }
-
-    public static void SendNavigationSubmitEvent(this VisualElement visualElement)
-    {
-        visualElement.Focus();
-        using NavigationSubmitEvent evt = new NavigationSubmitEvent()
-        {
-            target = visualElement
-        };
-        visualElement.SendEvent(evt);
-    }
-
-    public static void SendPointerDownEvent(this VisualElement visualElement)
-    {
-        using PointerDownEvent evt = new PointerDownEvent()
-        {
-            target = visualElement
-        };
-        visualElement.SendEvent(evt);
-    }
 }

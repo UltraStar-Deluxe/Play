@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using Responsible;
 using UniInject;
+using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
-using static Responsible.Responsibly;
-using static ResponsibleVisualElementUtils;
-using static ResponsibleLogAssertUtils;
+using static UnityEngine.Awaitable;
+using static ConditionUtils;
+using static VisualElementTestUtils;
 
 public class SongSelectOrderTest : AbstractPlayModeTest
 {
@@ -35,23 +35,28 @@ public class SongSelectOrderTest : AbstractPlayModeTest
 
     [UnityTest]
     [TestCaseSource(nameof(testCases))]
-    public IEnumerator OrderShouldAffectSongSelectEntries(ESongOrder songOrder, List<string> expectedArtistOrder) => IgnoreFailingMessages()
-        .ContinueWith(ClickButton(R.UxmlNames.searchPropertyButton))
-        .ContinueWith(WaitForSeconds(0.5f))
-        .ContinueWith(SelectSongOrder(songOrder))
-        .ContinueWith(WaitForSeconds(0.5f))
-        .ContinueWith(ExpectSongSelectEntriesInOrder(expectedArtistOrder))
-        .ToYieldInstruction(this.Executor);
+    public IEnumerator OrderShouldAffectSongSelectEntries(ESongOrder songOrder, List<string> expectedArtistOrder) =>
+        OrderShouldAffectSongSelectEntriesAsync(songOrder, expectedArtistOrder);
+    private async Awaitable OrderShouldAffectSongSelectEntriesAsync(ESongOrder songOrder, List<string> expectedArtistOrder)
+    {
+        LogAssertUtils.IgnoreFailingMessages();
+        await ClickButtonAsync(R.UxmlNames.searchPropertyButton);
+        await WaitForSecondsAsync(0.5f);
+        await SelectSongOrderAsync(songOrder);
+        await WaitForSecondsAsync(0.5f);
+        await ExpectSongSelectEntriesInOrderAsync(expectedArtistOrder);
+    }
 
-    private ITestInstruction<object> SelectSongOrder(ESongOrder songOrder)
-        => GetElement<DropdownField>(R.UxmlNames.songOrderDropdownField)
-            .ContinueWith(element => SetElementValue(element, songOrder.ToString()));
+    private async Awaitable SelectSongOrderAsync(ESongOrder songOrder)
+    {
+        DropdownField element = await GetElementAsync<DropdownField>(R.UxmlNames.songOrderDropdownField);
+        await SetElementValueAsync(element, songOrder.ToString());
+    }
 
-    private ITestInstruction<object> ExpectSongSelectEntriesInOrder(List<string> expectedArtistOrder) =>
-        WaitForCondition($"expect songs ordered by '{expectedArtistOrder.JoinWith(", ")}'",
-                    () =>
-                    {
-                        return songRouletteControl.SongEntries.Select(entry => entry.SongMeta.Artist).ToList()
-                            .SequenceEqual(expectedArtistOrder);
-                    }).ExpectWithinSeconds(5);
+    private async Awaitable ExpectSongSelectEntriesInOrderAsync(List<string> expectedArtistOrder)
+    {
+        await WaitForConditionAsync(
+                () => songRouletteControl.SongEntries.Select(entry => entry.SongMeta.Artist).ToList().SequenceEqual(expectedArtistOrder),
+                new WaitForConditionConfig { description = $"expect songs ordered by '{expectedArtistOrder.JoinWith(", ")}'" });
+    }
 }

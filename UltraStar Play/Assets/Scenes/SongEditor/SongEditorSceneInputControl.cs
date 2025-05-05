@@ -68,6 +68,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private MoveNoteToOwnSentenceAction moveNoteToOwnSentenceAction;
 
     [Inject]
+    private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
+
+    [Inject]
     private ExtendNotesAction extendNotesAction;
 
     [Inject]
@@ -243,14 +246,14 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private void JumpToEndOfSong()
     {
-        int endInBeats = SongMetaUtils.MaxBeat(songEditorSceneControl.GetAllNotes());
+        int endInBeats = SongMetaUtils.GetMaxBeat(songEditorSceneControl.GetAllNotes());
         double endInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, endInBeats);
         JumpToPosition(endInMillis, songAudioPlayer.DurationInMillis - 1);
     }
 
     private void JumpToStartOfSong()
     {
-        int startInBeats = SongMetaUtils.MinBeat(songEditorSceneControl.GetAllNotes());
+        int startInBeats = SongMetaUtils.GetMinBeat(songEditorSceneControl.GetAllNotes());
         double startInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, startInBeats);
         JumpToPosition(startInMillis, 0);
     }
@@ -275,6 +278,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private void AssignSelectedNotesToOwnSentence()
     {
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.Select(note => note.Sentence?.Voice).AllMatch(voice => voice == null))
+        {
+            moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, EVoiceId.P1);
+        }
         moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes);
     }
 
@@ -671,7 +678,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             // Special case: should still move following notes one octave up/down via Ctrl+Shift+Alt
             || (settings.SongEditorSettings.AdjustFollowingNotes && InputUtils.GetCurrentKeyboardModifier() is EKeyboardModifier.CtrlShiftAlt))
         {
-            return SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
+            return SongEditorSongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
         }
         else
         {

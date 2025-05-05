@@ -47,21 +47,20 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
     [TestCaseSource(nameof(supportedByUnity))]
     public IEnumerator ShouldLoadViaUnity(string txtFilePath)
     {
-        yield return SongAudioPlayerShouldLoadFile(txtFilePath);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath);
     }
 
     [UnityTest]
     [TestCaseSource(nameof(supportedByThirdPartyLib))]
-    [Ignore("No libVLC present in the project")]
     public IEnumerator ShouldLoadViaThirdParty(string txtFilePath)
     {
-        yield return SongAudioPlayerShouldLoadFile(txtFilePath);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath);
     }
 
     [UnityTest]
     [TestCaseSource(nameof(supportedByMidiManager))]
     public IEnumerator ShouldLoadMidi(string txtFilePath)
     {
-        yield return SongAudioPlayerShouldLoadFile(txtFilePath, 8000);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, 8000);
     }
 }

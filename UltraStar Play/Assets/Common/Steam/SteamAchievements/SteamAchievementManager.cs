@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CommonOnlineMultiplayer;
+using Steamworks;
 using Steamworks.Data;
 using UniInject;
 using UniRx;
@@ -11,12 +13,11 @@ using UnityEngine;
 
 public class SteamAchievementManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static SteamAchievementManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamAchievementManager>();
+    public static SteamAchievementManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SteamAchievementManager>();
 
     [Inject]
     private AchievementEventStream achievementEventStream;
 
-    private readonly Dictionary<string, Achievement> achievementIdToAchievement = new();
     private readonly HashSet<AchievementId> triggeredAchievementsSinceAppStart = new();
 
     protected override object GetInstance()
@@ -40,15 +41,19 @@ public class SteamAchievementManager : AbstractSingletonBehaviour, INeedInjectio
             .AddTo(gameObject);
     }
 
-    public void SetAvailableAchievements(IEnumerable<Achievement> achievements)
+    private void TriggerAchievement(AchievementId achievementId)
     {
-        foreach (Achievement achievement in achievements)
+        try
         {
-            achievementIdToAchievement[achievement.Identifier] = achievement;
+            DoTriggerAchievement(achievementId);
+        }
+        catch (Exception e)
+        {
+            e.Log($"Failed to trigger achievement: '{achievementId.Id}'");
         }
     }
 
-    private void TriggerAchievement(AchievementId achievementId)
+    private void DoTriggerAchievement(AchievementId achievementId)
     {
         if (triggeredAchievementsSinceAppStart.Contains(achievementId))
         {
@@ -85,6 +90,19 @@ public class SteamAchievementManager : AbstractSingletonBehaviour, INeedInjectio
 
     private bool TryGetAchievement(AchievementId achievementId, out Achievement achievement)
     {
-        return achievementIdToAchievement.TryGetValue(achievementId.Id, out achievement);
+        if (!SteamManager.Instance.IsConnectedToSteam)
+        {
+            achievement = default;
+            return false;
+        }
+
+        List<Achievement> achievements = SteamUserStats.Achievements.Where(achievement => achievementId.Id == achievement.Identifier).ToList();
+        if (achievements.IsNullOrEmpty())
+        {
+            achievement = default;
+            return false;
+        }
+        achievement = achievements[0];
+        return true;
     }
 }

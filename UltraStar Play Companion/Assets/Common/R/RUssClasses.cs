@@ -3,6 +3,11 @@ public static partial class R
 {
     public static class UssClasses
     {
+        public const string alert = "alert";
+        public const string alert_danger = "alert-danger";
+        public const string alert_info = "alert-info";
+        public const string alert_success = "alert-success";
+        public const string alert_warning = "alert-warning";
         public const string child_mb_4 = "child-mb-4";
         public const string controlWithLabelVertical = "controlWithLabelVertical";
         public const string ellipsis = "ellipsis";

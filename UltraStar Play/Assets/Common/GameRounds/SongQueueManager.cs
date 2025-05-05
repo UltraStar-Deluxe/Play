@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static SongQueueManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongQueueManager>();
+    public static SongQueueManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SongQueueManager>();
 
     private readonly List<SongQueueEntryDto> songQueueEntryDtos = new();
 
@@ -18,7 +18,8 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
     public bool IsSongQueueEmpty => songQueueEntryDtos.IsNullOrEmpty();
 
     private readonly Subject<SongQueueChangedEvent> songQueueChangedEventStream = new();
-    public IObservable<SongQueueChangedEvent> SongQueueChangedEventStream => songQueueChangedEventStream;
+    public IObservable<SongQueueChangedEvent> SongQueueChangedEventStream => songQueueChangedEventStream
+        .ObserveOnMainThread();
 
     [Inject]
     private UiManager uiManager;
@@ -38,6 +39,13 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
     protected override object GetInstance()
     {
         return Instance;
+    }
+
+    public void SetSongQueueEntries(List<SongQueueEntryDto> songQueueEntryDtos)
+    {
+        this.songQueueEntryDtos.Clear();
+        this.songQueueEntryDtos.AddRange(songQueueEntryDtos);
+        songQueueChangedEventStream.OnNext(new SongQueueChangedEvent(this.songQueueEntryDtos));
     }
 
     public void AddSongQueueEntry(SongQueueEntryDto songQueueEntryDto)
@@ -96,7 +104,7 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
             singSceneData.MedleySongIndex = 0;
         }
         else if (singSceneData.gameRoundSettings != null
-                 && singSceneData.gameRoundSettings.modifiers.AnyMatch(modifier => modifier is ShortSongGameRoundModifier))
+                 && singSceneData.gameRoundSettings.modifiers.AnyMatch(modifier => modifier.GetType().Name == "ShortSongGameRoundModifier"))
         {
             // Set as medley song to play shortened version
             singSceneData.MedleySongIndex = 0;
@@ -105,20 +113,50 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         return singSceneData;
     }
 
+    public List<SongQueueEntryDto> GetSongQueueEntries(int index)
+    {
+        List<SongQueueEntryDto> remainingSongQueueEntries = GetSongQueueEntries().ToList();
+        for (int i = 0; i <= index; i++)
+        {
+            List<SongQueueEntryDto> peekedSongQueueEntries = PeekNextSongQueueEntries(remainingSongQueueEntries);
+            if (i == index)
+            {
+                return peekedSongQueueEntries;
+            }
+            else if (peekedSongQueueEntries.IsNullOrEmpty())
+            {
+                return new List<SongQueueEntryDto>();
+            }
+
+            remainingSongQueueEntries.RemoveAll(peekedSongQueueEntries);
+        }
+
+        return new List<SongQueueEntryDto>();
+    }
+
     public List<SongQueueEntryDto> PeekNextSongQueueEntries()
+    {
+        return PeekNextSongQueueEntries(GetSongQueueEntries());
+    }
+
+    private List<SongQueueEntryDto> PeekNextSongQueueEntries(IReadOnlyList<SongQueueEntryDto> allSongQueueEntries)
     {
         if (IsSongQueueEmpty)
         {
-            return null;
+            return new List<SongQueueEntryDto>();
         }
 
         List<SongQueueEntryDto> result = new();
-        foreach (SongQueueEntryDto songQueueEntryDto in GetSongQueueEntries())
+        foreach (SongQueueEntryDto songQueueEntryDto in allSongQueueEntries)
         {
             if (result.IsNullOrEmpty()
                 || songQueueEntryDto.IsMedleyWithPreviousEntry)
             {
                 result.Add(songQueueEntryDto);
+            }
+            else
+            {
+                return result;
             }
         }
 

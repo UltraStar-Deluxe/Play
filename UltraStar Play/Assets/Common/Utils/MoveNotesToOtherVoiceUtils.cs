@@ -198,7 +198,7 @@ public static class MoveNotesToOtherVoiceUtils
         void SplitOnLongPause(List<Note> inputBatch)
         {
             SplitOnCondition(inputBatch,
-                (currentBatch, lastNote, note) => SongMetaUtils.NoteDistanceInMillis(songMeta, note, lastNote) > 1000);
+                (currentBatch, lastNote, note) => SongMetaUtils.GetNoteDistanceInMillis(songMeta, note, lastNote) > 1000);
         }
         result.ToList().ForEach(batch => SplitOnLongPause(batch));
         RemoveEmptyBatches();

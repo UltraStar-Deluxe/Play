@@ -9,7 +9,6 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-[Ignore("No AI tools present in the project")]
 public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
 {
     private static readonly string testFolderPath = Application.dataPath + "/PlayModeTests/CreateSingAlongDataTests";
@@ -25,9 +24,10 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
     }
 
     [UnityTest]
-    public IEnumerator ShouldCreateSingAlongData()
+    public IEnumerator ShouldCreateSingAlongData() => ShouldCreateSingAlongDataAsync();
+    private async Awaitable ShouldCreateSingAlongDataAsync()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         Dictionary<EVoiceId,string> voiceIdToDisplayName = new();
 
@@ -45,39 +45,39 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
         Injector injector = UltraStarPlaySceneInjectionManager.Instance.SceneInjector;
         injector.Inject(createSingAlongSongControl);
 
-        bool createdSingAlongDataSuccessfully = false;
-        createSingAlongSongControl.CreateSingAlongSongAsObservable(songMeta, false)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Assert.Fail($"Exception was thrown while creating sing-along data for audio file '{audioFileName}'");
-            })
-            .Subscribe(createdSongMeta =>
-            {
-                Assert.IsNotNull(createdSongMeta, "Failed to create sing-along data, created song meta is null.");
+        SongMeta createdSongMeta = null;
+        try
+        {
+            createdSongMeta = await createSingAlongSongControl.CreateSingAlongSongAsync(songMeta, false);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Assert.Fail($"Exception was thrown while creating sing-along data for audio file '{audioFileName}'");
+        }
 
-                Debug.Log($"Created sing-along data for audio file '{audioFileName}'");
-                createdSingAlongDataSuccessfully = true;
+        Assert.IsNotNull(createdSongMeta, "Failed to create sing-along data, created song meta is null.");
 
-                // Audio separation must have been executed, files must have been created.
-                Assert.IsTrue(SongMetaUtils.VocalsAudioResourceExists(createdSongMeta), "Vocals audio resource does not exist after creating sing-along data");
-                Assert.IsTrue(SongMetaUtils.InstrumentalAudioResourceExists(createdSongMeta), "Instrumental audio resource does not exist after creating sing-along data");
+        Debug.Log($"Created sing-along data for audio file '{audioFileName}'");
 
-                // Speech recognition must have been executed, some lyrics must have been found.
-                Assert.IsNotEmpty(SongMetaUtils.GetLyrics(createdSongMeta, EVoiceId.P1), "Missing lyrics after creating sing-along data");
+        // Audio separation must have been executed, files must have been created.
+        Assert.IsTrue(SongMetaUtils.VocalsAudioResourceExists(createdSongMeta), "Vocals audio resource does not exist after creating sing-along data");
+        Assert.IsTrue(SongMetaUtils.InstrumentalAudioResourceExists(createdSongMeta), "Instrumental audio resource does not exist after creating sing-along data");
 
-                // Pitch detection must have been executed, some notes must have been created with different pitch.
-                List<Note> createdNotes = SongMetaUtils.GetAllNotes(createdSongMeta);
-                Assert.IsNotEmpty(createdNotes, "No notes created after creating sing-along data");
+        // Speech recognition must have been executed, some lyrics must have been found.
+        Assert.IsNotEmpty(SongMetaUtils.GetLyrics(createdSongMeta, EVoiceId.P1), "Missing lyrics after creating sing-along data");
 
-                HashSet<int> pitchOfNotes = createdNotes
-                    .Select(note => note.MidiNote)
-                    .ToHashSet();
-                Assert.IsTrue(pitchOfNotes.Count > 2, "Not enough different pitch values after creating sing-along data");
+        // Pitch detection must have been executed, some notes must have been created with different pitch.
+        List<Note> createdNotes = SongMetaUtils.GetAllNotes(createdSongMeta);
+        Assert.IsNotEmpty(createdNotes, "No notes created after creating sing-along data");
 
-                // No txt file should have been created
-                Assert.IsTrue(!FileUtils.Exists(TxtFilePathToBeCreated));
-            });
+        HashSet<int> pitchOfNotes = createdNotes
+            .Select(note => note.MidiNote)
+            .ToHashSet();
+        Assert.IsTrue(pitchOfNotes.Count > 2, "Not enough different pitch values after creating sing-along data");
+
+        // No txt file should have been created
+        Assert.IsTrue(!FileUtils.Exists(TxtFilePathToBeCreated));
 
         // Wait until sing-along data has been created
         JobManager jobManager = JobManager.Instance;
@@ -86,17 +86,12 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
         while (!jobManager.AllJobsFinished
                && !TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis))
         {
-            yield return new WaitForSeconds(0.1f);
+            await Awaitable.WaitForSecondsAsync(0.1f);
         }
 
         if (TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis))
         {
             Assert.Fail($"Failed to create sing-along data within {maxWaitTimeInMillis} ms");
-        }
-
-        if (!createdSingAlongDataSuccessfully)
-        {
-            Assert.Fail($"Failed to create sing-along data. See log for errors.");
         }
     }
 }

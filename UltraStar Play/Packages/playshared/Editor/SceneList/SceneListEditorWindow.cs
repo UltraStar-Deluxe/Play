@@ -19,7 +19,6 @@ public class SceneListEditorWindow : EditorWindow
         "Background Bokeh VFX",
         "CartoonVFX9X",
         "Confetti FX Pro",
-        "FfmpegUnity",
         "Hovl Studio",
         "JMO Assets",
         "UnityStandaloneFileBrowser",

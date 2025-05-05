@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListener
+public class SongQueueEntryUiControl : INeedInjection
 {
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
@@ -33,22 +33,73 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.toggleMedleyButton)]
     private Button toggleMedleyButton;
-    public Button ToggleMedleyButton => toggleMedleyButton;
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.deleteButton)]
     private Button deleteButton;
-    public Button DeleteButton => deleteButton;
 
-    [Inject]
-    public SongQueueEntryDto SongQueueEntryDto { get; private set; }
+    private SongQueueEntryDto songQueueEntryDto;
+    public SongQueueEntryDto SongQueueEntryDto
+    {
+        get => songQueueEntryDto;
+        set
+        {
+            songQueueEntryDto = value;
+            UpdateSongQueueEntryUi();
+
+            if (songQueueEntryDto == null)
+            {
+                UnregisterCallback();
+            }
+            else
+            {
+                RegisterCallback();
+            }
+        }
+    }
 
     public Action OnDelete { get; set; }
     public Action OnToggleMedley { get; set; }
 
-    public void OnInjectionFinished()
+    private void RegisterCallback()
     {
-        deleteButton.RegisterCallbackButtonTriggered(_ => OnDelete?.Invoke());
-        toggleMedleyButton.RegisterCallbackButtonTriggered(_ => OnToggleMedley?.Invoke());
+        deleteButton.RegisterCallbackButtonTriggered(OnDeleteCallback);
+        toggleMedleyButton.RegisterCallbackButtonTriggered(OnToggleMedleyCallback);
+    }
+
+    private void UnregisterCallback()
+    {
+        deleteButton.UnregisterCallbackButtonTriggered(OnDeleteCallback);
+        toggleMedleyButton.UnregisterCallbackButtonTriggered(OnToggleMedleyCallback);
+    }
+
+    public void ShowToggleMedleyButton()
+    {
+        toggleMedleyButton.ShowByDisplay();
+    }
+
+    public void HideToggleMedleyButton()
+    {
+        toggleMedleyButton.HideByDisplay();
+    }
+
+    public void HideControls()
+    {
+        deleteButton.HideByDisplay();
+        HideToggleMedleyButton();
+    }
+
+    private void UpdateSongQueueEntryUi()
+    {
+        if (SongQueueEntryDto == null)
+        {
+            songArtist.text = "";
+            songTitle.text = "";
+            isMedleyIcon.HideByDisplay();
+            isNoMedleyIcon.HideByDisplay();
+            songQueueEntryModifierActiveIcon.HideByDisplay();
+            playerEntryList.Clear();
+            return;
+        }
 
         // Is medley or not
         isMedleyIcon.SetVisibleByDisplay(SongQueueEntryDto.IsMedleyWithPreviousEntry);
@@ -83,14 +134,13 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
         });
     }
 
-    public void HideToggleMedleyButton()
+    private void OnToggleMedleyCallback(EventBase evt)
     {
-        toggleMedleyButton.HideByDisplay();
+        OnToggleMedley?.Invoke();
     }
 
-    public void HideControls()
+    private void OnDeleteCallback(EventBase evt)
     {
-        deleteButton.HideByDisplay();
-        toggleMedleyButton.HideByDisplay();
+        OnDelete?.Invoke();
     }
 }

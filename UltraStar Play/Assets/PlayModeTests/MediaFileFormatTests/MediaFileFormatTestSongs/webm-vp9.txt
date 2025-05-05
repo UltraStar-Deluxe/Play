@@ -1,5 +1,5 @@
-﻿#TITLE:WebM-VP9 Format Test
-#ARTIST:Test Artist
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
 #MP3:webm-vp9.webm
 #VIDEO:webm-vp9.webm
 #BPM:200

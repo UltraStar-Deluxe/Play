@@ -13,7 +13,7 @@ using UnityEngine;
 
 public class SongDetailsRestControl : AbstractRestControl, INeedInjection
 {
-    public static SongDetailsRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongDetailsRestControl>();
+    public static SongDetailsRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SongDetailsRestControl>();
 
     [Inject]
     private SongMetaManager songMetaManager;
@@ -28,12 +28,12 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
 
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Songs)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.Songs)
             .SetDescription("Get loaded songs")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(SendLoadedSongs);
 
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Song)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.Song)
             .SetDescription($"Get song details.")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -60,7 +60,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(songDetailsDto);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.SongImage)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.SongImage)
             .SetDescription($"Get song cover image. Returns the background image if no cover image was found.")
             .SetRemoveOnDestroy(gameObject)
             .SetThread(ResponseThread.NewThread)
@@ -92,35 +92,14 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                     }
                 }
 
-                bool sendResponseComplete = false;
-                MainThreadDispatcher.Send(state =>
-                {
-                    ImageManager.LoadSpriteFromUri(imageUri)
-                        .CatchIgnore((Exception ex) =>
-                        {
-                            Debug.LogException(ex);
-                            requestData.Context.Response.WriteJson(new ErrorMessageDto("Failed to load song image"));
-                            sendResponseComplete = true;
-                            Debug.LogError($"Failed to load song image from uri {imageUri}");
-                        })
-                        .Subscribe(loadedSprite =>
-                        {
-                            byte[] jpgBytes = loadedSprite.texture.EncodeToJPG();
-                            string jpgBytesBase64 = Convert.ToBase64String(jpgBytes);
-                            ImageDto imageDto = new() { JpgBytesBase64 = jpgBytesBase64, };
-
-                            Debug.Log($"Returning song image for song {songId}");
-                            requestData.Context.Response.WriteJson(imageDto);
-                            sendResponseComplete = true;
-                        });
-                }, null);
+                Awaitable sendSongImageResponseAsync = SendSongImageResponseAsync(requestData, songId, imageUri);
 
                 // Wait until the coroutine is finished.
                 // Otherwise the response is sent before the image is loaded.
                 Debug.Log($"Waiting for load image to complete");
                 long maxWaitTimeInMillis = 5000;
                 long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-                while(!sendResponseComplete)
+                while(!sendSongImageResponseAsync.IsCompleted)
                 {
                     long durationInMillis = TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis;
                     if (durationInMillis > maxWaitTimeInMillis)
@@ -133,6 +112,28 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 Debug.Log($"Load image completed after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms");
             });
 	}
+
+    private async Awaitable SendSongImageResponseAsync(EndpointRequestData requestData, string songId, string imageUri)
+    {
+        try
+        {
+            await Awaitable.MainThreadAsync();
+            Sprite loadedSprite = await ImageManager.LoadSpriteFromUriAsync(imageUri);
+
+            byte[] jpgBytes = loadedSprite.texture.EncodeToJPG();
+            string jpgBytesBase64 = Convert.ToBase64String(jpgBytes);
+            ImageDto imageDto = new() { JpgBytesBase64 = jpgBytesBase64, };
+
+            Debug.Log($"Returning song image for song {songId}");
+            requestData.Context.Response.WriteJson(imageDto);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load song image from uri '{imageUri}': {ex.Message}");
+            requestData.Context.Response.WriteJson(new ErrorMessageDto("Failed to load song image"));
+        }
+    }
 
     private Dictionary<string, string> CreateVoiceDisplayNameToLyricsMap(SongMeta songMeta)
     {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
@@ -15,7 +15,7 @@ using UnityEngine.UIElements;
 
 public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection
 {
-    private static readonly string songArchiveInfoJsonUrl = "https://ultrastar-play.com/downloads/song-archives-info.json";
+    private static readonly string songArchiveInfoJsonUrl = "https://melodymania.org/downloads/song-archives-info.json";
 
     [InjectedInInspector]
     public VisualTreeAsset songFolderListEntryUi;
@@ -33,7 +33,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     private UIDocument uiDocument;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject(UxmlName = R.UxmlNames.songFolderList)]
     private VisualElement songFolderList;
@@ -125,7 +125,12 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 #endif
     }
 
-    private void CreateDownloadSongArchiveUiControl()
+    private void Update()
+    {
+        downloadSongArchiveUiControls.ForEach(it => it.UpdateProgress());
+    }
+
+    private async void CreateDownloadSongArchiveUiControl()
     {
         VisualElement visualElement = downloadSongArchiveUi.CloneTreeAndGetFirstChild();
 
@@ -133,37 +138,22 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .WithRootVisualElement(visualElement)
             .CreateAndInject<DownloadSongArchiveUiControl>();
 
-        // Send web request
-        UnityWebRequest webRequest = UnityWebRequest.Get(new Uri(songArchiveInfoJsonUrl));
-        webRequest.SendWebRequest();
-        StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
-            downloadHandler =>
-            {
-                downloadSongArchiveUiControl.SongArchiveEntries =
-                    JsonConverter.FromJson<List<SongArchiveEntry>>(downloadHandler.text);
-            },
-            ex => Debug.LogException(ex)));
-
-        downloadSongArchiveUiControl.IsDoneWithoutError.Subscribe(newValue =>
+        downloadSongArchiveUiControl.FinishEventStream.Subscribe(targetFolder =>
         {
-            if (newValue)
+            downloadSongArchiveUiControls.Remove(downloadSongArchiveUiControl);
+
+            // Add new song folder if needed
+            if (!targetFolder.IsNullOrEmpty()
+                && !settings.SongDirs.Contains(targetFolder))
             {
-                downloadSongArchiveUiControls.Remove(downloadSongArchiveUiControl);
-
-                // Add new song folder if needed
-                string targetFolder = downloadSongArchiveUiControl.TargetFolder;
-                if (!targetFolder.IsNullOrEmpty()
-                    && !settings.SongDirs.Contains(targetFolder))
-                {
-                    settings.SongDirs.Add(targetFolder);
-                }
-
-                // Fade out the download UI, then remove it
-                LeanTween
-                    .value(gameObject, visualElement.resolvedStyle.opacity, 0, 1f)
-                    .setOnUpdate(interpolatedValue => visualElement.style.opacity = interpolatedValue)
-                    .setOnComplete(_ => UpdateSongFolderList());
+                settings.SongDirs.Add(targetFolder);
             }
+
+            // Fade out the download UI, then remove it
+            LeanTween
+                .value(gameObject, visualElement.resolvedStyle.opacity, 0, 1f)
+                .setOnUpdate(interpolatedValue => visualElement.style.opacity = interpolatedValue)
+                .setOnComplete(_ => UpdateSongFolderList());
         });
 
         downloadSongArchiveUiControl.DeleteEventStream.Subscribe(_ =>
@@ -176,6 +166,22 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         downloadSongArchiveUiControls.Add(downloadSongArchiveUiControl);
 
         UpdateSongFolderList();
+
+        await UpdateSongArchiveEntriesAsync(downloadSongArchiveUiControl);
+    }
+
+    private async Awaitable UpdateSongArchiveEntriesAsync(DownloadSongArchiveUiControl downloadSongArchiveUiControl)
+    {
+        try
+        {
+            using UnityWebRequest webRequest = UnityWebRequest.Get(new Uri(songArchiveInfoJsonUrl));
+            string response = await WebRequestUtils.GetWebRequestResponseAsync(webRequest);
+            downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(response);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
     }
 
     private void AddNewSongFolder()
@@ -324,7 +330,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     private void CreateQuickFixAllDialog(Translation title, List<QuickFixAction> quickFixActions)
     {
-        MessageDialogControl quickFixAllDialog = uiManager.CreateDialogControl(title);
+        MessageDialogControl quickFixAllDialog = dialogManager.CreateDialogControl(title);
 
         ScrollView scrollView = new();
         scrollView.AddToClassList("child-mb-3");
@@ -407,12 +413,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
             VisualElement songIssueUi = CreateSongIssueListIssueEntry(songIssue);
             accordionItem.Add(songIssueUi);
-
-            // TODO: Add quick fix buttons back? See commit history. I don't think the game should concern
-            // itself with fixing the user's song library. Surely purpose built tools exist in the USDX
-            // ecosystem already? But also, if we have ffmpeg, just use it to play the media directly instead
-            // of converting? Honestly, I don't like the idea of the game modifying the user's song
-            // collection in any way.
 
             lastSongMetaPath = songMetaPath;
         }
@@ -573,7 +573,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             return;
         }
 
-        deleteSongFolderDialog = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_songLibrary_action_deleteSongFolderDialog_title));
+        deleteSongFolderDialog = dialogManager.CreateDialogControl(Translation.Get(R.Messages.options_songLibrary_action_deleteSongFolderDialog_title));
         deleteSongFolderDialog.DialogClosedEventStream.Subscribe(_ => deleteSongFolderDialog = null);
         deleteSongFolderDialog.Message = Translation.Get(R.Messages.options_songLibrary_action_deleteSongFolderDialog_message,
             "songFolder", settings.SongDirs[indexInList]);
@@ -595,6 +595,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     protected override void OnDestroy()
     {
         base.OnDestroy();
+
+        // Cancel downloads
+        downloadSongArchiveUiControls.ForEach(it => it.CancelDownload());
 
         issuesIcon.RemoveFromClassList("error");
         issuesIcon.RemoveFromClassList("warning");

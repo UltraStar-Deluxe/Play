@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="songSelectSceneMenuUiRoot" style="background-color: rgba(0, 0, 0, 0); padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; flex-grow: 1;">
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" horizontal-scroller-visibility="Hidden">
+            <ui:VisualElement name="container" class="child-mb-3" style="flex-grow: 1;">
+                <ui:Toggle label="$action_toggleMicTest" name="micCheckToggle" />
+                <ui:Toggle name="showSongIndexInSongSelectToggle" label="$options_showIndexInSongSelect" />
+                <ui:Toggle name="showScrollBarInSongSelectToggle" label="$options_showScrollBarInSongSelect" />
+                <ui:Toggle name="navigateFoldersInSongSelectToggle" label="$options_navigateFoldersInSongSelect" />
+            </ui:VisualElement>
+        </ui:ScrollView>
+        <ui:VisualElement name="spacer" style="background-color: rgba(0, 0, 0, 0); height: 20px; margin-top: auto; flex-shrink: 0;" />
+        <ui:VisualElement name="buttonRow" style="background-color: rgba(0, 0, 0, 0); width: 100%; align-items: center; flex-shrink: 0; flex-direction: row; justify-content: center; margin-top: auto;">
+            <ui:Button text="$action_close" display-tooltip-when-elided="true" name="closeSongSelectSceneMenuButton2" class="controlMinWidth" style="margin-right: 10px;" />
+            <ui:Button text="$action_apply" display-tooltip-when-elided="true" name="applySongSelectOptionsButton" class="controlMinWidth" style="margin-right: 10px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

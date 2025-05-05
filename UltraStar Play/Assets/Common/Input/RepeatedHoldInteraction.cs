@@ -27,20 +27,21 @@ public class RepeatedHoldInteraction : IInputInteraction
     {
         InputSystem.RegisterInteraction<RepeatedHoldInteraction>();
     }
-    
+
     private static readonly float defaultButtonPressPoint = 0.5f;
 
     public bool fireImmediately = true;
-    
+
     public float initialPause = 0.5f;
     public float repeatedPause = 0.2f;
-    
+
     public float pressPoint = 0.5f;
 
     private float InitialPauseOrDefault => initialPause > 0.0 ? initialPause : InputSystem.settings.defaultHoldTime;
-    private float RepeatedPauseOrDefault => repeatedPause > 0.0 ? repeatedPause : InputSystem.settings.defaultHoldTime;
+    private float RepeatedPauseOrDefault => Accelerated(repeatedPause > 0.0 ? repeatedPause : InputSystem.settings.defaultHoldTime);
     private float PressPointOrDefault => pressPoint > 0.0 ? pressPoint : defaultButtonPressPoint;
 
+    private float inputStartTime;
     private float ignoreInputUntilTime;
 
     /// <inheritdoc />
@@ -63,9 +64,16 @@ public class RepeatedHoldInteraction : IInputInteraction
                     // Check input again when the time elapsed or input changed.
                     context.SetTimeout(InitialPauseOrDefault);
                 }
+
+                inputStartTime = 0;
                 break;
 
             case InputActionPhase.Started:
+                if (inputStartTime <= 0)
+                {
+                    inputStartTime = Time.time;
+                }
+
                 // ControlIsActuated can returns false although the is non-zero. Thus, check both.
                 Vector2 valueAsVector2 = context.ReadValue<Vector2>();
                 if (valueAsVector2 == Vector2.zero
@@ -75,7 +83,7 @@ public class RepeatedHoldInteraction : IInputInteraction
                 }
                 else if (Time.time >= ignoreInputUntilTime - 0.1f)
                 {
-                    // Perform action but stay in the started phase, because we want to fire again after durationOrDefault 
+                    // Perform action but stay in the started phase, because we want to fire again after durationOrDefault
                     context.PerformedAndStayStarted();
                     ignoreInputUntilTime = Time.time + RepeatedPauseOrDefault;
 
@@ -104,10 +112,39 @@ public class RepeatedHoldInteraction : IInputInteraction
         ignoreInputUntilTime = 0;
         context.Canceled();
     }
-    
+
     /// <inheritdoc />
     public void Reset()
     {
         // Method needed to implement interface
+    }
+
+    /**
+     * Reduces the pause when holding down the navigation button for long time.
+     */
+    private float Accelerated(float pauseTimeInSeconds)
+    {
+        float inputDurationInSeconds = Time.time - inputStartTime - initialPause;
+        if (inputDurationInSeconds > 16)
+        {
+            return pauseTimeInSeconds / 12;
+        }
+
+        if (inputDurationInSeconds > 12)
+        {
+            return pauseTimeInSeconds / 8;
+        }
+
+        if (inputDurationInSeconds > 6)
+        {
+            return pauseTimeInSeconds / 4;
+        }
+
+        if (inputDurationInSeconds > 3)
+        {
+            return pauseTimeInSeconds / 2;
+        }
+
+        return pauseTimeInSeconds;
     }
 }

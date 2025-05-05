@@ -14,7 +14,7 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private NoteAreaControl noteAreaControl;

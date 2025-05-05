@@ -79,6 +79,13 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjection
             mouseDownScrollView = visualElement.GetFirstAncestorOfType<ScrollView>();
         }
 
+        // Ignore ListView because these can be reordered via drag and drop
+        if (mouseDownScrollView != null
+            && mouseDownScrollView.GetFirstAncestorOfType<ListView>() != null)
+        {
+            mouseDownScrollView = null;
+        }
+
         if (mouseDownScrollView == null)
         {
             return;

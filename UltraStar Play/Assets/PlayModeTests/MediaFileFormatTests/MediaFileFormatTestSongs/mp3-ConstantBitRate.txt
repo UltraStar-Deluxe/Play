@@ -1,5 +1,5 @@
-﻿#TITLE:MP3 Constant Bit Rate Format Test
-#ARTIST:Test Artist
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
 #MP3:mp3-ConstantBitRate.mp3
 #BPM:200
 - 0

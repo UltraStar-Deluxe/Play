@@ -35,14 +35,13 @@ public class SongVideoPlayerFormatTest : AbstractMediaFileFormatTest
     [TestCaseSource(nameof(supportedByUnity))]
     public IEnumerator ShouldLoadViaUnity(string txtFileName)
     {
-        yield return SongVideoPlayerShouldLoadFile(txtFileName);
+        yield return SongVideoPlayerShouldLoadFileAsync(txtFileName);
     }
 
     [UnityTest]
     [TestCaseSource(nameof(supportedByThirdPartyLib))]
-    [Ignore("No libVLC present in the project")]
     public IEnumerator ShouldLoadViaThirdParty(string txtFileName)
     {
-        yield return SongVideoPlayerShouldLoadFile(txtFileName);
+        yield return SongVideoPlayerShouldLoadFileAsync(txtFileName);
     }
 }

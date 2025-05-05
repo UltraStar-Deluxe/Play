@@ -33,7 +33,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     private Injector injector;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private SongSelectSceneData sceneData;
@@ -115,7 +115,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     public void OpenAskToUseJokerDialog(SongMeta songMeta, Action onYes = null)
     {
         CloseAskToUseJokerDialog();
-        askToUseJokerControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_useJokerDialog_title));
+        askToUseJokerControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_useJokerDialog_title));
         askToUseJokerControl.Message = Translation.Get(R.Messages.songSelectScene_useJokerDialog_message, "jokerCount", GetJokerCountTranslation());
         askToUseJokerControl.AddButton(Translation.Get(R.Messages.common_yes), _ =>
         {

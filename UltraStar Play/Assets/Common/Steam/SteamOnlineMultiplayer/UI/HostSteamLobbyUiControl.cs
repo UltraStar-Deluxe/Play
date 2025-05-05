@@ -1,5 +1,6 @@
 using System;
 using CommonOnlineMultiplayer;
+using Steamworks.Data;
 using UniInject;
 using UniRx;
 using Unity.Netcode;
@@ -62,7 +63,7 @@ namespace SteamOnlineMultiplayer
                 && (!HostHiddenGame || !HostGamePassword.IsNullOrEmpty()));
         }
 
-        private void HostGameOnSteam()
+        private async void HostGameOnSteam()
         {
             bool isHidden = hostHiddenGameToggle.value;
             ESteamLobbyVisibility lobbyVisibility = isHidden
@@ -73,6 +74,12 @@ namespace SteamOnlineMultiplayer
                 ? HostGamePassword
                 : "";
 
+            if (isHidden
+                && lobbyPassword.IsNullOrEmpty())
+            {
+                throw new OnlineMultiplayerException("Hosting a hidden lobby requires a password");
+            }
+
             SteamLobbyConfig steamLobbyConfig = new SteamLobbyConfig()
             {
                 name = $"{steamManager.PlayerName}'s game",
@@ -82,40 +89,35 @@ namespace SteamOnlineMultiplayer
                 password = lobbyPassword,
             };
 
-            ObservableUtils.RunOnNewTaskAsObservable(async () =>
-                    {
-                        if (isHidden
-                            && lobbyPassword.IsNullOrEmpty())
-                        {
-                            throw new OnlineMultiplayerException("Hosting a hidden lobby requires a password");
-                        }
+            try
+            {
+                await Awaitable.BackgroundThreadAsync();
+                Lobby lobby = await steamLobbyManager.CreateLobbyAsync(steamLobbyConfig);
+                await Awaitable.MainThreadAsync();
+                Debug.Log($"Successfully created lobby: {lobby.Id}.");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to create lobby: {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_failedToCreateLobby));
+                return;
+            }
 
-                        return await steamLobbyManager.CreateLobbyAsync(steamLobbyConfig);
-                    },
-                    Disposable.Empty)
-                .ObserveOnMainThread()
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to create lobby: {ex.Message}");
-                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_failedToCreateLobby));
-                })
-                .Select(lobby=>
-                {
-                    Debug.Log($"Successfully created lobby: {lobby.Id}. Starting Unity Netcode host with FacepunchTransport.");
-                    steamLobbyMemberManager.StartNetcodeNetworkManagerHost();
-                    return true;
-                })
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to start Unity Netcode host: {ex.Message}");
-                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_failedToStartNetcodeHost));
-                })
-                .Subscribe(_ =>
-                {
-                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_hostSuccess));
-                });
+            try
+            {
+                Debug.Log("Starting Unity Netcode host with FacepunchTransport.");
+                steamLobbyMemberManager.StartNetcodeNetworkManagerHost();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to start Unity Netcode host: {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_failedToStartNetcodeHost));
+                return;
+            }
+
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_hostSuccess));
         }
 
         public void Dispose()

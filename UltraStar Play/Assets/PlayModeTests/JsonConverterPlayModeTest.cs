@@ -12,7 +12,7 @@ public class JsonConverterPlayModeTest : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator UnityNetcodeClientIdRoundtripKeepsValue()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         Assert.IsTrue(JsonConverter.CustomConverterTypeNames.AnyMatch(it => it.Contains(nameof(UnityNetcodeClientId))),
             $"No custom JSON converter for {nameof(UnityNetcodeClientId)}");
@@ -33,7 +33,7 @@ public class JsonConverterPlayModeTest : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator SteamIdRoundtripKeepsValue()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         Assert.IsTrue(JsonConverter.CustomConverterTypeNames.AnyMatch(it => it.Contains(nameof(SteamId))),
             $"No custom JSON converter for {nameof(SteamId)}");

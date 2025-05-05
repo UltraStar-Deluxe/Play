@@ -1,17 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Responsible;
+using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
-using static Responsible.Responsibly;
-using static ResponsibleSceneUtils;
-using static ResponsibleLogAssertUtils;
-using static ResponsibleVisualElementUtils;
+using static SceneConditionTestUtils;
+using static VisualElementTestUtils;
+using static ConditionUtils;
 
 public class CoreGameLoopTest : AbstractPlayModeTest
 {
-    private const float TestSongAudioLengthInSeconds = 4;
+    private const float TestSongAudioLengthInMillis = 4000;
 
     // 3/4 of the notes should be hit.
     private static readonly int expectedScore = (int)(0.75 * PlayerScoreControl.maxScoreForNotes);
@@ -37,41 +36,48 @@ public class CoreGameLoopTest : AbstractPlayModeTest
     }
 
     [UnityTest]
-    public IEnumerator CoreGameLoopWorksWithoutErrors() => IgnoreFailingMessages()
-        .ContinueWith(StartSinging())
-        .ContinueWith(ExpectScene(EScene.SingScene))
-        .ContinueWith(ExpectScene(EScene.SingingResultsScene, TestSongAudioLengthInSeconds + 2))
-        .ContinueWith(ExpectSingingResultScore(expectedScore))
-        .ContinueWith(ExpectSingleHighscoreEntryInStatistics(expectedScore))
-        .ContinueWith(ClickContinue())
-        .ContinueWith(ExpectScene(EScene.SongSelectScene))
-        .ToYieldInstruction(Executor);
+    public IEnumerator CoreGameLoopWorksWithoutErrors() => CoreGameLoopWorksWithoutErrorsAsync();
+    private async Awaitable CoreGameLoopWorksWithoutErrorsAsync()
+    {
+        LogAssertUtils.IgnoreFailingMessages();
+        await StartSingingAsync();
+        await ExpectSceneAsync(EScene.SingScene);
+        await ExpectSceneAsync(EScene.SingingResultsScene, new WaitForConditionConfig { timeoutInMillis = TestSongAudioLengthInMillis + 2000 });
+        await ExpectSingingResultScoreAsync(expectedScore);
+        await ExpectSingleHighscoreEntryInStatisticsAsync(expectedScore);
+        await ClickContinueAsync();
+        await ExpectSceneAsync(EScene.SongSelectScene);
+    }
 
-    private ITestInstruction<object> ClickContinue()
-        => GetElement<Button>(R.UxmlNames.continueButton)
-            .ContinueWith(continueButton => ClickButton(continueButton));
+    private async Awaitable ClickContinueAsync()
+    {
+        Button continueButton = await GetElementAsync<Button>(R.UxmlNames.continueButton);
+        await ClickButtonAsync(continueButton);
+    }
 
-    private ITestInstruction<object> StartSinging()
-        => Do(
-            $"start singing via enter key",
-            () => InputFixture.PressAndRelease(Keyboard.enterKey));
+    private async Awaitable StartSingingAsync()
+    {
+        InputFixture.PressAndRelease(Keyboard.enterKey);
+        await Awaitable.WaitForSecondsAsync(0.1f);
+    }
 
-    private ITestInstruction<object> ExpectSingleHighscoreEntryInStatistics(int score)
-        => WaitForCondition(
-            $"expect single highscore entry with {score} points",
-            () =>
-            {
-                List<HighScoreEntry> highScoreEntries = StatisticsManager.Instance.Statistics.LocalStatistics
-                    .SelectMany(it => it.Value.HighScoreRecord.HighScoreEntries)
-                    .ToList();
-                return highScoreEntries.Count() == 1
-                       && highScoreEntries.FirstOrDefault().Score == score;
-            }).ExpectWithinSeconds(10);
+    private async Awaitable ExpectSingleHighscoreEntryInStatisticsAsync(int score)
+    {
+        await WaitForConditionAsync(() =>
+        {
+            List<HighScoreEntry> highScoreEntries = StatisticsManager.Instance.Statistics.LocalStatistics
+                .SelectMany(it => it.Value.HighScoreRecord.HighScoreEntries)
+                .ToList();
+            return highScoreEntries.Count() == 1
+                   && highScoreEntries.FirstOrDefault().Score == score;
+        }, new WaitForConditionConfig { description = $"expect single highscore entry with {score} points" });
+    }
 
-    private ITestInstruction<object> ExpectSingingResultScore(int score)
-        => GetElement<Label>(R.UxmlNames.totalScoreLabel)
-            .ContinueWith(totalScoreLabel => WaitForCondition(
-                $"score label shows {score}",
-                () => totalScoreLabel.text == score.ToString())
-                .ExpectWithinSeconds(5));
+    private async Awaitable ExpectSingingResultScoreAsync(int score)
+    {
+        Label totalScoreLabel = await GetElementAsync<Label>(R.UxmlNames.totalScoreLabel);
+        await WaitForConditionAsync(
+                () => totalScoreLabel.text == score.ToString(),
+                new WaitForConditionConfig { description = $"score label shows {score}" });
+    }
 }

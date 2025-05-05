@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UniRx;
 using Unity.Collections;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
@@ -17,7 +18,7 @@ namespace CommonOnlineMultiplayer
             this.messagingControl = messagingControl;
         }
 
-        private void DelayMessage(string messageName, IReadOnlyList<ulong> targetNetcodeClientIds, Action action)
+        private async Awaitable DelayMessageAsync(string messageName, IReadOnlyList<ulong> targetNetcodeClientIds, Action action)
         {
             if (DelayInMillis <= 0)
             {
@@ -28,8 +29,10 @@ namespace CommonOnlineMultiplayer
             int sleepTimeInMillis = RandomUtils.Range(1, DelayInMillis);
             float sleepTimeInSeconds = sleepTimeInMillis / 1000f;
             Log.Verbose(() => $"Delaying message '{messageName}' to Netcode clients {targetNetcodeClientIds.JoinWith(", ")} by {sleepTimeInSeconds:F3} seconds");
-            MainThreadDispatcher.StartCoroutine(
-            CoroutineUtils.ExecuteAfterDelayInSeconds(sleepTimeInSeconds, action));
+
+            await Awaitable.MainThreadAsync();
+            await Awaitable.WaitForSecondsAsync(sleepTimeInSeconds);
+            action();
         }
 
         public void RegisterNamedMessageHandlersToForwardMessages()
@@ -60,7 +63,7 @@ namespace CommonOnlineMultiplayer
             }
 
             FastBufferWriter fastBufferWriterCopy = CopyPersistent(fastBufferWriter);
-            DelayMessage(messageName, targetNetcodeClientIds,
+            DelayMessageAsync(messageName, targetNetcodeClientIds,
                 () => messagingControl.SendNamedMessageToClients(messageName, fastBufferWriterCopy, targetNetcodeClientIds, networkDelivery));
         }
 
@@ -77,7 +80,7 @@ namespace CommonOnlineMultiplayer
             }
 
             FastBufferWriter fastBufferWriterCopy = CopyPersistent(fastBufferWriter);
-            DelayMessage(messageName, new List<ulong>() {targetNetcodeClientId},
+            DelayMessageAsync(messageName, new List<ulong>() {targetNetcodeClientId},
                 () => messagingControl.SendNamedMessageToClient(messageName, fastBufferWriterCopy, targetNetcodeClientId, networkDelivery));
         }
 

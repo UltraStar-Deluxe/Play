@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using Serilog.Events;
 
 public static class ProcessUtils
 {
@@ -9,8 +8,8 @@ public static class ProcessUtils
         string arguments,
         out string output,
         out string errorOutput,
-        LogEventLevel outputLogLevel = LogEventLevel.Debug,
-        LogEventLevel errorOutputLogLevel = LogEventLevel.Debug)
+        ELogEventLevel outputLogLevel = ELogEventLevel.Debug,
+        ELogEventLevel errorOutputLogLevel = ELogEventLevel.Debug)
     {
         Log.WithLevel(outputLogLevel, () => $"Executing process '{executable} {arguments}'");
 

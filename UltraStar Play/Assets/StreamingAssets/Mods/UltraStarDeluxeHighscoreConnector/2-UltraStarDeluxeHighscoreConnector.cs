@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 using UniInject;
-using UniRx;
 using UnityEngine;
 
 public class UltraStarDeluxeHighscoreConnector : IHighScoreReader, IOnDisableMod
@@ -31,38 +29,38 @@ public class UltraStarDeluxeHighscoreConnector : IHighScoreReader, IOnDisableMod
         }
     }
 
-    public IObservable<HighScoreRecord> ReadHighScoreRecord(SongMeta songMeta)
+    public async Awaitable<HighScoreRecord> ReadHighScoreRecordAsync(SongMeta songMeta)
     {
         if (songMeta == null
             || modSettings.dbPath.IsNullOrEmpty())
         {
-            return Observable.Empty<HighScoreRecord>();
+            return null;
         }
 
         if (songMetaToHighScoreRecordCache.TryGetValue(songMeta, out HighScoreRecord cachedHighScoreRecord))
         {
-            return Observable.Return<HighScoreRecord>(cachedHighScoreRecord);
+            return cachedHighScoreRecord;
         }
 
-        Debug.Log($"Searching USDX highscore database for song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
-        return ObservableUtils.RunOnNewTaskAsObservable(
-            async () =>
-            {
-                HighScoreRecord highScoreRecord = await ReadHighScoreRecordAsync(songMeta);
-                if (highScoreRecord == null)
-                {
-                    songMetaToHighScoreRecordCache[songMeta] = new HighScoreRecord();
-                }
-                else 
-                {
-                    songMetaToHighScoreRecordCache[songMeta] = highScoreRecord;
-                }
-                return highScoreRecord;
-            },
-            Disposable.Empty);
+        Debug.Log($"Searching USDX highscore database for song '{songMeta.GetArtistDashTitle()}'");
+
+        await Awaitable.BackgroundThreadAsync();
+
+        HighScoreRecord highScoreRecord = ReadHighScoreRecordUncachedAsync(songMeta);
+        if (highScoreRecord == null)
+        {
+            songMetaToHighScoreRecordCache[songMeta] = new HighScoreRecord();
+        }
+        else
+        {
+            songMetaToHighScoreRecordCache[songMeta] = highScoreRecord;
+        }
+
+        await Awaitable.MainThreadAsync();
+        return highScoreRecord;
     }
 
-    private async Task<HighScoreRecord> ReadHighScoreRecordAsync(SongMeta songMeta)
+    private HighScoreRecord ReadHighScoreRecordUncachedAsync(SongMeta songMeta)
     {
         string artistEscaped = EscapeSqlStringArgument(songMeta.Artist);
         string titleEscaped = EscapeSqlStringArgument(songMeta.Title);
@@ -76,11 +74,11 @@ public class UltraStarDeluxeHighscoreConnector : IHighScoreReader, IOnDisableMod
         List<ScoreRecordQueryData> dbRecords = dbReader.ToList<ScoreRecordQueryData>();
         if (dbRecords.IsNullOrEmpty())
         {
-            Log.Verbose(() => $"No USDX high score found for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+            Log.Verbose(() => $"No USDX high score found for '{songMeta.GetArtistDashTitle()}'");
             return null;
         }
 
-        Log.Verbose(() => $"Found USDX high scores found for '{SongMetaUtils.GetArtistDashTitle(songMeta)}': {dbRecords.Count}, {JsonConverter.ToJson(dbRecords)}");
+        Log.Verbose(() => $"Found USDX high scores found for '{songMeta.GetArtistDashTitle()}': {dbRecords.Count}, {JsonConverter.ToJson(dbRecords)}");
         HighScoreRecord highScoreRecord = new HighScoreRecord();
         foreach(ScoreRecordQueryData dbRecord in dbRecords)
         {

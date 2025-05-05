@@ -1,7 +1,11 @@
 name: Jukebox and Sing
-version: 1.0.2
+version: 1.0.3
 description : |
-  Plays next songs automatically and shows the singing UI only when mic input is received.
+  Plays next songs automatically
+  and shows the singing UI only when mic input is received.
+  
   Good for spontaneous singing on parties.
+
+  Skip the current song via Shift+S or Shift+Right_Arrow
 authors:
   - email@melodymania.org

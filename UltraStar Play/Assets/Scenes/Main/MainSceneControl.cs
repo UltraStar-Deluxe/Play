@@ -5,8 +5,6 @@ using SteamOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -18,10 +16,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
-        hasLoggedVersionInfo = false;
         lastSupportTheProjectIconHighlightTimeInSeconds = 0;
     }
-    private static bool hasLoggedVersionInfo;
 
     private const float SupportTheProjectIconHighlightThresholdTimeInSeconds = 60 * 15;
     private static float lastSupportTheProjectIconHighlightTimeInSeconds;
@@ -114,7 +110,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     private ThemeManager themeManager;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private MicSampleRecorderManager micSampleRecorderManager;
@@ -126,11 +122,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     private SongIssueManager songIssueManager;
 
     private MessageDialogControl quitGameDialogControl;
-    private NewSongDialogControl newSongDialogControl;
-    private OnlineMultiplayerConnectionDialogControl onlineMultiplayerConnectionDialogControl;
     private MessageDialogControl supportTheProjectDialogControl;
+    private CreateSongDialogControl createSongDialogControl;
+    private OnlineMultiplayerConnectionDialogControl onlineMultiplayerConnectionDialogControl;
     private SettingsProblemHintControl settingsProblemHintControl;
     private readonly BuildInfoUiControl buildInfoUiControl = new();
+
+    private bool hasHighlightedShopButton;
 
     public void OnInjectionFinished()
     {
@@ -141,12 +139,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     private void Start()
     {
-        if (!hasLoggedVersionInfo)
-        {
-            hasLoggedVersionInfo = true;
-            Debug.Log("Version info: " + versionPropertiesTextAsset.text);
-        }
-
         startButton.RegisterCallbackButtonTriggered(_ => OpenSongSelectScene());
         startButton.Focus();
         partyButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.PartyModeScene));
@@ -170,7 +162,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         semanticVersionLabel.RegisterCallback<PointerDownEvent>(_ =>
         {
             versionDetailsContainer.ShowByDisplay();
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(10, () => versionDetailsContainer.HideByDisplay()));
+            AwaitableUtils.ExecuteAfterDelayInSecondsAsync(10, () => versionDetailsContainer.HideByDisplay());
             Debug.Log("Version info: " + versionPropertiesTextAsset.text);
             ClipboardUtils.CopyToClipboard(versionPropertiesTextAsset.text);
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
@@ -185,41 +177,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         micSampleRecorderManager.ConnectedMicDevicesChangesStream
             .Subscribe(_ => UpdateSettingsProblemHint())
             .AddTo(gameObject);
-    }
-
-    private void Update()
-    {
-        if (Keyboard.current.leftAltKey.wasPressedThisFrame)
-        {
-            AnimationUtils.HighlightIconWithBounce(gameObject, supportTheProjectIcon);
-        }
-    }
-
-    private void HighlightSupportTheProjectButton()
-    {
-        if (lastSupportTheProjectIconHighlightTimeInSeconds == 0
-            || TimeUtils.IsDurationAboveThresholdInSeconds(lastSupportTheProjectIconHighlightTimeInSeconds, SupportTheProjectIconHighlightThresholdTimeInSeconds))
-        {
-            lastSupportTheProjectIconHighlightTimeInSeconds = Time.time;
-            AnimationUtils.HighlightIconWithBounce(gameObject, supportTheProjectIcon);
-        }
-    }
-
-    private void OpenSupportTheProjectDialog()
-    {
-        if (supportTheProjectDialogControl != null)
-        {
-            return;
-        }
-
-        supportTheProjectDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_supportTheProjectDialog_title));
-        supportTheProjectDialogControl.Message = Translation.Get(R.Messages.mainScene_supportTheProjectDialog_message);
-        supportTheProjectDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
-            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_melodyMania)));
-        supportTheProjectDialogControl.AddButton(Translation.Get(R.Messages.action_buyOnSteam),
-            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_melodyMania_onSteam)));
-        supportTheProjectDialogControl.DialogClosedEventStream
-            .Subscribe(_ => supportTheProjectDialogControl = null);
     }
 
     private void OpenOnlineMultiplayerConnectionDialog()
@@ -260,7 +217,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             .Subscribe(_ => OnBack());
     }
 
-    public void CloseQuitGameDialog()
+    private void CloseQuitGameDialog()
     {
         if (quitGameDialogControl == null)
         {
@@ -269,17 +226,17 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
         quitGameDialogControl.CloseDialog();
         // Must not immediately focus next button or it will trigger as well
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => quitButton.Focus()));
+        AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () => quitButton.Focus());
     }
 
-    public void OpenQuitGameDialog()
+    private void OpenQuitGameDialog()
     {
         if (quitGameDialogControl != null)
         {
             return;
         }
 
-        quitGameDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_quitDialog_title));
+        quitGameDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_quitDialog_title));
         quitGameDialogControl.DialogClosedEventStream.Subscribe(_ => quitGameDialogControl = null);
         quitGameDialogControl.Message = Translation.Get(R.Messages.mainScene_quitDialog_message);
 
@@ -287,9 +244,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         quitGameDialogControl.AddButton(Translation.Get(R.Messages.action_quit), _ => ApplicationUtils.QuitOrStopPlayMode());
     }
 
-    public void OpenNewSongDialog()
+    private void OpenNewSongDialog()
     {
-        if (newSongDialogControl != null)
+        if (createSongDialogControl != null)
         {
             return;
         }
@@ -297,16 +254,41 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         VisualElement visualElement = newSongDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(visualElement);
 
-        newSongDialogControl = injector
+        createSongDialogControl = injector
             .WithRootVisualElement(visualElement)
-            .CreateAndInject<NewSongDialogControl>();
+            .CreateAndInject<CreateSongDialogControl>();
 
-        newSongDialogControl.DialogClosedEventStream
+        createSongDialogControl.DialogClosedEventStream
             .Subscribe(_ =>
             {
-                newSongDialogControl = null;
+                createSongDialogControl = null;
                 createSongButton.Focus();
             });
+    }
+
+    private void HighlightSupportTheProjectButton()
+    {
+        if (lastSupportTheProjectIconHighlightTimeInSeconds == 0
+            || TimeUtils.IsDurationAboveThresholdInSeconds(lastSupportTheProjectIconHighlightTimeInSeconds, SupportTheProjectIconHighlightThresholdTimeInSeconds))
+        {
+            lastSupportTheProjectIconHighlightTimeInSeconds = Time.time;
+            AnimationUtils.HighlightIconWithBounce(gameObject, supportTheProjectIcon);
+        }
+    }
+
+    private void OpenSupportTheProjectDialog()
+    {
+        if (supportTheProjectDialogControl != null)
+        {
+            return;
+        }
+
+        supportTheProjectDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_supportTheProjectDialog_title));
+        supportTheProjectDialogControl.DialogClosedEventStream.Subscribe(_ => supportTheProjectDialogControl = null);
+        supportTheProjectDialogControl.Message = Translation.Get(R.Messages.mainScene_supportTheProjectDialog_message);
+
+        supportTheProjectDialogControl.AddButton(Translation.Get(R.Messages.action_openMerchandiseShop),
+            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_merchandiseShop)));
     }
 
     public List<IBinding> GetBindings()

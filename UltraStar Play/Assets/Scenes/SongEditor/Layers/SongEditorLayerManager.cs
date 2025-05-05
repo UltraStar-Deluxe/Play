@@ -14,7 +14,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     private Dictionary<EVoiceId, SongEditorVoiceLayer> voiceIdToLayerMap;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private Settings settings;
@@ -34,12 +34,12 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     {
         songEditorLayerNameToColor = themeManager.GetSongEditorLayerColors();
         layerEnumToLayerMap = CreateLayerEnumToLayerMap();
-        voiceIdToLayerMap = CreateVoiceIdToLayerMap();songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+        voiceIdToLayerMap = CreateVoiceIdToLayerMap();songMetaChangedEventStream.Subscribe(OnSongMetaChanged);
     }
 
-    private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
+    private void OnSongMetaChanged(SongMetaChangedEvent changedEvent)
     {
-        if (changeEvent is MovedNotesToVoiceEvent mntve)
+        if (changedEvent is MovedNotesToVoiceEvent mntve)
         {
             mntve.Notes
                 .Where(note => note.Sentence != null)

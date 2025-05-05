@@ -4,49 +4,41 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using Responsible.Unity;
 using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using static ConditionUtils;
 
-public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjection
+public abstract class AbstractPlayModeTest : AbstractInputSystemTest, INeedInjection
 {
     protected virtual string TestSceneName => "CommonTestScene";
+    protected virtual string InitialSetUpSceneName => "CommonTestScene";
 
     private IDisposable sceneInjectionFinishedSubscription;
 
     [UnitySetUp]
-    public IEnumerator UnitySetUp()
+    public IEnumerator UnitySetUp() => UnitySetUpAsync();
+    private async Awaitable UnitySetUpAsync()
     {
-        LogAssert.ignoreFailingMessages = true;
-
-        yield return SetUpTestFixture();
-
-        yield return LoadTestScene();
-        yield return new WaitForEndOfFrame();
+        await SetUpTestFixtureAsync();
+        await LoadTestSceneAsync();
     }
 
     [UnityTearDown]
-    public IEnumerator UnityTearDown()
+    public IEnumerator UnityTearDown() => UnityTearDownAsync();
+    private async Awaitable UnityTearDownAsync()
     {
-        LogAssert.ignoreFailingMessages = true;
-        yield return TearDownTestFixture();
+        await TearDownTestFixtureAsync();
     }
 
-    private IEnumerator SetUpTestFixture()
+    private async Awaitable SetUpTestFixtureAsync()
     {
-        SettingsManager.SettingsLoaderSaver = new TestSettingsLoaderSaver();
-        StatisticsManager.StatisticsLoaderSaver = new TestStatisticsLoaderSaver();
-        IMicrophoneAdapter.Instance = new SimulatedMicrophoneAdapter();
+        Debug.Log($"{this}.{nameof(SetUpTestFixtureAsync)}");
 
-        sceneInjectionFinishedSubscription = UltraStarPlaySceneInjectionManager
-            .SceneInjectionFinishedEventStream
-            .Subscribe(evt => evt.SceneInjector.Inject(this));
-
-        yield return LoadInitialScene();
+        await LoadInitialSetUpSceneAsync();
 
         AssertUtils.HasType<TestSettings>(SettingsManager.Instance.Settings);
         ConfigureTestSettings(SettingsManager.Instance.Settings as TestSettings);
@@ -54,30 +46,42 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
         AssertUtils.HasType<TestStatistics>(StatisticsManager.Instance.Statistics);
         ConfigureTestStatistics(StatisticsManager.Instance.Statistics as TestStatistics);
 
-        AssertMicSampleRecorderIsSimulated();
+        AssertUtils.HasType<SimulatedMicrophoneAdapter>(IMicrophoneAdapter.Instance);
+        ConfigureMicSampleRecorderSimulation();
 
         ConfigureAndPrepareTestSongs(SettingsManager.Instance.Settings);
 
+        sceneInjectionFinishedSubscription = UltraStarPlaySceneInjectionManager
+            .SceneInjectionFinishedEventStream
+            .Subscribe(evt =>
+            {
+                Debug.Log($"Injecting test class {this}");
+                try
+                {
+                    evt.SceneInjector.Inject(this);
+                    sceneInjectionFinishedSubscription?.Dispose();
+                }
+                catch (InjectionException e)
+                {
+                    // Only log warning for failed injection
+                    // because it is expected when loading intermediate scenes before the final test scene.
+                    Debug.LogWarning(e.Message);
+                }
+            });
+
         InputFixture = new InputTestFixture();
         Keyboard = InputSystem.GetDevice<Keyboard>();
-
-        Executor = new UnityTestInstructionExecutor();
     }
 
-    private IEnumerator TearDownTestFixture()
+    private async Awaitable TearDownTestFixtureAsync()
     {
-        SettingsManager.SettingsLoaderSaver = null;
-        StatisticsManager.StatisticsLoaderSaver = null;
-        IMicrophoneAdapter.Instance = new PortAudioForUnityMicrophoneAdapter();
+        Debug.Log($"{this}.{nameof(TearDownTestFixtureAsync)}");
         sceneInjectionFinishedSubscription?.Dispose();
-        DeleteAllGameObjects();
-        yield return null;
+        await DeleteAllGameObjectsAsync();
     }
 
-    private void AssertMicSampleRecorderIsSimulated()
+    private void ConfigureMicSampleRecorderSimulation()
     {
-        AssertUtils.HasType<SimulatedMicrophoneAdapter>(IMicrophoneAdapter.Instance);
-
         string simulatedMicName = IMicrophoneAdapter.Instance.Devices.FirstOrDefault();
         MicProfile simulatedMicProfile = new MicProfile(simulatedMicName);
         MicSampleRecorder simulatedMicSampleRecorder = MicSampleRecorderManager.Instance.GetOrCreateMicSampleRecorder(simulatedMicProfile);
@@ -137,7 +141,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
 
     private void CopyTestSongMediaFilesToTargetFolder(string sourceSongFilePath, string targetSongFilePath)
     {
-        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(sourceSongFilePath, out List<SongIssue> songIssues);
+        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(sourceSongFilePath).SongMeta;
         CopyTestSongMediaFileToTargetFolder(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio), targetSongFilePath);
         CopyTestSongMediaFileToTargetFolder(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Video), targetSongFilePath);
         CopyTestSongMediaFileToTargetFolder(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Cover), targetSongFilePath);
@@ -193,38 +197,70 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest, INeedInjec
         SimulatedMicrophoneAdapter.SetSimulatedDevicePitchInHz(playerProfile.Name, 440);
     }
 
-    private IEnumerator LoadInitialScene()
+    protected virtual async Awaitable LoadTestSceneAsync()
+    {
+        if (TestSceneName.IsNullOrEmpty())
+        {
+            Debug.Log("Skip loading test scene, TestSceneName is null or empty.");
+            return;
+        }
+
+        await LoadSceneByNameAsync(TestSceneName);
+    }
+
+    private async Awaitable LoadInitialSetUpSceneAsync()
     {
         // Start with a simple scene that has all common objects but does not require a special game state.
-        yield return LoadSceneByName("CommonTestScene");
+        await LoadSceneByNameAsync(InitialSetUpSceneName);
     }
 
-    private IEnumerator LoadTestScene()
-    {
-        yield return LoadSceneByName(TestSceneName);
-    }
-
-    private static IEnumerator LoadSceneByName(string sceneName)
+    private async Awaitable LoadSceneByNameAsync(string sceneName)
     {
         if (sceneName.IsNullOrEmpty())
         {
-            yield break;
+            return;
         }
 
         Debug.Log($"Loading test scene {sceneName}");
         SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
-        yield return new WaitUntilWithTimeout(
-            $"Wait until test scene loaded: sceneName '{sceneName}'",
-            TimeSpan.FromSeconds(10),
-            () => SceneManager.GetActiveScene().name == sceneName);
+        await WaitForConditionAsync(
+            () => SceneManager.GetActiveScene().name == sceneName,
+            new WaitForConditionConfig {description = $"test scene loaded: sceneName '{sceneName}'"});
+
+        await WaitForConditionAsync(
+            () => DontDestroyOnLoadManager.Instance != null,
+            new WaitForConditionConfig { description = "DontDestroyOnLoadManager instance is present" });
     }
 
-    private void DeleteAllGameObjects()
+    private async Awaitable DeleteAllGameObjectsAsync()
     {
+        List<GameObject> gameObjects = new List<GameObject>();
+
+        // Destroy regular objects in scene
         foreach (GameObject gameObject in SceneManager.GetActiveScene().GetRootGameObjects())
+        {
+            gameObjects.Add(gameObject);
+        }
+
+        // Destroy DontDestroyOnLoad objects
+        if (DontDestroyOnLoadManager.Instance != null)
+        {
+            gameObjects.Add(DontDestroyOnLoadManager.Instance.gameObject);
+        }
+
+        foreach (GameObject gameObject in gameObjects)
         {
             GameObject.Destroy(gameObject);
         }
-        GameObject.Destroy(DontDestroyOnLoadManager.Instance.gameObject);
+
+        // Wait for objects to be destroyed
+        await WaitForConditionAsync(() =>
+        {
+            Debug.Log("Waiting for GameObjects to be destroyed.");
+            return gameObjects.AllMatch(destroyedGameObject => destroyedGameObject == null);
+        });
+        Debug.Log("All GameObjects have been destroyed.");
+
+        await Awaitable.NextFrameAsync();
     }
 }

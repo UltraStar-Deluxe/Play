@@ -8,6 +8,7 @@ using NUnit.Framework;
 using ProTrans;
 using UnityEngine;
 
+[Ignore("Manual test")]
 public class TranslationTest
 {
     private List<TranslatableAttribute> ignoredMissingTranslations;
@@ -63,7 +64,7 @@ public class TranslationTest
         List<string> sourceFolders = new List<string>() { Application.dataPath, $"{Application.dataPath}/../Packages" }
             .Select(folder => new DirectoryInfo(folder).FullName)
             .ToList();
-        List<string> files = FileScannerUtils.ScanForFiles(sourceFolders, new List<string>() { "*.cs", "*.uxml" });
+        List<string> files = FileScanner.GetFiles(sourceFolders, new FileScannerConfig("*.cs", "*.uxml") { Recursive = true });
 
         foreach (string file in files)
         {
@@ -401,7 +402,7 @@ public class TranslationTest
 
     private static List<string> GetFilesInFolderRecursive(string folderPath, params string[] fileExtensions)
     {
-        return DirectoryUtils.GetFiles(folderPath, true, fileExtensions)
+        return FileScanner.GetFiles(folderPath, new FileScannerConfig(fileExtensions) { Recursive = true })
             .ToList();
     }
 

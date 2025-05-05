@@ -1,12 +1,22 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
-        <ui:Label text="Connected Apps: 99" name="companionClientCountLabel" class="secondaryFontColor" style="display: none;" />
-        <ui:VisualElement name="noCompanionClientsContainer" style="align-items: center;">
-            <MaterialIcon tabindex="-1" name="noCompanionClientsIcon" icon="phone_iphone" class="noBackgroundInHierarchy" style="font-size: 64px;" />
-            <ui:Label text="$options_companionApp_noConnectedApps" display-tooltip-when-elided="true" name="noCompanionClientsLabel" class="largerFont noBackgroundInHierarchy" style="white-space: normal; display: flex; -unity-text-align: middle-left; -unity-font-style: bold;" />
-            <ui:Label text="$options_companionApp_noConnectedApps_hint" name="tryAddSongsLabel" class="secondaryFontColor mt-2 mb-1 noBackgroundInHierarchy" style="white-space: normal; -unity-text-align: middle-left;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="songScanInProgressContainer" picking-mode="Ignore" style="position: absolute; width: 100%; max-width: 33%; justify-content: center; align-items: flex-start;" />
-        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="companionClientList" style="width: 100%; min-height: 50px; flex-grow: 1; margin-bottom: 20px;" />
+        <ui:ScrollView>
+            <ui:Label text="Connected Apps: 99" name="companionClientCountLabel" class="secondaryFontColor" style="display: none;" />
+            <ui:VisualElement name="noCompanionClientsContainer" style="align-items: center;">
+                <MaterialIcon tabindex="-1" name="noCompanionClientsIcon" icon="phone_iphone" class="noBackgroundInHierarchy" style="font-size: 64px;" />
+                <ui:Label text="$options_companionApp_noConnectedApps" display-tooltip-when-elided="true" name="noCompanionClientsLabel" class="largerFont noBackgroundInHierarchy" style="white-space: normal; display: flex; -unity-text-align: middle-left; -unity-font-style: bold;" />
+                <ui:Label text="$options_companionApp_noConnectedApps_hint" name="tryAddSongsLabel" class="secondaryFontColor mt-2 mb-1 noBackgroundInHierarchy" style="white-space: normal; -unity-text-align: middle-left;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="companionClientList" style="width: 100%; min-height: 50px; flex-grow: 1; margin-bottom: 20px;" />
+            <AccordionItem name="permissionsAccordionItem" label="Permissions" content-visible="false">
+                <ui:Toggle label="$options_companionApp_requirePermissions" name="requireCompanionClientPermissionsToggle" class="mb-3" />
+                <ui:Label text="Default permissions for new connections" name="defaultPermissionsTitle" class="my-3" />
+                <ui:VisualElement name="defaultPermissionsContainer" class="child-mb-3" style="background-color: rgba(0, 0, 0, 0);">
+                    <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" class="noBackgroundInHierarchy" />
+                    <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" class="noBackgroundInHierarchy" />
+                    <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" class="noBackgroundInHierarchy" />
+                </ui:VisualElement>
+            </AccordionItem>
+        </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

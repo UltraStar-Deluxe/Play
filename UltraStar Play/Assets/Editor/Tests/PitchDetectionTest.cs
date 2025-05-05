@@ -17,7 +17,7 @@ public class PitchDetectionTest
         ShouldDetectPitch(sampleRateHz => new DywaAudioSamplesAnalyzer(sampleRateHz, 2048));
     }
 
-    private void ShouldDetectPitch(Func<int, IAudioSamplesAnalyzer> audioSamplesAnalyzerProvider)
+    private async void ShouldDetectPitch(Func<int, IAudioSamplesAnalyzer> audioSamplesAnalyzerProvider)
     {
         MicProfile micProfile = CreateDummyMicProfile();
 
@@ -35,7 +35,7 @@ public class PitchDetectionTest
         {
             // Load the audio clip
             string uri = pathAndNoteName.Key;
-            AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(uri, false);
+            AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(uri, false);
             float[] samples = new float[audioClip.samples];
             audioClip.GetData(samples, 0);
 

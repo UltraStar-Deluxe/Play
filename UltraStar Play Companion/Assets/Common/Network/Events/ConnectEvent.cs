@@ -8,13 +8,13 @@ public class ConnectEvent
     public int HttpServerPort { get; private set; }
     public string ErrorMessage { get; private set; }
     public IPEndPoint ServerIpEndPoint { get; private set; }
-    public List<HttpApiPermission> Permissions { get; private set; }
+    public List<RestApiPermission> Permissions { get; private set; }
     public List<GameRoundModifierDto> AvailableGameRoundModifierDtos { get; private set; }
 
     public ConnectEvent(
         int httpServerPort,
         IPEndPoint serverIpEndPoint,
-        List<HttpApiPermission> permissions,
+        List<RestApiPermission> permissions,
         List<GameRoundModifierDto> availableGameRoundModifierDtos)
     {
         IsSuccess = true;

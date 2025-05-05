@@ -1,5 +1,5 @@
 ﻿using UniInject;
-using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinishedListener
@@ -57,15 +57,16 @@ public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinish
         dialogMessage.SetTranslatedText(Translation.Empty);
     }
 
-    public void AddButton(Button button)
+    public async void AddButton(Button button)
     {
         dialogButtonContainer.Add(button);
 
         button.focusable = true;
         button.Focus();
+
         // Sometimes Unity cannot focus the button until it has been rendered once.
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
-            () => button.Focus()));
+        await Awaitable.NextFrameAsync();
+        button.Focus();
     }
 
     public Button AddButton(Translation text, EventCallback<EventBase> callback)

@@ -1,5 +1,5 @@
-﻿#TITLE:M4V Format Test
-#ARTIST:Test Artist
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
 #MP3:m4v.m4v
 #VIDEO:m4v.m4v
 #BPM:200

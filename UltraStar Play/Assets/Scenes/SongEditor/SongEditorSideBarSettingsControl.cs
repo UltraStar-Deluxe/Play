@@ -198,7 +198,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private HyphenateNotesAction hyphenateNotesAction;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     private LabeledChooserControl<MicProfile> micDeviceChooserControl;
     private EnumChooserControl<ESongEditorSamplesSource> playbackAudioChooserControl;
@@ -419,7 +419,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.PitchDetectionSamplesSource,
             newValue => settings.SongEditorSettings.PitchDetectionSamplesSource = newValue);
 
-        audioSeparationButton.RegisterCallbackButtonTriggered(_ =>
+        audioSeparationButton.RegisterCallbackButtonTriggered(async _ =>
         {
             if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
                 && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
@@ -427,7 +427,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingInstrumentalAudio));
                 return;
             }
-            audioSeparationManager.ProcessSongMeta(songMeta, true);
+            await audioSeparationManager.ProcessSongMetaJob(songMeta, true).GetResultAsync();
             audioSeparationButton.SetEnabled(false);
         });
         if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
@@ -516,7 +516,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         }
 
         hyphenateNotesAction.ExecuteAndNotify(songMeta, selectedNotes, hyphenator);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 
     private void AddSpaceBetweenNotesInSelection()

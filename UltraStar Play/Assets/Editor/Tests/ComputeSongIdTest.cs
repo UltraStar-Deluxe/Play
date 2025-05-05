@@ -11,7 +11,7 @@ public class ComputeSongIdTest
     {
         string originalFilePath = $"{folderPath}/ScoreRelevantSongHash.txt";
         UltraStarSongMeta songMeta = LoadSong(originalFilePath);
-        string computeScoreRelevantSongHash = SongMetaUtils.ComputeScoreRelevantSongHash(songMeta);
+        string computeScoreRelevantSongHash = SongIdComputer.ComputeScoreRelevantSongHash(songMeta);
 
         Assert.AreEqual("881be91e5214e6b381d467595789c5a9", computeScoreRelevantSongHash,
             "ScoreRelevantSongHash calculation changed. " +
@@ -20,6 +20,6 @@ public class ComputeSongIdTest
 
     private UltraStarSongMeta LoadSong(string path)
     {
-        return UltraStarSongParser.ParseFile(path, out List<SongIssue> songIssues, null, true);
+        return UltraStarSongParser.ParseFile(path).SongMeta;
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UniRx;
+using UnityEngine;
 
 public class SongCoverAndBackgroundImageProviderFromFolder : ISongCoverImageProvider, ISongBackgroundImageProvider
 {
@@ -16,47 +17,47 @@ public class SongCoverAndBackgroundImageProviderFromFolder : ISongCoverImageProv
     private Dictionary<string, string> folderToCoverUri = new Dictionary<string, string>();
     private Dictionary<string, string> folderToBackgroundUri = new Dictionary<string, string>();
 
-    public IObservable<string> GetCoverImageUri(SongMeta songMeta)
+    public async Awaitable<string> GetCoverImageUriAsync(SongMeta songMeta)
     {
         // Prefer image files that have "cover" or similar in their name.
         List<string> searchTerms = new List<string>() { "cover", "front", "album", "co" };
-        return GetImageUriPreferSearchTerms(songMeta, searchTerms, folderToCoverUri);
+        return GetImageUriPreferSearchTermsAsync(songMeta, searchTerms, folderToCoverUri);
     }
 
-    public IObservable<string> GetBackgroundImageUri(SongMeta songMeta)
+    public async Awaitable<string> GetBackgroundImageUriAsync(SongMeta songMeta)
     {
         // Prefer image files that have "cover" or similar in their name.
         List<string> searchTerms = new List<string>() { "background", "back", "bg" };
-        return GetImageUriPreferSearchTerms(songMeta, searchTerms, folderToBackgroundUri);
+        return GetImageUriPreferSearchTermsAsync(songMeta, searchTerms, folderToBackgroundUri);
     }
 
-    private IObservable<string> GetImageUriPreferSearchTerms(SongMeta songMeta, List<string> searchTerms, Dictionary<string, string> folderToUri)
+    private string GetImageUriPreferSearchTermsAsync(SongMeta songMeta, List<string> searchTerms, Dictionary<string, string> folderToUri)
     {
         string directoryPath = SongMetaUtils.GetDirectoryPath(songMeta);
         if (songMeta == null
             || !DirectoryUtils.Exists(directoryPath))
         {
-            return Observable.Empty<string>();
+            return "";
         }
 
         if (folderToUri.TryGetValue(directoryPath, out string uri))
         {
             if (uri.IsNullOrEmpty())
             {
-                return Observable.Empty<string>();
+                return "";
             }
             else
             {
-                return Observable.Return<string>(uri);
+                return uri;
             }
         }
 
-        List<string> imageFiles = FileScannerUtils.ScanForFiles(new List<string>() { directoryPath }, imageFileExtensionPatterns);
+        List<string> imageFiles = FileScanner.GetFiles(directoryPath, new FileScannerConfig(imageFileExtensionPatterns) { Recursive = true } );
         if (imageFiles.IsNullOrEmpty())
         {
             // Cache the value for following calls.
             folderToUri[directoryPath] = "";
-            return Observable.Empty<string>();
+            return "";
         }
 
         string finalImageFile = imageFiles.FirstOrDefault(file =>
@@ -71,9 +72,9 @@ public class SongCoverAndBackgroundImageProviderFromFolder : ISongCoverImageProv
 
         if (finalImageFile.IsNullOrEmpty())
         {
-            return Observable.Empty<string>();
+            return "";
         }
 
-         return Observable.Return<string>(finalImageFile);
+         return finalImageFile;
     }
 }

@@ -2,6 +2,7 @@ using System;
 using Steamworks;
 using UniInject;
 using UniRx;
+using Unity.Netcode;
 using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -9,7 +10,7 @@ using UnityEngine;
 
 public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static SteamManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamManager>();
+    public static SteamManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SteamManager>();
 
     public bool IsConnectedToSteam { get; private set; }
     public SteamId PlayerSteamId { get; private set; }
@@ -48,6 +49,10 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             }
 
             // SteamClient is initialized in FacepunchTransport.Awake()
+            if (!SteamClient.IsValid)
+            {
+                throw new SteamException("SteamClient.IsValid is false");
+            }
             if (!SteamClient.IsLoggedOn)
             {
                 throw new SteamException("SteamClient.IsLoggedOn is false");
@@ -63,8 +68,6 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
                 Debug.LogError("Connected to Steam but failed to request current stats");
             }
 
-            steamAchievementManager.SetAvailableAchievements(SteamUserStats.Achievements);
-
             steamWorkshopManager.DownloadWorkshopItems();
 
             connectedToSteamEventStream.OnNext(VoidEvent.instance);
@@ -72,9 +75,13 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         }
         catch (Exception e)
         {
-            Debug.LogException(e);
-            Debug.LogError($"Failed to initialize Steam, maybe not connected to Steam client: {e.Message}");
             IsConnectedToSteam = false;
+            if (NetworkManager.Singleton == null
+                || NetworkManager.Singleton.LogLevel <= LogLevel.Error)
+            {
+                Debug.LogException(e);
+                Debug.LogError($"Failed to initialize Steam, maybe not connected to Steam client: {e.Message}");
+            }
         }
     }
 

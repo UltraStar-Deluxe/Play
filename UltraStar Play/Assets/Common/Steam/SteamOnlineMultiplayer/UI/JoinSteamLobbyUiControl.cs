@@ -49,59 +49,57 @@ namespace SteamOnlineMultiplayer
             UpdateHostedGameList();
         }
 
-        private void JoinGameOnSteam(Lobby lobby)
+        private async void JoinGameOnSteam(Lobby lobby)
         {
-            ObservableUtils.RunOnNewTaskAsObservable(async () =>
-                    {
-                        return await steamLobbyManager.JoinLobbyAsync(lobby);
-                    },
-                    Disposable.Empty)
-                .ObserveOnMainThread()
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to join lobby: {ex.Message}");
-                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_failedToJoinLobby));
-                })
-                .Select(joinedLobby =>
-                {
-                    ulong joinedLobbyOwnerId = joinedLobby.Owner.Id;
-                    if (joinedLobbyOwnerId <= 0)
-                    {
-                        throw new OnlineMultiplayerException($"Successfully joined lobby '{joinedLobby.GetName()}' with id {joinedLobby.Id} but owner id is 0.");
-                    }
+            Lobby joinedLobby;
+            try
+            {
+                await Awaitable.BackgroundThreadAsync();
+                joinedLobby = await steamLobbyManager.JoinLobbyAsync(lobby);
+                await Awaitable.MainThreadAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to join lobby: {ex.Message}");
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_error_failedToJoinLobby));
+                return;
+            }
 
-                    Debug.Log($"Successfully joined lobby '{joinedLobby.GetName()}' with id {joinedLobby.Id} and owner {joinedLobby.Owner}. Starting Unity Netcode client with FacepunchTransport.");
-                    steamLobbyMemberManager.StartNetcodeNetworkManagerClient(joinedLobbyOwnerId);
-                    return true;
-                })
-                .Subscribe(_ =>
-                {
-                    NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_joinSuccess));
-                });
+            ulong joinedLobbyOwnerId = joinedLobby.Owner.Id;
+            if (joinedLobbyOwnerId <= 0)
+            {
+                throw new OnlineMultiplayerException($"Successfully joined lobby '{joinedLobby.GetName()}' with id {joinedLobby.Id} but owner id is 0.");
+            }
+
+            Debug.Log($"Successfully joined lobby '{joinedLobby.GetName()}' with id {joinedLobby.Id} and owner {joinedLobby.Owner}. Starting Unity Netcode client with FacepunchTransport.");
+            steamLobbyMemberManager.StartNetcodeNetworkManagerClient(joinedLobbyOwnerId);
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.onlineGame_joinSuccess));
         }
 
-        private void UpdateHostedGameList()
+        private async void UpdateHostedGameList()
         {
             string lobbyPassword = JoinGamePassword;
 
             hostedGameList.Clear();
 
-            ObservableUtils.RunOnNewTaskAsObservable(async () =>
-                {
-                    Lobby[] lobbies = await steamLobbyManager.GetLobbiesAsync(lobbyPassword);
-                    return lobbies;
-                },
-                Disposable.Empty)
-                .ObserveOnMainThread()
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                        "reason", ex.Message));
-                    hostedGameList.Add(new Label("Failed to fetch lobbies"));
-                })
-                .Subscribe(lobbies => FillHostedGameList(lobbies));
+            Lobby[] lobbies;
+            try
+            {
+                await Awaitable.BackgroundThreadAsync();
+                lobbies = await steamLobbyManager.GetLobbiesAsync(lobbyPassword);
+                await Awaitable.MainThreadAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                    "reason", ex.Message));
+                hostedGameList.Add(new Label("Failed to fetch lobbies"));
+                return;
+            }
+
+            FillHostedGameList(lobbies);
         }
 
         private void FillHostedGameList(Lobby[] lobbies)

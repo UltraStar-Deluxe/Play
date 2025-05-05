@@ -78,7 +78,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         statusLabel.SetTranslatedText(Translation.Empty);
     }
 
-    public void PublishWorkshopItem()
+    public async void PublishWorkshopItem()
     {
         ulong itemId = workshopItemChooserControl.Selection.IsNewItem
             ? 0
@@ -102,55 +102,59 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         }
 
         statusLabel.SetTranslatedText(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_uploading));
-        ObservableUtils.RunOnNewTaskAsObservable<ulong>(async () =>
+
+        try
+        {
+            ulong newlyPublishedFileId = await PublishWorkshopItemAsync(itemId, contentFolderPath, previewImagePath, title, description, tags);
+
+            ShowMessage(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_success));
+
+            // Update dropdown and select newly created Workshop Item
+            UpdateWorkshopItemChooserEntries();
+
+            WorkshopItemChooserEntry newlyPublishedWorkshopItemChooserEntry = workshopItemChooserControl.Items
+                .FirstOrDefault(item => !item.IsNewItem
+                                        && item.SteamWorkshopItem.Id.Value == newlyPublishedFileId);
+            if (newlyPublishedWorkshopItemChooserEntry != null)
             {
-                PublishResult publishResult = await steamWorkshopManager.PublishWorkshopItemAsync(
-                    itemId,
-                    contentFolderPath,
-                    previewImagePath,
-                    title,
-                    description,
-                    tags,
-                    progress => ShowProgress((int)(progress * 100)));
+                workshopItemChooserControl.Selection = newlyPublishedWorkshopItemChooserEntry;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to upload Steam Workshop item: {ex.Message}");
+            ShowMessage(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_error,
+                "reason", ex.Message));
+        }
+    }
 
-                if (!publishResult.Success)
-                {
-                    Debug.LogError($"Steam Workshop publish result is {publishResult.Result.ToString()}");
-                    throw new SteamException(Translation.Get(R.Messages.steamWorkshop_uploadDialog_exception_notSuccessful,
-                        "publishResult", publishResult.Result.ToString()));
-                }
-                Debug.Log($"Successfully uploaded Steam Workshop Item. Result: {publishResult.Result}, FileId: {publishResult.FileId}");
+    private async Awaitable<ulong> PublishWorkshopItemAsync(ulong itemId, string contentFolderPath, string previewImagePath, string title, string description,
+        List<string> tags)
+    {
+        PublishResult publishResult = await steamWorkshopManager.PublishWorkshopItemAsync(
+            itemId,
+            contentFolderPath,
+            previewImagePath,
+            title,
+            description,
+            tags,
+            progress => ShowProgress((int)(progress * 100)));
 
-                ApplicationUtils.OpenUrl($"https://steamcommunity.com/sharedfiles/filedetails/?id={publishResult.FileId}");
+        if (!publishResult.Success)
+        {
+            Debug.LogError($"Steam Workshop publish result is {publishResult.Result.ToString()}");
+            throw new SteamException(Translation.Get(R.Messages.steamWorkshop_uploadDialog_exception_notSuccessful,
+                "publishResult", publishResult.Result.ToString()));
+        }
+        Debug.Log($"Successfully uploaded Steam Workshop Item. Result: {publishResult.Result}, FileId: {publishResult.FileId}");
 
-                ShowMessage(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_downloading));
+        ApplicationUtils.OpenUrl($"https://steamcommunity.com/sharedfiles/filedetails/?id={publishResult.FileId}");
 
-                await steamWorkshopManager.SubscribeAndDownloadWorkshopItemAsync(publishResult.FileId);
-                return publishResult.FileId;
-            })
-            .ObserveOnMainThread()
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to upload Steam Workshop item: {ex.Message}");
-                ShowMessage(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_error,
-                    "reason", ex.Message));
-            })
-            .Subscribe(newlyPublishedFileId =>
-            {
-                ShowMessage(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_success));
+        ShowMessage(Translation.Get(R.Messages.steamWorkshop_uploadDialog_status_downloading));
 
-                // Update dropdown and select newly created Workshop Item
-                UpdateWorkshopItemChooserEntries();
-
-                WorkshopItemChooserEntry newlyPublishedWorkshopItemChooserEntry = workshopItemChooserControl.Items
-                    .FirstOrDefault(item => !item.IsNewItem
-                                            && item.SteamWorkshopItem.Id.Value == newlyPublishedFileId);
-                if (newlyPublishedWorkshopItemChooserEntry != null)
-                {
-                    workshopItemChooserControl.Selection = newlyPublishedWorkshopItemChooserEntry;
-                }
-            });
+        await steamWorkshopManager.SubscribeAndDownloadWorkshopItemAsync(publishResult.FileId);
+        return publishResult.FileId;
     }
 
     private void OnContentFolderChanged(string newContentFolder)
@@ -351,9 +355,8 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     {
         SetValueIfEmpty(workshopItemTitleTextField, StringUtils.ToTitleCase(PathUtils.GetFileName(folder)));
 
-        List<string> imageFiles = FileScannerUtils.ScanForFiles(
-            new List<string>() { folder },
-            ApplicationUtils.supportedImageFiles.Select(extension => $"*.{extension}").ToList());
+        List<string> imageFiles = FileScanner.GetFiles(folder,
+            new FileScannerConfig(ApplicationUtils.supportedImageFiles.Select(extension => $"*.{extension}").ToList()) { Recursive = true });
         string previewImagePath = imageFiles
             .FirstOrDefault(imageFile => PathUtils.GetFileName(imageFile).Contains("preview", StringComparison.InvariantCultureIgnoreCase))
             .OrIfNull(imageFiles.FirstOrDefault());

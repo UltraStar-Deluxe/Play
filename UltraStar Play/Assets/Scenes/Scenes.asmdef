@@ -3,7 +3,6 @@
     "rootNamespace": "",
     "references": [
         "Unity.Netcode.Runtime",
-        "Serilog",
         "Plugins",
         "UniRx",
         "Common",
@@ -19,7 +18,6 @@
         "AndroidRuntimePermissions.Runtime",
         "UnityStandaloneFileBrowser",
         "Vuplex.WebView",
-        "LiteNetLib",
         "com.whisper.unity",
         "OneJS"
     ],
@@ -29,9 +27,9 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "Facepunch.Steamworks.Win64.dll",
-        "Flurl.dll",
-        "Flurl.Http.dll",
-        "ICSharpCode.SharpZipLib.dll"
+        "LiteNetLib.dll",
+        "ICSharpCode.SharpZipLib.dll",
+        "System.Linq.Dynamic.Core.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

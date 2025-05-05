@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Steamworks;
-using Steamworks.ServerList;
 using Steamworks.Ugc;
 using UniInject;
 using UniRx;
@@ -12,7 +10,7 @@ using UnityEngine;
 
 public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, IInjectionFinishedListener
 {
-    public static SteamWorkshopManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamWorkshopManager>();
+    public static SteamWorkshopManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SteamWorkshopManager>();
 
     private readonly UseSteamWorkshopItemsControl useSteamWorkshopItemsControl = new();
     private readonly Subject<VoidEvent> finishDownloadWorkshopItemsEventStream = new();
@@ -36,31 +34,31 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         injector.Inject(useSteamWorkshopItemsControl);
     }
 
-    public void DownloadWorkshopItems()
+    public async void DownloadWorkshopItems()
     {
-        DownloadWorkshopItemsAsObservable()
-            .Subscribe(_ => Debug.Log("Download workshop items done"));
+        await DownloadWorkshopItemsAsync();
     }
 
-    public IObservable<IReadOnlyList<Item>> DownloadWorkshopItemsAsObservable()
+    public async Awaitable DownloadWorkshopItemsAsync()
     {
-        return ObservableUtils.RunOnNewTaskAsObservable(async () =>
-                await DownloadSubscribedWorkshopItemsAsync())
-            .ObserveOnMainThread()
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to download Steam Workshop items: {ex.Message}");
-                FireDownloadFinishedEvent();
-            })
-            .Select(items =>
-            {
-                Debug.Log($"Successfully downloaded {items.Count} Steam Workshop Items");
-                DownloadedWorkshopItems = items;
-                FireDownloadFinishedEvent();
-                useSteamWorkshopItemsControl.UseWorkshopItems(items);
-                return DownloadedWorkshopItems;
-            });
+        try
+        {
+            await Awaitable.BackgroundThreadAsync();
+            List<Item> items = await DownloadSubscribedWorkshopItemsAsync();
+            await Awaitable.MainThreadAsync();
+
+            Debug.Log($"Successfully downloaded {items.Count} Steam Workshop Items");
+            DownloadedWorkshopItems = items;
+            FireDownloadFinishedEvent();
+
+            useSteamWorkshopItemsControl.UseWorkshopItems(items);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to download Steam Workshop items: {ex.Message}");
+            FireDownloadFinishedEvent();
+        }
     }
 
     private void FireDownloadFinishedEvent()
@@ -76,7 +74,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         }
     }
 
-    private async Task<List<Item>> DownloadSubscribedWorkshopItemsAsync()
+    private async Awaitable<List<Item>> DownloadSubscribedWorkshopItemsAsync()
     {
         try
         {
@@ -94,7 +92,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         }
     }
 
-    private async Task DownloadWorkshopItemsAsync(List<Item> items)
+    private async Awaitable DownloadWorkshopItemsAsync(List<Item> items)
     {
         for (int i = 0; i < items.Count; i++)
         {
@@ -113,23 +111,23 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         }
     }
 
-    private async Task<List<Item>> QuerySubscribedWorkshopItemsAsync()
+    private async Awaitable<List<Item>> QuerySubscribedWorkshopItemsAsync()
     {
         Debug.Log($"Querying subscribed Steam Workshop items");
-        List<Item> result = await ReadAllPages(Query.Items.WhereUserSubscribed());
+        List<Item> result = await ReadAllPagesAsync(Query.Items.WhereUserSubscribed());
         Debug.Log($"Found {result.Count} subscribed Steam Workshop items");
         return result;
     }
 
-    private async Task<List<Item>> QueryPublishedWorkshopItemsAsync()
+    private async Awaitable<List<Item>> QueryPublishedWorkshopItemsAsync()
     {
         Debug.Log($"Querying published Steam Workshop items");
-        List<Item> result = await ReadAllPages(Query.Items.WhereUserPublished());
+        List<Item> result = await ReadAllPagesAsync(Query.Items.WhereUserPublished());
         Debug.Log($"Found {result.Count} published Steam Workshop items");
         return result;
     }
 
-    private async Task<List<Item>> ReadAllPages(Query ugcQuery)
+    private async Awaitable<List<Item>> ReadAllPagesAsync(Query ugcQuery)
     {
         // Some entries are returned multiple times. Thus, Use dictionary with unique ID as key.
         Dictionary<ulong, Item> itemIdToItem = new();
@@ -160,7 +158,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
             .ToList();
     }
 
-    public async Task<PublishResult> PublishWorkshopItemAsync(
+    public async Awaitable<PublishResult> PublishWorkshopItemAsync(
         ulong workshopItemId,
         string contentFolderPath,
         string previewImagePath,
@@ -172,7 +170,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         bool isNewWorkshopItem = workshopItemId <= 0;
         if (isNewWorkshopItem)
         {
-            string errorMessage = await GetNewWorkshopItemErrorMessage(contentFolderPath, previewImagePath, title);
+            string errorMessage = await GetNewWorkshopItemErrorMessageAsync(contentFolderPath, previewImagePath, title);
             if (!errorMessage.IsNullOrEmpty())
             {
                 throw new SteamException(errorMessage);
@@ -227,10 +225,10 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         }
 
         return await ugcEditor
-            .SubmitAsync(new ActionProgress(onProgress));
+            .SubmitAsync(new SteamWorkshopProgress(onProgress));
     }
 
-    public async Task SubscribeAndDownloadWorkshopItemAsync(ulong workshopItemFileId)
+    public async Awaitable SubscribeAndDownloadWorkshopItemAsync(ulong workshopItemFileId)
     {
         ResultPage? resultPage = await Query.Items.WithFileId(workshopItemFileId).GetPageAsync(1);
         if (!resultPage.HasValue)
@@ -239,10 +237,10 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         }
         await resultPage.Value.Entries.FirstOrDefault().Subscribe();
 
-        await DownloadWorkshopItemsAsObservable();
+        await DownloadWorkshopItemsAsync();
     }
 
-    public async Task UnsubscribeAndDownloadWorkshopItemAsync(ulong workshopItemFileId)
+    public async Awaitable UnsubscribeAndDownloadWorkshopItemAsync(ulong workshopItemFileId)
     {
         ResultPage? resultPage = await Query.Items.WithFileId(workshopItemFileId).GetPageAsync(1);
         if (!resultPage.HasValue)
@@ -251,10 +249,10 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         }
         await resultPage.Value.Entries.FirstOrDefault().Unsubscribe();
 
-        await DownloadWorkshopItemsAsObservable();
+        await DownloadWorkshopItemsAsync();
     }
 
-    private async Task<string> GetNewWorkshopItemErrorMessage(string contentFolderPath, string previewImagePath, string title)
+    private async Awaitable<string> GetNewWorkshopItemErrorMessageAsync(string contentFolderPath, string previewImagePath, string title)
     {
         if (!DirectoryUtils.Exists(contentFolderPath))
         {

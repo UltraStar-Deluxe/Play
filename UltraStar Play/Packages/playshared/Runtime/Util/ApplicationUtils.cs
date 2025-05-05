@@ -25,23 +25,6 @@ public static class ApplicationUtils
 
     public const string GeneratedFolderName = "Generated";
 
-    private static bool useFfmpegToPlayMediaFiles;
-    public static bool UseFfmpegToPlayMediaFiles
-    {
-        get => useFfmpegToPlayMediaFiles;
-        set
-        {
-            if (useFfmpegToPlayMediaFiles == value)
-            {
-                return;
-            }
-            Debug.Log($"use ffmpeg to play media files: {value}");
-            useFfmpegToPlayMediaFiles = value;
-            supportedAudioFiles = GetSupportedAudioFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
-            supportedVideoFiles = GetSupportedVideoFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
-        }
-    }
-
     private static bool useVlcToPlayMediaFiles;
     public static bool UseVlcToPlayMediaFiles
     {
@@ -54,8 +37,8 @@ public static class ApplicationUtils
             }
             Debug.Log($"use vlc to play media files: {value}");
             useVlcToPlayMediaFiles = value;
-            supportedAudioFiles = GetSupportedAudioFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
-            supportedVideoFiles = GetSupportedVideoFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
+            supportedAudioFiles = GetSupportedAudioFiles(useVlcToPlayMediaFiles);
+            supportedVideoFiles = GetSupportedVideoFiles(useVlcToPlayMediaFiles);
         }
     }
 
@@ -144,6 +127,22 @@ public static class ApplicationUtils
         .Where(line => !line.IsNullOrEmpty())
         .ToHashSet();
 
+    // Supported file formats of ffmpeg can be obtained via "ffmpeg -demuxers"
+    // See also https://stackoverflow.com/questions/50069235/what-are-all-of-the-file-extensions-supported-by-ffmpeg
+    // See also http://www.ffmpeg.org/general.html#toc-Supported-File-Formats_002c-Codecs-or-Features
+    public static readonly IReadOnlyCollection<string> vlcSupportedFileExtensions = ReadFfmpegSupportedFileExtensionsFromFile()
+        .Select(line => line.Trim().TrimStart('.'))
+        .Where(line => !line.IsNullOrEmpty())
+        .ToHashSet();
+
+    public static readonly IReadOnlyCollection<string> vlcSupportedAudioFiles = vlcSupportedFileExtensions
+        .Where(fileExtension => audioFileExtensions.Contains(fileExtension))
+        .ToList();
+
+    public static readonly IReadOnlyCollection<string> vlcSupportedVideoFiles = vlcSupportedFileExtensions
+        .Where(fileExtension => !audioFileExtensions.Contains(fileExtension))
+        .ToList();
+
     public static readonly IReadOnlyCollection<string> unitySupportedAudioFiles = new HashSet<string>
     {
         "mp3",
@@ -151,7 +150,7 @@ public static class ApplicationUtils
         "wav",
     }.ToHashSet();
 
-    public static IReadOnlyCollection<string> supportedAudioFiles = GetSupportedAudioFiles(false, false);
+    public static IReadOnlyCollection<string> supportedAudioFiles = GetSupportedAudioFiles(false);
 
     public static readonly IReadOnlyCollection<string> supportedVocalsSeparationAudioFiles = new HashSet<string>
     {
@@ -184,7 +183,7 @@ public static class ApplicationUtils
         "webm",
     };
 
-    public static IReadOnlyCollection<string> supportedVideoFiles = GetSupportedVideoFiles(false, false);
+    public static IReadOnlyCollection<string> supportedVideoFiles = GetSupportedVideoFiles(false);
 
     public static void OpenDirectory(string path)
     {
@@ -248,6 +247,18 @@ public static class ApplicationUtils
     {
         fileExtension = NormalizeFileExtension(fileExtension);
         return unitySupportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsVlcSupportedAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return vlcSupportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsVlcSupportedVideoFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return vlcSupportedVideoFiles.Contains(fileExtension);
     }
 
     public static bool IsSupportedAudioFormat(string fileExtension)
@@ -384,16 +395,18 @@ public static class ApplicationUtils
         return uri;
     }
 
-    private static IReadOnlyCollection<string> GetSupportedAudioFiles(bool includeFfmpegFormats, bool includeVlcFormats)
+    private static IReadOnlyCollection<string> GetSupportedAudioFiles(bool includeVlcFormats)
     {
         return unitySupportedAudioFiles
             .Union(supportedMidiFiles)
+            .Union(includeVlcFormats ? vlcSupportedAudioFiles : new List<string>())
             .ToHashSet();
     }
 
-    private static IReadOnlyCollection<string> GetSupportedVideoFiles(bool includeFfmpegFormats, bool includeVlcFormats)
+    private static IReadOnlyCollection<string> GetSupportedVideoFiles(bool includeVlcFormats)
     {
         return unitySupportedVideoFiles
+            .Union(includeVlcFormats ? vlcSupportedVideoFiles : new List<string>())
             .ToHashSet();
     }
 
@@ -414,6 +427,22 @@ public static class ApplicationUtils
 
             List<string> fallbackList = new List<string>() { "ogg", "mp3", "wav" };
             Debug.LogError($"Failed to load audio file extensions from file. Using fallback list: {fallbackList.JoinWith(", ")}");
+            return fallbackList;
+        }
+    }
+
+    private static IReadOnlyCollection<string> ReadFfmpegSupportedFileExtensionsFromFile()
+    {
+        try
+        {
+            return File.ReadAllLines(GetStreamingAssetsPath("ffmpeg-supported-common-file-extensions.txt"), Encoding.UTF8);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+
+            List<string> fallbackList = new List<string>() { "ogg", "mp3", "wav" };
+            Debug.LogError($"Failed to load ffmpeg supported audio file extensions from file. Using fallback list: {fallbackList.JoinWith(", ")}");
             return fallbackList;
         }
     }

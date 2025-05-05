@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
@@ -56,17 +57,36 @@ public static class SongMetaAssertUtils
         Assert.AreEqual(SongMetaUtils.GetLyrics(expected, EVoiceId.P2), SongMetaUtils.GetLyrics(actual, EVoiceId.P2));
 
         // Compare without FileInfo such that both should serialize to same JSON
-        string originalSongJson = ToJsonWithoutFileInfo(expected);
-        string savedSongJson = ToJsonWithoutFileInfo(actual);
+        string originalSongJson = ToJsonWithoutFileInfoAndIssues(expected);
+        string savedSongJson = ToJsonWithoutFileInfoAndIssues(actual);
+        File.WriteAllText($"{Path.GetTempPath()}/SongMetaAssertUtils-original.json", JsonConverter.Prettify(originalSongJson));
+        File.WriteAllText($"{Path.GetTempPath()}/SongMetaAssertUtils-saved.json", JsonConverter.Prettify(savedSongJson));
         Assert.AreEqual(originalSongJson, savedSongJson);
     }
 
-    private static string ToJsonWithoutFileInfo(SongMeta songMeta)
+    private static string ToJsonWithoutFileInfoAndIssues(SongMeta songMeta)
     {
+        // Remove irrelevant fields
         FileInfo fileInfo = songMeta.FileInfo;
         songMeta.SetFileInfo((FileInfo)null);
-        string json = JsonConverter.ToJson(songMeta);
+
+        List<SongIssue> songIssues = null;
+        if (songMeta is LazyLoadedFromFileSongMeta lazyLoadedSongMeta1)
+        {
+            songIssues = lazyLoadedSongMeta1.SongIssues;
+            lazyLoadedSongMeta1.SongIssues.Clear();
+        }
+
+        // Convert to JSON
+        string json = JsonConverter.ToJson(songMeta, true);
+
+        // Restore fields
         songMeta.SetFileInfo(fileInfo);
+        if (songMeta is LazyLoadedFromFileSongMeta lazyLoadedSongMeta2)
+        {
+            lazyLoadedSongMeta2.SongIssues.AddRange(songIssues);
+        }
+
         return json;
     }
 }

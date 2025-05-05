@@ -12,7 +12,7 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
     private VisualTreeAsset songPropertySideBarEntryUi;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongMeta songMeta;
@@ -57,7 +57,7 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
     public void OnInjectionFinished()
     {
         CreateSongPropertiesInputControls();
-        songMetaChangeEventStream
+        songMetaChangedEventStream
             .Where(evt => evt is SongPropertyChangedEvent)
             .Subscribe(_ => UpdateSongPropertyInputControls());
 
@@ -195,7 +195,7 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
                 if (newValue != valueGetter())
                 {
                     valueSetter(newValue);
-                    songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(songProperty));
+                    songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(songProperty));
                 }
             });
         }

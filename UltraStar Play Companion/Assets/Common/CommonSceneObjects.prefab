@@ -57,7 +57,7 @@ GameObject:
   - component: {fileID: 5626457258006968070}
   m_Layer: 0
   m_Name: TranslationManager
-  m_TagString: Untagged
+  m_TagString: TranslationManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -187,6 +187,52 @@ MonoBehaviour:
   useDontDestroyOnLoad: 0
   logInfoInEditMode: 0
   logInfoInPlayMode: 1
+--- !u!1 &3828856157652926732
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3848619992274774050}
+  - component: {fileID: 1321969864656250690}
+  m_Layer: 0
+  m_Name: NotificationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3848619992274774050
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828856157652926732}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5970054433468432184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1321969864656250690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828856157652926732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9550cfe9a604e1cab27bd9f3e6c8705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  notificationUi: {fileID: 9197481963319205126, guid: 621e11db1bf96254eb113e663e4bcc59, type: 3}
+  notificationOverlayUi: {fileID: 9197481963319205126, guid: 1b9e64f2bf87a1743adc6aced20186f0, type: 3}
 --- !u!1 &6312415460643119546
 GameObject:
   m_ObjectHideFlags: 0
@@ -219,6 +265,7 @@ Transform:
   m_Children:
   - {fileID: 7793846927334274923}
   - {fileID: 5848255959784561741}
+  - {fileID: 3848619992274774050}
   - {fileID: 4946081707020677670}
   - {fileID: 4959958248036601200}
   - {fileID: 7793846928232682641}
@@ -285,8 +332,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8caa8a6ad122f264387f89b36ce2a684, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  notificationOverlayUi: {fileID: 9197481963319205126, guid: 1b9e64f2bf87a1743adc6aced20186f0, type: 3}
-  notificationUi: {fileID: 9197481963319205126, guid: 621e11db1bf96254eb113e663e4bcc59, type: 3}
   messageDialogUi: {fileID: 9197481963319205126, guid: 9dd0037eeddfcb64ab006c7c01edb4e7, type: 3}
   micWithNameUi: {fileID: 9197481963319205126, guid: 633a1b5f196ee2f45beba597ffda0b45, type: 3}
   songListEntryUi: {fileID: 9197481963319205126, guid: 2d49ee40abf3e004ab100df248a731db, type: 3}
@@ -304,7 +349,7 @@ GameObject:
   - component: {fileID: 1770134915371172135}
   m_Layer: 0
   m_Name: MainGameHttpClient
-  m_TagString: Untagged
+  m_TagString: MainGameHttpClient
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -348,7 +393,7 @@ GameObject:
   - component: {fileID: 7793846927334274922}
   m_Layer: 0
   m_Name: ApplicationManager
-  m_TagString: Untagged
+  m_TagString: ApplicationManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -486,7 +531,7 @@ GameObject:
   - component: {fileID: 7793846928232682640}
   m_Layer: 0
   m_Name: SettingsManager
-  m_TagString: Untagged
+  m_TagString: SettingsManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -530,7 +575,7 @@ GameObject:
   - component: {fileID: 5134610190192529917}
   m_Layer: 0
   m_Name: SceneInjectionManager
-  m_TagString: Untagged
+  m_TagString: SceneInjectionManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -750,7 +795,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11414302, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_Value
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11452418, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: toggleKey

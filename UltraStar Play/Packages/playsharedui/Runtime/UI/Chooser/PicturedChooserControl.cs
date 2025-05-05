@@ -2,7 +2,7 @@
 using UniRx;
 using UnityEngine.UIElements;
 
-abstract public class PicturedChooserControl<T> : ListedChooserControl<T>
+public abstract class PicturedChooserControl<T> : ListedChooserControl<T>
 {
     protected PicturedChooserControl(Chooser chooser, List<T> items)
         : base(chooser)

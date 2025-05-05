@@ -145,20 +145,6 @@ public static class SongMetaUtils
         return PathUtils.GetAbsoluteFilePath(GetDirectoryPath(songMeta), pathOrUri);
     }
 
-    public static bool IsGeneratedAndSaved(SongMeta songMeta, string generatedSongFolderAbsolutePath)
-    {
-        DirectoryInfo directoryInfo = GetDirectoryInfo(songMeta);
-        if (directoryInfo == null
-            || !directoryInfo.Exists)
-        {
-            return false;
-        }
-
-        string songMetaAbsolutePath = directoryInfo.FullName;
-        return songMetaAbsolutePath.Contains(generatedSongFolderAbsolutePath)
-               && File.Exists(GetAbsoluteSongMetaFilePath(songMeta));
-    }
-
     public static DirectoryInfo GetDirectoryInfo(SongMeta songMeta)
     {
         return songMeta?.FileInfo?.Directory;
@@ -167,18 +153,6 @@ public static class SongMetaUtils
     public static string GetDirectoryPath(SongMeta songMeta)
     {
         return songMeta?.FileInfo?.Directory?.FullName ?? "";
-    }
-
-    public static void CreateDirectory(SongMeta songMeta)
-    {
-        DirectoryInfo directoryInfo = GetDirectoryInfo(songMeta);
-        if (directoryInfo == null
-            || directoryInfo.Exists)
-        {
-            return;
-        }
-
-        directoryInfo.Create();
     }
 
     public static string GetAbsoluteSongMetaFilePath(SongMeta songMeta)
@@ -266,21 +240,6 @@ public static class SongMetaUtils
         return newVoice;
     }
 
-    public static List<Note> GetFollowingNotes(SongMeta songMeta, List<Note> notes)
-    {
-        if (notes.IsNullOrEmpty())
-        {
-            return new List<Note>();
-        }
-
-        int maxBeat = notes.Select(it => it.EndBeat).Max();
-        List<Note> result = GetAllSentences(songMeta)
-            .SelectMany(sentence => sentence.Notes)
-            .Where(note => note.StartBeat >= maxBeat)
-            .ToList();
-        return result;
-    }
-
     // Returns the notes in the song as well as the notes in the layers in no particular order.
     public static List<Note> GetAllNotes(SongMeta songMeta)
     {
@@ -306,66 +265,10 @@ public static class SongMetaUtils
         return result;
     }
 
-    public static Sentence GetNextSentence(Sentence sentence)
-    {
-        if (sentence.Voice == null)
-        {
-            return null;
-        }
-
-        List<Sentence> sortedSentencesOfVoice = new(sentence.Voice.Sentences);
-        sortedSentencesOfVoice.Sort(Sentence.comparerByStartBeat);
-        Sentence lastSentence = null;
-        foreach (Sentence s in sortedSentencesOfVoice)
-        {
-            if (lastSentence == sentence)
-            {
-                return s;
-            }
-            lastSentence = s;
-        }
-        return null;
-    }
-
-    public static Sentence GetPreviousSentence(Sentence sentence)
-    {
-        if (sentence.Voice == null)
-        {
-            return null;
-        }
-
-        List<Sentence> sortedSentencesOfVoice = new(sentence.Voice.Sentences);
-        sortedSentencesOfVoice.Sort(Sentence.comparerByStartBeat);
-        Sentence lastSentence = null;
-        foreach (Sentence s in sortedSentencesOfVoice)
-        {
-            if (s == sentence)
-            {
-                return lastSentence;
-            }
-            lastSentence = s;
-        }
-        return null;
-    }
-
     public static List<Note> GetSortedNotes(Sentence sentence)
     {
         List<Note> result = new(sentence.Notes);
         result.Sort(Note.comparerByStartBeat);
-        return result;
-    }
-
-    public static List<Note> GetSortedNotes(SongMeta songMeta)
-    {
-        List<Note> result = GetAllNotes(songMeta);
-        result.Sort(Note.comparerByStartBeat);
-        return result;
-    }
-
-    public static List<Sentence> GetSortedSentences(SongMeta songMeta)
-    {
-        List<Sentence> result = GetAllSentences(songMeta);
-        result.Sort(Sentence.comparerByStartBeat);
         return result;
     }
 
@@ -440,11 +343,6 @@ public static class SongMetaUtils
         return sb.ToString();
     }
 
-    public static string GetArtistDashTitle(SongMeta songMeta)
-    {
-        return GetArtistAndTitle(songMeta, " - ");
-    }
-
     public static string GetArtistAndTitle(SongMeta songMeta, string joinWith)
     {
         if (songMeta == null)
@@ -454,7 +352,7 @@ public static class SongMetaUtils
         return GetArtistAndTitle(songMeta.Artist, songMeta.Title, joinWith);
     }
 
-    public static string GetArtistAndTitle(string artist, string title, string joinWith)
+    private static string GetArtistAndTitle(string artist, string title, string joinWith)
     {
         if (artist.IsNullOrEmpty()
             && title.IsNullOrEmpty())
@@ -493,7 +391,7 @@ public static class SongMetaUtils
         return notes.Select(note => note.MidiNote).Max();
     }
 
-    public static int MinBeat(List<Note> notes)
+    public static int GetMinBeat(List<Note> notes)
     {
         if (notes.IsNullOrEmpty())
         {
@@ -502,7 +400,7 @@ public static class SongMetaUtils
         return notes.Select(note => note.StartBeat).Min();
     }
 
-    public static int MaxBeat(List<Note> notes)
+    public static int GetMaxBeat(List<Note> notes)
     {
         if (notes.IsNullOrEmpty())
         {
@@ -511,282 +409,18 @@ public static class SongMetaUtils
         return notes.Select(note => note.EndBeat).Max();
     }
 
-    public static int LengthInBeats(List<Note> notes)
+    public static int GetLengthInBeats(List<Note> notes)
     {
-        return MaxBeat(notes) - MinBeat(notes);
+        return GetMaxBeat(notes) - GetMinBeat(notes);
     }
 
-    public static void RemoveAllNotes(SongMeta songMeta)
-    {
-        songMeta.Voices.ForEach(voice =>
-            voice.Sentences.ToList().ForEach(sentence => voice.RemoveSentence(sentence)));
-    }
-
-    public static double NoteDistanceInMillis(SongMeta songMeta, Note noteA, Note noteB)
+    public static double GetNoteDistanceInMillis(SongMeta songMeta, Note noteA, Note noteB)
     {
         int noteDistanceInBeats = Math.Min(
             Math.Abs(noteA.EndBeat - noteB.StartBeat),
             Math.Abs(noteB.EndBeat - noteA.StartBeat));
 
         return noteDistanceInBeats * SongMetaBpmUtils.MillisPerBeat(songMeta);
-    }
-
-    public static string GetMedleyName(List<SongMeta> songMetas)
-    {
-        if (songMetas.IsNullOrEmpty())
-        {
-            return "";
-        }
-
-        if (songMetas.Count == 1)
-        {
-            songMetas[0].GetArtistDashTitle();
-        }
-
-        return songMetas
-            .Select(songMeta => songMeta.Title)
-            .JoinWith(", ");
-    }
-
-    public static int GetMedleyStartBeat(SongMeta songMeta)
-    {
-        if (songMeta.MedleyStartInMillis > 0)
-        {
-            return (int)SongMetaBpmUtils.MillisToBeats(songMeta, songMeta.MedleyStartInMillis);
-        }
-        else
-        {
-            return GetDefaultMedleyStartBeat(songMeta);
-        }
-    }
-
-    public static int GetMedleyEndBeat(SongMeta songMeta, int targetDurationInSeconds)
-    {
-        if (songMeta.MedleyEndInMillis > 0)
-        {
-            return (int)SongMetaBpmUtils.MillisToBeats(songMeta, songMeta.MedleyEndInMillis);
-        }
-        else
-        {
-            return GetDefaultMedleyEndBeat(songMeta, targetDurationInSeconds);
-        }
-    }
-
-    private static int GetDefaultMedleyStartBeat(SongMeta songMeta)
-    {
-        // Search for lyrics about the middle of the song, approx. 20 seconds afterwards.
-        int middleBeat = GetMiddleBeat(songMeta);
-        Voice voice = GetVoiceById(songMeta, EVoiceId.P1);
-        List<Sentence> sentences = voice.Sentences.ToList();
-        List<Sentence> sentencesBeforeMiddleBeat = sentences
-            .Where(sentence => sentence.ExtendedMaxBeat < middleBeat)
-            .ToList();
-        if (sentencesBeforeMiddleBeat.IsNullOrEmpty())
-        {
-            // Should not happen, this is a weird song.
-            Debug.LogWarning("Could not calculate a nice medley start beat. Using the middle of the song instead.");
-            return middleBeat;
-        }
-
-        sentencesBeforeMiddleBeat.Sort(Sentence.comparerByStartBeat);
-        return sentencesBeforeMiddleBeat.LastOrDefault().MinBeat;
-    }
-
-    private static int GetDefaultMedleyEndBeat(SongMeta songMeta, int targetDurationInSeconds)
-    {
-        // End the medley approx. 30 seconds afterward the start.
-        int medleyStartBeta = GetMedleyStartBeat(songMeta);
-        int targetDurationInBeats = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, targetDurationInSeconds * 1000);
-        int targetEndBeat = medleyStartBeta + targetDurationInBeats;
-
-        List<Sentence> sentencesAfterMedleyStart = GetVoiceById(songMeta, EVoiceId.P1)
-            .Sentences
-            .Where(sentence => sentence.MinBeat > medleyStartBeta)
-            .ToList();
-
-        if (sentencesAfterMedleyStart.IsNullOrEmpty())
-        {
-            // Should not happen, this is a weird song.
-            Debug.LogWarning("Could not calculate a nice medley end beat. Using some beats after medley start instead.");
-            return medleyStartBeta + targetDurationInBeats;
-        }
-
-        Sentence sentence = sentencesAfterMedleyStart.FindMinElement(sentence =>
-        {
-            // Use sentence which best approximates the target distance.
-            float distanceToTargetBeat = Math.Abs(sentence.ExtendedMaxBeat - targetEndBeat);
-            return distanceToTargetBeat;
-        });
-        if (sentence == null)
-        {
-            return medleyStartBeta + 1;
-        }
-        return sentence.ExtendedMaxBeat;
-    }
-
-    private static int GetMiddleBeat(SongMeta songMeta)
-    {
-        // Search for lyrics about the middle of the song, approx. 20 seconds afterwards.
-        List<Note> allNotes = GetAllNotes(songMeta);
-        int minBeat = MinBeat(allNotes);
-        int maxBeat = MaxBeat(allNotes);
-        return minBeat + ((maxBeat - minBeat) / 2);
-    }
-
-    public static string GetRelativePath(SongMeta songMeta, string path)
-    {
-        string directoryPath = GetDirectoryPath(songMeta);
-        if (directoryPath.IsNullOrEmpty())
-        {
-            return path;
-        }
-
-        string relativePath = PathUtils.MakeRelativePath(directoryPath, path);
-        return relativePath;
-    }
-
-    public static string GetAttributionText(SongMeta selectedSong)
-    {
-        string GetAttributionText(string title, string author, string license, string source)
-        {
-            List<string> parts = new List<string>();
-            if (!author.IsNullOrEmpty())
-            {
-                parts.Add(author);
-            }
-            if (!license.IsNullOrEmpty())
-            {
-                parts.Add($"License: {license}");
-            }
-            if (!source.IsNullOrEmpty())
-            {
-                parts.Add($"Source: {source}");
-            }
-
-            if (parts.IsNullOrEmpty())
-            {
-                return "";
-            }
-
-            return parts.JoinWith("\n   ", $"• {title}: ", "");
-        }
-
-        string audioAuthor = selectedSong.GetAdditionalHeaderEntry($"AUDIOAUTHOR");
-        if (audioAuthor.IsNullOrEmpty())
-        {
-            audioAuthor = selectedSong.Artist;
-        }
-        string audioLicense = selectedSong.GetAdditionalHeaderEntry($"AUDIOLICENSE");
-        string audioSource = selectedSong.GetAdditionalHeaderEntry($"AUDIOSOURCE");
-
-        string lyricsAuthor = selectedSong.GetAdditionalHeaderEntry($"LYRICSAUTHOR");
-        string lyricsLicense = selectedSong.GetAdditionalHeaderEntry($"LYRICSLICENSE");
-        string lyricsSource = selectedSong.GetAdditionalHeaderEntry($"LYRICSSOURCE");
-
-        string backgroundAuthor = selectedSong.GetAdditionalHeaderEntry($"BACKGROUNDAUTHOR");
-        string backgroundLicense = selectedSong.GetAdditionalHeaderEntry($"BACKGROUNDLICENSE");
-        string backgroundSource = selectedSong.GetAdditionalHeaderEntry($"BACKGROUNDSOURCE");
-
-        string coverAuthor = selectedSong.GetAdditionalHeaderEntry($"COVERAUTHOR");
-        string coverLicense = selectedSong.GetAdditionalHeaderEntry($"COVERLICENSE");
-        string coverSource = selectedSong.GetAdditionalHeaderEntry($"COVERSOURCE");
-
-        string videoAuthor = selectedSong.GetAdditionalHeaderEntry($"VIDEOAUTHOR");
-        string videoLicense = selectedSong.GetAdditionalHeaderEntry($"VIDEOLICENSE");
-        string videoSource = selectedSong.GetAdditionalHeaderEntry($"VIDEOSOURCE");
-
-        return new List<string>()
-        {
-            GetAttributionText("Audio", audioAuthor, audioLicense, audioSource),
-            GetAttributionText("Lyrics", lyricsAuthor, lyricsLicense, lyricsSource),
-            GetAttributionText("Video", videoAuthor, videoLicense, videoSource),
-            GetAttributionText("Background", backgroundAuthor, backgroundLicense, backgroundSource),
-            GetAttributionText("Cover", coverAuthor, coverLicense, coverSource),
-        }.Where(it => !it.IsNullOrEmpty()).JoinWith("\n");
-    }
-
-    public static Voice CreateMergedVoice(List<Voice> voices)
-    {
-        if (voices.IsNullOrEmpty())
-        {
-            return null;
-        }
-
-        if (voices.Count == 1)
-        {
-            return voices.FirstOrDefault();
-        }
-
-        MergedVoice mergedVoice = new(voices);
-        foreach (Voice voice in voices.ToList())
-        {
-            foreach (Sentence newSentence in voice.Sentences.ToList())
-            {
-                // Add the sentence if there is none yet.
-                Sentence overlappingSentence = mergedVoice.Sentences
-                    .FirstOrDefault(existingSentence => IsBeatInSentence(existingSentence, newSentence.MinBeat, true, false)
-                                                        || IsBeatInSentence(existingSentence, newSentence.MaxBeat, true, false));
-                if (overlappingSentence != null)
-                {
-                    Debug.Log($"{newSentence} overlaps with {overlappingSentence}");
-                }
-
-                if (overlappingSentence == null)
-                {
-                    Sentence newSentenceClone = newSentence.CloneDeep();
-                    mergedVoice.AddSentence(newSentenceClone);
-                }
-            }
-        }
-
-        // Minimize sentences to make sure that they do not overlap
-        foreach (Sentence mergedSentence in mergedVoice.Sentences)
-        {
-            mergedSentence.SetLinebreakBeat(0);
-        }
-
-        // Sort sentences
-        List<Sentence> sortedSentences = mergedVoice.Sentences.ToList();
-        sortedSentences.Sort(Sentence.comparerByStartBeat);
-        mergedVoice.SetSentences(sortedSentences);
-
-        return mergedVoice;
-    }
-
-    public static void AddTrailingSpaceToLastNoteOfSentence(Sentence sentence)
-    {
-        if (sentence == null)
-        {
-            return;
-        }
-
-        AddTrailingSpaceToLastNoteOfSentence(sentence.Notes.LastOrDefault());
-    }
-
-    public static void AddTrailingSpaceToLastNoteOfSentence(List<Note> notes)
-    {
-        if (notes.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        notes.ForEach(note => AddTrailingSpaceToLastNoteOfSentence(note));
-    }
-
-    public static void AddTrailingSpaceToLastNoteOfSentence(Note note)
-    {
-        if (note == null)
-        {
-            return;
-        }
-
-        // Add space at end of note if it was the last note in the sentence. Otherwise, formerly separate words might be merged.
-        if (!note.Text.EndsWith(" ")
-            && note.Sentence != null
-            && note.Sentence.Notes.LastOrDefault() == note)
-        {
-            note.SetText(note.Text + " ");
-        }
     }
 
     public static string GetVideoUriPreferAudioUriIfWebView(SongMeta songMeta, Func<string, bool> canHandleUri)
@@ -803,64 +437,7 @@ public static class SongMetaUtils
         return videoUri;
     }
 
-    public static Color32 CreateColorForSongMeta(SongMeta songMeta)
-    {
-        return ColorGenerationUtils.FromString(songMeta.GetArtistDashTitle());
-    }
 
-    public static string ComputeScoreRelevantSongHash(SongMeta songMeta)
-    {
-        StringBuilder sb = new();
-        sb.Append("{");
-
-        sb.Append("BPM:");
-        sb.Append(songMeta.BeatsPerMinute.ToStringInvariantCulture("0.00"));
-
-        int voiceIndex = 1;
-        List<Voice> sortedVoices = songMeta.Voices
-            .OrderBy(voice => voice.Id)
-            .ToList();
-        foreach (Voice voice in sortedVoices)
-        {
-            sb.Append("|");
-            sb.Append("P");
-            sb.Append(voiceIndex);
-
-            IEnumerable<Note> scoreRelevantNotes = voice.Sentences.SelectMany(sentence => sentence.Notes)
-                .Where(n => n.Type is not ENoteType.Freestyle)
-                .OrderBy(n => n.StartBeat);
-            foreach (Note note in scoreRelevantNotes)
-            {
-                sb.Append("|");
-                sb.Append(UltraStarFormatWriter.GetNoteTypePrefix(note.Type));
-                sb.Append(" ");
-                sb.Append(note.StartBeat);
-                sb.Append(" ");
-                sb.Append(note.Length);
-                sb.Append(" ");
-                sb.Append(note.TxtPitch);
-            }
-            voiceIndex++;
-        }
-
-        sb.Append("}");
-
-        string scoreRelevantSongHash = Hashing.Md5(Encoding.UTF8.GetBytes(sb.ToString()));
-        Log.Verbose(() => $"{songMeta} has score relevant hash '{scoreRelevantSongHash}', computed from string: {sb}");
-        return scoreRelevantSongHash;
-    }
-
-    public static string ComputeUniqueSongHash(SongMeta songMeta)
-    {
-        if (songMeta == null)
-        {
-            return "";
-        }
-
-        string ultraStarSongFormat = UltraStarFormatWriter.ToUltraStarSongFormat(songMeta);
-        string songHash = Hashing.Md5(Encoding.UTF8.GetBytes(ultraStarSongFormat));
-        return songHash;
-    }
 
     public static bool HasSingAlongData(SongMeta songMeta)
     {
@@ -911,43 +488,5 @@ public static class SongMetaUtils
             result[voiceId] = displayName;
         }
         return result;
-    }
-
-    public static void AddVoice(SongMeta songMeta, Voice voice)
-    {
-        if (songMeta == null
-            || voice == null)
-        {
-            return;
-        }
-
-        songMeta.AddVoice(voice);
-    }
-
-    public static void RemoveVoice(SongMeta songMeta, EVoiceId voiceId)
-    {
-        if (songMeta == null)
-        {
-            return;
-        }
-
-        songMeta.RemoveVoice(voiceId);
-    }
-
-    public static void RemoveVoice(SongMeta songMeta, Voice voice)
-    {
-        if (songMeta == null
-            || voice == null)
-        {
-            return;
-        }
-
-        RemoveVoice(songMeta, voice.Id);
-    }
-
-    public static bool HasFailedToLoadVoices(SongMeta songMeta)
-    {
-        return songMeta is LazyLoadedVoicesSongMeta lazyLoadedVoicesSongMeta
-               && lazyLoadedVoicesSongMeta.LoadVoicesPhase is LazyLoadedVoicesSongMeta.ELoadVoicesPhase.Failed;
     }
 }

@@ -1,5 +1,5 @@
-﻿#TITLE:F4V Format Test
-#ARTIST:Test Artist
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
 #MP3:f4v.f4v
 #VIDEO:f4v.f4v
 #BPM:200

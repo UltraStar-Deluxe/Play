@@ -1,5 +1,5 @@
-﻿#TITLE:OGG-MKV Format Test
-#ARTIST:Test Artist
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
 #MP3:ogg.ogg
 #VIDEO:mkv.mkv
 #BPM:200

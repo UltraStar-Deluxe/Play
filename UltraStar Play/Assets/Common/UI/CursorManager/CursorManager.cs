@@ -8,7 +8,7 @@ using Cursor = UnityEngine.Cursor;
 
 public class CursorManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static CursorManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<CursorManager>();
+    public static CursorManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<CursorManager>();
 
     private static readonly int cursorWidth = 32;
     private static readonly int cursorHeight = 32;
@@ -50,12 +50,12 @@ public class CursorManager : AbstractSingletonBehaviour, INeedInjection
             .AddTo(gameObject);
         SetDefaultCursor();
     }
-    
+
     public static void SetCursorForVisualElement(VisualElement visualElement, ECursor cursor)
     {
         Instance.DoSetCursorForVisualElement(visualElement, cursor);
     }
-    
+
     private void DoSetCursorForVisualElement(VisualElement visualElement, ECursor cursor)
     {
         visualElement.RegisterCallback<PointerEnterEvent>(_ => SetCursor(cursor));
@@ -154,7 +154,7 @@ public class CursorManager : AbstractSingletonBehaviour, INeedInjection
         CurrentCursor = ECursor.Pencil;
         SetCursor(pencilCursorTexture, lowerLeft, CursorMode.Auto);
     }
-    
+
     public void SetCursorVertical()
     {
         if (!UseImageAsCursor())

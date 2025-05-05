@@ -1,5 +1,5 @@
-﻿#TITLE:MOV Format Test
-#ARTIST:Test Artist
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
 #MP3:mov.mov
 #VIDEO:mov.mov
 #BPM:200

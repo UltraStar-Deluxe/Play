@@ -2,15 +2,12 @@
     <ui:VisualElement name="loadedOptionsRoot">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%; height: 10%; flex-grow: 1; margin-bottom: 20px;">
             <Chooser wrap-around="true" min-value="0" max-value="100" step-value="10" name="themeChooser" label="$options_theme" class="noBackgroundInHierarchy" />
-            <Chooser wrap-around="true" min-value="0" max-value="100" step-value="10" name="backgroundLightChooser" label="$options_backgroundLights" class="noBackgroundInHierarchy" style="display: none;" />
+            <Chooser wrap-around="true" min-value="0" max-value="100" step-value="10" name="backgroundLightChooser" label="$options_backgroundLights" class="noBackgroundInHierarchy" />
             <Chooser name="sceneChangeAnimationChooser" wrap-around="true" min-value="0" max-value="100" step-value="10" label="$options_sceneTransition" class="noBackgroundInHierarchy" />
             <Chooser name="sceneChangeDurationChooser" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="$options_sceneTransitionDuration" class="noBackgroundInHierarchy" />
             <Chooser name="previewFadeInDurationChooser" label="$options_previewFadeInDuration" wrap-around="true" min-value="0" max-value="5" step-value="0.5" class="noBackgroundInHierarchy" />
             <Chooser name="songBackgroundScaleModeChooser" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="$options_songBackgroundScaleMode" class="noBackgroundInHierarchy" />
             <ui:Toggle name="imageAsCursorToggle" label="$options_useImageAsCursor" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="showSongIndexInSongSelectToggle" label="$options_showIndexInSongSelect" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="showScrollBarInSongSelectToggle" label="$options_showScrollBarInSongSelect" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="navigateFoldersInSongSelectToggle" label="$options_navigateFoldersInSongSelect" class="noBackgroundInHierarchy" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

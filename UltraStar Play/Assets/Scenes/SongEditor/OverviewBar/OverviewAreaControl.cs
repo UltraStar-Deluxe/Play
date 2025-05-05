@@ -96,7 +96,7 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
             () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.SameAsPlayback);
     }
 
-    public void UpdateAudioWaveForm()
+    public async void UpdateAudioWaveForm()
     {
         if (!songAudioPlayer.IsFullyLoaded
             // Must be an audio format. Getting all the samples does not work with video files.
@@ -120,7 +120,7 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
             audioWaveFormVisualization.WaveformColor = overviewAreaLabel.resolvedStyle.color;
         }
 
-        AudioClip audioClip = SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
+        AudioClip audioClip = await SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
         SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioClip);
     }
 

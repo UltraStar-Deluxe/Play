@@ -60,9 +60,7 @@ public class DropdownFieldControl<T>
         this.selectionProperty = new ReactiveProperty<T>(initialSelection);
         this.Items = items;
 
-        this.dropdownField.choices = items
-            .Select(item => this.itemToString(item))
-            .ToList();
+        UpdateChoices();
 
         if (initialSelection != null)
         {
@@ -93,5 +91,19 @@ public class DropdownFieldControl<T>
                 dropdownField.value = this.itemToString(newValue);
             }
         });
+    }
+
+    public void UpdateLabelText()
+    {
+        // Dropdown value is determined by the item display text. Thus, the choices must be updated as well as the display text.
+        UpdateChoices();
+        dropdownField.SetValueWithoutNotify(this.itemToString(Selection));
+    }
+
+    private void UpdateChoices()
+    {
+        this.dropdownField.choices = items
+            .Select(item => this.itemToString(item))
+            .ToList();
     }
 }

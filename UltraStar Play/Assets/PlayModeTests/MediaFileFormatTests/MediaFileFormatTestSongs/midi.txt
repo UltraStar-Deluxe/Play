@@ -1,5 +1,5 @@
-﻿#TITLE:MIDI Format Test
-#ARTIST:Test Artist
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
 #MP3:midi.mid
 #BPM:200
 - 0

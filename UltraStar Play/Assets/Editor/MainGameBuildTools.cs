@@ -2,23 +2,38 @@ using UnityEditor;
 
 public static class MainGameBuildTools
 {
-    private static readonly string appName = "UltraStar Play";
-
-    [MenuItem("Tools/Build/Build for release (Windows, macOS, Linux, signed apk, signed app bundle)")]
-    public static void BuildAllForRelease()
-    {
-        BuildWindows64();
-        BuildMacOS();
-        BuildLinux64();
-        BuildSignedAndroidApk();
-        BuildSignedAndroidAppBundle();
-        // BuildIOS();
-    }
+    private static readonly string appName = "Melody Mania";
 
     [MenuItem("Tools/Build/Windows64")]
     public static void BuildWindows64()
     {
-        BuildUtils.PerformCustomBuild(CreateCustomBuildOptions(BuildTarget.StandaloneWindows64));
+        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
+        BuildUtils.PerformCustomBuild(customBuildOptions);
+    }
+
+    [MenuItem("Tools/Build/Windows64 (dev build)")]
+    public static void BuildWindows64ForDev()
+    {
+        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
+        customBuildOptions.buildOptions |= BuildOptions.Development;
+        BuildUtils.PerformCustomBuild(customBuildOptions);
+    }
+
+    [MenuItem("Tools/Build/Windows64 - Build and upload to Steam")]
+    public static void BuildWindows64AndSteamUpload()
+    {
+        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
+        customBuildOptions.uploadToSteam = true;
+        BuildUtils.PerformCustomBuild(customBuildOptions);
+    }
+
+    [MenuItem("Tools/Build/Windows64 - Steam upload only")]
+    public static void SteamUploadLastWindows64Build()
+    {
+        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
+        customBuildOptions.uploadToSteam = true;
+
+        SteamBuildUtils.UploadBuildOutputToSteam(customBuildOptions);
     }
 
     [MenuItem("Tools/Build/Linux64")]

@@ -26,7 +26,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
     private readonly List<SongEditorMemento> history = new();
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongEditorLayerManager layerManager;
@@ -39,7 +39,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     public void OnSceneInjectionFinished()
     {
-        songMetaChangeEventStream
+        songMetaChangedEventStream
             .Where(evt => IsUndoable(evt))
             // When there is no new change to the song for some time, then record an undo-state.
             .Throttle(new TimeSpan(0, 0, 0, 0, 500))
@@ -164,7 +164,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
         editorNoteDisplayer.ClearNoteControls();
 
-        songMetaChangeEventStream.OnNext(new LoadedMementoEvent());
+        songMetaChangedEventStream.OnNext(new LoadedMementoEvent());
 
         songMetaToSongEditorMementoMap[songMeta] = undoState;
     }
@@ -187,7 +187,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
             {
                 // Create new voice
                 Voice voiceMementoClone = voiceMemento.CloneDeep();
-                SongMetaUtils.AddVoice(songMeta, voiceMementoClone);
+                SongEditorSongMetaUtils.AddVoice(songMeta, voiceMementoClone);
             }
             else
             {
@@ -209,7 +209,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
                 .FirstOrDefault(voice => voice.Id == voiceInSongMeta.Id);
             if (matchingVoiceMemento == null)
             {
-                SongMetaUtils.RemoveVoice(songMeta, voiceInSongMeta);
+                SongEditorSongMetaUtils.RemoveVoice(songMeta, voiceInSongMeta);
             }
         }
     }
@@ -226,7 +226,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         }
     }
 
-    private bool IsUndoable(SongMetaChangeEvent evt)
+    private bool IsUndoable(SongMetaChangedEvent evt)
     {
         return evt.Undoable
                && evt is not LoadedMementoEvent;

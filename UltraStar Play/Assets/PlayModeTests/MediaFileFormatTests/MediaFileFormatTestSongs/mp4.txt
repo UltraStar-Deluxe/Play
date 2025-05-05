@@ -1,5 +1,5 @@
-﻿#TITLE:MP4 Format Test
-#ARTIST:Test Artist
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
 #MP3:mp4.mp4
 #VIDEO:mp4.mp4
 #BPM:200

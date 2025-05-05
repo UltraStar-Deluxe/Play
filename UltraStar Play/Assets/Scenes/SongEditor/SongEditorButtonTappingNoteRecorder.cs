@@ -176,19 +176,25 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
         }
 
         string remainingButtonTappingLyrics = buttonTappingLyrics.Substring(cursorIndex);
-        int indexOfFirstSpaceOrNewline = StringUtils.MinIndexOf(remainingButtonTappingLyrics, 0, ' ', '\n');
-        if (indexOfFirstSpaceOrNewline < 0)
+        int indexOfSeparator = StringUtils.MinIndexOf(remainingButtonTappingLyrics, 0, ' ', ';', '\n');
+        if (indexOfSeparator < 0)
         {
             cursorIndex = buttonRecordingLyricsTextField.text.Length;
             return remainingButtonTappingLyrics;
         }
 
-        string firstWord = remainingButtonTappingLyrics.Substring(0, indexOfFirstSpaceOrNewline);
-        cursorIndex += indexOfFirstSpaceOrNewline + 1;
-        firstWord = firstWord.Replace("\n", "")
-            .Replace(" ", "")
-            .Replace(";", "");
-        return firstWord;
+        string word = remainingButtonTappingLyrics.Substring(0, indexOfSeparator + 1);
+        cursorIndex += indexOfSeparator + 1;
+        if (word.EndsWith('\n'))
+        {
+            word = word.Replace("\n", "");
+        }
+        else if(word.EndsWith(';'))
+        {
+            word = word.Replace(";", "");
+
+        }
+        return word;
     }
 
     private void ContinueLastRecordedNote(int currentBeat, ESongEditorLayer targetLayer)

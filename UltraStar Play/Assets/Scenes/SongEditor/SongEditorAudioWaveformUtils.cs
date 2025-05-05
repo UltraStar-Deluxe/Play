@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class SongEditorAudioWaveformUtils
 {
-    public static AudioClip GetAudioClipToDrawAudioWaveform(
+    public static async Awaitable<AudioClip> GetAudioClipToDrawAudioWaveform(
         SongMeta songMeta,
         Settings settings)
     {
@@ -38,7 +38,7 @@ public static class SongEditorAudioWaveformUtils
         }
 
         // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-        AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(audioUri, false);
+        AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(audioUri, false);
         return audioClip;
     }
 

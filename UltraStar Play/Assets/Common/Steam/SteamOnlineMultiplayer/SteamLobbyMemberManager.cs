@@ -13,7 +13,7 @@ namespace SteamOnlineMultiplayer
 {
     public class SteamLobbyMemberManager : AbstractSingletonBehaviour, INeedInjection, ILobbyMemberManager
     {
-        public static SteamLobbyMemberManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamLobbyMemberManager>();
+        public static SteamLobbyMemberManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SteamLobbyMemberManager>();
 
         private const int MaxConnectionDataLength = 2048;
 

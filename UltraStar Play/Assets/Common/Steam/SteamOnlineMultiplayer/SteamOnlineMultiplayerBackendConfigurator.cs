@@ -5,7 +5,7 @@ namespace SteamOnlineMultiplayer
 {
     public class SteamOnlineMultiplayerBackendConfigurator : AbstractSingletonBehaviour, INeedInjection
     {
-        public static SteamOnlineMultiplayerBackendConfigurator Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamOnlineMultiplayerBackendConfigurator>();
+        public static SteamOnlineMultiplayerBackendConfigurator Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SteamOnlineMultiplayerBackendConfigurator>();
 
         [Inject]
         private OnlineMultiplayerManager onlineMultiplayerManager;

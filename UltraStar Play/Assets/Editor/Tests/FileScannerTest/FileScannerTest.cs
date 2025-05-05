@@ -17,48 +17,48 @@ public class FileScannerTest
     [Test]
     public void NonRecursive()
     {
-        FileScanner fileScanner = new(txtFilePattern, false, false);
-        List<string> files = fileScanner.GetFiles(folderPath, false);
+        List<string> files = FileScanner.GetFiles(folderPath,
+            new FileScannerConfig(txtFilePattern) { ExcludeHiddenFiles = false, ExcludeHiddenFolders = false, Recursive = false });
         Assert.AreEqual(2, files.Count);
     }
 
     [Test]
     public void NonRecursiveMultiplePatterns()
     {
-        FileScanner fileScanner = new(patterns, false, false);
-        List<string> files = fileScanner.GetFiles(folderPath, false);
+        List<string> files = FileScanner.GetFiles(folderPath,
+            new FileScannerConfig(patterns) { ExcludeHiddenFiles = false, ExcludeHiddenFolders = false, Recursive = false });
         Assert.AreEqual(4, files.Count);
     }
 
     [Test]
     public void Recursive()
     {
-        FileScanner fileScanner = new(txtFilePattern, false, false);
-        List<string> files = fileScanner.GetFiles(folderPath, true);
+        List<string> files = FileScanner.GetFiles(folderPath,
+            new FileScannerConfig(txtFilePattern) { ExcludeHiddenFiles = false, ExcludeHiddenFolders = false, Recursive = true });
         Assert.AreEqual(6, files.Count);
     }
 
     [Test]
     public void RecursiveMultiplePatterns()
     {
-        FileScanner fileScanner = new(patterns, false, false);
-        List<string> files = fileScanner.GetFiles(folderPath, true);
+        List<string> files = FileScanner.GetFiles(folderPath,
+            new FileScannerConfig(patterns) { ExcludeHiddenFiles = false, ExcludeHiddenFolders = false, Recursive = true });
         Assert.AreEqual(12, files.Count);
     }
 
     [Test]
     public void RecursiveExcludeHiddenFolders()
     {
-        FileScanner fileScanner = new(txtFilePattern, true, false);
-        List<string> files = fileScanner.GetFiles(folderPath, true);
+        List<string> files = FileScanner.GetFiles(folderPath,
+            new FileScannerConfig(txtFilePattern) { ExcludeHiddenFiles = false, ExcludeHiddenFolders = true, Recursive = true });
         Assert.AreEqual(4, files.Count);
     }
 
     [Test]
     public void RecursiveExcludeHiddenFiles()
     {
-        FileScanner fileScanner = new(txtFilePattern, false, true);
-        List<string> files = fileScanner.GetFiles(folderPath, true);
+        List<string> files = FileScanner.GetFiles(folderPath,
+            new FileScannerConfig(txtFilePattern) { ExcludeHiddenFiles = true, ExcludeHiddenFolders = false, Recursive = true });
         Assert.AreEqual(5, files.Count);
     }
 }

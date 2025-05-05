@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using CommonOnlineMultiplayer;
-using PortAudioForUnity;
-using Serilog.Events;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
@@ -15,25 +13,13 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjection, IBinder
+public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjection, IBinder, IInjectionFinishedListener
 {
     [InjectedInInspector]
     public VisualTreeAsset uploadWorkshopItemDialogUi;
 
     [Inject(UxmlName = R.UxmlNames.showFpsToggle)]
     private Toggle showFpsToggle;
-
-    [Inject(UxmlName = R.UxmlNames.systemAudioBackendDelayChooser)]
-    private Chooser systemAudioBackendDelayChooser;
-
-    [Inject(UxmlName = R.UxmlNames.portAudioOutputDeviceChooser)]
-    private Chooser portAudioOutputDeviceChooser;
-
-    [Inject(UxmlName = R.UxmlNames.portAudioHostApiChooser)]
-    private Chooser portAudioHostApiChooser;
-
-    [Inject(UxmlName = R.UxmlNames.portAudioDeviceInfoButton)]
-    private Button portAudioDeviceInfoButton;
 
     [Inject(UxmlName = R.UxmlNames.maxConcurrentSongMediaConversionsChooser)]
     private Chooser maxConcurrentSongMediaConversionsChooser;
@@ -105,7 +91,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     private ThemeManager themeManager;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private UIDocument uiDocument;
@@ -143,17 +129,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.generatedFolderPathTextField)]
     private TextField generatedFolderPathTextField;
 
-    [Inject(UxmlName = R.UxmlNames.ffmpegConversionCommandsJsonChooser)]
-    private TextField ffmpegConversionCommandsJsonChooser;
-
     [Inject(UxmlName = R.UxmlNames.songVideoPlaybackChooser)]
     private Chooser songVideoPlaybackChooser;
-
-    [Inject(UxmlName = R.UxmlNames.useFfmpegToPlayMediaFilesChooser)]
-    private Chooser useFfmpegToPlayMediaFilesChooser;
-
-    [Inject(UxmlName = R.UxmlNames.logFfmpegOutputToggle)]
-    private Toggle logFfmpegOutputToggle;
 
     [Inject(UxmlName = R.UxmlNames.useVlcToPlayMediaFilesChooser)]
     private Chooser useVlcToPlayMediaFilesChooser;
@@ -161,8 +138,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.logVlcOutputToggle)]
     private Toggle logVlcOutputToggle;
 
-    [Inject(UxmlName = R.UxmlNames.checkCodecIsSupportedToggle)]
-    private Toggle checkCodecIsSupportedToggle;
+    [Inject(UxmlName = R.UxmlNames.vlcOptionsTextField)]
+    private TextField vlcOptionsTextField;
 
     [Inject(UxmlName = R.UxmlNames.vfxEnabledToggle)]
     private Toggle vfxEnabledToggle;
@@ -189,6 +166,13 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     private Chooser upgradeUltraStarFormatVersionForSave;
 
     private MessageDialogControl uploadWorkshopItemDialogControl;
+
+    private readonly PortAudioOptionsControl portAudioOptionsControl = new();
+
+    public void OnInjectionFinished()
+    {
+        injector.Inject(portAudioOptionsControl);
+    }
 
     protected override void Start()
     {
@@ -309,7 +293,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         reportIssueButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToReportIssues)));
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
-            ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
+            ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(ELogEventLevel.Verbose));
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
         });
 
@@ -380,24 +364,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .Bind(() => settings.UpgradeUltraStarSongFormatVersionForSave,
                 newValue => settings.UpgradeUltraStarSongFormatVersionForSave = newValue);
 
-        // Ffmpeg playback / conversion
-        FieldBindingUtils.Bind(ffmpegConversionCommandsJsonChooser,
-            () => JsonConverter.ToJson(settings.FileFormatToFfmpegConversionArguments, true),
-            newValueAsString =>
-            {
-                try
-                {
-                    Dictionary<string, string> newValueAsDict = JsonConverter.FromJson<Dictionary<string, string>>(newValueAsString);
-                    settings.FileFormatToFfmpegConversionArguments = newValueAsDict;
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError(
-                        $"Failed to update ffmpeg conversion commands with the following JSON: '{newValueAsString}', error message: {ex.Message}");
-                }
-            });
-
         // SongVideoPlayback
         new EnumChooserControl<ESongVideoPlayback>(songVideoPlaybackChooser)
             .Bind(() => settings.SongVideoPlayback,
@@ -412,50 +378,13 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.LogVlcOutput,
             newValue => settings.LogVlcOutput = newValue);
 
-
-        // ffmpeg
-        new EnumChooserControl<EThirdPartyLibraryUsage>(useFfmpegToPlayMediaFilesChooser)
-            .Bind(() => settings.FfmpegToPlayMediaFilesUsage,
-                newValue => settings.FfmpegToPlayMediaFilesUsage = newValue);
-
-        FieldBindingUtils.Bind(logFfmpegOutputToggle,
-            () => settings.LogFfmpegOutput,
-            newValue => settings.LogFfmpegOutput = newValue);
-
-        // Media file conversion
-        FieldBindingUtils.Bind(checkCodecIsSupportedToggle,
-            () => settings.CheckCodecIsSupported,
-            newValue => settings.CheckCodecIsSupported = newValue);
-
-        new NumberChooserControl(maxConcurrentSongMediaConversionsChooser, settings.MaxConcurrentSongMediaConversions).Bind(
-            () => settings.MaxConcurrentSongMediaConversions,
-            newValue => settings.MaxConcurrentSongMediaConversions = (int)Math.Max(newValue, 0));
-
-        // PortAudio device info
-        portAudioDeviceInfoButton.RegisterCallbackButtonTriggered(_ => ShowPortAudioDeviceInfo());
-
-        // PortAudio host API
-        new EnumChooserControl<PortAudioHostApi>(portAudioHostApiChooser, GetAvailablePortAudioHostApis())
-            .Bind(() => settings.PortAudioHostApi,
-                newValue => settings.PortAudioHostApi = newValue);
-
-        // PortAudio output device
-        LabeledChooserControl<string> portAudioOutputDeviceChooserControl = new(portAudioOutputDeviceChooser,
-            GetAvailablePortAudioOutputDeviceNames(),
-            item => item.IsNullOrEmpty() ? Translation.Get(R.Messages.common_default) : Translation.Of(item));
-        portAudioOutputDeviceChooserControl.Bind(
-            () => settings.PortAudioOutputDeviceName,
-            newValue => settings.PortAudioOutputDeviceName = newValue);
-
-        settings.ObserveEveryValueChanged(it => it.PortAudioHostApi)
-            .Subscribe(newValue => portAudioOutputDeviceChooserControl.Items = GetAvailablePortAudioOutputDeviceNames())
-            .AddTo(gameObject);
-
-        // System audio backend delay
-        UnitNumberChooserControl systemAudioBackendDelayChooserControl = new(systemAudioBackendDelayChooser, "ms");
-        systemAudioBackendDelayChooserControl.Bind(
-            () => settings.SystemAudioBackendDelayInMillis,
-            newValue => settings.SystemAudioBackendDelayInMillis = (int)newValue);
+        FieldBindingUtils.Bind(vlcOptionsTextField,
+            () => settings.VlcOptions.JoinWith("\n"),
+            newValue => settings.VlcOptions = Regex
+                .Split(newValue, @"\n")
+                .Select(it => it.Trim())
+                .Where(it => !it.IsNullOrEmpty())
+                .ToList());
 
         // Wipe lyrics
         FieldBindingUtils.Bind(wipeLyricsEffectToggle,
@@ -497,7 +426,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .WithRootVisualElement(visualElement)
             .CreateAndInject<UploadWorkshopItemUiControl>();
 
-        uploadWorkshopItemDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.steamWorkshop_uploadDialog_title));
+        uploadWorkshopItemDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.steamWorkshop_uploadDialog_title));
         uploadWorkshopItemDialogControl.AddVisualElement(visualElement);
         uploadWorkshopItemDialogControl.DialogClosedEventStream
             .Subscribe(evt =>
@@ -511,149 +440,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             _ => uploadWorkshopItemUiControl.PublishWorkshopItem());
         uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.action_cancel),
             _ => uploadWorkshopItemDialogControl.CloseDialog());
-    }
-
-    private List<string> GetAvailablePortAudioOutputDeviceNames()
-    {
-        return new List<string>()
-            {
-                "",
-            }
-            .Union(PortAudioUtils.DeviceInfos
-                .Where(deviceInfo => deviceInfo.MaxOutputChannels > 0
-                                     && deviceInfo.HostApi == MicrophoneAdapter.GetHostApi())
-                .Select(deviceInfo => deviceInfo.Name))
-            .ToList();
-    }
-
-    private List<PortAudioHostApi> GetAvailablePortAudioHostApis()
-    {
-        return new List<PortAudioHostApi>()
-            {
-                PortAudioHostApi.Default
-            }
-            .Union(PortAudioUtils.HostApis
-                .Select(portAudioHostApi => PortAudioConversionUtils.ConvertHostApi(portAudioHostApi))
-                .ToList())
-            .ToList();
-    }
-
-    private void ShowPortAudioDeviceInfo()
-    {
-        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.options_development_portAudioDialog_title));
-        messageDialogControl.AddButton(Translation.Get(R.Messages.options_development_action_copyCsv), _ => CopyPortAudioDeviceListCsv());
-        messageDialogControl.AddButton(Translation.Get(R.Messages.action_close), _ => messageDialogControl.CloseDialog());
-
-        Label defaultHostApiLabel = new Label();
-        defaultHostApiLabel.text = $"Default host API: {PortAudioConversionUtils.GetDefaultHostApi()}";
-        messageDialogControl.AddVisualElement(defaultHostApiLabel);
-
-        foreach (HostApiInfo hostApiInfo in PortAudioUtils.HostApiInfos)
-        {
-            // Add group for this host API
-            AccordionItem accordionItem = new(StringUtils.EscapeLineBreaks(hostApiInfo.Name));
-            messageDialogControl.AddVisualElement(accordionItem);
-
-            // Add label for each device of this host API
-            foreach (DeviceInfo deviceInfo in PortAudioUtils.DeviceInfos)
-            {
-                if (deviceInfo.HostApi != hostApiInfo.HostApi)
-                {
-                    continue;
-                }
-
-                Label deviceInfoLabel = new();
-                deviceInfoLabel.name = $"deviceInfoLabel";
-                deviceInfoLabel.AddToClassList("deviceInfoLabel");
-                string inputOutputIcons = GetInputOutputIcons(deviceInfo);
-                deviceInfoLabel.text = $"{inputOutputIcons} '{deviceInfo.Name}'," +
-                                       $" max input channels: {deviceInfo.MaxInputChannels}," +
-                                       $" max output channels: {deviceInfo.MaxOutputChannels}," +
-                                       $" default sample rate: {deviceInfo.DefaultSampleRate.ToStringInvariantCulture("0")}," +
-                                       $" default low input latency: {deviceInfo.DefaultLowInputLatency.ToStringInvariantCulture()}," +
-                                       $" default high input latency: {deviceInfo.DefaultHighInputLatency.ToStringInvariantCulture()}," +
-                                       $" default low output latency: {deviceInfo.DefaultLowOutputLatency.ToStringInvariantCulture()}," +
-                                       $" default high output latency: {deviceInfo.DefaultHighOutputLatency.ToStringInvariantCulture()}," +
-                                       $" host API device index: {deviceInfo.HostApiDeviceIndex}," +
-                                       $" global device index: {deviceInfo.GlobalDeviceIndex}";
-                accordionItem.Add(deviceInfoLabel);
-            }
-
-            // Add label for default input / output device
-            DeviceInfo defaultInputDevice = PortAudioUtils.DeviceInfos.FirstOrDefault(it => it.GlobalDeviceIndex == hostApiInfo.DefaultInputDeviceGlobalIndex);
-            DeviceInfo defaultOutputDevice = PortAudioUtils.DeviceInfos.FirstOrDefault(it => it.GlobalDeviceIndex == hostApiInfo.DefaultOutputDeviceGlobalIndex);
-            Label defaultDeviceLabel = new();
-            defaultDeviceLabel.text = $"Default input device: '{defaultInputDevice?.Name}', default output device: '{defaultOutputDevice?.Name}'";
-            accordionItem.Add(defaultDeviceLabel);
-        }
-    }
-
-    private string GetInputOutputIcons(DeviceInfo deviceInfo)
-    {
-        string inputIcon = deviceInfo.MaxInputChannels > 0
-            ? "🎤"
-            : "";
-        string outputIcon = deviceInfo.MaxOutputChannels > 0
-            ? "🔈"
-            : "";
-        return $"{inputIcon}{outputIcon}";
-    }
-
-    private void CopyPortAudioDeviceListCsv()
-    {
-        // TODO: use CSV lib with proper link between column header and values
-        StringBuilder sb = new();
-
-        // Add header
-        List<string> headers = new()
-        {
-            "host API",
-            "input/output",
-            "device name",
-            "max input channels",
-            "max output channels",
-            "default sample rate",
-            "default low input latency",
-            "default high input latency",
-            "default low output latency",
-            "default high output latency",
-            "host API device index",
-            "global device index",
-        };
-        string headerCsv = headers
-            .Select(it => $"\"{it}\"")
-            .JoinWith(", ");
-        sb.Append(headerCsv);
-        sb.Append("\n");
-
-        // Add values
-        foreach (DeviceInfo deviceInfo in PortAudioUtils.DeviceInfos)
-        {
-            string nameWithoutLineBreaks = StringUtils.EscapeLineBreaks(deviceInfo.Name);
-            List<string> values = new() {
-                deviceInfo.HostApi.ToString(),
-                GetInputOutputIcons(deviceInfo),
-                nameWithoutLineBreaks,
-                deviceInfo.MaxInputChannels.ToString(),
-                deviceInfo.MaxOutputChannels.ToString(),
-                deviceInfo.DefaultSampleRate.ToStringInvariantCulture("0"),
-                deviceInfo.DefaultLowInputLatency.ToStringInvariantCulture(),
-                deviceInfo.DefaultHighInputLatency.ToStringInvariantCulture(),
-                deviceInfo.DefaultLowOutputLatency.ToStringInvariantCulture(),
-                deviceInfo.DefaultHighOutputLatency.ToStringInvariantCulture(),
-                deviceInfo.HostApiDeviceIndex.ToString(),
-                deviceInfo.GlobalDeviceIndex.ToString(),
-            };
-            string valuesCsv = values
-                .Select(it => $"\"{it}\"")
-                .JoinWith(", ");
-            sb.Append(valuesCsv);
-            sb.Append("\n");
-        }
-
-        ClipboardUtils.CopyToClipboard(sb.ToString());
-
-        NotificationManager.CreateNotification(Translation.Get(R.Messages.common_copiedToClipboard));
     }
 
     private void UpdateLogEventLevel()

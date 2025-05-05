@@ -16,6 +16,15 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private SongSelectSceneControl songSelectSceneControl;
 
     [Inject]
+    private SongSelectMenuControl songSelectMenuControl;
+
+    [Inject]
+    private SongSelectSongQueueControl songSelectSongQueueControl;
+
+    [Inject]
+    private SongSelectModifiersControl songSelectModifiersControl;
+
+    [Inject]
     private SongSearchControl songSearchControl;
 
     [Inject]
@@ -102,6 +111,18 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => songRouletteControl.SelectNextEntry());
         InputManager.GetInputAction(R.InputActions.usplay_previousSong).PerformedAsObservable()
             .Subscribe(_ => songRouletteControl.SelectPreviousEntry());
+        InputManager.GetInputAction(R.InputActions.usplay_nextSongByOrderProperty).PerformedAsObservable(1)
+            .Subscribe(_ =>
+            {
+                InputManager.GetInputAction(R.InputActions.usplay_nextSong).CancelNotifyForThisFrame();
+                songSearchControl.SelectNextEntryByOrderProperty();
+            });
+        InputManager.GetInputAction(R.InputActions.usplay_previousSongByOrderProperty).PerformedAsObservable(1)
+            .Subscribe(_ =>
+            {
+                InputManager.GetInputAction(R.InputActions.usplay_previousSong).CancelNotifyForThisFrame();
+                songSearchControl.SelectPreviousEntryByOrderProperty();
+            });
 
         // Navigate to parent folder
         InputManager.GetInputAction(R.InputActions.usplay_navigateToParentFolder).PerformedAsObservable()
@@ -227,13 +248,17 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSelectSceneControl.OnCancelSearch();
         }
-        else if (songSelectSceneControl.SongQueueSlideInControl.Visible.Value)
+        else if (songSelectMenuControl.SceneMenuSlideInControl.Visible.Value)
         {
-            songSelectSceneControl.SongQueueSlideInControl.SlideOut();
+            songSelectMenuControl.SceneMenuSlideInControl.SlideOut();
         }
-        else if (songSelectSceneControl.ModifiersOverlaySlideInControl.Visible.Value)
+        else if (songSelectSongQueueControl.SongQueueSlideInControl.Visible.Value)
         {
-            songSelectSceneControl.ModifiersOverlaySlideInControl.SlideOut();
+            songSelectSongQueueControl.SongQueueSlideInControl.SlideOut();
+        }
+        else if (songSelectModifiersControl.ModifiersOverlaySlideInControl.Visible.Value)
+        {
+            songSelectModifiersControl.ModifiersOverlaySlideInControl.SlideOut();
         }
         else
         {
@@ -283,7 +308,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             }
             songSelectSceneControl.DoFuzzySearch(fuzzySearchText.Value);
 
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(fuzzySearchResetTimeInSeconds, () => CheckResetFuzzySearchText()));
+            AwaitableUtils.ExecuteAfterDelayInSecondsAsync(gameObject, fuzzySearchResetTimeInSeconds, () => CheckResetFuzzySearchText());
         }
     }
 

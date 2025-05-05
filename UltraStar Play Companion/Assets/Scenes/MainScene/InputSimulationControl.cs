@@ -162,7 +162,8 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         });
     }
 
-    private void SendSimulateLeftMouseButtonClickRequest()
+    // Method is public to access it from test
+    public async Awaitable SendSimulateLeftMouseButtonClickRequestAsync()
     {
         if (awaitingDragEnd)
         {
@@ -170,10 +171,15 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         }
 
         Debug.Log("simulating left mouse button single click");
-        SendSimulateInputRequest("leftMouseButton");
+        await SendSimulateInputRequestAsync("leftMouseButton");
     }
 
-    private void SendSimulateLeftMouseButtonDoubleClickRequest()
+    private async void SendSimulateLeftMouseButtonClickRequest()
+    {
+        await SendSimulateLeftMouseButtonClickRequestAsync();
+    }
+
+    private async void SendSimulateLeftMouseButtonDoubleClickRequest()
     {
         if (awaitingDragEnd)
         {
@@ -181,11 +187,11 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         }
 
         Debug.Log("simulating left mouse button double click");
-        SendSimulateInputRequest("leftMouseButton");
-        SendSimulateInputRequest("leftMouseButton");
+        await SendSimulateInputRequestAsync("leftMouseButton");
+        await SendSimulateInputRequestAsync("leftMouseButton");
     }
 
-    private void SendSimulateDragStartRequest()
+    private async void SendSimulateDragStartRequest()
     {
         if (awaitingDragEnd)
         {
@@ -194,10 +200,10 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
         awaitingDragEnd = true;
         Debug.Log("simulating drag start");
-        SendSimulateInputRequest("dragStart");
+        await SendSimulateInputRequestAsync("dragStart");
     }
 
-    private void SendSimulateDragEndRequest()
+    private async void SendSimulateDragEndRequest()
     {
         if (!awaitingDragEnd)
         {
@@ -206,7 +212,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
         awaitingDragEnd = false;
         Debug.Log("simulating drag end");
-        SendSimulateInputRequest("dragEnd");
+        await SendSimulateInputRequestAsync("dragEnd");
     }
 
     private void OnPointerUpOnRootVisualElement(PointerUpEvent evt)
@@ -220,7 +226,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void OnPointerDownOnMousePadArea(PointerDownEvent evt)
+    private async void OnPointerDownOnMousePadArea(PointerDownEvent evt)
     {
         Log.Debug(() => "OnPointerDownOnMousePadArea");
         UpdateClickCountOnPointerDownOnMousePadArea();
@@ -231,34 +237,29 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         mousePadAreaStartPos = evt.localPosition;
         lastMousePadAreaPos = evt.localPosition;
 
-        // Check for single click, i.e. released all fingers after single click
         if (mousePadAreaPointerDownEventClickCount == 1)
         {
-            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(ClickTimeThresholdInSeconds, () =>
+            // Check for single click, i.e. released all fingers after single click
+            await Awaitable.WaitForSecondsAsync(ClickTimeThresholdInSeconds);
+            if (!isPointerDownOnMousePadArea
+                && mousePadAreaPointerDownEventClickCount == 1
+                && !isMousePadAreaTotalPointerDeltaAboveThreshold
+                && !awaitingDragEnd)
             {
-                if (!isPointerDownOnMousePadArea
-                    && mousePadAreaPointerDownEventClickCount == 1
-                    && !isMousePadAreaTotalPointerDeltaAboveThreshold
-                    && !awaitingDragEnd)
-                {
-                    SendSimulateLeftMouseButtonClickRequest();
-                }
-            }));
+                SendSimulateLeftMouseButtonClickRequest();
+            }
         }
-
-        // Check for double click, i.e. released all fingers after double click
-        if (mousePadAreaPointerDownEventClickCount == 2)
+        else if (mousePadAreaPointerDownEventClickCount == 2)
         {
-            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(DoubleClickTimeThresholdInSeconds, () =>
+            // Check for double click, i.e. released all fingers after double click
+            await Awaitable.WaitForSecondsAsync(DoubleClickTimeThresholdInSeconds);
+            if (!isPointerDownOnMousePadArea
+                && mousePadAreaPointerDownEventClickCount == 2
+                && !isMousePadAreaTotalPointerDeltaAboveThreshold
+                && !awaitingDragEnd)
             {
-                if (!isPointerDownOnMousePadArea
-                    && mousePadAreaPointerDownEventClickCount == 2
-                    && !isMousePadAreaTotalPointerDeltaAboveThreshold
-                    && !awaitingDragEnd)
-                {
-                    SendSimulateLeftMouseButtonDoubleClickRequest();
-                }
-            }));
+                SendSimulateLeftMouseButtonDoubleClickRequest();
+            }
         }
     }
 
@@ -426,25 +427,25 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         lastMousePadAreaPos = localPosition;
     }
 
-    private void SendSimulateInputRequest(string inputControl)
+    private async Awaitable SendSimulateInputRequestAsync(string inputControl)
     {
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.Input
+        await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.Input
             .ReplaceOrThrow("{inputControl}", inputControl));
     }
 
-    private void SendSimulateScrollWheelRequest(Vector2 scrollDelta)
+    private async void SendSimulateScrollWheelRequest(Vector2 scrollDelta)
     {
         if (scrollDelta == Vector2.zero)
         {
             return;
         }
 
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.InputScrollWheel
+        await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.InputScrollWheel
             .ReplaceOrThrow("{deltaX}", scrollDelta.x.ToString(CultureInfo.InvariantCulture))
             .ReplaceOrThrow("{deltaY}", scrollDelta.y.ToString(CultureInfo.InvariantCulture)));
     }
 
-    private void SendSimulateMouseDeltaRequest(Vector2 mouseDelta)
+    private async void SendSimulateMouseDeltaRequest(Vector2 mouseDelta)
     {
         if (mouseDelta == Vector2.zero)
         {
@@ -457,14 +458,14 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.InputMouseDelta
+        await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.InputMouseDelta
             .ReplaceOrThrow("{deltaX}", mouseDelta.x.ToStringInvariantCulture())
             .ReplaceOrThrow("{deltaY}", mouseDelta.y.ToStringInvariantCulture()));
     }
 
     private void RegisterCallbackToSendSimulationInputRequest(Button uiButton, string keyboardButton)
     {
-        uiButton.RegisterCallbackButtonTriggered(_ => SendSimulateInputRequest(keyboardButton));
+        uiButton.RegisterCallbackButtonTriggered(async _ => await SendSimulateInputRequestAsync(keyboardButton));
     }
 
     private class CustomPointerMoveEvent

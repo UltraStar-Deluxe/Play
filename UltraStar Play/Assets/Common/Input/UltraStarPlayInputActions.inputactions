@@ -481,7 +481,7 @@
                     "name": "back",
                     "type": "Button",
                     "id": "3e3292ca-119e-4227-9948-6a5c5f53ac16",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -541,19 +541,19 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "nextCharacterQuickJumpCharacter",
+                    "name": "nextSongByOrderProperty",
                     "type": "Button",
                     "id": "bad4dd92-99be-47a6-bee5-c0fb3d2673f7",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "previousCharacterQuickJumpCharacter",
+                    "name": "previousSongByOrderProperty",
                     "type": "Button",
                     "id": "ec2a8b9f-b851-48d1-9853-8a0f4bb5fbd2",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -1291,9 +1291,42 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "previousCharacterQuickJumpCharacter",
+                    "action": "previousSongByOrderProperty",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "Shift+Left",
+                    "id": "2fdd9571-82e5-4017-a879-dd39d2b5fb15",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "previousSongByOrderProperty",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "b3bc7389-0e1a-42f1-873f-b8e2fa99bd5c",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "previousSongByOrderProperty",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "4f83a76f-7a04-42aa-ad5d-a47290e06184",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "previousSongByOrderProperty",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 },
                 {
                     "name": "",
@@ -1302,9 +1335,42 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "nextCharacterQuickJumpCharacter",
+                    "action": "nextSongByOrderProperty",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "Shift+Right",
+                    "id": "b3016c02-ff69-4900-b771-d1b397f08b7f",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "nextSongByOrderProperty",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "5f2355e3-c681-4715-9e7c-3c296a5d6912",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "nextSongByOrderProperty",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "1d38549e-f1e9-4d78-8912-a110059fcc53",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "nextSongByOrderProperty",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 },
                 {
                     "name": "",

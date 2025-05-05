@@ -8,7 +8,7 @@ using UniInject;
 public class MergeSentencesAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     public bool CanExecute(IReadOnlyCollection<Note> selectedNotes)
     {
@@ -42,6 +42,6 @@ public class MergeSentencesAction : INeedInjection
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes, Note targetNote)
     {
         Execute(selectedNotes, targetNote);
-        songMetaChangeEventStream.OnNext(new SentencesMergedEvent());
+        songMetaChangedEventStream.OnNext(new SentencesMergedEvent());
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -11,9 +12,10 @@ public class EditAndSaveTest : AbstractPlayModeTest
     protected static readonly string testFolderPath = Application.dataPath + "/Editor/Tests/TestSongs";
 
     [UnityTest]
-    public IEnumerator CanEditSongAndSaveChanges()
+    public IEnumerator CanEditSongAndSaveChanges() => CanEditSongAndSaveChangesAsync();
+    private async Awaitable CanEditSongAndSaveChangesAsync()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
         // Load SongMeta from temporary file
         string testSongFolderName = "SongEditorTestSongs";
@@ -41,7 +43,7 @@ public class EditAndSaveTest : AbstractPlayModeTest
             SongMeta = editedSongMeta,
         });
 
-        yield return new WaitForSeconds(0.5f);
+        await Awaitable.WaitForSecondsAsync(0.5f);
 
         Assert.IsNotNull(injector, "Did not get injector for loaded scene");
 
@@ -78,20 +80,16 @@ public class EditAndSaveTest : AbstractPlayModeTest
         // Assert GAP has been changed as expected
         Assert.AreEqual(newVideoGap, editedSongMeta.VideoGapInMillis, 0.1);
 
-        yield return new WaitForSeconds(0.5f);
+        await Awaitable.WaitForSecondsAsync(0.5f);
 
         // Save edited song
         SongMetaManager.Instance.SaveSong(editedSongMeta, true);
 
         // Assert changes have been persisted and loaded as expected
         SongMeta loadedEditedSongMeta = new LazyLoadedFromFileSongMeta(copiedSongMetaPath);
-        string expectedJson = JsonConverter.ToJson(editedSongMeta);
-        string actualJson = JsonConverter.ToJson(loadedEditedSongMeta);
-        Debug.Log($"Expected JSON: {expectedJson}");
-        Debug.Log($"Actual JSON: {actualJson}");
-        Assert.AreEqual(expectedJson, actualJson);
+        SongMetaAssertUtils.AssertSongMetasAreEqual(editedSongMeta, loadedEditedSongMeta);
 
         // Assert that there is a change compared to the original song
-        Assert.AreNotEqual(JsonConverter.ToJson(originalSongMetaPath), JsonConverter.ToJson(loadedEditedSongMeta));
+        Assert.Throws<AssertionException>(() => SongMetaAssertUtils.AssertSongMetasAreEqual(originalSongMeta, loadedEditedSongMeta));
     }
 }

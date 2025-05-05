@@ -1,5 +1,5 @@
-﻿#TITLE:MP3 Variable Bit Rate Format Test
-#ARTIST:Test Artist
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
 #MP3:mp3-VariableBitRate.mp3
 #BPM:200
 - 0

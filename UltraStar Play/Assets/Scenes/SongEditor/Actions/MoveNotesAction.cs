@@ -8,7 +8,7 @@ using UniInject;
 public class MoveNotesAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     public void MoveNotesHorizontal(int distanceInBeats, IEnumerable<Note> selectedNotes, IEnumerable<Note> followingNotes=null)
     {
@@ -29,12 +29,12 @@ public class MoveNotesAction : INeedInjection
     public void MoveNotesVerticalAndNotify(int distanceInMidiNotes, IEnumerable<Note> selectedNotes, IEnumerable<Note> followingNotes=null)
     {
         MoveNotesVertical(distanceInMidiNotes, selectedNotes, followingNotes);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 
     public void MoveNotesHorizontalAndNotify(int distanceInBeats, IEnumerable<Note> selectedNotes, IEnumerable<Note> followingNotes=null)
     {
         MoveNotesHorizontal(distanceInBeats, selectedNotes, followingNotes);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 }

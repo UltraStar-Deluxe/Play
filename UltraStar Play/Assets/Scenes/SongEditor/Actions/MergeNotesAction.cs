@@ -12,7 +12,7 @@ public class MergeNotesAction : INeedInjection
     private DeleteNotesAction deleteNotesAction;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongEditorLayerManager layerManager;
@@ -51,6 +51,6 @@ public class MergeNotesAction : INeedInjection
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes, Note targetNote)
     {
         Execute(selectedNotes, targetNote);
-        songMetaChangeEventStream.OnNext(new NotesMergedEvent());
+        songMetaChangedEventStream.OnNext(new NotesMergedEvent());
     }
 }

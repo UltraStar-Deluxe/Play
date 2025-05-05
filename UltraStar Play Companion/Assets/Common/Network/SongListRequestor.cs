@@ -1,5 +1,4 @@
 using System;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -19,7 +18,7 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
     [Inject]
     private MainGameHttpClient mainGameHttpClient;
 
-    public void RequestSongList()
+    public async void RequestSongList()
     {
         if (!mainGameHttpClient.IsConnected)
         {
@@ -27,9 +26,15 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
             return;
         }
 
-        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.Songs,
-            HandleSongListResponse,
-            HandleSongListErrorResponse);
+        try
+        {
+            string response = await mainGameHttpClient.GetRequestAsync(RestApiEndpointPaths.Songs);
+            HandleSongListResponse(response);
+        }
+        catch (Exception e)
+        {
+            HandleSongListErrorResponse(e);
+        }
     }
 
     private void HandleSongListResponse(string response)

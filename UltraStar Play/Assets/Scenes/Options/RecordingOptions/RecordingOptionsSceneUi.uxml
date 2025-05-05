@@ -6,8 +6,8 @@
             <ui:Label text="$options_recording_noConnectedMic_hint" name="tryConnectMicLabel" class="secondaryFontColor mt-2 mb-1 noBackgroundInHierarchy" style="white-space: normal; -unity-text-align: middle-left;" />
         </ui:VisualElement>
         <ui:VisualElement name="micConfigurationContainer" style="flex-grow: 1;">
-            <ui:VisualElement name="row">
-                <Chooser name="deviceChooser" wrap-around="false" min-value="0" max-value="100" step-value="10" class="multiline mr-2" style="width: 100%;" />
+            <ui:VisualElement name="row" class="child-mr-2">
+                <ui:DropdownField name="deviceChooser" style="flex-grow: 1;" />
                 <SlideToggle name="enabledToggle" style="-unity-text-align: upper-center;" />
             </ui:VisualElement>
             <ui:VisualElement name="micVisualizationContainer" class="my-2" style="border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; align-items: flex-start; justify-content: center; flex-direction: row; height: 60px;">
@@ -23,20 +23,23 @@
                         <Chooser name="colorChooser" label="$options_color" wrap-around="false" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                         <Chooser name="delayChooser" label="$options_delay" wrap-around="true" min-value="0" max-value="1000" step-value="10" class="noBackgroundInHierarchy" />
                         <ui:Button text="$options_delay_calibrate" display-tooltip-when-elided="true" name="calibrateDelayButton" class="controlMinWidth ellipsis ml-auto mb-3" />
-                        <Chooser name="amplificationChooser" label="$options_amplification" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                         <Chooser name="noiseSuppressionChooser" label="$options_noiseSuppression" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                        <Chooser name="amplificationChooser" label="$options_amplification" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                         <Chooser name="sampleRateChooser" label="$options_sampleRate" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                         <ui:VisualElement name="recordingDeviceInactiveOverlay" picking-mode="Ignore" class="overlay inactiveOverlay roundCorners" style="background-color: rgba(0, 0, 0, 0.5); display: none;" />
                     </ui:VisualElement>
-                    <ui:VisualElement name="globalSettingsContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                    <ui:VisualElement name="globalSettingsContainer" class="child-mb-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                         <ui:Label tabindex="-1" text="$options_globalSettings" display-tooltip-when-elided="true" name="globalSettingsLabel" class="noBackgroundInHierarchy" style="width: 100%; -unity-text-align: upper-center; -unity-font-style: bold; margin-top: 10px; margin-bottom: 10px;" />
+                        <Chooser name="systemAudioBackendDelayChooser" label="System Audio Backend Delay" wrap-around="true" min-value="0" max-value="500" step-value="10" class="noBackgroundInHierarchy" />
                         <ui:Toggle name="usePortAudioToggle" label="$options_usePortAudio" class="noBackgroundInHierarchy mt-3 mb-3" />
-                        <ui:Toggle name="playRecordedAudioToggle" label="$options_playRecordedAudio" style="margin-bottom: 0;" />
-                        <ui:VisualElement name="playRecordedAudioInfoContainer" style="flex-direction: row; align-items: center;">
-                            <MaterialIcon tabindex="-1" name="infoIcon" icon="info_outline" class="smallFont mr-1 nBackgroundInHierarchy" />
-                            <ui:Label tabindex="-1" text="$options_playRecordedAudioInfo" name="playRecordedAudioInfoLabel" class="smallFont playRecordedAudioInfoContainer" />
+                        <ui:VisualElement name="micPlaybackContainer" style="flex-grow: 1;">
+                            <ui:Toggle name="playRecordedAudioToggle" label="$options_playRecordedAudio" style="margin-bottom: 0;" />
+                            <ui:VisualElement name="playRecordedAudioInfoContainer" style="flex-direction: row; align-items: center; margin-top: -4px;">
+                                <MaterialIcon tabindex="-1" name="infoIcon" icon="info_outline" class="smallFont mr-1 nBackgroundInHierarchy" />
+                                <ui:Label tabindex="-1" text="$options_playRecordedAudioInfo" name="playRecordedAudioInfoLabel" class="smallFont playRecordedAudioInfoContainer" />
+                            </ui:VisualElement>
+                            <Chooser name="micPlaybackVolumeChooser" label="$options_micPlaybackVolume" wrap-around="true" min-value="0" max-value="1000" step-value="10" class="mt-1" />
                         </ui:VisualElement>
-                        <Chooser name="micPlaybackVolumeChooser" label="$options_micPlaybackVolume" wrap-around="true" min-value="0" max-value="1000" step-value="10" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:ScrollView>
