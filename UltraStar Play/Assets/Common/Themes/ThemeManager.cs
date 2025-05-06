@@ -258,98 +258,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         Debug.Log($"Loading theme '{themeMeta.FileNameWithoutExtension}'");
         loadedSprites.Clear();
 
-        ApplyThemeStyleSheets(themeMeta);
-
         await Awaitable.EndOfFrameAsync();
         ApplyThemeBackground(themeMeta);
         alreadyProcessedVisualElements.Clear();
         ApplyStyles(uiDocument.rootVisualElement);
         anyThemeLoaded = true;
-    }
-
-    private void ApplyThemeStyleSheets(ThemeMeta themeMeta)
-    {
-        // Remove old theme style sheets
-        foreach (StyleSheet styleSheet in filePathToStyleSheet.Values)
-        {
-            uiDocument.rootVisualElement.styleSheets.Remove(styleSheet);
-        }
-
-        if (themeMeta == null
-            || themeMeta.ThemeJson == null
-            || themeMeta.ThemeJson.styleSheets.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        foreach (string styleSheetFile in themeMeta.ThemeJson.styleSheets)
-        {
-            string absoluteStyleSheetFile = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, styleSheetFile);
-            if (!File.Exists(absoluteStyleSheetFile))
-            {
-                Debug.LogWarning($"Style Sheet file does not exist: {absoluteStyleSheetFile}");
-                continue;
-            }
-
-            if (!filePathToStyleSheet.TryGetValue(absoluteStyleSheetFile, out StyleSheet styleSheet))
-            {
-                styleSheet = LoadAndCacheStyleSheet(absoluteStyleSheetFile);
-            }
-
-            if (!uiDocument.rootVisualElement.styleSheets.Contains(styleSheet))
-            {
-                uiDocument.rootVisualElement.styleSheets.Add(styleSheet);
-            }
-        }
-    }
-
-    private StyleSheet LoadAndCacheStyleSheet(string styleSheetFile)
-    {
-        string styleSheetContent = File.ReadAllText(styleSheetFile);
-        StyleSheet styleSheet = StyleSheetUtils.CreateStyleSheet(styleSheetContent);
-        filePathToStyleSheet[styleSheetFile] = styleSheet;
-
-        AddStyleSheetFileSystemWatcher(styleSheetFile, styleSheet);
-
-        return styleSheet;
-    }
-
-    private void AddStyleSheetFileSystemWatcher(string styleSheetFile, StyleSheet styleSheet)
-    {
-        void OnThemeStyleSheetFileChanged(object sender, FileSystemEventArgs e)
-        {
-            ThreadUtils.RunOnMainThread(() => UpdateThemeStyleSheet(styleSheetFile, styleSheet));
-        }
-
-        Debug.Log($"Creating file system watcher for theme style sheet: {styleSheetFile}");
-        FileSystemWatcher fileSystemWatcher = FileSystemWatcherFactory.CreateFileSystemWatcher(
-            Path.GetDirectoryName(styleSheetFile),
-            new FileSystemWatcherConfig("ThemeStyleSheetWatcher", Path.GetFileName(styleSheetFile)),
-            OnThemeStyleSheetFileChanged);
-        styleSheetFileSystemWatchers.Add(fileSystemWatcher);
-    }
-
-    private void UpdateThemeStyleSheet(string styleSheetFile, StyleSheet styleSheet)
-    {
-        Debug.Log($"Reloading changed style sheet file: {styleSheetFile}");
-        try
-        {
-            bool wasAdded = uiDocument.rootVisualElement.styleSheets.Contains(styleSheet);
-            uiDocument.rootVisualElement.styleSheets.Remove(styleSheet);
-
-            string styleSheetContent = File.ReadAllText(styleSheetFile);
-            StyleSheetUtils.BuildStyleSheet(styleSheet, styleSheetContent);
-
-            if (wasAdded)
-            {
-                uiDocument.rootVisualElement.styleSheets.Add(styleSheet);
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to update style sheet with content from file '{styleSheetFile}'");
-        }
     }
 
     private void ApplyThemeBackground(ThemeMeta themeMeta)
