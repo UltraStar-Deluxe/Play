@@ -2,7 +2,7 @@ using UnityEditor;
 
 public static class MainGameBuildTools
 {
-    private static readonly string appName = "Melody Mania";
+    private static readonly string appName = "UltraStar Play";
 
     [MenuItem("Tools/Build/Windows64")]
     public static void BuildWindows64()
