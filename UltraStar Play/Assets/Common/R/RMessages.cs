@@ -11,6 +11,7 @@ public static partial class R
         public static readonly string action_addTeam = "action_addTeam";
         public static readonly string action_addToPlaylist = "action_addToPlaylist";
         public static readonly string action_apply = "action_apply";
+        public static readonly string action_buyOnSteam = "action_buyOnSteam";
         public static readonly string action_cancel = "action_cancel";
         public static readonly string action_close = "action_close";
         public static readonly string action_confirmDelete = "action_confirmDelete";
@@ -753,6 +754,8 @@ public static partial class R
         public static readonly string uri_howToSteamWorkshop = "uri_howToSteamWorkshop";
         public static readonly string uri_howToThemes = "uri_howToThemes";
         public static readonly string uri_logFiles = "uri_logFiles";
+        public static readonly string uri_melodyMania = "uri_melodyMania";
+        public static readonly string uri_melodyMania_onSteam = "uri_melodyMania_onSteam";
         public static readonly string uri_merchandiseShop = "uri_merchandiseShop";
         public static readonly string validation_missingValue = "validation_missingValue";
         public static readonly string webView_askToOpenWebsiteDialog_confirm = "webView_askToOpenWebsiteDialog_confirm";

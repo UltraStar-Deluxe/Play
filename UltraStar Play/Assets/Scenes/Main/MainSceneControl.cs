@@ -284,11 +284,15 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         }
 
         supportTheProjectDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_supportTheProjectDialog_title));
-        supportTheProjectDialogControl.DialogClosedEventStream.Subscribe(_ => supportTheProjectDialogControl = null);
         supportTheProjectDialogControl.Message = Translation.Get(R.Messages.mainScene_supportTheProjectDialog_message);
-
+        supportTheProjectDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
+            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_melodyMania)));
+        supportTheProjectDialogControl.AddButton(Translation.Get(R.Messages.action_buyOnSteam),
+            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_melodyMania_onSteam)));
         supportTheProjectDialogControl.AddButton(Translation.Get(R.Messages.action_openMerchandiseShop),
             _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_merchandiseShop)));
+        supportTheProjectDialogControl.DialogClosedEventStream
+            .Subscribe(_ => supportTheProjectDialogControl = null);
     }
 
     public List<IBinding> GetBindings()
