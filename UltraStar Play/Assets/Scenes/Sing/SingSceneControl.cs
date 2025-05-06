@@ -95,9 +95,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private Statistics statistics;
 
     [Inject]
-    private SteamManager steamManager;
-
-    [Inject]
     private UltraStarPlayInputManager inputManager;
 
     [Inject(UxmlName = R.UxmlNames.topLyricsContainer)]

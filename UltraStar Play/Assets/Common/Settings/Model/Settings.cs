@@ -176,7 +176,7 @@ public class Settings : ISettings
     public bool ReloadModsOnFileChange { get; set; }
 
     // Online multiplayer
-    public EOnlineMultiplayerBackend EOnlineMultiplayerBackend { get; set; } = EOnlineMultiplayerBackend.Steam;
+    public EOnlineMultiplayerBackend EOnlineMultiplayerBackend { get; set; } = EOnlineMultiplayerBackend.Netcode;
     public string UnityTransportIpAddress { get; set; } = "127.0.0.1";
     public ushort UnityTransportPort { get; set; } = 7777;
     public ENetworkDelivery BeatAnalyzedEventNetworkDelivery { get; set; } = ENetworkDelivery.ReliableSequenced;

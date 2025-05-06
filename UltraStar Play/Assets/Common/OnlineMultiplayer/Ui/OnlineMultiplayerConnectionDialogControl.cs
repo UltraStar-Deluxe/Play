@@ -99,18 +99,7 @@ namespace SteamOnlineMultiplayer
 
         private void ToggleOnlineMultiplayerBackend()
         {
-            switch (settings.EOnlineMultiplayerBackend)
-            {
-                case EOnlineMultiplayerBackend.Steam:
-                    settings.EOnlineMultiplayerBackend = EOnlineMultiplayerBackend.Netcode;
-                    break;
-                case EOnlineMultiplayerBackend.Netcode:
-                    settings.EOnlineMultiplayerBackend = EOnlineMultiplayerBackend.Steam;
-                    break;
-            }
-
-            // Close dialog to load different UI for different backend.
-            CloseDialog();
+            // Only Melody Mania has multiple backends, namely Steam in addition to raw Netcode
         }
 
         private void UpdateVisibleContainer()

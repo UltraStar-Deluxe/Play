@@ -72,9 +72,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.openPersistentDataPathButton)]
     private Button openPersistentDataPathButton;
 
-    [Inject(UxmlName = R.UxmlNames.openWebViewScriptsPathButton)]
-    private Button openWebViewScriptsPathButton;
-
     [Inject(UxmlName = R.UxmlNames.messageBufferTimeTextField)]
     private IntegerField messageBufferTimeTextField;
 
@@ -155,9 +152,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlClass = "accordionItem")]
     private List<AccordionItem> accordionItems;
-
-    [Inject(UxmlName = R.UxmlNames.uploadWorkshopItemButton)]
-    private Button uploadWorkshopItemButton;
 
     [Inject(UxmlName = R.UxmlNames.defaultUltraStarFormatVersionForSave)]
     private Chooser defaultUltraStarFormatVersionForSave;
@@ -307,16 +301,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             openPersistentDataPathButton.HideByDisplay();
         }
 
-        // Open WebView scripts path
-        if (PlatformUtils.IsStandalone)
-        {
-            openWebViewScriptsPathButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(WebViewUtils.GetDefaultWebViewScriptsAbsolutePath()));
-        }
-        else
-        {
-            openWebViewScriptsPathButton.HideByDisplay();
-        }
-
         // Message delay
         FieldBindingUtils.Bind(messageBufferTimeTextField,
             () => settings.CompanionClientMessageBufferTimeInMillis,
@@ -409,37 +393,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(simulateJitterInMillisField,
             () => settings.OnlineMultiplayerSimulatedJitterInMillis,
             newValue => settings.OnlineMultiplayerSimulatedJitterInMillis = newValue);
-
-        // Mods
-        uploadWorkshopItemButton.RegisterCallbackButtonTriggered(evt => ShowUploadNewModDialog());
-    }
-
-    private void ShowUploadNewModDialog()
-    {
-        if (uploadWorkshopItemDialogControl != null)
-        {
-            return;
-        }
-
-        VisualElement visualElement = uploadWorkshopItemDialogUi.CloneTreeAndGetFirstChild();
-        UploadWorkshopItemUiControl uploadWorkshopItemUiControl = injector
-            .WithRootVisualElement(visualElement)
-            .CreateAndInject<UploadWorkshopItemUiControl>();
-
-        uploadWorkshopItemDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.steamWorkshop_uploadDialog_title));
-        uploadWorkshopItemDialogControl.AddVisualElement(visualElement);
-        uploadWorkshopItemDialogControl.DialogClosedEventStream
-            .Subscribe(evt =>
-            {
-                uploadWorkshopItemUiControl.Dispose();
-                uploadWorkshopItemDialogControl = null;
-            });
-        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
-            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToSteamWorkshop)));
-        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.steamWorkshop_action_publish),
-            _ => uploadWorkshopItemUiControl.PublishWorkshopItem());
-        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.action_cancel),
-            _ => uploadWorkshopItemDialogControl.CloseDialog());
     }
 
     private void UpdateLogEventLevel()

@@ -46,16 +46,9 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(DefaultFocusableNavigator.Instance);
         bb.BindExistingInstance(MicSampleRecorderManager.Instance);
         bb.BindExistingInstance(AchievementEventStream.Instance);
-        bb.BindExistingInstance(WebViewManager.Instance);
         bb.BindExistingInstance(ModManager.Instance);
         bb.BindExistingInstance(RuntimeUiInspectionManager.Instance);
-        bb.BindExistingInstance(VlcManager.Instance);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(DefaultFocusableNavigator.Instance);
-
-        // Steam
-        bb.BindExistingInstance(SteamManager.Instance);
-        bb.BindExistingInstance(SteamAchievementManager.Instance);
-        bb.BindExistingInstance(SteamWorkshopManager.Instance);
 
         // Online Multiplayer
         bb.BindExistingInstance(OnlineMultiplayerManager.Instance);
@@ -65,12 +58,6 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(NetcodeLobbyManager.Instance);
         bb.BindExistingInstance(NetcodeLobbyMemberManager.Instance);
         bb.BindExistingInstance(NetcodeOnlineMultiplayerBackendConfigurator.Instance);
-
-        // Steam online multiplayer
-        bb.BindExistingInstance(SteamLobbyManager.Instance);
-        bb.BindExistingInstance(SteamLobbyMemberManager.Instance);
-        bb.BindExistingInstance(SteamOnlineMultiplayerBackendConfigurator.Instance);
-        bb.BindExistingInstance(DontDestroyOnLoadManager.FindComponentOrThrow<FacepunchTransport>());
 
         NetworkManagerInitialization.InitNetworkManagerSingleton();
         bb.BindExistingInstance(NetworkManager.Singleton);

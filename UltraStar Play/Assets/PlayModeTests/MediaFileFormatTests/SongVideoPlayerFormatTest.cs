@@ -38,6 +38,7 @@ public class SongVideoPlayerFormatTest : AbstractMediaFileFormatTest
         yield return SongVideoPlayerShouldLoadFileAsync(txtFileName);
     }
 
+    [Ignore("Requires third-party lib")]
     [UnityTest]
     [TestCaseSource(nameof(supportedByThirdPartyLib))]
     public IEnumerator ShouldLoadViaThirdParty(string txtFileName)

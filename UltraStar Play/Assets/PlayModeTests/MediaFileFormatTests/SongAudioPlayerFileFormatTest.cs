@@ -50,6 +50,7 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
         yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath);
     }
 
+    [Ignore("Requires third-party lib")]
     [UnityTest]
     [TestCaseSource(nameof(supportedByThirdPartyLib))]
     public IEnumerator ShouldLoadViaThirdParty(string txtFilePath)

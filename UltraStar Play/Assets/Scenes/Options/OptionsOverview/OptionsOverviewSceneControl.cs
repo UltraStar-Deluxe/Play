@@ -114,9 +114,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
     [Inject]
     private OptionsSceneData sceneData;
 
-    [Inject]
-    private SteamWorkshopManager steamWorkshopManager;
-
     private SceneRecipe loadedSceneRecipe;
     private readonly List<GameObject> loadedGameObjects = new();
     private readonly Dictionary<EScene, ToggleButton> sceneToButtonMap = new();
@@ -153,40 +150,12 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
             }
         });
 
-        openSteamWorkshopButton.RegisterCallbackButtonTriggered(_ => OpenSteamWorkshop());
-
-        updateSteamWorkshopItemsButton.RegisterCallbackButtonTriggered(_ => UpdateSteamWorkshopItems());
-        new TooltipControl(updateSteamWorkshopItemsButton, Translation.Get(R.Messages.steamWorkshop_updateTooltip));
-
         helpButton.RegisterCallbackButtonTriggered(_ => ShowHelp());
         issuesButton.RegisterCallbackButtonTriggered(_ => ShowIssuesDialog());
 
         backButton.RegisterCallbackButtonTriggered(_ => OnBack());
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
-    }
-
-    private void OpenSteamWorkshop()
-    {
-        if (LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        steamWorkshopManager.OpenSteamWorkshopOverlay(LoadedOptionsSceneControl.SteamWorkshopUri);
-    }
-
-    private async void UpdateSteamWorkshopItems()
-    {
-        await steamWorkshopManager.DownloadWorkshopItemsAsync();
-        if (GameObjectUtils.IsDestroyed(this))
-        {
-            return;
-        }
-
-        Debug.Log("Reloading current options scene because Steam Workshop items update finished");
-        await Awaitable.MainThreadAsync();
-        ReloadCurrentOptionsScene();
     }
 
     private void ReloadCurrentOptionsScene()

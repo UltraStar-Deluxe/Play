@@ -153,8 +153,6 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             playerProfileImageChooserControl.Chooser.NextItemButton.HideByDisplay();
             onlinePlayerProfileIcon.SetInClassList("onlineMultiplayerHost", lobbyMemberPlayerProfile.IsHost);
             onlinePlayerProfileIconContainer.ShowByDisplay();
-
-            UpdateOnlineMultiplayerPlayerImage(lobbyMemberPlayerProfile, playerProfileImageChooserControl);
         }
         else
         {
@@ -162,34 +160,6 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         }
 
         return visualElement;
-    }
-
-    private async void UpdateOnlineMultiplayerPlayerImage(LobbyMemberPlayerProfile lobbyMemberPlayerProfile, PlayerProfileImageChooserControl playerProfileImageChooserControl)
-    {
-        if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Netcode)
-        {
-            playerProfileImageChooserControl.Chooser.ItemLabel.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(lobbyMemberPlayerProfile.Name));
-        }
-        else if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Steam)
-        {
-            SteamLobbyMember steamLobbyMember = onlineMultiplayerManager.LobbyMemberManager.GetLobbyMember(lobbyMemberPlayerProfile.UnityNetcodeClientId) as SteamLobbyMember;
-            if (steamLobbyMember == null)
-            {
-                return;
-            }
-
-            try
-            {
-                Texture2D texture = await SteamAvatarImageUtils.GetAvatarTextureAsync(steamLobbyMember.SteamId);
-                playerProfileImageChooserControl.Chooser.ItemImage.image = texture;
-                playerProfileImageChooserControl.Chooser.ItemLabel.HideByDisplay();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to get avatar image of Steam user '{steamLobbyMember.DisplayName}' with id {steamLobbyMember.SteamId}");
-            }
-        }
     }
 
     public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=PlayerProfileImage";

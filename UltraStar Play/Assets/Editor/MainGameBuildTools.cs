@@ -19,23 +19,6 @@ public static class MainGameBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Windows64 - Build and upload to Steam")]
-    public static void BuildWindows64AndSteamUpload()
-    {
-        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
-        customBuildOptions.uploadToSteam = true;
-        BuildUtils.PerformCustomBuild(customBuildOptions);
-    }
-
-    [MenuItem("Tools/Build/Windows64 - Steam upload only")]
-    public static void SteamUploadLastWindows64Build()
-    {
-        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
-        customBuildOptions.uploadToSteam = true;
-
-        SteamBuildUtils.UploadBuildOutputToSteam(customBuildOptions);
-    }
-
     [MenuItem("Tools/Build/Linux64")]
     public static void BuildLinux64()
     {

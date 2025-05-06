@@ -51,9 +51,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private PanelHelper panelHelper;
 
-    [Inject]
-    private WebViewManager webViewManager;
-
     private readonly ReactiveProperty<string> fuzzySearchText = new("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
@@ -285,7 +282,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         if (newChar == (int)KeyCode.Escape
             || newChar == (int)KeyCode.Return
             || (newChar == (int)KeyCode.Backspace && fuzzySearchText.Value.IsNullOrEmpty())
-            || webViewManager.IsWebViewCanvasControlEnabled
             || (newChar == (int)KeyCode.Space && fuzzySearchText.Value.IsNullOrEmpty()))
         {
             return;

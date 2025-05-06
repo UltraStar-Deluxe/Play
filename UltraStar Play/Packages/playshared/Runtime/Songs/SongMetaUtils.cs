@@ -423,7 +423,7 @@ public static class SongMetaUtils
         return noteDistanceInBeats * SongMetaBpmUtils.MillisPerBeat(songMeta);
     }
 
-    public static string GetVideoUriPreferAudioUriIfWebView(SongMeta songMeta, Func<string, bool> canHandleUri)
+    public static string GetVideoUriPreferAudioUriIfWebView(SongMeta songMeta, Func<string, bool> canHandleUri = null)
     {
         if (songMeta == null)
         {

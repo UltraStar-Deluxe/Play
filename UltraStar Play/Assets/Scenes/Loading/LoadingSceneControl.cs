@@ -27,12 +27,6 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     [Inject]
     private PlaylistManager playlistManager;
 
-    [Inject]
-    private SteamManager steamManager;
-
-    [Inject]
-    private SteamWorkshopManager steamWorkshopManager;
-
     [Inject(UxmlName = R.UxmlNames.unexpectedErrorLabel)]
     private Label unexpectedErrorLabel;
 
@@ -47,9 +41,6 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
     [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
     private Button hiddenContinueButton;
-
-    private bool IsAllPreloadingFinished => IsSteamWorkshopItemsDownloadFinished;
-    private bool IsSteamWorkshopItemsDownloadFinished => steamWorkshopManager.DownloadState is SteamWorkshopManager.EDownloadState.Finished;
 
     private long waitStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
 
@@ -146,9 +137,8 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
     private void Update()
     {
-        // Continue to next scene when preloading data has finished, or max wait time has been reached.
-        if (IsAllPreloadingFinished
-            || TimeUtils.IsDurationAboveThresholdInMillis(waitStartTimeInMillis, MaxWaitTimeInMillis))
+        // Continue to next scene when max wait time has been reached.
+        if (TimeUtils.IsDurationAboveThresholdInMillis(waitStartTimeInMillis, MaxWaitTimeInMillis))
         {
             FinishScene();
         }

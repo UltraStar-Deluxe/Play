@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ProTrans;
-using Steamworks;
 using UniRx;
 using UnityEngine;
 
@@ -63,21 +62,6 @@ public static class DefaultSettingsFactory
             Debug.LogError("Failed to create initial mic profiles");
         }
 
-        // Fill settings with values from Steam.
-        SteamManager steamManager = SteamManager.Instance;
-        if (steamManager.IsConnectedToSteam)
-        {
-            FillSettingsFromSteamManager(defaultSettings, steamManager);
-        }
-        else
-        {
-            // Set the player name when connection to Steam has been established.
-            float startTimeInSeconds = Time.time;
-            steamManager.ConnectedToSteamEventStream
-                .Where(_ => Time.time - startTimeInSeconds < 10)
-                .Subscribe(_ => FillSettingsFromSteamManager(defaultSettings, steamManager));
-        }
-
         // Set speech recognition model
         if (PlatformUtils.IsStandalone)
         {
@@ -86,25 +70,6 @@ public static class DefaultSettingsFactory
         }
 
         return defaultSettings;
-    }
-
-    private static void FillSettingsFromSteamManager(Settings defaultSettings, SteamManager steamManager)
-    {
-        try
-        {
-            // Set first player profile name to Steam account name
-            defaultSettings.PlayerProfiles.FirstOrDefault().Name = steamManager.PlayerName;
-
-            // Set current language to Steam Client language if available.
-            // Note that there is also SteamApps.GameLanguage,
-            // but this is always English until the game officially supports other languages.
-            TrySetCurrentLanguage(defaultSettings, SteamUtils.SteamUILanguage);
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            Debug.LogError("Failed to initialized default settings with data from Steam");
-        }
     }
 
     private static void TrySetCurrentLanguage(Settings defaultSettings, string language)

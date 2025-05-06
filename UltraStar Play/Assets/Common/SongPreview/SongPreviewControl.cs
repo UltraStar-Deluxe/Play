@@ -39,9 +39,6 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     public ReactiveProperty<float> VideoFadeIn { get; private set; } = new();
     public ReactiveProperty<float> BackgroundImageFadeIn { get; private set; } = new();
 
-    // TODO: Inject the instance
-    private WebViewManager WebViewManager => WebViewManager.Instance;
-
     protected virtual void Start()
     {
         if (GetFinalPreviewVolume() <= 0)
@@ -82,9 +79,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         // The video has an additional delay to load.
         // As long as no frame is ready yet, the VideoPlayer.time is 0.
         if (!songVideoPlayer.IsPartiallyLoaded
-            || (songVideoPlayer.PositionInMillis <= 0
-                // WebView must be visible to see controls, even when audio is not ready yet.
-                && songVideoPlayer.CurrentVideoSupportProvider is not WebViewVideoSupportProvider))
+            || songVideoPlayer.PositionInMillis <= 0)
         {
             videoFadeInStartTimeInSeconds = Time.time;
         }

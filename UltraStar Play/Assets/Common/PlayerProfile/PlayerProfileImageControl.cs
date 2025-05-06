@@ -76,20 +76,6 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
             Sprite loadedSprite = await playerProfileImageManager.LoadPlayerProfileImageAsync(finalImagePath);
             image.style.backgroundImage = new StyleBackground(loadedSprite);
         }
-        else if (lobbyMember is SteamLobbyMember steamLobbyMember)
-        {
-            try
-            {
-                Texture2D texture = await SteamAvatarImageUtils.GetAvatarTextureAsync(steamLobbyMember.SteamId);
-                image.style.backgroundImage = new StyleBackground(texture);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError(
-                    $"Failed to get avatar image of player with Steam id {steamLobbyMember.SteamId}: {ex.Message}");
-            }
-        }
     }
 
     private void UpdatePlayerImageColors()
@@ -100,8 +86,7 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
 
     private void UpdatePlayerImageTintColor()
     {
-        if (lobbyMember != null
-            && lobbyMember is not SteamLobbyMember)
+        if (lobbyMember != null)
         {
             image.style.unityBackgroundImageTintColor = new StyleColor(CommonOnlineMultiplayerUtils.GetPlayerColor(playerProfile, micProfile));
         }
