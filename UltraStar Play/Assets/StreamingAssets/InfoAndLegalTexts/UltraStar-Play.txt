@@ -1,6 +1,3 @@
 UltraStar Play is a singing game with custom songs and integrated song editor.
 
-It is a commercial fork of open source project UltraStar Play
-to invest in its development and bring even more sing-along fun to live.
-
 https://ultrastar-play.com
