@@ -23,8 +23,11 @@ Join us on [Discord](https://discord.gg/PAUJFKCGbb) to meet other maintainers. W
 
 You can support this project by
 
+- buying its commercial continuation [Melody Mania](https://melodymania.org) on [Steam](https://store.steampowered.com/app/2394070/Melody_Mania)
+- buying from the partner [merch shop](https://karaoke.style)
 - becoming a [GitHub Sponsor](https://github.com/sponsors/achimmihca)
-- writing tutorials or blog posts
+- sending a small thank you via [PayPal](https://paypal.me/anstdev)
+- creating tutorials or blog posts
 - improving the [documentation](https://github.com/UltraStar-Deluxe/Play/wiki)
 - adding [translations](https://github.com/UltraStar-Deluxe/Play/wiki/Translations,-Internationalization-(I18N))
 - submitting [bug reports or feature requests](https://github.com/UltraStar-Deluxe/Play/issues)
