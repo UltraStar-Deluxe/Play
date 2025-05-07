@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         unityVersion:
-          - 2023.2.12f1
+          - 6000.1.0f1
         targetPlatform:
           # - StandaloneWindows64
           # - StandaloneLinux64
@@ -47,8 +47,7 @@ jobs:
       
       # Run setup script
       - name: Setup Script
-        working-directory: tools
-        run: sh setup.sh
+        run: sh build.sh RestoreCompanionAppDependencies
 
       # Build Executables.
       - uses: game-ci/unity-builder@v4
