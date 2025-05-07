@@ -157,7 +157,7 @@
       "dependencies": {}
     },
     "com.unity.vectorgraphics": {
-      "version": "2.0.0-preview.21",
+      "version": "2.0.0-preview.25",
       "depth": 0,
       "source": "registry",
       "dependencies": {
