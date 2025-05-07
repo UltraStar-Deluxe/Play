@@ -85,9 +85,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     [Inject]
     private RenderTextureManager renderTextureManager;
 
-    [Inject]
-    private BackgroundLightManager backgroundLightManager;
-
     private HashSet<VisualElement> registeredSfxVisualElements = new();
 
     private string lastThemeDynamicBackgroundJson;
@@ -530,16 +527,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteLightVideoFilePath);
             string videoPlayerUrl = ApplicationUtils.GetVideoPlayerUri(uri);
             StartVideoPlayer(backgroundLightVideoPlayer, videoPlayerUrl, backgroundJson.lightVideoPlaybackSpeed);
-
-            // Use the video as background lights instead of the bokeh particle system
-            backgroundLightManager.IsBackgroundLightEnabled = false;
         }
         else
         {
             StopVideoPlayer(backgroundLightVideoPlayer);
-
-            // Use the bokeh particle system as background lights
-            backgroundLightManager.IsBackgroundLightEnabled = true;
         }
     }
 

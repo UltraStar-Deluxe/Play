@@ -22,9 +22,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection
     [Inject(UxmlName = R.UxmlNames.sceneChangeDurationChooser)]
     private Chooser sceneChangeDurationChooser;
 
-    [Inject(UxmlName = R.UxmlNames.backgroundLightChooser)]
-    private Chooser backgroundLightChooser;
-
     [Inject(UxmlName = R.UxmlNames.songBackgroundScaleModeChooser)]
     private Chooser songBackgroundScaleModeChooser;
 
@@ -33,9 +30,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection
 
     [Inject]
     private UiManager uiManager;
-
-    [Inject]
-    private BackgroundLightManager backgroundLightManager;
 
     protected override void Start()
     {
@@ -64,12 +58,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection
             newValue => Translation.Of($"{newValue.ToStringInvariantCulture("0.00")} s"));
         sceneChangeDurationChooserControl.Bind(() => settings.SceneChangeDurationInSeconds,
                 newValue => settings.SceneChangeDurationInSeconds = newValue);
-
-        new LabeledChooserControl<int>(backgroundLightChooser,
-                NumberUtils.CreateIntList(0, backgroundLightManager.BackgroundLightInstancesCount),
-                item => Translation.Of(item.ToString()))
-            .Bind(() => settings.BackgroundLightIndex,
-                newValue => settings.BackgroundLightIndex = newValue);
 
         // Load available themes:
         List<ThemeMeta> themeMetas = themeManager.GetThemeMetas();
