@@ -2,7 +2,7 @@ using UnityEditor;
 
 public static class CompanionAppBuildTools
 {
-    private static readonly string appName = "Melody Mania Companion";
+    private static readonly string appName = "UltraStar Play Companion";
 
     [MenuItem("Tools/Build/Android - Build apk")]
     public static void BuildAndroidApk()

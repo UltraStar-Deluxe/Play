@@ -11,7 +11,7 @@
                 <ui:VisualElement name="titleAndDescription" class="mr-auto" style="flex-direction: row; align-items: center;">
                     <ui:VisualElement name="companionAppLogo" class="mr-3 ml-3" style="background-image: url(&quot;project://database/Packages/playshared/Runtime/Graphics/Logos/LogoSmall-512.png?fileID=2800000&amp;guid=f3ab5af68813c5446a5f5403af87b6c7&amp;type=3#LogoSmall-512&quot;); width: 48px; height: 48px; flex-shrink: 0;" />
                     <ui:VisualElement name="column" style="flex-grow: 1;">
-                        <ui:Label text="Melody Mania Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold; white-space: normal;" />
+                        <ui:Label text="UltraStar Play Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold; white-space: normal;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
