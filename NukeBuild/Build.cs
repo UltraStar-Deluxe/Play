@@ -80,7 +80,7 @@ class Build : NukeBuild
             // Download new packages
             DotNet($"build {GetNuGetPackagesProjectFolder(mainGameDir)}");
 
-            // Copy libraries for playshared
+            // Move libraries for playshared
             DirectoryUtils.MoveFiles(
                 mainGameNuGetPackagesSourceFolder,
                 playsharedNuGetPackagesTargetFolder,
@@ -91,10 +91,11 @@ class Build : NukeBuild
                 "Serilog.dll",
                 "Serilog.Sinks.File.dll",
                 "System.Diagnostics.DiagnosticSource.dll", // transitive dependency of Serilog
+                "System.Runtime.CompilerServices.Unsafe.dll", // transitive dependency of Serilog
                 "System.Threading.Channels.dll", // transitive dependency of Serilog
                 "YamlDotNet.dll");
 
-            // Copy libraries for main game
+            // Move libraries for main game
             DirectoryUtils.MoveFiles(
                 mainGameNuGetPackagesSourceFolder,
                 mainGameNuGetPackagesTargetFolder,
