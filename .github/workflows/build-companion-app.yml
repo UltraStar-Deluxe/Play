@@ -47,7 +47,7 @@ jobs:
       
       # Run setup script
       - name: Setup Script
-        run: sh build.sh RestoreCompanionAppDependencies
+        run: bash build.sh RestoreCompanionAppDependencies
 
       # Build Executables.
       - uses: game-ci/unity-builder@v4

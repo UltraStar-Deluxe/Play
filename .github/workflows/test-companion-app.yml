@@ -44,7 +44,7 @@ jobs:
       
       # Run setup script
       - name: Setup Script
-        run: sh build.sh RestoreCompanionAppDependencies
+        run: bash build.sh RestoreCompanionAppDependencies
       
       # Test Unity project
       - uses: game-ci/unity-test-runner@v4

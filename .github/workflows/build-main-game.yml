@@ -46,7 +46,7 @@ jobs:
       
       # Run setup script
       - name: Setup Script
-        run: sh build.sh RestoreMainGameDependencies
+        run: bash build.sh RestoreMainGameDependencies
 
       # Build Executables.
       - uses: game-ci/unity-builder@v4
