@@ -26,6 +26,7 @@ public class SongListTest : AbstractConnectedCompanionAppPlayModeTest
     private SongListPageObject songListPageObject;
 
     [UnityTest]
+    [Ignore("Main game not present on CI pipeline.")]
     [TestCaseSource("filterSongListTestCases")]
     public IEnumerator ShouldFilterSongList(string searchText) => ShouldFilterSongListAsync(searchText);
     private async Awaitable ShouldFilterSongListAsync(string searchText)

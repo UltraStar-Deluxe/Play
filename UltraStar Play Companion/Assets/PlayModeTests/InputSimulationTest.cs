@@ -1,4 +1,5 @@
 using System.Collections;
+using NUnit.Framework;
 using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -9,6 +10,7 @@ public class InputSimulationTest : AbstractConnectedCompanionAppPlayModeTest
     private InputSimulationControl inputSimulationControl;
 
     [UnityTest]
+    [Ignore("Main game not present on CI pipeline.")]
     public IEnumerator ShouldSendRequestSuccessfully() => ShouldSendRequestSuccessfullyAsync();
     private async Awaitable ShouldSendRequestSuccessfullyAsync()
     {

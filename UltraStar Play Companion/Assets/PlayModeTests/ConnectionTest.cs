@@ -1,4 +1,5 @@
 using System.Collections;
+using NUnit.Framework;
 using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -9,6 +10,7 @@ public class ConnectionTest : AbstractCompanionAppPlayModeTest
     private ClientSideCompanionClientManager clientSideCompanionClientManager;
 
     [UnityTest]
+    [Ignore("Main game not present on CI pipeline.")]
     public IEnumerator ShouldConnect() => ShouldConnectAsync();
     private async Awaitable ShouldConnectAsync()
     {

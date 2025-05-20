@@ -1,4 +1,5 @@
 using System.Collections;
+using NUnit.Framework;
 using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -12,6 +13,7 @@ public class SongDetailsTest : AbstractConnectedCompanionAppPlayModeTest
     private SongDetailsPageObject songDetailsPageObject;
 
     [UnityTest]
+    [Ignore("Main game not present on CI pipeline.")]
     public IEnumerator ShouldOpenSongDetails() => ShouldOpenSongDetailsAsync();
     private async Awaitable ShouldOpenSongDetailsAsync()
     {
@@ -32,6 +34,7 @@ public class SongDetailsTest : AbstractConnectedCompanionAppPlayModeTest
     }
 
     [UnityTest]
+    [Ignore("Main game not present on CI pipeline.")]
     public IEnumerator ToggleFavoriteShouldChangeIcon() => ToggleFavoriteShouldChangeIconAsync();
     private async Awaitable ToggleFavoriteShouldChangeIconAsync()
     {

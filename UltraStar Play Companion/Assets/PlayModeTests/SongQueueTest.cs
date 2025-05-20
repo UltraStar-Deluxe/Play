@@ -15,6 +15,7 @@ public class SongQueueTest : AbstractConnectedCompanionAppPlayModeTest
     private SongDetailsPageObject songDetailsPageObject;
 
     [UnityTest]
+    [Ignore("Main game not present on CI pipeline.")]
     [Order(1)]
     public IEnumerator ShouldEnqueueSong() => ShouldEnqueueSongAsync();
     private async Awaitable ShouldEnqueueSongAsync()
@@ -32,6 +33,7 @@ public class SongQueueTest : AbstractConnectedCompanionAppPlayModeTest
     }
 
     [UnityTest]
+    [Ignore("Main game not present on CI pipeline.")]
     [Order(2)]
     public IEnumerator ShouldRemoveSongQueueEntries() => ShouldRemoveSongQueueEntriesAsync();
     private async Awaitable ShouldRemoveSongQueueEntriesAsync()

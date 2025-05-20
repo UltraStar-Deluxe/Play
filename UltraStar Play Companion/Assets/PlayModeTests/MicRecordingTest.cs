@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -15,6 +16,7 @@ public class MicRecordingTest : AbstractConnectedCompanionAppPlayModeTest
     private Button toggleRecordingButton;
 
     [UnityTest]
+    [Ignore("Main game not present on CI pipeline.")]
     public IEnumerator ShouldFireBeatPitchEvents() => ShouldFireBeatPitchEventsAsync();
     private async Awaitable ShouldFireBeatPitchEventsAsync()
     {
