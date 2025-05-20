@@ -158,15 +158,13 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         if (spleeterResult.ExitCode != 0
             || !spleeterResult.Errors.IsNullOrEmpty())
         {
-            Debug.LogError($"Spleeter terminated with exit code {spleeterResult.ExitCode}. Error messages:\n" +
-                           $"    - {spleeterResult.Errors.JoinWith("\n    - ")}");
-            return;
+            throw new AudioSeparationException($"Spleeter terminated with exit code {spleeterResult.ExitCode}. Error messages:\n" +
+                                               $"    - {spleeterResult.Errors.JoinWith("\n    - ")}");
         }
 
         if (spleeterResult.WrittenFiles.IsNullOrEmpty())
         {
-            Debug.LogError("SpleeterResult.WrittenFiles is empty");
-            return;
+            throw new AudioSeparationException("SpleeterResult.WrittenFiles is empty");
         }
 
         // Save the SongMeta if it changed
