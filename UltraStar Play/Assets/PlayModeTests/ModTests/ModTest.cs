@@ -15,7 +15,14 @@ public class ModTest : AbstractPlayModeTest
 
     private static ModFolder testModFolder;
 
+    private static List<string> ignoredModFolders = new List<string>
+    {
+        // Ignored because StyleSheetUtils requires OneJs, which is only available in Melody Mania.
+        "CoinCollector",
+    };
+
     private static List<TestCaseData> ModNames => ModManager.GetModFolders()
+        .Where(modFolder => !ignoredModFolders.AnyMatch(ignoredModFolder => modFolder.ModName.Value.Contains(ignoredModFolder)))
         .Select(modFolder => new TestCaseData(modFolder.ModName).Returns(null))
         .ToList();
 

@@ -24,6 +24,7 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
     }
 
     [UnityTest]
+    [Ignore("AI tools included only in Melody Mania")]
     public IEnumerator ShouldCreateSingAlongData() => ShouldCreateSingAlongDataAsync();
     private async Awaitable ShouldCreateSingAlongDataAsync()
     {
