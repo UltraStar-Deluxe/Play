@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         unityVersion:
-          - 6000.1.0f1
+          - 6000.1.3f1
         targetPlatform:
           - Android
           - iOS
