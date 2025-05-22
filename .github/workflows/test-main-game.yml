@@ -63,7 +63,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           customParameters: "-nographics"
 
-      # Upload test results
+      # Upload test results for download
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         if: always()
@@ -71,9 +71,10 @@ jobs:
           name: Test results ${{ matrix.targetPlatform }}
           path: ${{ steps.testRunner.outputs.artifactsPath }}
 
-      # Publish test results to GitHub UI
-      - name: Publish Test Results
+      # Upload test result files for download
+      - name: Upload Test Result Files
+        uses: actions/upload-artifact@v4
         if: always()
-        uses: EnricoMi/upload-test-results-action@v2
         with:
-          files: ${{ steps.testRunner.outputs.artifactsPath }}/**/*.xml
+          name: Test results ${{ matrix.targetPlatform }}
+          path: ${{ steps.testRunner.outputs.artifactsPath }}/**/*.xml
