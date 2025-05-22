@@ -76,5 +76,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Test results ${{ matrix.targetPlatform }}
-          path: ${{ steps.testRunner.outputs.artifactsPath }}/**/*.xml
+          name: Test results files ${{ matrix.targetPlatform }}
+          path: ${{ steps.testRunner.outputs.artifactsPath }}/*.xml
