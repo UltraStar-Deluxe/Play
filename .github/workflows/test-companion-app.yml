@@ -76,4 +76,4 @@ jobs:
         if: always()
         uses: mikepenz/action-junit-report@v5
         with:
-          report_paths: ${{ steps.testRunner.outputs.artifactsPath }}/**/*.xml
+          report_paths: ${{ steps.testRunner.outputs.artifactsPath }}/*.xml
