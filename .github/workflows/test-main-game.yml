@@ -61,8 +61,16 @@ jobs:
           customParameters: "-nographics"
 
       # Upload test results
-      - uses: actions/upload-artifact@v4
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Test results ${{ matrix.targetPlatform }}
           path: ${{ steps.testRunner.outputs.artifactsPath }}
+
+      # Publish test results to GitHub UI
+      - name: Publish Test Results
+        if: always()
+        uses: actions/upload-test-results@v2
+        with:
+          files: ${{ steps.testRunner.outputs.artifactsPath }}/**/*.xml
