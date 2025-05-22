@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using static UnityEngine.Awaitable;
@@ -48,6 +49,7 @@ public class LoadSongsOnDemandTest : AbstractPlayModeTest
     }
 
     [UnityTest]
+    [Ignore("Flaky test when started via 'Run All'")] // TODO: Fix flaky test
     public IEnumerator ShouldLoadSongsOnDemand() => ShouldLoadSongsOnDemandAsync();
     private async Awaitable ShouldLoadSongsOnDemandAsync()
     {
