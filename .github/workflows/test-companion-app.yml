@@ -62,5 +62,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Test results (all modes)
+          name: Test results ${{ matrix.targetPlatform }}
           path: ${{ steps.testRunner.outputs.artifactsPath }}
