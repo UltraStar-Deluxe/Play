@@ -29,11 +29,13 @@ jobs:
           - iOS
     steps:
       # Clone repo and restore cache
-      - uses: actions/checkout@v4
+      - name: Clone Repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           lfs: true
-      - uses: actions/cache@v4
+      - name: Restore Cache
+        uses: actions/cache@v4
         with:
           path: ${{ env.PROJECT_PATH }}/Library
           key: Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-${{ hashFiles(env.PROJECT_PATH) }}
@@ -43,11 +45,12 @@ jobs:
             Library-
       
       # Run setup script
-      - name: Setup Script
+      - name: Restore Dependencies
         run: bash build.sh RestoreCompanionAppDependencies
       
       # Test Unity project
-      - uses: game-ci/unity-test-runner@v4
+      - name: Test Unity Project
+        uses: game-ci/unity-test-runner@v4
         id: testRunner
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -61,7 +64,8 @@ jobs:
           customParameters: "-nographics"
 
       # Upload test results
-      - uses: actions/upload-artifact@v4
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4    
         if: always()
         with:
           name: Test results ${{ matrix.targetPlatform }}
@@ -70,6 +74,6 @@ jobs:
       # Publish test results to GitHub UI
       - name: Publish Test Results
         if: always()
-        uses: actions/upload-test-results@v2
+        uses: EnricoMi/upload-test-results-action@v2
         with:
           files: ${{ steps.testRunner.outputs.artifactsPath }}/**/*.xml
