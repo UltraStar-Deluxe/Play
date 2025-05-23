@@ -184,7 +184,9 @@ public class CursorManager : AbstractSingletonBehaviour, INeedInjection
 
     private static void SetCursor(Texture2D texture, Vector2 hotspot, CursorMode cursorMode)
     {
-        if (PlatformUtils.IsStandalone)
+        if (PlatformUtils.IsStandalone
+            // Avoid crash in GitHub Actions CI that happens in Unity's SetCursor implementation.
+            && !Application.isBatchMode)
         {
             Cursor.SetCursor(texture, hotspot, cursorMode);
         }
