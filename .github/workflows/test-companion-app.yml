@@ -76,5 +76,6 @@ jobs:
         if: always()
         uses: dorny/test-reporter@v2
         with:
+          name: Test report ${{ matrix.targetPlatform }}
           path: ${{ steps.testRunner.outputs.artifactsPath }}/*.xml
           reporter: dotnet-nunit

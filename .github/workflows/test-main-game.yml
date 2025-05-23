@@ -76,7 +76,7 @@ jobs:
         if: always()
         uses: dorny/test-reporter@v2
         with:
-          artifact: Test results ${{ matrix.targetPlatform }}
           name: Test report ${{ matrix.targetPlatform }}
+          artifact: Test results ${{ matrix.targetPlatform }}
           path: ${{ steps.testRunner.outputs.artifactsPath }}/*.xml
           reporter: nunit
