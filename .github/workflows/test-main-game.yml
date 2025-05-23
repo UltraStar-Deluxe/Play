@@ -71,10 +71,12 @@ jobs:
           name: Test results ${{ matrix.targetPlatform }}
           path: ${{ steps.testRunner.outputs.artifactsPath }}
 
-      # Upload test result files for download
-      - name: Upload Test Result Files
-        uses: actions/upload-artifact@v4
+      # Publish test report to GitHub UI
+      - name: Publish Test Report
         if: always()
+        uses: dorny/test-reporter@v2
         with:
-          name: Test results files ${{ matrix.targetPlatform }}
+          artifact: Test results ${{ matrix.targetPlatform }}
+          name: Test report ${{ matrix.targetPlatform }}
           path: ${{ steps.testRunner.outputs.artifactsPath }}/*.xml
+          reporter: nunit

@@ -71,9 +71,10 @@ jobs:
           name: Test results ${{ matrix.targetPlatform }}
           path: ${{ steps.testRunner.outputs.artifactsPath }}
 
-      # Publish test results for GitHub UI
-      - name: Publish Test Results
+      # Publish test report to GitHub UI
+      - name: Publish Test Report
         if: always()
-        uses: mikepenz/action-junit-report@v5
+        uses: dorny/test-reporter@v2
         with:
-          report_paths: ${{ steps.testRunner.outputs.artifactsPath }}/*.xml
+          path: ${{ steps.testRunner.outputs.artifactsPath }}/*.xml
+          reporter: dotnet-nunit
