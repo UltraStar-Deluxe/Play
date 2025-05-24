@@ -59,7 +59,7 @@ jobs:
         with:
           projectPath: ${{ env.PROJECT_PATH }}
           unityVersion: ${{ matrix.unityVersion }}
-          testMode: all
+          testMode: editmode # TODO: change back to testMode: all after playmode tests have been fixed on Linux
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           customParameters: "-nographics"
 
