@@ -62,6 +62,10 @@ jobs:
           testMode: editmode # TODO: change back to testMode: all after playmode tests have been fixed on Linux
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           customParameters: "-nographics"
+        # Show the step as green even with non-zero exit code.
+        # Workaround for Unity being stupid and returning non-zero exit code although all tests pass.
+        # The Publish test report step will fail if there are test failures.
+        continue-on-error: true
 
       # Upload test results for download
       - name: Upload Test Results
