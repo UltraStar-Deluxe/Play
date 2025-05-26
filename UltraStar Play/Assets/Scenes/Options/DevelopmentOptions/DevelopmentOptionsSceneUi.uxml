@@ -35,7 +35,6 @@
                 <Chooser name="portAudioHostApiChooser" label="PortAudio Host API¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                 <Chooser name="portAudioOutputDeviceChooser" label="PortAudio Output Device" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                 <ui:Button text="Show PortAudio Devices" display-tooltip-when-elided="true" name="portAudioDeviceInfoButton" style="align-self: flex-end;" />
-                <ui:VisualElement name="asioCompatibleLogo" class="ml-auto" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Common/Graphics/Steinberg%20ASIO%20Logo%20Artwork/ASIO-compatible-logo-Steinberg-TM-BW.jpg?fileID=2800000&amp;guid=e30f46a3f183a7c43a13e1c35ac07e04&amp;type=3#ASIO-compatible-logo-Steinberg-TM-BW&quot;); -unity-background-scale-mode: scale-to-fit; min-width: 100px; min-height: 100px;" />
                 <Chooser name="pitchDetectionAlgorithmChooser" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />
                 <ui:Toggle name="customEventSystemOptInOnAndroidToggle" label="Use custom event system&#10;for input actions.&#10;This enables better keyboard&#10;and gamepad control&#10;but can cause issues on Android¹" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
             </AccordionItem>
