@@ -47,6 +47,18 @@ class Build : NukeBuild
             BuildMainGame("BuildWindows64");
         });
 
+    Target BuildMainGameLinux64 => _ => _
+        .Executes(() =>
+        {
+            BuildMainGame("BuildLinux64");
+        });
+
+    Target BuildMainGameMacOS => _ => _
+        .Executes(() =>
+        {
+            BuildMainGame("BuildMacOS");
+        });
+
     Target BuildCompanionAppAndroidApk => _ => _
         .Executes(() =>
         {
