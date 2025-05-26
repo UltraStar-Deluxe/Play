@@ -4,7 +4,7 @@ using UnityEngine;
 // This script must be placed next to a Camera component. Otherwise OnRenderImage is not called by Unity.
 public class BackgroundShaderControl : AbstractSingletonBehaviour, INeedInjection
 {
-    public static BackgroundShaderControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<BackgroundShaderControl>();
+    public static BackgroundShaderControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<BackgroundShaderControl>();
 
     private static readonly int _ParticleTex = Shader.PropertyToID("_ParticleTex");
     private static readonly int _UiTex = Shader.PropertyToID("_UiTex");

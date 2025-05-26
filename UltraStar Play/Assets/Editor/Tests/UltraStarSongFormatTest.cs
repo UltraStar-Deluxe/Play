@@ -13,7 +13,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldHandleNoteWithoutLyricsAndMissingLastSeparator()
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/NoteWithoutLyricsAndMissingLastSeparator.txt", out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/NoteWithoutLyricsAndMissingLastSeparator.txt").SongMeta;
         Assert.IsNotNull(songMeta);
         List<Note> notes = SongMetaUtils.GetAllNotes(songMeta);
         Assert.IsTrue(notes.Count == 6);
@@ -23,7 +23,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldAddPhraseEndBeatIfNotSameAsMaxBeat()
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/WithPhraseEndBeat.txt", out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/WithPhraseEndBeat.txt").SongMeta;
         string txt = UltraStarFormatWriter.ToUltraStarSongFormat(songMeta);
         Assert.IsTrue(Regex.IsMatch(txt, @"- \d"));
     }
@@ -32,7 +32,7 @@ public class UltraStarSongFormatTest
     [Ignore("Linebreak timing could be optional but is required by some other tools, https://github.com/UltraStar-Deluxe/format/issues/64")]
     public void ShouldNotAddPhraseEndBeatIfSameAsMaxBeat()
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/WithoutPhraseEndBeat.txt", out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/WithoutPhraseEndBeat.txt").SongMeta;
         string txt = UltraStarFormatWriter.ToUltraStarSongFormat(songMeta);
         Assert.IsFalse(Regex.IsMatch(txt, @"- \d"));
         Assert.IsTrue(txt.Contains("-"));
@@ -41,7 +41,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldNotContainP1InSoloSong()
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/Solo.txt", out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/Solo.txt").SongMeta;
         string txt = UltraStarFormatWriter.ToUltraStarSongFormat(songMeta);
         // P1 is optional when only having one voice
         Assert.IsFalse(txt.Contains("P1"));
@@ -50,7 +50,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldContainP1AndP2InDuetSong()
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/Duet.txt", out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/Duet.txt").SongMeta;
         string txt = UltraStarFormatWriter.ToUltraStarSongFormat(songMeta);
         Assert.IsTrue(txt.Contains("P1"));
         Assert.IsTrue(txt.Contains("P2"));
@@ -59,7 +59,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldHandleNoSpaceAfterNoteType()
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/NoSpaceAfterNoteType.txt", out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/NoSpaceAfterNoteType.txt").SongMeta;
         Assert.NotNull(songMeta);
         Assert.IsTrue(SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1).ToLowerInvariant().Contains("hello"));
         Assert.AreEqual(ENoteType.Normal, SongMetaUtils.GetAllNotes(songMeta)[0].Type);
@@ -69,7 +69,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldHandleMultipleSpacesAsNoteSeparator()
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/MultipleSpacesAsNoteSeparator.txt", out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/MultipleSpacesAsNoteSeparator.txt").SongMeta;
         Assert.NotNull(songMeta);
         // P1 has space at start of word
         Assert.IsTrue(SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1).ToLowerInvariant().Contains("hello world~"));
@@ -82,25 +82,35 @@ public class UltraStarSongFormatTest
     [TestCase("LyricsSpaceAtTheEnd.txt")]
     public void ShouldHandLyricsSpace(string txtFileName)
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/{txtFileName}", out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/{txtFileName}").SongMeta;
         Assert.NotNull(songMeta);
         string lyrics = SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1);
         Assert.AreEqual("hello world!", lyrics.ToLowerInvariant().Trim());
     }
 
     [Test]
+    public void ShouldHandleMixedCase()
+    {
+        Translation.InitTranslationConfig();
+        UltraStarSongParserResult parserResult = UltraStarSongParser.ParseFile($"{folderPath}/MixedCase.txt");
+        Assert.AreEqual(8, parserResult.SongMeta.TxtFileMedleyStartBeat);
+        Assert.AreEqual("cover.jpg", parserResult.SongMeta.Cover);
+        Assert.IsEmpty(parserResult.SongIssues);
+    }
+
+    [Test]
     public void ShouldHandleMissingTagName()
     {
         Translation.InitTranslationConfig();
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/MissingTagName.txt", out List<SongIssue> songIssues);
-        Assert.That(songIssues.AnyMatch(songIssue => songIssue.Message.Value.ToLowerInvariant().Contains("invalid formatting")));
-        Assert.NotNull(songMeta);
+        UltraStarSongParserResult parserResult = UltraStarSongParser.ParseFile($"{folderPath}/MissingTagName.txt");
+        Assert.That(parserResult.SongIssues.AnyMatch(songIssue => songIssue.Message.Value.ToLowerInvariant().Contains("invalid formatting")));
+        Assert.NotNull(parserResult.SongMeta);
     }
 
     [Test]
     public void ShouldHandleMissingTagValue()
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/MissingTagValue.txt", out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/MissingTagValue.txt").SongMeta;
         Assert.NotNull(songMeta);
         Assert.IsEmpty(songMeta.Language);
         Assert.AreEqual(0, songMeta.Year);
@@ -109,7 +119,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldHandleV100DeprecatedFields()
     {
-        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/v1.0.0.txt", out List<SongIssue> _);
+        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/v1.0.0.txt").SongMeta;
         Assert.NotNull(songMeta);
         Assert.AreEqual(songMeta.Version.EnumValue, EUltraStarSongFormatVersion.V100);
         Assert.AreEqual(songMeta.Audio, "TestSong.ogg");
@@ -120,7 +130,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldHandleV100InconsistentTimeUnits()
     {
-        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/v1.0.0.txt", out List<SongIssue> _);
+        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/v1.0.0.txt").SongMeta;
         Assert.NotNull(songMeta);
         Assert.AreEqual(EUltraStarSongFormatVersion.V100, songMeta.Version.EnumValue);
         Assert.AreEqual(1000, songMeta.GapInMillis);
@@ -140,7 +150,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldHandleV200ConsistentMillisecondsTimeUnit()
     {
-        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/v2.0.0.txt", out List<SongIssue> _);
+        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/v2.0.0.txt").SongMeta;
         Assert.NotNull(songMeta);
         Assert.AreEqual(EUltraStarSongFormatVersion.V200, songMeta.Version.EnumValue);
         Assert.AreEqual(1000, songMeta.GapInMillis);
@@ -164,7 +174,7 @@ public class UltraStarSongFormatTest
     {
         string songFileContentWithVersionPlaceholder = File.ReadAllText($"{folderPath}/ParseVersion.txt");
         string songFileContentWithoutPlaceholder = songFileContentWithVersionPlaceholder.Replace("VERSION_PLACEHOLDER", inputVersionString);
-        UltraStarSongMeta songMeta = UltraStarSongParser.ParseString(songFileContentWithoutPlaceholder, out List<SongIssue> songIssues, true);
+        UltraStarSongMeta songMeta = UltraStarSongParser.ParseString(songFileContentWithoutPlaceholder).SongMeta;
         Assert.NotNull(songMeta);
         Assert.AreEqual(expectedVersionString, songMeta.Version.StringValue);
         Assert.AreEqual(expectedVersionEnum, songMeta.Version.EnumValue);
@@ -173,7 +183,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldIgnoreSpaceAroundTagNameAndValue()
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/SpaceAroundTagNameAndValue.txt", out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/SpaceAroundTagNameAndValue.txt").SongMeta;
         Assert.NotNull(songMeta);
         Assert.AreEqual("English", songMeta.Language);
         Assert.AreEqual(2022, songMeta.Year);
@@ -182,9 +192,9 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldIgnoreNegativeNoteValues()
     {
-        LogAssert.ignoreFailingMessages = true;
+        LogAssertUtils.IgnoreFailingMessages();
 
-        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/NegativeNoteValues.txt", out List<SongIssue> _);
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/NegativeNoteValues.txt").SongMeta;
         Assert.NotNull(songMeta);
         Assert.IsTrue(SongMetaUtils.GetAllNotes(songMeta).Count > 0);
     }
@@ -192,7 +202,7 @@ public class UltraStarSongFormatTest
     [Test]
     public void ShouldIgnoreSpaceAroundNumber()
     {
-        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/SpaceAroundNumber.txt", out List<SongIssue> _);
+        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/SpaceAroundNumber.txt").SongMeta;
         Assert.NotNull(songMeta);
         Assert.AreEqual(200, songMeta.TxtFileBpm);
         Assert.AreEqual(0.12f, songMeta.GapInMillis, 0.001f);
@@ -203,7 +213,7 @@ public class UltraStarSongFormatTest
     public void CopyValuesFromUltraStarSongMetaToUltraStarSongMetaShouldNotChangeFields()
     {
         string originalFilePath = $"{folderPath}/LoadAndSaveProperties.txt";
-        UltraStarSongMeta originalSongMeta = UltraStarSongParser.ParseFile(originalFilePath, out List<SongIssue> _);
+        UltraStarSongMeta originalSongMeta = UltraStarSongParser.ParseFile(originalFilePath).SongMeta;
         UltraStarSongMeta copiedSongMeta = new(originalSongMeta);
         string originalJson = JsonConverter.ToJson(originalSongMeta);
         string copyJson = JsonConverter.ToJson(copiedSongMeta);
@@ -214,7 +224,7 @@ public class UltraStarSongFormatTest
     public void CopyValuesFromSongMetaToUltraStarSongMetaShouldNotChangeFields()
     {
         string originalFilePath = $"{folderPath}/LoadAndSaveProperties.txt";
-        SongMeta originalSongMeta = UltraStarSongParser.ParseFile(originalFilePath, out List<SongIssue> _);
+        SongMeta originalSongMeta = UltraStarSongParser.ParseFile(originalFilePath).SongMeta;
 
         SongMeta copiedSongMeta = new UltraStarSongMeta();
         copiedSongMeta.CopyValues(originalSongMeta);
@@ -232,7 +242,7 @@ public class UltraStarSongFormatTest
     {
         LoadAndSaveSongShouldNotChangeFieldsOfSongMeta(
             formatVersion,
-            path => UltraStarSongParser.ParseFile(path, out List<SongIssue> _));
+            path => UltraStarSongParser.ParseFile(path).SongMeta);
     }
 
     [Test]

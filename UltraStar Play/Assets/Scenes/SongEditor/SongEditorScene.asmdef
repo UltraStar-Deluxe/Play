@@ -13,16 +13,18 @@
         "Unity.InputSystem",
         "playshared",
         "playsharedui",
-        "SpleeterSharp",
         "UnityStandaloneFileBrowser",
-        "LiteNetLib",
         "com.whisper.unity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "NHyphenator.dll",
+        "Opportunity.LrcParser.dll",
+        "LiteNetLib.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],

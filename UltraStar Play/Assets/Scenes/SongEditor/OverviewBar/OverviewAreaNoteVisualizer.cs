@@ -13,7 +13,7 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
     private SongMeta songMeta;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
@@ -31,7 +31,7 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
 
     public void OnInjectionFinished()
     {
-        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+        songMetaChangedEventStream.Subscribe(OnSongMetaChanged);
 
         songAudioPlayer.LoadedEventStream.Subscribe(_ =>
         {
@@ -45,9 +45,9 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
         });
     }
 
-    private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
+    private void OnSongMetaChanged(SongMetaChangedEvent changedEvent)
     {
-        if (changeEvent is LyricsChangedEvent)
+        if (changedEvent is LyricsChangedEvent)
         {
             return;
         }

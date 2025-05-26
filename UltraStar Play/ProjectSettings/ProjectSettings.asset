@@ -3,7 +3,7 @@
 --- !u!129 &1
 PlayerSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 27
+  serializedVersion: 28
   productGUID: 661f1f6e5711e4e42adbaa1c5a3b1f47
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
@@ -49,6 +49,7 @@ PlayerSettings:
   m_StereoRenderingPath: 0
   m_ActiveColorSpace: 0
   unsupportedMSAAFallback: 0
+  m_SpriteBatchMaxVertexCount: 65535
   m_SpriteBatchVertexThreshold: 300
   m_MTRendering: 1
   mipStripping: 0
@@ -70,18 +71,18 @@ PlayerSettings:
   androidRenderOutsideSafeArea: 0
   androidUseSwappy: 0
   androidBlitType: 0
-  androidResizableWindow: 0
+  androidResizeableActivity: 0
   androidDefaultWindowWidth: 1920
   androidDefaultWindowHeight: 1080
   androidMinimumWindowWidth: 400
   androidMinimumWindowHeight: 300
   androidFullscreenMode: 1
   androidAutoRotationBehavior: 1
+  androidPredictiveBackSupport: 1
   androidApplicationEntry: 1
   defaultIsNativeResolution: 1
   macRetinaSupport: 1
   runInBackground: 1
-  captureSingleScreen: 0
   muteOtherAudioSources: 1
   Prepare IOS For Recording: 0
   Force IOS Speakers When Recording: 0
@@ -137,7 +138,9 @@ PlayerSettings:
   vulkanEnableLateAcquireNextImage: 0
   vulkanEnableCommandBufferRecycling: 1
   loadStoreDebugModeEnabled: 0
-  bundleVersion: 1.0.0-beta1
+  visionOSBundleVersion: 1.0
+  tvOSBundleVersion: 1.0
+  bundleVersion: 1.5.1-beta6
   preloadedAssets:
   - {fileID: 11400000, guid: 14252c98bd239904da98289cb5928ea0, type: 2}
   metroInputSource: 0
@@ -161,8 +164,8 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Android: com.ultrastar.UltraStarPlay
-    Standalone: com.ultrastar.UltraStarPlay
+    Android: com.melodymania.MelodyMania
+    Standalone: com.melodymania.MelodyMania
   buildNumber:
     Bratwurst: 0
     Standalone: 0
@@ -187,12 +190,14 @@ PlayerSettings:
   strictShaderVariantMatching: 1
   VertexChannelCompressionMask: 214
   iPhoneSdkVersion: 988
+  iOSSimulatorArchitecture: 0
   iOSTargetOSVersionString: 13.0
   tvOSSdkVersion: 0
+  tvOSSimulatorArchitecture: 0
   tvOSRequireExtendedGameController: 0
   tvOSTargetOSVersionString: 13.0
-  bratwurstSdkVersion: 0
-  bratwurstTargetOSVersionString: 13.0
+  VisionOSSdkVersion: 0
+  VisionOSTargetOSVersionString: 1.0
   uIPrerenderedIcon: 0
   uIRequiresPersistentWiFi: 0
   uIRequiresFullScreen: 1
@@ -217,7 +222,6 @@ PlayerSettings:
     rgba: 0
   iOSLaunchScreenFillPct: 100
   iOSLaunchScreenSize: 100
-  iOSLaunchScreenCustomXibPath: 
   iOSLaunchScreeniPadType: 0
   iOSLaunchScreeniPadImage: {fileID: 0}
   iOSLaunchScreeniPadBackgroundColor:
@@ -225,7 +229,6 @@ PlayerSettings:
     rgba: 0
   iOSLaunchScreeniPadFillPct: 100
   iOSLaunchScreeniPadSize: 100
-  iOSLaunchScreeniPadCustomXibPath: 
   iOSLaunchScreenCustomStoryboardPath: 
   iOSLaunchScreeniPadCustomStoryboardPath: 
   iOSDeviceRequirements: []
@@ -235,15 +238,16 @@ PlayerSettings:
   iOSMetalForceHardShadows: 0
   metalEditorSupport: 1
   metalAPIValidation: 1
+  metalCompileShaderBinary: 0
   iOSRenderExtraFrameOnPause: 0
   iosCopyPluginsCodeInsteadOfSymlink: 0
   appleDeveloperTeamID: 
   iOSManualSigningProvisioningProfileID: 
   tvOSManualSigningProvisioningProfileID: 
-  bratwurstManualSigningProvisioningProfileID: 
+  VisionOSManualSigningProvisioningProfileID: 
   iOSManualSigningProvisioningProfileType: 0
   tvOSManualSigningProvisioningProfileType: 0
-  bratwurstManualSigningProvisioningProfileType: 0
+  VisionOSManualSigningProvisioningProfileType: 0
   appleEnableAutomaticSigning: 0
   iOSRequireARKit: 0
   iOSAutomaticallyDetectAndAddCapabilities: 1
@@ -261,7 +265,6 @@ PlayerSettings:
   useCustomGradleSettingsTemplate: 0
   useCustomProguardFile: 0
   AndroidTargetArchitectures: 1
-  AndroidTargetDevices: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
   AndroidKeystoreName: '{inproject}: '
@@ -280,12 +283,12 @@ PlayerSettings:
     height: 180
     banner: {fileID: 0}
   androidGamepadSupportLevel: 0
-  chromeosInputEmulation: 1
   AndroidMinifyRelease: 0
   AndroidMinifyDebug: 0
   AndroidValidateAppBundleSize: 1
   AndroidAppBundleSizeToValidate: 150
   AndroidReportGooglePlayAppDependencies: 1
+  androidSymbolsSizeThreshold: 800
   m_BuildTargetIcons:
   - m_BuildTarget: 
     m_Icons:
@@ -486,7 +489,10 @@ PlayerSettings:
       m_Height: 1024
       m_Kind: 4
       m_SubKind: App Store
-  m_BuildTargetBatching: []
+  m_BuildTargetBatching:
+  - m_BuildTarget: Standalone
+    m_StaticBatching: 1
+    m_DynamicBatching: 0
   m_BuildTargetShaderSettings: []
   m_BuildTargetGraphicsJobs:
   - m_BuildTarget: MacStandaloneSupport
@@ -527,6 +533,9 @@ PlayerSettings:
   - m_BuildTarget: AndroidPlayer
     m_APIs: 0b000000
     m_Automatic: 0
+  - m_BuildTarget: WindowsStandaloneSupport
+    m_APIs: 02000000
+    m_Automatic: 0
   m_BuildTargetVRSettings: []
   m_DefaultShaderChunkSizeInMB: 16
   m_DefaultShaderChunkCount: 0
@@ -539,19 +548,15 @@ PlayerSettings:
     iPhone: 1
     tvOS: 1
   m_BuildTargetGroupLightmapEncodingQuality:
-  - m_BuildTarget: Standalone
+  - serializedVersion: 2
+    m_BuildTarget: Standalone
     m_EncodingQuality: 1
-  - m_BuildTarget: XboxOne
+  - serializedVersion: 2
+    m_BuildTarget: XboxOne
     m_EncodingQuality: 1
-  - m_BuildTarget: PS4
+  - serializedVersion: 2
+    m_BuildTarget: PS4
     m_EncodingQuality: 1
-  m_BuildTargetGroupHDRCubemapEncodingQuality:
-  - m_BuildTarget: Standalone
-    m_EncodingQuality: 2
-  - m_BuildTarget: XboxOne
-    m_EncodingQuality: 2
-  - m_BuildTarget: PS4
-    m_EncodingQuality: 2
   m_BuildTargetGroupLightmapSettings: []
   m_BuildTargetGroupLoadStoreDebugModeSettings: []
   m_BuildTargetNormalMapEncoding: []
@@ -559,15 +564,16 @@ PlayerSettings:
   playModeTestRunnerEnabled: 0
   runPlayModeTestAsEditModeTest: 0
   actionOnDotNetUnhandledException: 1
+  editorGfxJobOverride: 1
   enableInternalProfiler: 0
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
-  cameraUsageDescription: UltraStar Play uses webcams for custom player images and
+  cameraUsageDescription: Melody Mania uses webcams for custom player images and
     live backgrounds.
   locationUsageDescription: 
-  microphoneUsageDescription: UltraStar Play uses microphones to score the singing.
+  microphoneUsageDescription: Melody Mania uses microphones to score the singing.
   bluetoothUsageDescription: 
-  macOSTargetOSVersion: 10.13.0
+  macOSTargetOSVersion: 11.0
   switchNMETAOverride: 
   switchNetLibKey: 
   switchSocketMemoryPoolSize: 6144
@@ -712,6 +718,7 @@ PlayerSettings:
   switchEnableRamDiskSupport: 0
   switchMicroSleepForYieldTime: 25
   switchRamDiskSpaceSize: 12
+  switchUpgradedPlayerSettingsToNMETA: 0
   ps4NPAgeRating: 12
   ps4NPTitleSecret: 
   ps4NPTrophyPackPath: 
@@ -815,14 +822,15 @@ PlayerSettings:
   webGLMemoryLinearGrowthStep: 16
   webGLMemoryGeometricGrowthStep: 0.2
   webGLMemoryGeometricGrowthCap: 96
-  webGLEnableWebGPU: 0
   webGLPowerPreference: 2
   webGLWebAssemblyTable: 0
   webGLWebAssemblyBigInt: 0
   webGLCloseOnQuit: 0
+  webWasm2023: 0
+  webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
     Android: OS_MUTEX;VUPLEX_STANDALONE
-    Standalone: OS_MUTEX;VUPLEX_STANDALONE
+    Standalone: OS_MUTEX;HAS_ONEJS;HAS_VUPLEX_WEBVIEW;HAS_VLC_UNITY;MELODY_MANIA;VUPLEX_STANDALONE
     WebGL: OS_MUTEX
     iPhone: OS_MUTEX
   additionalCompilerArguments: {}
@@ -843,7 +851,7 @@ PlayerSettings:
   gcWBarrierValidation: 0
   apiCompatibilityLevelPerPlatform:
     Standalone: 3
-  editorAssembliesCompatibilityLevel: 1
+  editorAssembliesCompatibilityLevel: 2
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: UltraStar Deluxe Play
@@ -868,6 +876,7 @@ PlayerSettings:
   metroSplashScreenBackgroundColor: {r: 0.12941177, g: 0.17254902, b: 0.21568628,
     a: 1}
   metroSplashScreenUseBackgroundColor: 0
+  syncCapabilities: 0
   platformCapabilities: {}
   metroTargetDeviceFamilies: {}
   metroFTAName: 
@@ -928,10 +937,10 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId:
+  cloudProjectId: 
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: UltraStar Play
+  projectName: Melody Mania
   organizationId: andreas-stange
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 1
@@ -939,3 +948,6 @@ PlayerSettings:
   platformRequiresReadableAssets: 0
   virtualTexturingSupportEnabled: 0
   insecureHttpOption: 2
+  androidVulkanDenyFilterList: []
+  androidVulkanAllowFilterList: []
+  androidVulkanDeviceFilterListAsset: {fileID: 0}

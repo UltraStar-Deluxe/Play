@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using BsiGame.UI.UIElements;
 using UniInject;
 using UniRx;
@@ -13,27 +12,18 @@ using IBinding = UniInject.IBinding;
 
 public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        relativePlayerProfileImagePathToAbsolutePath = new();
-    }
-
-    public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
-
-    private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
+    public static UiManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<UiManager>();
 
     private readonly Subject<ChildrenChangedEvent> childrenChangedEventStream = new();
     public IObservable<ChildrenChangedEvent> ChildrenChangedEventStream => childrenChangedEventStream;
 
-    [InjectedInInspector]
-    public VisualTreeAsset messageDialogUi;
+    private int lastScreenWidth;
+    private int lastScreenHeight;
+    private readonly Subject<ScreenSizeChangedEvent> screenSizeChangedEventStream = new();
+    public IObservable<ScreenSizeChangedEvent> ScreenSizeChangedEventStream => screenSizeChangedEventStream;
 
     [InjectedInInspector]
     public VisualTreeAsset micWithNameUi;
-
-    [InjectedInInspector]
-    public Sprite fallbackPlayerProfileImage;
 
     [InjectedInInspector]
     public VisualTreeAsset nextGameRoundInfoUi;
@@ -79,7 +69,8 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
 
     protected override void StartSingleton()
     {
-        UpdatePlayerProfileImagePaths();
+        lastScreenWidth = Screen.width;
+        lastScreenHeight = Screen.height;
     }
 
     public void OnInjectionFinished()
@@ -109,192 +100,26 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
     {
         ContextMenuPopupControl.OpenContextMenuPopups
             .ForEach(contextMenuPopupControl => contextMenuPopupControl.Update());
+
+        UpdateScreenSize();
     }
 
-    public void ReloadPlayerProfileImages()
+    private void UpdateScreenSize()
     {
-        UpdatePlayerProfileImagePaths();
-    }
-
-    public void UpdatePlayerProfileImagePaths()
-    {
-        List<string> folders = PlayerProfileUtils.GetPlayerProfileImageFolders();
-        relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages(folders);
-    }
-
-    public MessageDialogControl CreateDialogControl(Translation dialogTitle)
-    {
-        VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
-        uiDocument.rootVisualElement.Add(dialogVisualElement);
-        dialogVisualElement.AddToClassList("wordWrap");
-
-        MessageDialogControl dialogControl = injector
-            .WithRootVisualElement(dialogVisualElement)
-            .CreateAndInject<MessageDialogControl>();
-        dialogControl.Title = dialogTitle;
-
-        return dialogControl;
-    }
-
-    public MessageDialogControl CreateErrorInfoDialogControl(
-        Translation dialogTitle,
-        Translation dialogMessage,
-        Translation errorMessage,
-        Translation closeButtonText = default)
-    {
-        MessageDialogControl messageDialogControl = CreateInfoDialogControl(dialogTitle, dialogMessage, closeButtonText);
-
-        // Add accordion item to show error message.
-        if (errorMessage.Value.IsNullOrEmpty())
+        if (lastScreenHeight != Screen.height
+            || lastScreenWidth != Screen.width)
         {
-            return messageDialogControl;
+            screenSizeChangedEventStream.OnNext(new ScreenSizeChangedEvent(
+                new Vector2Int(lastScreenWidth, lastScreenHeight),
+                new Vector2Int(Screen.width, Screen.height)));
+            lastScreenWidth = Screen.width;
+            lastScreenHeight = Screen.height;
         }
-
-        AccordionItem accordionItem = new AccordionItem();
-        accordionItem.SetTranslatedTitle(Translation.Get(R.Messages.common_details));
-        Label errorMessageLabel = new();
-        errorMessageLabel.SetTranslatedText(errorMessage);
-        accordionItem.Add(errorMessageLabel);
-        accordionItem.HideAccordionContent();
-        messageDialogControl.AddVisualElement(accordionItem);
-
-        return messageDialogControl;
-    }
-
-    public MessageDialogControl CreateInfoDialogControl(
-        Translation dialogTitle,
-        Translation dialogMessage,
-        Translation closeButtonText = default)
-    {
-        MessageDialogControl messageDialogControl = CreateDialogControl(dialogTitle);
-        messageDialogControl.Message = dialogMessage;
-
-        closeButtonText = !closeButtonText.Value.IsNullOrEmpty()
-            ? closeButtonText
-            : Translation.Get(R.Messages.action_close);
-        messageDialogControl.AddButton(closeButtonText, evt =>
-        {
-            messageDialogControl.CloseDialog();
-        });
-        return messageDialogControl;
-    }
-
-    public MessageDialogControl CreateConfirmationDialogControl(
-        Translation dialogTitle,
-        Translation dialogMessage,
-        Translation confirmButtonText,
-        Action<EventBase> onConfirm,
-        Translation cancelButtonText = default,
-        Action<EventBase> onCancel = null)
-    {
-        MessageDialogControl messageDialogControl = CreateDialogControl(dialogTitle);
-        messageDialogControl.Message = dialogMessage;
-        messageDialogControl.AddButton(confirmButtonText, evt =>
-        {
-            messageDialogControl.CloseDialog();
-            onConfirm?.Invoke(evt);
-        });
-
-        cancelButtonText = !cancelButtonText.Value.IsNullOrEmpty()
-            ? cancelButtonText
-            : Translation.Get(R.Messages.action_cancel);
-        messageDialogControl.AddButton(cancelButtonText, evt =>
-        {
-            messageDialogControl.CloseDialog();
-            onCancel?.Invoke(evt);
-        });
-        return messageDialogControl;
-    }
-
-    public MessageDialogControl CreateHelpDialogControl(
-        Translation dialogTitle,
-        Dictionary<string, string> titleToContentMap)
-    {
-        VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
-        uiDocument.rootVisualElement.Add(dialogVisualElement);
-        dialogVisualElement.AddToClassList("wordWrap");
-
-        MessageDialogControl dialogControl = injector
-            .WithRootVisualElement(dialogVisualElement)
-            .CreateAndInject<MessageDialogControl>();
-        dialogControl.Title = dialogTitle;
-
-        AccordionGroup accordionGroup = new();
-        dialogControl.AddVisualElement(accordionGroup);
-
-        void AddChapter(string title, string content)
-        {
-            AccordionItem accordionItem = new(title);
-            accordionItem.Add(new Label(content));
-            accordionGroup.Add(accordionItem);
-        }
-
-        titleToContentMap.ForEach(entry => AddChapter(entry.Key, entry.Value));
-
-        return dialogControl;
-    }
-
-    public string GetFinalPlayerProfileImagePath(PlayerProfile playerProfile)
-    {
-        if (playerProfile.ImagePath == PlayerProfile.WebcamImagePath)
-        {
-            int playerProfileIndex = settings.PlayerProfiles.IndexOf(playerProfile);
-            string webCamImagePath = PlayerProfileUtils.GetAbsoluteWebCamImagePath(playerProfileIndex);
-            return webCamImagePath;
-        }
-        else
-        {
-            return playerProfile.ImagePath;
-        }
-    }
-
-    public IObservable<Sprite> LoadPlayerProfileImage(string imagePath)
-    {
-        if (imagePath.IsNullOrEmpty())
-        {
-            return Observable.Return<Sprite>(fallbackPlayerProfileImage);
-        }
-
-        string relativePathNormalized = PathUtils.NormalizePath(imagePath);
-        string matchingFullPath = GetAbsolutePlayerProfileImagePaths().FirstOrDefault(absolutePath =>
-        {
-            string absolutePathNormalized = PathUtils.NormalizePath(absolutePath);
-            return absolutePathNormalized.EndsWith(relativePathNormalized);
-        });
-
-        if (matchingFullPath.IsNullOrEmpty())
-        {
-            Debug.LogWarning($"Cannot load player profile image with path '{imagePath}' (normalized: '{relativePathNormalized}'), no corresponding image file found.");
-            return Observable.Return(fallbackPlayerProfileImage);
-        }
-
-        return ImageManager.LoadSpriteFromUri(matchingFullPath);
-    }
-
-    public List<string> GetAbsolutePlayerProfileImagePaths()
-    {
-        return relativePlayerProfileImagePathToAbsolutePath.Values.ToList();
-    }
-
-    public List<string> GetRelativePlayerProfileImagePaths(bool includeWebCamImages)
-    {
-        if (includeWebCamImages)
-        {
-            return relativePlayerProfileImagePathToAbsolutePath.Keys.ToList();
-        }
-        else
-        {
-            return relativePlayerProfileImagePathToAbsolutePath.Keys
-                .Where(relativePath => !relativePath.Contains(PlayerProfileUtils.PlayerProfileWebCamImagesFolderName))
-                .ToList();
-        }
-
     }
 
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new();
-        bb.Bind(nameof(messageDialogUi)).ToExistingInstance(messageDialogUi);
         bb.Bind(nameof(nextGameRoundInfoUi)).ToExistingInstance(nextGameRoundInfoUi);
         bb.Bind(nameof(nextGameRoundInfoPlayerEntryUi)).ToExistingInstance(nextGameRoundInfoPlayerEntryUi);
         bb.Bind(nameof(micWithNameUi)).ToExistingInstance(micWithNameUi);

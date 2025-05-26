@@ -17,19 +17,6 @@ public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
 
     private readonly Dictionary<string, SongRepositorySearchResultEntry> txtFileToSearchResultCache = new Dictionary<string, SongRepositorySearchResultEntry>();
 
-    private FileScanner txtFileScanner;
-    private FileScanner TxtFileScanner
-    {
-        get
-        {
-            if (txtFileScanner == null)
-            {
-                txtFileScanner = new FileScanner("*.txt", true, true);
-            }
-            return txtFileScanner;
-        }
-    }
-
     private bool songScanStarted;
     private List<string> txtFilesInSongFolder = new List<string>();
 
@@ -38,18 +25,21 @@ public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
         SearchTxtFilesIfNotDoneYet();
     }
 
-    public IObservable<SongRepositorySearchResultEntry> SearchSongs(SongRepositorySearchParameters searchParameters)
+    public async Awaitable<SongRepositorySearchResult> SearchSongsAsync(SongRepositorySearchParameters searchParameters)
     {
         if (!DirectoryUtils.Exists(SongFolder)
             || searchParameters == null
             || searchParameters.SearchText.IsNullOrEmpty())
         {
-            return Observable.Empty<SongRepositorySearchResultEntry>();
+            return null;
         }
+
+        await Awaitable.BackgroundThreadAsync();
 
         SearchTxtFilesIfNotDoneYet();
 
-        return ObservableUtils.RunOnNewTaskAsObservableElements(() => SearchSongList(searchParameters), Disposable.Empty);
+        await Awaitable.MainThreadAsync();
+        return new SongRepositorySearchResult() { Entries = SearchSongList(searchParameters) };
     }
 
     private void SearchTxtFilesIfNotDoneYet()
@@ -63,11 +53,11 @@ public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
         songScanStarted = true;
         Task.Run(() => DoSearchTxtFiles());
     }
-    
+
     private void DoSearchTxtFiles()
     {
         Debug.Log($"Searching for txt files in '{SongFolder}'");
-        txtFilesInSongFolder = DirectoryUtils.GetFiles(SongFolder, true, $"*.txt");
+        txtFilesInSongFolder = FileScanner.GetFiles(SongFolder, new FileScannerConfig($"*.txt") { Recursive = true });
         Debug.Log($"Found {txtFilesInSongFolder.Count} txt files in '{SongFolder}'");
     }
 
@@ -104,8 +94,9 @@ public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
         try
         {
             Encoding encoding = GetEncodingFromModSettings();
-            SongMeta songMeta = UltraStarSongParser.ParseFile(txtFile, out List<SongIssue> songIssues, encoding);
-            SongRepositorySearchResultEntry resultEntry = new SongRepositorySearchResultEntry(songMeta, songIssues);
+            UltraStarSongParserResult result = UltraStarSongParser.ParseFile(txtFile, new UltraStarSongParserConfig { Encoding = encoding });
+            SongMeta songMeta = result.SongMeta;
+            SongRepositorySearchResultEntry resultEntry = new SongRepositorySearchResultEntry(songMeta, result.SongIssues);
             songMeta.RemoteSource = nameof(LocalFolderSongRepository);
             txtFileToSearchResultCache[txtFile] = resultEntry;
             return resultEntry;

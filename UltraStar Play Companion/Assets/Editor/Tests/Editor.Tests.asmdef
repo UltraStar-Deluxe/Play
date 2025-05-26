@@ -1,0 +1,36 @@
+{
+    "name": "Editor.Tests",
+    "rootNamespace": "",
+    "references": [
+        "UnityEngine.TestRunner",
+        "Unity.InputSystem",
+        "Serilog",
+        "Plugins",
+        "UniRx",
+        "com.achimmihca.protrans",
+        "com.achimmihca.uniinject",
+        "com.achimmihca.primeinputactions",
+        "playshared",
+        "playshared.Editor",
+        "playshared.Editor.Tests",
+        "playsharedui",
+        "playsharedui.Editor",
+        "playsharedui.Editor.Tests",
+        "Common",
+        "Scenes"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "LiteNetLib.dll",
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

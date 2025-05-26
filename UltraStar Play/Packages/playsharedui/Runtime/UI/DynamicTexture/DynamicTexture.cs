@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 /**
  * Holds a texture to draw pixels on a VisualElement (for UI Toolkit)
- * Example: 
+ * Example:
  * <pre>
  *      VisualElement dynImage = uiDoc.rootVisualElement.Q<VisualElement>("dynImage");
  *      dynImage.RegisterCallback<GeometryChangedEvent>(_ =>
@@ -93,7 +93,7 @@ public class DynamicTexture : IDisposable
             texture = null;
         }
     }
-    
+
     public void Dispose()
     {
         Debug.Log("Dispose DynamicTexture: " + name);
@@ -117,15 +117,15 @@ public class DynamicTexture : IDisposable
 
         // release texture when GameObject is destroyed
         gameObject.OnDestroyAsObservable()
-            .Subscribe(_ =>
+            .Subscribe(async _ =>
             {
                 // Delay the destruction of the texture to the next frame.
-                // Otherwise ugly white images may be visible during scene transition.
-                MainThreadDispatcher.StartCoroutine(
-                    CoroutineUtils.ExecuteAfterDelayInFrames(1, () => Dispose()));
+                // Otherwise, ugly white images may be visible during scene transition.
+                await Awaitable.NextFrameAsync();
+                Dispose();
             });
 
-        // create a 'blank screen' image 
+        // create a 'blank screen' image
         blank = new Color[TextureWidth * TextureHeight];
         for (int i = 0; i < blank.Length; i++)
         {

@@ -18,7 +18,7 @@ public class SupportedFileFormatListTest
             "wav",
             "wma",
         };
-        List<string> supportedFormats = ApplicationUtils.unitySupportedAudioFiles.ToList();
+        List<string> supportedFormats = ApplicationUtils.vlcSupportedAudioFiles.ToList();
         foreach (string expectedAudioFormat in expectedAudioFormats)
         {
             Assert.Contains(expectedAudioFormat, supportedFormats);
@@ -40,7 +40,7 @@ public class SupportedFileFormatListTest
             "webm",
             "wmv",
         };
-        List<string> supportedFormats = ApplicationUtils.unitySupportedVideoFiles.ToList();
+        List<string> supportedFormats = ApplicationUtils.vlcSupportedVideoFiles.ToList();
         foreach (string expectedVideoFormat in expectedVideoFormats)
         {
             Assert.Contains(expectedVideoFormat, supportedFormats);

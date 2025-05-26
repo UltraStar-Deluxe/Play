@@ -35,7 +35,7 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
         string visibleWhiteSpaceText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(newText);
         editorNoteControl.Note.SetText(visibleWhiteSpaceText);
         editorNoteControl.SetLyrics(visibleWhiteSpaceText);
-        songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = false});
+        songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = false});
     }
 
     protected override void ApplyNewText(string newText)
@@ -61,14 +61,14 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
             // Note has been split
             SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, settings.SongEditorSettings.SpaceBetweenNotesInMillis, songMeta);
 
-            songMetaChangeEventStream.OnNext(new NotesSplitEvent() { Undoable = undoable});
+            songMetaChangedEventStream.OnNext(new NotesSplitEvent() { Undoable = undoable});
         }
         else
         {
             viewModeText = viewModeText.Replace(";", "");
             editorNoteControl.Note.SetText(viewModeText);
             editorNoteControl.SyncWithNote();
-            songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable});
+            songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable});
         }
     }
 }

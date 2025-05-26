@@ -4,13 +4,5 @@
     "displayName": "PlayShared",
     "description": "Unity package for common assets of main game and companion app",
     "dependencies": {
-    },
-   "keywords": [
-    ],
-    "author": {
-      "name": "",
-      "email": ""
-    },
-	"samples": [
-    ]
+    }
 }

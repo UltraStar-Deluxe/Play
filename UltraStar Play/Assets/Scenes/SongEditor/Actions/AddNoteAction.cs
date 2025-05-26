@@ -8,7 +8,7 @@ using UniInject;
 public class AddNoteAction : INeedInjection
 {
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     public void Execute(SongMeta songMeta, int beat, int midiNote)
     {
@@ -34,7 +34,7 @@ public class AddNoteAction : INeedInjection
     public void ExecuteAndNotify(SongMeta songMeta, int beat, int midiNote)
     {
         Execute(songMeta, beat, midiNote);
-        songMetaChangeEventStream.OnNext(new NotesAddedEvent());
+        songMetaChangedEventStream.OnNext(new NotesAddedEvent());
     }
 
 }

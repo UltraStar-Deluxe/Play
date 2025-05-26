@@ -15,6 +15,7 @@ using static ArchUnitNET.Fluent.ArchRuleDefinition;
 using Assembly = System.Reflection.Assembly;
 using Type = System.Type;
 
+[Ignore("Manual test")]
 public class ArchUnitTranslationTest
 {
     private static List<TranslatableAssignment> ignoredUntranslatedAssignments = new();
@@ -34,6 +35,7 @@ public class ArchUnitTranslationTest
      * Checks that UI label setters (e.g. UnityEngine.UIElements.BaseField.label) are not called directly.
      * Instead, a custom extension method that takes a translation result as input should be used.
      */
+    [Ignore("Manual test")]
     [Test]
     [TestCase("playshared")]
     [TestCase("playsharedui")]

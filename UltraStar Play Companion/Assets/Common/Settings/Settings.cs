@@ -16,7 +16,7 @@ public class Settings : ISettings
     public MicProfile MicProfile { get; set; } = new MicProfile();
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; }
     public int TargetFps { get; set; } = 60;
-    public bool ShowAudioWaveForm { get; set; } = true;
+    public bool ShowAudioWaveForm { get; set; }
     public float MousePadSensitivity { get; set; } = 1f;
     public bool IsDevModeEnabled { get; set; }
     public ELogEventLevel MinimumLogLevel { get; set; } = ELogEventLevel.Information;

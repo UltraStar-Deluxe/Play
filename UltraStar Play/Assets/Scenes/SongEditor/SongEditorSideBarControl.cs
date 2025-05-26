@@ -125,7 +125,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     private SpeechRecognitionManager speechRecognitionManager;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     private readonly TabGroupControl sideBarTabGroupControl = new();
     private readonly SongEditorSideBarPropertiesControl propertiesControl = new();
@@ -177,7 +177,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             .Subscribe(autoSave => saveButton.SetVisibleByDisplay(!autoSave))
             .AddTo(gameObject);
 
-        inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
+        inputManager.InputDeviceChangedEventStream.Subscribe(_ => UpdateInputLegend());
 
         issuesSideBarContainer.RegisterCallback<GeometryChangedEvent>(evt =>
         {
@@ -244,7 +244,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             { Translation.Get(R.Messages.songEditor_helpDialog_layers_title),
                 Translation.Get(R.Messages.songEditor_helpDialog_layers) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(
+        helpDialogControl = dialogManager.CreateHelpDialogControl(
             Translation.Get(R.Messages.songEditor_helpDialog_title),
             titleToContentMap);
         helpDialogControl.DialogClosedEventStream.Subscribe(_ => helpDialogControl = null);
@@ -269,15 +269,14 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             return;
         }
 
-        SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters();
+        SpeechRecognizerConfig speechRecognizerConfig = speechRecognitionAction.CreateSpeechRecognizerParameters();
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
             NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
             NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
             settings.SongEditorSettings.SpeechRecognitionSamplesSource,
             150,
             true,
-            speechRecognitionParameters,
-            false);
+            speechRecognizerConfig);
     }
 
     private void UpdateRecordingButton()
@@ -379,36 +378,36 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
         List<InputActionInfo> inputActionInfos = new();
 
-        inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.usplay_back, Translation.Get(R.Messages.common_back)));
+        inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.usplay_back, Translation.Get(R.Messages.common_back)));
 
         if (inputManager.InputDeviceEnum == EInputDevice.KeyboardAndMouse)
         {
 
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_togglePause, "Toggle Pause"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_togglePause, "Toggle Pause"));
             inputActionInfos.Add(new InputActionInfo("Toggle Play / Pause", "Double Click"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_playSelectedNotes, "Play Selected Notes"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_playSelectedNotes, "Play Selected Notes"));
             inputActionInfos.Add(new InputActionInfo("Play MIDI Sound Of Note", "Ctrl+Click Note"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_undo, "Undo"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_redo, "Redo"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_save, "Save"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_copy, "Copy"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_cut, "Cut"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_paste, "Paste"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_delete, "Delete"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_openSearch, "Open Search"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_jumpToEndOfSong, "Jump To End Of Song"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_jumpToStartOfSong, "Jump To Start Of Song"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_navigateBackward, "Navigate Backward"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_navigateForward, "Navigate Forward"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_undo, "Undo"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_redo, "Redo"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_save, "Save"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_copy, "Copy"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_cut, "Cut"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_paste, "Paste"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_delete, "Delete"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_openSearch, "Open Search"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_jumpToEndOfSong, "Jump To End Of Song"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_jumpToStartOfSong, "Jump To Start Of Song"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_navigateBackward, "Navigate Backward"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_navigateForward, "Navigate Forward"));
             inputActionInfos.Add(new InputActionInfo("Zoom Horizontal", "Ctrl+Mouse Wheel"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_zoomInHorizontal, "Zoom In Horizontal"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_zoomOutHorizontal, "Zoom Out Horizontal"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_zoomInHorizontal, "Zoom In Horizontal"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_zoomOutHorizontal, "Zoom Out Horizontal"));
             inputActionInfos.Add(new InputActionInfo("Zoom Vertical", "Ctrl+Shift+Mouse Wheel"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_zoomInVertical, "Zoom In Vertical"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_zoomOutVertical, "Zoom Out Vertical"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_selectNextNote, "Select Next Note"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_selectPreviousNote, "Select Previous Note"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_selectAll, "Select All"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_zoomInVertical, "Zoom In Vertical"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_zoomOutVertical, "Zoom Out Vertical"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_selectNextNote, "Select Next Note"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_selectPreviousNote, "Select Previous Note"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_selectAll, "Select All"));
             inputActionInfos.Add(new InputActionInfo("Extend Selection", "Shift+Drag (with existing selection)"));
             inputActionInfos.Add(new InputActionInfo("Toggle Selection", "Ctrl+Drag"));
             inputActionInfos.Add(new InputActionInfo("Scroll Horizontal", "Mouse Wheel | Arrow Keys | Middle Mouse Button+Drag"));
@@ -419,15 +418,15 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             inputActionInfos.Add(new InputActionInfo("Move Left Side Of Note", "Ctrl+Arrow Keys | Divide (Numpad) | Multiply (Numpad)"));
             inputActionInfos.Add(new InputActionInfo("Move Right side Of Note", "Alt+Arrow Keys | 7 (Numpad) | 8 (Numpad) | 9 (Numpad)"));
             inputActionInfos.Add(new InputActionInfo("Draw new Note", "Shift+Drag (no selection)"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_editLyrics, "Edit Lyrics"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_assignToOwnSentence, "Assign To Own Sentence"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_toggleNoteTypeFreestyle, "Toggle Note Type Freestyle"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_toggleNoteTypeGolden, "Toggle Note Type Golden"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_toggleNoteTypeNormal, "Toggle Note Type Normal"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_toggleNoteTypeRap, "Toggle Note Type Rap"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_toggleNoteTypeRapGolden, "Toggle Note Type Rap Golden"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_pitchDetection, "Pitch Detection"));
-            inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.songEditor_speechRecognition, "Speech Recognition"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_editLyrics, "Edit Lyrics"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_assignToOwnSentence, "Assign To Own Sentence"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeFreestyle, "Toggle Note Type Freestyle"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeGolden, "Toggle Note Type Golden"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeNormal, "Toggle Note Type Normal"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeRap, "Toggle Note Type Rap"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeRapGolden, "Toggle Note Type Rap Golden"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_pitchDetection, "Pitch Detection"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_speechRecognition, "Speech Recognition"));
         }
         else if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {
@@ -440,7 +439,15 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
         inputLegendContainer.Clear();
         inputActionInfos.ForEach(inputActionInfo =>
-            inputLegendContainer.Add(InputLegendControl.CreateInputActionInfoUi(inputActionInfo)));
+            inputLegendContainer.Add(CreateInputActionInfoUi(inputActionInfo)));
+    }
+
+    private static VisualElement CreateInputActionInfoUi(InputActionInfo entry)
+    {
+        Label label = new();
+        label.AddToClassList("inputLegendLabel");
+        label.text = $"<b>{entry.ActionText}</b>: {entry.InputText}";
+        return label;
     }
 
     private void ClearSideBar(VisualElement visualElement)

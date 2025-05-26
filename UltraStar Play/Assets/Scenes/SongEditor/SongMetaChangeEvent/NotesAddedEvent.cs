@@ -1,4 +1,4 @@
-public class NotesAddedEvent : SongMetaChangeEvent
+public class NotesAddedEvent : SongMetaChangedEvent
 {
 
 }

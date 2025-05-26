@@ -66,7 +66,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
             AudioSource.Pause();
         });
-        songAudioPlayer.PlaybackSpeedChangedEventStream.Subscribe(newValue => AudioUtils.SetPitchWithPitchShifter(AudioSource, (float)newValue));
+        songAudioPlayer.PlaybackSpeedChangedEventStream.Subscribe(newValue => PitchShifterUtils.SetPitchWithPitchShifter(AudioSource, (float)newValue));
 
         // Update AudioClip (instrumental, vocals) when corresponding settings change
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource)
@@ -123,14 +123,14 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private void UpdateAudioClip()
+    private async void UpdateAudioClip()
     {
         if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.OriginalMusic)
         {
             return;
         }
 
-        AudioClip targetAudioClip = LoadAudioClip();
+        AudioClip targetAudioClip = await LoadAudioClip();
         if (targetAudioClip == null)
         {
             AudioSource.Stop();
@@ -151,7 +151,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private AudioClip LoadAudioClip()
+    private async Awaitable<AudioClip> LoadAudioClip()
     {
         if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Recording)
         {
@@ -178,7 +178,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             return null;
         }
 
-        AudioClip loadedAudioClip = AudioManager.LoadAudioClipFromUriImmediately(audioClipUri, false);
+        AudioClip loadedAudioClip = await AudioManager.LoadAudioClipFromUriAsync(audioClipUri, false);
         if (loadedAudioClip == null)
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_failedToLoadWithName,

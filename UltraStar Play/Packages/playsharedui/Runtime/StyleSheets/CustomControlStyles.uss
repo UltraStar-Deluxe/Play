@@ -1,4 +1,12 @@
 /**************************************************/
+/* ROW */
+/**************************************************/
+.row {
+    flex-direction: row;
+    align-items: center;
+}
+
+/**************************************************/
 /* SEPARATOR */
 /**************************************************/
 .horizontalSeparatorLine {
@@ -570,10 +578,7 @@ AccordionItem.expanded #toggleAccordionItemContentIcon {
 /**************************************************/
 
 #songQueueEntryUiRoot {
-    margin-top: 2px;
-    margin-bottom: 2px;
-    border-bottom-left-radius: 5px;
-    border-top-left-radius: 5px;
+    border-bottom-left-radius: 8px;
 }
 
 #songQueueEntryUiRoot.medleyWithNext {

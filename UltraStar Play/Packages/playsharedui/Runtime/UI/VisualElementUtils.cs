@@ -98,15 +98,15 @@ public static class VisualElementUtils
     public static bool IsDropdownListFocused(FocusController focusController, out VisualElement unityBaseDropdown)
     {
         VisualElement focusedVisualElement = GetFocusedVisualElement(focusController);
-        if (focusedVisualElement == null
-            || !focusedVisualElement.ClassListContains("unity-base-dropdown__container-inner"))
+        if (focusedVisualElement != null
+            && focusedVisualElement.ClassListContains("unity-scroll-view__content-container"))
         {
-            unityBaseDropdown = null;
-            return false;
+            unityBaseDropdown = focusedVisualElement.GetParent(parent => parent.ClassListContains("unity-base-dropdown"));
+            return unityBaseDropdown != null;
         }
 
-        unityBaseDropdown = focusedVisualElement.GetParent(parent => parent.ClassListContains("unity-base-dropdown"));
-        return unityBaseDropdown != null;
+        unityBaseDropdown = null;
+        return false;
     }
 
     public static void RegisterDirectClickCallback(VisualElement visualElement, Action onDirectClick = null)
@@ -267,5 +267,11 @@ public static class VisualElementUtils
     {
         element.style.left = pos.x - (element.parent != null ? element.parent.worldBound.xMin : 0);
         element.style.top = pos.y - (element.parent != null ? element.parent.worldBound.yMin : 0);
+    }
+
+    public static bool IsListViewFocused(ListViewH listView)
+    {
+        return listView.focusController?.focusedElement is VisualElement focusedElement
+               && focusedElement.GetAncestors().Contains(listView);
     }
 }

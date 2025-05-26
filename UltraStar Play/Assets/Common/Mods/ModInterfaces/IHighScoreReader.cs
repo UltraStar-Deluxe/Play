@@ -1,6 +1,6 @@
-﻿using System;
+﻿using UnityEngine;
 
 public interface IHighScoreReader : IMod
 {
-    public IObservable<HighScoreRecord> ReadHighScoreRecord(SongMeta songMeta);
+    public Awaitable<HighScoreRecord> ReadHighScoreRecordAsync(SongMeta songMeta);
 }

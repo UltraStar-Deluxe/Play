@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -20,8 +19,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 {
     private static readonly ProfilerMarker onInjectionFinishedProfilerMarker = new ProfilerMarker("SongSelectSceneControl.OnInjectionFinished");
     private readonly IComparer<object> songMetaPropertyComparer = new NullOrEmptyValueLastComparer();
-
-    private const string VirtualRootFolderName = "SONG_SELECT_ROOT";
 
     [InjectedInInspector]
     public SongSelectSceneInputControl songSelectSceneInputControl;
@@ -45,7 +42,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     public NewestSamplesMicPitchTracker micPitchTrackerPrefab;
 
     [Inject]
-    private UiManager uiManager;
+    private DialogManager dialogManager;
 
     [Inject]
     private UltraStarPlayInputManager inputManager;
@@ -65,42 +62,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject(UxmlName = R.UxmlNames.songOrderDropdownField)]
     private DropdownField songOrderDropdownField;
 
-    [Inject(UxmlName = R.UxmlNames.playerList)]
-    private VisualElement playerList;
-
-    [Inject(UxmlName = R.UxmlNames.addToSongQueueAsNewButton)]
-    private Button addToSongQueueAsNewButton;
-
-    [Inject(UxmlName = R.UxmlNames.addToSongQueueAsMedleyButton)]
-    private Button addToSongQueueAsMedleyButton;
-
-    [Inject(UxmlName = R.UxmlNames.startSongQueueButton)]
-    private Button startSongQueueButton;
-
-    [Inject(UxmlName = R.UxmlNames.toggleCoopModeButton)]
-    private Button toggleCoopModeButton;
-
-    [Inject(UxmlName = R.UxmlNames.coopIcon)]
-    private VisualElement coopIcon;
-
-    [Inject(UxmlName = R.UxmlNames.noCoopIcon)]
-    private VisualElement noCoopIcon;
-
-    [Inject(UxmlName = R.UxmlNames.navigateFolderUpButton)]
-    private Button navigateFolderUpButton;
-
     [Inject]
     private AchievementEventStream achievementEventStream;
 
     [Inject]
     private SongSelectSceneData sceneData;
-
-    private List<SongMeta> songMetas = new();
-    private List<SongMeta> lastSongMetasOfSongRouletteControl = new();
-    private DirectoryInfo lastDirectoryInfoOfSongRouletteControl;
-    private float lastSongMetaCountUpdateTimeInSeconds;
-    private string lastRawSearchText;
-    private SongSelectEntry selectedEntryBeforeSearch;
 
     [Inject]
     private Statistics statistics;
@@ -126,9 +92,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject]
     private SongIssueManager songIssueManager;
 
-    [Inject]
-    private SongQueueManager songQueueManager;
-
     [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
     private VisualElement noSongsFoundContainer;
 
@@ -147,78 +110,22 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject(UxmlName = R.UxmlNames.searchExpressionToggle)]
     private Toggle searchExpressionToggle;
 
-    [Inject(UxmlName = R.UxmlNames.toggleMicCheckButton)]
-    private ToggleButton toggleMicCheckButton;
-
-    [Inject(UxmlName = R.UxmlNames.micCheckIcon)]
-    private VisualElement micCheckIcon;
-
-    [Inject(UxmlName = R.UxmlNames.noMicCheckIcon)]
-    private VisualElement noMicCheckIcon;
+    [Inject(UxmlName = R.UxmlNames.micCheckToggle)]
+    private Toggle micCheckToggle;
 
     [Inject(UxmlName = R.UxmlNames.selectRandomSongButton)]
     private Button selectRandomSongButton;
 
-    [Inject(UxmlName = R.UxmlNames.toggleSongQueueOverlayButton)]
-    private Button toggleSongQueueOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.closeSongQueueButton)]
-    private Button closeSongQueueButton;
-
-    [Inject(UxmlName = R.UxmlNames.songQueueLengthContainer)]
-    private VisualElement songQueueLengthContainer;
-
-    [Inject(UxmlName = R.UxmlNames.songQueueLengthLabel)]
-    private Label songQueueLengthLabel;
-
-    [Inject(UxmlName = R.UxmlNames.songQueueOverlay)]
-    private VisualElement songQueueOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.toggleModifiersOverlayButton)]
-    private Button toggleModifiersOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.modifiersActiveIcon)]
-    private VisualElement modifiersActiveIcon;
-
-    [Inject(UxmlName = R.UxmlNames.hiddenHideSongQueueOverlayArea)]
-    private VisualElement hiddenHideSongQueueOverlayArea;
-
-    [Inject(UxmlName = R.UxmlNames.hiddenHideModifiersOverlayArea)]
-    private VisualElement hiddenHideModifiersOverlayArea;
-
-    [Inject(UxmlName = R.UxmlNames.modifiersInactiveIcon)]
-    private VisualElement modifiersInactiveIcon;
-
-    [Inject(UxmlName = R.UxmlNames.closeModifiersOverlayButton)]
-    private Button closeModifiersOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
-    private VisualElement modifierDialogOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.currentDifficultyLabel)]
-    private Label currentDifficultyLabel;
-
-    [Inject(UxmlName = R.UxmlNames.nextDifficultyButton)]
-    private Button nextDifficultyButton;
-
-    [Inject(UxmlName = R.UxmlNames.previousDifficultyButton)]
-    private Button previousDifficultyButton;
-
     private readonly SongSearchControl songSearchControl = new();
 
-    public ReactiveProperty<bool> IsSongRepositorySearchRunning { get; private set; } = new(false);
+    public ReactiveProperty<int> RunningSongRepositorySearches { get; set; } = new(0);
 
-    public SongMeta SelectedSong
-    {
-        get
-        {
-            return (songRouletteControl.SelectedEntry as SongSelectSongEntry)?.SongMeta;
-        }
-    }
+    public SongMeta SelectedSong => (songRouletteControl.SelectedEntry as SongSelectSongEntry)?.SongMeta;
 
     private MessageDialogControl searchExpressionHelpDialogControl;
     private MessageDialogControl lyricsDialogControl;
     private MessageDialogControl noSingAlongDataDialogControl;
+    private MessageDialogControl askToAssignMicsDialog;
 
     public PartyModeSceneData PartyModeSceneData => sceneData.partyModeSceneData;
     public bool HasPartyModeSceneData => PartyModeSceneData != null;
@@ -232,20 +139,23 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     public SongSelectionPlaylistChooserControl SongSelectionPlaylistChooserControl { get; private set; } = new();
     private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
     private readonly SongSelectScenePartyModeControl partyModeControl = new();
-    private readonly GameRoundModifierDialogControl modifierDialogControl = new();
-    private readonly SongQueueUiControl songQueueUiControl = new();
     private readonly SongSelectFilterControl songSelectFilterControl = new();
     private readonly SongSelectSelectedSongDetailsControl songSelectSelectedSongDetailsControl = new();
-
-    private MessageDialogControl askToAssignMicsDialog;
-
-    public VisualElementSlideInControl SongQueueSlideInControl { get; private set; }
-    public VisualElementSlideInControl ModifiersOverlaySlideInControl { get; private set; }
+    private readonly SongSelectMenuControl songSelectMenuControl = new();
+    private readonly SongSelectSongQueueControl songSelectSongQueueControl = new();
+    private readonly SongSelectModifiersControl songSelectModifiersControl = new();
+    private readonly SongSelectDifficultyAndScoreModeControl songSelectDifficultyAndScoreModeControl = new();
 
     private readonly Subject<BeforeSongStartedEvent> beforeSongStartedEventStream = new();
     public IObservable<BeforeSongStartedEvent> BeforeSongStartedEventStream => beforeSongStartedEventStream;
 
     private DropdownFieldControl<ESongOrder> songOrderDropdownFieldControl;
+
+    private List<SongMeta> lastSongMetasOfSongRouletteControl = new();
+    private DirectoryInfo lastDirectoryInfoOfSongRouletteControl;
+    private float lastSongMetaCountUpdateTimeInSeconds;
+    private string lastRawSearchText;
+    private SongSelectEntry selectedEntryBeforeSearch;
 
     public void OnInjectionFinished()
     {
@@ -254,10 +164,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         injector.Inject(SongSelectionPlaylistChooserControl);
         injector.Inject(createSingAlongSongControl);
         injector.Inject(partyModeControl);
-        injector.Inject(songQueueUiControl);
         injector.Inject(songSelectFilterControl);
         injector.Inject(songSearchControl);
         injector.Inject(songSelectSelectedSongDetailsControl);
+        injector.Inject(songSelectMenuControl);
+        injector.Inject(songSelectSongQueueControl);
+        injector.Inject(songSelectModifiersControl);
+        injector.Inject(songSelectDifficultyAndScoreModeControl);
     }
 
     private void Start()
@@ -280,6 +193,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         songMetaManager.AddedSongMetaEventStream
             .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
             .Subscribe(_ => UpdateAvailableSongsAndUi(songMetaManager.IsSongScanFinished));
+        songMetaManager.RemovedSongMetaEventStream
+            .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
+            .Subscribe(_ => UpdateAvailableSongsAndUi(songMetaManager.IsSongScanFinished));
         UpdateSongScanLabels(songMetaManager.IsSongScanFinished);
 
         InitSongMetas();
@@ -290,11 +206,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             partyModeControl.SelectRandomSong();
         }
 
-        InitDifficultyAndScoreMode();
-
-        toggleMicCheckButton.RegisterCallbackButtonTriggered(_ => nonPersistentSettings.MicTestActive.Value = !nonPersistentSettings.MicTestActive.Value);
-        nonPersistentSettings.MicTestActive.Subscribe(_ => UpdateMicCheckButton());
-        UpdateMicCheckButton();
+        FieldBindingUtils.Bind(micCheckToggle,
+            () => nonPersistentSettings.MicTestActive.Value,
+            newValue => nonPersistentSettings.MicTestActive.Value = newValue);
 
         songOrderDropdownFieldControl = new(songOrderDropdownField, EnumUtils.GetValuesAsList<ESongOrder>(), settings.SongOrder,
             item => Translation.Get(item));
@@ -313,7 +227,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         fuzzySearchTextLabel.ShowByDisplay();
         songSelectSceneInputControl.FuzzySearchText
-            .Subscribe(newValue => fuzzySearchTextLabel.SetTranslatedText(Translation.Of(newValue)));
+            .Subscribe(OnFuzzySearchTextChanged);
 
         songRouletteControl.SubmitEventStream.Subscribe(_ => OnSubmitSongRoulette());
         songRouletteControl.Focus();
@@ -337,7 +251,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                 }
             });
 
-        playlistManager.PlaylistChangeEventStream.Subscribe(playlistChangeEvent =>
+        playlistManager.PlaylistChangedEventStream.Subscribe(playlistChangeEvent =>
         {
             if (playlistChangeEvent.Playlist == SongSelectionPlaylistChooserControl.Selection.Value)
             {
@@ -349,28 +263,27 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         importSongsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.SongLibraryOptionsScene)));
 
-        if (settings.NavigateByFoldersInSongSelect)
-        {
-            navigateFolderUpButton.RegisterCallbackButtonTriggered(_ => TryNavigateToParentFolder());
-        }
-        navigateFolderUpButton.SetVisibleByDisplay(settings.NavigateByFoldersInSongSelect);
-
         createSingAlongSongControl.CreatedSingAlongVersionEventStream.Subscribe(processedSongMeta =>
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_createdSingAlongDataSuccess,
                 "name", Path.GetFileName(processedSongMeta.Audio)));
         });
 
-        // Song queue
-        InitSongQueue();
+        UpdateSceneTitle();
+    }
 
-        // Init modifier dialog
-        InitModifierDialog();
+    private void OnFuzzySearchTextChanged(string newValue)
+    {
+        if (!newValue.IsNullOrEmpty()
+            && newValue.Length == 1)
+        {
+            // Single letter search jumps to the first song that matches current order property
+            string songOrderTranslation = Translation.Get(settings.SongOrder);
+            fuzzySearchTextLabel.SetTranslatedText(Translation.Of($"{songOrderTranslation}: {newValue}"));
+            return;
+        }
 
-        // Hide slide-in controls with click outside
-        InitHideSlideInControlsViaClick();
-
-        UpdateTranslation();
+        fuzzySearchTextLabel.SetTranslatedText(Translation.Of(newValue));
     }
 
     private void UpdateAvailableSongsAndUi(bool isSongScanFinished)
@@ -378,239 +291,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         InitSongMetas();
         UpdateFilteredSongs();
         UpdateSongScanLabels(isSongScanFinished);
-    }
-
-    private void InitSongQueue()
-    {
-        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitSongQueueOverlay");
-
-        songQueueLengthContainer.HideByDisplay();
-        songQueueManager.SongQueueChangedEventStream
-            .Subscribe(_ => UpdateSongQueue())
-            .AddTo(gameObject);
-        UpdateSongQueue();
-
-        songQueueOverlay.ShowByDisplay();
-        SongQueueSlideInControl = new(songQueueOverlay, ESide2D.Right, false);
-        toggleSongQueueOverlayButton.RegisterCallbackButtonTriggered(_ => SongQueueSlideInControl.ToggleVisible());
-        closeSongQueueButton.RegisterCallbackButtonTriggered(_ => SongQueueSlideInControl.SlideOut());
-        addToSongQueueAsNewButton.RegisterCallbackButtonTriggered(_ => AddSongToSongQueue(SelectedSong));
-        addToSongQueueAsMedleyButton.RegisterCallbackButtonTriggered(_ => AddSongToSongQueueAsMedley(SelectedSong));
-        startSongQueueButton.RegisterCallbackButtonTriggered(_ => StartSingSceneWithNextSongQueueEntry());
-        songQueueUiControl.OnToggleMedley = songQueueEntryDto => songQueueManager.ToggleMedley(songQueueEntryDto);
-        songQueueUiControl.OnDelete = songQueueEntryDto => songQueueManager.RemoveSongQueueEntry(songQueueEntryDto);
-    }
-
-    private void InitHideSlideInControlsViaClick()
-    {
-        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitHideSlideInControlsViaClick");
-
-        hiddenHideModifiersOverlayArea.HideByDisplay();
-        hiddenHideModifiersOverlayArea.RegisterCallback<PointerDownEvent>(_ => ModifiersOverlaySlideInControl.SlideOut());
-        ModifiersOverlaySlideInControl.Visible.Subscribe(newValue =>
-        {
-            hiddenHideModifiersOverlayArea.SetVisibleByDisplay(newValue);
-            if (newValue)
-            {
-                closeModifiersOverlayButton.Focus();
-            }
-            else if (VisualElementUtils.IsDescendantFocused(modifierDialogOverlay))
-            {
-                toggleModifiersOverlayButton.Focus();
-            }
-        });
-
-        hiddenHideSongQueueOverlayArea.HideByDisplay();
-        hiddenHideSongQueueOverlayArea.RegisterCallback<PointerDownEvent>(_ => SongQueueSlideInControl.SlideOut());
-        SongQueueSlideInControl.Visible.Subscribe(newValue =>
-        {
-            hiddenHideSongQueueOverlayArea.SetVisibleByDisplay(newValue);
-            if (newValue)
-            {
-                closeSongQueueButton.Focus();
-            }
-            else if (VisualElementUtils.IsDescendantFocused(songQueueOverlay))
-            {
-                toggleSongQueueOverlayButton.Focus();
-            }
-        });
-    }
-
-    private void InitModifierDialog()
-    {
-        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitModifierDialog");
-
-        // Modifier dialog overlay
-        modifierDialogOverlay.ShowByDisplay();
-        ModifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
-        toggleModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.ToggleVisible());
-        closeModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.SlideOut());
-
-        // Modifier active icon
-        modifiersActiveIcon.HideByDisplay();
-        nonPersistentSettings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierActive)
-            .Subscribe(_ => UpdateModifiersActiveIcon());
-
-        // Delay initialization of modifier dialog control
-        bool initializedModifierDialogControl = false;
-        ModifiersOverlaySlideInControl.Visible.Subscribe(newValue =>
-        {
-            if (newValue
-                && !initializedModifierDialogControl)
-            {
-                initializedModifierDialogControl = true;
-                InitModifierDialogControl();
-            }
-        });
-    }
-
-    private void InitModifierDialogControl()
-    {
-        injector.WithRootVisualElement(modifierDialogOverlay)
-            .Inject(modifierDialogControl);
-        modifierDialogControl.OpenDialog(nonPersistentSettings.GameRoundSettings);
-        modifierDialogOverlay.Query(R_PlayShared.UxmlNames.closeModifierDialogButton).ForEach(it => it.HideByDisplay());
-    }
-
-    private void UpdateSongQueue()
-    {
-        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.UpdateSongQueue");
-
-        string newSongQueueLengthAsString = songQueueManager.SongQueueLength.ToString();
-        if (songQueueLengthLabel.text != newSongQueueLengthAsString)
-        {
-            songQueueLengthContainer.SetVisibleByDisplay(songQueueManager.SongQueueLength > 0);
-            songQueueLengthLabel.SetTranslatedText(Translation.Of(newSongQueueLengthAsString));
-            LeanTween.value(gameObject, Vector3.one * 1.5f, Vector3.one, 1.5f)
-                .setEaseOutBounce()
-                .setOnUpdate(s => songQueueLengthLabel.style.scale = new StyleScale(new Scale(new Vector2(s, s))));
-        }
-        songQueueUiControl.SetSongQueueEntryDtos(songQueueManager.GetSongQueueEntries());
-        startSongQueueButton.SetEnabled(!songQueueManager.IsSongQueueEmpty);
-    }
-
-    private void UpdateModifiersActiveIcon()
-    {
-        modifiersActiveIcon.SetVisibleByDisplay(nonPersistentSettings.GameRoundSettings.AnyModifierActive);
-        modifiersInactiveIcon.SetVisibleByDisplay(!nonPersistentSettings.GameRoundSettings.AnyModifierActive);
-    }
-
-    private void UpdateMicCheckButton()
-    {
-        toggleMicCheckButton.SetActive(nonPersistentSettings.MicTestActive.Value);
-        micCheckIcon.SetVisibleByDisplay(nonPersistentSettings.MicTestActive.Value);
-        noMicCheckIcon.SetVisibleByDisplay(!nonPersistentSettings.MicTestActive.Value);
-    }
-
-    private void InitDifficultyAndScoreMode()
-    {
-        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitDifficultyAndScoreMode");
-
-        // Set difficulty for all players
-        settings.ObserveEveryValueChanged(it => it.Difficulty)
-            .Subscribe(newValue =>
-            {
-                settings.PlayerProfiles
-                    .Union(nonPersistentSettings.LobbyMemberPlayerProfiles)
-                    .ForEach(it => it.Difficulty = newValue);
-            });
-
-        nextDifficultyButton.RegisterCallbackButtonTriggered(_ => SetNextDifficulty());
-        previousDifficultyButton.RegisterCallbackButtonTriggered(_ => SetPreviousDifficulty());
-
-        UpdateDifficultyAndScoreModeControls();
-
-        toggleCoopModeButton.RegisterCallbackButtonTriggered(_ =>
-        {
-            if (settings.ScoreMode == EScoreMode.CommonAverage)
-            {
-                settings.ScoreMode = EScoreMode.Individual;
-            }
-            else
-            {
-                settings.ScoreMode = EScoreMode.CommonAverage;
-            }
-            UpdateDifficultyAndScoreModeControls();
-        });
-    }
-
-    private void SetPreviousDifficulty()
-    {
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            settings.ScoreMode = EScoreMode.Individual;
-            SetDifficulty(EDifficulty.Hard);
-        }
-        else
-        {
-            switch (settings.Difficulty)
-            {
-                case EDifficulty.Easy:
-                    SetNoScoreMode();
-                    break;
-                case EDifficulty.Medium:
-                    SetDifficulty(EDifficulty.Easy);
-                    break;
-                case EDifficulty.Hard:
-                    SetDifficulty(EDifficulty.Medium);
-                    break;
-            }
-        }
-    }
-
-    private void SetNextDifficulty()
-    {
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            settings.ScoreMode = EScoreMode.Individual;
-            SetDifficulty(EDifficulty.Easy);
-        }
-        else
-        {
-            switch (settings.Difficulty)
-            {
-                case EDifficulty.Easy:
-                    SetDifficulty(EDifficulty.Medium);
-                    break;
-                case EDifficulty.Medium:
-                    SetDifficulty(EDifficulty.Hard);
-                    break;
-                case EDifficulty.Hard:
-                    SetNoScoreMode();
-                    break;
-            }
-        }
-    }
-
-    private void SetNoScoreMode()
-    {
-        settings.ScoreMode = EScoreMode.None;
-        UpdateDifficultyAndScoreModeControls();
-    }
-
-    private void SetDifficulty(EDifficulty difficulty)
-    {
-        settings.Difficulty = difficulty;
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            settings.ScoreMode = EScoreMode.Individual;
-        }
-        UpdateDifficultyAndScoreModeControls();
-    }
-
-    private void UpdateDifficultyAndScoreModeControls()
-    {
-        coopIcon.SetVisibleByDisplay(settings.ScoreMode == EScoreMode.CommonAverage);
-        noCoopIcon.SetVisibleByDisplay(settings.ScoreMode != EScoreMode.CommonAverage);
-
-        if (settings.ScoreMode == EScoreMode.None)
-        {
-            currentDifficultyLabel.SetTranslatedText(Translation.Get(R.Messages.options_difficulty_noScores));
-        }
-        else
-        {
-            currentDifficultyLabel.SetTranslatedText(Translation.Get(settings.Difficulty));
-        }
     }
 
     public void QuitSongSelect()
@@ -625,51 +305,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         {
             sceneNavigator.LoadScene(EScene.MainScene);
         }
-    }
-
-    public void AddSongToSongQueue(SongMeta songMeta)
-    {
-        if (songMeta == null)
-        {
-            return;
-        }
-
-        SongQueueEntryDto songQueueEntryDto = CreateSongQueueEntryWithCurrentSettings(songMeta);
-        songQueueManager.AddSongQueueEntry(songQueueEntryDto);
-    }
-
-    public void AddSongToSongQueueAsMedley(SongMeta songMeta)
-    {
-        if (songMeta == null)
-        {
-            return;
-        }
-
-        if (songQueueManager.IsSongQueueEmpty)
-        {
-            // Cannot create medley with previous song when song queue is empty.
-            AddSongToSongQueue(songMeta);
-            return;
-        }
-
-        SongQueueEntryDto songQueueEntryDto = CreateSongQueueEntryWithCurrentSettings(songMeta);
-        if (songQueueEntryDto != null)
-        {
-            songQueueEntryDto.IsMedleyWithPreviousEntry = true;
-            songQueueManager.AddSongQueueEntry(songQueueEntryDto);
-        }
-    }
-
-    private SongQueueEntryDto CreateSongQueueEntryWithCurrentSettings(SongMeta songMeta)
-    {
-        SongQueueEntryDto songQueueEntryDto = new();
-        songQueueEntryDto.SongDto = DtoConverter.ToDto(songMeta);
-        songQueueEntryDto.SingScenePlayerDataDto = DtoConverter.ToDto(CreateSingScenePlayerData());
-        songQueueEntryDto.GameRoundSettingsDto = new GameRoundSettingsDto()
-        {
-            ModifierDtos = DtoConverter.ToDto(nonPersistentSettings.GameRoundSettings.modifiers),
-        };
-        return songQueueEntryDto;
     }
 
     private void ShowSearchExpressionHelp()
@@ -689,7 +324,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             lyricsDialogControl.CloseDialog();
         }
 
-        lyricsDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_lyricsDialog_title,
+        lyricsDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_lyricsDialog_title,
             "songName", songMeta.Title));
         lyricsDialogControl.DialogClosedEventStream.Subscribe(_ => lyricsDialogControl = null);
 
@@ -716,11 +351,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(firstVoiceLyrics));
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(secondVoiceLyrics));
         }
-
-        // Add attribution and license info
-        AccordionItem attributionAccordionItem = new(Translation.Get(R.Messages.action_showAttribution));
-        attributionAccordionItem.Add(AttributionUtils.CreateAttributionVisualElement(songMeta));
-        lyricsDialogControl.AddVisualElement(attributionAccordionItem);
     }
 
     public void InitSongMetas()
@@ -732,11 +362,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitSongMetas");
 
-        songMetas = new List<SongMeta>(songMetaManager.GetSongMetas());
-        songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
-
         // Trigger achievement
-        if (songMetas.Count > 100)
+        if (songMetaManager.GetSongMetas().Count > 100)
         {
             achievementEventStream.OnNext(new AchievementEvent(AchievementId.browseMoreThan100Songs));
         }
@@ -798,77 +425,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        string GetEntryTitle(SongSelectEntry songSelectEntry)
-        {
-            if (songSelectEntry is SongSelectSongEntry songEntry)
-            {
-                return songEntry.SongMeta.Title;
-            }
-            else if (songSelectEntry is SongSelectFolderEntry folderEntry)
-            {
-                return folderEntry.DirectoryInfo.Name;
-            }
-            else
-            {
-                return "";
-            }
-        }
-
-        string GetEntryArtist(SongSelectEntry songSelectEntry)
-        {
-            if (songSelectEntry is SongSelectSongEntry songEntry)
-            {
-                return songEntry.SongMeta.Artist;
-            }
-            else
-            {
-                return "";
-            }
-        }
-
-        // Search title that starts with the text
-        SongSelectEntry titleStartsWithMatch = songRouletteControl.Find(it =>
-        {
-            string titleNoWhitespace = GetEntryTitle(it).Replace(" ", "");
-            return StringUtils.StartsWithIgnoreCaseAndDiacritics(titleNoWhitespace, searchTextNoWhitespace);
-        });
-        if (titleStartsWithMatch != null)
-        {
-            songRouletteControl.SelectEntry(titleStartsWithMatch);
-            return;
-        }
-
-        // Search artist that starts with the text
-        SongSelectEntry artistStartsWithMatch = songRouletteControl.Find(it =>
-        {
-            string artistNoWhitespace = GetEntryArtist(it).Replace(" ", "");
-            return StringUtils.StartsWithIgnoreCaseAndDiacritics(artistNoWhitespace, searchTextNoWhitespace);
-        });
-        if (artistStartsWithMatch != null)
-        {
-            songRouletteControl.SelectEntry(artistStartsWithMatch);
-            return;
-        }
-
-        // Search title or artist contains the text
-        SongSelectEntry artistOrTitleContainsMatch = songRouletteControl.Find(it =>
-        {
-            string artistNoWhitespace = GetEntryArtist(it).Replace(" ", "");
-            string titleNoWhitespace = GetEntryTitle(it).Replace(" ", "");
-            return StringUtils.ContainsIgnoreCaseAndDiacritics(artistNoWhitespace, searchTextNoWhitespace)
-                || StringUtils.ContainsIgnoreCaseAndDiacritics(titleNoWhitespace, searchTextNoWhitespace);
-        });
-        if (artistOrTitleContainsMatch != null)
-        {
-            songRouletteControl.SelectEntry(artistOrTitleContainsMatch);
-        }
+        SongSelectEntry entry = songSearchControl.GetFuzzySearchMatch(searchTextNoWhitespace);
+        songRouletteControl.SelectEntry(entry);
     }
 
     private SingSceneData CreateSingSceneDataWithGivenSongAndSettings(SongMeta songMeta, bool startPaused)
     {
         SingSceneData singSceneData = new();
         singSceneData.SongMetas = new List<SongMeta> { songMeta };
-        singSceneData.SingScenePlayerData = CreateSingScenePlayerData();
+        singSceneData.SingScenePlayerData = playerListControl.CreateSingScenePlayerData();
         singSceneData.partyModeSceneData = sceneData.partyModeSceneData;
         singSceneData.gameRoundSettings = new(nonPersistentSettings.GameRoundSettings);
         singSceneData.StartPaused = startPaused;
@@ -877,41 +442,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             && singSceneData.gameRoundSettings.modifiers.AnyMatch(modifier => modifier is ShortSongGameRoundModifier))
         {
             // Set as medley song to play shortened version
+            // TODO: This modification should happen in SingScene where the GameRoundModifier behaviors are defined.
             singSceneData.MedleySongIndex = 0;
         }
         return singSceneData;
     }
 
-    private SingScenePlayerData CreateSingScenePlayerData()
-    {
-        SingScenePlayerData singScenePlayerData = new();
-
-        List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
-        if (selectedPlayerProfiles.IsNullOrEmpty())
-        {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_noPlayerSelected_title));
-            return null;
-        }
-        singScenePlayerData.SelectedPlayerProfiles = selectedPlayerProfiles;
-        singScenePlayerData.PlayerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
-        singScenePlayerData.PlayerProfileToVoiceIdMap = playerListControl.GetSelectedPlayerProfileToExtendedVoiceIdMap();
-        return singScenePlayerData;
-    }
-
-    private void StartSingSceneWithNextSongQueueEntry()
-    {
-        if (songQueueManager.IsSongQueueEmpty)
-        {
-            return;
-        }
-
-        SingSceneData singSceneData = songQueueManager.CreateNextSingSceneData(sceneData.partyModeSceneData);
-        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
-    }
-
     public void StartSingSceneWithGivenSongAndSettings(SongMeta songMeta, bool startPaused, bool fireBeforeSongStartedEvent)
     {
-        if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
+        if (HasFailedToLoadVoices(songMeta))
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
             return;
@@ -945,9 +484,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
+        if (HasFailedToLoadVoices(songMeta))
         {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error));
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason, "reason", "Failed to load txt file"));
+            return;
+        }
+
+        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        {
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioNotFound));
             return;
         }
 
@@ -981,7 +526,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         songRouletteControl.SelectEntryBySongMeta(randomSongMeta);
     }
 
-    private void CheckAudioThenStartSingScene(SongMeta songMeta)
+    private async void CheckAudioThenStartSingScene(SongMeta songMeta)
     {
         if (songMeta == null)
         {
@@ -991,7 +536,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         // Check that there is associated sing-along data. If not, ask to open song editor.
         if (!SongMetaUtils.HasSingAlongData(songMeta))
         {
-            if (SongMetaUtils.HasFailedToLoadVoices(songMeta))
+            if (HasFailedToLoadVoices(songMeta))
             {
                 ShowFailedToLoadVoicesDialog(songMeta);
                 return;
@@ -1013,16 +558,19 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
 
         // Check that the used audio format can be loaded.
-        songAudioPlayer.LoadAndPlayAsObservable(songMeta)
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError( $"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
-                    "name", songMeta.Audio,
-                    "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
-            })
-            .Subscribe(_ => StartSingSceneWithGivenSongAndSettings(songMeta, false, true));
+        try
+        {
+            await songAudioPlayer.LoadAndPlayAsync(songMeta);
+            StartSingSceneWithGivenSongAndSettings(songMeta, false, true);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError( $"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
+            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
+                "name", songMeta.Audio,
+                "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
+        }
     }
 
     private void ShowFailedToLoadVoicesDialog(SongMeta songMeta)
@@ -1038,7 +586,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             errorMessage = Translation.Empty;
         }
 
-        uiManager.CreateErrorInfoDialogControl(
+        dialogManager.CreateErrorInfoDialogControl(
             Translation.Get(R.Messages.songSelectScene_failedToLoadSongDialog_title),
             Translation.Get(R.Messages.songSelectScene_failedToLoadSongDialog_message),
             errorMessage);
@@ -1046,7 +594,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void ShowAskToCreateSingAlongDataDialog(SongMeta songMeta)
     {
-        noSingAlongDataDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_noSingAlongDataDialog_title));
+        noSingAlongDataDialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_noSingAlongDataDialog_title));
         noSingAlongDataDialogControl.Message = Translation.Get(R.Messages.songSelectScene_noSingAlongDataDialog_message);
         noSingAlongDataDialogControl.MessageElement.AddToClassList("my-2");
         Button defaultButton = noSingAlongDataDialogControl.AddButton(Translation.Get(R.Messages.songSelectScene_noSingAlongDataDialog_createSingAlongData), _ =>
@@ -1090,6 +638,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
         nonPersistentSettings.SongSelectDirectoryInfo = directoryInfo;
         UpdateFilteredSongs();
+
+        // Restore selection
+        if (nonPersistentSettings.SongSelectDirectoryPathToLastSelection.TryGetValue(directoryInfo.FullName, out string lastSelection))
+        {
+            songRouletteControl.SelectEntryByPath(lastSelection);
+            songRouletteControl.FinishTransition();
+        }
     }
 
     public bool TryNavigateToParentFolder()
@@ -1102,7 +657,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         DirectoryInfo oldDirectoryInfo = nonPersistentSettings.SongSelectDirectoryInfo;
         if (oldDirectoryInfo == null
             || oldDirectoryInfo.Parent == null
-            || oldDirectoryInfo.Name == VirtualRootFolderName)
+            || SettingsUtils.IsSongFolderNavigationRootFolder(settings, oldDirectoryInfo))
         {
             return false;
         }
@@ -1112,7 +667,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
                 !settings.DisabledSongFolders.Contains(songFolder)
                 && new DirectoryInfo(songFolder).FullName == oldDirectoryInfo.FullName))
         {
-            nonPersistentSettings.SongSelectDirectoryInfo = new DirectoryInfo(VirtualRootFolderName);
+            nonPersistentSettings.SongSelectDirectoryInfo = new DirectoryInfo(SettingsUtils.SongFolderNavigationVirtualRootFolderName);
         }
         else
         {
@@ -1190,7 +745,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         CloseAskToAssignMicsDialog();
 
-        askToAssignMicsDialog = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_missingMicDialog_title));
+        askToAssignMicsDialog = dialogManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_missingMicDialog_title));
         string playerNamesCsv = playerProfilesWithoutMics
             .Select(it => it.Name)
             .JoinWith(", ");
@@ -1229,8 +784,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.OnSearchTextChanged");
 
-        StartSongRepositorySearch();
-
         string rawSearchText = songSearchControl.GetRawSearchText();
         if (!rawSearchText.IsNullOrEmpty()
             && lastRawSearchText.IsNullOrEmpty())
@@ -1240,39 +793,37 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
         lastRawSearchText = rawSearchText;
 
+        StartSongRepositorySearch();
+
         if (TryExecuteSpecialSearchSyntax(rawSearchText))
         {
             // Special search syntax used. Do not perform normal filtering.
             return;
         }
         UpdateFilteredSongs();
-
-        if (rawSearchText.IsNullOrEmpty())
-        {
-            // Restore selection from before search
-            if (selectedEntryBeforeSearch != null)
-            {
-                songRouletteControl.SelectEntry(selectedEntryBeforeSearch);
-            }
-        }
     }
 
-    private void StartSongRepositorySearch()
+    private async void StartSongRepositorySearch()
     {
-        IsSongRepositorySearchRunning.Value = true;
-        SongRepositorySearchParameters searchParameters = new(songSearchControl.GetSearchText());
-        SongRepositoryUtils.SearchSongs(searchParameters)
-            .Buffer(TimeSpan.FromMilliseconds(500))
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-            })
-            .DoOnCompleted(() => IsSongRepositorySearchRunning.Value = false)
-            .Subscribe(songSearchResultEntries =>
-            {
-                songSearchResultEntries.ForEach(entry => AddSearchResultEntryToSongMetaManager(entry));
-                UpdateFilteredSongs();
-            });
+        string searchText = songSearchControl.GetSearchText();
+        if (searchText.IsNullOrEmpty())
+        {
+            return;
+        }
+        Debug.Log($"StartSongRepositorySearch: searchText '{searchText}'");
+
+        try
+        {
+            RunningSongRepositorySearches.Value++;
+            SongRepositorySearchParameters searchParameters = new(searchText);
+            List<SongRepositorySearchResult> searchResults = await SongRepositorySearcher.SearchSongsAsync(searchParameters);
+            searchResults.SelectMany(result => result.Entries).ForEach(resultEntry => AddSearchResultEntryToSongMetaManager(resultEntry));
+        }
+        finally
+        {
+            RunningSongRepositorySearches.Value--;
+        }
+        UpdateFilteredSongs();
     }
 
     private void AddSearchResultEntryToSongMetaManager(SongRepositorySearchResultEntry searchResultEntry)
@@ -1282,10 +833,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             SongMeta songMeta = searchResultEntry.SongMeta;
             List<SongIssue> songIssues = searchResultEntry.SongIssues;
             if (songMeta != null
-                && !songMetas.Contains(songMeta)
                 && !songMetaManager.ContainsSongMeta(songMeta))
             {
-                songMetas.Add(songMeta);
                 songMetaManager.AddSongMeta(songMeta);
                 songIssueManager.AddSongIssues(songIssues);
             }
@@ -1299,23 +848,52 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private List<SongMeta> GetFilteredSongMetas()
     {
-        // Ignore prefix for special search syntax
         IPlaylist playlist = SongSelectionPlaylistChooserControl.Selection.Value;
-        List<SongMeta> filteredSongs = songSearchControl.GetFilteredSongMetas(songMetas)
-            .Where(songMeta => playlist == null
-                            || playlist.HasSongEntry(songMeta))
-            .Where(songMeta => songSelectFilterControl.SongMetaPassesActiveFilters(songMeta))
-            .Where(songMeta => nonPersistentSettings.SongSelectDirectoryInfo == null
-                               // Typically each song has its own folder. Thus, show a song if its PARENT folder matches the selected folder.
-                               || SongMetaUtils.GetDirectoryInfo(songMeta)?.Parent?.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName)
-            .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
+        bool PlaylistMatches(SongMeta songMeta)
+        {
+            return playlist == null
+                   || playlist.HasSongEntry(songMeta);
+        }
+
+        bool ActiveFiltersMatches(SongMeta songMeta)
+        {
+            return songSelectFilterControl.SongMetaPassesActiveFilters(songMeta);
+        }
+
+        bool CurrentFolderMatches(SongMeta songMeta)
+        {
+            return nonPersistentSettings.SongSelectDirectoryInfo == null
+                   // Typically each song has its own folder. Thus, show a song if its PARENT folder matches the selected folder.
+                   || SongMetaUtils.GetDirectoryInfo(songMeta)?.Parent?.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName
+                   // Show songs that can not be shown otherwise in virtual root folder
+                   || (SongMetaUtils.GetDirectoryInfo(songMeta) == null
+                       && SettingsUtils.IsSongFolderNavigationRootFolder(settings, nonPersistentSettings.SongSelectDirectoryInfo));
+        }
+
+        List<SongMeta> filteredSongs = songSearchControl.GetFilteredSongMetas(songMetaManager.GetSongMetas())
+            .Where(PlaylistMatches)
+            .Where(ActiveFiltersMatches)
+            .Where(CurrentFolderMatches)
+            .OrderBy(songMeta => GetPrimarySongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
+            .ThenBy(songMeta => GetSecondarySongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
             .ToList();
         return filteredSongs;
     }
 
-    private object GetSongMetaOrderByProperty(SongMeta songMeta)
+    private object GetPrimarySongMetaOrderByProperty(SongMeta songMeta)
     {
-        switch (settings.SongOrder)
+        return GetSongMetaOrderByProperty(songMeta, settings.SongOrder);
+    }
+
+    private object GetSecondarySongMetaOrderByProperty(SongMeta songMeta)
+    {
+        ESongOrder secondaryOrderProperty = settings.SongOrder == ESongOrder.Title ? ESongOrder.Artist : ESongOrder.Title;
+        return GetSongMetaOrderByProperty(songMeta, secondaryOrderProperty);
+    }
+
+    private object GetSongMetaOrderByProperty(SongMeta songMeta, ESongOrder songOrder)
+    {
+        switch (songOrder)
         {
             case ESongOrder.Artist:
                 return songMeta.Artist;
@@ -1369,6 +947,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         bb.BindExistingInstance(songPreviewControl);
         bb.BindExistingInstance(songSearchControl);
         bb.BindExistingInstance(songSelectSelectedSongDetailsControl);
+        bb.BindExistingInstance(songSelectMenuControl);
+        bb.BindExistingInstance(songSelectSongQueueControl);
+        bb.BindExistingInstance(songSelectModifiersControl);
+        bb.BindExistingInstance(songSelectDifficultyAndScoreModeControl);
         bb.Bind(nameof(micPitchTrackerPrefab)).ToExistingInstance(micPitchTrackerPrefab);
         return bb.GetBindings();
     }
@@ -1409,17 +991,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.UpdateFilteredSongs");
 
-        if (settings.NavigateByFoldersInSongSelect
-            && nonPersistentSettings.SongSelectDirectoryInfo == null)
-        {
-            nonPersistentSettings.SongSelectDirectoryInfo = new DirectoryInfo(VirtualRootFolderName);
-        }
-        else if (!settings.NavigateByFoldersInSongSelect
-                 && nonPersistentSettings.SongSelectDirectoryInfo != null)
-        {
-            nonPersistentSettings.SongSelectDirectoryInfo = null;
-        }
+        // Prepare to navigate by directory if needed
+        UpdateSongSelectDirectoryInfo();
 
+        // Check if filtered songs might have changed
         List<SongMeta> filteredSongMetas = GetFilteredSongMetas();
         if (!filteredSongMetas.IsNullOrEmpty()
             && filteredSongMetas.SequenceEqual(lastSongMetasOfSongRouletteControl)
@@ -1430,14 +1005,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         lastSongMetasOfSongRouletteControl = filteredSongMetas;
         lastDirectoryInfoOfSongRouletteControl = nonPersistentSettings.SongSelectDirectoryInfo;
 
+        // Prepare to update entries
         List<SongSelectEntry> newEntries = new();
 
         // Add folder entries
         if (settings.NavigateByFoldersInSongSelect)
         {
-            List<DirectoryInfo> directoryInfos = GetFilteredDirectoryInfos();
-            newEntries.AddRange(directoryInfos
-                .Select(directoryInfo => new SongSelectFolderEntry(directoryInfo)));
+            newEntries.AddRange(CreateSongSelectFolderEntries());
         }
 
         // Add song entries
@@ -1447,6 +1021,41 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         songRouletteControl.SetEntries(newEntries);
     }
 
+    private List<SongSelectEntry> CreateSongSelectFolderEntries()
+    {
+        List<SongSelectEntry> entries = new();
+
+        // Add entry to navigate to parent folder
+        if (nonPersistentSettings.SongSelectDirectoryInfo.Name != SettingsUtils.SongFolderNavigationVirtualRootFolderName)
+        {
+            DirectoryInfo parentDirectoryInfo = SettingsUtils.IsSongFolderNavigationRootFolder(settings, nonPersistentSettings.SongSelectDirectoryInfo.Parent)
+                    ? new DirectoryInfo(SettingsUtils.SongFolderNavigationVirtualRootFolderName)
+                    : nonPersistentSettings.SongSelectDirectoryInfo.Parent;
+            entries.Add(new SongSelectFolderEntry(parentDirectoryInfo));
+        }
+
+        // Add entries for other files and folders
+        List<DirectoryInfo> directoryInfos = GetFilteredDirectoryInfos();
+        entries.AddRange(directoryInfos
+            .Select(directoryInfo => new SongSelectFolderEntry(directoryInfo)));
+
+        return entries;
+    }
+
+    private void UpdateSongSelectDirectoryInfo()
+    {
+        if (settings.NavigateByFoldersInSongSelect
+            && SettingsUtils.IsSongFolderNavigationRootFolder(settings, nonPersistentSettings.SongSelectDirectoryInfo))
+        {
+            nonPersistentSettings.SongSelectDirectoryInfo = new DirectoryInfo(SettingsUtils.SongFolderNavigationVirtualRootFolderName);
+        }
+        else if (!settings.NavigateByFoldersInSongSelect
+                 && nonPersistentSettings.SongSelectDirectoryInfo != null)
+        {
+            nonPersistentSettings.SongSelectDirectoryInfo = null;
+        }
+    }
+
     private List<DirectoryInfo> GetFilteredDirectoryInfos()
     {
         if (nonPersistentSettings.SongSelectDirectoryInfo == null)
@@ -1454,7 +1063,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return new();
         }
 
-        if (nonPersistentSettings.SongSelectDirectoryInfo.Name == VirtualRootFolderName)
+        if (nonPersistentSettings.SongSelectDirectoryInfo.Name == SettingsUtils.SongFolderNavigationVirtualRootFolderName)
         {
             return settings.SongDirs
                 .Where(songFolder => !settings.DisabledSongFolders.Contains(songFolder))
@@ -1513,7 +1122,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         return false;
     }
 
-    public void UpdateTranslation()
+    public void UpdateSceneTitle()
     {
         if (HasPartyModeSceneData)
         {
@@ -1530,16 +1139,21 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     private void OnSubmitSearch()
     {
-        // Continue browsing songs from the currently selected entry.
-        selectedEntryBeforeSearch = songRouletteControl.SelectedEntry;
         songSearchControl.ResetSearchText();
         songRouletteControl.Focus();
+
+        // Continue browsing songs from the currently selected entry.
+        selectedEntryBeforeSearch = null;
     }
 
     public void OnCancelSearch()
     {
         songSearchControl.ResetSearchText();
         songRouletteControl.Focus();
+
+        // Continue browsing songs from the entry that was selected before starting the search.
+        songRouletteControl.SelectEntry(selectedEntryBeforeSearch);
+        selectedEntryBeforeSearch = null;
     }
 
     public void ShowCannotUseJokerMessage()
@@ -1586,7 +1200,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public void AskToRecreateSingAlongData(SongMeta songMeta)
     {
-        MessageDialogControl dialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_recreateSongDialog_title, "songName", songMeta.Title));
+        MessageDialogControl dialogControl = dialogManager.CreateDialogControl(Translation.Get(R.Messages.songSelectScene_recreateSongDialog_title, "songName", songMeta.Title));
         dialogControl.Message = Translation.Get(R.Messages.songSelectScene_recreateSongDialog_message);
         dialogControl.AddButton(Translation.Get(R.Messages.songSelectScene_recreateSongDialog_recreateAndSave), evt =>
         {
@@ -1604,5 +1218,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         });
 
         dialogControl.AddInformationMessage($"AI model parameters can be changed in the song editor");
+    }
+
+    private static bool HasFailedToLoadVoices(SongMeta songMeta)
+    {
+        return songMeta is LazyLoadedVoicesSongMeta lazyLoadedVoicesSongMeta
+               && lazyLoadedVoicesSongMeta.LoadVoicesPhase is LazyLoadedVoicesSongMeta.ELoadVoicesPhase.Failed;
     }
 }

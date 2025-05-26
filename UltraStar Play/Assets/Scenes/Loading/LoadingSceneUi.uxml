@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="background">
-        <ui:VisualElement name="logoContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center;">
-            <ui:VisualElement name="logo" style="width: 50%; height: 50%;" />
+        <ui:VisualElement name="logoContainer" style="position: absolute; align-items: center; justify-content: center; width: 100%; height: 100%;">
+            <ui:VisualElement name="logo" style="width: 50%; height: 50%; position: relative;" />
         </ui:VisualElement>
         <ui:VisualElement name="labelContainer" class="p-4" style="width: 100%; flex-grow: 1; flex-direction: column-reverse;">
             <ui:Label text="Loading..." name="loadingLabel" style="font-size: 25px; -unity-font-style: bold;" />

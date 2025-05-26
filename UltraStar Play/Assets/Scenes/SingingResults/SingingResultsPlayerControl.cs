@@ -110,35 +110,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
         }
 
         // Song rating
-        LoadSongRatingSprite(songRating.EnumValue)
-            .Subscribe(songRatingSprite =>
-            {
-                if (songRatingSprite == null)
-                {
-                    return;
-                }
-
-                ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
-                // Bouncy size animation
-                ratingLabel.style.scale = new StyleScale(new Scale(Vector2.zero));
-                ratingImage.style.scale = new StyleScale(new Scale(Vector2.zero));
-                LeanTween.value(singingResultsSceneControl.gameObject, Vector2.one, Vector2.one * 0.5f, bounceAnimTimeInSeconds)
-                    .setEasePunch()
-                    .setOnStart(() =>
-                    {
-                        if (TotalScoreAnimTimeInSeconds > 0)
-                        {
-                            PlaySingingResultsRatingPopupSound();
-                        }
-                    })
-                    .setOnUpdate(s =>
-                    {
-                        Vector2 scale = new Vector2(s, s);
-                        ratingLabel.style.scale = new StyleScale(new Scale(scale));
-                        ratingImage.style.scale = new StyleScale(new Scale(scale));
-                    })
-                    .setDelay(TotalScoreAnimTimeInSeconds);
-            });
+        InitSongRatingSpriteAsync();
         ratingLabel.SetTranslatedText(songRating.Translation);
 
         // Score texts (animated)
@@ -176,6 +148,42 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
         // AnimateStarRatingIcons();
 
         UpdateTranslation();
+    }
+
+    private async void InitSongRatingSprite()
+    {
+        await InitSongRatingSpriteAsync();
+    }
+
+    private async Awaitable InitSongRatingSpriteAsync()
+    {
+        Sprite songRatingSprite = await LoadSongRatingSpriteAsync(songRating.EnumValue);
+        if (songRatingSprite == null)
+        {
+            return;
+        }
+
+        ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
+        // Bouncy size animation
+        ratingLabel.style.scale = new StyleScale(new Scale(Vector2.zero));
+        ratingImage.style.scale = new StyleScale(new Scale(Vector2.zero));
+        LeanTween.value(singingResultsSceneControl.gameObject, Vector2.one, Vector2.one * 0.5f, bounceAnimTimeInSeconds)
+            .setEasePunch()
+            .setOnStart(() =>
+            {
+                if (TotalScoreAnimTimeInSeconds > 0)
+                {
+                    PlaySingingResultsRatingPopupSound();
+                }
+            })
+            .setOnUpdate(s =>
+            {
+                Vector2 scale = new Vector2(s, s);
+                ratingLabel.style.scale = new StyleScale(new Scale(scale));
+                ratingImage.style.scale = new StyleScale(new Scale(scale));
+            })
+            .setDelay(TotalScoreAnimTimeInSeconds);
+
     }
 
     private void PlaySingingResultsRatingPopupSound()
@@ -244,14 +252,14 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
         return highScoreEntry.Score == singingResultsPlayerScore.TotalScore;
     }
 
-    private IObservable<Sprite> LoadSongRatingSprite(ESongRating songRatingEnumValue)
+    private async Awaitable<Sprite> LoadSongRatingSpriteAsync(ESongRating songRatingEnumValue)
     {
         if (!settings.EnableDynamicThemes
             || themeManager.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
         {
-            return LoadDefaultSongRatingSprite(songRatingEnumValue);
+            return await LoadDefaultSongRatingSpriteAsync(songRatingEnumValue);
         }
-        return LoadSongRatingSpriteFromTheme(songRatingEnumValue);
+        return await LoadSongRatingSpriteFromThemeAsync(songRatingEnumValue);
     }
 
     private string GetTeamName()
@@ -271,7 +279,7 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
         return teamSettings != null;
     }
 
-    private IObservable<Sprite> LoadSongRatingSpriteFromTheme(ESongRating songRatingEnumValue)
+    private async Awaitable<Sprite> LoadSongRatingSpriteFromThemeAsync(ESongRating songRatingEnumValue)
     {
         try
         {
@@ -279,25 +287,25 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
             string valueForSongRating = themeMeta.ThemeJson.songRatingIcons.GetValueForSongRating(songRatingEnumValue);
             if (valueForSongRating.IsNullOrEmpty())
             {
-                return LoadDefaultSongRatingSprite(songRatingEnumValue);
+                return await LoadDefaultSongRatingSpriteAsync(songRatingEnumValue);
             }
 
             string imagePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, valueForSongRating);
-            return ImageManager.LoadSpriteFromUri(imagePath);
+            return await ImageManager.LoadSpriteFromUriAsync(imagePath);
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
             Debug.LogError($"Load song rating sprite from theme failed: {ex.Message}");
-            return LoadDefaultSongRatingSprite(songRatingEnumValue);
+            return await LoadDefaultSongRatingSpriteAsync(songRatingEnumValue);
         }
     }
 
-    private IObservable<Sprite> LoadDefaultSongRatingSprite(ESongRating songRatingEnumValue)
+    private async Awaitable<Sprite> LoadDefaultSongRatingSpriteAsync(ESongRating songRatingEnumValue)
     {
         SongRatingImageReference songRatingImageReference = singingResultsSceneControl.songRatingImageReferences
             .FirstOrDefault(it => it.songRating == songRatingEnumValue);
-        return Observable.Return<Sprite>(songRatingImageReference?.sprite);
+        return songRatingImageReference?.sprite;
     }
 
     public void UpdateTranslation()
@@ -320,20 +328,19 @@ public class SingingResultsPlayerControl : INeedInjection, IInjectionFinishedLis
 
     public void InitTopScoreVfx()
     {
-        singingResultsSceneControl.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(TotalScoreAnimTimeInSeconds,
-            () =>
+        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(singingResultsSceneControl.gameObject, TotalScoreAnimTimeInSeconds, () =>
+        {
+            VfxManager.CreateParticleEffect(new ParticleEffectConfig()
             {
-                VfxManager.CreateParticleEffect(new ParticleEffectConfig()
-                {
-                    particleEffect = EParticleEffect.LightGlowALoop,
-                    panelPos = playerImage.worldBound.center,
-                    scale = 0.4f,
-                    loop = true,
-                    isBackground = true,
-                    target = playerImage,
-                    hideAndShowWithTarget = true,
-                });
-            }));
+                particleEffect = EParticleEffect.LightGlowALoop,
+                panelPos = playerImage.worldBound.center,
+                scale = 0.4f,
+                loop = true,
+                isBackground = true,
+                target = playerImage,
+                hideAndShowWithTarget = true,
+            });
+        });
     }
 
     public void SetModScoreVisible(bool isVisible)

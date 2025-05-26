@@ -9,7 +9,7 @@ using UniInject;
 
 public class TranslationRestControl : AbstractRestControl, INeedInjection
 {
-    public static TranslationRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<TranslationRestControl>();
+    public static TranslationRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<TranslationRestControl>();
 
     protected override object GetInstance()
     {
@@ -18,7 +18,7 @@ public class TranslationRestControl : AbstractRestControl, INeedInjection
 
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Language)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.Language)
             .SetDescription($"Get current language as 2 letter country code")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -27,7 +27,7 @@ public class TranslationRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(new Dictionary<string, string> { { "language", twoLetterLanguageName } });
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Translations)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.Translations)
             .SetDescription($"Get all translations for the current language.")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>

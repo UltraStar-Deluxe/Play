@@ -11,6 +11,14 @@ using UnityEngine;
 
 public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
 {
+    public static ClientSideMicDataSender Instance
+    {
+        get
+        {
+            return GameObjectUtils.FindComponentWithTag<ClientSideMicDataSender>("ClientSideMicrophoneDataSender");
+        }
+    }
+
     [Inject]
     private Settings companionAppSettings;
 
@@ -25,6 +33,12 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
     private bool HasPositionInSong => songMeta != null && bestPositionInSongData != null;
 
     private IDisposable receivedMessageStreamDisposable;
+
+    private readonly Subject<MicProfile> micProfileChangedEventStream = new();
+    public IObservable<MicProfile> MicProfileChangedEventStream => micProfileChangedEventStream;
+
+    private readonly Subject<BeatPitchEventsDto> beatPitchEventsDtoEventStream = new();
+    public IObservable<BeatPitchEventsDto> BeatPitchEventsDtoEventStream => beatPitchEventsDtoEventStream;
 
     private void Start()
     {
@@ -130,6 +144,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
             UnixTimeMilliseconds = TimeUtils.GetUnixTimeMilliseconds(),
         };
 
+        beatPitchEventsDtoEventStream.OnNext(beatPitchEventsDto);
         SendMessageToServer(beatPitchEventsDto);
 
         lastAnalyzedBeat = currentBeatConsideringMicDelay;
@@ -153,10 +168,13 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         int midiNote = pitchEvent?.MidiNote ?? -1;
         float frequency = pitchEvent?.Frequency ?? -1;
         BeatPitchEventDto beatPitchEventDto = new(midiNote, -1, frequency);
-        SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDto)
+        BeatPitchEventsDto beatPitchEventsDto = new(beatPitchEventDto)
         {
             UnixTimeMilliseconds = TimeUtils.GetUnixTimeMilliseconds(),
-        });
+        };
+
+        beatPitchEventsDtoEventStream.OnNext(beatPitchEventsDto);
+        SendMessageToServer(beatPitchEventsDto);
     }
 
     private void SendMessageToServer(JsonSerializable jsonSerializable)
@@ -184,7 +202,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
             return null;
         }
 
-        PitchEvent pitchEvent = AbstractMicPitchTracker.AnalyzeBeat(
+        PitchEvent pitchEvent = AnalyzeBeat(
             songMeta,
             beat,
             positionInSongInMillis,
@@ -208,7 +226,9 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         newMicProfile.DelayInMillis = micProfileMessageDto.DelayInMillis;
         newMicProfile.Color = Colors.CreateColor(micProfileMessageDto.HexColor);
 
+        MicProfile = newMicProfile;
         companionAppSettings.MicProfile = newMicProfile;
+        micProfileChangedEventStream.OnNext(newMicProfile);
     }
 
     private void HandlePositionInSongMessage(PositionInSongDto positionInSongDto)

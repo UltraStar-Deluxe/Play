@@ -35,7 +35,6 @@
                 <Chooser name="portAudioHostApiChooser" label="PortAudio Host API¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                 <Chooser name="portAudioOutputDeviceChooser" label="PortAudio Output Device" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                 <ui:Button text="Show PortAudio Devices" display-tooltip-when-elided="true" name="portAudioDeviceInfoButton" style="align-self: flex-end;" />
-                <Chooser name="systemAudioBackendDelayChooser" label="System Audio Backend Delay" wrap-around="true" min-value="0" max-value="500" step-value="10" class="noBackgroundInHierarchy" />
                 <Chooser name="pitchDetectionAlgorithmChooser" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />
                 <ui:Toggle name="customEventSystemOptInOnAndroidToggle" label="Use custom event system&#10;for input actions.&#10;This enables better keyboard&#10;and gamepad control&#10;but can cause issues on Android¹" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
             </AccordionItem>
@@ -48,11 +47,8 @@
                 <Chooser name="songVideoPlaybackChooser" label="Song Video Playback" class="noBackgroundInHierarchy" />
                 <Chooser name="useVlcToPlayMediaFilesChooser" label="Use VLC to Play Audio&#10;and Video Files¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="logVlcOutputToggle" label="Log VLC Output" class="noBackgroundInHierarchy" />
-                <Chooser name="useFfmpegToPlayMediaFilesChooser" label="Use ffmpeg to Play Audio&#10;and Video Files (unstable)¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
-                <ui:Toggle name="logFfmpegOutputToggle" label="Log ffmpeg Output" class="noBackgroundInHierarchy" />
-                <ui:Toggle name="checkCodecIsSupportedToggle" label="Check Codecs are Supported&#10;(much slower song search)" class="noBackgroundInHierarchy" />
                 <Chooser name="maxConcurrentSongMediaConversionsChooser" label="Max Concurrent Conversions" wrap-around="true" min-value="0" max-value="100" step-value="1" class="noBackgroundInHierarchy" />
-                <ui:TextField picking-mode="Ignore" label="ffmpeg Conversion Commands&#10;(JSON)" name="ffmpegConversionCommandsJsonChooser" is-delayed="true" multiline="true" class="noBackgroundInHierarchy multiline" style="align-items: center; flex-grow: 1; margin-bottom: 4px; min-height: 100px;" />
+                <ui:TextField label="VLC Options, one per line¹" name="vlcOptionsTextField" multiline="true" class="noBackgroundInHierarchy multiline" style="min-height: 128px;" />
             </AccordionItem>
             <AccordionItem name="webViewGroup" label="Embedded Browser" class="child-mb-3">
                 <ui:Toggle name="enableWebViewToggle" label="Enable embedded browser¹" wrapAround="true" class="noBackgroundInHierarchy" />

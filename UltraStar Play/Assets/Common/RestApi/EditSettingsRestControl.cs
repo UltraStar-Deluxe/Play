@@ -6,7 +6,7 @@ using UniInject;
 
 public class EditSettingsRestControl : AbstractRestControl, INeedInjection
 {
-    public static EditSettingsRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<EditSettingsRestControl>();
+    public static EditSettingsRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<EditSettingsRestControl>();
 
     protected override object GetInstance()
     {
@@ -15,7 +15,7 @@ public class EditSettingsRestControl : AbstractRestControl, INeedInjection
 
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Config)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.Config)
             .SetDescription($"Get config.")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -23,10 +23,10 @@ public class EditSettingsRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(settings);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.Config)
+        httpServer.CreateEndpoint(HttpMethod.Post, RestApiEndpointPaths.Config)
             .SetDescription($"Set config. Only present fields in the request body are set.")
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteConfig)
+            .SetRequiredPermission(RestApiPermission.WriteConfig, settings)
             .SetCallbackAndAdd(requestData =>
             {
                 string jsonBody = requestData.Context.Request.GetBodyAsString();

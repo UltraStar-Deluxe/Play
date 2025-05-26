@@ -12,7 +12,7 @@ public class SetSongPropertyAction : INeedInjection
     private SongAudioPlayer songAudioPlayer;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private NoteAreaControl noteAreaControl;
@@ -35,12 +35,12 @@ public class SetSongPropertyAction : INeedInjection
     public void SetMedleyStartAndNotify(double positionInMillis)
     {
         SetMedleyStart(positionInMillis);
-        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.MedleyStart));
+        songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.MedleyStart));
     }
 
     public void SetMedleyEndAndNotify(double positionInMillis)
     {
         SetMedleyEnd(positionInMillis);
-        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.MedleyEnd));
+        songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.MedleyEnd));
     }
 }

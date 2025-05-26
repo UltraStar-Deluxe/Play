@@ -12,7 +12,7 @@ using UniRx;
 
 public class ApplyTranslationsOnChildrenChanged : AbstractSingletonBehaviour, INeedInjection
 {
-    public static ApplyTranslationsOnChildrenChanged Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ApplyTranslationsOnChildrenChanged>();
+    public static ApplyTranslationsOnChildrenChanged Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ApplyTranslationsOnChildrenChanged>();
 
     [Inject]
     private UiManager uiManager;

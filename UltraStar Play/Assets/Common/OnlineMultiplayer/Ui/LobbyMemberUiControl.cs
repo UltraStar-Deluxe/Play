@@ -60,7 +60,7 @@ namespace CommonOnlineMultiplayer
         protected virtual void UpdateImage()
         {
             Image imageElement = playerProfileImageChooser.ItemImage;
-            imageElement.style.backgroundImage = new StyleBackground(UiManager.Instance.fallbackPlayerProfileImage);
+            imageElement.style.backgroundImage = new StyleBackground(PlayerProfileImageManager.Instance.fallbackPlayerProfileImage);
             imageElement.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(lobbyMember.DisplayName));
         }
 

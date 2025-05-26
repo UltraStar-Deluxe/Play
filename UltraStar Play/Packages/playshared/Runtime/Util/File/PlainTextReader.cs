@@ -6,21 +6,23 @@ using UtfUnknown;
 
 public static class PlainTextReader
 {
-    public static StreamReader GetFileStreamReader(string path, Encoding encoding, bool useUniversalCharsetDetector)
+    public static StreamReader GetFileStreamReader(string path, PlainTextReaderConfig config = null)
     {
+        config ??= new PlainTextReaderConfig();
+
         if (path.IsNullOrEmpty()
             || !File.Exists(path))
         {
             throw new UnityException($"Can not read file. No file exists in specified path: {path}");
         }
 
-        if (encoding == null)
+        if (config.Encoding == null)
         {
-            encoding = useUniversalCharsetDetector
+            config.Encoding = config.UseUniversalCharsetDetector
                 ? GuessUnknownFileEncodingUsingUniversalCharsetDetector(path)
                 : GuessUnicodeFileEncoding(path);
         }
-        StreamReader reader = new(path, encoding, true);
+        StreamReader reader = new(path, config.Encoding, true);
         return reader;
     }
 

@@ -23,7 +23,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     private Button addButton;
 
     [Inject]
-    private UiManager uiManager;
+    private PlayerProfileImageManager playerProfileImageManager;
 
     [Inject]
     private WebCamManager webCamManager;
@@ -131,7 +131,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         });
         UpdatePlayerProfileInactiveOverlay(playerProfile, playerProfileInactiveOverlay);
 
-        PlayerProfileImageChooserControl playerProfileImageChooserControl = new PlayerProfileImageChooserControl(visualElement.Q<Chooser>(R.UxmlNames.playerProfileImageChooser), GetIndexInList(playerProfile), uiManager, webCamManager);
+        PlayerProfileImageChooserControl playerProfileImageChooserControl = new PlayerProfileImageChooserControl(visualElement.Q<Chooser>(R.UxmlNames.playerProfileImageChooser), GetIndexInList(playerProfile), playerProfileImageManager, webCamManager);
         playerProfileImageChooserControl.Bind(() => playerProfile.ImagePath,
                 newValue => playerProfile.ImagePath = newValue);
 
@@ -153,8 +153,6 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             playerProfileImageChooserControl.Chooser.NextItemButton.HideByDisplay();
             onlinePlayerProfileIcon.SetInClassList("onlineMultiplayerHost", lobbyMemberPlayerProfile.IsHost);
             onlinePlayerProfileIconContainer.ShowByDisplay();
-
-            UpdateOnlineMultiplayerPlayerImage(lobbyMemberPlayerProfile, playerProfileImageChooserControl);
         }
         else
         {
@@ -162,34 +160,6 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         }
 
         return visualElement;
-    }
-
-    private void UpdateOnlineMultiplayerPlayerImage(LobbyMemberPlayerProfile lobbyMemberPlayerProfile, PlayerProfileImageChooserControl playerProfileImageChooserControl)
-    {
-        if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Netcode)
-        {
-            playerProfileImageChooserControl.Chooser.ItemLabel.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(lobbyMemberPlayerProfile.Name));
-        }
-        else if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Steam)
-        {
-            SteamLobbyMember steamLobbyMember = onlineMultiplayerManager.LobbyMemberManager.GetLobbyMember(lobbyMemberPlayerProfile.UnityNetcodeClientId) as SteamLobbyMember;
-            if (steamLobbyMember == null)
-            {
-                return;
-            }
-
-            SteamOnlineMultiplayerUtils.GetAvatarTextureAsObservable(steamLobbyMember.SteamId)
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to get avatar image of Steam user '{steamLobbyMember.DisplayName}' with id {steamLobbyMember.SteamId}");
-                })
-                .Subscribe(texture =>
-                {
-                    playerProfileImageChooserControl.Chooser.ItemImage.image = texture;
-                    playerProfileImageChooserControl.Chooser.ItemLabel.HideByDisplay();
-                });
-        }
     }
 
     public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=PlayerProfileImage";

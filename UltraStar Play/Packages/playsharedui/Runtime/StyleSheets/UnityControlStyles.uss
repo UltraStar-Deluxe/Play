@@ -1,4 +1,17 @@
 /**************************************************/
+/* LIST VIEW */
+/**************************************************/
+.unity-list-view__reorderable-handle {
+    display: none;
+}
+
+.unity-list-view__reorderable-item__container {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/**************************************************/
 /* LABEL */
 /**************************************************/
 
@@ -286,6 +299,7 @@
     padding: 0;
     margin: 0;
     margin-top: 2px;
+    min-width: 220px;
 }
 
 .unity-base-dropdown__container-inner {
@@ -297,8 +311,9 @@
 
 .unity-base-dropdown__item {
     background-color: rgba(0, 0, 0, 0);
-    padding: 0 5px;
+    padding: 0 8px;
     margin: 0;
+    min-height: 40px;
     border-width: 0;
     border-bottom-width: 2px;
     border-color: var(--font-color);
@@ -315,6 +330,16 @@
 .unity-base-dropdown ScrollView #unity-content-container {
     padding-right: 0;
     padding-bottom: 0;
+}
+
+.unity-base-dropdown__checkmark {
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/SolidWhite.png');
+    -unity-background-image-tint-color: var(--font-color);
+    -unity-background-scale-mode: scale-to-fit;
+    border-radius: 50%;
+    margin-top: 12px;
+    width: 12px;
+    height: 12px;
 }
 
 /**************************************************/

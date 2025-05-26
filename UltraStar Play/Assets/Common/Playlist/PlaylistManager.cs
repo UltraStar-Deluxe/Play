@@ -1,18 +1,18 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using UniInject;
 using UniRx;
 using UnityEngine;
 
 public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static PlaylistManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PlaylistManager>();
+    public static PlaylistManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<PlaylistManager>();
 
-    private List<IPlaylist> playlists = new();
+    private ConcurrentBag<IPlaylist> playlists = new();
 
     public IReadOnlyList<IPlaylist> Playlists
     {
@@ -23,7 +23,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
                 CreateFavoritePlaylistIfNotExist();
                 ScanPlaylists();
             }
-            return playlists;
+            return playlists.ToList();
         }
     }
 
@@ -42,8 +42,12 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private readonly Subject<PlaylistChangeEvent> playlistChangeEventStream = new();
-    public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream
+    private readonly Subject<PlaylistChangedEvent> playlistChangedEventStream = new();
+    public IObservable<PlaylistChangedEvent> PlaylistChangedEventStream => playlistChangedEventStream
+        .ObserveOnMainThread();
+
+    private readonly Subject<VoidEvent> playlistsLoadedEventStream = new();
+    public IObservable<VoidEvent> PlaylistsLoadedEventStream => playlistsLoadedEventStream
         .ObserveOnMainThread();
 
     // TODO: Should be injected
@@ -93,28 +97,28 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         File.WriteAllLines(playlist.FilePath, lines);
     }
 
-    private void ScanPlaylists()
+    private async void ScanPlaylists()
     {
-        Task.Run(async () =>
+        try
         {
-            try
-            {
-                await ScanPlaylistsAsync();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to scan playlists: {ex.Message}");
-            }
-        });
+            await ScanPlaylistsAsync();
+            playlistsLoadedEventStream.OnNext(VoidEvent.instance);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to scan playlists: {ex.Message}");
+        }
     }
 
-    private async Task ScanPlaylistsAsync()
+    private async Awaitable ScanPlaylistsAsync()
     {
+        await Awaitable.BackgroundThreadAsync();
+
         Debug.Log($"Scanning playlists on thread {Thread.CurrentThread.ManagedThreadId}");
         using DisposableStopwatch d = new("Scanning playlists took <ms> ms");
 
-        playlists = new List<IPlaylist>();
+        playlists = new ConcurrentBag<IPlaylist>();
 
         await ScanPlaylistsInFolderAsync(ApplicationUtils.PlaylistFolder);
 
@@ -123,21 +127,23 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         {
             await ScanPlaylistsInFolderAsync(songFolder);
         }
+
+        await Awaitable.MainThreadAsync();
     }
 
-    private async Task ScanPlaylistsInFolderAsync(string folder)
+    private async Awaitable ScanPlaylistsInFolderAsync(string folder)
     {
         Debug.Log($"Scanning playlists in folder '{folder}'");
         using DisposableStopwatch d2 = new($"Scanning playlists in folder '{folder}' took <ms> ms");
 
-        await ScanUltraStarPlaylistsInFolder(folder);
-        await ScanM3UPlaylistsInFolder(folder);
+        await ScanUltraStarPlaylistsInFolderAsync(folder);
+        await ScanM3UPlaylistsInFolderAsync(folder);
     }
 
-    private async Task ScanM3UPlaylistsInFolder(string folder)
+    private async Awaitable ScanM3UPlaylistsInFolderAsync(string folder)
     {
-        FileScanner scanner = new($"*.{ApplicationUtils.M3uPlaylistFileExtension}", true, true);
-        List<string> playlistFilePaths = scanner.GetFiles(folder, true);
+        List<string> playlistFilePaths = FileScanner.GetFiles(folder,
+            new FileScannerConfig($"*.{ApplicationUtils.M3uPlaylistFileExtension}") { Recursive = true });
         foreach (string filePath in playlistFilePaths)
         {
             try
@@ -153,11 +159,10 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private async Task ScanUltraStarPlaylistsInFolder(string folder)
+    private async Awaitable ScanUltraStarPlaylistsInFolderAsync(string folder)
     {
         string ultraStarPlaylistFileExtensionPattern = $"*.{ApplicationUtils.UltraStarPlaylistFileExtension}";
-        FileScanner scanner = new(ultraStarPlaylistFileExtensionPattern, true, true);
-        List<string> playlistFilePaths = scanner.GetFiles(folder, true);
+        List<string> playlistFilePaths = FileScanner.GetFiles(folder, new FileScannerConfig(ultraStarPlaylistFileExtensionPattern) { Recursive = true });
         foreach (string filePath in playlistFilePaths)
         {
             try
@@ -193,7 +198,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         playlist.RemoveSongEntry(songMeta.Artist, songMeta.Title);
-        playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, songMeta));
+        playlistChangedEventStream.OnNext(new PlaylistChangedEvent(playlist, songMeta));
         SavePlaylist(playlist);
     }
 
@@ -206,16 +211,16 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         playlist.AddLineEntry(new UltraStartPlaylistSongEntry(songMeta.Artist, songMeta.Title));
-        playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, songMeta));
+        playlistChangedEventStream.OnNext(new PlaylistChangedEvent(playlist, songMeta));
         SavePlaylist(playlist);
     }
 
-    public class PlaylistChangeEvent
+    public class PlaylistChangedEvent
     {
         public IPlaylist Playlist { get; set; }
         public SongMeta SongMeta { get; set; }
 
-        public PlaylistChangeEvent(IPlaylist playlist, SongMeta songMeta)
+        public PlaylistChangedEvent(IPlaylist playlist, SongMeta songMeta)
         {
             Playlist = playlist;
             SongMeta = songMeta;
@@ -300,7 +305,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             nonPersistentSettings.PlaylistName.Value = newName;
         }
 
-        playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, null));
+        playlistChangedEventStream.OnNext(new PlaylistChangedEvent(playlist, null));
 
         errorMessage = Translation.Empty;
         return true;
@@ -336,9 +341,9 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             nonPersistentSettings.PlaylistName.Value = "";
         }
 
-        playlists.Remove(playlist);
+        playlists = new ConcurrentBag<IPlaylist>(playlists.Except(new List<IPlaylist> {playlist}));
 
-        playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, null));
+        playlistChangedEventStream.OnNext(new PlaylistChangedEvent(playlist, null));
 
         return Translation.Empty;
     }
@@ -356,7 +361,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         UltraStarPlaylist newPlaylist = new(newPlaylistPath);
         AddPlaylist(newPlaylist, newPlaylistPath);
 
-        playlistChangeEventStream.OnNext(new PlaylistChangeEvent(newPlaylist, null));
+        playlistChangedEventStream.OnNext(new PlaylistChangedEvent(newPlaylist, null));
 
         return newPlaylist;
     }

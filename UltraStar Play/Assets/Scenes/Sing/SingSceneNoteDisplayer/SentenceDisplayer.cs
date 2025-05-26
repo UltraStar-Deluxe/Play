@@ -48,7 +48,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
             .AddTo(gameObject);
     }
 
-    private void OnEnterSentence(PlayerControl.EnterSentenceEvent evt)
+    private async void OnEnterSentence(PlayerControl.EnterSentenceEvent evt)
     {
         lastEnterSentenceEvent = evt;
         Sentence sentence = evt.Sentence;
@@ -65,15 +65,14 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         if (delayInMillis > 0)
         {
             float delayInSeconds = (float)(delayInMillis / 1000);
-            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(
-                delayInSeconds, () =>
-                {
-                    // Only show the sentence if there was no other event in the meantime.
-                    if (lastEnterSentenceEvent == evt)
-                    {
-                        DisplaySentence(sentence);
-                    }
-                }));
+            await Awaitable.MainThreadAsync();
+            await Awaitable.WaitForSecondsAsync(delayInSeconds);
+
+            // Only show the sentence if there was no other event in the meantime.
+            if (lastEnterSentenceEvent == evt)
+            {
+                DisplaySentence(sentence);
+            }
         }
         else
         {
@@ -90,12 +89,11 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
             // Afterwards, fade out notes, then remove notes.
             if (playerControl != null)
             {
-                playerControl.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f,
-                    () =>
-                    {
-                        currentSentence = sentence;
-                        FadeOutNotesAfterLastSentence();
-                    }));
+                AwaitableUtils.ExecuteAfterDelayInSecondsAsync(playerControl.gameObject, 1f, () =>
+                {
+                    currentSentence = sentence;
+                    FadeOutNotesAfterLastSentence();
+                });
             }
         }
         else

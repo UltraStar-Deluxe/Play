@@ -106,7 +106,7 @@ public static class NumberUtils
         if (aEnd < aStart
             || bEnd < bStart)
         {
-            throw new IllegalArgumentException("'start' must be smaller than 'end'");
+            throw new ArgumentException("'start' must be smaller than 'end'");
         }
 
         // https://scicomp.stackexchange.com/questions/26258/the-easiest-way-to-find-intersection-of-two-intervals
@@ -217,4 +217,13 @@ public static class NumberUtils
         }
     }
 
+    public static bool IsDistanceGreaterThan(double from, double to, double threshold)
+    {
+        return Math.Abs(to - from) > threshold;
+    }
+
+    public static bool IsDistanceLessThan(double from, double to, double threshold)
+    {
+        return Math.Abs(to - from) < threshold;
+    }
 }

@@ -8,7 +8,13 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static ApplicationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ApplicationManager>();
+    public static ApplicationManager Instance
+    {
+        get
+        {
+            return GameObjectUtils.FindComponentWithTag<ApplicationManager>("ApplicationManager");
+        }
+    }
 
     public List<string> simulatedCommandLineArguments = new List<string>();
 
@@ -23,7 +29,7 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 
     private readonly Subject<Finger> fingerDownEventStream = new();
     public IObservable<Finger> FingerDownEventStream => fingerDownEventStream;
-
+    
     protected override object GetInstance()
     {
         return Instance;
@@ -48,7 +54,7 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-
+        
         targetFrameRate = settings.TargetFps;
         if (targetFrameRate > 0)
         {
@@ -126,12 +132,12 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
             }
         }
     }
-
+    
     private void OnFingerUp(Finger obj)
     {
        fingerUpEventStream.OnNext(obj);
     }
-
+    
     private void OnFingerDown(Finger obj)
     {
        fingerDownEventStream.OnNext(obj);

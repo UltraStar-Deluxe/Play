@@ -5,7 +5,7 @@ namespace CommonOnlineMultiplayer
 {
     public class HasSongRequestManager : AbstractOnlineMultiplayerRequestManager
     {
-        public static HasSongRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<HasSongRequestManager>();
+        public static HasSongRequestManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<HasSongRequestManager>();
 
         [Inject]
         private SongMetaManager songMetaManager;

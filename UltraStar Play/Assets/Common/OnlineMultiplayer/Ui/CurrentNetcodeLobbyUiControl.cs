@@ -23,9 +23,6 @@ namespace CommonOnlineMultiplayer
         [Inject(UxmlName = R.UxmlNames.disconnectOnlineGameButton)]
         private Button disconnectOnlineGameButton;
 
-        [Inject(UxmlName = R.UxmlNames.lobbyInfoContainer)]
-        private VisualElement lobbyInfoContainer;
-
         [Inject(Key = nameof(connectedClientEntryUi))]
         private VisualTreeAsset connectedClientEntryUi;
 
@@ -50,8 +47,6 @@ namespace CommonOnlineMultiplayer
 
         public void OnInjectionFinished()
         {
-            lobbyInfoContainer.HideByDisplay();
-
             connectedClientsListTitle.SetTranslatedText(Translation.Get(R.Messages.onlineGame_lobby_title,
                 "lobbyName", lobbyManager.CurrentLobby?.Name ?? ""));
             connectedClientsListScrollView.Clear();
@@ -121,7 +116,7 @@ namespace CommonOnlineMultiplayer
 
         public VisualElement CreateVisualElement()
         {
-            return Resources.Load<VisualTreeAsset>("CurrentSteamLobbyUi").CloneTreeAndGetFirstChild();
+            return Resources.Load<VisualTreeAsset>("CurrentNetcodeLobbyUi").CloneTreeAndGetFirstChild();
         }
     }
 }

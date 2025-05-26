@@ -242,8 +242,11 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
     {
         if (Directory.Exists(FullPath))
         {
-            // Check this song folder is not already added, either directly or indirectly as subfolder.
-            if (SettingsProblemHintControl.IsDuplicateFolder(FullPath, settings.SongDirs))
+            if (PathContainsHiddenFolder(FullPath))
+            {
+                ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_hiddenFoldersAreIgnored));
+            }
+            else if (SettingsProblemHintControl.IsDuplicateFolder(FullPath, settings.SongDirs))
             {
                 ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_duplicate));
             }
@@ -269,5 +272,26 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         {
             ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_notFound));
         }
+    }
+
+    private static bool PathContainsHiddenFolder(string path)
+    {
+        if (path.IsNullOrEmpty())
+        {
+            return false;
+        }
+
+        DirectoryInfo directoryInfo = new DirectoryInfo(path);
+        while (directoryInfo != null)
+        {
+            if (directoryInfo.Name.StartsWith(".")
+                && directoryInfo.Name != "."
+                && directoryInfo.Name != "..")
+            {
+                return true;
+            }
+            directoryInfo = directoryInfo.Parent;
+        }
+        return false;
     }
 }

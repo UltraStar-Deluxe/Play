@@ -12,35 +12,21 @@ using Debug = UnityEngine.Debug;
 
 public static class BuildUtils
 {
-    private const string KeystorePathEnvironmentVariable = "UNITY_KEYSTORE_PATH";
-    private const string KeystorePasswordEnvironmentVariable = "UNITY_KEYSTORE_PASSWORD";
-    private const string KeystoreKeyAliasEnvironmentVariable = "UNITY_KEYSTORE_KEY_ALIAS";
-    private const string KeystoreKeyAliasPasswordEnvironmentVariable = "UNITY_KEYSTORE_KEY_ALIAS_PASSWORD";
-
     private static readonly Dictionary<string, string> copyFilesBeforeBuild = new()
     {
         { "Assets/StreamingAssets/HOW_TO_DOWNLOAD_SPEECH_RECOGNITION_MODELS.txt" , "Assets/StreamingAssets/SpeechRecognitionModels/HOW_TO_DOWNLOAD_SPEECH_RECOGNITION_MODELS.txt" },
     };
 
-    private static readonly List<string> ignoredFoldersOfMobileBuild = new()
-    {
-        "Assets/StreamingAssets/SpleeterMsvcExe",
-        "Assets/StreamingAssets/BasicPitchExe",
-        "Assets/StreamingAssets/SpeechRecognitionModels",
-    };
-
-    private static string IgnoredAssetsOfMobileBuildFolder => "IgnoredAssetsOfMobileBuild";
-
     public static void PerformCustomBuild(CustomBuildOptions options)
     {
         CopyFilesBeforeBuild();
 
-        bool isMobileBuild = options.buildTarget is BuildTarget.Android or BuildTarget.iOS;
+        bool isMobileBuild = MobileBuildUtils.IsMobileBuild(options.buildTarget);
         try
         {
             if (isMobileBuild)
             {
-                ExcludeAssetsBeforeMobileBuild();
+                MobileBuildUtils.ExcludeAssetsBeforeMobileBuild();
             }
 
             AssetDatabase.Refresh();
@@ -50,7 +36,7 @@ public static class BuildUtils
         {
             if (isMobileBuild)
             {
-                IncludeAssetsAfterMobileBuild();
+                MobileBuildUtils.IncludeAssetsAfterMobileBuild();
             }
         }
     }
@@ -94,11 +80,11 @@ public static class BuildUtils
     {
         if (options.buildTarget is BuildTarget.Android)
         {
-            ConfigureAndroidBuildSettings(options);
+            MobileBuildUtils.ConfigureAndroidBuildSettings(options);
         }
         else if (options.buildTarget is BuildTarget.iOS)
         {
-            ConfigureIosBuildSettings(options);
+            MobileBuildUtils.ConfigureIosBuildSettings(options);
         }
     }
 
@@ -135,50 +121,11 @@ public static class BuildUtils
         CompressDirectoryToZipFile(outputFolderPath, outputFolderPath + ".zip");
     }
 
-    private static void ConfigureAndroidBuildSettings(CustomBuildOptions options)
-    {
-        PlayerSettings.Android.bundleVersionCode = GetBundleVersionFromCurrentTime();
-
-        // Build Android app bundle (aab file) or apk file
-        EditorUserBuildSettings.buildAppBundle = options.buildAppBundleForGooglePlay;
-
-        if (options.buildAppBundleForGooglePlay)
-        {
-            // Build the app bundle also for 64bit CPU architectures.
-            // Otherwise it cannot be uploaded to Google Play.
-            // Note that this build takes considerably more time.
-            // Must set the scripting backend to IL2CPP to build for non-ARMv7 architectures.
-            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
-            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7
-                                                         | AndroidArchitecture.ARM64;
-        }
-        else
-        {
-            // Build the app only for ARMv7 using Mono scripting backend.
-            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.Mono2x);
-            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7;
-        }
-
-        if (options.configureKeystoreForAndroidBuild)
-        {
-            ConfigureKeystoreForAndroidBuild();
-        }
-        else
-        {
-            PlayerSettings.Android.useCustomKeystore = false;
-        }
-    }
-
-    private static void ConfigureIosBuildSettings(CustomBuildOptions options)
-    {
-        PlayerSettings.iOS.buildNumber = GetBundleVersionFromCurrentTime().ToString();
-    }
-
     /**
      * Use the Unix time in minutes as bundle version.
      * This ensures that the value is incremented for every new build.
      */
-    private static int GetBundleVersionFromCurrentTime()
+    public static int GetBundleVersionFromCurrentTime()
     {
         // Using minutes (instead of milliseconds) makes the value small enough to fit into an int32.
         return (int)(TimeUtils.GetUnixTimeMilliseconds() / 1000 / 60);
@@ -207,77 +154,6 @@ public static class BuildUtils
         Thread.Sleep(100);
     }
 
-    private static void ExcludeAssetsBeforeMobileBuild()
-    {
-        DirectoryUtils.CreateDirectory(IgnoredAssetsOfMobileBuildFolder);
-        foreach (string path in ignoredFoldersOfMobileBuild)
-        {
-            string src = path;
-            string dest = $"{IgnoredAssetsOfMobileBuildFolder}/{path}";
-            Debug.Log($"Exclude directory before mobile build: {src} -> {dest}");
-            if (!DirectoryUtils.Exists(src))
-            {
-                Debug.LogWarning("Cannot move directory. Directory does not exist: " + src);
-                continue;
-            }
-
-            DirectoryUtils.CreateDirectory(new DirectoryInfo(dest).Parent.FullName);
-            Directory.Move(src, dest);
-            try
-            {
-                FileUtils.MoveFileOverwriteIfExists(src + ".meta", dest + ".meta");
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning("Failed to move .meta file: " + e.Message);
-            }
-
-            // Wait for file operation to complete
-            Thread.Sleep(100);
-
-            // Delete empty directory if needed.
-            if (Directory.Exists(src)
-                && Directory.GetFiles(src).IsNullOrEmpty())
-            {
-                Directory.Delete(src);
-            }
-        }
-    }
-
-    private static void IncludeAssetsAfterMobileBuild()
-    {
-        DirectoryUtils.CreateDirectory(IgnoredAssetsOfMobileBuildFolder);
-        foreach (string path in ignoredFoldersOfMobileBuild)
-        {
-            string src = $"{IgnoredAssetsOfMobileBuildFolder}/{path}";
-            string dest = path;
-            Debug.Log($"Include directory after mobile build: {src} -> {dest}");
-            if (!DirectoryUtils.Exists(src))
-            {
-                Debug.LogWarning("Cannot move directory. Directory does not exist: " + src);
-                continue;
-            }
-
-            DirectoryUtils.CreateDirectory(new DirectoryInfo(dest).Parent.FullName);
-            Directory.Move(src, dest);
-            try
-            {
-                FileUtils.MoveFileOverwriteIfExists(src + ".meta", dest + ".meta");
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning("Failed to move .meta file: " + e.Message);
-            }
-
-            // Delete empty directory if needed.
-            if (Directory.Exists(src)
-                && Directory.GetFiles(src).IsNullOrEmpty())
-            {
-                Directory.Delete(src);
-            }
-        }
-    }
-
     public static string GetPlayerSettingsFileBundleVersion()
     {
         // Return the value from the file because the C# API (PlayerSettings.bundleVersion) returns an older value
@@ -289,7 +165,7 @@ public static class BuildUtils
         return bundleVersion;
     }
 
-    private static string GetBuildOutputFolderFromBuildOptions(CustomBuildOptions options)
+    public static string GetBuildOutputFolderFromBuildOptions(CustomBuildOptions options)
     {
         return GetBuildOutputFolder(options.appName, options.buildTarget);
     }
@@ -365,13 +241,13 @@ public static class BuildUtils
             .ToArray();
     }
 
-    private static bool TryGetEnvironmentVariable(string key, out string value)
+    public static bool TryGetEnvironmentVariable(string key, out string value)
     {
         value = Environment.GetEnvironmentVariable(key);
         return !value.IsNullOrEmpty();
     }
 
-    private static string GetEnvironmentVariableOrThrow(string key)
+    public static string GetEnvironmentVariableOrThrow(string key)
     {
         if (!TryGetEnvironmentVariable(key, out string value))
         {
@@ -379,40 +255,6 @@ public static class BuildUtils
         }
 
         return value;
-    }
-
-    private static void ConfigureKeystoreForAndroidBuild()
-    {
-        if (!TryGetEnvironmentVariable(KeystorePathEnvironmentVariable, out string keystorePath))
-        {
-            throw new Exception($"Environment variable {KeystorePathEnvironmentVariable} not found");
-        }
-
-        if (!File.Exists(keystorePath))
-        {
-            throw new Exception($"Keystore not found in {keystorePath}");
-        }
-
-        if (!TryGetEnvironmentVariable(KeystorePasswordEnvironmentVariable, out string keystorePassword))
-        {
-            throw new Exception($"Environment variable ${KeystorePasswordEnvironmentVariable}");
-        }
-
-        if (!TryGetEnvironmentVariable(KeystoreKeyAliasEnvironmentVariable, out string aliasName))
-        {
-            throw new Exception($"$Environment variable {KeystoreKeyAliasEnvironmentVariable} not set");
-        }
-
-        if (!TryGetEnvironmentVariable(KeystoreKeyAliasPasswordEnvironmentVariable, out string aliasPassword))
-        {
-            throw new Exception($"Environment variable ${KeystoreKeyAliasPasswordEnvironmentVariable}");
-        }
-
-        PlayerSettings.Android.useCustomKeystore = true;
-        PlayerSettings.Android.keystoreName = keystorePath;
-        PlayerSettings.Android.keystorePass = keystorePassword;
-        PlayerSettings.Android.keyaliasName = aliasName;
-        PlayerSettings.Android.keyaliasPass = aliasPassword;
     }
 
     private static void CompressDirectoryToZipFile(string directoryPath, string outputFilePath, int compressionLevel = 9)

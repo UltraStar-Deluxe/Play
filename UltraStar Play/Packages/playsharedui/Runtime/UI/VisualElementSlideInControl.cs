@@ -8,7 +8,7 @@ public class VisualElementSlideInControl
 {
     public const string SlideOutClassName = "visualElementSlideOut";
     public const string SlideInClassName = "visualElementSlideIn";
-    
+
     private readonly VisualElement visualElement;
     private readonly ESide2D side;
     private readonly ToggleControl toggleControl;
@@ -17,7 +17,7 @@ public class VisualElementSlideInControl
 
     private Vector2 ResolvedStyleSize => new Vector2(visualElement.resolvedStyle.width, visualElement.resolvedStyle.height);
     private Vector2 lastSize;
-    
+
     public float OutsideMargin { get; set; } = 2f;
     public ReactiveProperty<bool> Visible => toggleControl.State;
 
@@ -26,7 +26,10 @@ public class VisualElementSlideInControl
         this.visualElement = visualElement;
         this.side = side;
         toggleControl = new ToggleControl(initiallyVisible, DoSlideIn, DoSlideOut);
-        
+
+        // Element must be visible for USS animation
+        visualElement.ShowByDisplay();
+
         this.visualElement.RegisterCallback<GeometryChangedEvent>(evt =>
         {
             Vector2 resolvedStyleSize = ResolvedStyleSize;
@@ -51,7 +54,7 @@ public class VisualElementSlideInControl
     {
         Visible.Value = true;
     }
-    
+
     public void SlideOut()
     {
         Visible.Value = false;
@@ -66,16 +69,16 @@ public class VisualElementSlideInControl
             new StylePropertyName("bottom")
         });
     }
-    
+
     private void DisableTransition()
     {
         visualElement.style.transitionProperty = new(new List<StylePropertyName>());
     }
-    
-    public void UpdatePositionWithoutTransition()
+
+    public async void UpdatePositionWithoutTransition()
     {
         DisableTransition();
-        
+
         if (Visible.Value)
         {
             DoSlideIn();
@@ -85,14 +88,16 @@ public class VisualElementSlideInControl
             DoSlideOut();
         }
 
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2, () => EnableTransition()));
+        await Awaitable.NextFrameAsync();
+        await Awaitable.NextFrameAsync();
+        EnableTransition();
     }
 
     private void DoSlideOut()
     {
         visualElement.RemoveFromClassList(SlideInClassName);
         visualElement.AddToClassList(SlideOutClassName);
-        
+
         if (side == ESide2D.Right)
         {
             visualElement.style.right = -(visualElement.resolvedStyle.width + OutsideMargin);
@@ -115,7 +120,7 @@ public class VisualElementSlideInControl
     {
         visualElement.AddToClassList(SlideInClassName);
         visualElement.RemoveFromClassList(SlideOutClassName);
-        
+
         if (side == ESide2D.Right)
         {
             visualElement.style.right = 0;

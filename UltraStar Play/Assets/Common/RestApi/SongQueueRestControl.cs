@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class SongQueueRestControl : AbstractRestControl, INeedInjection
 {
-    public static SongQueueRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongQueueRestControl>();
+    public static SongQueueRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SongQueueRestControl>();
 
     [Inject]
     private ServerSideCompanionClientManager serverSideCompanionClientManager;
@@ -27,7 +27,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
 
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.AvailablePlayers)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.AvailablePlayers)
             .SetDescription($"Get player profiles that can be used for singing")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -43,7 +43,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(dto);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.AvailableMicrophones)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.AvailableMicrophones)
             .SetDescription($"Get microphone profiles that can be used for singing")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -58,7 +58,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(dto);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.SongQueue)
+        httpServer.CreateEndpoint(HttpMethod.Get, RestApiEndpointPaths.SongQueue)
             .SetDescription($"Get song queue")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -71,10 +71,33 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(dto);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.SongQueueEntry)
+        httpServer.CreateEndpoint(HttpMethod.Post, RestApiEndpointPaths.SongQueue)
+            .SetDescription($"Set song queue")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
+            {
+                string json = requestData.Context.Request.GetBodyAsString();
+                ListDto<SongQueueEntryDto> listDto = JsonConverter.FromJson<ListDto<SongQueueEntryDto>>(json);
+                List<SongQueueEntryDto> songQueueEntryDtos = listDto.Items;
+
+                for (int i = 0; i < songQueueEntryDtos.Count; i++)
+                {
+                    SongQueueEntryDto songQueueEntryDto = songQueueEntryDtos[i];
+                    string errorMessage = songQueueManager.GetSongQueueEntryErrorMessage(songQueueEntryDto);
+                    if (!errorMessage.IsNullOrEmpty())
+                    {
+                        Debug.LogError($"Invalid song queue entry at index {i}: {errorMessage}");
+                        return;
+                    }
+                }
+
+                songQueueManager.SetSongQueueEntries(songQueueEntryDtos);
+            });
+
+        httpServer.CreateEndpoint(HttpMethod.Post, RestApiEndpointPaths.SongQueueEntry)
             .SetDescription($"Add entry song queue to the song queue.")
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteSongQueue)
+            .SetRequiredPermission(RestApiPermission.WriteSongQueue, settings)
             .SetCallbackAndAdd(requestData =>
             {
                 string json = requestData.Context.Request.GetBodyAsString();
@@ -90,10 +113,10 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                 songQueueManager.AddSongQueueEntry(songQueueEntryDto);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Delete, HttpApiEndpointPaths.SongQueueEntryIndex)
+        httpServer.CreateEndpoint(HttpMethod.Delete, RestApiEndpointPaths.SongQueueEntryIndex)
             .SetDescription($"Remove song queue entry at given index.")
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteSongQueue)
+            .SetRequiredPermission(RestApiPermission.WriteSongQueue, settings)
             .SetCallbackAndAdd(requestData =>
             {
                 if (!int.TryParse(requestData.PathParameters["index"], out int index)
@@ -107,10 +130,10 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                 songQueueManager.RemoveSongQueueEntry(songQueueEntryDto);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.SongQueueEntryIndex)
+        httpServer.CreateEndpoint(HttpMethod.Post, RestApiEndpointPaths.SongQueueEntryIndex)
             .SetDescription($"Update song queue entry at given index.")
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteSongQueue)
+            .SetRequiredPermission(RestApiPermission.WriteSongQueue, settings)
             .SetCallbackAndAdd(requestData =>
             {
                 if (!int.TryParse(requestData.PathParameters["index"], out int index)

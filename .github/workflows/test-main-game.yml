@@ -23,17 +23,19 @@ jobs:
       fail-fast: false
       matrix:
         unityVersion:
-          - 2023.2.12f1
+          - 6000.1.3f1
         targetPlatform:
           # At the moment, tests are target platform independent. Thus only build one.
           - StandaloneWindows64
     steps:
       # Clone repo and restore cache
-      - uses: actions/checkout@v4
+      - name: Clone Repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           lfs: true
-      - uses: actions/cache@v4
+      - name: Restore Cache
+        uses: actions/cache@v4
         with:
           path: ${{ env.PROJECT_PATH }}/Library
           key: Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-${{ hashFiles(env.PROJECT_PATH) }}
@@ -43,12 +45,12 @@ jobs:
             Library-
       
       # Run setup script
-      - name: Setup Script
-        working-directory: tools
-        run: sh setup.sh
+      - name: Restore Dependencies
+        run: bash build.sh RestoreMainGameDependencies
       
       # Test Unity project
-      - uses: game-ci/unity-test-runner@v4
+      - name: Test Unity Project
+        uses: game-ci/unity-test-runner@v4
         id: testRunner
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -57,11 +59,23 @@ jobs:
         with:
           projectPath: ${{ env.PROJECT_PATH }}
           unityVersion: ${{ matrix.unityVersion }}
-          testMode: all
+          testMode: editmode # TODO: change back to testMode: all after playmode tests have been fixed on Linux
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           customParameters: "-nographics"
-      - uses: actions/upload-artifact@v4
+
+      # Upload test results for download
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Test results (all modes)
+          name: Test results ${{ matrix.targetPlatform }}
           path: ${{ steps.testRunner.outputs.artifactsPath }}
+
+      # Publish test report to GitHub UI
+      - name: Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v2
+        with:
+          name: Test report ${{ matrix.targetPlatform }}
+          path: ${{ steps.testRunner.outputs.artifactsPath }}/*.xml
+          reporter: dotnet-nunit

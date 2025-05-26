@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Responsible;
+using System.Threading.Tasks;
 using UniInject;
 using UnityEngine;
 using UnityEngine.TestTools;
-using static Responsible.Responsibly;
-using static ResponsibleVisualElementUtils;
-using static ResponsibleSceneUtils;
-using static ResponsibleLogAssertUtils;
+using static ConditionUtils;
+using static SceneConditionTestUtils;
+using static VisualElementTestUtils;
 
 public class SongEditorLrcFormatImportTest : AbstractPlayModeTest
 {
@@ -20,22 +19,35 @@ public class SongEditorLrcFormatImportTest : AbstractPlayModeTest
         [00:19.58]Deine Zauber binden wieder, was die Mode streng geteilt,
         [00:29.19]alle Menschen werden Brüder, wo dein sanfter Flügel weilt.");
 
-
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private SongEditorLayerManager songEditorLayerManager;
-    private List<Note> ImportedNotes => songEditorLayerManager.GetLayerNotes(songEditorLayerManager.GetEnumLayer(ESongEditorLayer.Import));
 
     [UnityTest]
-    public IEnumerator ShouldImportLrcFormat() => IgnoreFailingMessages()
-        .ContinueWith(ExpectScene(EScene.SongEditorScene))
-        .ContinueWith(ClickButton(R.UxmlNames.openImportLrcDialogButton))
-        .ContinueWith(SetElementValue(R.UxmlNames.importLrcTextField, lrcExample))
-        .ContinueWith(ClickButton(R.UxmlNames.importLrcFormatButton))
-        .ContinueWith(WaitForCondition("expect notes have been imported",
-            () => ImportedNotes.Count == 30
-                  && SongMetaUtils.GetLyrics(ImportedNotes).StartsWith("Freude, schöner Götterfunken"))
-            .ExpectWithinSeconds(10))
-        .ToYieldInstruction(Executor);
+    public IEnumerator ShouldImportLrcFormat() => ShouldImportLrcFormatAsync();
+
+    public async Awaitable ShouldImportLrcFormatAsync()
+    {
+        // Given
+        await ExpectSceneAsync(EScene.SongEditorScene);
+
+        // When
+        await ClickButtonAsync(R.UxmlNames.openImportLrcDialogButton);
+        await SetElementValueAsync(R.UxmlNames.importLrcTextField, lrcExample);
+        await ClickButtonAsync(R.UxmlNames.importLrcFormatButton);
+
+        // Then
+        await ExpectImportedNotesAsync();
+    }
+
+    private async Awaitable ExpectImportedNotesAsync()
+    {
+        await WaitForConditionAsync(() =>
+            {
+                List<Note> importedNotes = songEditorLayerManager.GetLayerNotes(songEditorLayerManager.GetEnumLayer(ESongEditorLayer.Import));
+                return importedNotes.Count == 30
+                       && SongMetaUtils.GetLyrics(importedNotes).StartsWith("Freude, schöner Götterfunken");
+            }, new WaitForConditionConfig {description = "expect notes have been imported"});
+    }
 
     private static string TrimStartOfEachLine(string input)
     {

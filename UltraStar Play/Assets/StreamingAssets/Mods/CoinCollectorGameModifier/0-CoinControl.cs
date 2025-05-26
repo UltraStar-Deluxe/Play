@@ -1,5 +1,5 @@
-using UniRx;
 using UnityEngine.UIElements;
+using UnityEngine;
 
 public class CoinControl
 {
@@ -18,9 +18,14 @@ public class CoinControl
 
         this.visualElement = new VisualElement();
         visualElement.name = "coinCollectorCoin";
-        ImageManager.LoadSpriteFromUri($"{modFolder}/images/coins/Gold_1.png")
-            .Subscribe(sprite => visualElement.style.backgroundImage = new StyleBackground(sprite));
-
         targetNoteControl.VisualElement.Add(visualElement);
+
+        LoadSprite();
+    }
+
+    private async void LoadSprite()
+    {
+        Sprite sprite = await ImageManager.LoadSpriteFromUriAsync($"{modFolder}/images/coins/Gold_1.png");
+        visualElement.style.backgroundImage = new StyleBackground(sprite);
     }
 }

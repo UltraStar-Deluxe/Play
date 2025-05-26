@@ -11,7 +11,13 @@ public class SettingsManager : AbstractSingletonBehaviour
         settings = null;
     }
 
-    public static SettingsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SettingsManager>();
+    public static SettingsManager Instance
+    {
+        get
+        {
+            return GameObjectUtils.FindComponentWithTag<SettingsManager>("SettingsManager");
+        }
+    }
 
     // The settings must be written to the same path they have been loaded from.
     // This field stores the path from where settings have been loaded / will be saved.
@@ -77,8 +83,9 @@ public class SettingsManager : AbstractSingletonBehaviour
             string loadedSettingsPath = GetSettingsPath();
             if (!File.Exists(loadedSettingsPath))
             {
-                UnityEngine.Debug.LogWarning($"Settings file not found. Creating default settings at {loadedSettingsPath}.");
+                Debug.LogWarning($"Settings file not found. Creating default settings at {loadedSettingsPath}.");
                 settings = new Settings();
+                settings.ClientName = SettingsUtils.GetInitialClientName();
                 // Create unique device identifier
                 settings.CreateAndSetClientId();
                 Save();

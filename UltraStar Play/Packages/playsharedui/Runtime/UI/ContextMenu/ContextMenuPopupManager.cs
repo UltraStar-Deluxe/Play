@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 public class ContextMenuPopupManager : AbstractSingletonBehaviour, ISceneInjectionFinishedListener
 {
-    public static ContextMenuPopupManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ContextMenuPopupManager>();
+    public static ContextMenuPopupManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ContextMenuPopupManager>();
 
     [InjectedInInspector]
     public VisualTreeAsset contextMenuUi;

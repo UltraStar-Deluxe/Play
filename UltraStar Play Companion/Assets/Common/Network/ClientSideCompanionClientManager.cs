@@ -12,7 +12,7 @@ using UnityEngine;
 
 public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INeedInjection, INetEventListener
 {
-    public static ClientSideCompanionClientManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ClientSideCompanionClientManager>();
+    public static ClientSideCompanionClientManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<ClientSideCompanionClientManager>();
 
     [Inject]
     private Settings settings;
@@ -29,8 +29,10 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
     private int connectRequestCount;
 
     private NetPeer ServerPeer => liteNetLibClient.FirstPeer;
+    private bool HasServerPeer => ServerPeer != null;
 
-    public bool IsConnected => ServerPeer != null;
+    public bool IsConnected => HasServerPeer
+                               && ServerPeer.ConnectionState is ConnectionState.Connected;
 
     private readonly Subject<JsonSerializable> receivedMessageStream = new();
     public IObservable<JsonSerializable> ReceivedMessageStream => receivedMessageStream;
@@ -64,7 +66,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     private void ConnectToServer()
     {
-        if (IsConnected)
+        if (HasServerPeer)
         {
             return;
         }
@@ -115,7 +117,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
         {
             ClientId = settings.ClientId,
             ClientName = settings.ClientName,
-            ProtocolVersion = ProtocolVersions.ProtocolVersion
+            ProtocolVersion = CompanionClientProtocolVersion.ProtocolVersion
         };
         NetDataWriter netDataWriter = new NetDataWriter();
         netDataWriter.Put(connectRequestDto.ToJson());
@@ -136,7 +138,8 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     private void StartLiteNetLibClient()
     {
-        if (liteNetLibClient.IsRunning)
+        if (liteNetLibClient == null
+            || liteNetLibClient.IsRunning)
         {
             return;
         }
@@ -148,7 +151,8 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     private void StopLiteNetLibClient()
     {
-        if (!liteNetLibClient.IsRunning)
+        if (liteNetLibClient == null
+            || !liteNetLibClient.IsRunning)
         {
             return;
         }
@@ -162,7 +166,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
         liteNetLibClient.PollEvents();
 
         // Try to connect to the server every second.
-        if (!IsConnected
+        if (!HasServerPeer
             && (lastConnectionAttemptTimeInSeconds == 0
                 || Time.time - lastConnectionAttemptTimeInSeconds > 1))
         {
@@ -198,7 +202,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
     public void SendMessageToServer(JsonSerializable jsonSerializable, DeliveryMethod deliveryMethod)
     {
         if (jsonSerializable == null
-            || !IsConnected)
+            || !HasServerPeer)
         {
             return;
         }
@@ -287,7 +291,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
         connectEventStream.OnNext(new ConnectEvent(
             connectResponseDto.HttpServerPort,
-            ServerPeer.EndPoint,
+            ServerPeer,
             connectResponseDto.Permissions,
             connectResponseDto.AvailableGameRoundModifierDtos));
         connectRequestCount = 0;
@@ -295,7 +299,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
 
     public void OnPeerConnected(NetPeer peer)
     {
-        Debug.Log($"Connected to {peer.EndPoint}");
+        Debug.Log($"Connected to {peer}");
     }
 
     public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -307,8 +311,7 @@ public class ClientSideCompanionClientManager : AbstractSingletonBehaviour, INee
         }
         catch (Exception ex)
         {
-            Debug.LogException(ex);
-            Debug.LogError("Failed to read additional info from disconnect message");
+            ex.Log("Failed to read additional info from disconnect message");
             disconnectInfoAdditionalData = "";
         }
         Debug.Log($"Disconnected: reason: {disconnectInfo.Reason}, additional info: {disconnectInfoAdditionalData}, socket error code: {disconnectInfo.SocketErrorCode}");

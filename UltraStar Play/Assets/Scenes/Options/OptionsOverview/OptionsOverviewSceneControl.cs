@@ -114,9 +114,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
     [Inject]
     private OptionsSceneData sceneData;
 
-    [Inject]
-    private SteamWorkshopManager steamWorkshopManager;
-
     private SceneRecipe loadedSceneRecipe;
     private readonly List<GameObject> loadedGameObjects = new();
     private readonly Dictionary<EScene, ToggleButton> sceneToButtonMap = new();
@@ -153,42 +150,12 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
             }
         });
 
-        openSteamWorkshopButton.RegisterCallbackButtonTriggered(_ => OpenSteamWorkshop());
-
-        updateSteamWorkshopItemsButton.RegisterCallbackButtonTriggered(_ => UpdateSteamWorkshopItems());
-        new TooltipControl(updateSteamWorkshopItemsButton, Translation.Get(R.Messages.steamWorkshop_updateTooltip));
-
         helpButton.RegisterCallbackButtonTriggered(_ => ShowHelp());
         issuesButton.RegisterCallbackButtonTriggered(_ => ShowIssuesDialog());
 
         backButton.RegisterCallbackButtonTriggered(_ => OnBack());
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
-    }
-
-    private void OpenSteamWorkshop()
-    {
-        if (LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        steamWorkshopManager.OpenSteamWorkshopOverlay(LoadedOptionsSceneControl.SteamWorkshopUri);
-    }
-
-    private void UpdateSteamWorkshopItems()
-    {
-        steamWorkshopManager.DownloadWorkshopItemsAsObservable()
-            .Subscribe(_ =>
-            {
-                if (GameObjectUtils.IsDestroyed(this))
-                {
-                    return;
-                }
-
-                Debug.Log("Reloading current options scene because Steam Workshop items update finished");
-                ReloadCurrentOptionsScene();
-            });
     }
 
     private void ReloadCurrentOptionsScene()
@@ -264,9 +231,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         // Scroll with mouse drag
         MouseEventScrollControl.RegisterMouseScrollEvents();
 
-        // Define usable scroll wheel increments for ScrollView.
-        ScrollViewScrollWheelSpeedControl.UpdateScrollWheelSpeedOfAllScrollViews(loadedSceneVisualElement);
-
         UpdateTranslation();
     }
 
@@ -304,13 +268,13 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
             modSettingsProblemHintIcon,
             SettingsProblemHintControl.GetModSettingsProblems(modManager));
 
-        StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.5f, () =>
+        AwaitableUtils.ExecuteRepeatedlyInSecondsAsync(gameObject, 0.5f, () =>
         {
             songSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songIssueManager));
             recordingSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetRecordingSettingsProblems(settings));
             playerProfileSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetPlayerSettingsProblems(settings));
             modSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetModSettingsProblems(modManager));
-        }));
+        });
     }
 
     public void UpdateTranslation()

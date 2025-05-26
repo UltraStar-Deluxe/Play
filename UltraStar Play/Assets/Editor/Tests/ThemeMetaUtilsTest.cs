@@ -72,7 +72,8 @@ public class ThemeMetaUtilsTest
     private static List<ThemeMeta> GetThemeMetas()
     {
         string testThemeFolder = $"{Application.dataPath}/Editor/Tests/TestThemes/";
-        List<string> themeFiles = DirectoryUtils.GetFiles(testThemeFolder, true, "*.json");
+        List<string> themeFiles = FileScanner.GetFiles(testThemeFolder,
+            new FileScannerConfig("*.json"){Recursive = true});
         List<ThemeMeta> themeMetas = themeFiles.Select(file => new ThemeMeta(file)).ToList();
         return themeMetas;
     }

@@ -21,8 +21,8 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
 
     private static readonly Dictionary<InputDevice, InputDeviceChange> inputDeviceToLastChange = new();
 
-    private readonly Subject<InputDeviceChangeEvent> inputDeviceChangeEventStream = new();
-    public IObservable<InputDeviceChangeEvent> InputDeviceChangeEventStream => inputDeviceChangeEventStream;
+    private readonly Subject<InputDeviceChangedEvent> inputDeviceChangedEventStream = new();
+    public IObservable<InputDeviceChangedEvent> InputDeviceChangedEventStream => inputDeviceChangedEventStream;
 
     private EInputDevice inputDeviceEnum = GetDefaultInputDeviceEnum();
     public EInputDevice InputDeviceEnum {
@@ -35,7 +35,7 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
             if (inputDeviceEnum != value)
             {
                 inputDeviceEnum = value;
-                inputDeviceChangeEventStream.OnNext(new InputDeviceChangeEvent());
+                inputDeviceChangedEventStream.OnNext(new InputDeviceChangedEvent());
             }
         }
     }
@@ -73,9 +73,9 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         }
 
         UpdateInputDeviceIcon();
-        InputDeviceChangeEventStream.Subscribe(_ => UpdateInputDeviceIcon());
+        InputDeviceChangedEventStream.Subscribe(_ => UpdateInputDeviceIcon());
 
-        StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.1f, () => UpdateInputDeviceEnum()));
+        AwaitableUtils.ExecuteRepeatedlyInSecondsAsync(gameObject, 1, () => UpdateInputDeviceEnum());
     }
 
     private void UpdateInputDeviceEnum()
@@ -107,7 +107,7 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
     private void OnDeviceChange(InputDevice inputDevice, InputDeviceChange inputDeviceChange)
     {
         inputDeviceToLastChange[inputDevice] = inputDeviceChange;
-        inputDeviceChangeEventStream.OnNext(new InputDeviceChangeEvent());
+        inputDeviceChangedEventStream.OnNext(new InputDeviceChangedEvent());
     }
 
     private static EInputDevice GetDefaultInputDeviceEnum()

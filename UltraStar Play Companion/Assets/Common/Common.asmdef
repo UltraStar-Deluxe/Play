@@ -10,15 +10,15 @@
         "com.achimmihca.primeinputactions",
         "Unity.InputSystem",
         "playshared",
-        "playsharedui",
-        "LiteNetLib"
+        "playsharedui"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        ""
+        "LiteNetLib.dll",
+        "RandomFriendlyNameGenerator.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

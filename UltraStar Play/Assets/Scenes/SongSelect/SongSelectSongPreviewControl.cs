@@ -2,6 +2,7 @@
 using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -135,21 +136,21 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         base.StartSongPreview(songMeta);
     }
 
-    protected override IObservable<SongAudioLoadedEvent> StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
-    {
-        if (currentSongSelectEntryControl == null)
-        {
-            return Observable.Empty<SongAudioLoadedEvent>();
-        }
-        return base.StartAudioPreview(songMeta, previewStartInMillis);
-    }
-
-    protected override void StartVideoPreview(SongMeta songMeta)
+    protected override async Awaitable StartAudioPreviewAsync(SongMeta songMeta, int previewStartInMillis)
     {
         if (currentSongSelectEntryControl == null)
         {
             return;
         }
-        base.StartVideoPreview(songMeta);
+        await base.StartAudioPreviewAsync(songMeta, previewStartInMillis);
+    }
+
+    protected override async Awaitable StartVideoPreviewAsync(SongMeta songMeta)
+    {
+        if (currentSongSelectEntryControl == null)
+        {
+            return;
+        }
+        await base.StartVideoPreviewAsync(songMeta);
     }
 }

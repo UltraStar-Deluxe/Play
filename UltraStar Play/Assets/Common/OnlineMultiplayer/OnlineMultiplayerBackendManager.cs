@@ -6,7 +6,7 @@ namespace CommonOnlineMultiplayer
 {
     public class OnlineMultiplayerBackendManager : AbstractSingletonBehaviour, INeedInjection
     {
-        public static OnlineMultiplayerBackendManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<OnlineMultiplayerBackendManager>();
+        public static OnlineMultiplayerBackendManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<OnlineMultiplayerBackendManager>();
 
         public OnlineMultiplayerBackend CurrentBackend => onlineMultiplayerBackends
             .FirstOrDefault(it => it.Backend == settings.EOnlineMultiplayerBackend);

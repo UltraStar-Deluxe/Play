@@ -52,12 +52,12 @@ public static partial class R
         public static readonly string usplay_enter = "usplay/enter";
         public static readonly string usplay_increaseVolume = "usplay/increaseVolume";
         public static readonly string usplay_navigateToParentFolder = "usplay/navigateToParentFolder";
-        public static readonly string usplay_nextCharacterQuickJumpCharacter = "usplay/nextCharacterQuickJumpCharacter";
         public static readonly string usplay_nextSong = "usplay/nextSong";
+        public static readonly string usplay_nextSongByOrderProperty = "usplay/nextSongByOrderProperty";
         public static readonly string usplay_openContextMenu = "usplay/openContextMenu";
         public static readonly string usplay_openSongEditor = "usplay/openSongEditor";
-        public static readonly string usplay_previousCharacterQuickJumpCharacter = "usplay/previousCharacterQuickJumpCharacter";
         public static readonly string usplay_previousSong = "usplay/previousSong";
+        public static readonly string usplay_previousSongByOrderProperty = "usplay/previousSongByOrderProperty";
         public static readonly string usplay_randomSong = "usplay/randomSong";
         public static readonly string usplay_restartSong = "usplay/restartSong";
         public static readonly string usplay_search = "usplay/search";

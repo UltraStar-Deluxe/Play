@@ -1,0 +1,41 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="songEntryUiRoot" class="roundCorners" style="align-items: center; justify-content: flex-end; overflow: hidden;">
+        <ui:VisualElement name="vinylImage" style="background-color: rgba(0, 0, 0, 0); height: 120px; width: 120px; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongSelect/SongSelectImages/vinyl-2202325.png?fileID=2800000&amp;guid=e1ddeb129dc193d4c8087d5564ab28de&amp;type=3#vinyl-2202325&apos;); display: none;" />
+        <ui:VisualElement name="innerSongEntryUi" class="listItem backgroundTransition dynamicPanel" style="flex-direction: column; align-items: stretch; justify-content: flex-end; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; height: auto;">
+            <ui:VisualElement name="songImageOuter" style="background-image: url(&quot;project://database/Packages/playshared/Runtime/Graphics/NoCover.png?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&quot;); -unity-background-scale-mode: scale-and-crop; flex-shrink: 0; min-width: 20px; min-height: 20px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; align-items: flex-start; overflow: hidden;">
+                <ui:VisualElement name="songImageInner" picking-mode="Ignore" class="overlay" style="-unity-background-scale-mode: scale-and-crop;" />
+                <ui:VisualElement name="folderImage" picking-mode="Ignore" class="overlay" style="background-image: url(&quot;project://database/Packages/playshared/Runtime/Graphics/Icons/Folder.png?fileID=2800000&amp;guid=e71a978c024d44a4bb6a7702a64c1cd0&amp;type=3#Folder&quot;); -unity-background-scale-mode: scale-and-crop;">
+                    <ui:VisualElement name="folderPreviewImage" picking-mode="Ignore" class="overlay" style="background-image: url(&quot;project://database/Packages/playshared/Runtime/Graphics/NoCover.png?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&quot;); -unity-background-scale-mode: scale-and-crop;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="songEntryDarkOverlay" picking-mode="Ignore" class="overlay" style="flex-grow: 1; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;" />
+                <MaterialIcon tabindex="-1" icon="cloud_off" name="notAvailableInOnlineGameIcon" class="overlay rounded" style="-unity-text-align: middle-center; font-size: 100px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="center" style="padding-top: 2px; padding-right: 2px; padding-bottom: 2px; padding-left: 2px;">
+                <ui:VisualElement name="songInfoContainer" picking-mode="Ignore" class="px-1" style="min-height: 50px; overflow: hidden;">
+                    <ui:Label text="Some very long song title" display-tooltip-when-elided="true" name="songTitle" picking-mode="Ignore" class="ellipsis" style="white-space: normal; -unity-font-style: bold; max-height: 45px;" />
+                    <ui:Label text="Some very very long artist name" display-tooltip-when-elided="true" name="songArtist" picking-mode="Ignore" class="smallFont secondaryFontColor ellipsis" style="white-space: normal; max-height: 35px;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="row" class="pl-1" style="background-color: rgba(0, 0, 0, 0); align-items: center;">
+                    <ui:VisualElement name="stars" class="mr-auto" style="background-color: rgba(0, 0, 0, 0); justify-content: center; flex-direction: row;">
+                        <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" class="secondaryFontColor" style="font-size: 14px;" />
+                        <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" class="secondaryFontColor" style="font-size: 14px;" />
+                        <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" class="secondaryFontColor" style="font-size: 14px;" />
+                        <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" class="secondaryFontColor" style="font-size: 14px;" />
+                        <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" class="secondaryFontColor" style="font-size: 14px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="iconBar" class="row">
+                        <ui:VisualElement name="songEntryDuetIcon" picking-mode="Ignore" class="secondaryFontColor" style="flex-shrink: 0; width: 24px; height: 24px; background-image: url(&quot;project://database/Assets/Common/Graphics/Icons/DuetIconWithOutline.png?fileID=2800000&amp;guid=0babf1c7d1bbb374d8d09884cc3a4e8a&amp;type=3#DuetIconWithOutline&quot;); -unity-background-scale-mode: scale-to-fit;" />
+                        <MaterialIcon name="songEntryFavoriteIcon" icon="favorite" picking-mode="Ignore" class="secondaryFontColor songSelectSongEntryIcon" />
+                    </ui:VisualElement>
+                    <ui:Button display-tooltip-when-elided="true" name="openSongMenuButton" class="squareButton transparentBackgroundColor focusableNavigatorIgnore" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; width: auto; height: auto;">
+                        <MaterialIcon tabindex="-1" picking-mode="Ignore" name="openSongMenuIcon" icon="more_vert" class="secondaryFontColor" style="font-size: 18px;" />
+                    </ui:Button>
+                    <ui:VisualElement name="iconBar" picking-mode="Ignore" class="mt-auto pb-4" style="align-items: center; flex-direction: column-reverse; position: absolute; right: 0; bottom: 0;">
+                        <MaterialIcon name="songEntryAutoGeneratedIcon" icon="auto_awesome" picking-mode="Ignore" class="secondaryFontColor songSelectSongEntryIcon" />
+                        <MaterialIcon name="songEntryRemoteSourceIcon" icon="cloud" picking-mode="Ignore" class="secondaryFontColor songSelectSongEntryIcon" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

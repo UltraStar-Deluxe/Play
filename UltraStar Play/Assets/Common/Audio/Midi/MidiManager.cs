@@ -12,7 +12,7 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static MidiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MidiManager>();
+    public static MidiManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<MidiManager>();
 
     [InjectedInInspector]
     public TextAsset defaultSoundfontAsset;

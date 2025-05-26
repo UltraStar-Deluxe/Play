@@ -1,4 +1,4 @@
-public class SentencesMergedEvent : SongMetaChangeEvent
+public class SentencesMergedEvent : SongMetaChangedEvent
 {
 
 }

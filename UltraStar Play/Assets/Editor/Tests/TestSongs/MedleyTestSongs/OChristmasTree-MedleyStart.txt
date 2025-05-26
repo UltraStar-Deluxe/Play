@@ -1,0 +1,186 @@
+﻿#TITLE:O Christmas Tree
+#MP3:4s.ogg
+#BPM:300
+#GAP:4007
+#COVER:christmas-3809544.jpg
+#BACKGROUND:christmas-3809544.jpg
+#LANGUAGE:English
+#AUDIOAUTHOR:Ernst Anschutz, Dogman15 on MuseScore
+#AUDIOLICENSE:Public Domain
+#BACKGROUNDAUTHOR:TheoCrazzolara on Pixabay
+#BACKGROUNDLICENSE:Pixabay Content License
+#MEDLEYSTARTBEAT:396
+: 0 9 -2 O
+: 11 4 3 Christ
+: 17 3 3 mas
+: 22 9 3 tree,
+: 33 9 5 O
+: 44 4 7 Christ
+: 50 3 7 mas
+: 55 11 7 tree
+- 66
+: 72 3 7 How
+: 77 4 5 love
+: 83 3 7 ly
+: 88 9 8 are
+: 99 9 2 your
+: 110 9 5 bran
+: 121 6 3 ches
+- 127
+: 132 9 -2 O
+: 143 4 3 Christ
+: 149 3 3 mas
+: 154 9 3 tree,
+* 165 9 5 O
+* 176 4 7 Christ
+* 182 3 7 mas
+* 187 11 7 tree
+- 198
+: 204 3 7 How
+: 209 4 5 love
+: 215 3 7 ly
+: 220 9 8 are
+: 231 9 2 your
+: 242 9 5 bran
+: 253 11 3 ches
+- 264
+: 270 3 10 Not
+: 275 4 10 on
+: 281 3 7 ly
+* 286 9 12 green
+: 297 9 10 in
+: 308 4 10 sum
+: 314 3 8 mer's
+: 319 11 8 heat
+- 330
+: 336 3 8 But
+: 341 4 8 al
+: 347 3 5 so
+* 352 9 10 win
+* 363 9 8 ter's
+* 374 4 8 snow
+* 380 3 7 and
+* 385 6 7 sleet
+- 391
+: 396 9 -2 O
+: 407 4 3 Christ
+: 413 3 3 mas
+: 418 9 3 tree,
+* 429 9 5 O
+* 440 4 7 Christ
+* 446 3 7 mas
+* 451 11 7 tree
+- 462
+* 468 3 7 How
+* 473 4 5 love
+* 479 3 7 ly
+* 484 9 8 are
+* 495 9 2 your
+* 506 9 5 bran
+* 517 11 3 ches
+- 528
+: 660 9 -2 O
+: 671 4 3 Christ
+: 677 3 3 mas
+: 682 9 3 tree,
+* 693 9 5 O
+* 704 4 7 Christ
+* 710 3 7 mas
+* 715 11 7 tree
+- 726
+: 732 3 7 Of
+: 737 4 5 all
+: 743 3 7 the
+: 748 9 8 trees
+: 759 9 2 most
+: 770 9 5 love
+: 781 11 3 ly
+- 792
+: 798 3 10 Each
+: 803 4 10 year
+: 809 3 7 you
+* 814 9 12 bring
+: 825 9 10 to
+: 836 4 10 us
+: 842 3 8 de
+: 847 11 8 light
+- 858
+: 864 3 8 With
+: 869 4 8 bright
+: 875 3 5 ly
+* 880 9 10 shin
+* 891 9 8 ing
+* 902 4 8 Christ
+* 908 3 7 mas
+* 913 6 7 light
+- 919
+: 924 9 -2 O
+: 935 4 3 Christ
+: 941 3 3 mas
+: 946 9 3 tree,
+* 957 9 5 O
+* 968 4 7 Christ
+* 974 3 7 mas
+* 979 11 7 tree
+- 990
+* 996 3 7 Of
+* 1001 4 5 all
+* 1007 3 7 the
+* 1012 9 8 trees
+* 1023 9 2 most
+* 1034 9 5 love
+* 1045 11 3 ly
+- 1056
+: 1188 9 -2 O
+: 1199 4 3 Christ
+: 1205 3 3 mas
+: 1210 9 3 tree,
+* 1221 9 5 O
+* 1232 4 7 Christ
+* 1238 3 7 mas
+* 1243 11 7 tree
+- 1254
+: 1260 3 7 We
+: 1265 4 5 learn
+: 1271 3 7 from
+: 1276 9 8 all
+: 1287 9 2 your
+: 1298 9 5 beau
+: 1309 11 3 ty
+- 1320
+: 1326 3 10 Your
+: 1331 4 10 bright
+: 1337 3 7 green
+* 1342 9 12 leaves
+: 1353 9 10 with
+: 1364 4 10 fest
+: 1370 3 8 ive
+: 1375 11 8 cheer
+- 1386
+: 1392 3 8 Give
+: 1397 4 8 hope
+: 1403 3 5 and
+* 1408 9 10 strength
+* 1419 9 8 through
+* 1430 4 8 out
+* 1436 3 7 the
+* 1441 6 7 year
+- 1447
+: 1452 9 -2 O
+: 1463 4 3 Christ
+: 1469 3 3 mas
+: 1474 9 3 tree,
+* 1485 9 5 O
+* 1496 4 7 Christ
+* 1502 3 7 mas
+* 1507 11 7 tree
+- 1518
+* 1524 3 7 We
+* 1529 4 5 learn
+* 1535 3 7 from
+* 1540 9 8 all
+* 1551 9 2 your
+* 1562 9 5 beau
+* 1573 11 3 ty
+- 1584
+E

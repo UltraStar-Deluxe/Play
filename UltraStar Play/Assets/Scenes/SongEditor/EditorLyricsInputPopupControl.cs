@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
-    protected SongMetaChangeEventStream songMetaChangeEventStream;
+    protected SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     protected SongEditorSceneControl songEditorSceneControl;
@@ -67,8 +67,7 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
         {
             // Move focus away
             textField.Blur();
-            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
-                () => textField.GetRootVisualElement().Q<Button>().Focus()));
+            AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () => textField.GetRootVisualElement().Q<Button>().Focus());
         }
     }
 

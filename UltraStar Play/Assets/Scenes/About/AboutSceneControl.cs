@@ -25,16 +25,6 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection
         { "BGM", "InfoAndLegalTexts/BGM.txt" },
         { "Soundfont", "InfoAndLegalTexts/GeneralUser-GS-Soundfont-License.txt" },
         { "Pixabay", "InfoAndLegalTexts/Pixabay-Content-License.txt" },
-        { "CEF", "InfoAndLegalTexts/Chromium-Embedded-Framework.txt" },
-
-        // Libraries used by "Ffmpeg for Unity"
-        { "BSD 2-Clause", "InfoAndLegalTexts/BSD-2-Clause.txt" },
-        { "BSD 3-Clause", "InfoAndLegalTexts/BSD-3-Clause.txt" },
-        { "LGPGv2.1", "InfoAndLegalTexts/lgpl-2.1.txt" },
-        { "LGPGv3", "InfoAndLegalTexts/lgpl-3.0.txt" },
-        { "openh264", "InfoAndLegalTexts/openh264-Binary-License.txt" },
-        { "png", "InfoAndLegalTexts/libpng-License.txt" },
-        { "zlib", "InfoAndLegalTexts/zlib-License.txt" },
     };
 
     [Inject]

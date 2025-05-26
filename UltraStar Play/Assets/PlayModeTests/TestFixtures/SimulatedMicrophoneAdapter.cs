@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SimulatedMicrophoneAdapter : IMicrophoneAdapter
@@ -57,7 +58,7 @@ public class SimulatedMicrophoneAdapter : IMicrophoneAdapter
     {
         if (pitchInHz < 8.18 || pitchInHz > 12543.85)
         {
-            throw new IllegalArgumentException("Pitch frequency outside MIDI note range");
+            throw new ArgumentException("Pitch frequency outside MIDI note range");
         }
         deviceNameToSimulatedPitchInHz[deviceName] = pitchInHz;
     }

@@ -7,13 +7,13 @@ using UnityEngine.UIElements;
 
 public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 {
-    public static GlobalInputControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<GlobalInputControl>();
+    public static GlobalInputControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<GlobalInputControl>();
 
     [Inject]
     private Settings settings;
 
     [Inject]
-    private VolumeControl volumeControl;
+    private VolumeManager volumeManager;
 
     [Inject]
     private SceneRecipeManager sceneRecipeManager;
@@ -62,8 +62,8 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 
     private void ToggleMuteAudio()
     {
-        volumeControl.ToggleMuteAudio();
-        if (volumeControl.IsMuted)
+        volumeManager.ToggleMuteAudio();
+        if (volumeManager.IsMuted)
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_mute));
         }
@@ -78,11 +78,10 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
         Debug.Log("Toggle full-screen mode");
         Screen.fullScreen = !Screen.fullScreen;
         // A full-screen switch does not happen immediately; it will actually happen when the current frame is finished.
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2,
-            () =>
-            {
-                settings.FullScreenMode = Screen.fullScreenMode.ToCustomFullScreenMode();
-                Debug.Log("New full-screen mode " + settings.FullScreenMode);
-            }));
+        AwaitableUtils.ExecuteAfterDelayInFramesAsync(2, () =>
+        {
+            settings.FullScreenMode = Screen.fullScreenMode.ToCustomFullScreenMode();
+            Debug.Log("New full-screen mode " + settings.FullScreenMode);
+        });
     }
 }

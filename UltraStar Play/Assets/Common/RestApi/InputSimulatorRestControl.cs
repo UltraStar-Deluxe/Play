@@ -12,7 +12,7 @@ using UnityEngine.InputSystem.LowLevel;
 
 public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
 {
-    public static InputSimulatorRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<InputSimulatorRestControl>();
+    public static InputSimulatorRestControl Instance => DontDestroyOnLoadManager.FindComponentOrThrow<InputSimulatorRestControl>();
 
     private Keyboard virtualKeyboard;
     private Mouse virtualMouse;
@@ -138,6 +138,12 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         UpdateMouseDragSimulation();
     }
 
+    protected override void OnDestroySingleton()
+    {
+        InputSystem.RemoveDevice(virtualKeyboard);
+        InputSystem.RemoveDevice(virtualMouse);
+    }
+
     private void UpdateMouseDragSimulation()
     {
         // TODO: Simulating drag does not seem to work.
@@ -187,7 +193,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription(description)
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetRequiredPermission(RestApiPermission.WriteInputSimulation, settings)
             .SetCallbackAndAdd(requestData =>
             {
                 if (virtualKeyboard == null)
@@ -202,11 +208,11 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
 
     private void RegisterMouseDeltaEndpoint()
     {
-        string path = HttpApiEndpointPaths.InputMouseDelta;
+        string path = RestApiEndpointPaths.InputMouseDelta;
         httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription("Move the current mouse if any by the given X and Y delta values")
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetRequiredPermission(RestApiPermission.WriteInputSimulation, settings)
             .SetCallbackAndAdd(requestData =>
             {
                 Log.Verbose(() => $"Received input simulation request '{path}' via URL '{requestData.Context.Request.Url}'");
@@ -221,11 +227,11 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
 
     private void RegisterScrollWheelEndpoint()
     {
-        string path = HttpApiEndpointPaths.InputScrollWheel;
+        string path = RestApiEndpointPaths.InputScrollWheel;
         httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription("Simulate scroll wheel events")
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetRequiredPermission(RestApiPermission.WriteInputSimulation, settings)
             .SetCallbackAndAdd(requestData =>
             {
                 Log.Debug(() => $"Received input simulation request '{path}' via URL '{requestData.Context.Request.Url}'");
@@ -238,45 +244,33 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
             });
     }
 
-    private void SimulateMouseScrollDelta(Vector2 scrollDelta)
+    private async void SimulateMouseScrollDelta(Vector2 scrollDelta)
     {
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
-        {
-            DoSimulateMouseScrollDelta(scrollDelta, systemMouse);
-        }));
-    }
+        await Awaitable.MainThreadAsync();
 
-    private void DoSimulateMouseScrollDelta(Vector2 scrollDelta, Mouse mouse)
-    {
-        using (StateEvent.From(mouse, out InputEventPtr eventPtr))
+        using (StateEvent.From(systemMouse, out InputEventPtr eventPtr))
         {
-            mouse.scroll.WriteValueIntoEvent(scrollDelta, eventPtr);
+            systemMouse.scroll.WriteValueIntoEvent(scrollDelta, eventPtr);
             InputSystem.QueueEvent(eventPtr);
         }
     }
 
-    private void SimulateMouseDelta(Vector2 delta)
+    private async void SimulateMouseDelta(Vector2 delta)
     {
         if (delta == Vector2.zero)
         {
             return;
         }
 
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
-        {
-            DoSimulateMouseDelta(delta, systemMouse);
-        }));
-    }
+        await Awaitable.MainThreadAsync();
 
-    private void DoSimulateMouseDelta(Vector2 delta, Mouse mouse)
-    {
         // Use the mouse position from the legacy input API
         // because the value returned by Unity's newer InputSystem is not accurate when executed in the Unity editor.
         Vector2 unityInputMousePosition = Input.mousePosition;
         Vector2 newMousePosition = unityInputMousePosition + delta;
-        using (StateEvent.From(mouse, out InputEventPtr eventPtr))
+        using (StateEvent.From(systemMouse, out InputEventPtr eventPtr))
         {
-            mouse.WarpCursorPosition(newMousePosition);
+            systemMouse.WarpCursorPosition(newMousePosition);
             InputSystem.QueueEvent(eventPtr);
         }
     }
@@ -290,7 +284,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription(description)
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetRequiredPermission(RestApiPermission.WriteInputSimulation, settings)
             .SetCallbackAndAdd(request =>
             {
                 callback(request);
@@ -309,7 +303,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription(description)
             .SetRemoveOnDestroy(gameObject)
-            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetRequiredPermission(RestApiPermission.WriteInputSimulation, settings)
             .SetCallbackAndAdd(_ =>
             {
                 if (condition != null
@@ -324,7 +318,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
             });
     }
 
-    private void SimulateButtonClick(InputDevice inputDevice, InputControl inputControl, ESimulateButtonDirection simulateButtonDirection)
+    private async void SimulateButtonClick(InputDevice inputDevice, InputControl inputControl, ESimulateButtonDirection simulateButtonDirection)
     {
         Log.Debug(() => $"Triggering button event {simulateButtonDirection} on input control {inputControl}");
 
@@ -332,28 +326,27 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
             is ESimulateButtonDirection.Down
             or ESimulateButtonDirection.DownFollowedByUp)
         {
-            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
+            await Awaitable.MainThreadAsync();
+
+            using (StateEvent.From(inputDevice, out InputEventPtr eventPtr))
             {
-                using (StateEvent.From(inputDevice, out InputEventPtr eventPtr))
-                {
-                    inputControl.WriteValueIntoEvent(1f, eventPtr);
-                    InputSystem.QueueEvent(eventPtr);
-                }
-            }));
+                inputControl.WriteValueIntoEvent(1f, eventPtr);
+                InputSystem.QueueEvent(eventPtr);
+            }
         }
 
         if (simulateButtonDirection
             is ESimulateButtonDirection.Up
             or ESimulateButtonDirection.DownFollowedByUp)
         {
-            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () =>
+            await Awaitable.MainThreadAsync();
+            await Awaitable.EndOfFrameAsync();
+
+            using (StateEvent.From(inputDevice, out InputEventPtr eventPtr))
             {
-                using (StateEvent.From(inputDevice, out InputEventPtr eventPtr))
-                {
-                    inputControl.WriteValueIntoEvent(0f, eventPtr);
-                    InputSystem.QueueEvent(eventPtr);
-                }
-            }));
+                inputControl.WriteValueIntoEvent(0f, eventPtr);
+                InputSystem.QueueEvent(eventPtr);
+            }
         }
     }
 }

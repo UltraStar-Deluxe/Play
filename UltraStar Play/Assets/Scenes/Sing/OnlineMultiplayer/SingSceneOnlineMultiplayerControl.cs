@@ -268,8 +268,8 @@ public class SingSceneOnlineMultiplayerControl : MonoBehaviour, INeedInjection, 
                     float delayInSeconds = ex is TimeoutException
                         ? 0
                         : SingSceneReadyResponseTimeoutInMillis / 1000f;
-                    singSceneControl.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(delayInSeconds,
-                        () => SendInitialUnpauseMessageWhenAllReadyToStart(failedAttempts + 1)));
+                    AwaitableUtils.ExecuteAfterDelayInSecondsAsync(gameObject, delayInSeconds,
+                        () => SendInitialUnpauseMessageWhenAllReadyToStart(failedAttempts + 1));
                 }
             })
             .DoOnCompleted(() =>

@@ -4,21 +4,19 @@ public static class MainGameBuildTools
 {
     private static readonly string appName = "UltraStar Play";
 
-    [MenuItem("Tools/Build/Build for release (Windows, macOS, Linux, signed apk, signed app bundle)")]
-    public static void BuildAllForRelease()
-    {
-        BuildWindows64();
-        BuildMacOS();
-        BuildLinux64();
-        BuildSignedAndroidApk();
-        BuildSignedAndroidAppBundle();
-        // BuildIOS();
-    }
-
     [MenuItem("Tools/Build/Windows64")]
     public static void BuildWindows64()
     {
-        BuildUtils.PerformCustomBuild(CreateCustomBuildOptions(BuildTarget.StandaloneWindows64));
+        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
+        BuildUtils.PerformCustomBuild(customBuildOptions);
+    }
+
+    [MenuItem("Tools/Build/Windows64 (dev build)")]
+    public static void BuildWindows64ForDev()
+    {
+        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
+        customBuildOptions.buildOptions |= BuildOptions.Development;
+        BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
     [MenuItem("Tools/Build/Linux64")]

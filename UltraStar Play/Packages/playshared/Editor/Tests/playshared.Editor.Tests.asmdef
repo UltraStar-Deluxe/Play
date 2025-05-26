@@ -1,0 +1,18 @@
+﻿{
+  "name": "playshared.Editor.Tests",
+  "references": [
+    "playshared",
+    "playshared.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

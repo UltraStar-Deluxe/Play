@@ -1,104 +1,202 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UniRx;
 using UnityEngine;
 
-public class Job
+public class Job<T> : IJob
 {
-	public Translation Name { get; private set; }
+    /**
+     * Getter for the Awaitable that should be executed.
+     * A Getter is used instead of the Awaitable directly to avoid premature execution.
+     */
+    private Func<Awaitable<T>> awaitableProvider;
+
+    public Translation Name { get; }
+    public JobProgress Progress { get; }
+
+    public bool AdoptChildJobError { get; set; } = true;
+
+    private CancellationTokenSource CancellationTokenSource => Progress?.CancellationTokenSource;
+    private bool IsCancellationRequested => CancellationTokenSource != null && CancellationTokenSource.IsCancellationRequested;
 
     public ReactiveProperty<EJobStatus> Status { get; private set; } = new(EJobStatus.Pending);
     public ReactiveProperty<EJobResult> Result { get; private set; }  = new (EJobResult.Pending);
 
-    private readonly List<Job> childJobs = new();
-    public IReadOnlyList<Job> ChildJobs => childJobs;
-    public Job ParentJob { get; private set; }
+    private readonly List<IJob> childJobs = new();
+    public IReadOnlyList<IJob> ChildJobs => childJobs;
 
-    public long EstimatedTotalDurationInMillis { get; set; }
-    public double EstimatedCurrentProgressInPercent
+    private IJob parentJob;
+
+    public IJob ParentJob
     {
-        get
-        {
-            if (endTimeInMillis > 0)
-            {
-                return 100;
-            }
-
-            if (EstimatedTotalDurationInMillis <= 0
-                || startTimeInMillis == 0)
-            {
-                return 0;
-            }
-
-            double progressInPercent = 100.0 * (double)CurrentDurationInMillis / EstimatedTotalDurationInMillis;
-            if (progressInPercent > 99)
-            {
-                progressInPercent = 99;
-            }
-            return progressInPercent;
-        }
-
+        get => parentJob;
         set
         {
-            double progressFactor = value / 100.0;
-            if (progressFactor <= 0)
+            if (Status.Value is not EJobStatus.Pending)
+            {
+                throw new InvalidOperationException("Job has already been started. Cannot change parent job.");
+            }
+
+            if (parentJob == value)
             {
                 return;
             }
-            EstimatedTotalDurationInMillis = (long)(CurrentDurationInMillis * (1 / progressFactor));
-        }
-    }
-
-    public long CurrentDurationInMillis
-    {
-        get
-        {
-            if (startTimeInMillis == 0)
+            if (parentJob != null)
             {
-                return 0;
+                throw new InvalidOperationException("Cannot change parent job");
             }
-            if (endTimeInMillis > 0)
-            {
-                return endTimeInMillis - startTimeInMillis;
-            }
-            return TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis;
-        }
-    }
-
-    private long startTimeInMillis;
-    private long endTimeInMillis;
-
-    private Action onCancel;
-    public Action OnCancel {
-        get
-        {
-            return onCancel;
-        }
-        set
-        {
-            onCancel = value;
-            IsCancelable.Value = onCancel != null;
-        }
-    }
-    public ReactiveProperty<bool> IsCanceled { get; private set; } = new(false);
-    public ReactiveProperty<bool> IsCancelable { get; private set; } = new(false);
-
-    public Job(Translation name, Job parentJob = null)
-    {
-        Name = name;
-        if (parentJob != null)
-        {
+            parentJob = value;
             parentJob.AddChildJob(this);
         }
     }
 
-    private void AddChildJob(Job childJob)
+    public ReactiveProperty<bool> IsCanceled { get; }
+    public ReactiveProperty<bool> IsCancelable { get; }
+
+    /**
+     * Constructor intended to set the Awaitable later.
+     */
+    public Job(
+        Translation name,
+        CancellationTokenSource cancellationTokenSource)
+        : this(name, null, cancellationTokenSource)
     {
-        childJob.ParentJob = this;
+    }
+
+    public Job(
+        Translation name,
+        Func<Awaitable<T>> awaitableProvider = null,
+        CancellationTokenSource cancellationTokenSource = null)
+    {
+        Name = name;
+        this.awaitableProvider = awaitableProvider;
+        this.Progress = new JobProgress(cancellationTokenSource);
+        IsCanceled = new ReactiveProperty<bool>(false);
+        IsCancelable = new ReactiveProperty<bool>(CancellationTokenSource != null);
+    }
+
+    public async Awaitable RunAsync()
+    {
+        await GetResultAsync();
+    }
+
+    public async Awaitable<T> GetResultAsync()
+    {
+        if (Status.Value != EJobStatus.Pending)
+        {
+            throw new InvalidOperationException($"Can only start a job that is in a pending state: job '{Name}', status {Status.Value}");
+        }
+
+        try
+        {
+            T result = default;
+            SetStatus(EJobStatus.Running);
+
+            Awaitable<T> awaitable = awaitableProvider?.Invoke();
+
+            if (awaitable == null
+                && childJobs.IsNullOrEmpty())
+            {
+                throw new InvalidOperationException($"Job is missing awaitable to be executed: job '{Name}'");
+            }
+
+            if (awaitable != null)
+            {
+                result = await awaitable;
+            }
+            if (!childJobs.IsNullOrEmpty())
+            {
+                await RunChildJobsAsync();
+            }
+
+            CancellationTokenSource?.Token.ThrowIfCancellationRequested();
+            SetResult(EJobResult.Ok);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Job '{Name}' failed: {ex.Message}");
+            SetResult(EJobResult.Error);
+            throw ex;
+        }
+        finally
+        {
+            if (Status.Value != EJobStatus.Finished)
+            {
+                SetStatus(EJobStatus.Finished);
+            }
+        }
+    }
+
+    public void SetAwaitable(Func<Awaitable<T>> newValue)
+    {
+        if (Status.Value is not EJobStatus.Pending)
+        {
+            throw new InvalidOperationException("Job has already been started. Cannot change awaitable.");
+        }
+
+        awaitableProvider = newValue;
+    }
+
+    public void AddChildJob(IJob childJob)
+    {
+        if (Status.Value is not EJobStatus.Pending)
+        {
+            throw new InvalidOperationException("Job has already been started. Cannot add child jobs.");
+        }
+
+        if (this == childJob)
+        {
+            throw new ArgumentException("Cannot add self as child job.");
+        }
+
+        if (childJobs.Contains(childJob))
+        {
+            // Avoid recursion with setting parentJob
+            return;
+        }
+
         childJobs.Add(childJob);
+        childJob.ParentJob = this;
 
         childJob.Result.Subscribe(_ => OnChildJobChanged());
         childJob.Status.Subscribe(_ => OnChildJobChanged());
+    }
+
+    private async Awaitable RunChildJobsAsync()
+    {
+        if (AdoptChildJobError)
+        {
+            foreach (IJob childJob in childJobs)
+            {
+                if (childJob.Result.Value is EJobResult.Pending)
+                {
+                    await childJob.RunAsync();
+                }
+                CancellationTokenSource?.Token.ThrowIfCancellationRequested();
+            }
+        }
+        else
+        {
+            foreach (IJob childJob in childJobs)
+            {
+                try
+                {
+                    if (childJob.Result.Value is EJobResult.Pending)
+                    {
+                        await childJob.RunAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.Log($"Child job failed, continuing with remaining child jobs: parent job '{Name}', failed child job '{childJob.Name}'");
+                }
+                CancellationTokenSource?.Token.ThrowIfCancellationRequested();
+            }
+        }
     }
 
     private void OnChildJobChanged()
@@ -106,7 +204,7 @@ public class Job
         bool anyChildHasError = false;
         bool anyChildRunning = false;
         bool allChildrenFinished = true;
-        foreach (Job childJob in childJobs)
+        foreach (IJob childJob in childJobs)
         {
             if (childJob.Result.Value == EJobResult.Error)
             {
@@ -123,7 +221,8 @@ public class Job
             }
         }
 
-        if (anyChildHasError)
+        if (anyChildHasError
+            && AdoptChildJobError)
         {
             SetResult(EJobResult.Error);
         }
@@ -138,7 +237,7 @@ public class Job
         }
     }
 
-    public void SetStatus(EJobStatus newStatus)
+    private void SetStatus(EJobStatus newStatus)
     {
         if (Status.Value == newStatus)
         {
@@ -151,12 +250,12 @@ public class Job
             || Status.Value is EJobStatus.Running
             && newStatus != EJobStatus.Finished)
         {
-            throw new IllegalStateException($"Cannot change state from {Status.Value} to {newStatus}");
+            throw new InvalidOperationException($"Cannot change state from {Status.Value} to {newStatus}");
         }
 
         if (newStatus == EJobStatus.Running)
         {
-            startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+            Progress.StartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         }
 
         Status.Value = newStatus;
@@ -167,7 +266,7 @@ public class Job
         }
     }
 
-    public void SetResult(EJobResult newResult)
+    private void SetResult(EJobResult newResult)
     {
         if (Result.Value == newResult)
         {
@@ -179,7 +278,7 @@ public class Job
                 && newResult != EJobResult.Error)
             || Result.Value is EJobResult.Ok or EJobResult.Error)
         {
-            throw new IllegalStateException($"Cannot change result from {Result.Value} to {newResult}");
+            throw new InvalidOperationException($"Cannot change result from {Result.Value} to {newResult}");
         }
 
         // Cancel job if the result is set to error
@@ -198,39 +297,40 @@ public class Job
         }
 
         Result.Value = newResult;
-        endTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        Progress.EndTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         if (Status.Value != EJobStatus.Finished)
         {
             SetStatus(EJobStatus.Finished);
         }
     }
 
-    public void SetResultIfPending(EJobResult newResult)
-    {
-        if (Result.Value == EJobResult.Pending)
-        {
-            SetResult(newResult);
-        }
-    }
-
     public void Cancel()
     {
         if (IsCanceled.Value
-            || !IsCancelable.Value)
+            || IsCancellationRequested)
         {
+            Debug.LogWarning($"Job is already canceled: name '{Name}'");
             return;
         }
 
-        IsCanceled.Value = true;
-        try
+        if (!IsCancelable.Value)
         {
-            Debug.Log($"Cancelling job '{Name}'");
-            onCancel?.Invoke();
+            Debug.LogWarning($"Job cannot be canceled: name '{Name}'");
+            return;
         }
-        catch (Exception ex)
+
+        Debug.Log($"Cancelling job '{Name}'");
+        IsCanceled.Value = true;
+        CancellationTokenSource?.Cancel();
+
+        CancelChildJobs();
+    }
+
+    private void CancelChildJobs()
+    {
+        foreach (IJob childJob in childJobs)
         {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to cancel job '{Name}': {ex.Message}");
+            childJob?.Cancel();
         }
     }
 }

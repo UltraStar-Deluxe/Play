@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -9,6 +8,8 @@ using UnityEngine.UIElements;
 
 public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
+    private const float SongQueueItemHeightInPx = 80;
+
     private IComparer<SongDto> songDtoComparer = new SongListSongDtoComparer();
 
     [Inject(Key = nameof(songListEntryUi))]
@@ -56,13 +57,12 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
     [Inject]
     private Injector injector;
 
+    [Inject(UxmlName = R_PlayShared.UxmlNames.songQueueEntriesListView)]
+    private ListView listView;
+
     private readonly TabGroupControl tabGroupControl = new();
     private readonly SongDetailsControl songDetailsControl = new();
     private readonly SongQueueUiControl songQueueUiControl = new();
-
-    private List<SongQueueEntryDto> SongQueueEntryDtos => songQueueUiControl.SongQueueEntryControls
-        .Select(control => control.SongQueueEntryDto)
-        .ToList();
 
     private ScrollView songListViewScrollView;
     private Vector2 songListViewScrollPosBeforeHide = new Vector2(-1, -1);
@@ -97,8 +97,10 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
 
         mainGameHttpClient.Permissions.Subscribe(_ => UpdateSongQueue());
 
-        songQueueUiControl.OnDelete = entry => DeleteSongQueueEntry(entry);
-        songQueueUiControl.OnToggleMedley = entry => ToggleMedley(entry);
+        songQueueUiControl.OnDelete = DeleteSongQueueEntry;
+        songQueueUiControl.OnToggleMedley = ToggleMedley;
+        songQueueUiControl.OnItemIndexChanged = OnSongQueueItemIndexChanged;
+        songQueueUiControl.ItemHeight = SongQueueItemHeightInPx;
 
         songListView.makeItem = OnMakeItem;
         songListView.bindItem = OnBindItem;
@@ -159,38 +161,42 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
         return songListEntry;
     }
 
-    private void DeleteSongQueueEntry(SongQueueEntryDto entry)
+    private async void DeleteSongQueueEntry(SongQueueEntryDto entry)
     {
-        mainGameHttpClient.DeleteRequest(HttpApiEndpointPaths.SongQueueEntryIndex
-                .ReplaceOrThrow("{index}", SongQueueEntryDtos.IndexOf(entry).ToString()),
-            response =>
-            {
-                UpdateSongQueue();
-            },
-            ex =>
-            {
-                UpdateSongQueue();
-            });
+        try
+        {
+            await mainGameHttpClient.DeleteRequestAsync(RestApiEndpointPaths.SongQueueEntryIndex
+                .ReplaceOrThrow("{index}", songQueueUiControl.GetSongQueueEntryIndex(entry).ToString()));
+        }
+        finally
+        {
+            UpdateSongQueue();
+        }
     }
 
-    private void ToggleMedley(SongQueueEntryDto entry)
+    private async void ToggleMedley(SongQueueEntryDto entry)
     {
         entry.IsMedleyWithPreviousEntry = !entry.IsMedleyWithPreviousEntry;
-        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntryIndex
-                .ReplaceOrThrow("{index}", SongQueueEntryDtos.IndexOf(entry).ToString()),
-            entry.ToJson(),
-            MimeTypeUtils.ApplicationJson,
-            response =>
-            {
-                UpdateSongQueue();
-            },
-            ex =>
-            {
-                UpdateSongQueue();
-            });
+        try
+        {
+            await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.SongQueueEntryIndex
+                    .ReplaceOrThrow("{index}", songQueueUiControl.GetSongQueueEntryIndex(entry).ToString()),
+                entry.ToJson());
+        }
+        finally
+        {
+            UpdateSongQueue();
+        }
     }
 
-    private void UpdateSongQueue()
+    private async void OnSongQueueItemIndexChanged(SongQueueUiControl.ItemIndexChangedEvent evt)
+    {
+        Debug.Log($"OnSongQueueItemIndexChanged: {evt.OldIndex}, {evt.NewIndex}");
+        string json = new ListDto<SongQueueEntryDto>(evt.UpdatedItems.ToList()).ToJson();
+        await mainGameHttpClient.PostRequestAsync(RestApiEndpointPaths.SongQueue, json);
+    }
+
+    private async void UpdateSongQueue()
     {
         songQueueUiControl.Clear();
 
@@ -199,28 +205,24 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
             return;
         }
 
-        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.SongQueue,
-            response =>
-            {
-                ListDto<SongQueueEntryDto> listDto = JsonConverter.FromJson<ListDto<SongQueueEntryDto>>(response);
-                if (listDto == null)
-                {
-                    songQueueContainer.Add(new Label("Failed to load song queue."));
-                    return;
-                }
-
-                songQueueUiControl.SetSongQueueEntryDtos(listDto.Items);
-
-                if (!mainGameHttpClient.Permissions.Value.Contains(HttpApiPermission.WriteSongQueue))
-                {
-                    songQueueUiControl.HideControls();
-                }
-            },
-            ex =>
+        try
+        {
+            string response = await mainGameHttpClient.GetRequestAsync(RestApiEndpointPaths.SongQueue);
+            ListDto<SongQueueEntryDto> listDto = JsonConverter.FromJson<ListDto<SongQueueEntryDto>>(response);
+            if (listDto == null)
             {
                 songQueueContainer.Add(new Label("Failed to load song queue."));
-                Debug.LogException(ex);
-            });
+                return;
+            }
+
+            songQueueUiControl.HasWriteSongQueuePermission = mainGameHttpClient.Permissions.Value.Contains(RestApiPermission.WriteSongQueue);
+            songQueueUiControl.SetSongQueueEntryDtos(listDto.Items);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            songQueueContainer.Add(new Label("Failed to load song queue."));
+        }
     }
 
     private void UpdateSongListViewItems()
@@ -254,8 +256,8 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, IDisp
     {
         string searchText = songSearchTextField.value.ToLowerInvariant();
         return searchText.IsNullOrEmpty()
-               || songDto.Title.ToLowerInvariant().Contains(searchText)
-               || songDto.Artist.ToLowerInvariant().Contains(searchText);
+               || StringUtils.ContainsIgnoreCaseAndDiacritics(songDto.Title, searchText)
+               || StringUtils.ContainsIgnoreCaseAndDiacritics(songDto.Artist, searchText);
     }
 
     private void HandleSongListEvent(SongListEvent evt)

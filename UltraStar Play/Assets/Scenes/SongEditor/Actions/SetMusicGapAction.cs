@@ -13,7 +13,7 @@ public class SetMusicGapAction : INeedInjection
     private SongAudioPlayer songAudioPlayer;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private NoteAreaControl noteAreaControl;
@@ -44,6 +44,6 @@ public class SetMusicGapAction : INeedInjection
     public void ExecuteAndNotify(double positionInMillis, bool keepNotesPosition = false)
     {
         Execute(positionInMillis, keepNotesPosition);
-        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Gap));
+        songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Gap));
     }
 }

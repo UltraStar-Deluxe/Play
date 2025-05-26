@@ -1,0 +1,38 @@
+{
+    "name": "Editor.Tests",
+    "rootNamespace": "",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "Plugins",
+        "UniRx",
+        "com.achimmihca.uniinject",
+        "com.achimmihca.protrans",
+        "playshared",
+        "playshared.Editor.Tests",
+        "playsharedui",
+        "playsharedui.Editor.Tests",
+        "Common",
+        "Scenes",
+        "SongEditorScene"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "Moq.dll",
+        "ArchUnitNET.dll",
+        "ArchUnitNET.NUnit.dll",
+        "Facepunch.Steamworks.Win64.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

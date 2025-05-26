@@ -15,7 +15,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
     private SongMeta songMeta;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
     private NoteAreaControl noteAreaControl;
@@ -62,7 +62,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             .Subscribe(_ => UpdateLabelTexts())
             .AddTo(gameObject);
 
-        songMetaChangeEventStream.Subscribe(evt =>
+        songMetaChangedEventStream.Subscribe(evt =>
         {
             if (evt
                 is SongPropertyChangedEvent { SongProperty: ESongProperty.Gap }

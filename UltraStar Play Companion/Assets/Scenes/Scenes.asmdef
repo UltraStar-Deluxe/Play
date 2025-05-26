@@ -2,7 +2,6 @@
     "name": "Scenes",
     "rootNamespace": "",
     "references": [
-        "Serilog",
         "Plugins",
         "UniRx",
         "Common",
@@ -10,14 +9,17 @@
         "com.achimmihca.uniinject",
         "Unity.InputSystem",
         "playshared",
-        "playsharedui",
-        "LiteNetLib"
+        "playsharedui"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "LiteNetLib.dll",
+        "Serilog.dll",
+        "Serilog.Sinks.File.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],

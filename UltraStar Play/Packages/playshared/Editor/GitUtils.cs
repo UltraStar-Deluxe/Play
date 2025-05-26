@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Serilog.Events;
 using UnityEditor.Build;
 using UnityEngine;
 
@@ -12,8 +11,8 @@ public static class GitUtils
         if (ProcessUtils.RunProcess("git", arguments,
                 out string output,
                 out string errorOutput,
-                LogEventLevel.Information,
-                LogEventLevel.Error))
+                ELogEventLevel.Information,
+                ELogEventLevel.Error))
         {
             // Check for fatal errors.
             if (output.IsNullOrEmpty() || output.Contains("fatal"))
@@ -39,7 +38,7 @@ public static class GitUtils
             Debug.LogError("Git is not set-up correctly, required to be on PATH, and to be a git project.");
             return "git-error";
         }
-        
+
         return output;
     }
 

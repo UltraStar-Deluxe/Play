@@ -24,8 +24,11 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(SongIssueManager.Instance);
         bb.BindExistingInstance(CursorManager.Instance);
         bb.BindExistingInstance(UiManager.Instance);
+        bb.BindExistingInstance(PlayerProfileImageManager.Instance);
+        bb.BindExistingInstance(DialogManager.Instance);
         bb.BindExistingInstance(MidiManager.Instance);
         bb.BindExistingInstance(ImageManager.Instance);
+        bb.BindExistingInstance(FolderPreviewImageManager.Instance);
         bb.BindExistingInstance(AudioManager.Instance);
         bb.BindExistingInstance(SfxManager.Instance);
         bb.BindExistingInstance(TranslationManager.Instance);
@@ -39,19 +42,12 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(BackgroundMusicManager.Instance);
         bb.BindExistingInstance(VfxManager.Instance);
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
-        bb.BindExistingInstance(BackgroundLightManager.Instance);
         bb.BindExistingInstance(DefaultFocusableNavigator.Instance);
         bb.BindExistingInstance(MicSampleRecorderManager.Instance);
         bb.BindExistingInstance(AchievementEventStream.Instance);
-        bb.BindExistingInstance(WebViewManager.Instance);
         bb.BindExistingInstance(ModManager.Instance);
         bb.BindExistingInstance(RuntimeUiInspectionManager.Instance);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(DefaultFocusableNavigator.Instance);
-
-        // Steam
-        bb.BindExistingInstance(SteamManager.Instance);
-        bb.BindExistingInstance(SteamAchievementManager.Instance);
-        bb.BindExistingInstance(SteamWorkshopManager.Instance);
 
         // Online Multiplayer
         bb.BindExistingInstance(OnlineMultiplayerManager.Instance);
@@ -62,26 +58,20 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(NetcodeLobbyMemberManager.Instance);
         bb.BindExistingInstance(NetcodeOnlineMultiplayerBackendConfigurator.Instance);
 
-        // Steam online multiplayer
-        bb.BindExistingInstance(SteamLobbyManager.Instance);
-        bb.BindExistingInstance(SteamLobbyMemberManager.Instance);
-        bb.BindExistingInstance(SteamOnlineMultiplayerBackendConfigurator.Instance);
-        bb.BindExistingInstance(DontDestroyOnLoadManager.Instance.FindComponentOrThrow<FacepunchTransport>());
-
-        if (NetworkManager.Singleton == null)
-        {
-            FindOrCreateNetworkManager().SetSingleton();
-        }
+        NetworkManagerInitialization.InitNetworkManagerSingleton();
         bb.BindExistingInstance(NetworkManager.Singleton);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
+        bb.BindExistingInstance(SpeechRecognizerProvider.Instance);
+        bb.BindExistingInstance(WhisperSpeechRecognizerProvider.Instance);
+        bb.BindExistingInstance(SpeechRecognitionNoteCreator.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);
         bb.BindExistingInstance(PitchDetectionManager.Instance);
         bb.BindExistingInstance(SongQueueManager.Instance);
         bb.BindExistingInstance(JobManager.Instance);   bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.BindExistingInstance(ThemeManager.Instance);
         bb.BindExistingInstance(GlobalInputControl.Instance);
-        bb.BindExistingInstance(VolumeControl.Instance);
+        bb.BindExistingInstance(VolumeManager.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
         bb.BindExistingInstance(HttpServer.Instance as UltraStarPlayHttpServer);
@@ -103,26 +93,5 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstanceLazy(() => StatisticsManager.Instance.Statistics);
 
         return bb.GetBindings();
-    }
-
-    private NetworkManager FindOrCreateNetworkManager()
-    {
-        NetworkManager networkManager = NetworkManager.Singleton;
-        if (networkManager != null)
-        {
-            return networkManager;
-        }
-
-        networkManager = FindObjectOfType<NetworkManager>();
-        if (networkManager != null)
-        {
-            return networkManager;
-        }
-
-        GameObject networkManagerGameObject = new GameObject();
-        networkManagerGameObject.name = "NetworkManager-RuntimeCreated";
-        networkManager = networkManagerGameObject.AddComponent<NetworkManager>();
-        return networkManager;
-
     }
 }

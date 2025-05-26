@@ -11,14 +11,14 @@ using UnityEngine.UIElements;
 
 public class JobManager : AbstractSingletonBehaviour, INeedInjection
 {
-    private readonly List<Job> jobsWithoutParent = new();
+    private readonly List<IJob> jobsWithoutParent = new();
 
-    public static JobManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<JobManager>();
+    public static JobManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<JobManager>();
 
     public bool AllJobsFinished => AllJobs
         .AllMatch(job => job.Status.Value is EJobStatus.Finished);
 
-    private List<Job> AllJobs => jobsWithoutParent
+    private List<IJob> AllJobs => jobsWithoutParent
         .Union(jobToJobControl.Keys)
         .Distinct()
         .ToList();
@@ -41,8 +41,8 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
     private VisualElement jobListElement;
     private Button toggleJobListButton;
 
-    private readonly Dictionary<Job, JobListEntryControl> jobToJobControl = new();
-    private readonly HashSet<Job> fadingJobs = new();
+    private readonly Dictionary<IJob, JobListEntryControl> jobToJobControl = new();
+    private readonly HashSet<IJob> fadingJobs = new();
 
     private bool isJobListMinimized;
 
@@ -84,14 +84,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public static Job CreateAndAddJob(Translation title, Job parentJob = null)
-    {
-        Job job = new(title, parentJob);
-        Instance.AddJob(job);
-        return job;
-    }
-
-    public void AddJob(Job job)
+    public void AddJob(IJob job)
     {
         if (jobToJobControl.ContainsKey(job))
         {
@@ -107,7 +100,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         jobsUiNeedsRefresh = true;
     }
 
-    private void FadeOutThenRemoveJob(Job job)
+    private void FadeOutThenRemoveJob(IJob job)
     {
         if (!jobToJobControl.TryGetValue(job, out JobListEntryControl jobListEntryControl))
         {
@@ -128,7 +121,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         fadingJobs.Add(job);
     }
 
-    private void RemoveJob(Job job)
+    private void RemoveJob(IJob job)
     {
         jobsWithoutParent.Remove(job);
         if (jobToJobControl.TryGetValue(job, out JobListEntryControl jobListEntryControl))
@@ -145,7 +138,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         jobsWithoutParent.ForEach(job => CreateOrUpdateJobUi(job));
     }
 
-    private void CreateOrUpdateJobUi(Job job)
+    private void CreateOrUpdateJobUi(IJob job)
     {
         if (jobToJobControl.TryGetValue(job, out JobListEntryControl _))
         {
@@ -157,7 +150,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private void UpdateJobUi(Job job)
+    private void UpdateJobUi(IJob job)
     {
         // Create UI for child jobs that do not have a UI yet
         job.ChildJobs
@@ -165,7 +158,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
             .ForEach(childJob => CreateJobUi(childJob));
     }
 
-    private void CreateJobUi(Job job)
+    private void CreateJobUi(IJob job)
     {
         VisualElement jobListEntryElement = jobListEntryUi.CloneTree().Children().FirstOrDefault();
 
@@ -176,7 +169,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         jobToJobControl.Add(job, jobListEntryControl);
 
         // Only show this job in the UI if it takes a noticeable amount of time.
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.5f, () =>
+        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(0.5f, () =>
         {
             if (GameObjectUtils.IsDestroyed(this))
             {
@@ -194,7 +187,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
                     MinimizeJobList();
                 }
             }
-        }));
+        });
 
         job.ChildJobs.ForEach(childJob => CreateOrUpdateJobUi(childJob));
     }
@@ -301,7 +294,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         jobsWithoutParent.ForEach(job => CancelJob(job, true));
     }
 
-    private void CancelJob(Job job, bool recursive)
+    private void CancelJob(IJob job, bool recursive)
     {
         // Cancel child jobs first
         if (recursive
@@ -315,20 +308,5 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         {
             job.Cancel();
         }
-    }
-
-    public static Job CreateJobFromObservable<T>(Translation jobName, Job parentJob, IObservable<T> observable)
-    {
-        Job job = new(jobName, parentJob);
-        observable
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Job '{jobName}' failed: {ex.Message}");
-                job.SetResult(EJobResult.Error);
-                throw ex;
-            })
-            .Subscribe(_ => job.SetStatus(EJobStatus.Finished));
-        return job;
     }
 }
