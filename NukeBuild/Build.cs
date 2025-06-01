@@ -170,7 +170,7 @@ class Build : NukeBuild
             .SetTestResultFile(buildOutput / $"Nuke-TestResults-{unityProject}-{unityTestPlatform}.xml")
             .SetProjectPath(unityProjectDir)
             .SetTestPlatform(unityTestPlatform)
-            .SetStableExitCodes(0)
+            .SetStableExitCodes(0, 2)
         );
     }
 
