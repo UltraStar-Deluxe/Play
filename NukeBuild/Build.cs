@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,6 +15,7 @@ class Build : NukeBuild
 {
     [Parameter] readonly uint cloneDepth = 1000;
     [Parameter] readonly AbsolutePath buildOutput = RootDirectory / "Build";
+
     [Parameter] readonly AbsolutePath unityExecutable;
     [Parameter] readonly UnityTestPlatform testPlatform = UnityTestPlatform.EditMode;
 
@@ -169,6 +170,7 @@ class Build : NukeBuild
             .SetTestResultFile(buildOutput / $"Nuke-TestResults-{unityProject}-{unityTestPlatform}.xml")
             .SetProjectPath(unityProjectDir)
             .SetTestPlatform(unityTestPlatform)
+            .SetStableExitCodes(0)
         );
     }
 
