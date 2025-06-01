@@ -17,7 +17,8 @@ class Build : NukeBuild
     [Parameter] readonly AbsolutePath buildOutput = RootDirectory / "Build";
 
     [Parameter] readonly AbsolutePath unityExecutable;
-    [Parameter] readonly UnityTestPlatform testPlatform = UnityTestPlatform.EditMode;
+
+    [Parameter] readonly UnityTestPlatform testPlatform = UnityTestPlatform.PlayMode;
 
     private readonly AbsolutePath mainGameDir = RootDirectory / "UltraStar Play";
     private readonly AbsolutePath companionAppDir = RootDirectory / "UltraStar Play Companion";
