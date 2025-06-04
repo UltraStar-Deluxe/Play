@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:FLAC Format Test
+#ARTIST:Test Artist
 #MP3:flac.flac
 #BPM:200
 - 0

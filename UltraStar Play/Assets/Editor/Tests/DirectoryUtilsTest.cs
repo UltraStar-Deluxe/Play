@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 public class DirectoryUtilsTest
 {
+#if UNITY_EDITOR_WIN
     [Test]
     public void ShouldReturnParentDirectories()
     {
@@ -29,4 +30,5 @@ public class DirectoryUtilsTest
                 new DirectoryInfo("C:/"),
             }));
     }
+#endif
 }

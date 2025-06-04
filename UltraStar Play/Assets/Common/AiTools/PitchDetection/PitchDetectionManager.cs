@@ -156,16 +156,12 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         if (basicPitchResult.ExitCode != 0
             || !basicPitchResult.Errors.IsNullOrEmpty())
         {
-            Debug.LogError($"Basic Pitch terminated with exit code {basicPitchResult.ExitCode}. Output:\n{basicPitchResult.Output}");
-            midiFilePath = "";
-            return false;
+            throw new PitchDetectionException($"Basic Pitch terminated with exit code {basicPitchResult.ExitCode}. Output:\n{basicPitchResult.Output}");
         }
 
         if (basicPitchResult.WrittenFiles.IsNullOrEmpty())
         {
-            Debug.LogError($"BasicPitchResult.WrittenFiles is empty. Output:\n{basicPitchResult.Output}");
-            midiFilePath = "";
-            return false;
+            throw new PitchDetectionException($"BasicPitchResult.WrittenFiles is empty. Output:\n{basicPitchResult.Output}");
         }
 
         // Prepare directory to move created audio files.

@@ -1,11 +1,11 @@
 {
   "dependencies": {
     "com.achimmihca.portaudioforunity": {
-      "version": "https://github.com/achimmihca/PortAudioForUnity.git?path=PortAudioForUnity/Packages/com.achimmihca.portaudioforunity#25349c9dce2ea583c45d2247947e5e851bc2f7bf",
+      "version": "https://github.com/achimmihca/PortAudioForUnity.git?path=PortAudioForUnity/Packages/com.achimmihca.portaudioforunity#f53ccb9fc05f32fcc8a764a36bc98d1fb48519e6",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "25349c9dce2ea583c45d2247947e5e851bc2f7bf"
+      "hash": "f53ccb9fc05f32fcc8a764a36bc98d1fb48519e6"
     },
     "com.achimmihca.primeinputactions": {
       "version": "https://github.com/achimmihca/PrimeInputActions.git?path=PrimeInputActions/Packages/com.achimmihca.primeinputactions#d0a9440d0c8e0df84f573f1dc9785bbda4c96b7a",
@@ -50,13 +50,13 @@
       "hash": "31253e868265494482a8bb32269942b0b2e3d17e"
     },
     "com.bsigame.visualelementevents": {
-      "version": "https://github.com/BSimonSweet/Unity-VisualElementEvents.git#cc25fdb9a6927632773e8f77e4587a3628ec1722",
+      "version": "https://github.com/achimmihca/Unity-VisualElementEvents.git#c383e7d86d627847a07fc98bbf9aa258202ec6ab",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.nuget.mono-cecil": "1.10.2"
       },
-      "hash": "cc25fdb9a6927632773e8f77e4587a3628ec1722"
+      "hash": "c383e7d86d627847a07fc98bbf9aa258202ec6ab"
     },
     "com.community.netcode.transport.facepunch": {
       "version": "https://github.com/achimmihca/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.facepunch#7e6bee030f3f9fd32960f8d611aa5ec45bac7b8b",
@@ -86,7 +86,7 @@
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
-      "depth": 0,
+      "depth": 1,
       "source": "builtin",
       "dependencies": {}
     },
@@ -112,21 +112,9 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.dt.app-ui": {
-      "version": "1.1.1",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.physics": "1.0.0",
-        "com.unity.modules.androidjni": "1.0.0",
-        "com.unity.modules.uielements": "1.0.0",
-        "com.unity.modules.screencapture": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.ext.nunit": {
       "version": "2.0.5",
-      "depth": 0,
+      "depth": 1,
       "source": "builtin",
       "dependencies": {}
     },
@@ -171,34 +159,19 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
-    "com.unity.multiplayer.center": {
-      "version": "1.0.0",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.uielements": "1.0.0"
-      }
-    },
     "com.unity.netcode.gameobjects": {
-      "version": "2.3.2",
-      "depth": 0,
+      "version": "1.12.0",
+      "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.transport": "2.4.0",
-        "com.unity.nuget.mono-cecil": "1.11.4"
+        "com.unity.transport": "1.4.0",
+        "com.unity.nuget.mono-cecil": "1.10.1"
       },
       "url": "https://packages.unity.com"
     },
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.4",
       "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.nuget.newtonsoft-json": {
-      "version": "3.2.1",
-      "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -262,25 +235,9 @@
         "com.unity.searcher": "4.9.3"
       }
     },
-    "com.unity.sysroot": {
-      "version": "2.0.10",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.sysroot.linux-x86_64": {
-      "version": "2.0.9",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.sysroot": "2.0.10"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.test-framework": {
       "version": "1.5.1",
-      "depth": 0,
+      "depth": 1,
       "source": "builtin",
       "dependencies": {
         "com.unity.ext.nunit": "2.0.3",
@@ -298,19 +255,9 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.toolchain.win-x86_64-linux-x86_64": {
-      "version": "2.0.10",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.sysroot": "2.0.10",
-        "com.unity.sysroot.linux-x86_64": "2.0.9"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.transport": {
       "version": "2.5.1",
-      "depth": 1,
+      "depth": 2,
       "source": "registry",
       "dependencies": {
         "com.unity.burst": "1.8.12",
@@ -321,18 +268,12 @@
     },
     "com.unity.ugui": {
       "version": "2.0.0",
-      "depth": 0,
+      "depth": 1,
       "source": "builtin",
       "dependencies": {
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
       }
-    },
-    "com.unity.ui.builder": {
-      "version": "2.0.0",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {}
     },
     "com.unity.vectorgraphics": {
       "version": "2.0.0-preview.25",
@@ -393,12 +334,6 @@
       "source": "embedded",
       "dependencies": {}
     },
-    "com.unity.modules.ai": {
-      "version": "1.0.0",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {}
-    },
     "com.unity.modules.androidjni": {
       "version": "1.0.0",
       "depth": 0,
@@ -407,7 +342,7 @@
     },
     "com.unity.modules.animation": {
       "version": "1.0.0",
-      "depth": 0,
+      "depth": 1,
       "source": "builtin",
       "dependencies": {}
     },
@@ -419,13 +354,13 @@
     },
     "com.unity.modules.audio": {
       "version": "1.0.0",
-      "depth": 0,
+      "depth": 1,
       "source": "builtin",
       "dependencies": {}
     },
     "com.unity.modules.hierarchycore": {
       "version": "1.0.0",
-      "depth": 1,
+      "depth": 2,
       "source": "builtin",
       "dependencies": {}
     },
@@ -437,7 +372,7 @@
     },
     "com.unity.modules.imgui": {
       "version": "1.0.0",
-      "depth": 0,
+      "depth": 2,
       "source": "builtin",
       "dependencies": {}
     },
@@ -465,14 +400,6 @@
       "source": "builtin",
       "dependencies": {}
     },
-    "com.unity.modules.screencapture": {
-      "version": "1.0.0",
-      "depth": 1,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.imageconversion": "1.0.0"
-      }
-    },
     "com.unity.modules.subsystems": {
       "version": "1.0.0",
       "depth": 2,
@@ -489,13 +416,13 @@
     },
     "com.unity.modules.ui": {
       "version": "1.0.0",
-      "depth": 0,
+      "depth": 1,
       "source": "builtin",
       "dependencies": {}
     },
     "com.unity.modules.uielements": {
       "version": "1.0.0",
-      "depth": 0,
+      "depth": 1,
       "source": "builtin",
       "dependencies": {
         "com.unity.modules.ui": "1.0.0",
@@ -506,7 +433,7 @@
     },
     "com.unity.modules.unitywebrequest": {
       "version": "1.0.0",
-      "depth": 0,
+      "depth": 1,
       "source": "builtin",
       "dependencies": {}
     },
@@ -521,7 +448,7 @@
     },
     "com.unity.modules.unitywebrequestaudio": {
       "version": "1.0.0",
-      "depth": 0,
+      "depth": 2,
       "source": "builtin",
       "dependencies": {
         "com.unity.modules.unitywebrequest": "1.0.0",
@@ -530,7 +457,7 @@
     },
     "com.unity.modules.unitywebrequesttexture": {
       "version": "1.0.0",
-      "depth": 0,
+      "depth": 1,
       "source": "builtin",
       "dependencies": {
         "com.unity.modules.unitywebrequest": "1.0.0",

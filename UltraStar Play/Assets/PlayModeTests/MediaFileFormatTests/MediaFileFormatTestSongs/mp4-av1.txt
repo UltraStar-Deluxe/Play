@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:MP4-AV1 Format Test
+#ARTIST:Test Artist
 #MP3:mp4-av1.mp4
 #VIDEO:mp4-av1.mp4
 #BPM:200

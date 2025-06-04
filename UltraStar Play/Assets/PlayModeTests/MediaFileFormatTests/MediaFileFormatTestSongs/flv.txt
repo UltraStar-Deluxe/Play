@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:FLV Format Test
+#ARTIST:Test Artist
 #MP3:flv.flv
 #VIDEO:flv.flv
 #BPM:200

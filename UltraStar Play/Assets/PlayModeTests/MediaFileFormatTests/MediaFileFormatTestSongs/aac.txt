@@ -1,5 +1,5 @@
-﻿#TITLE:TestTitle
-#ARTIST:TestArtist
+﻿#TITLE:AAC Format Test
+#ARTIST:Test Artist
 #MP3:aac.aac
 #BPM:200
 - 0
