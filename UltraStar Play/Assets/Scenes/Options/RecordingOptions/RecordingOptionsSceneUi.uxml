@@ -24,7 +24,7 @@
                         <Chooser name="delayChooser" label="$options_delay" wrap-around="true" min-value="0" max-value="1000" step-value="10" class="noBackgroundInHierarchy" />
                         <ui:Button text="$options_delay_calibrate" display-tooltip-when-elided="true" name="calibrateDelayButton" class="controlMinWidth ellipsis ml-auto mb-3" />
                         <Chooser name="noiseSuppressionChooser" label="$options_noiseSuppression" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
-                        <Chooser name="amplificationChooser" label="$options_amplification" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                        <Chooser name="amplificationChooser" label="$options_amplification" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" style="display: none;" />
                         <Chooser name="sampleRateChooser" label="$options_sampleRate" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                         <ui:VisualElement name="recordingDeviceInactiveOverlay" picking-mode="Ignore" class="overlay inactiveOverlay roundCorners" style="background-color: rgba(0, 0, 0, 0.5); display: none;" />
                     </ui:VisualElement>
