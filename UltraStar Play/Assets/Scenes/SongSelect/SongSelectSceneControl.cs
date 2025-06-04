@@ -972,7 +972,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        if (playlistManager.FavoritesPlaylist.HasSongEntry(SelectedSong))
+        if (PlaylistUtils.IsFavorite(playlistManager, SelectedSong))
         {
             playlistManager.RemoveSongFromPlaylist(playlistManager.FavoritesPlaylist, SelectedSong);
         }

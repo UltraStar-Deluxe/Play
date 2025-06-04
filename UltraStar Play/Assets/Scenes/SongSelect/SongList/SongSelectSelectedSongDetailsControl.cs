@@ -160,12 +160,6 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         UpdateHighScores(new List<HighScoreEntry>());
     }
 
-    private bool IsFavorite(SongMeta songMeta)
-    {
-        return songMeta != null
-               && playlistManager.FavoritesPlaylist.HasSongEntry(songMeta);
-    }
-
     public void OnSongSelectionChanged(SongSelectEntrySelection selection)
     {
         SongSelectEntry selectedEntry = selection.Entry;
