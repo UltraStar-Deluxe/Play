@@ -25,9 +25,11 @@ jobs:
           - StandaloneWindows64
           - StandaloneLinux64
           - StandaloneOSX
-          # Skip Android build until "JDK not found" issue has been solved (https://github.com/game-ci/unity-builder/issues/489)
+          # TODO: Android build has "JDK not found" issue, https://github.com/game-ci/unity-builder/issues/489
           #- Android
-          - iOS
+          # TODO: iOS build has issues
+          # - iOS
+          # TODO: UltraStar Play does not support WebGL yet
           # - WebGL
     steps:
       # Clone repo and restore cache
