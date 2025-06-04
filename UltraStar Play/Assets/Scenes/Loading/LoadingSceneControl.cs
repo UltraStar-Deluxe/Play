@@ -110,13 +110,6 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
         // The SongMetas are loaded on access.
         songMetaManager.ScanSongsIfNotDoneYet();
-        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(0.5f, () =>
-        {
-            if (gameObject)
-            {
-                PreloadSongMedia();
-            }
-        });
 
         // Extract StreamingAssets on Android from the JAR
         AndroidStreamingAssets.Extract();
@@ -151,68 +144,6 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             || TimeUtils.IsDurationAboveThresholdInMillis(waitStartTimeInMillis, MaxWaitTimeInMillis))
         {
             FinishScene();
-        }
-    }
-
-    private void PreloadSongMedia()
-    {
-        // Get first few songs metas to cache them
-        List<SongMeta> allSongMetas = songMetaManager.GetSongMetas().ToList();
-        Debug.Log($"Preloading song media. Total found song metas so far: {allSongMetas.Count}, preloading up to {preloadSongCount} songs");
-        List<SongMeta> songMetas = allSongMetas
-            .Take(preloadSongCount)
-            .ToList();
-        songMetas.ForEach(songMeta => PreloadSongMetaMedia(songMeta));
-    }
-
-    private async void PreloadSongMetaMedia(SongMeta songMeta)
-    {
-        Debug.Log($"Preloading local media of song {songMeta}");
-        try
-        {
-            // Preload audio
-            if (SongMetaUtils.AudioResourceExists(songMeta)
-                && !WebRequestUtils.IsHttpOrHttpsUri(SongMetaUtils.GetAudioUri(songMeta))
-                && ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(SongMetaUtils.GetAudioUri(songMeta)))
-                && !ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(SongMetaUtils.GetAudioUri(songMeta))))
-            {
-                string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-                AudioClip loadedAudioClip = await AudioManager.LoadAudioClipFromUriAsync(audioUri);
-                Debug.Log($"Preloaded audio '{loadedAudioClip.name}'");
-            }
-
-            // Preload cover
-            if (SongMetaUtils.CoverResourceExists(songMeta)
-                && !WebRequestUtils.IsHttpOrHttpsUri(SongMetaUtils.GetCoverUri(songMeta))
-                && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(SongMetaUtils.GetCoverUri(songMeta))))
-            {
-                string coverUri = SongMetaUtils.GetCoverUri(songMeta);
-                await ImageManager.LoadSpriteFromUriAsync(coverUri);
-                Debug.Log($"Preloaded cover image '{coverUri}'");
-            }
-
-            // Preload background
-            if (SongMetaUtils.BackgroundResourceExists(songMeta)
-                && !WebRequestUtils.IsHttpOrHttpsUri(SongMetaUtils.GetBackgroundUri(songMeta))
-                && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(SongMetaUtils.GetBackgroundUri(songMeta))))
-            {
-                string backgroundUri = SongMetaUtils.GetBackgroundUri(songMeta);
-                await ImageManager.LoadSpriteFromUriAsync(backgroundUri);
-                Debug.Log($"Preloaded background image '{backgroundUri}'");
-            }
-
-            // Video resource of the song does not need to be cached.
-
-            // Parse whole file by reading the voices.
-            if (songMeta.TryGetVoice(EVoiceId.P1, out Voice _))
-            {
-                Debug.Log($"Preloaded voices of '{songMeta.GetArtistDashTitle()}'");
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Failed to preload media of song {songMeta}");
-            Debug.LogException(ex);
         }
     }
 
