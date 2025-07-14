@@ -1,14 +1,14 @@
 "appbuild"
 {
 	"appid" "2394070"
-	"desc" "Melody_Mania-1.4.4-beta3-8ed662f4f-2501012208"
-	"buildoutput" "F:\Dev\Projects\GitHub\achimmihca\MelodyMania\tools\steamworks_sdk_157\sdk\tools\ContentBuilder\output"
+	"desc" "Melody_Mania-1.5.2-beta1-ed9b34e0d-2507141910"
+	"buildoutput" "C:\Dev\Projects\GitHub\achimmihca\MelodyMania\Tools\steamworks_sdk_157\sdk\tools\ContentBuilder\output"
 	"contentroot" ""
 	"setlive" "private-beta"
 	"preview" "0"
 	"local"	""
 	"depots"
 	{
-		"2394071" "F:\Dev\Projects\GitHub\achimmihca\MelodyMania\tools\steamworks_sdk_157\vdf_files\depot_2394071.vdf"
+		"2394071" "C:\Dev\Projects\GitHub\achimmihca\MelodyMania\Tools\steamworks_sdk_157\vdf_files\depot_2394071.vdf"
 	}
 }

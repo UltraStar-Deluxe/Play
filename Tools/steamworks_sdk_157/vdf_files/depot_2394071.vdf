@@ -1,7 +1,7 @@
 "DepotBuildConfig"
 {
 	"DepotID" "2394071"
-	"contentroot" "F:\Dev\Projects\GitHub\achimmihca\MelodyMania\tools\steamworks_sdk_157\sdk\tools\ContentBuilder\content\MelodyMania-Windows"
+	"contentroot" "C:\Dev\Projects\GitHub\achimmihca\MelodyMania\Tools\steamworks_sdk_157\sdk\tools\ContentBuilder\content\MelodyMania-Windows"
 	"FileMapping"
 	{
 		"LocalPath" "*"
