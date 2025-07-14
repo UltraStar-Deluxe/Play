@@ -84,12 +84,13 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     public bool IsFavoritesPlaylist(IPlaylist playlist)
     {
-        return playlist.Name == ApplicationUtils.FavoritesPlaylistName;
+        return playlist?.Name == ApplicationUtils.FavoritesPlaylistName;
     }
 
     public void SavePlaylist(UltraStarPlaylist playlist)
     {
-        if (playlist.FilePath.IsNullOrEmpty())
+        if (playlist == null
+            || playlist.FilePath.IsNullOrEmpty())
         {
             return;
         }
@@ -392,11 +393,21 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     public bool HasSongEntry(IPlaylist playlist, SongMeta songMeta)
     {
+        if (playlist == null)
+        {
+            return false;
+        }
+        
         return playlist.HasSongEntry(songMeta);
     }
 
     public List<SongMeta> GetSongMetas(IPlaylist playlist)
     {
+        if (playlist == null)
+        {
+            return new List<SongMeta>();
+        }
+
         IReadOnlyCollection<SongMeta> allSongMetas = songMetaManager.GetSongMetas();
         return allSongMetas.Where(songMeta => HasSongEntry(playlist, songMeta)).ToList();
     }
