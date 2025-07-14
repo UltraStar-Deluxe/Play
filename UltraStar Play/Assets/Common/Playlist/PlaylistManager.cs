@@ -194,10 +194,13 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     public void RemoveSongFromPlaylist(UltraStarPlaylist playlist, SongMeta songMeta)
     {
         if (playlist == null
-            || songMeta == null)
+            || songMeta == null
+            || playlist is UltraStarAllSongsPlaylist)
         {
             return;
         }
+        nonPersistentSettings.LastEditedPlaylistName.Value = playlist.Name;
+        
         playlist.RemoveSongEntry(songMeta.Artist, songMeta.Title);
         playlistChangedEventStream.OnNext(new PlaylistChangedEvent(playlist, songMeta));
         SavePlaylist(playlist);
@@ -207,10 +210,13 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     {
         if (playlist == null
             || songMeta == null
+            || playlist is UltraStarAllSongsPlaylist
             || HasSongEntry(playlist, songMeta))
         {
             return;
         }
+        nonPersistentSettings.LastEditedPlaylistName.Value = playlist.Name;
+        
         playlist.AddLineEntry(new UltraStartPlaylistSongEntry(songMeta.Artist, songMeta.Title));
         playlistChangedEventStream.OnNext(new PlaylistChangedEvent(playlist, songMeta));
         SavePlaylist(playlist);

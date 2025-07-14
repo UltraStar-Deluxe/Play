@@ -66,10 +66,10 @@ public static partial class R
         public static readonly string usplay_skipToNextLyrics = "usplay/skipToNextLyrics";
         public static readonly string usplay_space = "usplay/space";
         public static readonly string usplay_start = "usplay/start";
-        public static readonly string usplay_toggleFavorite = "usplay/toggleFavorite";
-        public static readonly string usplay_toggleFavoritePlaylistActive = "usplay/toggleFavoritePlaylistActive";
         public static readonly string usplay_toggleFullscreen = "usplay/toggleFullscreen";
         public static readonly string usplay_toggleHelp = "usplay/toggleHelp";
+        public static readonly string usplay_toggleLastEditedPlaylistActive = "usplay/toggleLastEditedPlaylistActive";
+        public static readonly string usplay_toggleLastEditedPlaylistEntry = "usplay/toggleLastEditedPlaylistEntry";
         public static readonly string usplay_toggleMute = "usplay/toggleMute";
         public static readonly string usplay_togglePause = "usplay/togglePause";
         public static readonly string usplay_togglePlayers = "usplay/togglePlayers";

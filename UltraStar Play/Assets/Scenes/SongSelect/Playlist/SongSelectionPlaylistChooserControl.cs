@@ -92,20 +92,24 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
         Selection.SetValueAndForceNotify(newSelection);
     }
 
-    public void ToggleFavoritePlaylist()
+    public void TogglePlaylist(IPlaylist playlist)
     {
-        if (songSelectSceneControl.UsePartyModePlaylist)
+        if (songSelectSceneControl.UsePartyModePlaylist
+            || items.IndexOf(playlist) < 0)
         {
             return;
         }
 
-        if (items.IndexOf(Selection.Value) == 0)
+        IPlaylist allSongsPlaylist = items[0];
+        if (items.IndexOf(Selection.Value) == items.IndexOf(playlist))
         {
-            Selection.Value = playlistManager.FavoritesPlaylist;
+            // Already selected, switch to all songs playlist
+            Selection.Value = allSongsPlaylist;
         }
         else
         {
-            Selection.Value = items[0];
+            // Not selected, switch to selected playlist
+            Selection.Value = playlist;
         }
     }
 

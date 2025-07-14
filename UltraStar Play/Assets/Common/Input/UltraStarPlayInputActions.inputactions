@@ -490,13 +490,13 @@
                     "name": "search",
                     "type": "Button",
                     "id": "41e6fe7e-d361-40fe-897f-152f177a881f",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "toggleFavoritePlaylistActive",
+                    "name": "toggleLastEditedPlaylistActive",
                     "type": "PassThrough",
                     "id": "78ffc4f4-f4d2-468d-9e42-608b3b757ccf",
                     "expectedControlType": "Button",
@@ -505,7 +505,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "toggleFavorite",
+                    "name": "toggleLastEditedPlaylistEntry",
                     "type": "PassThrough",
                     "id": "6227994f-ca76-4f05-917e-85d369edb5e7",
                     "expectedControlType": "Button",
@@ -840,7 +840,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "toggleFavorite",
+                    "action": "toggleLastEditedPlaylistEntry",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -851,7 +851,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "toggleFavorite",
+                    "action": "toggleLastEditedPlaylistEntry",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -862,7 +862,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "toggleFavorite",
+                    "action": "toggleLastEditedPlaylistEntry",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -1390,7 +1390,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "toggleFavoritePlaylistActive",
+                    "action": "toggleLastEditedPlaylistActive",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -1401,7 +1401,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "toggleFavoritePlaylistActive",
+                    "action": "toggleLastEditedPlaylistActive",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -1412,7 +1412,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "toggleFavoritePlaylistActive",
+                    "action": "toggleLastEditedPlaylistActive",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -1423,7 +1423,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "toggleFavoritePlaylistActive",
+                    "action": "toggleLastEditedPlaylistActive",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },

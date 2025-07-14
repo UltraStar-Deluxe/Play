@@ -9,6 +9,12 @@ public class NonPersistentSettings
 
     // Song select settings
     public ReactiveProperty<string> PlaylistName { get; private set; } = new("");
+    
+    /**
+     * The Playlist that was last used, i.e., where songs have been added or removed.
+     */
+    public ReactiveProperty<string> LastEditedPlaylistName { get; private set; } = new("");
+    
     public ReactiveProperty<bool> MicTestActive { get; private set; } = new();
     public Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveSearchPropertyFilters { get; private set; } = new();
     public ReactiveProperty<bool> IsShowOnlyDuetsFilterActive { get; private set; } = new();

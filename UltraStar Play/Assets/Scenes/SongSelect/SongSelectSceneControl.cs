@@ -122,6 +122,33 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public SongMeta SelectedSong => (songRouletteControl.SelectedEntry as SongSelectSongEntry)?.SongMeta;
 
+    public UltraStarPlaylist LastEditedPlaylist
+    {
+        get
+        {
+            string playlistName = nonPersistentSettings.LastEditedPlaylistName.Value;
+            if (playlistName.IsNullOrEmpty())
+            {
+                return playlistManager.FavoritesPlaylist;
+            }
+
+            return (playlistManager.GetPlaylistByName(playlistName) as UltraStarPlaylist) ?? playlistManager.FavoritesPlaylist;
+        }
+
+        set
+        {
+            UltraStarPlaylist newPlaylist = value;
+            if (newPlaylist == null
+                || newPlaylist is UltraStarAllSongsPlaylist)
+            {
+                nonPersistentSettings.LastEditedPlaylistName.Value = "";
+                return;
+            }
+            
+            nonPersistentSettings.LastEditedPlaylistName.Value = value.Name;
+        }
+    }
+
     private MessageDialogControl searchExpressionHelpDialogControl;
     private MessageDialogControl lyricsDialogControl;
     private MessageDialogControl noSingAlongDataDialogControl;
@@ -960,25 +987,34 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         return new SongSelectSceneData();
     }
 
-    public void ToggleFavoritePlaylist()
+    public void ToggleLastEditedPlaylist()
     {
-        SongSelectionPlaylistChooserControl.ToggleFavoritePlaylist();
+        SongSelectionPlaylistChooserControl.TogglePlaylist(LastEditedPlaylist);
     }
 
-    public void ToggleSelectedSongIsFavorite()
+    public void ToggleSelectedSongInLastEditedPlaylist()
     {
         if (SelectedSong == null)
         {
             return;
         }
 
-        if (PlaylistUtils.IsFavorite(playlistManager, SelectedSong))
+        UltraStarPlaylist targetPlaylist = LastEditedPlaylist;
+        if (PlaylistUtils.IsInPlaylist(targetPlaylist, SelectedSong))
         {
-            playlistManager.RemoveSongFromPlaylist(playlistManager.FavoritesPlaylist, SelectedSong);
+            playlistManager.RemoveSongFromPlaylist(targetPlaylist, SelectedSong);
+            if (targetPlaylist != playlistManager.FavoritesPlaylist)
+            {
+                NotificationManager.CreateNotification(Translation.Of($"Removed '{SelectedSong.GetArtistDashTitle()}' from '{targetPlaylist.Name}'"));
+            }
         }
         else
         {
-            playlistManager.AddSongToPlaylist(playlistManager.FavoritesPlaylist, SelectedSong);
+            playlistManager.AddSongToPlaylist(targetPlaylist, SelectedSong);
+            if (targetPlaylist != playlistManager.FavoritesPlaylist)
+            {
+                NotificationManager.CreateNotification(Translation.Of($"Added '{SelectedSong.GetArtistDashTitle()}' to '{targetPlaylist.Name}'"));
+            }
         }
     }
 
