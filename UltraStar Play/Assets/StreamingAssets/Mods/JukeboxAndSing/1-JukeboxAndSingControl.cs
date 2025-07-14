@@ -27,6 +27,12 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
     private SongMetaManager songMetaManager;
 
     [Inject]
+    private PlaylistManager playlistManager;
+
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
+
+    [Inject]
     private UIDocument uiDocument;
 
     [Inject]
@@ -233,7 +239,11 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
 
     private SongMeta GetNextRandomSongMeta()
     {
-        List<SongMeta> unseenSongMetas = songMetaManager.GetSongMetas()
+        List<SongMeta> allSongMetas = nonPersistentSettings.PlaylistName.Value.IsNullOrEmpty()
+            ? songMetaManager.GetSongMetas().ToList()
+            : playlistManager.GetSongMetas(playlistManager.GetPlaylistByName(nonPersistentSettings.PlaylistName.Value));
+
+        List<SongMeta> unseenSongMetas = allSongMetas
             .Except(seenSongMetas)
             .ToList();
 
