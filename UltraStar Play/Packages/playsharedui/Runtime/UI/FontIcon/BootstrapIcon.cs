@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-public class BootstrapIcon : FontIcon
+[UxmlElement]
+public partial class BootstrapIcon : FontIcon
 {
     private static readonly Dictionary<string, string> bootstrapIconNameToCodepointCache = new();
-
-    // UIToolkit factory classes
-    public new class UxmlFactory : UxmlFactory<BootstrapIcon, UxmlTraits> {}
-
-    public new class UxmlTraits : FontIcon.UxmlTraits {}
 
     protected override bool TryGetCodepointByIconName(string iconName, out string codepoint)
     {
