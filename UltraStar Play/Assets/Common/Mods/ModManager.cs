@@ -289,8 +289,25 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     private List<Type> GetModInterfaces()
     {
         return AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(domainAssembly => domainAssembly.GetTypes())
-            .Where(type => type.IsInterface
+            .SelectMany(assembly => 
+            {
+                try
+                {
+                    return assembly.GetTypes();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Failed to get types from assembly {assembly}: " + ex.Message);
+                    Debug.LogException(ex);
+                    if (ex is ReflectionTypeLoadException reflectionTypeLoadException)
+                    {
+                        // Return types that have been loaded so far.
+                        return reflectionTypeLoadException.Types.Where(t => t != null);
+                    }
+                    return Enumerable.Empty<Type>();
+                }
+            })
+            .Where(type => type.IsInterface 
                            && typeof(IMod).IsAssignableFrom(type))
             .ToList();
     }
