@@ -38,6 +38,7 @@ public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInject
         ignoreFrameDropUntilTimeInSeconds = Time.time + 0.5f;
     }
 
+#if UNITY_EDITOR
     private void Update()
     {
         if (currentScene is EScene.SongEditorScene)
@@ -53,4 +54,5 @@ public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInject
             Log.Debug(() => $"Frame drop detected, deltaTime: {deltaTimeInMillis} ms");
         }
     }
+#endif
 }
