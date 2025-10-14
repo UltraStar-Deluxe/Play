@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -25,7 +27,15 @@ public class ContextMenuModManager : AbstractSingletonBehaviour, INeedInjection
         List<IContextMenuMod> contextMenuMods = ModManager.GetModObjects<IContextMenuMod>();
         foreach (IContextMenuMod contextMenuMod in contextMenuMods)
         {
-            contextMenuMod.FillContextMenu(contextMenu);
+            try
+            {
+                contextMenuMod.FillContextMenu(contextMenu);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to run ContextMenuMod: type '{contextMenuMod.GetType()}', error message: '{e.Message}'");
+                Debug.LogException(e);
+            }
         }
     }
 }
