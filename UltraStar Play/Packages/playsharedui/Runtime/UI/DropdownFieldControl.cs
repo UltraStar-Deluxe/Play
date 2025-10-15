@@ -52,6 +52,14 @@ public class DropdownFieldControl<T>
         }
     }
 
+    public bool EnableRichText
+    {
+        get => TextElement.enableRichText;
+        set => TextElement.enableRichText = value;
+    }
+
+    private TextElement TextElement => dropdownField.Q<TextElement>(); 
+    
     public DropdownFieldControl(DropdownField dropdownField, List<T> items, T initialSelection,
         Func<T, string> itemToString)
     {
@@ -91,6 +99,19 @@ public class DropdownFieldControl<T>
                 dropdownField.value = this.itemToString(newValue);
             }
         });
+        
+        this.dropdownField.formatListItemCallback = FormatListItemCallback;
+        EnableRichText = false;
+    }
+
+    private string FormatListItemCallback(string item)
+    {
+        // Disable parsing of Rich Text in PopupField labels.
+        // This is needed because Rich Text parsing is enabled by default in Unity.
+        // See https://discussions.unity.com/t/how-to-disable-rich-text-of-dropdownfield-popup-labels/1690284/3
+        return EnableRichText
+            ? item
+            : $"<noparse>{item}</noparse>";
     }
 
     public void UpdateLabelText()
