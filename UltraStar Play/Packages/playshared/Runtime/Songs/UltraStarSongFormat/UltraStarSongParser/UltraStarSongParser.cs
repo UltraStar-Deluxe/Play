@@ -102,6 +102,15 @@ public static class UltraStarSongParser
             headerFields.GetValueOrDefault("AUDIO", ""),
             voiceIdToDisplayName,
             version);
+        
+        // The GAP as well as BPM determine absolute millisecond positions in the song when given a beat.
+        // This is why these fields have to be loaded first.
+        string gap = headerFields.GetValueOrDefault("GAP", "");
+        if (!gap.IsNullOrEmpty())
+        {
+            songMeta.GapInMillis = ParseNumber("GAP", gap);
+        }
+
         foreach (KeyValuePair<string, string> item in headerFields)
         {
             try
@@ -351,7 +360,7 @@ public static class UltraStarSongParser
                 songMeta.EndInMillis = ParseNumber(key, value);
                 break;
             case "GAP":
-                songMeta.GapInMillis = ParseNumber(key, value);
+                // GAP is already parsed earlier because the timing of beats can depend on this field, similar to BPM.
                 break;
             case "GENRE":
                 songMeta.Genre = value;
