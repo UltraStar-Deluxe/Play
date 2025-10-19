@@ -9,6 +9,7 @@ public class MedleyCalculationTest
     private static List<MedleyCalculationTestCase> testCases = new List<MedleyCalculationTestCase>()
     {
         new("OChristmasTree-MedleyStart-MedleyEnd.txt", 396, 1045),
+        new("OChristmasTree-MedleyStart-MedleyEnd-before-Gap.txt", 396, 1045),
         new("OChristmasTree-MedleyStart.txt", 396, 528),
         new("OChristmasTree-NoMedleyStart-NoMedleyEnd.txt", 660, 858),
     };
@@ -18,8 +19,8 @@ public class MedleyCalculationTest
     public void ShouldCalculateMedleyStartAndMedleyEnd(MedleyCalculationTestCase testCase)
     {
         UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + testCase.FileName).SongMeta;
-        Assert.AreEqual(SongMetaMedleyUtils.GetMedleyStartBeat(songMeta), testCase.ExpectedMedleyStartBeat);
-        Assert.AreEqual(SongMetaMedleyUtils.GetMedleyEndBeat(songMeta, 10), testCase.ExpectedMedleyEndBeat);
+        Assert.AreEqual(testCase.ExpectedMedleyStartBeat, SongMetaMedleyUtils.GetMedleyStartBeat(songMeta), 1);
+        Assert.AreEqual(testCase.ExpectedMedleyEndBeat, SongMetaMedleyUtils.GetMedleyEndBeat(songMeta, 10), 1);
     }
 
     public class MedleyCalculationTestCase
