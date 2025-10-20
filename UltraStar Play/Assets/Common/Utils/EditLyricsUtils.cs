@@ -2,14 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UniInject;
 
+// TODO: Not a static utils class anymore
 public class EditLyricsUtils
 {
-    public static readonly string syllableSeparator = ";";
-    public static readonly string wordSeparator = " ";
-    public static readonly string sentenceSeparator = "\n";
+    [Inject]
+    private Settings settings;
     
-    public static bool TryApplyEditModeText(
+    private char WordSeparator => settings.SongEditorSettings.WordSeparator;
+    private char SyllableSeparator => settings.SongEditorSettings.SyllableSeparator;
+    private char SentenceSeparator => settings.SongEditorSettings.SentenceSeparator;
+    
+    public bool TryApplyEditModeText(
         SongMeta songMeta,
         Note note,
         string newText,
@@ -24,8 +29,8 @@ public class EditLyricsUtils
         }
 
         // Replace multiple control characters with a single character
-        viewModeText = Regex.Replace(viewModeText, @"\s+", wordSeparator);
-        viewModeText = Regex.Replace(viewModeText, $@"{syllableSeparator}+", syllableSeparator);
+        viewModeText = Regex.Replace(viewModeText, $@"\{WordSeparator.ToString()}+", WordSeparator.ToString());
+        viewModeText = Regex.Replace(viewModeText, $@"\{SyllableSeparator.ToString()}+", SyllableSeparator.ToString());
 
         // Split note to apply space and semicolon control characters.
         // Otherwise the text would mess up following notes when using the LyricsArea.
@@ -33,7 +38,7 @@ public class EditLyricsUtils
         return true;
     }
 
-    private static List<Note> SplitNoteForNewText(
+    private List<Note> SplitNoteForNewText(
         SongMeta songMeta,
         Note note,
         string newText)
@@ -45,9 +50,9 @@ public class EditLyricsUtils
             return notesAfterSplit;
         }
 
-        List<int> splitIndexes = AllIndexesOfCharacterBeforeTextEnd(newText, ' ')
+        List<int> splitIndexes = AllIndexesOfCharacterBeforeTextEnd(newText, WordSeparator)
             .ToList()
-            .Union(AllIndexesOfCharacterBeforeTextEnd(newText, ';').ToList())
+            .Union(AllIndexesOfCharacterBeforeTextEnd(newText, SyllableSeparator).ToList())
             .Distinct()
             .ToList();
         splitIndexes.Sort();
@@ -98,7 +103,7 @@ public class EditLyricsUtils
 
         // Remove semicolon from lyrics. These are only used to separate notes in the song editor.
         notesAfterSplit.ForEach(currentNote =>
-            currentNote.SetText(currentNote.Text.Replace(";", "")));
+            currentNote.SetText(currentNote.Text.Replace(SyllableSeparator.ToString(), "")));
 
         return notesAfterSplit;
     }

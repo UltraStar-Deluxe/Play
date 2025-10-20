@@ -1,9 +1,14 @@
 ﻿using System.Collections.Generic;
 using NHyphenator;
+using UniInject;
 
-public static class HyphenateNotesUtils
+// TODO: Not a static utils class anymore
+public class HyphenateNotesUtils : INeedInjection
 {
-    public static Dictionary<Note, List<Note>> HypenateNotes(SongMeta songMeta, List<Note> createdNotes, Hyphenator hyphenator)
+    [Inject]
+    private EditLyricsUtils editLyricsUtils;
+    
+    public Dictionary<Note, List<Note>> HypenateNotes(SongMeta songMeta, List<Note> createdNotes, Hyphenator hyphenator)
     {
         Dictionary<Note, List<Note>> noteToNotesAfterSplit = new();
     
@@ -15,7 +20,7 @@ public static class HyphenateNotesUtils
                 continue;
             }
 
-            EditLyricsUtils.TryApplyEditModeText(songMeta, note, newText, out List<Note> notesAfterSplit);
+            editLyricsUtils.TryApplyEditModeText(songMeta, note, newText, out List<Note> notesAfterSplit);
             noteToNotesAfterSplit[note] = notesAfterSplit;
         }
 

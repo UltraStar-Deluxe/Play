@@ -5,6 +5,7 @@ using PrimeInputActions;
 using SimpleHttpServerForUnity;
 using SteamOnlineMultiplayer;
 using UniInject;
+using UniInject.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -92,6 +93,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.Bind(typeof(IServerSideCompanionClientManager)).ToExistingInstance(ServerSideCompanionClientManager.Instance);
         bb.BindExistingInstance(ServerSideCompanionClientManager.Instance);
 
+        BindEditLyricsDependencies(bb);
+        
         EventSystem eventSystem = GameObjectUtils.FindComponentWithTag<EventSystem>("EventSystem");
         bb.BindExistingInstance(eventSystem);
 
@@ -107,5 +110,27 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstanceLazy(() => StatisticsManager.Instance.Statistics);
 
         return bb.GetBindings();
+    }
+
+    /**
+     * Dependencies for editing lyrics via special syntax.
+     * Ideally, this would only be needed in SongEditor scope. But it is also used in common package to create sing-along data.
+     */
+    private void BindEditLyricsDependencies(BindingBuilder bb)
+    {
+        // Prepare injector
+        Injector injector = UniInjectUtils.CreateInjector();
+        injector.AddBindingForInstance(SettingsManager.Instance.Settings);
+        
+        // Create and inject instances
+        EditLyricsUtils editLyricsUtils = new();
+        injector.Inject(editLyricsUtils);
+        bb.BindExistingInstance(editLyricsUtils);
+        
+        // TODO: This is super ugly because constructing the dependencies here manually contradicts the idea of using dependency injection.
+        injector.AddBindingForInstance(editLyricsUtils);
+        HyphenateNotesUtils hyphenateNotesUtils = new();
+        injector.Inject(hyphenateNotesUtils);
+        bb.BindExistingInstance(hyphenateNotesUtils);
     }
 }

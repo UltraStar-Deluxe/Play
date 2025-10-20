@@ -28,6 +28,7 @@ public class SongEditorSettings
 
     // Velocity should be between 0 and 127
     public int MidiVelocity { get; set; } = 100;
+
     // Gain is similar to volume and should be between 0 and 1 to make it more silent and above 1 to make it louder.
     public float MidiGain { get; set; } = 1;
     public bool MidiSoundPlayAlongEnabled { get; set; }
@@ -64,4 +65,9 @@ public class SongEditorSettings
 
     // Editing
     public int SpaceBetweenNotesInMillis { get; set; } = SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis;
+
+    // Lyrics
+    public char SyllableSeparator { get; set; } = ';';
+    public char WordSeparator { get; set; } = ' ';
+    public char SentenceSeparator { get; set; } = '\n';
 }

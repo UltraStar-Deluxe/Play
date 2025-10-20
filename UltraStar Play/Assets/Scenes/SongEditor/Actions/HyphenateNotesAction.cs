@@ -19,6 +19,9 @@ public class HyphenateNotesAction : INeedInjection
     [Inject]
     private SpaceBetweenNotesAction spaceBetweenNotesAction;
     
+    [Inject]
+    private HyphenateNotesUtils hyphenateNotesUtils;
+    
     public void Execute(SongMeta songMeta, List<Note> notes, Hyphenator hyphenator)
     {
         if (songMeta == null
@@ -30,7 +33,7 @@ public class HyphenateNotesAction : INeedInjection
         
         int spaceBetweenNotesInMillis = settings.SongEditorSettings.SpaceBetweenNotesInMillis;
 
-        Dictionary<Note,List<Note>> noteToNotesAfterSplit = HyphenateNotesUtils.HypenateNotes(songMeta, notes, hyphenator);
+        Dictionary<Note,List<Note>> noteToNotesAfterSplit = hyphenateNotesUtils.HypenateNotes(songMeta, notes, hyphenator);
         noteToNotesAfterSplit.ForEach(entry =>
         {
             Note note = entry.Key;
