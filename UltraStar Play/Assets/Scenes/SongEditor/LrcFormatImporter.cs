@@ -7,7 +7,7 @@ using UnityEngine;
 public class LrcFormatImporter : INeedInjection
 {
     [Inject]
-    private EditLyricsUtils editLyricsUtils;
+    private LyricsEditor lyricsEditor;
     
     public Translation GetLrcFormatErrorMessage(string lrcText)
     {
@@ -88,7 +88,7 @@ public class LrcFormatImporter : INeedInjection
             text);
 
         // Split note on space and semicolon characters
-        editLyricsUtils.TryApplyEditModeText(songMeta, note, note.Text, out List<Note> notesAfterSplit);
+        lyricsEditor.TryApplyEditModeText(songMeta, note, note.Text, out List<Note> notesAfterSplit);
 
         SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, settings.SongEditorSettings.SpaceBetweenNotesInMillis, songMeta);
 

@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UniInject;
 
-// TODO: Not a static utils class anymore
-public class EditLyricsUtils
+public class LyricsEditor
 {
     [Inject]
     private Settings settings;
-    
+
     private char WordSeparator => settings.SongEditorSettings.WordSeparator;
     private char SyllableSeparator => settings.SongEditorSettings.SyllableSeparator;
     private char SentenceSeparator => settings.SongEditorSettings.SentenceSeparator;

@@ -2,11 +2,10 @@
 using NHyphenator;
 using UniInject;
 
-// TODO: Not a static utils class anymore
-public class HyphenateNotesUtils : INeedInjection
+public class NoteHyphenator : INeedInjection
 {
     [Inject]
-    private EditLyricsUtils editLyricsUtils;
+    private LyricsEditor lyricsEditor;
     
     public Dictionary<Note, List<Note>> HypenateNotes(SongMeta songMeta, List<Note> createdNotes, Hyphenator hyphenator)
     {
@@ -20,7 +19,7 @@ public class HyphenateNotesUtils : INeedInjection
                 continue;
             }
 
-            editLyricsUtils.TryApplyEditModeText(songMeta, note, newText, out List<Note> notesAfterSplit);
+            lyricsEditor.TryApplyEditModeText(songMeta, note, newText, out List<Note> notesAfterSplit);
             noteToNotesAfterSplit[note] = notesAfterSplit;
         }
 

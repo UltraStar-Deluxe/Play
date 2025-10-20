@@ -123,14 +123,14 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         injector.AddBindingForInstance(SettingsManager.Instance.Settings);
         
         // Create and inject instances
-        EditLyricsUtils editLyricsUtils = new();
-        injector.Inject(editLyricsUtils);
-        bb.BindExistingInstance(editLyricsUtils);
+        LyricsEditor lyricsEditor = new();
+        injector.Inject(lyricsEditor);
+        bb.BindExistingInstance(lyricsEditor);
         
         // TODO: This is super ugly because constructing the dependencies here manually contradicts the idea of using dependency injection.
-        injector.AddBindingForInstance(editLyricsUtils);
-        HyphenateNotesUtils hyphenateNotesUtils = new();
-        injector.Inject(hyphenateNotesUtils);
-        bb.BindExistingInstance(hyphenateNotesUtils);
+        injector.AddBindingForInstance(lyricsEditor);
+        NoteHyphenator noteHyphenator = new();
+        injector.Inject(noteHyphenator);
+        bb.BindExistingInstance(noteHyphenator);
     }
 }

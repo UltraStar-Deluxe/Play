@@ -14,7 +14,7 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
     private SpeechRecognizerProvider speechRecognizerProvider;
     
     [Inject]
-    private HyphenateNotesUtils hyphenateNotesUtils;
+    private NoteHyphenator noteHyphenator;
 
     protected override object GetInstance()
     {
@@ -78,7 +78,7 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         // Split syllables if hyphenation is enabled
         if (config.Hyphenator != null)
         {
-            Dictionary<Note,List<Note>> noteToNotesAfterSplit = hyphenateNotesUtils.HypenateNotes(config.SongMeta, createdNotes, config.Hyphenator);
+            Dictionary<Note,List<Note>> noteToNotesAfterSplit = noteHyphenator.HypenateNotes(config.SongMeta, createdNotes, config.Hyphenator);
             noteToNotesAfterSplit.ForEach(entry =>
             {
                 Note note = entry.Key;
