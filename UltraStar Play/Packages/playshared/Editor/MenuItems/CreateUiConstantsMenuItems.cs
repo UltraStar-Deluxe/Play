@@ -202,12 +202,12 @@ public static class CreateUiConstantsMenuItems
         string newline = Environment.NewLine;
 
         StringBuilder sb = new();
-        sb.AppendLine("// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.");
-        sb.AppendLine("public static partial class " + className + newline + "{");
-        sb.AppendLine(indentation + "public static class " + subClassName + newline + indentation + "{");
+        sb.AppendLineFeed("// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.");
+        sb.AppendLineFeed("public static partial class " + className + newline + "{");
+        sb.AppendLineFeed(indentation + "public static class " + subClassName + newline + indentation + "{");
         AppendFieldDeclarations(sb, constantValues, fieldNames, indentation + indentation, useConst);
-        sb.AppendLine(indentation + "}");
-        sb.AppendLine("}");
+        sb.AppendLineFeed(indentation + "}");
+        sb.AppendLineFeed("}");
         return sb.ToString();
     }
 
@@ -231,11 +231,11 @@ public static class CreateUiConstantsMenuItems
             sb.Append(indentation);
             if (useConst)
             {
-                sb.AppendLine($"public const string {fieldName} = \"{value}\";");
+                sb.AppendLineFeed($"public const string {fieldName} = \"{value}\";");
             }
             else
             {
-                sb.AppendLine($"public static readonly string {fieldName} = \"{value}\";");
+                sb.AppendLineFeed($"public static readonly string {fieldName} = \"{value}\";");
             }
         }
     }

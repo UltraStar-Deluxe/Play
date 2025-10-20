@@ -84,7 +84,7 @@ namespace ShellCommandRunner
                 }
 
                 logAction(e.Data);
-                outputBuilder.AppendLine(e.Data);
+                outputBuilder.AppendLineFeed(e.Data);
             };
 
             process.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e)
@@ -95,7 +95,7 @@ namespace ShellCommandRunner
                 }
 
                 logAction(e.Data);
-                outputBuilder.AppendLine(e.Data);
+                outputBuilder.AppendLineFeed(e.Data);
             };
             return process;
         }

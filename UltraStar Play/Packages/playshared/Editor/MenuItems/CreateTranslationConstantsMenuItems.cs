@@ -65,12 +65,12 @@ public static class CreateTranslationConstantsMenuItems
         string newline = Environment.NewLine;
 
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine("// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.");
-        sb.AppendLine("public static partial class " + className + newline + "{");
-        sb.AppendLine(indentation + "public static class " + subClassName + newline + indentation + "{");
+        sb.AppendLineFeed("// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.");
+        sb.AppendLineFeed("public static partial class " + className + newline + "{");
+        sb.AppendLineFeed(indentation + "public static class " + subClassName + newline + indentation + "{");
         AppendFieldDeclarations(sb, constantValues, fieldNames, indentation + indentation);
-        sb.AppendLine(indentation + "}");
-        sb.AppendLine("}");
+        sb.AppendLineFeed(indentation + "}");
+        sb.AppendLineFeed("}");
         return sb.ToString();
     }
 
@@ -92,7 +92,7 @@ public static class CreateTranslationConstantsMenuItems
             }
 
             sb.Append(indentation);
-            sb.AppendLine($"public static readonly string {fieldName} = \"{value}\";");
+            sb.AppendLineFeed($"public static readonly string {fieldName} = \"{value}\";");
         }
     }
 
