@@ -5,7 +5,7 @@ using UniInject;
 public class NoteHyphenator : INeedInjection
 {
     [Inject]
-    private LyricsEditor lyricsEditor;
+    private EditModeLyricsSplitter editModeLyricsSplitter;
     
     public Dictionary<Note, List<Note>> HypenateNotes(SongMeta songMeta, List<Note> createdNotes, Hyphenator hyphenator)
     {
@@ -19,7 +19,7 @@ public class NoteHyphenator : INeedInjection
                 continue;
             }
 
-            lyricsEditor.TryApplyEditModeText(songMeta, note, newText, out List<Note> notesAfterSplit);
+            editModeLyricsSplitter.TryApplyEditModeText(songMeta, note, newText, out List<Note> notesAfterSplit);
             noteToNotesAfterSplit[note] = notesAfterSplit;
         }
 

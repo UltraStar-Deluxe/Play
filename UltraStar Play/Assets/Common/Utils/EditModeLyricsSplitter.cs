@@ -4,15 +4,17 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UniInject;
 
-public class LyricsEditor
+public class EditModeLyricsSplitter
 {
     [Inject]
     private Settings settings;
 
     private char WordSeparator => settings.SongEditorSettings.WordSeparator;
     private char SyllableSeparator => settings.SongEditorSettings.SyllableSeparator;
-    private char SentenceSeparator => settings.SongEditorSettings.SentenceSeparator;
-    
+
+    /**
+     * Split note on space and semicolon characters.
+     */
     public bool TryApplyEditModeText(
         SongMeta songMeta,
         Note note,

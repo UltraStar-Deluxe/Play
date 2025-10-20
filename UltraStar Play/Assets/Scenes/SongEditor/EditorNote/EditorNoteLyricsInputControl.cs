@@ -19,7 +19,7 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
     private SongEditorLayerManager layerManager;
     
     [Inject]
-    private LyricsEditor lyricsEditor;
+    private EditModeLyricsSplitter editModeLyricsSplitter;
     
     public override void OnInjectionFinished()
     {
@@ -51,7 +51,7 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
         string viewModeText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(newText);
         
         bool wasOnLayer = layerManager.TryGetEnumLayer(editorNoteControl.Note, out SongEditorEnumLayer songEditorLayer);
-        lyricsEditor.TryApplyEditModeText(songMeta, editorNoteControl.Note, newText, out List<Note> notesAfterSplit);
+        editModeLyricsSplitter.TryApplyEditModeText(songMeta, editorNoteControl.Note, newText, out List<Note> notesAfterSplit);
         if (wasOnLayer
             && !notesAfterSplit.IsNullOrEmpty())
         {
