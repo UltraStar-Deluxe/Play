@@ -393,6 +393,7 @@ public static partial class R
         public const string lyricsAreaVoice1Button = "lyricsAreaVoice1Button";
         public const string lyricsAreaVoice2Button = "lyricsAreaVoice2Button";
         public const string lyricsContainer = "lyricsContainer";
+        public const string lyricsGroup = "lyricsGroup";
         public const string lyricsLabel = "lyricsLabel";
         public const string lyricsPropertyToggle = "lyricsPropertyToggle";
         public const string main = "main";
@@ -893,6 +894,7 @@ public static partial class R
         public const string sum = "sum";
         public const string supportTheProjectButton = "supportTheProjectButton";
         public const string supportTheProjectIcon = "supportTheProjectIcon";
+        public const string syllableSeparatorTextField = "syllableSeparatorTextField";
         public const string syncLyricsAreaToggle = "syncLyricsAreaToggle";
         public const string systemAudioBackendDelayChooser = "systemAudioBackendDelayChooser";
         public const string tabGroup = "tabGroup";
@@ -1026,6 +1028,7 @@ public static partial class R
         public const string webViewGroup = "webViewGroup";
         public const string wideIcon = "wideIcon";
         public const string wipeLyricsEffectToggle = "wipeLyricsEffectToggle";
+        public const string wordSeparatorTextField = "wordSeparatorTextField";
         public const string workshopItemChooser = "workshopItemChooser";
         public const string workshopItemDescriptionTextField = "workshopItemDescriptionTextField";
         public const string workshopItemFolderTextField = "workshopItemFolderTextField";

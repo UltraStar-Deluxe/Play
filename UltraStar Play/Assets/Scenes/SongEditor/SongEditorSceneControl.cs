@@ -114,6 +114,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorSearchControl songEditorSearchControl = new();
     private readonly ImportLrcDialogControl importLrcDialogControl = new();
     private readonly SongEditorPositionHistoryNavigationControl positionHistoryNavigationControl = new();
+    private readonly EditModeLyricsConverter editModeLyricsConverter = new();
 
     [Inject]
     private SongEditorSceneData sceneData;
@@ -124,6 +125,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     public void OnInjectionFinished()
     {
+        injector.Inject(editModeLyricsConverter);
         injector.Inject(overviewAreaControl);
         injector.Inject(videoAreaControl);
         injector.Inject(songEditorVirtualPianoControl);
@@ -489,6 +491,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songEditorSceneInputControl);
         bb.BindExistingInstance(issueAnalyzerControl);
         bb.BindExistingInstance(statusBarControl);
+        bb.BindExistingInstance(editModeLyricsConverter);
         bb.BindExistingInstance(this);
         bb.Bind(nameof(issueSideBarEntryUi)).ToExistingInstance(issueSideBarEntryUi);
         bb.Bind(nameof(songPropertySideBarEntryUi)).ToExistingInstance(songPropertySideBarEntryUi);

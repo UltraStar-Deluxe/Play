@@ -3,6 +3,10 @@
 [Serializable]
 public class SongEditorSettings
 {
+    public const char DefaultSyllableSeparator = ';';
+    public const char DefaultWordSeparator = ' ';
+    public const char DefaultSentenceSeparator = '\n';
+    
     public bool AutoSave { get; set; }
 
     public int MusicVolumePercent { get; set; } = 100;
@@ -67,7 +71,7 @@ public class SongEditorSettings
     public int SpaceBetweenNotesInMillis { get; set; } = SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis;
 
     // Lyrics
-    public char SyllableSeparator { get; set; } = ';';
-    public char WordSeparator { get; set; } = ' ';
-    public char SentenceSeparator { get; set; } = '\n';
+    public char SyllableSeparator { get; set; } = DefaultSyllableSeparator;
+    public char WordSeparator { get; set; } = DefaultWordSeparator;
+    public char SentenceSeparator { get; set; } = DefaultSentenceSeparator;
 }

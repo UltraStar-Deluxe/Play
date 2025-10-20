@@ -9,11 +9,14 @@ public class EditorSentenceLyricsInputControl : EditorLyricsInputPopupControl
     [Inject]
     private EditorSentenceControl editorSentenceControl;
 
+    [Inject]
+    private EditModeLyricsConverter editModeLyricsConverter;
+
     private string lastEditModeText;
 
     protected override string GetInitialText()
     {
-        string text = LyricsUtils.GetEditModeText(editorSentenceControl.Sentence);
+        string text = editModeLyricsConverter.GetEditModeText(editorSentenceControl.Sentence);
         return ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(text);
     }
 
@@ -35,7 +38,7 @@ public class EditorSentenceLyricsInputControl : EditorLyricsInputPopupControl
     {
         // Map edit-mode text to lyrics of notes
         string visibleWhiteSpaceText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
-        LyricsUtils.MapEditModeTextToNotes(visibleWhiteSpaceText, new List<Sentence> { editorSentenceControl.Sentence });
+        editModeLyricsConverter.MapEditModeTextToNotes(visibleWhiteSpaceText, new List<Sentence> { editorSentenceControl.Sentence });
         songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }
 }

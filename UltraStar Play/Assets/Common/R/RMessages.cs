@@ -605,6 +605,9 @@ public static partial class R
         public static readonly string songEditor_options_layout_showVirtualPiano = "songEditor_options_layout_showVirtualPiano";
         public static readonly string songEditor_options_layout_showWaveForm = "songEditor_options_layout_showWaveForm";
         public static readonly string songEditor_options_layout_title = "songEditor_options_layout_title";
+        public static readonly string songEditor_options_lyrics_syllableSeparator = "songEditor_options_lyrics_syllableSeparator";
+        public static readonly string songEditor_options_lyrics_title = "songEditor_options_lyrics_title";
+        public static readonly string songEditor_options_lyrics_wordSeparator = "songEditor_options_lyrics_wordSeparator";
         public static readonly string songEditor_options_microphone = "songEditor_options_microphone";
         public static readonly string songEditor_options_microphone_title = "songEditor_options_microphone_title";
         public static readonly string songEditor_options_microphoneDelay = "songEditor_options_microphoneDelay";

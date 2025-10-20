@@ -52,6 +52,10 @@
             <ui:TextField picking-mode="Ignore" value="400" name="midiDelayTextField" label="$songEditor_options_midi_delay" style="flex-grow: 1; flex-direction: column;" />
             <ui:Button text="$songEditor_options_midi_import" display-tooltip-when-elided="true" name="importMidiFileButton" style="width: 100%;" />
         </SongEditorSideBarGroup>
+        <SongEditorSideBarGroup name="lyricsGroup" label="$songEditor_options_lyrics_title">
+            <ui:TextField label="$songEditor_options_lyrics_wordSeparator" placeholder-text="Default (space)" name="wordSeparatorTextField" style="flex-direction: column;" />
+            <ui:TextField label="$songEditor_options_lyrics_syllableSeparator" placeholder-text="Default (semicolon)" name="syllableSeparatorTextField" style="flex-direction: column;" />
+        </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="layoutGroup" label="$songEditor_options_layout_title">
             <ui:Toggle name="showRightSideBarToggle" label="$songEditor_options_layout_showRightSide" />
             <ui:Toggle name="showAudioWaveformInBackgroundToggle" label="$songEditor_options_layout_showWaveForm" />

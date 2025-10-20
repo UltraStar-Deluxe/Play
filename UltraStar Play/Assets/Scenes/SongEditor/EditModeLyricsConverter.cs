@@ -1,14 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UniInject;
 
-public static class LyricsUtils
+public class EditModeLyricsConverter : INeedInjection
 {
-    public static readonly char syllableSeparator = ';';
-    public static readonly char sentenceSeparator = '\n';
-    public static readonly char spaceCharacter = ' ';
+    [Inject]
+    private Settings settings;
 
-    public static string GetViewModeText(Voice voice)
+    private char WordSeparator => settings.SongEditorSettings.WordSeparator;
+    private char SyllableSeparator => settings.SongEditorSettings.SyllableSeparator;
+    private char SentenceSeparator => settings.SongEditorSettings.SentenceSeparator;
+
+    public string GetViewModeText(Voice voice)
     {
         StringBuilder stringBuilder = new();
         List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(voice);
@@ -19,20 +23,20 @@ public static class LyricsUtils
             {
                 stringBuilder.Append(note.Text);
             }
-            stringBuilder.Append(sentenceSeparator);
+            stringBuilder.Append(SentenceSeparator);
         }
         return stringBuilder.ToString();
     }
 
-    public static string GetEditModeText(Voice voice)
+    public string GetEditModeText(Voice voice)
     {
         List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(voice);
         return sortedSentences
             .Select(sentence => GetEditModeText(sentence))
-            .JoinWith(sentenceSeparator.ToString());
+            .JoinWith(SentenceSeparator.ToString());
     }
 
-    public static string GetEditModeText(Sentence sentence)
+    public string GetEditModeText(Sentence sentence)
     {
         StringBuilder stringBuilder = new();
         Note lastNote = null;
@@ -42,16 +46,14 @@ public static class LyricsUtils
             if (lastNote != null
                 && lastNote.Sentence == note.Sentence)
             {
-                // Add a space when the last note ended or the current note started with a space.
-                // Otherwise use the non-whitespace syllableSeparator as end-of-note.
-                if (lastNote.Text.EndsWith(spaceCharacter)
-                    || note.Text.StartsWith(spaceCharacter))
+                // Detect border of words, i.e., the last note ended or the current note starts with a space.
+                if (lastNote.Text.EndsWith(" ") || note.Text.StartsWith(" "))
                 {
-                    stringBuilder.Append(spaceCharacter);
+                    stringBuilder.Append(WordSeparator);
                 }
                 else
                 {
-                    stringBuilder.Append(syllableSeparator);
+                    stringBuilder.Append(SyllableSeparator);
                 }
             }
             stringBuilder.Append(note.Text.Trim());
@@ -65,7 +67,7 @@ public static class LyricsUtils
         return stringBuilder.ToString();
     }
 
-    public static void MapEditModeTextToNotes(string editModeText, IEnumerable<Sentence> sentences)
+    public void MapEditModeTextToNotes(string editModeText, IEnumerable<Sentence> sentences)
     {
         int sentenceIndex = 0;
         int noteIndex = 0;
@@ -113,17 +115,17 @@ public static class LyricsUtils
 
         foreach (char c in editModeText)
         {
-            if (c == LyricsUtils.sentenceSeparator)
+            if (c == SentenceSeparator)
             {
                 SelectNextSentence();
             }
-            else if (c == LyricsUtils.syllableSeparator)
+            else if (c == SyllableSeparator)
             {
                 SelectNextNote();
             }
-            else if (c == ' ')
+            else if (c == WordSeparator)
             {
-                stringBuilder.Append(c);
+                stringBuilder.Append(' ');
                 SelectNextNote();
             }
             else

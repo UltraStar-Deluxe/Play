@@ -161,6 +161,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.playbackPostEndTimeInMillisTextField)]
     private IntegerField playbackPostEndTimeInMillisTextField;
 
+    [Inject(UxmlName = R.UxmlNames.wordSeparatorTextField)]
+    private TextField wordSeparatorTextField;
+
+    [Inject(UxmlName = R.UxmlNames.syllableSeparatorTextField)]
+    private TextField syllableSeparatorTextField;
+
     [Inject]
     private SongMeta songMeta;
 
@@ -435,6 +441,23 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         {
             audioSeparationButton.SetEnabled(false);
         }
+
+        // Lyrics editing separators
+        Bind(wordSeparatorTextField,
+            () => settings.SongEditorSettings.WordSeparator == SongEditorSettings.DefaultWordSeparator
+                ? ""
+                : settings.SongEditorSettings.WordSeparator.ToString(),
+            newValue => settings.SongEditorSettings.WordSeparator = newValue.IsNullOrEmpty()
+                ? SongEditorSettings.DefaultWordSeparator
+                : newValue[0]);
+
+        Bind(syllableSeparatorTextField,
+            () => settings.SongEditorSettings.SyllableSeparator == SongEditorSettings.DefaultSyllableSeparator
+                ? ""
+                : settings.SongEditorSettings.SyllableSeparator.ToString(),
+            newValue => settings.SongEditorSettings.SyllableSeparator = newValue.IsNullOrEmpty()
+                ? SongEditorSettings.DefaultSyllableSeparator
+                : newValue[0]);
 
         // Show / hide VisualElements
         Bind(showRightSideBarToggle,
