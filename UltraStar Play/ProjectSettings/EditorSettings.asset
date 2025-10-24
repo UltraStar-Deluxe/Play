@@ -3,9 +3,9 @@
 --- !u!159 &1
 EditorSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 14
+  serializedVersion: 15
   m_SerializationMode: 2
-  m_LineEndingsForNewScripts: 0
+  m_LineEndingsForNewScripts: 1
   m_DefaultBehaviorMode: 1
   m_PrefabRegularEnvironment: {fileID: 0}
   m_PrefabUIEnvironment: {fileID: 0}
