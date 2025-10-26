@@ -32,11 +32,13 @@ Plugins/UnityStandaloneFileBrowser.meta
 ########################################
 ## Third-party assets from the Unity Asset Store
 
+# WebView by Vuplex
 Vuplex/
 Vuplex.meta
 
-OneJS/
-OneJS.meta
+# OneJs by Singtaa
+Singtaa/
+Singtaa.meta
 
 ######################################
 ## StreamingAssets

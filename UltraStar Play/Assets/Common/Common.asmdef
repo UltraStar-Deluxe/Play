@@ -26,7 +26,8 @@
         "Vuplex.WebView",
         "com.whisper.unity",
         "VLCUnity",
-        "OneJS"
+        "OneJS.Common",
+        "OneJS.CustomStyleSheets.Pre6.3"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
