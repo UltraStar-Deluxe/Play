@@ -4,14 +4,14 @@ public static class MainGameBuildTools
 {
     private static readonly string appName = "Melody Mania";
 
-    [MenuItem("Tools/Build/Windows64")]
+    [MenuItem("Build/Windows64")]
     public static void BuildWindows64()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Windows64 (dev build)")]
+    [MenuItem("Build/Windows64 (dev build)")]
     public static void BuildWindows64ForDev()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
@@ -19,7 +19,7 @@ public static class MainGameBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Windows64 - Build and upload to Steam")]
+    [MenuItem("Build/Windows64 - Build and upload to Steam")]
     public static void BuildWindows64AndSteamUpload()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
@@ -27,7 +27,7 @@ public static class MainGameBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Windows64 - Steam upload only")]
+    [MenuItem("Build/Windows64 - Steam upload only")]
     public static void SteamUploadLastWindows64Build()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
@@ -36,31 +36,31 @@ public static class MainGameBuildTools
         SteamBuildUtils.UploadBuildOutputToSteam(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Linux64")]
+    [MenuItem("Build/Linux64")]
     public static void BuildLinux64()
     {
         BuildUtils.PerformCustomBuild(CreateCustomBuildOptions(BuildTarget.StandaloneLinux64));
     }
 
-    [MenuItem("Tools/Build/macOS")]
+    [MenuItem("Build/macOS")]
     public static void BuildMacOS()
     {
         BuildUtils.PerformCustomBuild(CreateCustomBuildOptions(BuildTarget.StandaloneOSX));
     }
 
-    [MenuItem("Tools/Build/Android - Push apk to device")]
+    [MenuItem("Build/Android - Push apk to device")]
     public static void PushToAndroid()
     {
         BuildUtils.PushApkToDevice(appName);
     }
 
-    [MenuItem("Tools/Build/Android - Build apk")]
+    [MenuItem("Build/Android - Build apk")]
     public static void BuildAndroidApk()
     {
         BuildUtils.PerformCustomBuild(CreateCustomBuildOptions(BuildTarget.Android));
     }
 
-    [MenuItem("Tools/Build/Android - Build and run apk")]
+    [MenuItem("Build/Android - Build and run apk")]
     public static void BuildAndRunAndroidApk()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
@@ -68,7 +68,7 @@ public static class MainGameBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Android - Build signed apk")]
+    [MenuItem("Build/Android - Build signed apk")]
     public static void BuildSignedAndroidApk()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
@@ -76,7 +76,7 @@ public static class MainGameBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Android - Build and run signed apk")]
+    [MenuItem("Build/Android - Build and run signed apk")]
     public static void BuildAndRunSignedAndroidApk()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
@@ -85,7 +85,7 @@ public static class MainGameBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Android - Build signed app bundle")]
+    [MenuItem("Build/Android - Build signed app bundle")]
     public static void BuildSignedAndroidAppBundle()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
@@ -94,7 +94,7 @@ public static class MainGameBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Android - Build and run signed app bundle")]
+    [MenuItem("Build/Android - Build and run signed app bundle")]
     public static void BuildAndRunSignedAndroidAppBundle()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
@@ -104,7 +104,7 @@ public static class MainGameBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/iOS")]
+    [MenuItem("Build/iOS")]
     public static void BuildIOS()
     {
         BuildUtils.PerformCustomBuild(CreateCustomBuildOptions(BuildTarget.iOS));
