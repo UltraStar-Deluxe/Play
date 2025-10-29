@@ -10,6 +10,6 @@ public class CreateAllConstantsMenuItems
 
         CreateUiConstantsMenuItems.CreateConstantsForUxmlNamesAndUssClasses();
         CreateTranslationConstantsMenuItems.CreateTranslationConstants();
-        CreateInputActionConstantsMenuItems.CreateInputActionConstants();
+        CreateInputActionConstantsMenuItem.CreateInputActionConstants();
     }
 }
