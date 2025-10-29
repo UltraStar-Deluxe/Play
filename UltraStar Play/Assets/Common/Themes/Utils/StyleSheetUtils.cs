@@ -12,7 +12,7 @@ public static class StyleSheetUtils
 
     public static void BuildStyleSheet(StyleSheet styleSheet, string styleSheetContent)
     {
-        new CustomStyleSheetImporterImpl().BuildStyleSheet(styleSheet, styleSheetContent);
+        new CustomStyleSheetImporterImpl(null).BuildStyleSheet(styleSheet, styleSheetContent);
     }
 
     public static StyleSheet CreateStyleSheet(string styleSheetContent)

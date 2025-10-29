@@ -2,11 +2,14 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public abstract class FontIcon : Label
+[UxmlElement]
+public abstract partial class FontIcon : Label
 {
     private static string missingIconText = "?";
 
-    private string icon;
+    private string icon = "";
+
+    [UxmlAttribute]
     public string Icon
     {
         get
@@ -20,23 +23,8 @@ public abstract class FontIcon : Label
         }
     }
 
-    public new class UxmlTraits : VisualElement.UxmlTraits
-    {
-        // Additional XML attributes
-        private readonly UxmlStringAttributeDescription icon = new() { name = "icon", defaultValue = "" };
-
-        public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
-        {
-            base.Init(ve, bag, cc);
-            FontIcon target = ve as FontIcon;
-            target.Icon = icon.GetValueFromBag(bag, cc);
-        }
-    }
-
     protected FontIcon()
     {
-        Icon = "";
-
         // Enable parsing of escape sequences in the text to handle \uXXXX as a single character.
         parseEscapeSequences = true;
     }
