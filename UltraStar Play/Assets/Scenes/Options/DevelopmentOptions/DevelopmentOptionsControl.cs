@@ -21,9 +21,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.showFpsToggle)]
     private Toggle showFpsToggle;
 
-    [Inject(UxmlName = R.UxmlNames.maxConcurrentSongMediaConversionsChooser)]
-    private Chooser maxConcurrentSongMediaConversionsChooser;
-
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmChooser)]
     private Chooser pitchDetectionAlgorithmChooser;
 

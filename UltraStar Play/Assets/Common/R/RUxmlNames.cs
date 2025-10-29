@@ -397,7 +397,6 @@ public static partial class R
         public const string lyricsLabel = "lyricsLabel";
         public const string lyricsPropertyToggle = "lyricsPropertyToggle";
         public const string main = "main";
-        public const string maxConcurrentSongMediaConversionsChooser = "maxConcurrentSongMediaConversionsChooser";
         public const string mediaFileFormatGroup = "mediaFileFormatGroup";
         public const string messageBufferTimeTextField = "messageBufferTimeTextField";
         public const string micButton = "micButton";

@@ -48,7 +48,6 @@
                 <Chooser name="songVideoPlaybackChooser" label="Song Video Playback" class="noBackgroundInHierarchy" />
                 <Chooser name="useVlcToPlayMediaFilesChooser" label="Use VLC to Play Audio&#10;and Video Files¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="logVlcOutputToggle" label="Log VLC Output" class="noBackgroundInHierarchy" />
-                <Chooser name="maxConcurrentSongMediaConversionsChooser" label="Max Concurrent Conversions" wrap-around="true" min-value="0" max-value="100" step-value="1" class="noBackgroundInHierarchy" />
                 <ui:TextField label="VLC Options, one per line¹" name="vlcOptionsTextField" multiline="true" class="noBackgroundInHierarchy multiline" style="min-height: 128px;" />
             </AccordionItem>
             <AccordionItem name="webViewGroup" label="Embedded Browser" class="child-mb-3">
