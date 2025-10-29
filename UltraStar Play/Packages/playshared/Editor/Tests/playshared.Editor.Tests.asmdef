@@ -1,18 +1,24 @@
-﻿{
-  "name": "playshared.Editor.Tests",
-  "references": [
-    "playshared",
-    "playshared.Editor"
-  ],
-  "includePlatforms": [
-    "Editor"
-  ],
-  "excludePlatforms": [],
-  "allowUnsafeCode": false,
-  "overrideReferences": false,
-  "precompiledReferences": [],
-  "autoReferenced": false,
-  "defineConstraints": [],
-  "versionDefines": [],
-  "noEngineReferences": false
+{
+    "name": "playshared.Editor.Tests",
+    "rootNamespace": "",
+    "references": [
+        "playshared",
+        "playshared.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "ArchUnitNET.dll",
+        "ArchUnitNET.NUnit.dll",
+        "System.Collections.Immutable.dll",
+        "StronglyConnectedComponents.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
