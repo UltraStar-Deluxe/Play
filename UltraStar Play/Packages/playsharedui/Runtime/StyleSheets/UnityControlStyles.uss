@@ -1,3 +1,6 @@
+/* TODO: Make use of built-in style variables of Unity ( https://docs.unity3d.com/Documentation/Manual/UIE-uss-built-in-variable-reference.html ) */
+
+
 /**************************************************/
 /* LIST VIEW */
 /**************************************************/
@@ -47,6 +50,10 @@
     -unity-text-align: middle-left;
     margin: 0;
     overflow: hidden;
+}
+
+.unity-base-text-field > .unity-base-text-field__input--multiline {
+    min-height: var(--control-height);
 }
 
 .unity-base-text-field.multiline .unity-text-element--inner-input-field-component {
