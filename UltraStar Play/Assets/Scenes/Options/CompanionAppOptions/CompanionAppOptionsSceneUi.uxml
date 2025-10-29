@@ -7,7 +7,7 @@
                 <ui:Label text="$options_companionApp_noConnectedApps" display-tooltip-when-elided="true" name="noCompanionClientsLabel" class="largerFont noBackgroundInHierarchy" style="white-space: normal; display: flex; -unity-text-align: middle-left; -unity-font-style: bold;" />
                 <ui:Label text="$options_companionApp_noConnectedApps_hint" name="tryAddSongsLabel" class="secondaryFontColor mt-2 mb-1 noBackgroundInHierarchy" style="white-space: normal; -unity-text-align: middle-left;" />
             </ui:VisualElement>
-            <ui:VisualElement name="companionClientList" style="width: 100%; min-height: 50px; flex-grow: 1; margin-bottom: 20px;" />
+            <ui:VisualElement name="companionClientList" class="child-mb-3" style="width: 100%; min-height: 50px; flex-grow: 1; margin-bottom: 20px;" />
             <AccordionItem name="permissionsAccordionItem" label="Permissions" content-visible="false">
                 <ui:Toggle label="$options_companionApp_requirePermissions" name="requireCompanionClientPermissionsToggle" class="mb-3" />
                 <ui:Label text="Default permissions for new connections" name="defaultPermissionsTitle" class="my-3" />
