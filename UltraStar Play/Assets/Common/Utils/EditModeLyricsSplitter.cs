@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UniInject;
 
-public class EditModeLyricsSplitter
+public class EditModeLyricsSplitter : INeedInjection
 {
     [Inject]
     private Settings settings;
