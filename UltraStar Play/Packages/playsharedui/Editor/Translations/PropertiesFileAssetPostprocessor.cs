@@ -34,7 +34,7 @@ public class PropertiesFileAssetPostprocessor : AssetPostprocessor
         if (DontDestroyOnLoadManager.Instance != null
             && TranslationManager.Instance.generateConstantsOnResourceChange)
         {
-            CreateTranslationConstantsMenuItems.CreateTranslationConstants();
+            GenerateTranslationConstantsMenuItems.GenerateTranslationConstants();
         }
     }
 }

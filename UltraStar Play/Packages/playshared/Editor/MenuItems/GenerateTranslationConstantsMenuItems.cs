@@ -8,7 +8,7 @@ using ProTrans;
 using UnityEditor;
 using UnityEngine;
 
-public static class CreateTranslationConstantsMenuItems
+public static class GenerateTranslationConstantsMenuItems
 {
     private static HashSet<string> cSharpKeywords = new HashSet<string> { "public", "protected", "private",
         "static", "void", "readonly", "const",
@@ -22,7 +22,7 @@ public static class CreateTranslationConstantsMenuItems
     private static readonly string indentation = "    ";
 
     [MenuItem("Generate/C# Constants/Translation properties")]
-    public static void CreateTranslationConstants()
+    public static void GenerateTranslationConstants()
     {
         Translation.InitTranslationConfig();
 

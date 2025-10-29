@@ -12,7 +12,6 @@ public class InputActionAssetPostprocessor : AssetPostprocessor
     {
         InputManager inputManager = InputManager.Instance;
         if (inputManager == null
-            || !inputManager.generateConstantsOnResourceChange
             || inputManager.defaultInputActionAsset == null)
         {
             return;
@@ -27,11 +26,8 @@ public class InputActionAssetPostprocessor : AssetPostprocessor
             {
                 if (path.EndsWith(defaultInputActionAssetPath))
                 {
-                    if (inputManager.LogInfoNow)
-                    {
-                        Debug.Log("Creating InputAction path constants because of changed file: " + path);
-                    }
-                    CreateInputActionConstantsMenuItem.CreateInputActionConstants();
+                    Debug.Log("Generating InputAction path constants because of changed file: " + path);
+                    GenerateInputActionConstantsMenuItem.GenerateInputActionConstants();
                     return;
                 }
             }

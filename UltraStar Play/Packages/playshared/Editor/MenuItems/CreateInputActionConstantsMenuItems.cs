@@ -5,7 +5,7 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-public class CreateInputActionConstantsMenuItem
+public class GenerateInputActionConstantsMenuItem
 {
     private static HashSet<string> cSharpKeywords = new HashSet<string> { "public", "protected", "private",
         "static", "void", "readonly", "const",
@@ -19,7 +19,7 @@ public class CreateInputActionConstantsMenuItem
     private static readonly string indentation = "    ";
 
     [MenuItem("Generate/C# Constants/InputActions")]
-    public static void CreateInputActionConstants()
+    public static void GenerateInputActionConstants()
     {
         PrimeInputActions.InputManager inputManager = PrimeInputActions.InputManager.Instance;
         if (inputManager == null)
@@ -29,7 +29,7 @@ public class CreateInputActionConstantsMenuItem
         }
 
         string subClassName = "InputActions";
-        string targetPath = $"{inputManager.generatedConstantsFolder}/{className + subClassName}.cs";
+        string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
 
         List<string> inputActionPaths = PrimeInputActions.InputManager.Instance.defaultInputActionAsset.actionMaps
             .SelectMany(actionMap => actionMap.actions)
@@ -42,14 +42,11 @@ public class CreateInputActionConstantsMenuItem
             .ToList();
 
         string classCode = CreateClassCode(subClassName, inputActionPaths, fieldNames);
-        Directory.CreateDirectory(inputManager.generatedConstantsFolder);
+        Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
         File.WriteAllText(targetPath, classCode, Encoding.UTF8);
 
         AssetDatabase.ImportAsset(targetPath);
-        if (inputManager.LogInfoNow)
-        {
-            Debug.Log("Generated file " + targetPath);
-        }
+        Debug.Log("Generated file " + targetPath);
     }
 
     private static string CreateClassCode(string subClassName, List<string> constantValues, List<string> fieldNames = null)

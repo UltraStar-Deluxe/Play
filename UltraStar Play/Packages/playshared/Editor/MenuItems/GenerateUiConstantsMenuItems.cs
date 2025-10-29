@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using UnityEditor;
 
-public static class CreateUiConstantsMenuItems
+public static class GenerateUiConstantsMenuItems
 {
     private static readonly Regex ussClassDeclarationRegex = new Regex(@"\.(?<ussClassName>[^\d][\w\-]+)");
 
@@ -22,19 +22,19 @@ public static class CreateUiConstantsMenuItems
     private static readonly string indentation = "    ";
 
     [MenuItem("Generate/C# Constants/UXML names and classes")]
-    public static void CreateConstantsForUxmlNamesAndUssClasses()
+    public static void GenerateConstantsForUxmlNamesAndUssClasses()
     {
-        CreateConstantsForUxmlNames();
-        CreateConstantsForUssClasses();
+        GenerateConstantsForUxmlNames();
+        GenerateConstantsForUssClasses();
     }
 
-    public static void CreateConstantsForUxmlNames()
+    public static void GenerateConstantsForUxmlNames()
     {
         CreateConstantsForUxmlNamesInPlayShared();
-        CreateConstantsForUxmlNamesInAssets();
+        GenerateConstantsForUxmlNamesInAssets();
     }
 
-    public static void CreateConstantsForUxmlNamesInAssets()
+    public static void GenerateConstantsForUxmlNamesInAssets()
     {
         string className = "R";
         string subClassName = "UxmlNames";
@@ -75,13 +75,13 @@ public static class CreateUiConstantsMenuItems
         FileUtils.WriteAllTextIfChanged(targetPath, classCode);
     }
 
-    public static void CreateConstantsForUssClasses()
+    public static void GenerateConstantsForUssClasses()
     {
-        CreateConstantsForUssClassesInPlayShared();
-        CreateConstantsForUssClassesInAssets();
+        GenerateConstantsForUssClassesInPlayShared();
+        GenerateConstantsForUssClassesInAssets();
     }
 
-    public static void CreateConstantsForUssClassesInAssets()
+    public static void GenerateConstantsForUssClassesInAssets()
     {
         string className = "R";
         string subClassName = "UssClasses";
@@ -102,7 +102,7 @@ public static class CreateUiConstantsMenuItems
         FileUtils.WriteAllTextIfChanged(targetPath, classCode);
     }
 
-    public static void CreateConstantsForUssClassesInPlayShared()
+    public static void GenerateConstantsForUssClassesInPlayShared()
     {
         string className = "R_PlayShared";
         string subClassName = "UssClasses";

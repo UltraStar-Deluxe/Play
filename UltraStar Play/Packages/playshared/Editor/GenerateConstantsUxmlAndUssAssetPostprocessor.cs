@@ -7,9 +7,9 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class CreateConstantsUxmlAndUssAssetPostprocessor : AssetPostprocessor
+public class GenerateConstantsUxmlAndUssAssetPostprocessor : AssetPostprocessor
 {
-    private static readonly bool createConstantsOnFileChange = false;
+    private static readonly bool generateConstantsOnFileChange = false;
 
     private static void OnPostprocessAllAssets(
         string[] importedAssets,
@@ -17,7 +17,7 @@ public class CreateConstantsUxmlAndUssAssetPostprocessor : AssetPostprocessor
         string[] movedAssets,
         string[] movedFromAssetPaths)
     {
-        if (!createConstantsOnFileChange)
+        if (!generateConstantsOnFileChange)
         {
             return;
         }
@@ -46,8 +46,8 @@ public class CreateConstantsUxmlAndUssAssetPostprocessor : AssetPostprocessor
                 .ToList();
             string changedFileNamesCsv = changedFiles.Select(path => Path.GetFileName(path)).JoinWith(", ");
             Debug.Log($"Creating UXML and USS constants because of changed files: {changedFileNamesCsv}");
-            CreateUiConstantsMenuItems.CreateConstantsForUxmlNames();
-            CreateUiConstantsMenuItems.CreateConstantsForUssClasses();
+            GenerateUiConstantsMenuItems.GenerateConstantsForUxmlNames();
+            GenerateUiConstantsMenuItems.GenerateConstantsForUssClasses();
         }
     }
 }
