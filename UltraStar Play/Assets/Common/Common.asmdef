@@ -44,7 +44,8 @@
         "Newtonsoft.Json.dll",
         "Serilog.dll",
         "Serilog.Sinks.File.dll",
-        "System.Text.Encoding.CodePages.dll"
+        "System.Text.Encoding.CodePages.dll",
+        "Utf8Json.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

@@ -105,6 +105,7 @@ class Build : NukeBuild
                 "System.Diagnostics.DiagnosticSource.dll", // transitive dependency of Serilog
                 "System.Runtime.CompilerServices.Unsafe.dll", // transitive dependency of Serilog
                 "System.Threading.Channels.dll", // transitive dependency of Serilog
+                "Utf8Json.dll",
                 "YamlDotNet.dll");
 
             // Move libraries for main game

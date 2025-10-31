@@ -7,7 +7,8 @@ public static class CompanionAppMessageUtils
     {
         try
         {
-            HasMessageType hasMessageType = JsonConverter.FromJson<HasMessageType>(json);
+            // Use Utf8Json for better performance. There can be hundreds of messages per second such that Newtonsoft.Json is too slow in this case.
+            HasMessageType hasMessageType = Utf8Json.JsonSerializer.Deserialize<HasMessageType>(json);
             if (Enum.TryParse(hasMessageType.MessageType, out messageType))
             {
                 // OK. MessageType is valid.
@@ -27,7 +28,8 @@ public static class CompanionAppMessageUtils
         }
     }
 
-    private class HasMessageType
+    // Class must be public, otherwise Utf8Json cannot deserialize an instance of it.
+    public class HasMessageType
     {
         public string MessageType { get; set; }
     }
