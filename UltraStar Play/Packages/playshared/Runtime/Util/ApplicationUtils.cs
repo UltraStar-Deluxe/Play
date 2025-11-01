@@ -35,7 +35,6 @@ public static class ApplicationUtils
             {
                 return;
             }
-            Debug.Log($"use vlc to play media files: {value}");
             useVlcToPlayMediaFiles = value;
             supportedAudioFiles = GetSupportedAudioFiles(useVlcToPlayMediaFiles);
             supportedVideoFiles = GetSupportedVideoFiles(useVlcToPlayMediaFiles);

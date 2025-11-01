@@ -36,8 +36,6 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private OnlineMultiplayerManager onlineMultiplayerManager;
 
-    public bool logSceneChangeDuration;
-
     public EScene CurrentScene => sceneRecipeManager.GetCurrentScene();
 
     protected override object GetInstance()
@@ -56,10 +54,6 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
         SceneChangedEventStream.Subscribe(_ =>
         {
             stopwatch.Stop();
-            if (logSceneChangeDuration)
-            {
-                Debug.Log($"Changing scenes took {stopwatch.ElapsedMilliseconds} ms (including animation if fade in/out transition is used)");
-            }
         }).AddTo(gameObject);
 
         // Cannot register this in OnEnable because injection may not have finished yet in OnEnable.
