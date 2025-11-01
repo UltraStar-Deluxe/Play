@@ -29,7 +29,8 @@
         "Facepunch.Steamworks.Win64.dll",
         "LiteNetLib.dll",
         "ICSharpCode.SharpZipLib.dll",
-        "System.Linq.Dynamic.Core.dll"
+        "System.Linq.Dynamic.Core.dll",
+        "LibVLCSharp.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LibVLCSharp;
 using PrimeInputActions;
 using UniInject;
 using UniRx;
@@ -134,6 +135,8 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
         Debug.Log("Supported file extensions by vlc: " + ApplicationUtils.vlcSupportedFileExtensions.JoinWith(", "));
 
+        PreloadLibVlc();
+
         waitStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
 
@@ -194,5 +197,22 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         result.Add(Application.persistentDataPath + "/Songs");
 #endif
         return result;
+    }
+
+    /**
+     * Preload libVLC to avoid lag in the game.
+     */
+    private void PreloadLibVlc()
+    {
+        try
+        {
+            MediaPlayer mediaPlayer = VlcManager.Instance.CreateMediaPlayer();
+            Debug.Log($"Preloaded libVLC instance, mediaPlayer: {mediaPlayer}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to preload libVLC instance: {e.Message}");
+            Debug.LogException(e);
+        }
     }
 }
