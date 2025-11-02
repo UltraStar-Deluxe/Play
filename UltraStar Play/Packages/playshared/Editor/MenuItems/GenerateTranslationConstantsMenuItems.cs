@@ -28,7 +28,7 @@ public static class GenerateTranslationConstantsMenuItems
 
         string generatedConstantsFolder = "Assets/Common/R";
         string subClassName = "Messages";
-        string targetPath = new FileInfo($"{generatedConstantsFolder}/{className}{subClassName}.cs").FullName;
+        string absoluteTargetPath = new FileInfo($"{generatedConstantsFolder}/{className}{subClassName}.cs").FullName;
 
         List<string> translationKeys = GetTranslationKeys();
         if (translationKeys.IsNullOrEmpty())
@@ -40,9 +40,9 @@ public static class GenerateTranslationConstantsMenuItems
         translationKeys.Sort();
         string classCode = CreateClassCode(subClassName, translationKeys);
         Directory.CreateDirectory(generatedConstantsFolder);
-        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
-        AssetDatabase.ImportAsset(targetPath);
-        Debug.Log("Generated file " + targetPath);
+        File.WriteAllText(absoluteTargetPath, classCode, Encoding.UTF8);
+        AssetDatabase.ImportAsset(Path.GetRelativePath(Application.dataPath, absoluteTargetPath));
+        Debug.Log("Generated file " + absoluteTargetPath);
     }
 
     private static List<string> GetTranslationKeys()
