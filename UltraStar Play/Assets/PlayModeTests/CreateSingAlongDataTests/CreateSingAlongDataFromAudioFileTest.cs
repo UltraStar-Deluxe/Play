@@ -13,9 +13,13 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
 {
     private static readonly string testFolderPath = Application.dataPath + "/PlayModeTests/CreateSingAlongDataTests";
     private static string OutputFolderPath => $"{Application.temporaryCachePath}/{nameof(CreateSingAlongDataFromAudioFileTest)}/Output";
-    private static readonly string audioFileName = $"HoliznaCC0 - To Be an Animal - Excerpt.ogg";
-    private static string AudioFilePath => $"{testFolderPath}/{audioFileName}";
-    private static string TxtFilePathToBeCreated => $"{OutputFolderPath}/{Path.GetFileNameWithoutExtension(audioFileName)}";
+
+    private static readonly List<TestCaseData> testCases = new List<TestCaseData>()
+    {
+        new TestCaseData("HoliznaCC0 - To Be an Animal - Excerpt.ogg").Returns(null),
+        // TODO: fix handling of special characters
+        // new TestCaseData("HoliznaCC0 - To Be an Animal - Excerpt - 测试文件_Тест_αβγ_🌍_äöü_ñ_café.ogg").Returns(null),
+    };
 
     [SetUp]
     public void RemoveOldOutputFiles()
@@ -24,22 +28,25 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
     }
 
     [UnityTest]
-    public IEnumerator ShouldCreateSingAlongData() => ShouldCreateSingAlongDataAsync();
-    private async Awaitable ShouldCreateSingAlongDataAsync()
+    [TestCaseSource(nameof(testCases))]
+    public IEnumerator ShouldCreateSingAlongData(string audioFileName) => ShouldCreateSingAlongDataAsync(audioFileName);
+    private async Awaitable ShouldCreateSingAlongDataAsync(string audioFileName)
     {
         LogAssertUtils.IgnoreFailingMessages();
 
-        Dictionary<EVoiceId,string> voiceIdToDisplayName = new();
+        string audioFilePath = $"{testFolderPath}/{audioFileName}";
+        string txtFilePathToBeCreated = $"{OutputFolderPath}/{Path.GetFileNameWithoutExtension(audioFileName)}";
 
+        Dictionary<EVoiceId,string> voiceIdToDisplayName = new();
         SongMeta songMeta = new UltraStarSongMeta(
             "HoliznaCC0",
             "To Be an Animal",
             300,
-            AudioFilePath,
+            audioFilePath,
             voiceIdToDisplayName);
-        songMeta.SetFileInfo(TxtFilePathToBeCreated);
+        songMeta.SetFileInfo(txtFilePathToBeCreated);
 
-        Debug.Log($"Creating sing-along data for '{TxtFilePathToBeCreated}'");
+        Debug.Log($"Creating sing-along data for '{txtFilePathToBeCreated}'");
 
         CreateSingAlongSongControl createSingAlongSongControl = new();
         Injector injector = UltraStarPlaySceneInjectionManager.Instance.SceneInjector;
@@ -77,7 +84,7 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
         Assert.IsTrue(pitchOfNotes.Count > 2, "Not enough different pitch values after creating sing-along data");
 
         // No txt file should have been created
-        Assert.IsTrue(!FileUtils.Exists(TxtFilePathToBeCreated));
+        Assert.IsTrue(!FileUtils.Exists(txtFilePathToBeCreated));
 
         // Wait until sing-along data has been created
         JobManager jobManager = JobManager.Instance;
