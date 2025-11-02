@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using ShellCommandRunner;
+using UnityEngine;
 
 namespace SpleeterRunner
 {
@@ -31,8 +32,51 @@ namespace SpleeterRunner
             string args = string.Join(' ', parameterStringList);
             string fullCommand = $"{spleeterExecutable} {args}";
             ShellCommandRunner.ShellCommandRunner shellCommandRunner = new(logAction, null);
-            ShellCommandResult result = await shellCommandRunner.RunAsync(fullCommand, cancellationToken);
-            return ParseSpleeterProcessOutput(result.ExitCode, result.Output);
+            ShellCommandResult shellResult = await shellCommandRunner.RunAsync(fullCommand, cancellationToken);
+            SpleeterResult parsedResult = ParseSpleeterProcessOutput(shellResult.ExitCode, shellResult.Output);
+            
+            // Parsing output paths is unreliable when there are non-ascii characters. Thus, construct written files from given parameters.
+            // All this is super ugly and should be replaced with Spleeter running on Unity's AI runtime directly.
+            if (parsedResult.ExitCode != 0)
+            {
+                return parsedResult;
+            }
+
+            return new SpleeterResult()
+            {
+                ExitCode = parsedResult.ExitCode,
+                Output = parsedResult.Output,
+                Errors = parsedResult.Errors,
+                WrittenFiles = GetWrittenFiles(spleeterParameters, parsedResult),
+            };
+        }
+
+        private List<string> GetWrittenFiles(SpleeterParameters spleeterParameters, SpleeterResult parsedResult)
+        {
+            if (parsedResult.WrittenFiles.IsNullOrEmpty()
+                || parsedResult.WrittenFiles.AllMatch(File.Exists))
+            {
+                return parsedResult.WrittenFiles;
+            }
+
+            Debug.Log("Constructing written files of spleeter command from given input parameters as fallback. The parsed written files do not exist, possibly because of encoding issues." +
+                      $" Parsed written files: {parsedResult.WrittenFiles.JoinWith(",")}");
+
+            // The variable name is confusing because OutputFolder can be a file path.
+            string outputFolder = Directory.Exists(spleeterParameters.OutputFolder)
+                    ? spleeterParameters.OutputFolder
+                    : Path.GetDirectoryName(spleeterParameters.OutputFolder);
+
+            string audioFileNameWithoutExtension = Path.GetFileNameWithoutExtension(spleeterParameters.InputFile);
+            string vocalsAudioPath = $"{outputFolder}/{audioFileNameWithoutExtension}.vocals.ogg";
+            string instrumentalAudioPath = $"{outputFolder}/{audioFileNameWithoutExtension}.accompaniment.ogg";
+
+            if (!File.Exists(vocalsAudioPath) || !File.Exists(instrumentalAudioPath))
+            {
+                return new List<string>();
+            }
+            
+            return new List<string> { vocalsAudioPath, instrumentalAudioPath, };
         }
 
         private static SpleeterResult ParseSpleeterProcessOutput(int exitCode, string processOutput)

@@ -17,8 +17,7 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
     private static readonly List<TestCaseData> testCases = new List<TestCaseData>()
     {
         new TestCaseData("HoliznaCC0 - To Be an Animal - Excerpt.ogg").Returns(null),
-        // TODO: fix handling of special characters
-        // new TestCaseData("HoliznaCC0 - To Be an Animal - Excerpt - 测试文件_Тест_αβγ_🌍_äöü_ñ_café.ogg").Returns(null),
+        new TestCaseData("HoliznaCC0 - To Be an Animal - Excerpt - 测试文件_Тест_αβγ_🌍_äöü_ñ_café.ogg").Returns(null),
     };
 
     [SetUp]
