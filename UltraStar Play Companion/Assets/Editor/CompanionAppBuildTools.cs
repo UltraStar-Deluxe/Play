@@ -4,13 +4,13 @@ public static class CompanionAppBuildTools
 {
     private static readonly string appName = "Melody Mania Companion";
 
-    [MenuItem("Tools/Build/Android - Build apk")]
+    [MenuItem("Build/Android - Build apk")]
     public static void BuildAndroidApk()
     {
         BuildUtils.PerformCustomBuild(CreateCustomBuildOptions(BuildTarget.Android));
     }
 
-    [MenuItem("Tools/Build/Android - Build and run apk")]
+    [MenuItem("Build/Android - Build and run apk")]
     public static void BuildAndRunAndroidApk()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
@@ -18,7 +18,7 @@ public static class CompanionAppBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Android - Build signed app bundle (aab)")]
+    [MenuItem("Build/Android - Build signed app bundle (aab)")]
     public static void BuildSignedAndroidAppBundle()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
@@ -27,7 +27,7 @@ public static class CompanionAppBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Android - Build and run signed app bundle (aab)")]
+    [MenuItem("Build/Android - Build and run signed app bundle (aab)")]
     public static void BuildAndRunSignedAndroidAppBundle()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
@@ -37,13 +37,13 @@ public static class CompanionAppBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Android - Push apk to device")]
+    [MenuItem("Build/Android - Push apk to device")]
     public static void PushToAndroid()
     {
         BuildUtils.PushApkToDevice(appName);
     }
 
-    [MenuItem("Tools/Build/iOS")]
+    [MenuItem("Build/iOS")]
     public static void BuildIOS()
     {
         BuildUtils.PerformCustomBuild(CreateCustomBuildOptions(BuildTarget.iOS));
