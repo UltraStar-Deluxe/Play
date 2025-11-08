@@ -32,6 +32,9 @@ Shader "UltraStar Play/Background Shader"
         [Header(Animation)]
         [Space]
         _TransitionTime ("Transition Time", Range(0,1)) = 0
+        
+        // _MainTex is only specified to fix an error from Unity at runtime. Seems like Unity expects field for something.
+        [NoScaleOffset][HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
     }
     SubShader
     {
