@@ -12,6 +12,7 @@
     "com.unity.ide.visualstudio": "2.0.25",
     "com.unity.inputsystem": "1.14.2",
     "com.unity.mobile.android-logcat": "1.4.6",
+    "com.unity.nuget.mono-cecil": "1.10.2",
     "com.unity.nuget.newtonsoft-json": "3.2.2",
     "com.unity.test-framework": "1.6.0",
     "com.unity.toolchain.win-x86_64-linux-x86_64": "2.0.11",
