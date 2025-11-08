@@ -102,7 +102,7 @@ public class Settings : ISettings
     public ESongBackgroundScaleMode SongBackgroundScaleMode { get; set; } = ESongBackgroundScaleMode.FitOutside;
 
     // Sing scene settings
-    public ENoteDisplayMode NoteDisplayMode { get; set; } = ENoteDisplayMode.SentenceBySentence;
+    public ENoteDisplayMode NoteDisplayMode { get; set; } = ENoteDisplayMode.ScrollingNoteStream;
     public int NoteDisplayLineCount { get; set; } = 0; // 0 for 'auto'
     public EStaticLyricsDisplayMode StaticLyricsDisplayMode { get; set; } = EStaticLyricsDisplayMode.Bottom;
     public bool WipeLyrics { get; set; } = true;
