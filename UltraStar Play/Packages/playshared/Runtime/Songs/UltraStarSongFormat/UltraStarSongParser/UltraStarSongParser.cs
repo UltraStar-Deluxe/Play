@@ -444,17 +444,30 @@ public static class UltraStarSongParser
             case "YEAR":
                 songMeta.Year = (uint)ParseNumber(key, value);
                 break;
-            case "AUDIOAUTHOR":
-            case "AUDIOLICENSE":
-            case "AUDIOSOURCE":
-            case "BACKGROUNDAUTHOR":
-            case "BACKGROUNDLICENSE":
-            case "BACKGROUNDSOURCE":
+            case "ALBUM": // deprecated field
+            case "AUDIOAUTHOR": // deprecated field
+            case "AUDIOLICENSE": // deprecated field
+            case "AUDIOSOURCE": // deprecated field
+            case "AUTHOR": // deprecated field
+            case "BACKGROUNDAUTHOR": // deprecated field
+            case "BACKGROUNDLICENSE": // deprecated field
+            case "BACKGROUNDSOURCE": // deprecated field
+            case "CALCMEDLEY":
+            case "COMMENT":
             case "CREATOR":
+            case "DUETSINGERP1": // deprecated field
+            case "DUETSINGERP2": // deprecated field
             case "ENCODING":
-            case "FIXER":
+            case "FIXER": // deprecated field
+            case "LENGTH": // deprecated field
+            case "NOTESGAP": // deprecated field
             case "P1":
             case "P2":
+            case "PROVIDEDBY":
+            case "RELATIVE": // deprecated field
+            case "RESOLUTION": // deprecated field
+            case "SOURCE": // deprecated field
+            case "YOUTUBE": // deprecated field
                 // Known additional header entry
                 songMeta.SetAdditionalHeaderEntry(key, value);
                 break;
