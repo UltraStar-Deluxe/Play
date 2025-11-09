@@ -58,6 +58,24 @@ class Build : NukeBuild
         {
             BuildMainGame("BuildMacOS");
         });
+    
+    Target BuildMainGameAndroidApk => _ => _
+        .Executes(() =>
+        {
+            BuildMainGame("BuildAndroidApk");
+        });
+    
+    Target BuildAndRunMainGameAndroidApk => _ => _
+        .Executes(() =>
+        {
+            BuildMainGame("BuildAndRunAndroidApk");
+        });
+    
+    Target BuildMainGameSignedAndroidAppBundle => _ => _
+        .Executes(() =>
+        {
+            BuildMainGame("BuildSignedAndroidAppBundle");
+        });
 
     Target BuildCompanionAppAndroidApk => _ => _
         .Executes(() =>
