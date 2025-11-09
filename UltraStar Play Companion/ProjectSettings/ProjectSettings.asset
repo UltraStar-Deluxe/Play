@@ -183,7 +183,7 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 29004210
+  AndroidBundleVersionCode: 29376806
   AndroidMinSdkVersion: 23
   AndroidTargetSdkVersion: 35
   AndroidPreferredInstallLocation: 1
@@ -277,7 +277,7 @@ PlayerSettings:
   AndroidTargetArchitectures: 3
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: F:/Dev/Keys/MelodyMania.keystore
+  AndroidKeystoreName: C:/Dev/Keys/MelodyMania.keystore
   AndroidKeyaliasName: melodymania-upload-key
   AndroidEnableArmv9SecurityFeatures: 0
   AndroidEnableArm64MTE: 0
