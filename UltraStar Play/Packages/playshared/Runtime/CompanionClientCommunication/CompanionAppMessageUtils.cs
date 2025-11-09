@@ -7,8 +7,13 @@ public static class CompanionAppMessageUtils
     {
         try
         {
+#if UNITY_STANDALONE
             // Use Utf8Json for better performance. There can be hundreds of messages per second such that Newtonsoft.Json is too slow in this case.
+            // TODO: Utf8Json does not work on Android with IL2CPP backend work some reason. Consider System.Text.Json as alternative.
             HasMessageType hasMessageType = Utf8Json.JsonSerializer.Deserialize<HasMessageType>(json);
+#else
+            HasMessageType hasMessageType = JsonConverter.FromJson<HasMessageType>(json);
+#endif
             if (Enum.TryParse(hasMessageType.MessageType, out messageType))
             {
                 // OK. MessageType is valid.
