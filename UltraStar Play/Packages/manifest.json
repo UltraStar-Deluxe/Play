@@ -11,6 +11,7 @@
     "com.community.netcode.transport.facepunch": "https://github.com/achimmihca/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.facepunch#7e6bee030f3f9fd32960f8d611aa5ec45bac7b8b",
     "com.darrentsung.dtcompiletimetracker": "https://github.com/DarrenTsung/DTCompileTimeTracker.git#276095b3b212d7c33106b53d71b93b5a72d1e1d3",
     "com.singularitygroup.hotreload": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.5",
+    "com.unity.build-report-inspector": "0.3.0-preview",
     "com.unity.ide.rider": "3.0.38",
     "com.unity.ide.visualstudio": "2.0.25",
     "com.unity.inputsystem": "1.14.2",
