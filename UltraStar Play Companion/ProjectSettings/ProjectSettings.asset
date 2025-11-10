@@ -170,9 +170,9 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Android: com.melodymania.MelodyManiaCompanion
-    Standalone: com.melodymania.MelodyManiaCompanion
-    iPhone: com.melodymania.MelodyManiaCompanion
+    Android: com.ultrastar.UltraStarPlayCompanion
+    Standalone: com.ultrastar.UltraStarPlayCompanion
+    iPhone: com.ultrastar.UltraStarPlayCompanion
   buildNumber:
     Bratwurst: 0
     Standalone: 0
