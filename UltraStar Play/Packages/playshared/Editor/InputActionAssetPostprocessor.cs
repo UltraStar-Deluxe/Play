@@ -10,7 +10,7 @@ public class InputActionAssetPostprocessor : AssetPostprocessor
         string[] movedAssets,
         string[] movedFromAssetPaths)
     {
-        InputManager inputManager = InputManager.Instance;
+        InputManager inputManager = GameObjectUtils.FindObjectOfType<InputManager>(false);
         if (inputManager == null
             || inputManager.defaultInputActionAsset == null)
         {
