@@ -55,8 +55,8 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
         LabeledChooserControl<IPlaylist> playlistChooserControl = new(songSelectionPlaylistChooser, playlists,
             newValue => Translation.Of(playlistManager.GetPlaylistName(newValue)));
         playlistChooserControl.Bind(
-            () => partyModeSettings.SongSelectionSettings.SongPoolPlaylist,
-            newValue => partyModeSettings.SongSelectionSettings.SongPoolPlaylist = newValue);
+            () => playlistManager.GetPlaylistByName(partyModeSettings.SongSelectionSettings.SongPoolPlaylistName, UltraStarAllSongsPlaylist.Instance),
+            newValue => partyModeSettings.SongSelectionSettings.SongPoolPlaylistName = newValue.Name);
 
         // Joker count
         LabeledChooserControl<int> jokerCountChooserControl =
