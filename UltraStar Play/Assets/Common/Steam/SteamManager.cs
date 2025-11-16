@@ -13,6 +13,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
     public static SteamManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SteamManager>();
 
     public bool IsConnectedToSteam { get; private set; }
+    public Exception SteamConnectionError { get; private set; }
     public SteamId PlayerSteamId { get; private set; }
     public string PlayerName { get; private set; } = "Player";
 
@@ -28,6 +29,8 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
     private readonly Subject<VoidEvent> disconnectedFromSteamEventStream = new();
     public IObservable<VoidEvent> DisconnectedFromSteamEventStream => disconnectedFromSteamEventStream;
 
+    public bool HasConnectionError => SteamConnectionError != null;
+    
     protected override object GetInstance()
     {
         return Instance;
@@ -76,6 +79,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         catch (Exception e)
         {
             IsConnectedToSteam = false;
+            SteamConnectionError = e;
             if (NetworkManager.Singleton == null
                 || NetworkManager.Singleton.LogLevel <= LogLevel.Error)
             {
@@ -84,7 +88,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             }
         }
     }
-
+    
     protected override void OnDestroySingleton()
     {
         Debug.Log("Shutting down SteamClient...");

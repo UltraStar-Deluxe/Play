@@ -57,7 +57,8 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     private Button hiddenContinueButton;
 
     private bool IsAllPreloadingFinished => preloadActions.IsNullOrEmpty() && IsSteamWorkshopItemsDownloadFinished;
-    private bool IsSteamWorkshopItemsDownloadFinished => steamWorkshopManager.DownloadState is SteamWorkshopManager.EDownloadState.Finished;
+    private bool IsSteamWorkshopItemsDownloadFinished => steamManager.HasConnectionError
+                                                         || steamWorkshopManager.DownloadState is SteamWorkshopManager.EDownloadState.Finished;
 
     private long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
 
