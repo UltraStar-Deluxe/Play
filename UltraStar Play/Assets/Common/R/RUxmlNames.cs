@@ -363,6 +363,7 @@ public static partial class R
         public const string layoutGroup = "layoutGroup";
         public const string lbl_welcometo = "lbl_welcometo";
         public const string leadingPlayerIcon = "leadingPlayerIcon";
+        public const string learnMoreButton = "learnMoreButton";
         public const string leftArrow = "leftArrow";
         public const string leftButton = "leftButton";
         public const string leftHandle = "leftHandle";
@@ -375,6 +376,7 @@ public static partial class R
         public const string loadedSceneContainer = "loadedSceneContainer";
         public const string loadedSceneContent = "loadedSceneContent";
         public const string loadedSceneTitle = "loadedSceneTitle";
+        public const string loadingDetailsLabel = "loadingDetailsLabel";
         public const string loadingLabel = "loadingLabel";
         public const string lobbyInfoContainer = "lobbyInfoContainer";
         public const string lobbyInfoLabel = "lobbyInfoLabel";
@@ -1006,7 +1008,7 @@ public static partial class R
         public const string videoAreaContent = "videoAreaContent";
         public const string videoAreaLabel = "videoAreaLabel";
         public const string videoImage = "videoImage";
-        public const string viewMoreButton = "viewMoreButton";
+        public const string viewLogButton = "viewLogButton";
         public const string vinylImage = "vinylImage";
         public const string virtualPiano = "virtualPiano";
         public const string vlcOptionsTextField = "vlcOptionsTextField";

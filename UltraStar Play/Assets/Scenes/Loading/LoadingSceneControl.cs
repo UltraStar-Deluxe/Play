@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using LibVLCSharp;
 using PrimeInputActions;
 using UniInject;
@@ -14,10 +15,7 @@ using UnityEngine.UIElements;
 
 public class LoadingSceneControl : MonoBehaviour, INeedInjection
 {
-    private const long MaxWaitTimeInMillis = 1200;
-
-    [InjectedInInspector]
-    public int preloadSongCount = 10;
+    private const long MaxWaitTimeInMillis = 20000;
 
     [InjectedInInspector]
     public TextAsset localVersionTextAsset;
@@ -39,6 +37,9 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
     [Inject(UxmlName = R.UxmlNames.unexpectedErrorLabel)]
     private Label unexpectedErrorLabel;
+    
+    [Inject(UxmlName = R.UxmlNames.loadingDetailsLabel)]
+    private Label loadingDetailsLabel;
 
     [Inject(UxmlName = R.UxmlNames.unexpectedErrorContainer)]
     private VisualElement unexpectedErrorContainer;
@@ -55,13 +56,17 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
     private Button hiddenContinueButton;
 
-    private bool IsAllPreloadingFinished => IsSteamWorkshopItemsDownloadFinished;
+    private bool IsAllPreloadingFinished => preloadActions.IsNullOrEmpty() && IsSteamWorkshopItemsDownloadFinished;
     private bool IsSteamWorkshopItemsDownloadFinished => steamWorkshopManager.DownloadState is SteamWorkshopManager.EDownloadState.Finished;
 
-    private long waitStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+    private long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
 
+    private bool isInitStarted;
+    private bool isInitDone;
     private bool hasFinishedScene;
 
+    private readonly Dictionary<string, Action> preloadActions = new();
+    
     private void Start()
     {
         // Show general error message after short pause.
@@ -74,83 +79,115 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
                 ShowGeneralErrorMessage();
             }
         });
-
+        
         // Log version info
         Debug.Log($"VERSION.txt file content:\n{localVersionTextAsset.text}");
-
-        // The settings are loaded on access.
-        Settings settings = SettingsManager.Instance.Settings;
-        string jsonSettings = JsonConverter.ToJson(settings, false);
-        Debug.Log("loaded settings:" + jsonSettings);
-
-        // Init song folders if none yet
-        if (settings.SongDirs.IsNullOrEmpty())
-        {
-            settings.SongDirs = CreateInitialSongFolders();
-        }
-        
-        // Create custom player profile images folder
-        DirectoryUtils.CreateDirectory(PlayerProfileUtils.GetDefaultPlayerProfileImageFolderAbsolutePath());
 
         // The next scene should show up automatically.
         // However, in case of an Exception (e.g. song folder not found)
         // it might be useful to continue via button.
-        InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
-            .Subscribe(_ => FinishAfterDelay());
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => FinishAfterDelay());
-        InputManager.GetInputAction(R.InputActions.ui_click).PerformedAsObservable()
             .Subscribe(_ => FinishAfterDelay());
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => FinishAfterDelay());
         InputManager.GetInputAction(R.InputActions.usplay_enter).PerformedAsObservable()
             .Subscribe(_ => FinishAfterDelay());
         hiddenContinueButton.RegisterCallbackButtonTriggered(_ => FinishAfterDelay());
+        
+        // The settings are loaded on access.
+        AddPreloadAction("Settings", () =>
+        {
+            Settings settings = SettingsManager.Instance.Settings;
+            string jsonSettings = JsonConverter.ToJson(settings, false);
+            Debug.Log("loaded settings:" + jsonSettings);
+            
+            // Init song folders if none yet
+            if (settings.SongDirs.IsNullOrEmpty())
+            {
+                settings.SongDirs = CreateInitialSongFolders();
+            }
+        });
+        
+        // Create custom player profile images folder
+        AddPreloadAction("Custom player profile images folder", () =>
+        {
+            DirectoryUtils.CreateDirectory(PlayerProfileUtils.GetDefaultPlayerProfileImageFolderAbsolutePath());
+        });
 
         // Keep mobile devices from turning off the screen while the game is running.
-        Screen.sleepTimeout = (int)0f;
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        AddPreloadAction("Keep display on", () =>
+        {
+            Screen.sleepTimeout = (int)0f;
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        });
 
         // Load playlists
         Debug.Log($"Preloading playlists");
-        playlistManager.GetPlaylists(true, true);
+        AddPreloadAction("Playlists", () =>
+        {
+            playlistManager.GetPlaylists(true, true);
+        });
 
         // The SongMetas are loaded on access.
-        songMetaManager.ScanSongsIfNotDoneYet();
+        AddPreloadAction("Songs", () =>
+        {
+            songMetaManager.ScanSongsIfNotDoneYet();
+        });
 
         // Extract StreamingAssets on Android from the JAR
-        AndroidStreamingAssets.Extract();
+        AddPreloadAction("Streaming Assets", () =>
+        {
+            AndroidStreamingAssets.Extract();
+        });
 
         // Ask for microphone and webcam permissions on Android
         if (PlatformUtils.IsAndroid)
         {
-            AndroidRuntimePermissions.Permission checkAudioPermission = AndroidRuntimePermissions.CheckPermission("android.permission.RECORD_AUDIO");
-            if (checkAudioPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
+            AddPreloadAction("Android permissions", () =>
             {
-                AndroidRuntimePermissions.RequestPermission("android.permission.RECORD_AUDIO");
-            }
+                AndroidRuntimePermissions.Permission checkAudioPermission = AndroidRuntimePermissions.CheckPermission("android.permission.RECORD_AUDIO");
+                if (checkAudioPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
+                {
+                    AndroidRuntimePermissions.RequestPermission("android.permission.RECORD_AUDIO");
+                }
 
-            AndroidRuntimePermissions.Permission checkCameraPermission = AndroidRuntimePermissions.CheckPermission("android.permission.CAMERA");
-            if (checkCameraPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
-            {
-                AndroidRuntimePermissions.RequestPermission("android.permission.CAMERA");
-            }
+                AndroidRuntimePermissions.Permission checkCameraPermission =
+                    AndroidRuntimePermissions.CheckPermission("android.permission.CAMERA");
+                if (checkCameraPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
+                {
+                    AndroidRuntimePermissions.RequestPermission("android.permission.CAMERA");
+                }
+            });
         }
 
-        MidiManager.Instance.InitIfNotDoneYet();
+        AddPreloadAction("MIDI playback", () =>
+        {
+            MidiManager.Instance.InitIfNotDoneYet();
+        });
 
-        Debug.Log("Supported file extensions by vlc: " + ApplicationUtils.vlcSupportedFileExtensions.JoinWith(", "));
+        AddPreloadAction("libVLC", () =>
+        {
+            Debug.Log("Supported file extensions by vlc: " + ApplicationUtils.vlcSupportedFileExtensions.JoinWith(", "));
+            PreloadLibVlc();
+        });
 
-        PreloadLibVlc();
-
-        waitStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        AddPreloadAction("Finished", () =>
+        {
+            Debug.Log("Preloading finished.");
+        });
     }
 
     private void Update()
     {
+        // Preload data in Update, to make the scene visible. Otherwise in Start, the scene has not been rendered yet.
+        if (!preloadActions.IsNullOrEmpty())
+        {
+            ExecuteNextPreloadAction();
+        }
+        
         // Continue to next scene when preloading data has finished, or max wait time has been reached.
         if (IsAllPreloadingFinished
-            || TimeUtils.IsDurationAboveThresholdInMillis(waitStartTimeInMillis, MaxWaitTimeInMillis))
+            || TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, MaxWaitTimeInMillis))
         {
             FinishScene();
         }
@@ -221,5 +258,19 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             Debug.LogError($"Failed to preload libVLC instance: {e.Message}");
             Debug.LogException(e);
         }
+    }
+    
+    private void AddPreloadAction(string title, Action action)
+    {
+        preloadActions.Add(title, action);
+    }
+    
+    private void ExecuteNextPreloadAction()
+    {
+        (string key, Action action) = preloadActions.FirstOrDefault();
+        preloadActions.Remove(key);
+            
+        loadingDetailsLabel.text = key;
+        action();
     }
 }

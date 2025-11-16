@@ -42,6 +42,7 @@ public static partial class R
         public const string child_ml_2 = "child-ml-2";
         public const string child_mr_1 = "child-mr-1";
         public const string child_mr_2 = "child-mr-2";
+        public const string child_mr_3 = "child-mr-3";
         public const string circle = "circle";
         public const string circleButton = "circleButton";
         public const string comboBoxButton = "comboBoxButton";
