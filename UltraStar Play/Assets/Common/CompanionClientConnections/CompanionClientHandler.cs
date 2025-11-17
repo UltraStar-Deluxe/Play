@@ -69,7 +69,8 @@ public class CompanionClientHandler : ICompanionClientHandler
         switch (messageType)
         {
             case CompanionAppMessageType.BeatPitchEvents:
-                BeatPitchEventsDto beatPitchEventsDto = JsonConverter.FromJson<BeatPitchEventsDto>(json);
+                // Use UnityEngine.JsonUtility for better performance. There can be hundreds of messages per second such that Newtonsoft.Json is too slow in this case.
+                BeatPitchEventsDto beatPitchEventsDto = JsonUtility.FromJson<BeatPitchEventsDto>(json);
 
                 UpdateJitterStats(beatPitchEventsDto);
 
