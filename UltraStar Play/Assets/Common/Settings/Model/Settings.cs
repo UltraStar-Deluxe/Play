@@ -88,7 +88,7 @@ public class Settings : ISettings
     // Theme settings
     public string ThemeName { get; set; } = ThemeManager.DefaultThemeName;
     public bool EnableDynamicThemes { get; set; } = true;
-    public bool AnimatedBackground { get; set; } = false;
+    public bool AnimatedBackground { get; set; } = true;
     public int BackgroundLightIndex { get; set; } = 0;
 
     // Design / presentation settings
