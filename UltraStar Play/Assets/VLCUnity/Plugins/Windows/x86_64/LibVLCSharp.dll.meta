@@ -1,2 +1,42 @@
 fileFormatVersion: 2
 guid: 028bc65da849c654dbaf6a6e8720f997
+PluginImporter:
+  externalObjects: {}
+  serializedVersion: 3
+  iconMap: {}
+  executionOrder: {}
+  defineConstraints: []
+  isPreloaded: 0
+  isOverridable: 0
+  isExplicitlyReferenced: 0
+  validateReferences: 1
+  platformData:
+    Android:
+      enabled: 1
+      settings: {}
+    Any:
+      enabled: 0
+      settings: {}
+    Editor:
+      enabled: 1
+      settings:
+        DefaultValueInitialized: true
+    OSXUniversal:
+      enabled: 1
+      settings: {}
+    Win:
+      enabled: 1
+      settings: {}
+    Win64:
+      enabled: 1
+      settings: {}
+    WindowsStoreApps:
+      enabled: 1
+      settings:
+        CPU: AnyCPU
+    XboxOne:
+      enabled: 1
+      settings: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
