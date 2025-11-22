@@ -13,48 +13,14 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
     private MediaPlayer vlcMediaPlayer;
     public MediaPlayer VlcMediaPlayer => vlcMediaPlayer;
 
-    private long lastVlcMediaPlayerTimeInMillisWhenPlaying;
     private double lastSetVolumeFactor = 1;
-
-    private bool shouldBePlaying;
 
     private void Update()
     {
-        if (shouldBePlaying && IsPlaying)
-        {
-            lastVlcMediaPlayerTimeInMillisWhenPlaying = vlcMediaPlayer.Time;
-        }
-
-        UpdateVlcMediaPlayerPause();
-
         // Update volume when AudioListener.volume changes, which is considered as part of the property setter
-        if (shouldBePlaying
-            && IsPlaying
+        if (IsPlaying
             && Math.Abs(VlcMediaPlayerTargetVolumePercent - vlcMediaPlayer.Volume) > 1)
         {
-            VolumeFactor = lastSetVolumeFactor;
-        }
-    }
-
-    private void UpdateVlcMediaPlayerPause()
-    {
-        // TODO: Workaround for unreliable VLC MediaPlayer pause state ( https://code.videolan.org/videolan/vlc/-/issues/28353 )
-        if (!IsFullyLoaded)
-        {
-            return;
-        }
-
-        if (!shouldBePlaying && vlcMediaPlayer != null && vlcMediaPlayer.IsPlaying)
-        {
-            Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing. Set VLC MediaPlayer to pause again.");
-            vlcMediaPlayer.SetPause(true);
-            vlcMediaPlayer.SetVolume(0);
-            PositionInMillis = lastVlcMediaPlayerTimeInMillisWhenPlaying;
-        }
-        else if (shouldBePlaying && vlcMediaPlayer != null && !vlcMediaPlayer.IsPlaying)
-        {
-            Log.Verbose(() => "Should be playing but VLC MediaPlayer is paused. Set VLC MediaPlayer to play again.");
-            vlcMediaPlayer.SetPause(false);
             VolumeFactor = lastSetVolumeFactor;
         }
     }
@@ -80,11 +46,6 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         // Set volume to 0 to avoid audio glitches. Needed because PlayAsync is used to trigger loading.
         vlcMediaPlayer.SetVolume(0);
 
-        // Because of VLC bug with play/pause time, shouldBePlaying needs to be in sync initially.
-        // Otherwise, the time sync workaround might restart the audio unexpectedly.
-        // PlayAsync is used to trigger loading, so set shouldBePlaying to true to be in sync initially.
-        shouldBePlaying = true;
-
         // Play to trigger loading. PlayAsync to not block the main thread and avoid stutter.
         vlcMediaPlayer.PlayAsync();
 
@@ -103,7 +64,6 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
             throw new DestroyedAlreadyException($"Failed to load audio clip '{audioUri}': {nameof(VlcAudioSupportProvider)} has been destroyed already.");
         }
 
-        vlcMediaPlayer.SetPause(!shouldBePlaying);
         return new AudioLoadedEvent(audioUri);
     }
 
@@ -122,7 +82,6 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
 
     public override void Play()
     {
-        shouldBePlaying = true;
         if (IsFullyLoaded)
         {
             vlcMediaPlayer?.SetPause(false);
@@ -131,7 +90,6 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
 
     public override void Pause()
     {
-        shouldBePlaying = false;
         if (IsFullyLoaded)
         {
             vlcMediaPlayer?.SetPause(true);
@@ -140,7 +98,6 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
 
     public override void Stop()
     {
-        shouldBePlaying = false;
         vlcMediaPlayer?.StopAsync();
     }
 
@@ -175,15 +132,11 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
     {
         get
         {
-            // VLC MediaPlayer continues time even if not playing. Workaround: return old time if not playing.
-            return shouldBePlaying && vlcMediaPlayer.IsPlaying
-                ? vlcMediaPlayer.Time
-                : lastVlcMediaPlayerTimeInMillisWhenPlaying;
+            return vlcMediaPlayer?.Time ?? 0;
         }
 
         set
         {
-            lastVlcMediaPlayerTimeInMillisWhenPlaying = (long)value;
             // VLC MediaPlayer jumps to the end of the song when time is 0, so set 1 as minimum.
             vlcMediaPlayer.SetTime((long)Math.Max(1, value));
         }
@@ -197,7 +150,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         set
         {
             lastSetVolumeFactor = value;
-            if (shouldBePlaying && IsPlaying)
+            if (IsPlaying)
             {
                 vlcMediaPlayer?.SetVolume(VlcMediaPlayerTargetVolumePercent);
             }
