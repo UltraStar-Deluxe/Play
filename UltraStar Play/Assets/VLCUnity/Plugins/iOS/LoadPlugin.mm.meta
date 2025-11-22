@@ -1,8 +1,8 @@
 fileFormatVersion: 2
-guid: 4a24905aa1d2349c2a80b4dd75c4f406
+guid: 2370d5d4e6cab36419fa37a8319dd60c
 PluginImporter:
   externalObjects: {}
-  serializedVersion: 2
+  serializedVersion: 3
   iconMap: {}
   executionOrder: {}
   defineConstraints: []
@@ -11,26 +11,21 @@ PluginImporter:
   isExplicitlyReferenced: 0
   validateReferences: 1
   platformData:
-  - first:
-      Any: 
-    second:
+    Any:
       enabled: 0
       settings: {}
-  - first:
-      Editor: Editor
-    second:
+    Editor:
       enabled: 0
       settings:
         DefaultValueInitialized: true
-  - first:
-      iPhone: iOS
-    second:
+    VisionOS:
+      enabled: 1
+      settings: {}
+    iOS:
       enabled: 1
       settings:
         CPU: ARM64
-  - first:
-      tvOS: tvOS
-    second:
+    tvOS:
       enabled: 1
       settings: {}
   userData: 

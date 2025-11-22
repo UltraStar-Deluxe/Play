@@ -26,13 +26,16 @@ public class VLCPlayerExample : MonoBehaviour
 	Texture2D _vlcTexture = null; //This is the texture libVLC writes to directly. It's private.
 	public RenderTexture texture = null; //We copy it into this texture which we actually use in unity.
 
+	private VLCAudioSource vlcAudioSource; // The VLCAudioSource component that handles audio conversion
 
-	public string path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"; //Can be a web path or a local path
+
+	public string path = "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_stereo.avi"; //Can be a web path or a local path
 
 	// when copying native Texture2D textures to Unity RenderTextures, the orientation mapping is incorrect on Android, so we flip it over.
 	public bool flipTextureX = true;
 	public bool flipTextureY = true;
 	public bool playOnAwake = true; //Open path and Play during Awake
+	public bool useUnityAudio = false; // Direct Audio through a Unity AudioSource
 
 	public bool logToConsole = false; //Log function calls and LibVLC logs to Unity console
 
@@ -50,6 +53,10 @@ public class VLCPlayerExample : MonoBehaviour
 		if (canvasScreen == null)
 			canvasScreen = GetComponent<RawImage>();
 
+		// Setup Audio
+		if(useUnityAudio)
+			vlcAudioSource = gameObject.AddComponent<VLCAudioSource>();
+
 		//Setup Media Player
 		CreateMediaPlayer();
 
@@ -60,8 +67,9 @@ public class VLCPlayerExample : MonoBehaviour
 
 	void OnDestroy()
 	{
-		//Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
+		//Clean up all resources
 		DestroyMediaPlayer();
+		DestroyTextures();
 	}
 
 	void Update()
@@ -106,8 +114,12 @@ public class VLCPlayerExample : MonoBehaviour
 	public void Open()
 	{
 		Log("VLCPlayerExample Open");
-		if (mediaPlayer.Media != null)
-			mediaPlayer.Media.Dispose();
+		var currentMedia = mediaPlayer.Media;
+		if (currentMedia != null)
+		{
+			currentMedia.Dispose();
+			currentMedia = null;
+		}
 
 		var trimmedPath = path.Trim(new char[]{'"'});//Windows likes to copy paths with quotes but Uri does not like to open them
 		mediaPlayer.Media = new Media(new Uri(trimmedPath));
@@ -132,8 +144,7 @@ public class VLCPlayerExample : MonoBehaviour
 		Log("VLCPlayerExample Stop");
 		mediaPlayer?.Stop();
 
-		_vlcTexture = null;
-		texture = null;
+		DestroyTextures();
 	}
 
 	public void Seek(long timeDelta)
@@ -279,6 +290,8 @@ public class VLCPlayerExample : MonoBehaviour
 			DestroyMediaPlayer();
 		}
 		mediaPlayer = new MediaPlayer(libVLC);
+		if(useUnityAudio)
+			vlcAudioSource.Attach(mediaPlayer);
 	}
 
 	//Dispose of the MediaPlayer object.
@@ -290,7 +303,31 @@ public class VLCPlayerExample : MonoBehaviour
 		mediaPlayer = null;
 	}
 
-	//Resize the output textures to the size of the video
+	void DestroyTextures()
+	{
+		Log("VLCPlayerExample DestroyTextures");
+		
+		if (screen != null && screen.material != null)
+			screen.material.mainTexture = null;
+		if (canvasScreen != null)
+			canvasScreen.texture = null;
+
+		if (texture != null)
+		{
+			if (RenderTexture.active == texture)
+				RenderTexture.active = null;
+			texture.Release();
+			DestroyImmediate(texture);
+			texture = null;
+		}
+
+		if (_vlcTexture != null)
+		{
+			DestroyImmediate(_vlcTexture);
+			_vlcTexture = null;
+		}
+	}
+
 	void ResizeOutputTextures(uint px, uint py)
 	{
 		var texptr = mediaPlayer.GetTexture(px, py, out bool updated);
@@ -304,8 +341,10 @@ public class VLCPlayerExample : MonoBehaviour
 				py = swap;
 			}
 
-			_vlcTexture = Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texptr); //Make a texture of the proper size for the video to output to
-			texture = new RenderTexture(_vlcTexture.width, _vlcTexture.height, 0, RenderTextureFormat.ARGB32); //Make a renderTexture the same size as vlctex
+			DestroyTextures();
+
+			_vlcTexture = Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texptr);
+			texture = new RenderTexture(_vlcTexture.width, _vlcTexture.height, 0, RenderTextureFormat.ARGB32);
 
 			if (screen != null)
 				screen.material.mainTexture = texture;

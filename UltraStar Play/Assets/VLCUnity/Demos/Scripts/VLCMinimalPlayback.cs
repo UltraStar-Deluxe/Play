@@ -65,7 +65,7 @@ public class VLCMinimalPlayback : MonoBehaviour
             if(_mediaPlayer.Media == null)
             {
                 // playing remote media
-                _mediaPlayer.Media = new Media(new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
+                _mediaPlayer.Media = new Media(new Uri("https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_stereo.avi"));
             }
 
             _mediaPlayer.Play();
@@ -92,23 +92,8 @@ public class VLCMinimalPlayback : MonoBehaviour
 
         if (tex == null)
         {
-            // If received size is not null, it and scale the texture
-            uint i_videoHeight = 0;
-            uint i_videoWidth = 0;
-
-            _mediaPlayer.Size(0, ref i_videoWidth, ref i_videoHeight);
-            var texptr = _mediaPlayer.GetTexture(i_videoWidth, i_videoHeight, out bool updated);
-            if (i_videoWidth != 0 && i_videoHeight != 0 && updated && texptr != IntPtr.Zero)
-            {
-                Debug.Log("Creating texture with height " + i_videoHeight + " and width " + i_videoWidth);
-                tex = Texture2D.CreateExternalTexture((int)i_videoWidth,
-                    (int)i_videoHeight,
-                    TextureFormat.RGBA32,
-                    false,
-                    true,
-                    texptr);
-                GetComponent<Renderer>().material.mainTexture = tex;
-            }
+            tex = TextureHelper.CreateNativeTexture(ref _mediaPlayer, linear: true);
+            GetComponent<Renderer>().material.mainTexture = tex;
         }
         else if (tex != null)
         {

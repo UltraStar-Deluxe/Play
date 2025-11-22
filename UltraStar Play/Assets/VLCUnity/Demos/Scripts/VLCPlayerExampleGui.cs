@@ -146,6 +146,7 @@ public class VLCPlayerExampleGui : MonoBehaviour
 	void Update()
 	{
 		//Update screen aspect ratio. Doing this every frame is probably more than is necessary.
+		if (vlcPlayer == null) return;
 
 		if(vlcPlayer.texture != null)
 			screenAspectRatioFitter.aspectRatio = (float)vlcPlayer.texture.width / (float)vlcPlayer.texture.height;
