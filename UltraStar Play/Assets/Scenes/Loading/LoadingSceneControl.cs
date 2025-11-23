@@ -270,8 +270,9 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     {
         (string key, Action action) = preloadActions.FirstOrDefault();
         preloadActions.Remove(key);
-            
+
         loadingDetailsLabel.text = key;
-        action();
+        // Execute action in next frame to update the label. 
+        AwaitableUtils.ExecuteAfterDelayInFramesAsync(gameObject, 1, () => action());
     }
 }
