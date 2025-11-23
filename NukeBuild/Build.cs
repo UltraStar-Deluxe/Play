@@ -113,7 +113,11 @@ class Build : NukeBuild
                 mainGameNuGetPackagesSourceFolder,
                 mainGameNuGetPackagesTargetFolder,
                 SearchOption.AllDirectories,
-                "*.dll");
+                "NHyphenator.dll",
+                "Opportunity.LrcParser.dll",
+                "System.Linq.Dynamic.Core.dll",
+                "System.Text.Encoding.CodePages.dll"
+                );
         });
 
     Target RestoreMainGameDependencies => _ => _
@@ -134,12 +138,12 @@ class Build : NukeBuild
             // Download new packages
             DotNet($"build {GetNuGetPackagesProjectFolder(companionAppDir)}");
 
-            // Copy libraries for companion app
+            // Move libraries for companion app
             DirectoryUtils.MoveFiles(
                 companionAppNuGetPackagesSourceFolder,
                 companionAppNuGetPackagesTargetFolder,
                 SearchOption.AllDirectories,
-                "*.dll");
+                "RandomFriendlyNameGenerator.dll");
         });
 
     Target RestoreCompanionAppDependencies => _ => _
