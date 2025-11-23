@@ -45,18 +45,18 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
 
         // Set volume to 0 to avoid audio glitches. Needed because PlayAsync is used to trigger loading.
         vlcMediaPlayer.SetVolume(0);
+        lastSetVolumeFactor = 0;
 
         // Play to trigger loading. PlayAsync to not block the main thread and avoid stutter.
         vlcMediaPlayer.PlayAsync();
 
-        // Avoid unnecessary time changes to avoid audio glitches and time synchronization mismatches.
+        // Only set PositionInMillis if not 0, to avoid unnecessary time changes. This avoids audio glitches and time synchronization mismatches.
         if (startPositionInMillis > 0)
         {
             PositionInMillis = startPositionInMillis;
         }
 
-        // The video is loaded asynchronously.
-        // The duration property indicates whether it has been loaded.
+        // Wait until media has been loaded asynchronously.
         await ConditionUtils.WaitForConditionAsync(() => !this || IsFullyLoaded,
             new WaitForConditionConfig {description = $"load audio '{audioUri}'" });
         if (!this)
