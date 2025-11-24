@@ -17,7 +17,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
      * When the cache has reached this critical size
      * then unused sprites are searched in the scene and removed from memory.
      */
-    private const int CriticalCacheSize = 10;
+    private const int CriticalCacheSize = 20;
     private readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
     private readonly Dictionary<string, RunningRequest> runningRequests = new();
 
