@@ -15,10 +15,13 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
 
     private readonly HashSet<ISpriteHolder> spriteHolders = new();
 
-    // When the cache has reached the critical size, then unused sprites are searched in the scene
-    // and removed from memory.
+    /**
+     * When the cache has reached this critical size
+     * then unused sprites are searched in the scene and removed from memory.
+     */
     private readonly int criticalCacheSize = 50;
     private readonly Dictionary<string, CachedSprite> spriteCache = new();
+    private readonly Dictionary<string, RunningRequest> runningRequests = new();
 
     protected override object GetInstance()
     {
@@ -71,6 +74,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
             .ToList();
 
         // Remove from cache before reloading.
+        Log.Debug(() => $"Remove sprite from cache before reload. uri: '{uri}'");
         RemoveCachedSprite(cachedSprite);
 
         Sprite sprite = await LoadSpriteFromUriAsync(uri);
@@ -92,16 +96,45 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
         if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
             && cachedSprite?.Sprite != null)
         {
+            Log.Verbose(() => $"Reusing cached sprite: uri '{uri}'");
             return cachedSprite.Sprite;
         }
+        
+        // Multiple requests should load the image only once.
+        // And when eventually loaded, then all callers should receive the same instance.
+        if (runningRequests.TryGetValue(uri, out RunningRequest runningRequest))
+        {
+            Log.Verbose(() => $"Awaiting already running request for sprite: uri '{uri}'");
+            return await WaitForRunningRequest(runningRequest);
+        }
+        runningRequest = new();
+        runningRequests[uri] = runningRequest;
+        try
+        {
+            Sprite sprite = await DoLoadUncachedSpriteFromUriAsync(uri);
+            runningRequest.result = sprite;
+            return sprite;
+        }
+        catch (Exception e)
+        {
+            runningRequest.exception = e;
+            throw;
+        }
+        finally
+        {
+            runningRequests.Remove(uri);
+        }
+    }
 
+    private async Awaitable<Sprite> DoLoadUncachedSpriteFromUriAsync(string uri)
+    {
         Texture2D loadedTexture;
         try
         {
             using UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(new Uri(uri));
             await WebRequestUtils.SendWebRequestAsync(webRequest);
 
-            loadedTexture = (webRequest.downloadHandler as DownloadHandlerTexture).texture;
+            loadedTexture = DownloadHandlerTexture.GetContent(webRequest);
         }
         catch (Exception ex)
         {
@@ -110,25 +143,32 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
 
         Sprite sprite = CreateUncachedSprite(loadedTexture);
         AddSpriteToCache(sprite, uri);
+        Log.Verbose(() => $"Added sprite to cache: cache size {spriteCache.Count}, uri '{uri}'");
         return sprite;
     }
-
+    
     private void AddSpriteToCache(Sprite sprite, string source)
     {
         // Check critical size of cache BEFORE adding the new sprite.
         // (Otherwise the new sprite will be removed immediately because it is not used yet.)
         if (spriteCache.Count >= criticalCacheSize)
         {
-            RemoveUnusedSpritesFromCache();
+            DoRemoveUnusedSpritesFromCache();
         }
 
         // Cache the new sprite.
         CachedSprite cachedSprite = new(source, sprite);
+
+        if (spriteCache.ContainsKey(source))
+        {
+            Debug.LogWarning($"Sprite was already cached: source '{source}'");
+        }
         spriteCache[source] = cachedSprite;
     }
 
-    private void ClearCache()
+    public void ClearCache()
     {
+        Log.Verbose(() => $"Clearing sprite cache. current count: {spriteCache.Count}");
         foreach (CachedSprite cachedSprite in new List<CachedSprite>(spriteCache.Values))
         {
             RemoveCachedSprite(cachedSprite);
@@ -147,6 +187,9 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
 
     private void DoRemoveUnusedSpritesFromCache()
     {
+        using IDisposable d = new DisposableStopwatch("RemoveUnusedSpritesFromCache");
+        
+        int countBefore = spriteCache.Count;
         HashSet<Sprite> usedSprites = new();
         // Remember the sprites of all registered ISpriteHolder as still in use.
         spriteHolders.ForEach(spriteHolder => usedSprites.AddRange(spriteHolder.GetSprites()));
@@ -156,7 +199,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
         if (uiDocument != null)
         {
             uiDocument.rootVisualElement
-                .Query<VisualElement>()
+                .Query()
                 .ForEach(visualElement =>
                 {
                     if (visualElement.style.backgroundImage != null
@@ -173,8 +216,8 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
             .Where(cachedSprite => !usedSprites.Contains(cachedSprite.Sprite))
             .ToList();
 
-        Debug.Log($"Removing {unusedSprites.Count} unused sprites from cache.");
         unusedSprites.ForEach(RemoveCachedSprite);
+        Log.Debug(() => $"Removed unused sprites from cache. count before: {countBefore}, count after: {spriteCache.Count}, removed {unusedSprites.Count}");
     }
 
     private void RemoveCachedSprite(CachedSprite cachedSprite)
@@ -212,5 +255,23 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
             Source = source;
             Sprite = sprite;
         }
+    }
+
+    private async Awaitable<Sprite> WaitForRunningRequest(RunningRequest runningRequest)
+    {
+        while (runningRequest.result == null
+               && runningRequest.exception == null)
+        {
+            await Awaitable.EndOfFrameAsync();
+        }
+        return runningRequest.result ?? throw runningRequest.exception;
+    }
+
+    // Custom solution to resolve multiple awaits because AwaitableCompletionSource did not work as expected.
+    private class RunningRequest
+    {
+        public string uri;
+        public Sprite result;
+        public Exception exception;
     }
 }
