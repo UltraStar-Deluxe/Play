@@ -1,7 +1,5 @@
-﻿using System;
-using LibVLCSharp;
+﻿using LibVLCSharp;
 using UniInject;
-using UniRx;
 using UnityEngine;
 
 public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportProvider
