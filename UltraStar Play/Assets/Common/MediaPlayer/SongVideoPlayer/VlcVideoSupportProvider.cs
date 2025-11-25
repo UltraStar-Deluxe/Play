@@ -9,43 +9,6 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     [Inject]
     private VlcManager vlcManager;
 
-    private long lastVlcMediaPlayerTimeInMillisWhenPlaying;
-    private bool shouldBePlaying;
-
-    protected override void Update()
-    {
-        base.Update();
-
-        if (shouldBePlaying && IsPlaying)
-        {
-            lastVlcMediaPlayerTimeInMillisWhenPlaying = mediaPlayer.Time;
-        }
-
-        UpdateVlcMediaPlayerPause();
-    }
-
-    private void UpdateVlcMediaPlayerPause()
-    {
-        // TODO: Workaround for unreliable VLC MediaPlayer pause state ( https://code.videolan.org/videolan/vlc/-/issues/28353 )
-        if (!IsFullyLoaded)
-        {
-            return;
-        }
-
-        if (!shouldBePlaying && mediaPlayer != null && mediaPlayer.IsPlaying)
-        {
-            Log.Verbose(() => "Should be paused but VLC MediaPlayer is playing. Set VLC MediaPlayer to pause again.");
-            mediaPlayer.SetPause(true);
-            PositionInMillis = lastVlcMediaPlayerTimeInMillisWhenPlaying;
-        }
-        else if (shouldBePlaying && mediaPlayer != null && !mediaPlayer.IsPlaying)
-        {
-            Log.Verbose(() => "Should be playing but VLC MediaPlayer is paused. Set VLC MediaPlayer to play again.");
-            mediaPlayer.SetPause(false);
-            PositionInMillis = lastVlcMediaPlayerTimeInMillisWhenPlaying;
-        }
-    }
-
     public override bool IsSupported(string videoUri, bool videoEqualsAudio)
     {
         return base.IsSupported(videoUri, videoEqualsAudio)
@@ -79,13 +42,11 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
-        await ConditionUtils.WaitForConditionAsync(() => !this || mediaPlayer?.Media?.Duration > 0);
+        await ConditionUtils.WaitForConditionAsync(() => !this || IsFullyLoaded);
         if (!this)
         {
             throw new DestroyedAlreadyException($"Failed to load video '{videoUri}': {nameof(VlcVideoSupportProvider)} has been destroyed already.");
         }
-
-        mediaPlayer.SetPause(!shouldBePlaying);
         return new VideoLoadedEvent(videoUri);
     }
 
@@ -97,7 +58,6 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
     public override void Play()
     {
-        shouldBePlaying = true;
         if (IsFullyLoaded)
         {
             mediaPlayer?.SetPause(false);
@@ -106,7 +66,6 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
     public override void Pause()
     {
-        shouldBePlaying = false;
         if (IsFullyLoaded)
         {
             mediaPlayer?.SetPause(true);
@@ -115,7 +74,6 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
     public override void Stop()
     {
-        shouldBePlaying = true;
         mediaPlayer?.StopAsync();
     }
 
@@ -155,14 +113,10 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     {
         get
         {
-            // VLC MediaPlayer continues time even if not playing. Workaround: return old time if not playing.
-            return shouldBePlaying && mediaPlayer.IsPlaying
-                ? mediaPlayer.Time
-                : lastVlcMediaPlayerTimeInMillisWhenPlaying;
+            return mediaPlayer?.Time ?? 0;;
         }
         set
         {
-            lastVlcMediaPlayerTimeInMillisWhenPlaying = (long)value;
             mediaPlayer?.SetTime((long)value);
         }
     }
