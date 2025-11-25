@@ -1,7 +1,6 @@
 ﻿using System;
 using LibVLCSharp;
 using UniInject;
-using UniRx;
 using UnityEngine;
 
 public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
@@ -117,7 +116,10 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
         }
         set
         {
-            mediaPlayer?.SetTime((long)value);
+            if (IsFullyLoaded)
+            {
+                mediaPlayer?.SetTime((long)value);
+            }
         }
     }
 

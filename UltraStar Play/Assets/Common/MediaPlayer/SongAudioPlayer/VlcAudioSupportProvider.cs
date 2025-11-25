@@ -2,7 +2,6 @@
 using System.IO;
 using LibVLCSharp;
 using UniInject;
-using UniRx;
 using UnityEngine;
 
 public class VlcAudioSupportProvider : AbstractAudioSupportProvider
@@ -138,7 +137,10 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         set
         {
             // VLC MediaPlayer jumps to the end of the song when time is 0, so set 1 as minimum.
-            vlcMediaPlayer.SetTime((long)Math.Max(1, value));
+            if (IsFullyLoaded)
+            {
+                vlcMediaPlayer.SetTime((long)Math.Max(1, value));
+            }
         }
     }
 
