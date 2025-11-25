@@ -14,7 +14,7 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
         get
         {
             return songAudioPlayer.CurrentAudioSupportProvider is VlcAudioSupportProvider vlcAudioSupportProvider
-                ? vlcAudioSupportProvider.VlcMediaPlayer
+                ? vlcAudioSupportProvider.MediaPlayer
                 : null;
         }
     }
