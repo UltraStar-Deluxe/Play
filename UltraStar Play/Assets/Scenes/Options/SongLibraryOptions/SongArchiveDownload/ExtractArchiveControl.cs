@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading;
 using ICSharpCode.SharpZipLib.Core;
@@ -73,13 +74,24 @@ public class ExtractArchiveControl
         extractedZipEntryCount = 0;
         totalZipEntryCount = zipFile.Count;
 
+        // Workaround for Windows path length limit: Extract to temporary folder with shorter path. 
+        // Use Path.GetTempPath because Unity's Application.persistentDataPath can only be called on the main thread.
+        string extractFolder = PlatformUtils.IsWindows ? $"{Path.GetTempPath()}/extract-{Guid.NewGuid()}" : targetFolder;
+
         foreach (ZipEntry entry in zipFile)
         {
-            ExtractZipEntry(zipFile, entry);
+            ExtractZipEntry(zipFile, entry, extractFolder);
+        }
+        
+        // Move to target folder
+        if (PlatformUtils.IsWindows)
+        {
+            DirectoryUtils.CopyAll(extractFolder, targetFolder);
+            DirectoryUtils.Delete(extractFolder, true);
         }
     }
 
-    private void ExtractZipEntry(ZipFile zipFile, ZipEntry zipEntry)
+    private void ExtractZipEntry(ZipFile zipFile, ZipEntry zipEntry, string targetFolder)
     {
         string entryPath = zipEntry.Name;
         if (!zipEntry.IsFile)
