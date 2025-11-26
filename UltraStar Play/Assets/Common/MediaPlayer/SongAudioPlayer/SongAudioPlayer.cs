@@ -271,10 +271,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         loadedSongMeta = songMeta;
         DurationInMillis = currentAudioSupportProvider.DurationInMillis;
         currentAudioSupportProvider.VolumeFactor = VolumeFactor;
-        if (IsPlaying)
-        {
-            currentAudioSupportProvider.Play();
-        }
+        isPlaying = true;
+        currentAudioSupportProvider.Play();
 
         loadedEventStream.OnNext(new SongAudioLoadedEvent(songMeta, evt.AudioUri));
         return new SongAudioLoadedEvent(songMeta, evt.AudioUri);
