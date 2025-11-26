@@ -31,6 +31,11 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
         return Instance;
     }
 
+    protected override void OnDestroySingleton()
+    {
+        DisposeLibVlc();
+    }
+
     public MediaPlayer CreateMediaPlayer()
     {
         InitVlcIfNotDoneYet();
@@ -72,6 +77,11 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
 
     private void InitVlcIfNotDoneYet()
     {
+        if (this != Instance)
+        {
+            throw new SingletonNotFoundException("This is not the singleton instance.");
+        }
+        
         if (libVLC != null)
         {
             return;
@@ -88,8 +98,8 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
         Core.Initialize(Application.dataPath);
         libVLC = new LibVLC(enableDebugLogs: true, settings.VlcOptions.ToArray());
 
-        Debug.Log($"Initialized libVLC, changeset: {libVLC.Changeset}, LibVLCSharp version: {typeof(LibVLC).Assembly.GetName().Version}");
-
+        Debug.Log($"Initialized libVLC, changeset: '{libVLC.Changeset}', libVLC version: '{libVLC.Version}', libVLC assembly version: '{typeof(LibVLC).Assembly.GetName().Version}'");
+        
         // Setup Error Logging
         libVLC.Log += (s, e) =>
         {
@@ -117,6 +127,7 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
+        Debug.Log("Disposing libVLC instance");
         libVLC.Dispose();
         libVLC = null;
     }
@@ -132,6 +143,8 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
             || vlcTexture.width != width
             || vlcTexture.height != height)
         {
+            Debug.Log($"Creating new VLC textures. Width: {width}, Height: {height}");
+
             // Destroy old textures
             Destroy(vlcTexture);
 
