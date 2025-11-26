@@ -97,9 +97,9 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
             // LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
             try
             {
-                if (settings.LogVlcOutput)
+                if (settings?.LogVlcOutput ?? false)
                 {
-                    Debug.Log($"[libVLC] {e.FormattedLog}");
+                    Debug.Log($"[libVLC] {e?.FormattedLog}");
                 }
             }
             catch (Exception ex)
