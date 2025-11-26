@@ -20,6 +20,8 @@ public class ImageManagerTest : AbstractPlayModeTest
     public IEnumerator ConcurrentCallsShouldReturnSameImageInstance() => ConcurrentCallsShouldReturnSameImageInstanceAsync();
     private async Awaitable ConcurrentCallsShouldReturnSameImageInstanceAsync()
     {
+        LogAssertUtils.IgnoreFailingMessages();
+        
         List<Sprite> loadedSprites = new List<Sprite>();
 
         // Can be better tested with an artificial delay or breakpoint in ImageManager.

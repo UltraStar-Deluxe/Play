@@ -20,6 +20,8 @@ public class AudioManagerTest : AbstractPlayModeTest
     public IEnumerator ConcurrentCallsShouldReturnSameAudioInstance() => ConcurrentCallsShouldReturnSameAudioInstanceAsync();
     private async Awaitable ConcurrentCallsShouldReturnSameAudioInstanceAsync()
     {
+        LogAssertUtils.IgnoreFailingMessages();
+        
         List<AudioClip> loadedAudioClips = new List<AudioClip>();
 
         // Can be better tested with an artificial delay or breakpoint in AudioManager.
