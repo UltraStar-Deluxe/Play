@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="background" style="flex-grow: 1; align-items: center; justify-content: center;">
-        <ui:VisualElement name="logo" />
+        <ui:VisualElement name="logo" class="m-3" />
         <ui:VisualElement name="row" style="position: absolute; top: 66.6%;">
             <ui:Button text="$mainScene_button_sing" name="startButton" class="mb-3" style="height: 60px; width: 160px; font-size: 18px;" />
             <ui:Button text="$mainScene_button_party" name="partyButton" class="mainSceneButton ml-5" style="width: 160px; height: 60px; font-size: 18px;" />

@@ -86,6 +86,9 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
             return;
         }
         visualElementsWithChildChangeManipulator.Add(uiDocument.rootVisualElement);
+      
+        // TODO: There is a crash when using ChildChangeManipulator with IL2CPP.
+#if !ENABLE_IL2CPP
         uiDocument.rootVisualElement.AddManipulator(new ChildChangeManipulator());
         uiDocument.rootVisualElement.RegisterCallback<ChildChangeEvent>(evt => childrenChangedEventStream.OnNext(new ChildrenChangedEvent()
         {
@@ -94,6 +97,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder, II
             newChildCount = evt.newChildCount,
             previousChildCount = evt.previousChildCount,
         }));
+#endif
     }
 
     private void Update()

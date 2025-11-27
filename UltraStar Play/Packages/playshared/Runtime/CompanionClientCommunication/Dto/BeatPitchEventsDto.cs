@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 
+[Serializable] // Serializable is required for UnityEngine.JsonUtility
 public class BeatPitchEventsDto : CompanionAppMessageDto
 {
     public List<BeatPitchEventDto> BeatPitchEvents { get; set; } = new List<BeatPitchEventDto>();
