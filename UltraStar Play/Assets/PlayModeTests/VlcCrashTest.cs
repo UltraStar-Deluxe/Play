@@ -20,6 +20,9 @@ public class VlcCrashTest : AbstractPlayModeTest
     
     [Inject]
     private Injector injector;
+    
+    private List<SongAudioPlayer> songAudioPlayers = new();
+    private List<SongVideoPlayer> songVideoPlayers = new();
 
     protected override void ConfigureTestSettings(TestSettings settings)
     {
@@ -57,10 +60,20 @@ public class VlcCrashTest : AbstractPlayModeTest
             SongVideoPlayer songVideoPlayer = CreateSongVideoPlayer(songAudioPlayer);
             songVideoPlayer.gameObject.name = $"SongVideoPlayer {i}";
 
+            songAudioPlayers.Add(songAudioPlayer);
+            songVideoPlayers.Add(songVideoPlayer);
+            
             PlaySong(songAudioPlayer, songVideoPlayer, songMetas[i]);
         }
 
         await Awaitable.WaitForSecondsAsync(1);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        songAudioPlayers.ForEach(songAudioPlayer => Object.Destroy(songAudioPlayer.gameObject));
+        songVideoPlayers.ForEach(songVideoPlayer => Object.Destroy(songVideoPlayer.gameObject));
     }
 
     private async Awaitable PlaySong(SongAudioPlayer songAudioPlayer, SongVideoPlayer songVideoPlayer, SongMeta songMeta)
