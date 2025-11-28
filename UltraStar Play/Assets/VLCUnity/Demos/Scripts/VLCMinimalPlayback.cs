@@ -97,11 +97,7 @@ public class VLCMinimalPlayback : MonoBehaviour
         }
         else if (tex != null)
         {
-            var texptr = _mediaPlayer.GetTexture((uint)tex.width, (uint)tex.height, out bool updated);
-            if (updated)
-            {
-                tex.UpdateExternalTexture(texptr);
-            }
+            TextureHelper.UpdateTexture(tex, ref _mediaPlayer);
         }
     }
 }

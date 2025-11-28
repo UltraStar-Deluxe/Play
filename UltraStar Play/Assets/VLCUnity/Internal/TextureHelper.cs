@@ -13,6 +13,56 @@ namespace LibVLCSharp
         [DllImport(UnityPlugin, CallingConvention = CallingConvention.Cdecl, EntryPoint = "libvlc_unity_set_bit_depth_format")]
         static extern void SetBitDepthFormat(IntPtr mediaplayer, int bitDepth);
 
+        [DllImport(UnityPlugin, CallingConvention = CallingConvention.Cdecl, EntryPoint = "libvlc_unity_set_unity_texture_vulkan")]
+        static extern bool SetUnityTextureVulkan(IntPtr mediaplayer, IntPtr texturePtr);
+
+        [DllImport(UnityPlugin, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetRenderEventFunc")]
+        static extern IntPtr GetRenderEventFunc();
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+        // Track if we're using the Vulkan approach (Unity-owned texture)
+        private static bool isVulkanMode = false;
+#endif
+        /// <summary>
+        /// Update texture with new frame data
+        /// </summary>
+        /// <param name="texture">The texture to update</param>
+        /// <param name="player">The media player</param>
+        /// <returns>true if frame was updated</returns>
+        public static bool UpdateTexture(Texture2D texture, ref MediaPlayer player)
+        {
+            if (texture == null)
+                return false;
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+            // Vulkan on Android uses AccessTexture approach - plugin updates the texture directly via render thread
+            if (isVulkanMode)
+            {
+                // Check if there's an update
+                var texptr = player.GetTexture((uint)texture.width, (uint)texture.height, out bool updated);
+
+                if (updated && texptr != System.IntPtr.Zero)
+                {
+                    // Issue a plugin event to trigger the texture copy on the render thread
+                    // This ensures AccessTexture is called at the right time
+                    IntPtr renderEventFunc = GetRenderEventFunc();
+                    GL.IssuePluginEvent(renderEventFunc, 0);
+                    return true;
+                }
+                return false;
+            }
+#endif
+
+            // Standard approach for non-Vulkan
+            var ptr = player.GetTexture((uint)texture.width, (uint)texture.height, out bool updatedd);
+            if (updatedd && ptr != System.IntPtr.Zero)
+            {
+                texture.UpdateExternalTexture(ptr);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Helper for native texture creation
         /// </summary>
@@ -45,6 +95,36 @@ namespace LibVLCSharp
 #endif
             }
 
+#if UNITY_ANDROID && !UNITY_EDITOR
+            // Vulkan on Android requires a different approach
+            if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Vulkan)
+            {
+                if (width == 0 || height == 0)
+                    return default;
+
+                // Create Unity-owned texture
+                var texture = new Texture2D((int)width, (int)height,
+                    bitDepth == BitDepth.Bit16 ? TextureFormat.RGBAHalf : TextureFormat.RGBA32,
+                    mipmap, linear);
+
+                // Force Unity to allocate GPU resources for the texture before we pass it to the plugin
+                // This ensures the VkImage is fully created and initialized
+                texture.Apply(false, false);
+
+                // Pass texture to plugin so it can update it via AccessTexture
+                if (!SetUnityTextureVulkan(player.NativeReference, texture.GetNativeTexturePtr()))
+                {
+                    UnityEngine.Debug.LogError("[VLC-Unity] Failed to set Unity texture for Vulkan");
+                    UnityEngine.Object.Destroy(texture);
+                    return default;
+                }
+
+                isVulkanMode = true;
+                return texture;
+            }
+#endif
+
+            // Standard approach for non-Vulkan or non-Android
             var texptr = player.GetTexture(width, height, out bool updated);
 
             if (width != 0 && height != 0 && updated && texptr != IntPtr.Zero)

@@ -116,30 +116,16 @@ public class VLCSubtitles : MonoBehaviour
         if (tex == null)
         {
             // If received size is not null, it and scale the texture
-            uint i_videoHeight = 0;
-            uint i_videoWidth = 0;
-
-            _mediaPlayer.Size(0, ref i_videoWidth, ref i_videoHeight);
-            var texptr = _mediaPlayer.GetTexture(i_videoWidth, i_videoHeight, out bool updated);
-            if (i_videoWidth != 0 && i_videoHeight != 0 && updated && texptr != IntPtr.Zero)
+            tex = TextureHelper.CreateNativeTexture(ref _mediaPlayer, linear: true);
+            if (tex != null)
             {
-                Debug.Log("Creating texture with height " + i_videoHeight + " and width " + i_videoWidth);
-                tex = Texture2D.CreateExternalTexture((int)i_videoWidth,
-                    (int)i_videoHeight,
-                    TextureFormat.RGBA32,
-                    false,
-                    true,
-                    texptr);
+                Debug.Log("Creating texture with height " + tex.height + " and width " + tex.width);
                 GetComponent<Renderer>().material.mainTexture = tex;
             }
         }
         else if (tex != null)
         {
-            var texptr = _mediaPlayer.GetTexture((uint)tex.width, (uint)tex.height, out bool updated);
-            if (updated)
-            {
-                tex.UpdateExternalTexture(texptr);
-            }
+            TextureHelper.UpdateTexture(tex, ref _mediaPlayer);
         }
     }
 }

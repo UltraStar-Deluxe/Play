@@ -69,9 +69,21 @@ namespace Videolabs.VLCUnity.Editor
 
         internal static void OnPostprocessBuildMac(BuildTarget buildTarget, string path)
         {
-            if(path.EndsWith(".app") || buildTarget != BuildTarget.StandaloneOSX)
+            if(buildTarget != BuildTarget.StandaloneOSX)
+                return;
+            
+            var platformName = BuildPipeline.GetBuildTargetName(buildTarget);
+            // TODO: this is a hidden, no more documented Unity Editor API. Fail gracefully if not available
+            var cpu = EditorUserBuildSettings.GetPlatformSettings(platformName, "Architecture");
+            if(cpu == "x64ARM64") // Universal builds are not yet supported
             {
-                // "Create XCode Project" is unchecked
+                Debug.LogError("Universal architecture not yet supported. Please select either Intel 64-bit or Apple Silicon ARM");
+                return;
+            }
+
+            if(path.EndsWith(".app"))
+            {
+                // "Create XCode Project" is unchecked, no further processing required
                 return;
             }
 

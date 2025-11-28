@@ -39,7 +39,8 @@ For the Unity Android target, we support:
 
 Reminded: If you want to target arm64-v8a CPU architecture, you must select it in the player settings. To be able to select it, you need to switch the scripting backend to IL2CPP (as opposed to Mono). This is a Unity requirement unrelated to libvlc.
 
-VLC for Unity requires Android 16 minimum.
+VLC for Unity requires Android 21 (Android 5.0 Lollipop) minimum for OpenGL ES.
+For Vulkan support, Android 26 (Android 8.0 Oreo) or higher is required with ARM64 architecture.
 
 ## UWP
 

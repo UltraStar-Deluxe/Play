@@ -85,21 +85,16 @@ public class VLCThreeSixty : MonoBehaviour
     {
         if (texture == null)
         {
-            uint width = 0, height = 0;
-            player.Size(0, ref width, ref height);
-            var texPtr = player.GetTexture(width, height, out bool updated);
-
-            if (width != 0 && height != 0 && updated && texPtr != IntPtr.Zero)
+            texture = TextureHelper.CreateNativeTexture(ref player, linear: true);
+            if (texture != null)
             {
-                Debug.Log($"Creating texture with height {height} and width {width}");
-                texture = Texture2D.CreateExternalTexture((int)width, (int)height, TextureFormat.RGBA32, false, true, texPtr);
+                Debug.Log($"Creating texture with height {texture.height} and width {texture.width}");
                 renderer.material.mainTexture = texture;
             }
         }
         else
         {
-            var texPtr = player.GetTexture((uint)texture.width, (uint)texture.height, out bool updated);
-            if (updated) texture.UpdateExternalTexture(texPtr);
+            TextureHelper.UpdateTexture(texture, ref player);
         }
     }
 

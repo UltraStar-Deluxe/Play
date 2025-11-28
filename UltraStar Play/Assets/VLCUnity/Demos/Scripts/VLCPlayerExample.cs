@@ -88,11 +88,8 @@ public class VLCPlayerExample : MonoBehaviour
 		if (_vlcTexture != null)
 		{
 			//Update the vlc texture (tex)
-			var texptr = mediaPlayer.GetTexture(width, height, out bool updated);
-			if (updated)
+			if (TextureHelper.UpdateTexture(_vlcTexture, ref mediaPlayer))
 			{
-				_vlcTexture.UpdateExternalTexture(texptr);
-
 				//Copy the vlc texture into the output texture, automatically flipped over
 				var flip = new Vector2(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
 				Graphics.Blit(_vlcTexture, texture, flip, Vector2.zero); //If you wanted to do post processing outside of VLC you could use a shader here.
@@ -330,8 +327,7 @@ public class VLCPlayerExample : MonoBehaviour
 
 	void ResizeOutputTextures(uint px, uint py)
 	{
-		var texptr = mediaPlayer.GetTexture(px, py, out bool updated);
-		if (px != 0 && py != 0 && updated && texptr != IntPtr.Zero)
+		if (px != 0 && py != 0)
 		{
 			//If the currently playing video uses the Bottom Right orientation, we have to do this to avoid stretching it.
 			if(GetVideoOrientation() == VideoOrientation.BottomRight)
@@ -343,13 +339,17 @@ public class VLCPlayerExample : MonoBehaviour
 
 			DestroyTextures();
 
-			_vlcTexture = Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texptr);
-			texture = new RenderTexture(_vlcTexture.width, _vlcTexture.height, 0, RenderTextureFormat.ARGB32);
+			_vlcTexture = TextureHelper.CreateNativeTexture(ref mediaPlayer, linear: true);
 
-			if (screen != null)
-				screen.material.mainTexture = texture;
-			if (canvasScreen != null)
-				canvasScreen.texture = texture;
+			if (_vlcTexture != null)
+			{
+				texture = new RenderTexture(_vlcTexture.width, _vlcTexture.height, 0, RenderTextureFormat.ARGB32);
+
+				if (screen != null)
+					screen.material.mainTexture = texture;
+				if (canvasScreen != null)
+					canvasScreen.texture = texture;
+			}
 		}
 	}
 
