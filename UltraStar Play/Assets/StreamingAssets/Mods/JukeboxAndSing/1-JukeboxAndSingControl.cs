@@ -18,6 +18,9 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
     private SingSceneControl singSceneControl;
 
     [Inject]
+    private SingSceneData singSceneData;
+
+    [Inject]
     private SongAudioPlayer songAudioPlayer;
 
     [Inject]
@@ -202,7 +205,11 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
 
     public void StartNextSong()
     {
-        SongMeta nextSongMeta = GetNextSongMeta();
+        SingSceneData currentSingSceneData = SceneNavigator.GetSceneDataOrThrow<SingSceneData>();
+        SongMeta currentSongMeta = currentSingSceneData.SongMetas.FirstOrDefault();
+        seenSongMetas.Add(currentSongMeta);
+        
+        SongMeta nextSongMeta = GetNextSongMeta(currentSongMeta);
         if (nextSongMeta == null)
         {
             Debug.Log($"{nameof(JukeboxAndSingControl)} - No next song found");
@@ -211,7 +218,6 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
 
         Debug.Log($"{nameof(JukeboxAndSingControl)} - Starting next song '{nextSongMeta.GetArtistDashTitle()}'");
 
-        SingSceneData currentSingSceneData = SceneNavigator.GetSceneDataOrThrow<SingSceneData>();
         SingSceneData nextSingSceneData = new SingSceneData();
 
         nextSingSceneData.SingScenePlayerData = currentSingSceneData.SingScenePlayerData;
@@ -221,14 +227,43 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
         sceneNavigator.LoadScene(EScene.SingScene, nextSingSceneData);
     }
 
-    private SongMeta GetNextSongMeta()
+    private SongMeta GetNextSongMeta(SongMeta currentSongMeta)
     {
         SongMeta nextSongQueueSongMeta = GetNextSongQueueSongMeta();
         if (nextSongQueueSongMeta != null) {
+            Debug.Log($"{nameof(JukeboxAndSingControl)} - Choosing next song from song queue");
             return nextSongQueueSongMeta;
         }
 
-        return GetNextRandomSongMeta();
+        List<SongMeta> allSelectableSongMetas = GetAllSelectableSongMetas();
+        if (modSettings.RandomSelection)
+        {
+            Debug.Log($"{nameof(JukeboxAndSingControl)} - Choosing next song randomly out of {allSelectableSongMetas.Count} selectable songs.");
+            return GetNextRandomSongMeta(allSelectableSongMetas);
+        }
+        else 
+        {
+            Debug.Log($"{nameof(JukeboxAndSingControl)} - Choosing next song sequentially out of {allSelectableSongMetas.Count} selectable songs.");
+            return GetNextSequentialSongMeta(allSelectableSongMetas, currentSongMeta);
+        }
+    }
+
+    private List<SongMeta> GetAllSelectableSongMetas()
+    {
+        bool usePlaylist = !nonPersistentSettings.PlaylistName.Value.IsNullOrEmpty() && nonPersistentSettings.PlaylistName.Value != UltraStarAllSongsPlaylist.Instance.Name;
+        Debug.Log($"{nameof(JukeboxAndSingControl)} - Choosing next song from " + (usePlaylist ? nonPersistentSettings.PlaylistName.Value : "all songs"));
+
+        List<SongMeta> songMetas = usePlaylist
+            ? playlistManager.GetSongMetas(playlistManager.GetPlaylistByName(nonPersistentSettings.PlaylistName.Value)).ToList()
+            : songMetaManager.GetSongMetas().ToList();
+
+        return songMetas
+                // Order by Artist then Title, thereby put null and empty values last
+                .OrderBy(songMeta => string.IsNullOrEmpty(songMeta.Artist))
+                .ThenBy(songMeta => songMeta.Artist ?? "")
+                .ThenBy(songMeta => string.IsNullOrEmpty(songMeta.Title))
+                .ThenBy(songMeta => songMeta.Title ?? "")
+                .ToList();
     }
 
     private SongMeta GetNextSongQueueSongMeta()
@@ -237,22 +272,31 @@ public class JukeboxAndSingControl : MonoBehaviour, INeedInjection, IInjectionFi
         return singSceneData?.SongMetas?.FirstOrDefault();
     }
 
-    private SongMeta GetNextRandomSongMeta()
+    private SongMeta GetNextRandomSongMeta(List<SongMeta> allSelectableSongMetas)
     {
-        List<SongMeta> allSongMetas = nonPersistentSettings.PlaylistName.Value.IsNullOrEmpty()
-            ? songMetaManager.GetSongMetas().ToList()
-            : playlistManager.GetSongMetas(playlistManager.GetPlaylistByName(nonPersistentSettings.PlaylistName.Value));
-
-        List<SongMeta> unseenSongMetas = allSongMetas
+        List<SongMeta> unseenSongMetas = allSelectableSongMetas
             .Except(seenSongMetas)
             .ToList();
+        Debug.Log($"{nameof(JukeboxAndSingControl)} - Choosing next song from {unseenSongMetas.Count} unseen songs");
 
         if (unseenSongMetas.IsNullOrEmpty())
         {
             seenSongMetas.Clear();
-            unseenSongMetas = songMetaManager.GetSongMetas().ToList();
+            unseenSongMetas = allSelectableSongMetas;
         }
         return RandomUtils.RandomOf(unseenSongMetas);
+    }
+
+    private SongMeta GetNextSequentialSongMeta(List<SongMeta> allSelectableSongMetas, SongMeta currentSongMeta)
+    {
+        SongMeta songMeta = currentSongMeta != null
+            ? allSelectableSongMetas.GetElementAfter(currentSongMeta, true) 
+            : allSelectableSongMetas.FirstOrDefault();
+
+        Debug.Log($"{nameof(JukeboxAndSingControl)} - Next sequential song: '{songMeta?.GetArtistDashTitle()}'");
+        Debug.Log($"{nameof(JukeboxAndSingControl)} - allSelectableSongMetas: {allSelectableSongMetas.Select(s => s.GetArtistDashTitle()).JoinWith(", ")}");
+
+        return songMeta;
     }
 
     private void DisableSingSceneFinisher()
