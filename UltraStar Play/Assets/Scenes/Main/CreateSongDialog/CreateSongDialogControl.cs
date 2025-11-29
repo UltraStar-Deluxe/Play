@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SFB;
 using UniInject;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -81,24 +83,59 @@ public class CreateSongDialogControl : AbstractModalDialogControl, IInjectionFin
             return;
         }
 
-        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(newValue);
-        // Expected file name: "trackNumber - artist - title", where trackNumber, artist, and separators are optional.
-        Match artistDashTitleMatch = Regex.Match(fileNameWithoutExtension, @"^((?<trackNumber>\d+)(\s?[-|,~]\s?))?((?<artist>[^\-]+)(\s?[-|,~]\s?))?(?<title>[^\-]+)$");
-        if (artistDashTitleMatch.Success)
+        if (!TrySetArtistAndTitleFromFileMetadata(newValue))
         {
-            string title = artistDashTitleMatch.Groups["title"].Value.Trim();
-            string artist = artistDashTitleMatch.Groups["artist"].Value.Trim();
-            if (int.TryParse(artist, out int artistAsInt))
+            if (!TrySetArtistAndTitleFromFileName(newValue))
             {
-                // Ignore artist part when it can be parsed to an int because in this case, it is probably a track number.
-                artist = "";
-                title = fileNameWithoutExtension;
+                artistTextField.value = "";
+                titleTextField.value = "";
             }
-            artistTextField.value = artist;
-            titleTextField.value = title;
         }
 
         UpdateOkButtonEnabled();
+    }
+
+    private bool TrySetArtistAndTitleFromFileMetadata(string filePath)
+    {
+        try
+        {
+            TagLib.File file = TagLib.File.Create(filePath);
+            Debug.Log($"File.Tag: {JsonConverter.ToJson(file.Tag)}");
+            string artist = file.Tag.AlbumArtists.JoinWith(", ");
+            string title = file.Tag.Title;
+            artistTextField.value = artist;
+            titleTextField.value = title;
+            return !artist.IsNullOrEmpty() && !title.IsNullOrEmpty();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            Debug.LogError($"Failed to read file metadata. File '{filePath}', Error message: {e.Message}");
+            return false;
+        }
+    }
+
+    private bool TrySetArtistAndTitleFromFileName(string filePath)
+    {
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+        // Expected file name: "trackNumber - artist - title", where trackNumber, artist, and separators are optional.
+        Match artistDashTitleMatch = Regex.Match(fileNameWithoutExtension, @"^((?<trackNumber>\d+)(\s?[-|,~]\s?))?((?<artist>[^\-]+)(\s?[-|,~]\s?))?(?<title>[^\-]+)$");
+        if (!artistDashTitleMatch.Success)
+        {
+            return false;
+        }
+
+        string title = artistDashTitleMatch.Groups["title"].Value.Trim();
+        string artist = artistDashTitleMatch.Groups["artist"].Value.Trim();
+        if (int.TryParse(artist, out int artistAsInt))
+        {
+            // Ignore artist part when it can be parsed to an int because in this case, it is probably a track number.
+            artist = "";
+            title = fileNameWithoutExtension;
+        }
+        artistTextField.value = artist;
+        titleTextField.value = title;
+        return true;
     }
 
     private void OpenSelectAudioFileDialog()

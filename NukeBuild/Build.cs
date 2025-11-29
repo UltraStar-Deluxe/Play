@@ -116,7 +116,8 @@ class Build : NukeBuild
                 "NHyphenator.dll",
                 "Opportunity.LrcParser.dll",
                 "System.Linq.Dynamic.Core.dll",
-                "System.Text.Encoding.CodePages.dll"
+                "System.Text.Encoding.CodePages.dll",
+                "TagLibSharp.dll"
                 );
         });
 

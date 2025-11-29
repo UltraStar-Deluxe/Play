@@ -11,6 +11,9 @@
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0.2" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.4" />
 
+    <!-- Read audio meta tags to fill Title and Artist when creating a new song -->
+    <PackageReference Include="TagLibSharp" Version="2.3.0" />
+    
     <!-- Only used in mod "TriggerKeyStrokeToToggleMicWhenSinging" -->
     <PackageReference Include="WindowsInput" Version="6.4.1" />
 
