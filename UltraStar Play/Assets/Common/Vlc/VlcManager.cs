@@ -1,7 +1,9 @@
 using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using LibVLCSharp;
+using Serilog;
 using UniInject;
 using UnityEngine;
 
@@ -11,6 +13,8 @@ using UnityEngine;
 public class VlcManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static VlcManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<VlcManager>();
+
+    private static Serilog.Core.Logger logger;
 
     [Inject]
     private Settings settings;
@@ -34,6 +38,7 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
     protected override void OnDestroySingleton()
     {
         DisposeLibVlc();
+        DisposeVlcLogger();
     }
 
     public MediaPlayer CreateMediaPlayer()
@@ -100,6 +105,9 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
 
         Debug.Log($"Initialized libVLC, changeset: '{libVLC.Changeset}', libVLC version: '{libVLC.Version}', libVLC assembly version: '{typeof(LibVLC).Assembly.GetName().Version}'");
         
+        // Initialize Serilog logger for VLC output
+        InitVlcLogger();
+
         // Setup Error Logging
         libVLC.Log += (s, e) =>
         {
@@ -107,9 +115,9 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
             // LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
             try
             {
-                if (settings?.LogVlcOutput ?? false)
+                if (settings.LogVlcOutput && e?.FormattedLog != null)
                 {
-                    Debug.Log($"[libVLC] {e?.FormattedLog}");
+                    logger?.Information(e.FormattedLog);
                 }
             }
             catch (Exception ex)
@@ -130,6 +138,35 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
         Debug.Log("Disposing libVLC instance");
         libVLC.Dispose();
         libVLC = null;
+    }
+
+    private static void InitVlcLogger()
+    {
+        if (logger != null)
+        {
+            return;
+        }
+
+        string logFilePath = $"{Log.logFileFolder}/vlc-{DateTime.Now.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture)}.log";
+        logger = new LoggerConfiguration()
+            .WriteTo.File(
+                path: logFilePath,
+                outputTemplate: Log.outputTemplate)
+            .CreateLogger();
+
+        Debug.Log($"Initialized Serilog logger for VLC output. Path: {logFilePath}");
+    }
+
+    private static void DisposeVlcLogger()
+    {
+        if (logger == null)
+        {
+            return;
+        }
+
+        Debug.Log("Disposing Serilog VLC logger");
+        logger.Dispose();
+        logger = null;
     }
 
     public static void UpdateVlcTextures(MediaPlayer mediaPlayer, ref Texture2D vlcTexture)
