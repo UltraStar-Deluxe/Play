@@ -49,7 +49,8 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
 
     public static void DestroyMediaPlayer(MediaPlayer mediaPlayer)
     {
-        if (mediaPlayer == null)
+        if (libVLC == null
+            || mediaPlayer == null)
         {
             return;
         }
@@ -58,10 +59,7 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
         string mediaUrl = mediaPlayer.Media?.Mrl;
         Log.Debug(() => $"Disposing Vlc MediaPlayer (Media: '{mediaUrl}', NativeReference: {mediaPlayerNativeReference})");
 
-        // TODO: Workaround to make crash in libVLC less likely ( https://discord.com/channels/957290213246390352/1175861964438769715 ).
-        // The crash does not occur when sleeping long enough BEFORE disposing the object.
-        // Thus, maybe loading the media is not done yet?
-        // But how to know when the object is ready to be disposed?
+        // Dispose on a background thread to avoid blocking the main thread.
         Task.Run(() =>
         {
             if (libVLC == null)
@@ -69,13 +67,7 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
                 // libVLC has already been disposed, probably by closing the app.
                 return;
             }
-
-            int sleepTimeInMillis = 500;
-            Log.Debug(() => $"Sleeping {sleepTimeInMillis} ms before disposing Vlc MediaPlayer to make crash in libVLC less likely (Media: '{mediaUrl}', NativeReference: {mediaPlayerNativeReference})");
-            Thread.Sleep(sleepTimeInMillis);
-
             mediaPlayer.Dispose();
-
             Log.Debug(() => $"Successfully disposed Vlc MediaPlayer (Media: '{mediaUrl}', NativeReference: {mediaPlayerNativeReference})");
         });
     }
