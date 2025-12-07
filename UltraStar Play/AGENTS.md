@@ -10,10 +10,13 @@ Players sing into a microphone and get points if they hit the correct note.
 There are multiple brands named `UltraStar Play` and `Melody Mania` that share the same root.
 
 ### Companion App
-This project is for the main game. There is also another Unity project for the so called `Companion App`.
-The Companion App is used for example to use a smartphone as microphone, or browsing the song list when playing the main game.
-
-Main game and Companion App share a lot of code. This is why common code is stored in a common package dependency called `playshared`. The `playshared` package is a package in main game Unity project. It is referenced from the Companion App via file path in its `manifest.json`.
+- This project is for the main game.
+- There is also another Unity project for the so called `Companion App`.
+- The Companion App is used for example to use a smartphone as microphone, or browsing the song list when playing the main game.
+- Main game and Companion App share a lot of code. Common code is stored in a package called `playshared`.
+  - The `playshared` package is a package in main game Unity project.
+- When modifying code in `playshared` package, consider impact on both projects
+- Companion App references `playshared` via file path in `manifest.json`
 
 ### UltraStar Format
 - This project uses the open and community-grown `UltraStar` karaoke format.
@@ -116,14 +119,61 @@ Main game and Companion App share a lot of code. This is why common code is stor
 - Common code of main game and companion app in `playshared` package.
 
 ## Unit Tests
+- **IMPORTANT**: Do not automatically add or run tests without explicit permission.
+- 
 - Unity differentiates Edit Mode tests and Play Mode tests.
 - `Editor/Tests` contains NUnit unit tests that are executed in Edit Mode.
   - These correspond to methods annotated with normal NUnit annotations.
 - `PlayModeTests` contain NUNit unit tests that are executed in Play Mode.
   - These correspond to methods annotated with Unity's custom `[UnityTest]`, `[UnitySetUp]`, `[UnityTearDown]` annotations.
-- In this project, all Play Mode tests inherit from AbstractPlayModeTest class.
-- For tests, a custom instance of some dependencies instantiated and injected into classes.
-  - TestSettings instead of normal Settings.
-  - TestStatistics instead of normal Statistics.
-- Do not add or run tests automatically. Ask if you want to add tests.
 
+- When asked to add tests:
+  - Edit Mode tests go in `Editor/Tests/`
+  - Play Mode tests go in `PlayModeTests/` and inherit from `AbstractPlayModeTest`
+
+## Localization
+- All user-facing text must use translation keys from `R.Messages`
+- Example: `button.SetTranslatedText(R.Messages.action_cancel)`
+- Translation files: `.properties` format in `Packages/playshared/Runtime/Resources/Translations`
+- Never hardcode user-facing strings
+
+## Files AI Should Not Modify
+- Generated constant files: `RUxmlNames.cs`, `RMessages.cs`, `RInputActions.cs`
+- Third-party assets in: Background Bokeh VFX, CartoonVFX9X, etc.
+- NuGet DLLs (managed via custom script only)
+
+## Common Pitfalls to Avoid
+- Never use `var` keyword - always use explicit types
+- Don't use C# `Task` - use Unity's `Awaitable` instead
+- Don't use Unity Coroutines - use async/await with Awaitable
+- Don't directly modify generated R.* constant files
+- Don't use HTML tags in UI Toolkit
+- Don't use grid or table layout in Style Sheets - stick to Unity' Style Sheet subset of CSS.
+
+## Example Code Patterns
+
+### Dependency Injection Example
+```csharp
+public class MySceneControl : INeedInjection
+{
+    [Inject]
+    private Settings settings;
+    
+    [Inject]
+    private SongMetaManager songMetaManager;
+    
+    [Inject]
+    private SongSelectSceneControl songSelectSceneControl;
+
+    [Inject(UxmlName = R.UxmlNames.startButton)]
+    private Button startButton;
+}
+```
+### Async Pattern Example
+```csharp
+public async Awaitable LoadSongAsync(SongMeta songMeta)
+{
+    await Awaitable.WaitForSecondsAsync(0.1f);
+    // Implementation
+}
+```
