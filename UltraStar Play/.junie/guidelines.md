@@ -1,0 +1,1 @@
+Follow the guidelines in AGENTS.md file.
