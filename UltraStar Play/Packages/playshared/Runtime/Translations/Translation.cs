@@ -105,7 +105,9 @@ public readonly struct Translation
 
     public static void InitTranslationConfig()
     {
-        TranslationConfig.Singleton.PropertiesFileProvider = new CachingPropertiesFileProvider(new ResourcesFolderPropertiesFileProvider());
+        TranslationConfig.Singleton.PropertiesFileProvider = new CachingPropertiesFileProvider(
+            new OverwriteTranslationsPropertiesFileProvider(
+                new ResourcesFolderPropertiesFileProvider()));
         TranslationConfig.Singleton.MissingPlaceholderStrategy = Application.isEditor ? MissingPlaceholderStrategy.Throw : MissingPlaceholderStrategy.Log;
         TranslationConfig.Singleton.UnexpectedPlaceholderStrategy = Application.isEditor ? UnexpectedPlaceholderStrategy.Throw : UnexpectedPlaceholderStrategy.Log;
     }
