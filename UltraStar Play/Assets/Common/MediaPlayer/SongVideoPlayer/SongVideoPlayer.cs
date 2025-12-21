@@ -4,6 +4,7 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using UnityEngine.Video;
 
@@ -33,6 +34,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private IVideoSupportProvider currentVideoSupportProvider;
     public IVideoSupportProvider CurrentVideoSupportProvider => currentVideoSupportProvider;
+
+    private IVideoSyncStrategy videoSyncStrategy;
 
     [Inject]
     private WebViewManager webViewManager;
@@ -72,6 +75,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     public bool ForceSyncOnForwardJump { get; set; }
 
     private SongMeta loadedSongMeta;
+    public SongMeta LoadedSongMeta => loadedSongMeta;
 
     public bool IsPartiallyLoaded => currentVideoSupportProvider != null;
     public bool IsFullyLoaded => IsPartiallyLoaded && DurationInMillis > 0 && loadedSongMeta != null;
@@ -117,16 +121,23 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         set
         {
             if (!IsPartiallyLoaded
-                || double.IsNaN(value))
+                || double.IsNaN(value)
+                || DurationInMillis <= 0)
             {
                 return;
             }
 
-            currentVideoSupportProvider.PositionInMillis = value;
+            double normalizedValue = NumberUtils.Limit(value, 0, DurationInMillis);
+            if (IsLooping)
+            {
+                currentVideoSupportProvider.PositionInMillis = normalizedValue % DurationInMillis;
+            }
+            else
+            {
+                currentVideoSupportProvider.PositionInMillis = normalizedValue;
+            }
         }
     }
-
-    private float nextSyncTimeInSeconds;
 
     private bool freezeVideo;
     public bool FreezeVideo
@@ -145,7 +156,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         get => isLooping;
         set
         {
-            if (!IsPartiallyLoaded)
+            if (!IsPartiallyLoaded
+                || isLooping == value)
             {
                 return;
             }
@@ -246,6 +258,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             VideoLoadedEvent evt = await videoSupportProvider.LoadAsync(videoUri, songAudioPlayer.PositionInMillis);
             currentVideoSupportProvider = videoSupportProvider;
+            UpdateVideoSyncStrategy();
             return evt;
         }
         catch (Exception ex)
@@ -291,6 +304,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         currentVideoSupportProvider = null;
         DurationInMillis = 0;
         loadedSongMeta = null;
+        videoSyncStrategy = null;
     }
 
     private void SyncVideoWithMusic(bool forceImmediateSync)
@@ -305,94 +319,59 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     private void SyncVideoPlayPauseWithAudio()
     {
         if (!IsFullyLoaded
-            || !gameObject.activeInHierarchy
-            // When the SongAudioPlayer is used to also play the video then there is nothing to synchronize
-            || currentVideoSupportProvider is SongAudioPlayerVlcVideoSupportProvider)
+            || !gameObject.activeInHierarchy)
         {
             return;
         }
 
-        bool songAudioPlayerIsPlaying = songAudioPlayer == null || songAudioPlayer.IsPlaying;
-
-        if ((!songAudioPlayerIsPlaying
-             && IsPlaying)
-            || (IsFullyLoaded
-                && DurationInMillis <= songAudioPlayer.PositionInSeconds
-                && !IsLooping)
-            || FreezeVideo)
-        {
-            PauseVideo();
-        }
-        else if (songAudioPlayerIsPlaying
-                 && !IsPlaying)
-
-        {
-            if (!IsWaitingForVideoGap(songAudioPlayer.PositionInMillis, loadedSongMeta.VideoGapInMillis))
-            {
-                PlayVideo();
-                SyncVideoPositionWithAudio(true);
-            }
-        }
+        videoSyncStrategy?.SyncPlayPause(this);
     }
 
     public void SyncVideoPositionWithAudio(bool forceImmediateSync)
     {
         if (!IsFullyLoaded
-            || (!forceImmediateSync && nextSyncTimeInSeconds > Time.time)
-            // When the SongAudioPlayer is used to also play the video then there is nothing to synchronize
-            || currentVideoSupportProvider is SongAudioPlayerVlcVideoSupportProvider)
+            || !gameObject.activeInHierarchy)
         {
             return;
         }
 
-        double positionInAudioInMillis = songAudioPlayer.PositionInMillis;
-        double durationOfAudioInMillis = songAudioPlayer.DurationInMillis;
-        if (IsWaitingForVideoGap(positionInAudioInMillis, loadedSongMeta.VideoGapInMillis))
-        {
-            return;
-        }
-
-        // Loop short videos
-        IsLooping = DurationInMillis < durationOfAudioInMillis / 2;
-
-        // Both, the smooth sync and immediate sync need some time.
-        nextSyncTimeInSeconds = Time.time + 1;
-
-        double targetPositionInMillis = (loadedSongMeta.VideoGapInMillis) + positionInAudioInMillis;
-        if (IsLooping)
-        {
-            targetPositionInMillis %= DurationInMillis;
-        }
-        double timeDifferenceInMillis = targetPositionInMillis - PositionInMillis;
-
-        if (FreezeVideo)
-        {
-            PlaybackSpeed = 0;
-        }
-        else
-        {
-            // A big mismatch is corrected immediately.
-            // A short mismatch in video and song position is smoothed out by adjusting the playback speed of the video.
-            if (forceImmediateSync || Math.Abs(timeDifferenceInMillis) > 3000)
-            {
-                // Correct the mismatch immediately.
-                PositionInMillis = targetPositionInMillis;
-                PlaybackSpeed = 1f;
-            }
-            else
-            {
-                // Smooth out the time difference over a duration of 2 seconds
-                float newPlaybackSpeed = 1 + (float)(timeDifferenceInMillis / 2000);
-                PlaybackSpeed = newPlaybackSpeed;
-            }
-        }
+        UpdateLooping();
+        videoSyncStrategy?.SyncPosition(this, forceImmediateSync);
     }
 
-    // Returns true if still waiting for the start of the video at the given position in the song.
-    private bool IsWaitingForVideoGap(double positionInMillis, double videoGapInMillis)
+    public bool IsWaitingForVideoGap()
     {
+        double videoGapInMillis = LoadedSongMeta.VideoGapInMillis;
+        double audioPositionInMillis = songAudioPlayer.PositionInMillis;
+        
         // A negative video gap means this duration has to be waited before playing the video.
-        return videoGapInMillis < 0 && positionInMillis < -videoGapInMillis;
+        return videoGapInMillis < 0 && audioPositionInMillis < -videoGapInMillis;
+    }
+
+    /**
+     * Returns the absolute target position in the video file to be in sync with the audio.
+     * Thereby, the video gap, audio gap, and looping video (short video) are considered.
+     */
+    public double GetTargetPositionInMillis()
+    {
+        if (!IsPartiallyLoaded
+            || !songAudioPlayer.IsFullyLoaded)
+        {
+            return 0;
+        }
+        
+        double targetPositionInMillis = LoadedSongMeta.VideoGapInMillis + songAudioPlayer.PositionInMillis;
+        return IsLooping
+            ? targetPositionInMillis % DurationInMillis
+            : targetPositionInMillis;
+    }
+
+    /**
+     * Returns the difference of the target position and the actual position in the video file.
+     */
+    public double GetOffsetPositionInMillis()
+    {
+        return GetTargetPositionInMillis() - PositionInMillis;
     }
 
     public async void ShowBackgroundImage(SongMeta songMeta)
@@ -528,6 +507,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         DurationInMillis = currentVideoSupportProvider.DurationInMillis;
         currentVideoSupportProvider.PositionInMillis = songAudioPlayer.PositionInMillis;
         currentVideoSupportProvider.SetTargetTexture(videoPlayer.targetTexture);
+        UpdateVideoSyncStrategy();
         PlayVideo();
 
         return new SongVideoLoadedEvent(songMeta, evt.VideoUri);
@@ -591,12 +571,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    private void PlayVideo()
+    public void PlayVideo()
     {
         SetPlaying(true);
     }
 
-    private void PauseVideo()
+    public void PauseVideo()
     {
         SetPlaying(false);
     }
@@ -611,7 +591,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         currentVideoSupportProvider.Stop();
     }
 
-    private void SetPlaying(bool value)
+    public void SetPlaying(bool value)
     {
         if (!IsPartiallyLoaded)
         {
@@ -631,5 +611,35 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
         return !videoUri.IsNullOrEmpty();
+    }
+
+    private void UpdateVideoSyncStrategy()
+    {
+        if (currentVideoSupportProvider == null
+            // If audio player is also responsible for playing video, do not sync.
+            || currentVideoSupportProvider is SongAudioPlayerVlcVideoSupportProvider)
+        {
+            videoSyncStrategy = null;
+            return;
+        }
+
+        // VLC does not support smooth playback speed adjustments. Use pause and skip instead.
+        if (currentVideoSupportProvider is VlcVideoSupportProvider)
+        {
+            videoSyncStrategy = new PauseAndSkipVideoSyncStrategy();
+            return;
+        }
+        
+        // Use playback speed adjustment by default.
+        videoSyncStrategy = new PlaybackSpeedVideoSyncStrategy();
+    }
+
+    private void UpdateLooping()
+    {
+        if (!IsFullyLoaded)
+        {
+            return;
+        }
+        IsLooping = DurationInMillis < songAudioPlayer.DurationInMillis / 2;
     }
 }
