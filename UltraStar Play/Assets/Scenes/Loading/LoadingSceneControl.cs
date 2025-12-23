@@ -169,6 +169,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         AddPreloadAction("libVLC", () =>
         {
             Debug.Log("Supported file extensions by vlc: " + ApplicationUtils.vlcSupportedFileExtensions.JoinWith(", "));
+            DisableLibVlcIfLastExitWasNotClean();
             PreloadLibVlc();
         });
 
@@ -245,7 +246,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     }
 
     /**
-     * Preload libVLC to avoid lag in the game.
+     * Preload libVLC to avoid lag later in the game.
      */
     private void PreloadLibVlc()
     {
@@ -260,7 +261,34 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             Debug.LogException(e);
         }
     }
-    
+
+    private void DisableLibVlcIfLastExitWasNotClean()
+    {
+        try
+        {
+            Settings settings = SettingsManager.Instance.Settings;
+            if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Never)
+            {
+                // Nothing to disable
+                return;
+            }
+            
+            if (!DontDestroyOnLoadManager.Instance.DoFindComponentOrThrow<CleanShutdownChecker>().WasLastShutdownClean)
+            {
+                string errorMessage = "Rough exit detected! Disabling libVLC to keep things stable. You can enable it again in 'Development Options > File Format Support'.";
+                Debug.LogWarning(errorMessage);
+                NotificationManager.CreateNotification(Translation.Of(errorMessage));
+                settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
+                ApplicationUtils.UseVlcToPlayMediaFiles = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to disable libVLC if last exit was not clean: {ex.Message}");
+        }
+    }
+
     private void AddPreloadAction(string title, Action action)
     {
         preloadActions.Add(title, action);
