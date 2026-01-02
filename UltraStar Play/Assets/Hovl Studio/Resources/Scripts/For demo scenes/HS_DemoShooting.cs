@@ -26,7 +26,7 @@ public class HS_DemoShooting : MonoBehaviour
     float buttonSaver = 0f;
 
     //For Camera shake
-    public Animation camAnim;
+    // public Animation camAnim;
 
     void Start()
     {
@@ -41,7 +41,7 @@ public class HS_DemoShooting : MonoBehaviour
         //Single shoot
         if (Input.GetButtonDown("Fire1"))
         {
-            camAnim.Play(camAnim.clip.name);
+            // camAnim.Play(camAnim.clip.name);
             Instantiate(Prefabs[Prefab], FirePoint.transform.position, FirePoint.transform.rotation);
         }
 
