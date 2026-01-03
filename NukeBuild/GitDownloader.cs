@@ -46,7 +46,7 @@ public class GitDownloader
 
     private void CloneRepository()
     {
-        Console.WriteLine($"Cloning from remote: RemoteUrl='{RemoteUrl}', CommitHash='{{CommitHash}}', Depth='{Depth}'");
+        Console.WriteLine($"Cloning from remote: RemoteUrl='{RemoteUrl}', CommitHash='{CommitHash}', Depth='{Depth}'");
 
         Git($"init", workingDirectory: TargetDir);
         Git($"remote add origin {RemoteUrl}", workingDirectory: TargetDir);
