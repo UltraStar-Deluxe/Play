@@ -72,8 +72,8 @@ public abstract class BaseDependencyDownloader(
         // - Cannot use prepared Unity package from GitHub because Unity dependency resolution inside a package (inside playshared) does not work with GitHub repositories
         var downloader = new GitDownloader
         {
-            RemoteUrl = "https://github.com/neuecc/UniRx.git",
-            CommitHash = "66205df49631860dd8f7c3314cb518b54c944d30",
+            RemoteUrl = "https://github.com/achimmihca/UniRx",
+            CommitHash = "7870c2d6cd035b4c18bb264c3dd529a4ac452e6e",
             Branch = "master",
             TargetDir = unityProjectDir / "Assets" / "Plugins" / "UniRx",
             Depth = cloneDepth,
