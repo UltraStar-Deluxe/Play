@@ -27,7 +27,7 @@
         "com.whisper.unity",
         "VLCUnity",
         "OneJS.Common",
-        "OneJS.CustomStyleSheets.Pre6.3"
+        "OneJS.CustomStyleSheets.6.3"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
