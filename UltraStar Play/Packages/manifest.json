@@ -27,7 +27,11 @@
     "jillejr.newtonsoft.json-for-unity.converters": "https://github.com/applejag/Newtonsoft.Json-for-Unity.Converters.git#1.6.3",
     "com.unity.modules.adaptiveperformance": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
+    "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.particlesystem": "1.0.0",
+    "com.unity.modules.physics2d": "1.0.0",
+    "com.unity.modules.unitywebrequesttexture": "1.0.0",
+    "com.unity.modules.unitywebrequestwww": "1.0.0",
     "com.unity.modules.vectorgraphics": "1.0.0",
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0"
