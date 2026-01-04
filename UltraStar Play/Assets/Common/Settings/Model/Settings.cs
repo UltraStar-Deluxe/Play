@@ -19,7 +19,7 @@ public class Settings : ISettings
     public int VocalsAudioVolumePercent { get; set; } = 100;
     public int SceneChangeSoundVolumePercent { get; set; } = 30;
     public int SfxVolumePercent { get; set; } = 30;
-    public bool PreferPortAudio { get; set; }
+    public bool PreferPortAudio { get; set; } = true;
     public bool PlayRecordedAudio { get; set; }
     public string SoundfontPath { get; set; } = "";
     public float PreviewFadeInDurationInSeconds { get; set; } = 2;
