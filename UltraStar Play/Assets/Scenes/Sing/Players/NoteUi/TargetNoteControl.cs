@@ -1,4 +1,5 @@
-﻿using CommonOnlineMultiplayer;
+﻿using System.Collections.Generic;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -87,6 +88,11 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         image.style.unityBackgroundImageTintColor = new StyleColor(color);
         image.SetBorderColor(color);
         targetNoteBorder.SetBorderColor(color);
+        
+        if (micProfile == null)
+        {
+            VisualElement.style.opacity = 0.25f;
+        }
     }
 
     private Color32 GetColorForPlayer()
