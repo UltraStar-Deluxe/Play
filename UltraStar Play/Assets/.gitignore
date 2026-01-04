@@ -45,6 +45,12 @@ Vuplex.meta
 Singtaa/
 Singtaa.meta
 
+# AVPro Video by RenderHeads Ltd
+AVProVideo/
+AVProVideo.meta
+StreamingAssets/AVProVideoSamples/
+StreamingAssets/AVProVideoSamples.meta
+
 ######################################
 ## StreamingAssets
 StreamingAssets/SpleeterMsvcExe/
