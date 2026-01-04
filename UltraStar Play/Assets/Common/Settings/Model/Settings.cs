@@ -170,6 +170,7 @@ public class Settings : ISettings
     public List<string> VlcOptions { get; set; } = new();
     public bool LogVlcOutput { get; set; }
     public EThirdPartyLibraryUsage VlcToPlayMediaFilesUsage { get; set; } = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
+    public EThirdPartyLibraryUsage AvProToPlayMediaFilesUsage { get; set; } = EThirdPartyLibraryUsage.Always;
 
     // Mods
     public List<string> EnabledMods { get; private set; } = new();

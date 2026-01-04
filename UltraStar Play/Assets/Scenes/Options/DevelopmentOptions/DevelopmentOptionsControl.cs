@@ -131,6 +131,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlName = R.UxmlNames.useVlcToPlayMediaFilesChooser)]
     private Chooser useVlcToPlayMediaFilesChooser;
+    
+    [Inject(UxmlName = R.UxmlNames.useAvproToPlayMediaFilesChooser)]
+    private Chooser useAvproToPlayMediaFilesChooser;
 
     [Inject(UxmlName = R.UxmlNames.logVlcOutputToggle)]
     private Toggle logVlcOutputToggle;
@@ -365,6 +368,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new EnumChooserControl<ESongVideoPlayback>(songVideoPlaybackChooser)
             .Bind(() => settings.SongVideoPlayback,
                 newValue => settings.SongVideoPlayback = newValue);
+
+        // AVPro
+        new EnumChooserControl<EThirdPartyLibraryUsage>(useAvproToPlayMediaFilesChooser)
+            .Bind(() => settings.AvProToPlayMediaFilesUsage,
+                newValue => settings.AvProToPlayMediaFilesUsage = newValue);
 
         // VLC
         new EnumChooserControl<EThirdPartyLibraryUsage>(useVlcToPlayMediaFilesChooser)

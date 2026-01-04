@@ -34,6 +34,7 @@ public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
     {
         return !WebViewUtils.CanHandleWebViewUrl(audioUri)
             && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
+            && settings.AvProToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
             && ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(audioUri));
     }
 

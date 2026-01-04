@@ -142,6 +142,42 @@ public static class ApplicationUtils
         .Where(fileExtension => !audioFileExtensions.Contains(fileExtension))
         .ToList();
 
+    public static readonly IReadOnlyCollection<string> avproSupportedAudioFiles = new List<string>
+        {
+            "aac",
+            "aif",
+            "aiff",
+            "flac",
+            "kar",
+            "m4a",
+            "mid",
+            "midi",
+            "mp3",
+            "ogg",
+            "opus",
+            "pcm",
+            "wav",
+            "wma",
+        }
+        .Where(fileExtension => audioFileExtensions.Contains(fileExtension))
+        .ToList();
+
+    public static readonly IReadOnlyCollection<string> avproSupportedVideoFiles = new List<string>
+        {
+            "avi",
+            "flv",
+            "m4v",
+            "mkv",
+            "mov",
+            "mp4",
+            "mpeg",
+            "mpg",
+            "ogg",
+            "webm",
+        }
+        .Where(fileExtension => !audioFileExtensions.Contains(fileExtension))
+        .ToList();
+
     public static readonly IReadOnlyCollection<string> unitySupportedAudioFiles = new HashSet<string>
     {
         "mp3",
@@ -260,6 +296,18 @@ public static class ApplicationUtils
         return vlcSupportedVideoFiles.Contains(fileExtension);
     }
 
+    public static bool IsAvproSupportedAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return avproSupportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsAvproSupportedVideoFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return avproSupportedVideoFiles.Contains(fileExtension);
+    }
+    
     public static bool IsSupportedAudioFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);

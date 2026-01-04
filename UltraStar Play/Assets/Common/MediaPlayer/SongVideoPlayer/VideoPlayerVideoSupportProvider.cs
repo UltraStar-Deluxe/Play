@@ -27,6 +27,7 @@ public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
     {
         return !WebViewUtils.CanHandleWebViewUrl(videoUri)
             && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
+            && settings.AvProToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
             && ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(videoUri));
     }
 
