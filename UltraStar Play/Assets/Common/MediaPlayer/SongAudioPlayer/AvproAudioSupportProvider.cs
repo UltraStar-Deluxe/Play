@@ -8,7 +8,6 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
     public MediaPlayer mediaPlayer;
 
     private double lastSetVolumeFactor = 1;
-    private bool playing;
 
     private void Update()
     {
@@ -25,16 +24,13 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
         mediaPlayer.Pause();
         mediaPlayer.CloseMedia();
 
-        mediaPlayer.SetMediaSource(MediaSource.Path);
-        mediaPlayer.SetMediaPath(new MediaPath(audioUri, MediaPathType.AbsolutePathOrURL));
 
         // Set volume to 0 to avoid audio glitches.
         mediaPlayer.AudioVolume = 0;
         lastSetVolumeFactor = 0;
 
-        // Play to trigger loading.
-        mediaPlayer.Play();
-        playing = true;
+        // Play to trigger loading. autoPlay is true by default
+        mediaPlayer.OpenMedia(new MediaPath(audioUri, MediaPathType.AbsolutePathOrURL));
 
         // Only set PositionInMillis if not 0, to avoid unnecessary time changes. This avoids audio glitches and time synchronization mismatches.
         if (startPositionInMillis > 0)
@@ -69,7 +65,6 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
     {
         if (IsFullyLoaded)
         {
-            playing = true;
             mediaPlayer.Play();
         }
     }
@@ -78,21 +73,19 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
     {
         if (IsFullyLoaded)
         {
-            playing = false;
             mediaPlayer.Pause();
         }
     }
 
     public override void Stop()
     {
-        playing = false;
         mediaPlayer.Pause();
         mediaPlayer.CloseMedia();
     }
 
     public override bool IsPlaying
     {
-        get => playing;
+        get => mediaPlayer.Control.IsPlaying();
         set
         {
             if (value)
