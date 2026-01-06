@@ -8,6 +8,7 @@
         "UniRx",
         "com.achimmihca.uniinject",
         "com.achimmihca.protrans",
+        "com.achimmihca.portaudioforunity",
         "playshared",
         "playshared.Editor.Tests",
         "playsharedui",
