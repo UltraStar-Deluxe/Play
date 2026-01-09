@@ -63,33 +63,40 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
         string songFilePath = GetSongMetaFilePath(txtFilePath);
         long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
 
-        try
+        SongMeta songMeta = LoadSongMeta(songFilePath);
+        T evt = await songMediaPlayer.LoadAndPlayAsync(songMeta);
+
+        double durationInMillis = songMediaPlayer.DurationInMillis;
+        if (durationInMillis <= 0)
         {
-            SongMeta songMeta = LoadSongMeta(songFilePath);
-            T evt = await songMediaPlayer.LoadAndPlayAsync(songMeta);
-
-            double durationInMillis = songMediaPlayer.DurationInMillis;
-            if (durationInMillis <= 0)
-            {
-                Assert.Fail($"Failed to load, duration is 0.");
-            }
-
-            if (Math.Abs(durationInMillis - targetDurationInMillis) > MaxDistanceToTargetDurationInMillis)
-            {
-                Assert.Fail($"Expected duration near {targetDurationInMillis} ms, but was {durationInMillis} ms.");
-            }
-
-            if (TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis))
-            {
-                Assert.Fail($"Failed to load audio after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. SongMeta: {JsonConverter.ToJson(songMeta)}");
-            }
-
-            Debug.Log($"Loaded successfully after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms, media duration: {songMediaPlayer.DurationInMillis} ms, mediaUri: '{evt.MediaUri}'");
+            Assert.Fail($"Failed to load, duration is 0.");
         }
-        catch (Exception ex)
+
+        if (Math.Abs(durationInMillis - targetDurationInMillis) > MaxDistanceToTargetDurationInMillis)
         {
-            Debug.LogException(ex);
+            Assert.Fail($"Expected duration near {targetDurationInMillis} ms, but was {durationInMillis} ms.");
         }
+
+        if (TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis))
+        {
+            Assert.Fail($"Failed to load audio after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. SongMeta: {JsonConverter.ToJson(songMeta)}");
+        }
+
+        Debug.Log($"Loaded successfully after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms, media duration: {songMediaPlayer.DurationInMillis} ms, mediaUri: '{evt.MediaUri}', mediaSupportProvider: {GetMediaSupportProvider(songMediaPlayer)}");
+    }
+
+    private object GetMediaSupportProvider<T>(ISongMediaPlayer<T> songMediaPlayer) where T : ISongMediaLoadedEvent
+    {
+        if (songMediaPlayer is SongAudioPlayer audioPlayer)
+        {
+            return audioPlayer.CurrentAudioSupportProvider;
+        }
+        if (songMediaPlayer is SongVideoPlayer videoPlayer)
+        {
+            return videoPlayer.CurrentVideoSupportProvider;
+        }
+
+        return null;
     }
 
     protected string GetSongMetaFilePath(string txtFilePath)
