@@ -5,6 +5,8 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
 {
     public MediaPlayer mediaPlayer;
     public ResolveToRenderTexture resolveToRenderTexture;
+
+    private string lastMediaPlayerError = "";
     
     public override bool IsSupported(string videoUri, bool videoEqualsAudio)
     {
@@ -25,6 +27,10 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
         mediaPlayer.Stop();
         mediaPlayer.CloseMedia();
 
+        mediaPlayer.Events.RemoveAllListeners();
+        mediaPlayer.Events.AddListener(OnMediaPlayerError);
+        lastMediaPlayerError = "";
+
         // autoPlay is true by default
         mediaPlayer.OpenMedia(new MediaPath(videoUri, MediaPathType.AbsolutePathOrURL));
         mediaPlayer.AudioMuted = true;
@@ -36,10 +42,15 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
-        await ConditionUtils.WaitForConditionAsync(() => !this || IsFullyLoaded);
+        await ConditionUtils.WaitForConditionAsync(() => !this || IsFullyLoaded || HasMediaPlayerError());
         if (!this)
         {
             throw new DestroyedAlreadyException($"Failed to load video '{videoUri}': {nameof(AvproVideoSupportProvider)} has been destroyed already.");
+        }
+
+        if (HasMediaPlayerError())
+        {
+            throw new AvproException(lastMediaPlayerError);
         }
         return new VideoLoadedEvent(videoUri);
     }
@@ -117,4 +128,18 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
     }
 
     public override double DurationInMillis => (mediaPlayer.Info?.GetDuration() ?? 0) * 1000.0;
+    
+    private void OnMediaPlayerError(MediaPlayer aMediaPlayer, MediaPlayerEvent.EventType eventType, ErrorCode errorCode)
+    {
+        if (errorCode is ErrorCode.None)
+        {
+            return;
+        }
+        lastMediaPlayerError = Helper.GetErrorMessage(errorCode);
+    }
+
+    private bool HasMediaPlayerError()
+    {
+        return !lastMediaPlayerError.IsNullOrEmpty();
+    }
 }

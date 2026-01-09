@@ -9,6 +9,8 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
 
     private double lastSetVolumeFactor = 1;
 
+    private string lastMediaPlayerError = "";
+    
     private void Update()
     {
         // Update volume when AudioListener.volume changes, which is considered as part of the property setter
@@ -24,6 +26,9 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
         mediaPlayer.Pause();
         mediaPlayer.CloseMedia();
 
+        mediaPlayer.Events.RemoveAllListeners();
+        mediaPlayer.Events.AddListener(OnMediaPlayerError);
+        lastMediaPlayerError = "";
 
         // Set volume to 0 to avoid audio glitches.
         mediaPlayer.AudioVolume = 0;
@@ -39,13 +44,17 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
         }
 
         // Wait until media has been loaded asynchronously.
-        await ConditionUtils.WaitForConditionAsync(() => !this || IsFullyLoaded,
+        await ConditionUtils.WaitForConditionAsync(() => !this || IsFullyLoaded || HasMediaPlayerError(),
             new WaitForConditionConfig {description = $"load audio '{audioUri}'" });
         if (!this)
         {
             throw new DestroyedAlreadyException($"Failed to load audio clip '{audioUri}': {nameof(AvproAudioSupportProvider)} has been destroyed already.");
         }
 
+        if (HasMediaPlayerError())
+        {
+            throw new AvproException(lastMediaPlayerError);
+        }
         return new AudioLoadedEvent(audioUri);
     }
 
@@ -142,4 +151,18 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
     }
 
     private float MediaPlayerTargetVolumePercent => (float)(lastSetVolumeFactor * AudioListener.volume);
+    
+    private void OnMediaPlayerError(MediaPlayer aMediaPlayer, MediaPlayerEvent.EventType eventType, ErrorCode errorCode)
+    {
+        if (errorCode is ErrorCode.None)
+        {
+            return;
+        }
+        lastMediaPlayerError = Helper.GetErrorMessage(errorCode);
+    }
+
+    private bool HasMediaPlayerError()
+    {
+        return !lastMediaPlayerError.IsNullOrEmpty();
+    }
 }
