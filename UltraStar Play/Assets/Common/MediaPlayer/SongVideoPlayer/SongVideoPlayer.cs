@@ -617,9 +617,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         if (currentVideoSupportProvider == null
             // If audio player is also responsible for playing video, do not sync.
-            || currentVideoSupportProvider is SongAudioPlayerVlcVideoSupportProvider)
+            || currentVideoSupportProvider is SongAudioPlayerVlcVideoSupportProvider
+            || currentVideoSupportProvider is SongAudioPlayerAvproVideoSupportProvider)
         {
-            videoSyncStrategy = null;
+            videoSyncStrategy = new PlayPauseOnlyVideoSyncStrategy();
             return;
         }
 
