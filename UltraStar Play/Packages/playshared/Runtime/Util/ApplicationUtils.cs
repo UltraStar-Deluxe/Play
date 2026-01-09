@@ -146,7 +146,7 @@ public static class ApplicationUtils
         {
             "aac",
             "aif",
-            "aiff",
+            // "aiff", // Not supported by AVPro
             "flac",
             "kar",
             "m4a",
@@ -165,7 +165,8 @@ public static class ApplicationUtils
     public static readonly IReadOnlyCollection<string> avproSupportedVideoFiles = new List<string>
         {
             "avi",
-            "flv",
+            // "flv", // Not supported by AVPro
+            // "f4v", // Not supported by AVPro
             "m4v",
             "mkv",
             "mov",
@@ -174,6 +175,7 @@ public static class ApplicationUtils
             "mpg",
             "ogg",
             "webm",
+            "wmv",
         }
         .Where(fileExtension => !audioFileExtensions.Contains(fileExtension))
         .ToList();
