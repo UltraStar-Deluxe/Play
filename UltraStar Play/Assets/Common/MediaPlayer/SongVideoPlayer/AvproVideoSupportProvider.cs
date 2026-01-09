@@ -97,8 +97,7 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
         get => mediaPlayer.Control?.GetPlaybackRate() ?? 1;
         set
         {
-            // TODO: SetPlaybackRate does not work smoothly
-            // mediaPlayer.Control?.SetPlaybackRate((float)value);
+            mediaPlayer.Control?.SetPlaybackRate((float)value);
         }
     }
 

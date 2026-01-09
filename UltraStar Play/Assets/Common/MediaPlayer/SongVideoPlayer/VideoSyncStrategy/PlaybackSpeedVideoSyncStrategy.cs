@@ -6,6 +6,8 @@ using UnityEngine;
  */
 public class PlaybackSpeedVideoSyncStrategy : AbstractVideoSyncStrategy
 {
+    private const int ImmediatePlaybackPositionSyncThresholdInMillis = 3000;
+    private const int MinOffsetToSyncThresholdInMillis = 10;
     private const float SyncCheckIntervalInSeconds = 1;
     
     private float lastSyncTimeInSeconds;
@@ -36,12 +38,19 @@ public class PlaybackSpeedVideoSyncStrategy : AbstractVideoSyncStrategy
         {
             // A big mismatch is corrected immediately.
             // A short mismatch in video and song position is smoothed out by adjusting the playback speed of the video.
-            if (forceImmediateSync || Math.Abs(offsetInMillis) > 3000)
+            if (forceImmediateSync || Math.Abs(offsetInMillis) > ImmediatePlaybackPositionSyncThresholdInMillis)
             {
                 // Correct the mismatch immediately.
                 Log.WithMethodContext().Verbose(() => $"Hard sync to audio position. Offset: {offsetInMillis:F1} ms");
                 songVideoPlayer.PositionInMillis = songVideoPlayer.GetTargetPositionInMillis();
                 songVideoPlayer.PlaybackSpeed = 1f;
+            }
+            else if (Math.Abs(offsetInMillis) < MinOffsetToSyncThresholdInMillis)
+            {
+                // Good enough, do not change anything.
+                float newPlaybackSpeed = 1;
+                Log.WithMethodContext().Verbose(() => $"No sync needed. Offset: {offsetInMillis:F1} ms, PlaybackSpeed: {newPlaybackSpeed}");
+                songVideoPlayer.PlaybackSpeed = newPlaybackSpeed;
             }
             else
             {

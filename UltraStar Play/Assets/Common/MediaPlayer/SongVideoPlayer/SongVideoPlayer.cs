@@ -626,9 +626,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         // VLC does not support smooth playback speed adjustments. Use pause and skip instead.
         // Same for AvPro.
-        // TODO: Does AvPro support smooth playback speed adjustments?
-        if (currentVideoSupportProvider is VlcVideoSupportProvider
-            || currentVideoSupportProvider is AvproVideoSupportProvider)
+        if (currentVideoSupportProvider is VlcVideoSupportProvider)
         {
             videoSyncStrategy = new PauseAndSkipVideoSyncStrategy();
             return;

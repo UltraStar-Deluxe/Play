@@ -9,7 +9,7 @@ using UnityEngine;
 public class PauseAndSkipVideoSyncStrategy : AbstractVideoSyncStrategy
 {
     private const int ImmediatePlaybackPositionSyncThresholdInMillis = 2000;
-    private const int MinOffsetToSyncPositionInMillis = 100;
+    private const int MinOffsetToSyncThresholdInMillis = 100;
     private const double SyncCheckIntervalInSeconds = 2;
     // TODO: Find a better approach to consider the time it takes to change position.
     private const double AssumedPositionChangeDelayInMillis = 400;
@@ -44,7 +44,7 @@ public class PauseAndSkipVideoSyncStrategy : AbstractVideoSyncStrategy
 
         // Positive when target (audio aligned video time) is ahead of current video time
         double offsetInMillis = songVideoPlayer.GetOffsetPositionInMillis();
-        if (!forceImmediateSync && Math.Abs(offsetInMillis) < MinOffsetToSyncPositionInMillis)
+        if (!forceImmediateSync && Math.Abs(offsetInMillis) < MinOffsetToSyncThresholdInMillis)
         {
             Log.WithMethodContext().Verbose(() => $"No sync to audio position. Offset: {offsetInMillis:F1} ms");
             return;
