@@ -31,6 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6601479958619146052}
+  - {fileID: 4315982028030467925}
   m_Father: {fileID: 7650755054248871620}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6702678212285683988
@@ -46,6 +47,63 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Common::AvproAudioSupportProvider
   mediaPlayer: {fileID: 8913127269396744840}
+--- !u!1 &2236393017034967331
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4315982028030467925}
+  - component: {fileID: 1669580694796533858}
+  m_Layer: 5
+  m_Name: ResolveToRenderTexture
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4315982028030467925
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2236393017034967331}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7627928185600742695}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1669580694796533858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2236393017034967331}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 448e5e4039505584c852da1a7cc5c361, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AVProVideo.Runtime::RenderHeads.Media.AVProVideo.ResolveToRenderTexture
+  _mediaPlayer: {fileID: 8913127269396744840}
+  _options:
+    applyHSBC: 0
+    hue: 0
+    saturation: 0.5
+    brightness: 0.5
+    contrast: 0.5
+    gamma: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    generateMipmaps: 0
+    aspectRatio: 5
+  _resolveFlags: 23
+  _externalTexture: {fileID: 0}
 --- !u!1 &3051613993728625028
 GameObject:
   m_ObjectHideFlags: 0

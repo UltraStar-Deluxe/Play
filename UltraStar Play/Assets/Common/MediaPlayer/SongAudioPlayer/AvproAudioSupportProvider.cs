@@ -102,19 +102,19 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
     public override double PlaybackSpeed
     {
         get => mediaPlayer.PlaybackRate;
-        set => mediaPlayer.PlaybackRate = (float)value;
+        set => SetPlaybackSpeed(value, true);
     }
 
     public override void SetPlaybackSpeed(double newValue, bool changeTempoButKeepPitch)
     {
-        // Not supported
+        mediaPlayer.PlaybackRate = (float)newValue;
     }
 
     public override double PositionInMillis
     {
         get
         {
-            return (mediaPlayer.Control?.GetCurrentTime() * 1000.0) ?? 0;
+            return (mediaPlayer.Control?.GetCurrentTime() ?? 0) * 1000.0;
         }
 
         set
@@ -126,7 +126,7 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
         }
     }
 
-    public override double DurationInMillis => (mediaPlayer.Info?.GetDuration() * 1000.0) ?? 0;
+    public override double DurationInMillis => (mediaPlayer.Info?.GetDuration() ?? 0) * 1000.0;
 
     public override double VolumeFactor
     {
