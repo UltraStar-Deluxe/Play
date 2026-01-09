@@ -94,7 +94,7 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
 
     public override bool IsPlaying
     {
-        get => mediaPlayer.Control.IsPlaying();
+        get => mediaPlayer.Control?.IsPlaying() ?? false;
         set
         {
             if (value)

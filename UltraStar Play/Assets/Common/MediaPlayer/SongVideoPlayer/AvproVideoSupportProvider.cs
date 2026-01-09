@@ -100,7 +100,7 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
     public override bool IsLooping
     {
         get => mediaPlayer.Control?.IsLooping() ?? false;
-        set { mediaPlayer.Control.SetLooping(value); }
+        set { mediaPlayer.Control?.SetLooping(value); }
     }
 
     public override double PlaybackSpeed
