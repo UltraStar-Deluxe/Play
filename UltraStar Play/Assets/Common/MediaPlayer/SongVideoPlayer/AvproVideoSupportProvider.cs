@@ -7,13 +7,6 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
     public ResolveToRenderTexture resolveToRenderTexture;
 
     private string lastMediaPlayerError = "";
-    
-    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
-    {
-        return base.IsSupported(videoUri, videoEqualsAudio)
-               // The SongAudioPlayer's mediaPlayer should be used when video and audio are equal
-               && !videoEqualsAudio;
-    }
 
     public override void Unload()
     {

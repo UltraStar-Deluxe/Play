@@ -25,12 +25,6 @@ public abstract class AbstractVlcVideoSupportProvider : AbstractVideoSupportProv
         Destroy(vlcTexture);
     }
 
-    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
-    {
-        return !WebRequestUtils.IsHttpOrHttpsUri(videoUri)
-               && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
-               && ApplicationUtils.IsVlcSupportedVideoFormat(Path.GetExtension(videoUri));
-    }
 
     public override void SetTargetTexture(RenderTexture renderTexture)
     {

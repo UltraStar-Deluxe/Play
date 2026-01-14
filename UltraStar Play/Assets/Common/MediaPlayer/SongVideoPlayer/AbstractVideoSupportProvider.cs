@@ -11,7 +11,6 @@ public abstract class AbstractVideoSupportProvider : MonoBehaviour, INeedInjecti
     protected SceneNavigator sceneNavigator;
 
     public abstract Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis);
-    public abstract bool IsSupported(string videoUri, bool videoEqualsAudio);
     public abstract void Unload();
     public abstract void Play();
     public abstract void Pause();

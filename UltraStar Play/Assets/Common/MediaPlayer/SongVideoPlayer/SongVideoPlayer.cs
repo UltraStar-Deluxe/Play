@@ -245,8 +245,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         UnloadVideo();
 
-        IVideoSupportProvider videoSupportProvider = availableVideoSupportProviders
-            .FirstOrDefault(it => it.IsSupported(videoUri, videoEqualsAudio));
+        IVideoSupportProvider videoSupportProvider = VideoSupportProviderSelectionStrategy.Select(
+            availableVideoSupportProviders,
+            videoUri,
+            videoEqualsAudio,
+            songAudioPlayer,
+            settings);
         if (videoSupportProvider == null)
         {
             throw new SongVideoPlayerException($"Unsupported video resource '{videoUri}'.");
@@ -275,12 +279,18 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 .Except(new List<IVideoSupportProvider>() { videoSupportProvider })
                 .Where(it => it != null) // Objects can be null when they have been destroyed already.
                 .ToArray();
-            Debug.LogError($"Failed to load video '{videoUri}' via {videoSupportProvider}. Using one of {remainingVideoSupportProviders.JoinWith(", ")} as fallback: {ex.Message}");
-
-            if (remainingVideoSupportProviders.IsNullOrEmpty())
+            IVideoSupportProvider nextProvider = VideoSupportProviderSelectionStrategy.Select(
+                remainingVideoSupportProviders,
+                videoUri,
+                videoEqualsAudio,
+                songAudioPlayer,
+                settings);
+            if (nextProvider == null)
             {
-                throw new VideoSupportProviderException($"Failed to load video and no remaining video support providers: {videoUri}");
+                throw new VideoSupportProviderException($"Failed to load video and no remaining suitable video support providers. uri: {videoUri}, videoEqualsAudio: {videoEqualsAudio}");
             }
+
+            Debug.LogError($"Failed to load video '{videoUri}' via {videoSupportProvider}. Trying {nextProvider} as fallback: {ex.Message}");
 
             return await DoLoadAndPlayVideoAsync(videoUri, remainingVideoSupportProviders, videoEqualsAudio);
         }

@@ -8,13 +8,6 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     [Inject]
     private VlcManager vlcManager;
 
-    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
-    {
-        return base.IsSupported(videoUri, videoEqualsAudio)
-               // The SongAudioPlayer's mediaPlayer should be used when video and audio are equal
-               && !videoEqualsAudio;
-    }
-
     public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {
         // Instantiate new vlc player

@@ -17,13 +17,6 @@ public class SongAudioPlayerAvproVideoSupportProvider : AbstractAvproVideoSuppor
         }
     }
 
-    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
-    {
-        return base.IsSupported(videoUri, videoEqualsAudio)
-            && videoEqualsAudio
-            && SongAudioPlayerAvproMediaPlayer != null;
-    }
-
     public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {
         await ConditionUtils.WaitForConditionAsync(() => !this || SongAudioPlayerAvproMediaPlayer?.Info?.GetDuration() > 0,
