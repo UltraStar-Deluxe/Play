@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine.TestTools;
@@ -56,7 +57,8 @@ public class SongVideoPlayerFormatTest : AbstractMediaFileFormatTest
         SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         
-        yield return SongVideoPlayerShouldLoadFileAsync(txtFileName);
+        yield return SongVideoPlayerShouldLoadFileAsync(txtFileName,
+            new List<Type> {typeof(VideoPlayerVideoSupportProvider)});
     }
 
     [UnityTest]
@@ -66,7 +68,8 @@ public class SongVideoPlayerFormatTest : AbstractMediaFileFormatTest
         SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
         SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         
-        yield return SongVideoPlayerShouldLoadFileAsync(txtFileName);
+        yield return SongVideoPlayerShouldLoadFileAsync(txtFileName,
+            new List<Type> {typeof(VlcVideoSupportProvider)});
     }
     
     [UnityTest]
@@ -76,6 +79,7 @@ public class SongVideoPlayerFormatTest : AbstractMediaFileFormatTest
         SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
         
-        yield return SongVideoPlayerShouldLoadFileAsync(txtFileName);
+        yield return SongVideoPlayerShouldLoadFileAsync(txtFileName,
+            new List<Type> {typeof(AvproVideoSupportProvider)});
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine.TestTools;
@@ -33,14 +34,17 @@ public class WebViewTest : AbstractMediaFileFormatTest
     [UnityTest]
     public IEnumerator ShouldUseLocalAudioTest([ValueSource(nameof(shouldUseLocalAudioFiles))] string txtFilePath)
     {
-        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath);
-        Assert.IsFalse(songAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
+        yield return SongAudioPlayerShouldLoadFileAsync(
+            txtFilePath,
+            new List<Type> { typeof(AudioSourceAudioSupportProvider) });
     }
 
     [UnityTest]
     public IEnumerator ShouldUseWebView([ValueSource(nameof(shouldUseWebViewFiles))] string txtFilePath)
     {
-        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, WebViewTargetDurationInMillis, WebViewMaxWaitTimeInMillis);
-        Assert.IsTrue(songAudioPlayer.CurrentAudioSupportProvider is WebViewAudioSupportProvider);
+        yield return SongAudioPlayerShouldLoadFileAsync(
+            txtFilePath,
+            new List<Type> { typeof(WebViewAudioSupportProvider) },
+            WebViewTargetDurationInMillis, WebViewMaxWaitTimeInMillis);
     }
 }

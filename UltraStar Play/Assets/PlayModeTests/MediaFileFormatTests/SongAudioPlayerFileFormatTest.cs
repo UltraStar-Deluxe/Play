@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine.TestTools;
@@ -69,7 +70,8 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
         SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         
-        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath,
+            new List<Type> {typeof(AudioSourceAudioSupportProvider), typeof(VideoPlayerAudioSupportProvider)});
     }
 
     [UnityTest]
@@ -79,7 +81,8 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
         SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
         SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         
-        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath,
+            new List<Type> {typeof(VlcAudioSupportProvider)});
     }
     
     [UnityTest]
@@ -89,7 +92,8 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
         SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
         SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         
-        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath,
+            new List<Type> {typeof(AvproAudioSupportProvider)});
     }
 
     [UnityTest]
@@ -99,6 +103,8 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
         SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         
-        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, 8000);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath,
+            new List<Type> {typeof(MidiAudioSupportProvider)},
+            8000);
     }
 }
