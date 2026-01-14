@@ -290,7 +290,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 throw new VideoSupportProviderException($"Failed to load video and no remaining suitable video support providers. uri: {videoUri}, videoEqualsAudio: {videoEqualsAudio}");
             }
 
-            Debug.LogError($"Failed to load video '{videoUri}' via {videoSupportProvider}. Trying {nextProvider} as fallback: {ex.Message}");
+            Debug.LogError($"Failed to load video '{videoUri}' via {videoSupportProvider}. Trying {nextProvider} as fallback.");
 
             return await DoLoadAndPlayVideoAsync(videoUri, remainingVideoSupportProviders, videoEqualsAudio);
         }

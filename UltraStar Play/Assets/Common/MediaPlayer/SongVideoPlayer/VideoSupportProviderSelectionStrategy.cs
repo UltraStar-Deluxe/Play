@@ -16,9 +16,10 @@ public static class VideoSupportProviderSelectionStrategy
         }
 
         // WebView URLs
-        if (WebViewUtils.CanHandleWebViewUrl(videoUri))
+        if (WebViewUtils.CanHandleWebViewUrl(videoUri)
+            && TryGetProvider<WebViewVideoSupportProvider>(availableProviders, out IVideoSupportProvider webViewProvider))
         {
-            return GetByType<WebViewVideoSupportProvider>(availableProviders);
+            return webViewProvider;
         }
 
         string extension = Path.GetExtension(videoUri);
@@ -27,44 +28,50 @@ public static class VideoSupportProviderSelectionStrategy
         // Unity VideoPlayer is default, also for HTTP URLs
         if (settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
             && settings.AvProToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
-            && (ApplicationUtils.IsUnitySupportedVideoFormat(extension) || isHttp))
+            && (ApplicationUtils.IsUnitySupportedVideoFormat(extension) || isHttp)
+            && TryGetProvider<VideoPlayerVideoSupportProvider>(availableProviders, out IVideoSupportProvider videoPlayerProvider))
         {
-            return GetByType<VideoPlayerVideoSupportProvider>(availableProviders);
+            return videoPlayerProvider;
         }
         
         // When audio and video are the same file, reuse the audio provider from VLC respectively AVPro.
         if (videoEqualsAudio)
         {
-            if (songAudioPlayer.CurrentAudioSupportProvider is AvproAudioSupportProvider)
+            if (songAudioPlayer.CurrentAudioSupportProvider is AvproAudioSupportProvider
+                && TryGetProvider<SongAudioPlayerAvproVideoSupportProvider>(availableProviders, out IVideoSupportProvider songAudioPlayerAvproProvider))
             {
-                return GetByType<SongAudioPlayerAvproVideoSupportProvider>(availableProviders);
+                return songAudioPlayerAvproProvider;
             }
             
-            if (songAudioPlayer.CurrentAudioSupportProvider is VlcAudioSupportProvider)
+            if (songAudioPlayer.CurrentAudioSupportProvider is VlcAudioSupportProvider
+                && TryGetProvider<SongAudioPlayerVlcVideoSupportProvider>(availableProviders, out IVideoSupportProvider songAudioPlayerVlcProvider))
             {
-                return GetByType<SongAudioPlayerVlcVideoSupportProvider>(availableProviders);
+                return songAudioPlayerVlcProvider;
             }
         }
 
         // AVPro as fallback
         if (settings.AvProToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
-            && ApplicationUtils.IsAvproSupportedVideoFormat(extension))
+            && ApplicationUtils.IsAvproSupportedVideoFormat(extension)
+            && TryGetProvider<AvproVideoSupportProvider>(availableProviders, out IVideoSupportProvider avproProvider))
         {
-            return GetByType<AvproVideoSupportProvider>(availableProviders);
+            return avproProvider;
         }
 
         // VLC as fallback
         if (settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
-            && ApplicationUtils.IsVlcSupportedVideoFormat(extension))
+            && ApplicationUtils.IsVlcSupportedVideoFormat(extension)
+            && TryGetProvider<VlcVideoSupportProvider>(availableProviders, out IVideoSupportProvider vlcProvider))
         {
-            return GetByType<VlcVideoSupportProvider>(availableProviders);
+            return vlcProvider;
         }
 
         return null;
     }
 
-    private static IVideoSupportProvider GetByType<T>(IVideoSupportProvider[] availableProviders) where T : IVideoSupportProvider
+    private static bool TryGetProvider<T>(IVideoSupportProvider[] availableProviders, out IVideoSupportProvider provider) where T : IVideoSupportProvider
     {
-        return availableProviders.OfType<T>().FirstOrDefault();
+        provider = availableProviders.OfType<T>().FirstOrDefault();
+        return provider != null;
     }
 }

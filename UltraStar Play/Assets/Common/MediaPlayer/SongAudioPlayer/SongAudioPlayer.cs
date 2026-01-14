@@ -318,7 +318,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
                 .Except(new List<IAudioSupportProvider>() { audioSupportProvider })
                 .ToArray();
             IAudioSupportProvider nextProvider = AudioSupportProviderSelectionStrategy.Select(
-                availableAudioSupportProviders,
+                remainingAudioSupportProviders,
                 audioUri,
                 settings);
             if (nextProvider == null)
@@ -326,7 +326,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
                 throw new AudioSupportProviderException($"Failed to load audio and no remaining suitable audio support providers. uri: {audioUri}");
             }
 
-            Debug.LogError($"Failed to load audio '{audioUri}' via {audioSupportProvider}. Trying {nextProvider} as fallback: {ex.Message}");
+            Debug.LogError($"Failed to load audio '{audioUri}' via {audioSupportProvider}. Trying {nextProvider} as fallback.");
 
             return await DoLoadAndPlayAsync(audioUri, remainingAudioSupportProviders, streamAudio, startPositionInMillis);
         }
