@@ -50,7 +50,7 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
     {
         // The SongVideoPlayer requires a running SongAudioPlayer.
         // For example for time sync and to reuse video if possible (depending on VideoSupportProvider).
-        await SongMediaPlayerShouldLoadFileAsync(songAudioPlayer, txtFilePath, expectedMediaSupportProviderTypes, targetDurationInMillis, maxWaitTimeInMillis);
+        await SongMediaPlayerShouldLoadFileAsync(songAudioPlayer, txtFilePath, null, targetDurationInMillis, maxWaitTimeInMillis);
         await SongMediaPlayerShouldLoadFileAsync(songVideoPlayer, txtFilePath, expectedMediaSupportProviderTypes, targetDurationInMillis, maxWaitTimeInMillis);
     }
 
@@ -85,14 +85,17 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
             Assert.Fail($"Failed to load audio after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. SongMeta: {JsonConverter.ToJson(songMeta)}");
         }
 
-        object mediaSupportProvider = GetMediaSupportProvider(songMediaPlayer);
-        Type actualType = mediaSupportProvider?.GetType();
-        Assert.Contains(actualType, expectedMediaSupportProviderTypes);
+        IMediaSupportProvider mediaSupportProvider = GetMediaSupportProvider(songMediaPlayer);
+        if (!expectedMediaSupportProviderTypes.IsNullOrEmpty())
+        {
+            Type actualType = mediaSupportProvider?.GetType();
+            Assert.IsTrue(expectedMediaSupportProviderTypes.Contains(actualType), $"Unexpected media support provider type. actual: '{actualType}', expected one of: '{expectedMediaSupportProviderTypes.JoinWith(", ")}'");
+        }
 
         Debug.Log($"Loaded successfully after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms, media duration: {songMediaPlayer.DurationInMillis} ms, mediaUri: '{evt.MediaUri}', mediaSupportProvider: {mediaSupportProvider}");
     }
 
-    private object GetMediaSupportProvider<T>(ISongMediaPlayer<T> songMediaPlayer) where T : ISongMediaLoadedEvent
+    private IMediaSupportProvider GetMediaSupportProvider<T>(ISongMediaPlayer<T> songMediaPlayer) where T : ISongMediaLoadedEvent
     {
         if (songMediaPlayer is SongAudioPlayer audioPlayer)
         {
