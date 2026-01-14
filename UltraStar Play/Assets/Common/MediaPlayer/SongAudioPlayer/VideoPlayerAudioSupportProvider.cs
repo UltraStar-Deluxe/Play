@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using UniInject;
 using UnityEngine;
 using UnityEngine.Video;
@@ -62,14 +60,6 @@ public class VideoPlayerAudioSupportProvider : AbstractAudioSupportProvider
         audioSourceAudioSupportProvider.audioSource.Play();
 
         return new AudioLoadedEvent(audioUri);
-    }
-
-    public override bool IsSupported(string audioUri)
-    {
-        return !WebViewUtils.CanHandleWebViewUrl(audioUri)
-            && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
-            && settings.AvProToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
-            && ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(audioUri));
     }
 
     public override void Unload()

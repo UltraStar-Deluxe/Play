@@ -286,8 +286,10 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
     {
         Log.Debug(() => $"SongAudioPlayer.DoLoadAndPlayAsObservable '{audioUri}'");
 
-        IAudioSupportProvider audioSupportProvider = availableAudioSupportProviders
-            .FirstOrDefault(it => it.IsSupported(audioUri));
+        IAudioSupportProvider audioSupportProvider = AudioSupportProviderSelectionStrategy.Select(
+            availableAudioSupportProviders,
+            audioUri,
+            settings);
         if (audioSupportProvider == null)
         {
             throw new SongAudioPlayerException($"Unsupported audio resource '{audioUri}'.");
@@ -315,12 +317,17 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
             IAudioSupportProvider[] remainingAudioSupportProviders = availableAudioSupportProviders
                 .Except(new List<IAudioSupportProvider>() { audioSupportProvider })
                 .ToArray();
-            Debug.LogError($"Failed to load audio '{audioUri}' via {audioSupportProvider}. Using one of {remainingAudioSupportProviders.JoinWith(", ")} as fallback: {ex.Message}");
-
-            if (remainingAudioSupportProviders.IsNullOrEmpty())
+            IAudioSupportProvider nextProvider = AudioSupportProviderSelectionStrategy.Select(
+                availableAudioSupportProviders,
+                audioUri,
+                settings);
+            if (nextProvider == null)
             {
-                throw new AudioSupportProviderException($"Failed to load audio and no remaining audio support providers: {audioUri}", ex);
+                throw new AudioSupportProviderException($"Failed to load audio and no remaining suitable audio support providers. uri: {audioUri}");
             }
+
+            Debug.LogError($"Failed to load audio '{audioUri}' via {audioSupportProvider}. Trying {nextProvider} as fallback: {ex.Message}");
+
             return await DoLoadAndPlayAsync(audioUri, remainingAudioSupportProviders, streamAudio, startPositionInMillis);
         }
     }

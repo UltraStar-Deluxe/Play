@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using RenderHeads.Media.AVProVideo;
 using UnityEngine;
 
@@ -56,14 +55,6 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
             throw new AvproException(lastMediaPlayerError);
         }
         return new AudioLoadedEvent(audioUri);
-    }
-
-    public override bool IsSupported(string audioUri)
-    {
-        return !WebViewUtils.CanHandleWebViewUrl(audioUri)
-            && settings.AvProToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
-            && (ApplicationUtils.IsAvproSupportedAudioFormat(Path.GetExtension(audioUri))
-                || ApplicationUtils.IsAvproSupportedVideoFormat(Path.GetExtension(audioUri)));
     }
 
     public override void Unload()

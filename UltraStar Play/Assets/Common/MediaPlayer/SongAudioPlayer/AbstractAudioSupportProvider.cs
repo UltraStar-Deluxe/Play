@@ -1,6 +1,4 @@
-﻿using System;
-using UniInject;
-using UniRx;
+﻿using UniInject;
 using UnityEngine;
 
 public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjection, IAudioSupportProvider
@@ -9,7 +7,6 @@ public abstract class AbstractAudioSupportProvider : MonoBehaviour, INeedInjecti
     protected Settings settings;
 
     public abstract Awaitable<AudioLoadedEvent> LoadAsync(string audioUri, bool streamAudio, double startPositionInMillis);
-    public abstract bool IsSupported(string audioUri);
     public abstract void Unload();
     public abstract void Play();
     public abstract void Pause();
