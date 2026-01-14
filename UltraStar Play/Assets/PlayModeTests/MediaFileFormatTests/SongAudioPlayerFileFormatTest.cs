@@ -102,4 +102,25 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
         
         yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, typeof(MidiAudioSupportProvider), 8000);
     }
+    
+    [UnityTest]
+    public IEnumerator ShouldLoadViaVlcAsFallback()
+    {
+        // AVPro does not support aiff.
+        SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
+        SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
+        yield return SongVideoPlayerShouldLoadFileAsync("aiff.txt", typeof(SongAudioPlayerVlcVideoSupportProvider));
+        
+        // Unity does not support flac format, but AVPro would support it.
+        SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
+        yield return SongVideoPlayerShouldLoadFileAsync("flac.txt", typeof(SongAudioPlayerVlcVideoSupportProvider));
+    }
+    
+    [UnityTest]
+    public IEnumerator ShouldLoadViaAvproAsFallback()
+    {
+        SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
+        SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
+        yield return SongVideoPlayerShouldLoadFileAsync("flac.txt", typeof(SongAudioPlayerAvproVideoSupportProvider));
+    }
 }
