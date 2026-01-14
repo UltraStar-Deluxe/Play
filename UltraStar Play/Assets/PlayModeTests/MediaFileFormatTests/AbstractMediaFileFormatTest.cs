@@ -35,29 +35,29 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
 
     protected async Awaitable SongAudioPlayerShouldLoadFileAsync(
         string txtFilePath,
-        List<Type> expectedMediaSupportProviderTypes,
+        Type expectedMediaSupportProviderType,
         double targetDurationInMillis = DefaultTargetDurationInMillis,
         long maxWaitTimeInMillis = DefaultMaxWaitTimeInMillis)
     {
-        await SongMediaPlayerShouldLoadFileAsync(songAudioPlayer, txtFilePath, expectedMediaSupportProviderTypes, targetDurationInMillis, maxWaitTimeInMillis);
+        await SongMediaPlayerShouldLoadFileAsync(songAudioPlayer, txtFilePath, expectedMediaSupportProviderType, targetDurationInMillis, maxWaitTimeInMillis);
     }
 
     protected async Awaitable SongVideoPlayerShouldLoadFileAsync(
         string txtFilePath,
-        List<Type> expectedMediaSupportProviderTypes,
+        Type expectedMediaSupportProviderType,
         double targetDurationInMillis = DefaultTargetDurationInMillis,
         long maxWaitTimeInMillis = DefaultMaxWaitTimeInMillis)
     {
         // The SongVideoPlayer requires a running SongAudioPlayer.
         // For example for time sync and to reuse video if possible (depending on VideoSupportProvider).
         await SongMediaPlayerShouldLoadFileAsync(songAudioPlayer, txtFilePath, null, targetDurationInMillis, maxWaitTimeInMillis);
-        await SongMediaPlayerShouldLoadFileAsync(songVideoPlayer, txtFilePath, expectedMediaSupportProviderTypes, targetDurationInMillis, maxWaitTimeInMillis);
+        await SongMediaPlayerShouldLoadFileAsync(songVideoPlayer, txtFilePath, expectedMediaSupportProviderType, targetDurationInMillis, maxWaitTimeInMillis);
     }
 
     private async Awaitable SongMediaPlayerShouldLoadFileAsync<T>(
         ISongMediaPlayer<T> songMediaPlayer,
         string txtFilePath,
-        List<Type> expectedMediaSupportProviderTypes,
+        Type expectedMediaSupportProviderType,
         double targetDurationInMillis = DefaultTargetDurationInMillis,
         long maxWaitTimeInMillis = DefaultMaxWaitTimeInMillis) where T : ISongMediaLoadedEvent
     {
@@ -86,10 +86,10 @@ public abstract class AbstractMediaFileFormatTest : AbstractPlayModeTest
         }
 
         IMediaSupportProvider mediaSupportProvider = GetMediaSupportProvider(songMediaPlayer);
-        if (!expectedMediaSupportProviderTypes.IsNullOrEmpty())
+        if (expectedMediaSupportProviderType != null)
         {
             Type actualType = mediaSupportProvider?.GetType();
-            Assert.IsTrue(expectedMediaSupportProviderTypes.Contains(actualType), $"Unexpected media support provider type. actual: '{actualType}', expected one of: '{expectedMediaSupportProviderTypes.JoinWith(", ")}'");
+            Assert.AreEqual(expectedMediaSupportProviderType, actualType, $"Unexpected media support provider type. actual: '{actualType}', expected: '{expectedMediaSupportProviderType}'");
         }
 
         Debug.Log($"Loaded successfully after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms, media duration: {songMediaPlayer.DurationInMillis} ms, mediaUri: '{evt.MediaUri}', mediaSupportProvider: {mediaSupportProvider}");

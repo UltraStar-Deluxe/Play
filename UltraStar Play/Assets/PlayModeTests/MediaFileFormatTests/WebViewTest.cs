@@ -36,7 +36,7 @@ public class WebViewTest : AbstractMediaFileFormatTest
     {
         yield return SongAudioPlayerShouldLoadFileAsync(
             txtFilePath,
-            new List<Type> { typeof(AudioSourceAudioSupportProvider) });
+            typeof(AudioSourceAudioSupportProvider));
     }
 
     [UnityTest]
@@ -44,7 +44,7 @@ public class WebViewTest : AbstractMediaFileFormatTest
     {
         yield return SongAudioPlayerShouldLoadFileAsync(
             txtFilePath,
-            new List<Type> { typeof(WebViewAudioSupportProvider) },
+            typeof(WebViewAudioSupportProvider),
             WebViewTargetDurationInMillis, WebViewMaxWaitTimeInMillis);
     }
 }

@@ -8,16 +8,16 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
 {
     private static readonly List<TestCaseData> supportedByUnity = new List<TestCaseData>()
     {
-        new TestCaseData("mp3-ConstantBitRate.txt").Returns(null),
-        new TestCaseData("mp3-VariableBitRate.txt").Returns(null),
-        new TestCaseData("ogg.txt").Returns(null),
-        new TestCaseData("wav.txt").Returns(null),
+        new TestCaseData("mp3-ConstantBitRate.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
+        new TestCaseData("mp3-VariableBitRate.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
+        new TestCaseData("ogg.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
+        new TestCaseData("wav.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
 
-        // Supported via Unity video player
-        new TestCaseData("avi.txt").Returns(null),
-        new TestCaseData("mp4.txt").Returns(null),
-        new TestCaseData("mp4-hvec.txt").Returns(null),
-        new TestCaseData("webm-vp8.txt").Returns(null),
+        // Video formats, supported via Unity VideoPlayer
+        new TestCaseData("avi.txt", typeof(VideoPlayerAudioSupportProvider)).Returns(null),
+        new TestCaseData("mp4.txt", typeof(VideoPlayerAudioSupportProvider)).Returns(null),
+        new TestCaseData("mp4-hvec.txt", typeof(VideoPlayerAudioSupportProvider)).Returns(null),
+        new TestCaseData("webm-vp8.txt", typeof(VideoPlayerAudioSupportProvider)).Returns(null),
     };
 
     private static readonly List<TestCaseData> supportedByVlc = new List<TestCaseData>()
@@ -28,7 +28,7 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
         new TestCaseData("m4a.txt").Returns(null),
         new TestCaseData("wma.txt").Returns(null),
 
-        // Supported via video player
+        // Video formats
         new TestCaseData("f4v.txt").Returns(null),
         new TestCaseData("flv.txt").Returns(null),
         new TestCaseData("mkv.txt").Returns(null),
@@ -47,7 +47,7 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
         new TestCaseData("m4a.txt").Returns(null),
         new TestCaseData("wma.txt").Returns(null),
 
-        // Supported via video player
+        // Video formats
         // new TestCaseData("f4v.txt").Returns(null), // Not supported by AVPro
         // new TestCaseData("flv.txt").Returns(null), // Not supported by AVPro
         new TestCaseData("mkv.txt").Returns(null),
@@ -65,13 +65,12 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
 
     [UnityTest]
     [TestCaseSource(nameof(supportedByUnity))]
-    public IEnumerator ShouldLoadViaUnity(string txtFilePath)
+    public IEnumerator ShouldLoadViaUnity(string txtFilePath, Type expectedAudioSupportProviderType)
     {
         SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         
-        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath,
-            new List<Type> {typeof(AudioSourceAudioSupportProvider), typeof(VideoPlayerAudioSupportProvider)});
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, expectedAudioSupportProviderType);
     }
 
     [UnityTest]
@@ -81,19 +80,17 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
         SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
         SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         
-        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath,
-            new List<Type> {typeof(VlcAudioSupportProvider)});
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, typeof(VlcAudioSupportProvider));
     }
     
     [UnityTest]
     [TestCaseSource(nameof(supportedByAvpro))]
     public IEnumerator ShouldLoadViaAvpro(string txtFilePath)
     {
-        SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
-        SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
+        SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
+        SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
         
-        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath,
-            new List<Type> {typeof(AvproAudioSupportProvider)});
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, typeof(AvproAudioSupportProvider));
     }
 
     [UnityTest]
@@ -103,8 +100,6 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
         SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
         
-        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath,
-            new List<Type> {typeof(MidiAudioSupportProvider)},
-            8000);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, typeof(MidiAudioSupportProvider), 8000);
     }
 }
