@@ -47,6 +47,7 @@ public static partial class R
         public const string circleButton = "circleButton";
         public const string comboBoxButton = "comboBoxButton";
         public const string comboButton = "comboButton";
+        public const string contents = "contents";
         public const string controlLabel = "controlLabel";
         public const string controlMinWidth = "controlMinWidth";
         public const string controlWithLabelHorizontal = "controlWithLabelHorizontal";
@@ -55,6 +56,9 @@ public static partial class R
         public const string creditsRegularBanner = "creditsRegularBanner";
         public const string currentLyrics = "currentLyrics";
         public const string currentNoteLyrics = "currentNoteLyrics";
+        public const string cursor_none = "cursor-none";
+        public const string cursor_normal = "cursor-normal";
+        public const string cursor_pan = "cursor-pan";
         public const string dangerButton = "dangerButton";
         public const string default_bg_color = "default-bg-color";
         public const string default_text_color = "default-text-color";
@@ -79,6 +83,7 @@ public static partial class R
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string fontColor = "fontColor";
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
+        public const string grid = "grid";
         public const string gridLine = "gridLine";
         public const string grow = "grow";
         public const string h__lb_18px_rb_ = "h-_lb_18px_rb_";
@@ -162,6 +167,7 @@ public static partial class R
         public const string noBackgroundInHierarchy = "noBackgroundInHierarchy";
         public const string noteAreaGridLabel = "noteAreaGridLabel";
         public const string noTextShadow = "noTextShadow";
+        public const string onejs_so_selected = "onejs-so-selected";
         public const string onlineMultiplayerHost = "onlineMultiplayerHost";
         public const string opacity_0 = "opacity-0";
         public const string opacity_100 = "opacity-100";
@@ -177,6 +183,7 @@ public static partial class R
         public const string p__lb_2px_rb_ = "p-_lb_2px_rb_";
         public const string p__lb_6px_rb_ = "p-_lb_6px_rb_";
         public const string p_1 = "p-1";
+        public const string p_10 = "p-10";
         public const string p_3 = "p-3";
         public const string p_4 = "p-4";
         public const string p_5 = "p-5";
@@ -260,6 +267,9 @@ public static partial class R
         public const string text_white = "text-white";
         public const string text_white_s_80 = "text-white_s_80";
         public const string text_xl = "text-xl";
+        public const string text_yellow_300 = "text-yellow-300";
+        public const string theme_dark = "theme-dark";
+        public const string theme_light = "theme-light";
         public const string timeBar = "timeBar";
         public const string tinyFont = "tinyFont";
         public const string titleText = "titleText";

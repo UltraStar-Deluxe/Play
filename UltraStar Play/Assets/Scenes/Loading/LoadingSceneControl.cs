@@ -166,12 +166,15 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             MidiManager.Instance.InitIfNotDoneYet();
         });
 
-        AddPreloadAction("libVLC", () =>
+        if (SettingsManager.Instance.Settings.VlcApiUsage is not EApiUsage.Disabled)
         {
-            Debug.Log("Supported file extensions by vlc: " + ApplicationUtils.vlcSupportedFileExtensions.JoinWith(", "));
-            DisableLibVlcIfLastExitWasNotClean();
-            PreloadLibVlc();
-        });
+            AddPreloadAction("libVLC", () =>
+            {
+                Debug.Log("Supported file extensions by vlc: " + ApplicationUtils.vlcSupportedFileExtensions.JoinWith(", "));
+                DisableLibVlcIfLastExitWasNotClean();
+                PreloadLibVlc();
+            });
+        }
 
         AddPreloadAction("Finished", () =>
         {
@@ -267,7 +270,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         try
         {
             Settings settings = SettingsManager.Instance.Settings;
-            if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Never)
+            if (settings.VlcApiUsage is EApiUsage.Disabled)
             {
                 // Nothing to disable
                 return;
@@ -278,8 +281,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
                 string errorMessage = "Rough exit detected! Disabling libVLC to keep things stable. You can enable it again in 'Development Options > File Format Support'.";
                 Debug.LogWarning(errorMessage);
                 NotificationManager.CreateNotification(Translation.Of(errorMessage));
-                settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
-                ApplicationUtils.UseVlcToPlayMediaFiles = false;
+                settings.VlcApiUsage = EApiUsage.Disabled;
             }
         }
         catch (Exception ex)

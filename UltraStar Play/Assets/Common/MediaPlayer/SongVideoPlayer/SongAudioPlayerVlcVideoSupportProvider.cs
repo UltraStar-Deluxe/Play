@@ -17,13 +17,6 @@ public class SongAudioPlayerVlcVideoSupportProvider : AbstractVlcVideoSupportPro
         }
     }
 
-    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
-    {
-        return base.IsSupported(videoUri, videoEqualsAudio)
-            && videoEqualsAudio
-            && SongAudioPlayerVlcMediaPlayer != null;
-    }
-
     public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {
         await ConditionUtils.WaitForConditionAsync(() => !this || SongAudioPlayerVlcMediaPlayer?.Media?.Duration > 0,

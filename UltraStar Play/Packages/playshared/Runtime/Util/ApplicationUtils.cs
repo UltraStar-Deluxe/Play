@@ -25,22 +25,6 @@ public static class ApplicationUtils
 
     public const string GeneratedFolderName = "Generated";
 
-    private static bool useVlcToPlayMediaFiles;
-    public static bool UseVlcToPlayMediaFiles
-    {
-        get => useVlcToPlayMediaFiles;
-        set
-        {
-            if (useVlcToPlayMediaFiles == value)
-            {
-                return;
-            }
-            useVlcToPlayMediaFiles = value;
-            supportedAudioFiles = GetSupportedAudioFiles(useVlcToPlayMediaFiles);
-            supportedVideoFiles = GetSupportedVideoFiles(useVlcToPlayMediaFiles);
-        }
-    }
-
     private static string threadSafeStreamingAssetsPath;
     public static string ThreadSafeStreamingAssetsPath
     {
@@ -142,14 +126,50 @@ public static class ApplicationUtils
         .Where(fileExtension => !audioFileExtensions.Contains(fileExtension))
         .ToList();
 
+    public static readonly IReadOnlyCollection<string> avproSupportedAudioFiles = new List<string>
+        {
+            "aac",
+            "aif",
+            // "aiff", // Not supported by AVPro
+            "flac",
+            "kar",
+            "m4a",
+            "mid",
+            "midi",
+            "mp3",
+            "ogg",
+            "opus",
+            "pcm",
+            "wav",
+            "wma",
+        }
+        .Where(fileExtension => audioFileExtensions.Contains(fileExtension))
+        .ToList();
+
+    public static readonly IReadOnlyCollection<string> avproSupportedVideoFiles = new List<string>
+        {
+            "avi",
+            // "flv", // Not supported by AVPro
+            // "f4v", // Not supported by AVPro
+            "m4v",
+            "mkv",
+            "mov",
+            "mp4",
+            "mpeg",
+            "mpg",
+            "ogg",
+            "webm",
+            "wmv",
+        }
+        .Where(fileExtension => !audioFileExtensions.Contains(fileExtension))
+        .ToList();
+
     public static readonly IReadOnlyCollection<string> unitySupportedAudioFiles = new HashSet<string>
     {
         "mp3",
         "ogg",
         "wav",
     }.ToHashSet();
-
-    public static IReadOnlyCollection<string> supportedAudioFiles = GetSupportedAudioFiles(false);
 
     public static readonly IReadOnlyCollection<string> supportedVocalsSeparationAudioFiles = new HashSet<string>
     {
@@ -178,11 +198,23 @@ public static class ApplicationUtils
         "mpg",
 
         // NOTE: webm is only supported by Unity when using VP8.
-        // webm with VP9 is not supported by Unity and will fail, such that ffmpeg or similar should be used as fallback.
+        // webm with VP9 is not supported by Unity and will fail, such that VLC, AVPro, or similar should be used as fallback.
         "webm",
     };
-
-    public static IReadOnlyCollection<string> supportedVideoFiles = GetSupportedVideoFiles(false);
+    
+    public static readonly IReadOnlyCollection<string> allSupportedAudioFiles = unitySupportedAudioFiles
+        .Union(vlcSupportedAudioFiles)
+        .Union(avproSupportedAudioFiles)
+        .Distinct()
+        .OrderBy(format => format)
+        .ToList();
+    
+    public static readonly IReadOnlyCollection<string> allSupportedVideoFiles = unitySupportedVideoFiles
+        .Union(vlcSupportedVideoFiles)
+        .Union(avproSupportedVideoFiles)
+        .Distinct()
+        .OrderBy(format => format)
+        .ToList();
 
     public static void OpenDirectory(string path)
     {
@@ -260,22 +292,22 @@ public static class ApplicationUtils
         return vlcSupportedVideoFiles.Contains(fileExtension);
     }
 
-    public static bool IsSupportedAudioFormat(string fileExtension)
+    public static bool IsAvproSupportedAudioFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
-        return supportedAudioFiles.Contains(fileExtension);
+        return avproSupportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsAvproSupportedVideoFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return avproSupportedVideoFiles.Contains(fileExtension);
     }
 
     public static bool IsUnitySupportedVideoFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
         return unitySupportedVideoFiles.Contains(fileExtension);
-    }
-
-    public static bool IsSupportedVideoFormat(string fileExtension)
-    {
-        fileExtension = NormalizeFileExtension(fileExtension);
-        return supportedVideoFiles.Contains(fileExtension);
     }
 
     public static bool IsSupportedMidiFormat(string fileExtension)
@@ -398,13 +430,6 @@ public static class ApplicationUtils
         return unitySupportedAudioFiles
             .Union(supportedMidiFiles)
             .Union(includeVlcFormats ? vlcSupportedAudioFiles : new List<string>())
-            .ToHashSet();
-    }
-
-    private static IReadOnlyCollection<string> GetSupportedVideoFiles(bool includeVlcFormats)
-    {
-        return unitySupportedVideoFiles
-            .Union(includeVlcFormats ? vlcSupportedVideoFiles : new List<string>())
             .ToHashSet();
     }
 

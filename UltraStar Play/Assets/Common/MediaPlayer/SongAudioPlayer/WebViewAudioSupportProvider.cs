@@ -1,6 +1,4 @@
-﻿using System;
-using UniInject;
-using UniRx;
+﻿using UniInject;
 using UnityEngine;
 
 public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
@@ -26,11 +24,6 @@ public class WebViewAudioSupportProvider : AbstractAudioSupportProvider
 
         PositionInMillis = startPositionInMillis;
         return new AudioLoadedEvent(audioUri);
-    }
-
-    public override bool IsSupported(string audioUri)
-    {
-        return WebViewUtils.CanHandleWebViewUrl(audioUri);
     }
 
     public override void Unload()

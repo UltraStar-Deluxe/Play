@@ -8,11 +8,6 @@ public class WebViewVideoSupportProvider : AbstractVideoSupportProvider
     [Inject]
     private WebViewManager webViewManager;
 
-    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
-    {
-        return WebViewUtils.CanHandleWebViewUrl(videoUri);
-    }
-
     public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {
         await ConditionUtils.WaitForConditionAsync(() => !this || webViewManager.DurationInMillis > 0,

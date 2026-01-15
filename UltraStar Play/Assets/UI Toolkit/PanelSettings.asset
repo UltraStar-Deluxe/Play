@@ -35,6 +35,7 @@ MonoBehaviour:
   m_ClearColor: 1
   m_ColorClearValue: {r: 0, g: 0, b: 0, a: 0}
   m_VertexBudget: 0
+  m_TextureSlotCount: 8
   m_DynamicAtlasSettings:
     m_MinAtlasSize: 64
     m_MaxAtlasSize: 4096
@@ -42,6 +43,10 @@ MonoBehaviour:
     m_ActiveFilters: -1
   m_AtlasBlitShader: {fileID: 9101, guid: 0000000000000000f000000000000000, type: 0}
   m_DefaultShader: {fileID: 9100, guid: 0000000000000000f000000000000000, type: 0}
+  m_RuntimeGaussianBlurShader: {fileID: 20300, guid: 0000000000000000f000000000000000,
+    type: 0}
+  m_RuntimeColorEffectShader: {fileID: 20301, guid: 0000000000000000f000000000000000,
+    type: 0}
   m_SDFShader: {fileID: 19011, guid: 0000000000000000f000000000000000, type: 0}
   m_BitmapShader: {fileID: 9001, guid: 0000000000000000f000000000000000, type: 0}
   m_SpriteShader: {fileID: 19012, guid: 0000000000000000f000000000000000, type: 0}

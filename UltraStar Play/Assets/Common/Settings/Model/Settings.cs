@@ -169,7 +169,11 @@ public class Settings : ISettings
     // Vlc settings
     public List<string> VlcOptions { get; set; } = new();
     public bool LogVlcOutput { get; set; }
-    public EThirdPartyLibraryUsage VlcToPlayMediaFilesUsage { get; set; } = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
+
+    // Media APIs
+    public EApiUsage UnityMediaApiUsage { get; set; } = EApiUsage.Enabled;
+    public EApiUsage AvProApiUsage { get; set; } = EApiUsage.Preferred;
+    public EApiUsage VlcApiUsage { get; set; } = EApiUsage.Enabled;
 
     // Mods
     public List<string> EnabledMods { get; private set; } = new();

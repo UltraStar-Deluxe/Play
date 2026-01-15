@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using LibVLCSharp;
 using UniInject;
 using UnityEngine;
@@ -64,14 +63,6 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         }
 
         return new AudioLoadedEvent(audioUri);
-    }
-
-    public override bool IsSupported(string audioUri)
-    {
-        return !WebViewUtils.CanHandleWebViewUrl(audioUri)
-            && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
-            && (ApplicationUtils.IsVlcSupportedAudioFormat(Path.GetExtension(audioUri))
-                || ApplicationUtils.IsVlcSupportedVideoFormat(Path.GetExtension(audioUri)));
     }
 
     public override void Unload()

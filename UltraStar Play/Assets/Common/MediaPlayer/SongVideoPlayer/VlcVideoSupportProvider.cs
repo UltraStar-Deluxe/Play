@@ -8,13 +8,6 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     [Inject]
     private VlcManager vlcManager;
 
-    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
-    {
-        return base.IsSupported(videoUri, videoEqualsAudio)
-               // The SongAudioPlayer's mediaPlayer should be used when video and audio are equal
-               && !videoEqualsAudio;
-    }
-
     public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {
         // Instantiate new vlc player
@@ -37,7 +30,10 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
 
         // Play to trigger loading. PlayAsync to not block the main thread and avoid stutter.
         mediaPlayer.PlayAsync();
-        PositionInMillis = startPositionInMillis;
+        if (startPositionInMillis > 0)
+        {
+            PositionInMillis = startPositionInMillis;
+        }
 
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
@@ -52,6 +48,7 @@ public class VlcVideoSupportProvider : AbstractVlcVideoSupportProvider
     public override void Unload()
     {
         base.Unload();
+        // TODO: Better unload media instead of DestroyMediaPlayer?
         DestroyVlcMediaPlayer();
     }
 

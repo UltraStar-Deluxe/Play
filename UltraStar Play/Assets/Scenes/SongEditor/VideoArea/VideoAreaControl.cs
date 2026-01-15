@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -142,7 +144,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Video",
             SongMetaUtils.GetDirectoryPath(songMeta),
-            FileSystemDialogUtils.CreateExtensionFilters("Video Files", ApplicationUtils.supportedVideoFiles),
+            FileSystemDialogUtils.CreateExtensionFilters("Video Files", ApplicationUtils.allSupportedVideoFiles),
             () => songMeta.Video,
             newValue =>
             {
