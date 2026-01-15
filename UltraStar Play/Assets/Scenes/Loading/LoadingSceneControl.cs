@@ -166,12 +166,15 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             MidiManager.Instance.InitIfNotDoneYet();
         });
 
-        AddPreloadAction("libVLC", () =>
+        if (SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never)
         {
-            Debug.Log("Supported file extensions by vlc: " + ApplicationUtils.vlcSupportedFileExtensions.JoinWith(", "));
-            DisableLibVlcIfLastExitWasNotClean();
-            PreloadLibVlc();
-        });
+            AddPreloadAction("libVLC", () =>
+            {
+                Debug.Log("Supported file extensions by vlc: " + ApplicationUtils.vlcSupportedFileExtensions.JoinWith(", "));
+                DisableLibVlcIfLastExitWasNotClean();
+                PreloadLibVlc();
+            });
+        }
 
         AddPreloadAction("Finished", () =>
         {
