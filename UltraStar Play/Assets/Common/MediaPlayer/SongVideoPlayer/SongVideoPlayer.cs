@@ -636,13 +636,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         // VLC does not support smooth playback speed adjustments. Use pause and skip instead.
         // Same for AvPro.
-        if (currentVideoSupportProvider is VlcVideoSupportProvider)
+        if (currentVideoSupportProvider is VlcVideoSupportProvider
+            || currentVideoSupportProvider is AvproVideoSupportProvider)
         {
             videoSyncStrategy = new PauseAndSkipVideoSyncStrategy();
             return;
         }
         
-        // Use playback speed adjustment by default.
+        // Use playback speed adjustment by default (works perfect in Unity API).
         videoSyncStrategy = new PlaybackSpeedVideoSyncStrategy();
     }
 
