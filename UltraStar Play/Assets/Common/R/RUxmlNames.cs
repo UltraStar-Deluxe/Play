@@ -43,6 +43,7 @@ public static partial class R
         public const string audioSeparationCommandTextField = "audioSeparationCommandTextField";
         public const string audioWaveForm = "audioWaveForm";
         public const string autoSaveToggle = "autoSaveToggle";
+        public const string avproApiUsageChooser = "avproApiUsageChooser";
         public const string backButton = "backButton";
         public const string background = "background";
         public const string backgroundLightChooser = "backgroundLightChooser";
@@ -981,6 +982,7 @@ public static partial class R
         public const string undoButton = "undoButton";
         public const string unexpectedErrorContainer = "unexpectedErrorContainer";
         public const string unexpectedErrorLabel = "unexpectedErrorLabel";
+        public const string unityApiUsageChooser = "unityApiUsageChooser";
         public const string unityTransportIpAddressField = "unityTransportIpAddressField";
         public const string unityTransportPortField = "unityTransportPortField";
         public const string unityVersionLabel = "unityVersionLabel";
@@ -992,10 +994,8 @@ public static partial class R
         public const string urlChooserButton = "urlChooserButton";
         public const string urlTextField = "urlTextField";
         public const string urlTextFieldHint = "urlTextFieldHint";
-        public const string useAvproToPlayMediaFilesChooser = "useAvproToPlayMediaFilesChooser";
         public const string usePortAudioToggle = "usePortAudioToggle";
         public const string useUniversalCharsetDetectorToggle = "useUniversalCharsetDetectorToggle";
-        public const string useVlcToPlayMediaFilesChooser = "useVlcToPlayMediaFilesChooser";
         public const string useWebcamToggle = "useWebcamToggle";
         public const string validationWarningContainer = "validationWarningContainer";
         public const string versionDetailsContainer = "versionDetailsContainer";
@@ -1012,6 +1012,7 @@ public static partial class R
         public const string viewLogButton = "viewLogButton";
         public const string vinylImage = "vinylImage";
         public const string virtualPiano = "virtualPiano";
+        public const string vlcApiUsageChooser = "vlcApiUsageChooser";
         public const string vlcOptionsTextField = "vlcOptionsTextField";
         public const string vocalsAudioVolumeChooser = "vocalsAudioVolumeChooser";
         public const string voiceIdLabel = "voiceIdLabel";

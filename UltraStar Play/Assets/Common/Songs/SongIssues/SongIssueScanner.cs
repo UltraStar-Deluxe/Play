@@ -52,9 +52,7 @@ public class SongIssueScanner
             // Search issues in used audio, video, image files
             try
             {
-                List<SongIssue> mediaFormatSongIssues = GetSupportedMediaFormatIssues(
-                    songMeta,
-                    settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never);
+                List<SongIssue> mediaFormatSongIssues = GetSupportedMediaFormatIssues(songMeta, settings);
                 result.AddRange(mediaFormatSongIssues);
             }
             catch (Exception ex)
@@ -89,9 +87,7 @@ public class SongIssueScanner
      * Checks whether the audio and video file formats of the song are supported.
      * Returns true iff the audio file of the SongMeta exists and is supported.
      */
-    private static List<SongIssue> GetSupportedMediaFormatIssues(
-        SongMeta songMeta,
-        bool useVlcToPlayMediaFiles)
+    private static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta, Settings settings)
     {
         List<SongIssue> songIssues = new();
 
@@ -104,7 +100,7 @@ public class SongIssueScanner
                     "value", ApplicationUtils.ReplacePathsWithDisplayString(videoUri)),
                 ESongIssueSeverity.Warning);
 
-            CheckVideoFormatIsSupported(songIssues, videoUri,
+            CheckVideoFormatIsSupported(songIssues, videoUri, settings,
                 () => Translation.Get(R.Messages.songIssue_media_unsupported,
                     "actual", GetUriOrExtensionWithoutDot(videoUri),
                     "expected", UnitySupportedVideoFileExtensionsCsv),
@@ -122,7 +118,7 @@ public class SongIssueScanner
                 () => Translation.Get(R.Messages.songIssue_media_notFound,
                     "value", ApplicationUtils.ReplacePathsWithDisplayString(audioUri)),
                 ESongIssueSeverity.Error);
-            CheckAudioOrVideoFormatIsSupported(songIssues, audioUri,
+            CheckAudioOrVideoFormatIsSupported(songIssues, audioUri, settings,
                 () => Translation.Get(R.Messages.songIssue_media_unsupported,
                     "actual", GetUriOrExtensionWithoutDot(audioUri),
                     "expected", UnitySupportedAudioFileExtensionsCsv),
@@ -222,6 +218,7 @@ public class SongIssueScanner
     private static void CheckVideoFormatIsSupported(
         List<SongIssue> songIssues,
         string pathOrUri,
+        Settings settings,
         Func<Translation> errorMessageGetter,
         Func<SongIssueData> songIssueDataGetter,
         ESongIssueSeverity severity)
@@ -231,8 +228,7 @@ public class SongIssueScanner
             return;
         }
 
-        if (!ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(pathOrUri))
-            && !WebViewUtils.CanHandleWebViewUrl(pathOrUri))
+        if (!IsSupportedVideoFormat(pathOrUri, settings))
         {
             songIssues.Add(new SongIssue(severity, songIssueDataGetter(), errorMessageGetter(), -1, -1));
             // Do not attempt to load this file
@@ -243,6 +239,7 @@ public class SongIssueScanner
     private static void CheckAudioOrVideoFormatIsSupported(
         List<SongIssue> songIssues,
         string pathOrUri,
+        Settings settings,
         Func<Translation> errorMessageGetter,
         Func<SongIssueData> songIssueDataGetter,
         ESongIssueSeverity severity)
@@ -252,12 +249,60 @@ public class SongIssueScanner
             return;
         }
 
-        string fileExtension = Path.GetExtension(pathOrUri);
-        if (!ApplicationUtils.IsSupportedAudioFormat(fileExtension)
-            && !ApplicationUtils.IsSupportedVideoFormat(fileExtension)
-            && !WebViewUtils.CanHandleWebViewUrl(pathOrUri))
+        if (!IsSupportedAudioOrVideoFormat(pathOrUri, settings))
         {
             songIssues.Add(new SongIssue(severity, songIssueDataGetter(), errorMessageGetter(), -1, -1));
         }
+    }
+
+    private static bool IsSupportedAudioOrVideoFormat(string pathOrUri, Settings settings)
+    {
+        string fileExtension = Path.GetExtension(pathOrUri);
+        if (settings.UnityMediaApiUsage is not EApiUsage.Disabled
+            && (ApplicationUtils.IsUnitySupportedAudioFormat(fileExtension)
+                || ApplicationUtils.IsUnitySupportedVideoFormat(fileExtension)))
+        {
+            return true;
+        }
+
+        if (settings.AvProApiUsage is not EApiUsage.Disabled
+            && (ApplicationUtils.IsAvproSupportedAudioFormat(fileExtension)
+                || ApplicationUtils.IsAvproSupportedVideoFormat(fileExtension)))
+        {
+            return true;
+        }
+
+        if (settings.VlcApiUsage is not EApiUsage.Disabled
+            && (ApplicationUtils.IsVlcSupportedAudioFormat(fileExtension)
+                || ApplicationUtils.IsVlcSupportedVideoFormat(fileExtension)))
+        {
+            return true;
+        }
+
+        return WebViewUtils.CanHandleWebViewUrl(pathOrUri);
+    }
+    
+    private static bool IsSupportedVideoFormat(string pathOrUri, Settings settings)
+    {
+        string fileExtension = Path.GetExtension(pathOrUri);
+        if (settings.UnityMediaApiUsage is not EApiUsage.Disabled
+            && ApplicationUtils.IsUnitySupportedVideoFormat(fileExtension))
+        {
+            return true;
+        }
+
+        if (settings.AvProApiUsage is not EApiUsage.Disabled
+            && ApplicationUtils.IsAvproSupportedVideoFormat(fileExtension))
+        {
+            return true;
+        }
+
+        if (settings.VlcApiUsage is not EApiUsage.Disabled
+            && ApplicationUtils.IsVlcSupportedVideoFormat(fileExtension))
+        {
+            return true;
+        }
+
+        return WebViewUtils.CanHandleWebViewUrl(pathOrUri);
     }
 }

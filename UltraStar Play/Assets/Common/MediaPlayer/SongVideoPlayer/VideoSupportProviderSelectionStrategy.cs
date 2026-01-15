@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 public static class VideoSupportProviderSelectionStrategy
@@ -16,57 +17,115 @@ public static class VideoSupportProviderSelectionStrategy
         }
 
         // WebView URLs
-        if (WebViewUtils.CanHandleWebViewUrl(videoUri)
-            && TryGetProvider<WebViewVideoSupportProvider>(availableProviders, out IVideoSupportProvider webViewProvider))
+        if (TryGetWebViewProvider(availableProviders, videoUri, out IVideoSupportProvider provider))
         {
-            return webViewProvider;
-        }
-
-        string extension = Path.GetExtension(videoUri);
-        bool isHttp = WebRequestUtils.IsHttpOrHttpsUri(videoUri);
-        
-        // Unity VideoPlayer is default, also for HTTP URLs
-        if (settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
-            && settings.AvProToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
-            && (ApplicationUtils.IsUnitySupportedVideoFormat(extension) || isHttp)
-            && TryGetProvider<VideoPlayerVideoSupportProvider>(availableProviders, out IVideoSupportProvider videoPlayerProvider))
-        {
-            return videoPlayerProvider;
+            return provider;
         }
         
-        // When audio and video are the same file, reuse the audio provider from VLC respectively AVPro.
-        if (videoEqualsAudio)
+        // Select the video support provider of the API that has highest priority
+        List<EMediaApi> mediaApis = MediaApiPriorityUtils.GetMediaApisOrderedByPriority(settings);
+        foreach (EMediaApi mediaApi in mediaApis)
         {
-            if (songAudioPlayer.CurrentAudioSupportProvider is AvproAudioSupportProvider
-                && TryGetProvider<SongAudioPlayerAvproVideoSupportProvider>(availableProviders, out IVideoSupportProvider songAudioPlayerAvproProvider))
+            if (mediaApi == EMediaApi.Unity
+                && TryGetUnityProvider(availableProviders, videoUri, out provider))
             {
-                return songAudioPlayerAvproProvider;
+                return provider;
             }
-            
-            if (songAudioPlayer.CurrentAudioSupportProvider is VlcAudioSupportProvider
-                && TryGetProvider<SongAudioPlayerVlcVideoSupportProvider>(availableProviders, out IVideoSupportProvider songAudioPlayerVlcProvider))
+
+            if (mediaApi == EMediaApi.Avpro
+                && TryGetAvproProvider(availableProviders, videoUri, videoEqualsAudio, songAudioPlayer, out provider))
             {
-                return songAudioPlayerVlcProvider;
+                return provider;
             }
-        }
 
-        // AVPro as fallback
-        if (settings.AvProToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
-            && ApplicationUtils.IsAvproSupportedVideoFormat(extension)
-            && TryGetProvider<AvproVideoSupportProvider>(availableProviders, out IVideoSupportProvider avproProvider))
-        {
-            return avproProvider;
-        }
-
-        // VLC as fallback
-        if (settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
-            && ApplicationUtils.IsVlcSupportedVideoFormat(extension)
-            && TryGetProvider<VlcVideoSupportProvider>(availableProviders, out IVideoSupportProvider vlcProvider))
-        {
-            return vlcProvider;
+            if (mediaApi == EMediaApi.Vlc
+                && TryGetVlcProvider(availableProviders, videoUri, videoEqualsAudio, songAudioPlayer, out provider))
+            {
+                return provider;
+            }
         }
 
         return null;
+    }
+
+    private static bool TryGetWebViewProvider(IVideoSupportProvider[] availableProviders, string videoUri,
+        out IVideoSupportProvider provider)
+    {
+        if (WebViewUtils.CanHandleWebViewUrl(videoUri)
+            && TryGetProvider<WebViewVideoSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+
+        provider = null;
+        return false;
+    }
+
+    private static bool TryGetUnityProvider(IVideoSupportProvider[] availableProviders,
+        string videoUri,
+        out IVideoSupportProvider provider)
+    {
+        string extension = Path.GetExtension(videoUri);
+        bool isHttp = WebRequestUtils.IsHttpOrHttpsUri(videoUri);
+        
+        if ((ApplicationUtils.IsUnitySupportedVideoFormat(extension) || isHttp)
+            && TryGetProvider<VideoPlayerVideoSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+
+        provider = null;
+        return false;
+    }
+
+    private static bool TryGetAvproProvider(
+        IVideoSupportProvider[] availableProviders,
+        string videoUri,
+        bool videoEqualsAudio,
+        SongAudioPlayer songAudioPlayer,
+        out IVideoSupportProvider provider)
+    {
+        if (videoEqualsAudio
+            && songAudioPlayer.CurrentAudioSupportProvider is AvproAudioSupportProvider
+            && TryGetProvider<SongAudioPlayerAvproVideoSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+        
+        string extension = Path.GetExtension(videoUri);
+        if (ApplicationUtils.IsAvproSupportedVideoFormat(extension)
+            && TryGetProvider<AvproVideoSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+
+        provider = null;
+        return false;
+    }
+
+    private static bool TryGetVlcProvider(
+        IVideoSupportProvider[] availableProviders,
+        string videoUri,
+        bool videoEqualsAudio,
+        SongAudioPlayer songAudioPlayer,
+        out IVideoSupportProvider provider)
+    {
+        if (videoEqualsAudio
+            && songAudioPlayer.CurrentAudioSupportProvider is VlcAudioSupportProvider
+            && TryGetProvider<SongAudioPlayerVlcVideoSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+        
+        string extension = Path.GetExtension(videoUri);
+        if (ApplicationUtils.IsVlcSupportedVideoFormat(extension)
+            && TryGetProvider<VlcVideoSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+
+        provider = null;
+        return false;
     }
 
     private static bool TryGetProvider<T>(IVideoSupportProvider[] availableProviders, out IVideoSupportProvider provider) where T : IVideoSupportProvider

@@ -577,7 +577,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         string absoluteVideoFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.videoPath);
         if (!absoluteVideoFilePath.IsNullOrEmpty()
-            && ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(absoluteVideoFilePath)))
+            && ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(absoluteVideoFilePath)))
         {
             string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteVideoFilePath);
             string videoPlayerUrl = ApplicationUtils.GetVideoPlayerUri(uri);
@@ -612,7 +612,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         string absoluteLightVideoFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.lightVideoPath);
         if (!absoluteLightVideoFilePath.IsNullOrEmpty()
-            && ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(absoluteLightVideoFilePath)))
+            && ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(absoluteLightVideoFilePath)))
         {
             string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteLightVideoFilePath);
             string videoPlayerUrl = ApplicationUtils.GetVideoPlayerUri(uri);

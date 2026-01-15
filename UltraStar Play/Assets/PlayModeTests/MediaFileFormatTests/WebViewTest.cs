@@ -34,6 +34,7 @@ public class WebViewTest : AbstractMediaFileFormatTest
     [UnityTest]
     public IEnumerator ShouldUseLocalAudioTest([ValueSource(nameof(shouldUseLocalAudioFiles))] string txtFilePath)
     {
+        SettingsManager.Instance.Settings.UnityMediaApiUsage = EApiUsage.Preferred;
         yield return SongAudioPlayerShouldLoadFileAsync(
             txtFilePath,
             typeof(AudioSourceAudioSupportProvider));

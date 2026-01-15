@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 public static class AudioSupportProviderSelectionStrategy
@@ -14,61 +15,136 @@ public static class AudioSupportProviderSelectionStrategy
         }
 
         // WebView URLs
-        if (WebViewUtils.CanHandleWebViewUrl(audioUri)
-            && TryGetProvider<WebViewAudioSupportProvider>(availableProviders, out IAudioSupportProvider webViewProvider))
+        if (TryGetWebViewProvider(availableProviders, audioUri, out IAudioSupportProvider webViewProvider))
         {
             return webViewProvider;
         }
 
-        string extension = Path.GetExtension(audioUri);
-        bool isHttp = WebRequestUtils.IsHttpOrHttpsUri(audioUri);
-
-        // Unity API is default, also for HTTP URLs
-        if (settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
-            && settings.AvProToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always)
+        // MIDI files
+        if (TryGetMidiProvider(availableProviders, audioUri, out IAudioSupportProvider provider))
         {
-            if (ApplicationUtils.IsSupportedMidiFormat(extension)
-                && TryGetProvider<MidiAudioSupportProvider>(availableProviders, out IAudioSupportProvider midiProvider))
-            {
-                return midiProvider;
-            }
-
-            if (ApplicationUtils.IsUnitySupportedVideoFormat(extension)
-                && TryGetProvider<VideoPlayerAudioSupportProvider>(availableProviders, out IAudioSupportProvider videoPlayerProvider))
-            {
-                return videoPlayerProvider;
-            }
-
-            if ((ApplicationUtils.IsUnitySupportedAudioFormat(extension) || isHttp)
-                && TryGetProvider<AudioSourceAudioSupportProvider>(availableProviders, out IAudioSupportProvider audioSourceProvider))
-            {
-                return audioSourceProvider;
-            }
+            return provider;
         }
 
-        // AVPro as fallback
-        if (settings.AvProToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
-            && (ApplicationUtils.IsAvproSupportedAudioFormat(extension)
-                || ApplicationUtils.IsAvproSupportedVideoFormat(extension))
-            && TryGetProvider<AvproAudioSupportProvider>(availableProviders, out IAudioSupportProvider avproProvider))
+        // Select the audio support provider of the API that has highest priority
+        List<EMediaApi> mediaApis = MediaApiPriorityUtils.GetMediaApisOrderedByPriority(settings);
+        foreach (EMediaApi mediaApi in mediaApis)
         {
-            return avproProvider;
-        }
+            if (mediaApi == EMediaApi.Unity
+                && TryGetUnityProvider(availableProviders, audioUri, out provider))
+            {
+                return provider;
+            }
 
-        // VLC as fallback
-        if (settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never
-            && (ApplicationUtils.IsVlcSupportedAudioFormat(extension)
-                || ApplicationUtils.IsVlcSupportedVideoFormat(extension))
-            && TryGetProvider<VlcAudioSupportProvider>(availableProviders, out IAudioSupportProvider vlcProvider))
-        {
-            return vlcProvider;
+            if (mediaApi == EMediaApi.Avpro
+                && TryGetAvProProvider(availableProviders, audioUri, out provider))
+            {
+                return provider;
+            }
+
+            if (mediaApi == EMediaApi.Vlc
+                && TryGetVlcProvider(availableProviders, audioUri, out provider))
+            {
+                return provider;
+            }
         }
 
         return null;
     }
 
-    private static bool TryGetProvider<T>(IAudioSupportProvider[] availableProviders,
-        out IAudioSupportProvider provider) where T : IAudioSupportProvider
+    private static bool TryGetWebViewProvider(
+        IAudioSupportProvider[] availableProviders,
+        string audioUri,
+        out IAudioSupportProvider provider)
+    {
+        if (WebViewUtils.CanHandleWebViewUrl(audioUri)
+            && TryGetProvider<WebViewAudioSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+
+        provider = null;
+        return false;
+    }
+
+    private static bool TryGetMidiProvider(
+        IAudioSupportProvider[] availableProviders,
+        string audioUri,
+        out IAudioSupportProvider provider)
+    {
+        string extension = Path.GetExtension(audioUri);
+        
+        if (ApplicationUtils.IsSupportedMidiFormat(extension)
+            && TryGetProvider<MidiAudioSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+
+        provider = null;
+        return false;
+    }
+
+    private static bool TryGetVlcProvider(
+        IAudioSupportProvider[] availableProviders,
+        string audioUri,
+        out IAudioSupportProvider provider)
+    {
+        string extension = Path.GetExtension(audioUri);
+        
+        if ((ApplicationUtils.IsVlcSupportedAudioFormat(extension)
+             || ApplicationUtils.IsVlcSupportedVideoFormat(extension))
+            && TryGetProvider<VlcAudioSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+
+        provider = null;
+        return false;
+    }
+
+    private static bool TryGetAvProProvider(
+        IAudioSupportProvider[] availableProviders,
+        string audioUri,
+        out IAudioSupportProvider provider)
+    {
+        string extension = Path.GetExtension(audioUri);
+        
+        if ((ApplicationUtils.IsAvproSupportedAudioFormat(extension)
+             || ApplicationUtils.IsAvproSupportedVideoFormat(extension))
+            && TryGetProvider<AvproAudioSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+
+        provider = null;
+        return false;
+    }
+
+    private static bool TryGetUnityProvider(
+        IAudioSupportProvider[] availableProviders,
+        string audioUri,
+        out IAudioSupportProvider provider)
+    {
+        string extension = Path.GetExtension(audioUri);
+        bool isHttp = WebRequestUtils.IsHttpOrHttpsUri(audioUri);
+        
+        if (ApplicationUtils.IsUnitySupportedVideoFormat(extension)
+            && TryGetProvider<VideoPlayerAudioSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+
+        if ((ApplicationUtils.IsUnitySupportedAudioFormat(extension) || isHttp)
+            && TryGetProvider<AudioSourceAudioSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+
+        provider = null;
+        return false;
+    }
+
+    private static bool TryGetProvider<T>(IAudioSupportProvider[] availableProviders, out IAudioSupportProvider provider) where T : IAudioSupportProvider
     {
         provider = availableProviders.OfType<T>().FirstOrDefault();
         return provider != null;

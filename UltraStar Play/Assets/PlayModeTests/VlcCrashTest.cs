@@ -27,7 +27,7 @@ public class VlcCrashTest : AbstractPlayModeTest
     protected override void ConfigureTestSettings(TestSettings settings)
     {
         settings.LogVlcOutput = true;
-        settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
+        settings.VlcApiUsage = EApiUsage.Preferred;
         settings.SongDirs = new List<string>
         {
             "C:/Dev/UltraStar-Songs-Debug"

@@ -42,7 +42,7 @@ public class LoadMediaStressTest : AbstractPlayModeTest
         };
         settings.SongPreviewDelayInMillis = 0;
         settings.ShowSongIndexInSongSelect = true;
-        settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
+        settings.VlcApiUsage = EApiUsage.Preferred;
     }
 
     [UnityTest]

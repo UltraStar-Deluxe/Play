@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
+/**
+ * Tests the video player support, including video support provider selection.
+ * Therefore, it assumes the default provider priority (when all are enabled): Unity > AVPro > VLC.
+ */
 public class SongVideoPlayerFormatTest : AbstractMediaFileFormatTest
 {
     private static readonly List<TestCaseData> supportedByUnity = new List<TestCaseData>()
@@ -55,19 +59,7 @@ public class SongVideoPlayerFormatTest : AbstractMediaFileFormatTest
     [TestCaseSource(nameof(supportedByUnity))]
     public IEnumerator ShouldLoadViaUnity(string txtFileName, Type expectedVideoSupportProviderType)
     {
-        SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
-        SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
-        
-        yield return SongVideoPlayerShouldLoadFileAsync(txtFileName, expectedVideoSupportProviderType);
-    }
-
-    [UnityTest]
-    [TestCaseSource(nameof(supportedByVlc))]
-    public IEnumerator ShouldLoadViaVlc(string txtFileName, Type expectedVideoSupportProviderType)
-    {
-        SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
-        SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
-        
+        ConfigureMediaApiSettings(EApiUsage.Enabled, EApiUsage.Disabled, EApiUsage.Disabled);
         yield return SongVideoPlayerShouldLoadFileAsync(txtFileName, expectedVideoSupportProviderType);
     }
     
@@ -75,30 +67,41 @@ public class SongVideoPlayerFormatTest : AbstractMediaFileFormatTest
     [TestCaseSource(nameof(supportedByAvpro))]
     public IEnumerator ShouldLoadViaAvpro(string txtFileName, Type expectedVideoSupportProviderType)
     {
-        SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
-        SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Always;
-        
+        ConfigureMediaApiSettings(EApiUsage.Disabled, EApiUsage.Enabled, EApiUsage.Disabled);        
+        yield return SongVideoPlayerShouldLoadFileAsync(txtFileName, expectedVideoSupportProviderType);
+    }
+    
+    [UnityTest]
+    [TestCaseSource(nameof(supportedByVlc))]
+    public IEnumerator ShouldLoadViaVlc(string txtFileName, Type expectedVideoSupportProviderType)
+    {
+        ConfigureMediaApiSettings(EApiUsage.Disabled, EApiUsage.Disabled, EApiUsage.Enabled);
         yield return SongVideoPlayerShouldLoadFileAsync(txtFileName, expectedVideoSupportProviderType);
     }
 
     [UnityTest]
     public IEnumerator ShouldLoadViaVlcAsFallback()
     {
-        // AVPro does not support f4v.
-        SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
-        SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
+        // Neither Unity nor AVPro support f4v.
+        ConfigureMediaApiSettings(EApiUsage.Enabled, EApiUsage.Enabled, EApiUsage.Enabled);
         yield return SongVideoPlayerShouldLoadFileAsync("f4v.txt", typeof(SongAudioPlayerVlcVideoSupportProvider));
         
-        // Unity does not support AV1 video format, but AVPro would support it.
-        SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
+        // Unity does not support AV1 video format, but AVPro does support it. So must disable AVPro to test VLC fallback.
+        SettingsManager.Instance.Settings.AvProApiUsage = EApiUsage.Disabled;
         yield return SongVideoPlayerShouldLoadFileAsync("webm-vp9.txt", typeof(SongAudioPlayerVlcVideoSupportProvider));
     }
     
     [UnityTest]
     public IEnumerator ShouldLoadViaAvproAsFallback()
     {
-        SettingsManager.Instance.Settings.VlcToPlayMediaFilesUsage = EThirdPartyLibraryUsage.Never;
-        SettingsManager.Instance.Settings.AvProToPlayMediaFilesUsage = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
+        ConfigureMediaApiSettings(EApiUsage.Enabled, EApiUsage.Enabled, EApiUsage.Disabled);
         yield return SongVideoPlayerShouldLoadFileAsync("webm-vp9.txt", typeof(SongAudioPlayerAvproVideoSupportProvider));
+    }
+    
+    private static void ConfigureMediaApiSettings(EApiUsage unity, EApiUsage avpro, EApiUsage vlc)
+    {
+        SettingsManager.Instance.Settings.UnityMediaApiUsage = unity;
+        SettingsManager.Instance.Settings.AvProApiUsage = avpro;
+        SettingsManager.Instance.Settings.VlcApiUsage = vlc;
     }
 }

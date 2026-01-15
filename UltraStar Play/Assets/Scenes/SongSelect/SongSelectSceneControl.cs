@@ -596,7 +596,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             Debug.LogError( $"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
             NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
                 "name", songMeta.Audio,
-                "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
+                "supportedFormats", ApplicationUtils.allSupportedAudioFiles.JoinWith(", ")));
         }
     }
 

@@ -129,11 +129,14 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.songVideoPlaybackChooser)]
     private Chooser songVideoPlaybackChooser;
 
-    [Inject(UxmlName = R.UxmlNames.useVlcToPlayMediaFilesChooser)]
-    private Chooser useVlcToPlayMediaFilesChooser;
+    [Inject(UxmlName = R.UxmlNames.unityApiUsageChooser)]
+    private Chooser unityApiUsageChooser;
     
-    [Inject(UxmlName = R.UxmlNames.useAvproToPlayMediaFilesChooser)]
-    private Chooser useAvproToPlayMediaFilesChooser;
+    [Inject(UxmlName = R.UxmlNames.avproApiUsageChooser)]
+    private Chooser avproApiUsageChooser;
+    
+    [Inject(UxmlName = R.UxmlNames.vlcApiUsageChooser)]
+    private Chooser vlcApiUsageChooser;
 
     [Inject(UxmlName = R.UxmlNames.logVlcOutputToggle)]
     private Toggle logVlcOutputToggle;
@@ -369,16 +372,20 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .Bind(() => settings.SongVideoPlayback,
                 newValue => settings.SongVideoPlayback = newValue);
 
-        // AVPro
-        new EnumChooserControl<EThirdPartyLibraryUsage>(useAvproToPlayMediaFilesChooser)
-            .Bind(() => settings.AvProToPlayMediaFilesUsage,
-                newValue => settings.AvProToPlayMediaFilesUsage = newValue);
+        // Media Api Preferences
+        new EnumChooserControl<EApiUsage>(unityApiUsageChooser)
+            .Bind(() => settings.UnityMediaApiUsage,
+                newValue => settings.UnityMediaApiUsage = newValue);
+        
+        new EnumChooserControl<EApiUsage>(avproApiUsageChooser)
+            .Bind(() => settings.AvProApiUsage,
+                newValue => settings.AvProApiUsage = newValue);
 
-        // VLC
-        new EnumChooserControl<EThirdPartyLibraryUsage>(useVlcToPlayMediaFilesChooser)
-            .Bind(() => settings.VlcToPlayMediaFilesUsage,
-                newValue => settings.VlcToPlayMediaFilesUsage = newValue);
+        new EnumChooserControl<EApiUsage>(vlcApiUsageChooser)
+            .Bind(() => settings.VlcApiUsage,
+                newValue => settings.VlcApiUsage = newValue);
 
+        // VLC Settings
         FieldBindingUtils.Bind(logVlcOutputToggle,
             () => settings.LogVlcOutput,
             newValue => settings.LogVlcOutput = newValue);
