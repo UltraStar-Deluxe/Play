@@ -14,7 +14,7 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
     {
         // Update volume when AudioListener.volume changes, which is considered as part of the property setter
         if (IsPlaying
-            && Math.Abs(MediaPlayerTargetVolumePercent - mediaPlayer.AudioVolume) > 1)
+            && Math.Abs(MediaPlayerTargetVolumeFactor - mediaPlayer.AudioVolume) > 0.01)
         {
             VolumeFactor = lastSetVolumeFactor;
         }
@@ -136,12 +136,12 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
             lastSetVolumeFactor = value;
             if (IsPlaying)
             {
-                mediaPlayer.AudioVolume = MediaPlayerTargetVolumePercent;
+                mediaPlayer.AudioVolume = MediaPlayerTargetVolumeFactor;
             }
         }
     }
 
-    private float MediaPlayerTargetVolumePercent => (float)(lastSetVolumeFactor * AudioListener.volume);
+    private float MediaPlayerTargetVolumeFactor => (float)(lastSetVolumeFactor * AudioListener.volume);
     
     private void OnMediaPlayerError(MediaPlayer aMediaPlayer, MediaPlayerEvent.EventType eventType, ErrorCode errorCode)
     {
