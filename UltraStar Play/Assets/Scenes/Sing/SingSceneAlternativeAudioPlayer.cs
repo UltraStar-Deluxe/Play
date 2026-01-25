@@ -60,7 +60,13 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         settings.ObserveEveryValueChanged(it => it.VocalsAudioVolumePercent)
             .Subscribe(_ => UpdateAudioSources())
             .AddTo(gameObject);
+        settings.ObserveEveryValueChanged(_ => AudioListener.volume)
+            .Subscribe(_ => UpdateAudioSources())
+            .AddTo(gameObject);
 
+        songAudioPlayer.LoadedEventStream
+            .Subscribe(_ => UpdateAudioSources())
+            .AddTo(gameObject);
         songAudioPlayer.PlaybackStartedEventStream
             .Subscribe(_ =>
             {
