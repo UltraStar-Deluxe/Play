@@ -173,7 +173,7 @@ public class Settings : ISettings
     // Media APIs
     public EApiUsage UnityMediaApiUsage { get; set; } = EApiUsage.Enabled;
     public EApiUsage AvProApiUsage { get; set; } = EApiUsage.Preferred;
-    public EApiUsage VlcApiUsage { get; set; } = EApiUsage.Enabled;
+    public EApiUsage VlcApiUsage { get; set; } = EApiUsage.Preferred;
 
     // Mods
     public List<string> EnabledMods { get; private set; } = new();
