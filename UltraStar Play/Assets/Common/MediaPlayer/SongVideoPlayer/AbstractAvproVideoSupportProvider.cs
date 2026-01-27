@@ -1,5 +1,3 @@
-﻿using System.IO;
-
-public abstract class AbstractAvproVideoSupportProvider : AbstractVideoSupportProvider
+﻿public abstract class AbstractAvproVideoSupportProvider : AbstractVideoSupportProvider
 {
 }

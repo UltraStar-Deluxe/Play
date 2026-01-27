@@ -5,9 +5,6 @@ using UnityEngine;
 public abstract class AbstractVideoSupportProvider : MonoBehaviour, INeedInjection, IVideoSupportProvider
 {
     [Inject]
-    protected Settings settings;
-
-    [Inject]
     protected SceneNavigator sceneNavigator;
 
     public abstract Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis);
