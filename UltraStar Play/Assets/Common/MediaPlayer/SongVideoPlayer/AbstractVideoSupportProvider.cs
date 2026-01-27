@@ -19,7 +19,7 @@ public abstract class AbstractVideoSupportProvider : MonoBehaviour, INeedInjecti
     public abstract double PositionInMillis { get; set; }
     public abstract double DurationInMillis { get; }
 
-    protected bool IsFullyLoaded => DurationInMillis > 0;
+    protected virtual bool IsFullyLoaded => DurationInMillis > 0;
 
     public virtual void SetBackgroundScaleMode(ESongBackgroundScaleMode mode)
     {

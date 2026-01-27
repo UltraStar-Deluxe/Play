@@ -6,8 +6,12 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
     public MediaPlayer mediaPlayer;
     public ResolveToRenderTexture resolveToRenderTexture;
 
+    protected override bool IsFullyLoaded => base.IsFullyLoaded && firstFrameReady;
+    
     private string lastMediaPlayerError = "";
 
+    private bool firstFrameReady;
+    
     private RenderTexture TargetTexture
     {
         get => resolveToRenderTexture.ExternalTexture;
@@ -20,6 +24,7 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
         mediaPlayer.CloseMedia();
         RenderTextureUtils.Clear(TargetTexture);
         SetTargetTexture(null);
+        firstFrameReady = false;
     }
 
     public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
@@ -28,8 +33,9 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
         mediaPlayer.CloseMedia();
 
         mediaPlayer.Events.RemoveAllListeners();
-        mediaPlayer.Events.AddListener(OnMediaPlayerError);
+        mediaPlayer.Events.AddListener(OnMediaPlayerEvent);
         lastMediaPlayerError = "";
+        firstFrameReady = false;
 
         // autoPlay is true by default
         mediaPlayer.OpenMedia(new MediaPath(videoUri, MediaPathType.AbsolutePathOrURL));
@@ -128,14 +134,18 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
     }
 
     public override double DurationInMillis => (mediaPlayer.Info?.GetDuration() ?? 0) * 1000.0;
-    
-    private void OnMediaPlayerError(MediaPlayer aMediaPlayer, MediaPlayerEvent.EventType eventType, ErrorCode errorCode)
+
+    private void OnMediaPlayerEvent(MediaPlayer aMediaPlayer, MediaPlayerEvent.EventType eventType, ErrorCode errorCode)
     {
-        if (errorCode is ErrorCode.None)
+        switch (eventType)
         {
-            return;
+            case MediaPlayerEvent.EventType.Error when errorCode is not ErrorCode.None:
+                lastMediaPlayerError = Helper.GetErrorMessage(errorCode);
+                break;
+            case MediaPlayerEvent.EventType.FirstFrameReady:
+                firstFrameReady = true;
+                break;
         }
-        lastMediaPlayerError = Helper.GetErrorMessage(errorCode);
     }
 
     private bool HasMediaPlayerError()

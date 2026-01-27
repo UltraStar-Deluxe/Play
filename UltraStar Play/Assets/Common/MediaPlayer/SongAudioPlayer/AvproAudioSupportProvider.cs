@@ -26,7 +26,7 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
         mediaPlayer.CloseMedia();
 
         mediaPlayer.Events.RemoveAllListeners();
-        mediaPlayer.Events.AddListener(OnMediaPlayerError);
+        mediaPlayer.Events.AddListener(OnMediaPlayerEvent);
         lastMediaPlayerError = "";
 
         // Set volume to 0 to avoid audio glitches.
@@ -143,13 +143,14 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
 
     private float MediaPlayerTargetVolumeFactor => (float)(lastSetVolumeFactor * AudioListener.volume);
     
-    private void OnMediaPlayerError(MediaPlayer aMediaPlayer, MediaPlayerEvent.EventType eventType, ErrorCode errorCode)
+    private void OnMediaPlayerEvent(MediaPlayer aMediaPlayer, MediaPlayerEvent.EventType eventType, ErrorCode errorCode)
     {
-        if (errorCode is ErrorCode.None)
+        switch (eventType)
         {
-            return;
+            case MediaPlayerEvent.EventType.Error when errorCode is not ErrorCode.None:
+                lastMediaPlayerError = Helper.GetErrorMessage(errorCode);
+                break;
         }
-        lastMediaPlayerError = Helper.GetErrorMessage(errorCode);
     }
 
     private bool HasMediaPlayerError()
