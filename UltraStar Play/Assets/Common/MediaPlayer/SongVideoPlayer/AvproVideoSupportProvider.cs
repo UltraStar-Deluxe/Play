@@ -8,11 +8,18 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
 
     private string lastMediaPlayerError = "";
 
+    private RenderTexture TargetTexture
+    {
+        get => resolveToRenderTexture.ExternalTexture;
+        set => resolveToRenderTexture.ExternalTexture = value;
+    }
+    
     public override void Unload()
     {
         mediaPlayer.Stop();
         mediaPlayer.CloseMedia();
-        resolveToRenderTexture.ExternalTexture = null;
+        RenderTextureUtils.Clear(TargetTexture);
+        SetTargetTexture(null);
     }
 
     public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
@@ -71,7 +78,7 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
 
     public override void SetTargetTexture(RenderTexture renderTexture)
     {
-        resolveToRenderTexture.ExternalTexture = renderTexture;
+        TargetTexture = renderTexture;
     }
 
     public override bool IsPlaying

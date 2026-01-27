@@ -7,6 +7,12 @@ public class SongAudioPlayerAvproVideoSupportProvider : AbstractAvproVideoSuppor
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
+    private RenderTexture TargetTexture
+    {
+        get => songAudioPlayer.GetComponentInChildren<ResolveToRenderTexture>().ExternalTexture;
+        set => songAudioPlayer.GetComponentInChildren<ResolveToRenderTexture>().ExternalTexture = value;
+    }
+
     private MediaPlayer SongAudioPlayerAvproMediaPlayer
     {
         get
@@ -31,7 +37,8 @@ public class SongAudioPlayerAvproVideoSupportProvider : AbstractAvproVideoSuppor
 
     public override void Unload()
     {
-        // Handled by SongAudioPlayer
+        RenderTextureUtils.Clear(TargetTexture);
+        // Rest Handled by SongAudioPlayer
     }
 
     public override void Play()
@@ -51,7 +58,7 @@ public class SongAudioPlayerAvproVideoSupportProvider : AbstractAvproVideoSuppor
 
     public override void SetTargetTexture(RenderTexture renderTexture)
     {
-        songAudioPlayer.GetComponentInChildren<ResolveToRenderTexture>().ExternalTexture = renderTexture;
+        TargetTexture = renderTexture;
     }
 
     public override bool IsPlaying

@@ -22,9 +22,9 @@ public abstract class AbstractVlcVideoSupportProvider : AbstractVideoSupportProv
 
     public override void Unload()
     {
+        RenderTextureUtils.Clear(targetTexture);
         Destroy(vlcTexture);
     }
-
 
     public override void SetTargetTexture(RenderTexture renderTexture)
     {
