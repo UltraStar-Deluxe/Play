@@ -98,6 +98,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private SettingsManager settingsManager;
 
     [Inject]
     private ModManager modManager;
@@ -407,6 +410,8 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
     private void OnDestroy()
     {
+        settingsManager.SaveSettings();
+        
         UnloadLastOptionsScene();
     }
 }
