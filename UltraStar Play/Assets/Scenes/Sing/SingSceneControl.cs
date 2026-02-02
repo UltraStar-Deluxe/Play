@@ -14,6 +14,8 @@ using IBinding = UniInject.IBinding;
 
 public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
+    private const float VideoFadeInTimeInSeconds = 1f;
+
     private static SingSceneControl instance;
     public static SingSceneControl Instance
     {
@@ -678,6 +680,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         try
         {
+            songVideoPlayer.VideoFadeInTimeInSeconds = VideoFadeInTimeInSeconds;
             string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(SongMeta, WebViewUtils.CanHandleWebViewUrl);
             if (SongMetaUtils.ResourceExists(SongMeta, videoUri))
             {

@@ -84,6 +84,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public bool HasLoadedBackgroundImage { get; private set; }
 
+    public double VideoFadeInTimeInSeconds { get; set; }
+
     private float playbackSpeed = 1;
     public float PlaybackSpeed
     {
@@ -301,7 +303,15 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         if (videoImageVisualElement != null)
         {
             videoImageVisualElement.ShowByDisplay();
-            videoImageVisualElement.style.opacity = 1;
+            if (VideoFadeInTimeInSeconds > 0)
+            {
+                videoImageVisualElement.style.opacity = 0;
+                AnimationUtils.FadeInVisualElement(gameObject, videoImageVisualElement, (float)VideoFadeInTimeInSeconds);
+            }
+            else
+            {
+                videoImageVisualElement.style.opacity = 1;
+            }
         }
     }
 
