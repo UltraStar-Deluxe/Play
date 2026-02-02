@@ -89,17 +89,20 @@ public class VLCYouTubePlayback : MonoBehaviour
 
         playing = false;
         _mediaPlayer?.Stop();
-        
+
         // there is no need to dispose every time you stop, but you should do so when you're done using the mediaplayer and this is how:
-        // _mediaPlayer?.Dispose(); 
+        // _mediaPlayer?.Dispose();
         // _mediaPlayer = null;
-        GetComponent<Renderer>().material.mainTexture = null;
-        tex = null;
     }
 
     void Update()
     {
-        if(!playing) return;
+        if(!playing)
+        {
+            if (tex != null && _mediaPlayer != null)
+                TextureHelper.UpdateTexture(tex, ref _mediaPlayer);
+            return;
+        }
 
         if (tex == null)
         {
@@ -111,7 +114,7 @@ public class VLCYouTubePlayback : MonoBehaviour
                 GetComponent<Renderer>().material.mainTexture = tex;
             }
         }
-        else if (tex != null)
+        else
         {
             TextureHelper.UpdateTexture(tex, ref _mediaPlayer);
         }

@@ -24,9 +24,6 @@ namespace Videolabs.VLCUnity.Editor
 
         const string AndroidVulkanErrorMessage = "The Vulkan graphics API is only supported by the VLC Unity plugin in ARM64 builds." +
         "\n\nPlease go to Player Settings > Android > Other Settings > Target Architectures and ensure ARM64 is enabled.";
-        const string WindowsD3D12ErrorMessage = "The Direct3D12 graphics API is not supported by the VLC Unity plugin." +
-        "\n\nPlease go to Player Settings > Windows or UWP > Auto Graphics API and remove Direct3D12 from the list." +
-        "\nOnly Direct3D11 is currently supported on Windows and UWP targets.";
 
 #if UNITY_SUPPORTS_BUILD_REPORT
         public void OnPreprocessBuild(BuildReport report)
@@ -44,20 +41,11 @@ namespace Videolabs.VLCUnity.Editor
                     throw new BuildFailedException(AndroidVulkanErrorMessage);
                 }
             }
-            else if(target == BuildTarget.StandaloneWindows64 || target == BuildTarget.WSAPlayer)
-            {
-                if(IsD3D12Configured(target))
-                {
-                    throw new BuildFailedException(WindowsD3D12ErrorMessage);
-                }
-            }
         }
 
         static bool IsVulkanConfigured => GetGraphicsApiIndex(BuildTarget.Android, GraphicsDeviceType.Vulkan) >= 0;
 
         static bool IsARM64Enabled => (PlayerSettings.Android.targetArchitectures & AndroidArchitecture.ARM64) != 0;
-
-        static bool IsD3D12Configured(BuildTarget target) => GetGraphicsApiIndex(target, GraphicsDeviceType.Direct3D12) >= 0;
 
         static int GetGraphicsApiIndex(BuildTarget target, GraphicsDeviceType api)
         {

@@ -140,8 +140,6 @@ public class VLCPlayerExample : MonoBehaviour
 	{
 		Log("VLCPlayerExample Stop");
 		mediaPlayer?.Stop();
-
-		DestroyTextures();
 	}
 
 	public void Seek(long timeDelta)

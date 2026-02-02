@@ -21,6 +21,8 @@ LibVLCSharp docs (not Unity specific) https://code.videolan.org/videolan/LibVLCS
 
 !! You need to set your Unity target platform to "PC, Mac & Linux Standalone" to target Windows classic. Go for the x86_64 architecture.
 
+Both Direct3D 11 and Direct3D 12 graphics APIs are supported.
+
 ## Android
 
 For the Unity Android target, we support:
@@ -48,6 +50,8 @@ For the Unity UWP target, we support:
 - x86_64,
 - ARM64.
 
+Both Direct3D 11 and Direct3D 12 graphics APIs are supported.
+
 If you need 32 bit versions, feel free to email us with information regarding your use case at unity@videolabs.io
 
 > In the publisher manifest, make sure the 'InternetClient' capability is enabled so that VLC can access remote streams.
@@ -72,6 +76,22 @@ Both Apple Silicon (ARM64) and Intel Macs builds are supported, in Editor and th
 
 The following build scenario is currently unsupported for the beta release:
 - Universal builds (binaries with both Intel64 and Apple Silicon binaries) currently are not supported nor tested.
+
+### macOS Plugin Authorization (Editor only)
+
+VLC Unity plugins are currently unsigned. macOS Gatekeeper blocks unsigned code from running in the Unity Editor, which may prevent the plugins from loading during development.
+
+To fix this, use the built-in authorization tool:
+
+1. Go to **Tools > VLC Unity > macOS Plugin Setup**
+2. If plugins are blocked, click **Authorize Plugins**
+3. Enter your macOS password when prompted
+
+The tool removes the `com.apple.quarantine` extended attribute that macOS applies to downloaded files. A warning will appear in the Console if plugins are blocked, and also before building.
+
+**Note:** Standalone builds are not affected by this and work normally. This authorization is only needed for Editor testing.
+
+**Alternative:** If you have an Apple Developer certificate, you can sign the binaries yourself to permanently resolve this.
 
 ## General
 

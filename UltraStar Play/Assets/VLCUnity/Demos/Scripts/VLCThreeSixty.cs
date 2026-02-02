@@ -76,7 +76,14 @@ public class VLCThreeSixty : MonoBehaviour
 
     void Update()
     {
-        if (!playing) return;
+        if (!playing)
+        {
+            if (texScreen != null && _mediaPlayerScreen != null)
+                TextureHelper.UpdateTexture(texScreen, ref _mediaPlayerScreen);
+            if (texSphere != null && _mediaPlayerSphere != null)
+                TextureHelper.UpdateTexture(texSphere, ref _mediaPlayerSphere);
+            return;
+        }
         UpdateTexture(ref texScreen, _mediaPlayerScreen, screen);
         UpdateTexture(ref texSphere, _mediaPlayerSphere, sphere);
     }
