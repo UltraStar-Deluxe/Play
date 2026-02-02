@@ -11,6 +11,7 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
     private string lastMediaPlayerError = "";
 
     private bool firstFrameReady;
+    private double startPositionInMillis;
     
     private RenderTexture TargetTexture
     {
@@ -36,6 +37,7 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
         mediaPlayer.Events.AddListener(OnMediaPlayerEvent);
         lastMediaPlayerError = "";
         firstFrameReady = false;
+        this.startPositionInMillis = startPositionInMillis;
 
         // autoPlay is true by default
         mediaPlayer.OpenMedia(new MediaPath(videoUri, MediaPathType.AbsolutePathOrURL));
@@ -58,6 +60,7 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
         {
             throw new AvproException(lastMediaPlayerError);
         }
+
         return new VideoLoadedEvent(videoUri);
     }
 
@@ -139,11 +142,18 @@ public class AvproVideoSupportProvider : AbstractAvproVideoSupportProvider
     {
         switch (eventType)
         {
+            case MediaPlayerEvent.EventType.ResolutionChanged when !firstFrameReady:
+                // Seek to half of the video duration to trigger loading a frame.
+                // Otherwise, the video does not load sometimes ( https://github.com/RenderHeads/UnityPlugin-AVProVideo/issues/2427 )
+                mediaPlayer.Control?.SeekFast(mediaPlayer.Info.GetDuration() / 2);
+                break;
             case MediaPlayerEvent.EventType.Error when errorCode is not ErrorCode.None:
                 lastMediaPlayerError = Helper.GetErrorMessage(errorCode);
                 break;
             case MediaPlayerEvent.EventType.FirstFrameReady:
                 firstFrameReady = true;
+                // Reset position to intended start position.
+                PositionInMillis = startPositionInMillis;
                 break;
         }
     }
