@@ -9,6 +9,7 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
     private double lastSetVolumeFactor = 1;
 
     private string lastMediaPlayerError = "";
+    private double startPositionInMillis;
     
     private void Update()
     {
@@ -28,6 +29,7 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
         mediaPlayer.Events.RemoveAllListeners();
         mediaPlayer.Events.AddListener(OnMediaPlayerEvent);
         lastMediaPlayerError = "";
+        this.startPositionInMillis = startPositionInMillis;
 
         // Set volume to 0 to avoid audio glitches.
         mediaPlayer.AudioVolume = 0;
@@ -35,12 +37,6 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
 
         // Play to trigger loading. autoPlay is true by default
         mediaPlayer.OpenMedia(new MediaPath(audioUri, MediaPathType.AbsolutePathOrURL));
-
-        // Only set PositionInMillis if not 0, to avoid unnecessary time changes. This avoids audio glitches and time synchronization mismatches.
-        if (startPositionInMillis > 0)
-        {
-            PositionInMillis = startPositionInMillis;
-        }
 
         // Wait until media has been loaded asynchronously.
         await ConditionUtils.WaitForConditionAsync(() => !this || IsFullyLoaded || HasMediaPlayerError(),
@@ -147,6 +143,10 @@ public class AvproAudioSupportProvider : AbstractAudioSupportProvider
     {
         switch (eventType)
         {
+            // Skip to given start position, if any.
+            case MediaPlayerEvent.EventType.MetaDataReady when startPositionInMillis > 0:
+                PositionInMillis = startPositionInMillis;
+                break;
             case MediaPlayerEvent.EventType.Error when errorCode is not ErrorCode.None:
                 lastMediaPlayerError = Helper.GetErrorMessage(errorCode);
                 break;
