@@ -224,6 +224,9 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             Debug.Log("no audio player");
         }
 
+        // Allow the active sync strategy to perform background measurements/updates each frame
+        videoSyncStrategy?.Update(this);
+
         if (TimeUtils.IsDurationAboveThresholdInSeconds(lastApplyPlaybackStateToVideoProviderTimeInSeconds, 1))
         {
             lastApplyPlaybackStateToVideoProviderTimeInSeconds = Time.time;
