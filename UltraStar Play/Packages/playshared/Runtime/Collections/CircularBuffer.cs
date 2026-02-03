@@ -265,6 +265,16 @@ namespace CircularBuffer
             return newArray;
         }
 
+        public List<T> ToList()
+        {
+            List<T> newList = new List<T>(Count);
+            foreach (T item in this)
+            {
+                newList.Add(item);
+            }
+            return newList;
+        }
+        
         #region IEnumerable<T> implementation
         public IEnumerator<T> GetEnumerator()
         {
