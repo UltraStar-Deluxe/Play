@@ -1,10 +1,5 @@
 ﻿public abstract class AbstractVideoSyncStrategy : IVideoSyncStrategy
 {
-    public virtual void Update(SongVideoPlayer songVideoPlayer)
-    {
-        // Default no-op
-    }
-
     public virtual void SyncPlayPause(SongVideoPlayer songVideoPlayer)
     {
         if (!songVideoPlayer.IsFullyLoaded

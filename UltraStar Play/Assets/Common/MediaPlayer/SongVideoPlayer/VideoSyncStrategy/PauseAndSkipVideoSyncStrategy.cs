@@ -13,43 +13,15 @@ public class PauseAndSkipVideoSyncStrategy : AbstractVideoSyncStrategy
     private const int ImmediatePlaybackPositionSyncThresholdInMillis = 2000;
     private const int MinOffsetToSyncThresholdInMillis = 100;
     private const double SyncCheckIntervalInSeconds = 2;
+    private const float ResidualOffsetMeasurementDelayInSeconds = 0.5f;
     
     // Keep a rolling median of recent residual offsets observed after performing a seek.
     // Positive residual means target (audio-aligned) is ahead of the video after the seek
     // and next skip should be larger by that amount to compensate.
     private readonly CircularBuffer<double> residualHistoryInMillis = new(5);
 
-    // Track the last seek request to measure its outcome
-    private bool pendingSeekMeasurement;
-    private float seekRequestTimeInSeconds;
-
     private bool syncingPositionWithPause;
     private float lastSyncTimeInSeconds;
-
-    public override void Update(SongVideoPlayer songVideoPlayer)
-    {
-        if (!songVideoPlayer || !songVideoPlayer.IsFullyLoaded)
-        {
-            return;
-        }
-
-        // If we recently performed a skip-seek, observe the residual after a short debounce
-        if (pendingSeekMeasurement)
-        {
-            float elapsed = Time.time - seekRequestTimeInSeconds;
-            // Wait a short time to allow the provider to present the new frame/position
-            if (elapsed > 0.2f)
-            {
-                double residualNowInMillis = songVideoPlayer.GetOffsetPositionInMillis();
-                residualHistoryInMillis.PushBack(residualNowInMillis);
-
-                Log.WithMethodContext().Verbose(() =>
-                    $"Measured post-seek residual: {residualNowInMillis:F1} ms (median: {GetMedianResidualInMillis():F1} ms)");
-
-                pendingSeekMeasurement = false;
-            }
-        }
-    }
 
     public override void SyncPlayPause(SongVideoPlayer songVideoPlayer)
     {
@@ -141,11 +113,28 @@ public class PauseAndSkipVideoSyncStrategy : AbstractVideoSyncStrategy
         double newPosition = currentTime + skipTimeMs;
         Log.WithMethodContext().Verbose(() => $"skip time: {skipTimeMs:F1} ms, offset: {offsetInMillis:F1} ms, residual compensation: {compensationMs:F1} ms");
 
-        // Request the seek and track it for measurement
-        pendingSeekMeasurement = true;
-        seekRequestTimeInSeconds = Time.time;
-
         songVideoPlayer.PositionInMillis = newPosition;
+
+        MeasureResidualOffsetAfterDelay(songVideoPlayer);
+    }
+
+    private void MeasureResidualOffsetAfterDelay(SongVideoPlayer songVideoPlayer)
+    {
+        // Measure residual offset after seek has finished. 
+        AwaitableUtils.ExecuteAfterDelayInSecondsAsync(songVideoPlayer.gameObject, ResidualOffsetMeasurementDelayInSeconds, () =>
+        {
+            if (songVideoPlayer.gameObject == null)
+            {
+                // Object was destroyed in the meantime
+                return;
+            }
+            
+            double residualNowInMillis = songVideoPlayer.GetOffsetPositionInMillis();
+            residualHistoryInMillis.PushBack(residualNowInMillis);
+
+            Log.WithMethodContext().Verbose(() =>
+                $"Measured post-seek residual: {residualNowInMillis:F1} ms (median: {GetMedianResidualInMillis():F1} ms)");
+        });
     }
 
     private double GetMedianResidualInMillis()
