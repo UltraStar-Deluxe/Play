@@ -376,6 +376,7 @@ public static partial class R
         public static readonly string options_recording_noConnectedMic = "options_recording_noConnectedMic";
         public static readonly string options_recording_noConnectedMic_hint = "options_recording_noConnectedMic_hint";
         public static readonly string options_recording_title = "options_recording_title";
+        public static readonly string options_recordingDevices = "options_recordingDevices";
         public static readonly string options_reduceAudioVolume = "options_reduceAudioVolume";
         public static readonly string options_reloadModsOnFileChange = "options_reloadModsOnFileChange";
         public static readonly string options_replayGainLoudnessNormalization = "options_replayGainLoudnessNormalization";

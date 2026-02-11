@@ -53,6 +53,7 @@ public static partial class R
         public const string basicPitchCommandTextField = "basicPitchCommandTextField";
         public const string beatAnalyzedEventNetworkDeliveryChooser = "beatAnalyzedEventNetworkDeliveryChooser";
         public const string bestMatchnigTrackAndChannelLabel = "bestMatchnigTrackAndChannelLabel";
+        public const string blackBackground = "blackBackground";
         public const string bonusLabel = "bonusLabel";
         public const string bottomBarsOverlay = "bottomBarsOverlay";
         public const string bottomButtonRow = "bottomButtonRow";
@@ -160,6 +161,7 @@ public static partial class R
         public const string detectBpmLabel = "detectBpmLabel";
         public const string developerOptionsButton = "developerOptionsButton";
         public const string deviceChooser = "deviceChooser";
+        public const string devicesTab = "devicesTab";
         public const string dialogButtonContainer = "dialogButtonContainer";
         public const string dialogCloseButton = "dialogCloseButton";
         public const string dialogContent = "dialogContent";
@@ -221,8 +223,7 @@ public static partial class R
         public const string generatedFolderPathHintLabel = "generatedFolderPathHintLabel";
         public const string generatedFolderPathTextField = "generatedFolderPathTextField";
         public const string genrePropertyToggle = "genrePropertyToggle";
-        public const string globalSettingsContainer = "globalSettingsContainer";
-        public const string globalSettingsLabel = "globalSettingsLabel";
+        public const string globalSettingsTab = "globalSettingsTab";
         public const string goldenNoteIndicator = "goldenNoteIndicator";
         public const string goldenNoteScore = "goldenNoteScore";
         public const string goToIssueButton = "goToIssueButton";

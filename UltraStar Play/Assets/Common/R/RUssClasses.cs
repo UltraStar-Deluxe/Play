@@ -201,6 +201,7 @@ public static partial class R
         public const string previousNoteLyrics = "previousNoteLyrics";
         public const string pt_1 = "pt-1";
         public const string pt_2 = "pt-2";
+        public const string pt_3 = "pt-3";
         public const string px__lb_12px_rb_ = "px-_lb_12px_rb_";
         public const string px_1 = "px-1";
         public const string px_2 = "px-2";

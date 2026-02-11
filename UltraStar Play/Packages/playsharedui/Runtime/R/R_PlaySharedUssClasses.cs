@@ -228,6 +228,9 @@ public static partial class R_PlayShared
         public const string unity_scroller__vertical = "unity-scroller--vertical";
         public const string unity_scroll_view__content_and_vertical_scroll_container = "unity-scroll-view__content-and-vertical-scroll-container";
         public const string unity_scroll_view__content_container = "unity-scroll-view__content-container";
+        public const string unity_tab__header = "unity-tab__header";
+        public const string unity_tab__header_underline = "unity-tab__header-underline";
+        public const string unity_tab_view = "unity-tab-view";
         public const string unity_text_input = "unity-text-input";
         public const string unity_toggle = "unity-toggle";
         public const string unity_toggle__checkmark = "unity-toggle__checkmark";
