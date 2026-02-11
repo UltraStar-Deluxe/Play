@@ -110,6 +110,7 @@ public class Settings : ISettings
     public bool ShowLyricsOnNotes { get; set; }
     public bool ShowPlayerInfoNextToNotes { get; set; }
     public bool ShowPlayerNames { get; set; } = true;
+    public bool ShowPlayerImages { get; set; } = true;
     public bool ShowScoreNumbers { get; set; } = true;
     public ESongProgressBar ShowSongProgressBar { get; set; } = ESongProgressBar.Detailed;
     public bool AnalyzeBeatsWithoutTargetNote { get; set; } = true;

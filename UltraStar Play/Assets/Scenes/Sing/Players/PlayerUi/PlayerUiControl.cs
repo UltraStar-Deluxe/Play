@@ -213,8 +213,16 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         settings.ObserveEveryValueChanged(it => it.ShowPlayerNames)
             .Subscribe(newValue => playerNameLabel.SetVisibleByDisplay(newValue));
 
+        settings.ObserveEveryValueChanged(it => it.ShowPlayerImages)
+            .Subscribe(newValue => playerImageContainer.SetVisibleByDisplay(IsPlayerImageVisible()));
+        
         settings.ObserveEveryValueChanged(it => it.ShowScoreNumbers)
             .Subscribe(newValue => playerScoreLabel.SetVisibleByDisplay(newValue));
+    }
+
+    private bool IsPlayerImageVisible()
+    {
+        return settings.ShowPlayerImages && settings.ScoreMode != EScoreMode.None;
     }
 
     private void ChangeLayoutByPlayerCount()

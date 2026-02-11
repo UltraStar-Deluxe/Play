@@ -510,6 +510,7 @@ public static partial class R
         public static readonly string singScene_options_showLyricsOnNotes = "singScene_options_showLyricsOnNotes";
         public static readonly string singScene_options_showPitchArrow = "singScene_options_showPitchArrow";
         public static readonly string singScene_options_showPlayerAlongsideNotes = "singScene_options_showPlayerAlongsideNotes";
+        public static readonly string singScene_options_showPlayerImages = "singScene_options_showPlayerImages";
         public static readonly string singScene_options_showPlayerName = "singScene_options_showPlayerName";
         public static readonly string singScene_options_showPlayerScore = "singScene_options_showPlayerScore";
         public static readonly string singScene_options_showProgressBar = "singScene_options_showProgressBar";
