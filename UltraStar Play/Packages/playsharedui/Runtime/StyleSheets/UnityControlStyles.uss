@@ -2,6 +2,42 @@
 
 
 /**************************************************/
+/* TAB GROUP and TAB */
+/**************************************************/
+.unity-tab-view {
+}
+
+.unity-tab__header {
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    background-color: var(--control-color);
+}
+
+.unity-tab__header:focus {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-tab__header:active {
+    background-color: var(--control-color-accent2);
+}
+
+.unity-tab__header:hover {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-tab__header-underline {
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    background-color: var(--control-color);
+}
+
+.unity-tab__header:hover > .unity-tab__header-underline {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-tab__header:checked > .unity-tab__header-underline {
+    background-color: var(--font-color-accent1);
+}
+
+/**************************************************/
 /* LIST VIEW */
 /**************************************************/
 .unity-list-view__reorderable-handle {

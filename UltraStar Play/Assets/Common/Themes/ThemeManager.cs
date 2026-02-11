@@ -815,6 +815,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             });
         }
 
+        // Tabs
+        root.Query<TabView>().ForEach(tabView =>
+        {
+            ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, tabView);
+            tabView.Query(null, "unity-tab__header").ForEach(styleTarget => 
+                ApplyControlColorConfigToVisualElement(styleTarget, styleConfig));
+        });
+        
         // Toggle
         root.Query<Toggle>().ForEach(toggle =>
         {
