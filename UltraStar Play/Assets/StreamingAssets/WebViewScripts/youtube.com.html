@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name='referrer' content='origin'>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #player-host {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        #unmute-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #00000011;
+            color: red;
+            text-align: center;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div id='player-host'></div>
+
+    <div id="unmute-overlay" onclick="onClickOverlayClicked()">click overlay to unmute</div>
+    
+    <script>
+        var tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+        
+        var youTubePlayer;
+        function onYouTubeIframeAPIReady() {
+            youTubePlayer = new YT.Player('player-host', {
+                height: '100%',
+                width: '100%',
+                videoId: 'jNQXAC9IVRw',
+                playerVars: {
+                    'origin': window.location.origin || 'https://www.youtube.com',
+                    'mute': 1,
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'mute': 1,
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            event.target.playVideo();
+            event.target.setVolume(100);
+        }
+        
+        function onClickOverlayClicked() {
+            youTubePlayer.unMute();
+            document.getElementById('unmute-overlay').remove();
+        }
+        </script>
+</body>
+</html>

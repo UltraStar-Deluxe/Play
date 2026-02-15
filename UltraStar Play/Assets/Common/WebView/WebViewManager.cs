@@ -1,5 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 using PrimeInputActions;
+using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -38,6 +42,11 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private UltraStarPlayHttpServer httpServer;
+
+    private string webViewHtmlPage = "";
 
     private IWebView webView;
     public IWebView WebView => webView; // Public getter to allow modding
@@ -135,6 +144,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     private string loadedUrl;
     public string LoadedUrl => loadedUrl; // Public getter to allow modding
 
+    private bool hasClickedUnmuteOverlay;
+    
     private bool javaScriptCanLoadUrl;
 
     public bool IsWebViewCanvasControlEnabled => webViewCanvas.renderMode is RenderMode.ScreenSpaceOverlay;
@@ -170,6 +181,16 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             InitializeWebViewConfig();
             InstantiateWebViewPrefab();
         }
+        
+        httpServer.CreateEndpoint(HttpMethod.Get, "webview")
+            .SetDescription("Get HTML page for WebView")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(SendWebViewHtmlPage);
+    }
+
+    private void SendWebViewHtmlPage(EndpointRequestData requestData)
+    {
+        requestData.Context.Response.SendResponse(webViewHtmlPage);
     }
 
     protected override void OnDestroySingleton()
@@ -299,6 +320,17 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
         UpdatePositionInMillisEstimate();
         SendPositionInMillisIfNeeded();
+
+        if (IsFullyLoaded
+            && !hasClickedUnmuteOverlay)
+        {
+            Log.WithClassContext().Debug(() => "Unmuting video by clicking unmute overlay");
+            hasClickedUnmuteOverlay = true;
+            
+            // Click hidden unmute-overlay to unmute video by "real user action".
+            // This is a workaround to bypass the autoplay policy that videos with audio can only autostart muted. 
+            webView.Click(100, 100, true);
+        }
     }
 
     private void SendPositionInMillisIfNeeded()
@@ -560,6 +592,17 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                 ExecuteSetVolume(0);
                 ExecuteJavaScript($"loadUrl('{url}')");
             }
+            else if (IsYouTubeUrl(url)
+                     && TryGetYouTubeVideoId(url, out string videoId))
+            {
+                Debug.Log($"Loading YouTube URL into WebView. videoId: {videoId}");
+                
+                webView.PageLoadScripts.Clear();
+                webView.PageLoadScripts.Add(webViewScript);
+                hasClickedUnmuteOverlay = false;
+                webViewHtmlPage = GetYouTubeHtml(videoId);
+                webView.LoadUrl($"{httpServer.host}:{httpServer.port}/webview");
+            }
             else
             {
                 Debug.Log("Loading new URL into WebView");
@@ -569,6 +612,31 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             }
         });
         return true;
+    }
+
+    private static bool IsYouTubeUrl(string url)
+    {
+        return new Uri(url).Host.Replace("www.", "") == "youtube.com";
+    }
+
+    private static string GetYouTubeHtml(string videoId)
+    {
+        string filePath = ApplicationUtils.GetStreamingAssetsPath("WebViewScripts/youtube.com.html");
+        return File.ReadAllText(filePath).Replace("jNQXAC9IVRw", videoId);
+    }
+
+    private static bool TryGetYouTubeVideoId(string url, out string videoId)
+    {
+        try
+        {
+            videoId = Regex.Match(url, @"v=([^&]+)").Groups[1].Value;
+            return true;
+        }
+        catch (Exception)
+        {
+            videoId = null;
+            return false;
+        }
     }
 
     private void UpdateWebViewCameraActive()

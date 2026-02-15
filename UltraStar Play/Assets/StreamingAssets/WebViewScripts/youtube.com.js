@@ -1,5 +1,7 @@
 ﻿function getPlayer() {
-    return document.getElementById('movie_player');
+    // Try to use global variable from crafted HTML page with iframe embed.
+    // Fall back to use movie_player element from regular YouTube web page.
+    return youTubePlayer || document.getElementById('movie_player');
 }
 
 setInterval(() => checkPlayerState(), 1000);
