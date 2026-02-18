@@ -4,6 +4,13 @@ using UnityEngine;
 
 public static class SongEditorAudioWaveformUtils
 {
+    public static bool IsSupportedAudioFormat(SongMeta songMeta, Settings settings)
+    {
+        // Must be an audio format supported by Unity to get all the samples
+        string audioUri = GetAudioUri(songMeta, GetAudioWaveformSamplesSource(settings));
+        return ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(audioUri));
+    }
+    
     public static async Awaitable<AudioClip> GetAudioClipToDrawAudioWaveform(
         SongMeta songMeta,
         Settings settings)
@@ -99,7 +106,7 @@ public static class SongEditorAudioWaveformUtils
         // using IDisposable d = new DisposableStopwatch($"Draw audio wave form");
         audioWaveFormVisualization.DrawAudioWaveForm(samples, minSample, maxSample);
     }
-
+    
     private static string GetAudioUri(SongMeta songMeta, ESongEditorSamplesSource samplesSource)
     {
         switch (samplesSource)

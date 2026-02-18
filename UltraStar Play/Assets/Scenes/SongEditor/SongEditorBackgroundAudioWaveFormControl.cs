@@ -96,8 +96,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
         if (!VisualElementUtils.HasGeometry(TargetElement)
             || noteAreaControl.MinMillisecondsInViewport == noteAreaControl.MaxMillisecondsInViewport
             || !songAudioPlayer.IsFullyLoaded
-            // Must be an audio format. Getting all the samples does not work with video files.
-            || !ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(songMeta.Audio))
+            || !SongEditorAudioWaveformUtils.IsSupportedAudioFormat(songMeta, settings)
             || !VisualElementUtils.HasGeometry(TargetElement)
             || lastUpdateAudioWaveformFrameCount == Time.frameCount)
         {
