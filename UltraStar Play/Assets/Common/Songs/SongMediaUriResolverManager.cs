@@ -29,20 +29,7 @@ public class SongMediaUriResolverManager : AbstractSingletonBehaviour, INeedInje
                    .FirstOrDefault(uri => !uri.IsNullOrEmpty())
                ?? audioUri;
     }
-
-    private string SafeGetUri(Func<string> func)
-    {
-        try
-        {
-            return func();
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            return null;
-        }
-    }
-
+    
     public string ResolveVideoUri(SongMeta songMeta)
     {
         string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
@@ -52,6 +39,7 @@ public class SongMediaUriResolverManager : AbstractSingletonBehaviour, INeedInje
         }
         
         return ModManager.GetModObjects<IVideoUriProvider>()
+                   .Union(new List<IVideoUriProvider>() { usdbVideoTagSyntaxMediaResolver })
                    .Select(provider => SafeGetUri(() => provider.GetVideoUri(songMeta)))
                    .FirstOrDefault(uri => !uri.IsNullOrEmpty())
                ?? videoUri;
@@ -142,5 +130,18 @@ public class SongMediaUriResolverManager : AbstractSingletonBehaviour, INeedInje
         }
 
         return "";
+    }
+
+    private string SafeGetUri(Func<string> func)
+    {
+        try
+        {
+            return func();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            return null;
+        }
     }
 }

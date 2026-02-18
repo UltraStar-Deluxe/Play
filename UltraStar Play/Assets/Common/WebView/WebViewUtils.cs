@@ -20,6 +20,7 @@ public static class WebViewUtils
 
     public static List<string> AdditionalWebViewScriptsFolders { get; set; } = new();
 
+    // TODO: Refactor to be outside of WebViewUtils. For example, use a list of supported hosts in the settings object instead.
     public static bool CanHandleWebViewUrl(string url)
     {
         try

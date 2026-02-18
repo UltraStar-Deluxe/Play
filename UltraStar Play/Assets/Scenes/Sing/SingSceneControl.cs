@@ -681,15 +681,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         try
         {
             songVideoPlayer.VideoFadeInTimeInSeconds = VideoFadeInTimeInSeconds;
-            string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(SongMeta, WebViewUtils.CanHandleWebViewUrl);
-            if (SongMetaUtils.ResourceExists(SongMeta, videoUri))
-            {
-                songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
-            }
-            else
-            {
-                songVideoPlayer.ShowBackgroundImage(SongMeta);
-            }
+            songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
         }
         catch (Exception ex)
         {

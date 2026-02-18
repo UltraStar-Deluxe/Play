@@ -31,6 +31,17 @@
     <div id="unmute-overlay" onclick="onClickOverlayClicked()">click overlay to unmute</div>
     
     <script>
+        // URI to be resolved at runtime with value from song. See WebViewManager.cs.
+        var uri = '{{uri}}';
+        if (uri.startsWith('{{') && uri.endsWith('}}')) {
+            // Fallback value for testing
+            uri = 'https://www.youtube.com/watch?v=jNQXAC9IVRw';
+        }
+        console.log('uri to load: ' + uri);
+        
+        var videoId = extractYouTubeVideoId(uri);
+        console.log('YouTube video id: ' + videoId);
+        
         var tag = document.createElement('script');
         tag.src = 'https://www.youtube.com/iframe_api';
         document.head.appendChild(tag);
@@ -40,7 +51,7 @@
             youTubePlayer = new YT.Player('player-host', {
                 height: '100%',
                 width: '100%',
-                videoId: 'jNQXAC9IVRw',
+                videoId: videoId,
                 playerVars: {
                     'origin': window.location.origin || 'https://www.youtube.com',
                     'mute': 1,
@@ -60,6 +71,24 @@
         function onClickOverlayClicked() {
             youTubePlayer.unMute();
             document.getElementById('unmute-overlay').remove();
+        }
+
+        function extractYouTubeVideoId(url) {
+            if (!url || typeof url !== 'string') return null;
+
+            const patterns = [
+                /(?:youtube\.com\/watch\?(?:.*&)?v=)([^&#?/\s]{11})/,  // Standard: youtube.com/watch?v=ID
+                /(?:youtube\.com\/embed\/)([^&#?/\s]{11})/,            // Embed:    youtube.com/embed/ID
+                /(?:youtube\.com\/v\/)([^&#?/\s]{11})/,                // Old embed: youtube.com/v/ID
+                /(?:youtu\.be\/)([^&#?/\s]{11})/,                      // Short:    youtu.be/ID
+            ];
+
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) return match[1];
+            }
+
+            return null;
         }
         </script>
 </body>

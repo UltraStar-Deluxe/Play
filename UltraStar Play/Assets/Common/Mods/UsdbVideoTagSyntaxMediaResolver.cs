@@ -2,10 +2,8 @@
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-public class UsdbVideoTagSyntaxMediaResolver : IAudioUriProvider, ICoverUriProvider, IBackgroundUriProvider
+public class UsdbVideoTagSyntaxMediaResolver : IAudioUriProvider, IVideoUriProvider, ICoverUriProvider, IBackgroundUriProvider
 {
-    // Only implement GetAudioUri because the audio is more relevant to play the karaoke song.
-    // That it also includes the video is a detail. 
     public string GetAudioUri(SongMeta songMeta)
     {
         string audioPart = TryGetMediaId(songMeta.Video, "a")
@@ -22,6 +20,11 @@ public class UsdbVideoTagSyntaxMediaResolver : IAudioUriProvider, ICoverUriProvi
         
         // Assume YouTube video.
         return $"https://www.youtube.com/watch?v={audioPart}";
+    }
+
+    public string GetVideoUri(SongMeta songMeta)
+    {
+        return GetAudioUri(songMeta);
     }
 
     public async Awaitable<string> GetCoverUriAsync(SongMeta songMeta)

@@ -8,4 +8,5 @@
     DurationInMillis,
     Volume,
     CanLoadUrl,
+    Click,
 }

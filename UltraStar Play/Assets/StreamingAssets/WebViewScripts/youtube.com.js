@@ -27,6 +27,10 @@ function onPlayerStateChange(newPlayerState) {
         const durationInMillis = getPlayer().getDuration() * 1000;
         postMessage({type: 'DurationInMillis', value: durationInMillis});
 
+        // Click hidden unmute-overlay via WebView to unmute video by "real user action".
+        // This is a workaround to bypass the autoplay policy that videos with audio can only autostart muted. 
+        postMessage({type: 'Click', x: 100, y: 100});
+
         // newPlayerState is
         // -1 => not started
         //  0 => finished
@@ -47,11 +51,6 @@ function loadUrl(url)
     if (url.startsWith("{{")) {
         console.log("url is not set. Using fallback value instead.");
         url = fallbackUrl;
-    }
-
-    if (url.startsWith("{{")) {
-        console.log("url is not set even after using fallback value. Aborting.");
-        return;
     }
 
     const urlObject = new URL(url);
