@@ -92,6 +92,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject]
     private SongIssueManager songIssueManager;
 
+    [Inject]
+    private SongMediaUriResolverManager songMediaUriResolverManager;
+
     [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
     private VisualElement noSongsFoundContainer;
 
@@ -517,7 +520,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        string audioUri = songMediaUriResolverManager.ResolveAudioUri(songMeta);
+        if (!SongMetaUtils.ResourceExists(songMeta, audioUri))
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioNotFound));
             return;
@@ -574,9 +578,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
 
         // Check that the audio file exists
-        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        string audioUri = songMediaUriResolverManager.ResolveAudioUri(songMeta);
+        if (!SongMetaUtils.ResourceExists(songMeta, audioUri))
         {
-            string audioUri = SongMetaUtils.GetAudioUri(songMeta);
             Translation errorMessage = Translation.Get(R.Messages.songSelectScene_error_audioNotFound,
                 "name", audioUri);
             Debug.LogWarning(errorMessage);

@@ -18,7 +18,7 @@ public static class SongEditorAudioWaveformUtils
             audioUri = GetAudioUri(songMeta, ESongEditorSamplesSource.OriginalMusic);
         }
 
-        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        if (!SongMetaUtils.ResourceExists(songMeta, audioUri))
         {
             Debug.Log($"Audio file resource does not exist {audioUri}");
             return null;
