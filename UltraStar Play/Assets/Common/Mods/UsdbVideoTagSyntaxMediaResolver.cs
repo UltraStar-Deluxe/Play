@@ -6,20 +6,20 @@ public class UsdbVideoTagSyntaxMediaResolver : IAudioUriProvider, IVideoUriProvi
 {
     public string GetAudioUri(SongMeta songMeta)
     {
-        string audioPart = TryGetMediaId(songMeta.Video, "a")
+        string mediaId = TryGetMediaId(songMeta.Video, "a")
             ?? TryGetMediaId(songMeta.Video, "v");
-        if (audioPart.IsNullOrEmpty())
+        if (mediaId.IsNullOrEmpty())
         {
             return null;
         }
 
-        if (audioPart.StartsWith("http://") || audioPart.StartsWith("https://"))
+        if (mediaId.StartsWith("http://") || mediaId.StartsWith("https://"))
         {
-            return audioPart;
+            return mediaId;
         }
         
         // Assume YouTube video.
-        return $"https://www.youtube.com/watch?v={audioPart}";
+        return $"https://www.youtube.com/watch?v={mediaId}";
     }
 
     public string GetVideoUri(SongMeta songMeta)
@@ -29,14 +29,24 @@ public class UsdbVideoTagSyntaxMediaResolver : IAudioUriProvider, IVideoUriProvi
 
     public async Awaitable<string> GetCoverUriAsync(SongMeta songMeta)
     {
-        string coverPart = TryGetMediaId(songMeta.Video, "co");
-        return $"https://assets.fanart.tv/fanart/{coverPart}";
+        string mediaId = TryGetMediaId(songMeta.Video, "co");
+        if (mediaId.StartsWith("http://") || mediaId.StartsWith("https://"))
+        {
+            return mediaId;
+        }
+        
+        return $"https://assets.fanart.tv/fanart/{mediaId}";
     }
 
     public async Awaitable<string> GetBackgroundUriAsync(SongMeta songMeta)
     {
-        string backgroundPart = TryGetMediaId(songMeta.Video, "bg");
-        return $"https://assets.fanart.tv/fanart/{backgroundPart}";
+        string mediaId = TryGetMediaId(songMeta.Video, "bg");
+        if (mediaId.StartsWith("http://") || mediaId.StartsWith("https://"))
+        {
+            return mediaId;
+        }
+        
+        return $"https://assets.fanart.tv/fanart/{mediaId}";
     }
     
     private static string TryGetMediaId(string usdbVideoTag, string tagId)
