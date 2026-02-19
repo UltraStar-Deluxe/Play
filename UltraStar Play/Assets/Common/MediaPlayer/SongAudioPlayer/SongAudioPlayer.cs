@@ -255,7 +255,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
     }
 
     public async Awaitable<SongAudioLoadedEvent> LoadAndPlayAsync(SongMeta songMeta)
-        => await LoadAndPlayAsync(songMeta, 0);
+        => await LoadAndPlayAsync(songMeta, songMeta.StartInMillis);
 
     public async Awaitable<SongAudioLoadedEvent> LoadAndPlayAsync(
         SongMeta songMeta,
@@ -304,6 +304,11 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         {
             AudioLoadedEvent evt = await audioSupportProvider.LoadAsync(audioUri, streamAudio, startPositionInMillis);
             currentAudioSupportProvider = audioSupportProvider;
+            if (!audioSupportProvider.IsPlaying)
+            {
+                audioSupportProvider.Play();
+            }
+            
             return evt;
         }
         catch (Exception ex)
