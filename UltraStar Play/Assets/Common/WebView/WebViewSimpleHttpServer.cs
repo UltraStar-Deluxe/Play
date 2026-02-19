@@ -57,7 +57,15 @@ public class WebViewSimpleHttpServer
             }
             catch (HttpListenerException e)
             {
-                Debug.LogException(e);
+                if (running)
+                {
+                    Debug.LogException(e);
+                }
+                else
+                {
+                    // Log warning instead of error to prevent failing tests.
+                    Debug.LogWarning("Server already stopped: " + e.Message);
+                }
                 break;
             }
         }

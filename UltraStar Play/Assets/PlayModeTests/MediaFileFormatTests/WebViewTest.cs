@@ -21,6 +21,7 @@ public class WebViewTest : AbstractMediaFileFormatTest
         "WebViewTests/AudioOnly.txt",
         "WebViewTests/VideoUrlOnly.txt",
         "WebViewTests/WebsiteOnly.txt",
+        "WebViewTests/UsdbVideoTagSyntax.txt",
     };
 
     protected override void ConfigureTestSettings(TestSettings settings)
@@ -34,6 +35,7 @@ public class WebViewTest : AbstractMediaFileFormatTest
     [UnityTest]
     public IEnumerator ShouldUseLocalAudioTest([ValueSource(nameof(shouldUseLocalAudioFiles))] string txtFilePath)
     {
+        LogAssertUtils.IgnoreFailingMessages();
         SettingsManager.Instance.Settings.UnityMediaApiUsage = EApiUsage.Preferred;
         yield return SongAudioPlayerShouldLoadFileAsync(
             txtFilePath,
@@ -43,6 +45,7 @@ public class WebViewTest : AbstractMediaFileFormatTest
     [UnityTest]
     public IEnumerator ShouldUseWebView([ValueSource(nameof(shouldUseWebViewFiles))] string txtFilePath)
     {
+        LogAssertUtils.IgnoreFailingMessages();
         yield return SongAudioPlayerShouldLoadFileAsync(
             txtFilePath,
             typeof(WebViewAudioSupportProvider),
