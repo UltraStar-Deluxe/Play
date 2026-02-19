@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
 
@@ -8,12 +9,17 @@ public class WebViewSimpleHttpServer
 {
     private readonly Func<string> htmlProvider;
     private readonly HttpListener listener;
+    
+    private readonly string url;
+    public string Url => url;
+    
     private Thread thread;
     private bool running;
 
-    public WebViewSimpleHttpServer(Func<string> htmlProvider, string url)
+    public WebViewSimpleHttpServer(Func<string> htmlProvider)
     {
         this.htmlProvider = htmlProvider;
+        this.url = $"http://localhost:{GetFreeTcpPort()}/";
         listener = new HttpListener();
         listener.Prefixes.Add(url);
     }
@@ -53,6 +59,28 @@ public class WebViewSimpleHttpServer
             {
                 Debug.LogException(e);
                 break;
+            }
+        }
+    }
+
+    private static int GetFreeTcpPort()
+    {
+        TcpListener tcpListener = new TcpListener(IPAddress.Loopback, 0);
+        try
+        {
+            tcpListener.Start();
+            return (tcpListener.LocalEndpoint as IPEndPoint)?.Port ?? 8080;
+        }
+        finally
+        {
+            try
+            {
+                tcpListener.Stop();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                Log.WithClassContext().Error(() => $"Failed to stop TcpListener after getting free port. tcpListener: {tcpListener}, error: {e.Message}");
             }
         }
     }

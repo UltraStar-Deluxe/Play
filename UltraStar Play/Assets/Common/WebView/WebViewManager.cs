@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
 using PrimeInputActions;
-using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -13,8 +10,6 @@ using Vuplex.WebView;
 public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static WebViewManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<WebViewManager>();
-
-    private const string CustomHtmlPageUrl = "http://localhost:8081/";
 
     private static bool isWebConfigInitialized;
 
@@ -45,7 +40,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
     
-    private string customHtml = "";
+    private string customHtml = "initial custom html";
 
     private IWebView webView;
     public IWebView WebView => webView; // Public getter to allow modding
@@ -181,13 +176,18 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             InstantiateWebViewPrefab();
         }
         
+        StartCustomWebViewHttpServer();
+    }
+
+    private void StartCustomWebViewHttpServer()
+    {
         // YouTube embed did not work when loading the HTML directly via WebView.LoadHtml, possibly because of missing headers.
         // However, it worked when loading the HTML via WebView.LoadUrl from a simple HTTP server.
         try
         {
-            webViewSimpleHttpServer = new WebViewSimpleHttpServer(() => customHtml, CustomHtmlPageUrl);
+            webViewSimpleHttpServer = new WebViewSimpleHttpServer(() => customHtml);
             webViewSimpleHttpServer.Start();
-            Log.WithClassContext().Information(() => $"Started http server for custom WebView HTML pages. url: '{CustomHtmlPageUrl}'");
+            Log.WithClassContext().Information(() => $"Started http server for custom WebView HTML pages. url: '{webViewSimpleHttpServer.Url}'");
         }
         catch (Exception e)
         {
@@ -596,7 +596,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                 Debug.Log($"Loading custom HTML page into WebView. url: '{url}'");
                 webView.PageLoadScripts.Clear();
                 webView.PageLoadScripts.Add(webViewScript);
-                webView.LoadUrl(CustomHtmlPageUrl);
+                webView.LoadUrl(webViewSimpleHttpServer.Url);
             }
             else
             {
