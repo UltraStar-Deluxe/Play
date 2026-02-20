@@ -681,15 +681,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         try
         {
             songVideoPlayer.VideoFadeInTimeInSeconds = VideoFadeInTimeInSeconds;
-            string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(SongMeta, WebViewUtils.CanHandleWebViewUrl);
-            if (SongMetaUtils.ResourceExists(SongMeta, videoUri))
-            {
-                songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
-            }
-            else
-            {
-                songVideoPlayer.ShowBackgroundImage(SongMeta);
-            }
+            songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
         }
         catch (Exception ex)
         {
@@ -1274,12 +1266,21 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.LogError($"Failed to load audio: {ex.Message}");
+            Debug.LogError($"Failed to load audio '{SongMeta.GetArtistDashTitle()}': {ex.Message}");
 
             if (ex is not DestroyedAlreadyException)
             {
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                    "reason", ex.Message));
+                // Create notification after delay to avoid them being removed directly when changing scene.
+                // TODO: Preserve notifications across scenes until they fade-out.
+                AwaitableUtils.ExecuteAfterDelayInSecondsAsync(NotificationManager.Instance.gameObject, 0.1f, () =>
+                {
+                    NotificationManager.CreateNotification(Translation.Get(
+                        R.Messages.songSelectScene_error_audioFailedToLoad,
+                        "name", SongMeta.Audio,
+                        "supportedFormats", ApplicationUtils.allSupportedAudioFiles.JoinWith(", ")));
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                        "reason", ex.Message));
+                });
             }
             PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
             sceneNavigator.LoadScene(EScene.SongSelectScene);

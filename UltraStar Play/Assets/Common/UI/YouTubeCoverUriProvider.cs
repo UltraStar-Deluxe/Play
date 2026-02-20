@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
 
-public class YouTubeCoverImageProvider : ISongCoverImageProvider
+public class YouTubeCoverUriProvider : ICoverUriProvider
 {
-    public async Awaitable<string> GetCoverImageUriAsync(SongMeta songMeta)
+    public async Awaitable<string> GetCoverUriAsync(SongMeta songMeta)
     {
         string webViewUri = SongMetaUtils.GetWebViewUrl(songMeta);
         if (TryGetYouTubeUri(webViewUri, out Uri uri))

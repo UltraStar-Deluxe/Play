@@ -128,10 +128,7 @@ public class VlcAudioSupportProvider : AbstractAudioSupportProvider
         set
         {
             // VLC MediaPlayer jumps to the end of the song when time is 0, so set 1 as minimum.
-            if (IsFullyLoaded)
-            {
-                mediaPlayer.SetTime((long)Math.Max(1, value));
-            }
+            mediaPlayer?.SetTime((long)Math.Max(1, value));
         }
     }
 

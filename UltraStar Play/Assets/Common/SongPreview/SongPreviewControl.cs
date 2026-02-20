@@ -28,6 +28,9 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     [Inject]
     protected Settings settings;
 
+    [Inject]
+    protected SongMediaUriResolverManager songMediaUriResolverManager;
+
     protected SongMeta currentPreviewSongMeta;
 
     protected readonly Subject<SongMeta> startSongPreviewEventStream = new();
@@ -82,9 +85,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         // The video has an additional delay to load.
         // As long as no frame is ready yet, the VideoPlayer.time is 0.
         if (!songVideoPlayer.IsPartiallyLoaded
-            || (songVideoPlayer.PositionInMillis <= 0
-                // WebView must be visible to see controls, even when audio is not ready yet.
-                && songVideoPlayer.CurrentVideoSupportProvider is not WebViewVideoSupportProvider))
+            || songVideoPlayer.PositionInMillis <= 0)
         {
             videoFadeInStartTimeInSeconds = Time.time;
         }
@@ -218,7 +219,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         }
 
         // Use the audio URL as video if the WebView can handle it (e.g. a YouTube video).
-        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
+        string videoUri = songMediaUriResolverManager.ResolveVideoUri(songMeta);
         if (!SongMetaUtils.ResourceExists(songMeta, videoUri))
         {
             songVideoPlayer.UnloadVideo();

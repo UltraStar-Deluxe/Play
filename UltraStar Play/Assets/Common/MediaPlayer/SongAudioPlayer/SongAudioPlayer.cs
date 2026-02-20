@@ -16,6 +16,9 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
 
     [Inject]
     private SceneNavigator sceneNavigator;
+    
+    [Inject]
+    private SongMediaUriResolverManager songMediaUriResolverManager;
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSourceAudioSupportProvider audioSourceAudioSupportProvider;
@@ -252,7 +255,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
     }
 
     public async Awaitable<SongAudioLoadedEvent> LoadAndPlayAsync(SongMeta songMeta)
-        => await LoadAndPlayAsync(songMeta, 0);
+        => await LoadAndPlayAsync(songMeta, songMeta.StartInMillis);
 
     public async Awaitable<SongAudioLoadedEvent> LoadAndPlayAsync(
         SongMeta songMeta,
@@ -261,8 +264,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
     {
         UnloadAudio();
 
-        string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        string audioUri = GetAudioUri(songMeta);
+        if (!SongMetaUtils.ResourceExists(songMeta, audioUri))
         {
             throw new SongAudioPlayerException($"Audio resource does not exist: {audioUri}");
         }
@@ -277,7 +280,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         loadedEventStream.OnNext(new SongAudioLoadedEvent(songMeta, evt.AudioUri));
         return new SongAudioLoadedEvent(songMeta, evt.AudioUri);
     }
-
+    
     private async Awaitable<AudioLoadedEvent> DoLoadAndPlayAsync(
         string audioUri,
         IAudioSupportProvider[] availableAudioSupportProviders,
@@ -301,6 +304,11 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         {
             AudioLoadedEvent evt = await audioSupportProvider.LoadAsync(audioUri, streamAudio, startPositionInMillis);
             currentAudioSupportProvider = audioSupportProvider;
+            if (!audioSupportProvider.IsPlaying)
+            {
+                audioSupportProvider.Play();
+            }
+            
             return evt;
         }
         catch (Exception ex)
@@ -449,5 +457,10 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         {
             playbackSpeedChangedEventStream.OnNext(newPlaybackSpeed);
         }
+    }
+    
+    private string GetAudioUri(SongMeta songMeta)
+    {
+        return songMediaUriResolverManager.ResolveAudioUri(songMeta);
     }
 }

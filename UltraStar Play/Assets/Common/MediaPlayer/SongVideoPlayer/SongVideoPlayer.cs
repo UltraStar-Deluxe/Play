@@ -39,6 +39,9 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     [Inject]
     private WebViewManager webViewManager;
+    
+    [Inject]
+    private SongMediaUriResolverManager songMediaUriResolverManager;
 
     [Inject(UxmlName = R.UxmlNames.songVideoImage, Optional = true)]
     private VisualElement videoImageVisualElement;
@@ -409,7 +412,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             videoImageVisualElement.style.opacity = 0;
         }
 
-        string uri = await SongMetaImageUtils.GetBackgroundOrCoverImageUriAsync(songMeta);
+        string uri = await songMediaUriResolverManager.ResolveBackgroundOrCoverUriAsync(songMeta);
         SetBackgroundImageFromUri(uri);
     }
 
@@ -446,7 +449,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     public async void LoadAndPlayVideoOrShowBackgroundImage(SongMeta songMeta)
     {
         if (!HasVideoUri(songMeta)
-            || IsSongVideoPlaybackDisabled())
+            || IsSongVideoPlaybackDisabled()
+            || !SongMetaUtils.ResourceExists(songMeta, GetVideoUri(songMeta)))
         {
             ShowBackgroundImage(songMeta);
             return;
@@ -502,7 +506,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         UnloadVideo();
 
         // Use the audio URL as video if the WebView can handle it (e.g. a YouTube video).
-        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
+        string videoUri = GetVideoUri(songMeta);
 
         if (videoUri.IsNullOrEmpty())
         {
@@ -627,12 +631,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         ignoredVideoFiles.Add(uri);
     }
 
-    private static bool HasVideoUri(SongMeta songMeta)
-    {
-        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
-        return !videoUri.IsNullOrEmpty();
-    }
-
     private void UpdateVideoSyncStrategy()
     {
         if (currentVideoSupportProvider == null
@@ -664,5 +662,16 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
         IsLooping = DurationInMillis < songAudioPlayer.DurationInMillis / 2;
+    }
+    
+    private bool HasVideoUri(SongMeta songMeta)
+    {
+        string videoUri = GetVideoUri(songMeta);
+        return !videoUri.IsNullOrEmpty();
+    }
+
+    private string GetVideoUri(SongMeta songMeta)
+    {
+        return songMediaUriResolverManager.ResolveVideoUri(songMeta);
     }
 }

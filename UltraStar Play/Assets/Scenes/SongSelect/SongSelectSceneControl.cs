@@ -92,6 +92,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject]
     private SongIssueManager songIssueManager;
 
+    [Inject]
+    private SongMediaUriResolverManager songMediaUriResolverManager;
+
     [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
     private VisualElement noSongsFoundContainer;
 
@@ -517,7 +520,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        string audioUri = songMediaUriResolverManager.ResolveAudioUri(songMeta);
+        if (!SongMetaUtils.ResourceExists(songMeta, audioUri))
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioNotFound));
             return;
@@ -574,9 +578,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
 
         // Check that the audio file exists
-        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        string audioUri = songMediaUriResolverManager.ResolveAudioUri(songMeta);
+        if (!SongMetaUtils.ResourceExists(songMeta, audioUri))
         {
-            string audioUri = SongMetaUtils.GetAudioUri(songMeta);
             Translation errorMessage = Translation.Get(R.Messages.songSelectScene_error_audioNotFound,
                 "name", audioUri);
             Debug.LogWarning(errorMessage);
@@ -584,20 +588,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        // Check that the used audio format can be loaded.
-        try
-        {
-            await songAudioPlayer.LoadAndPlayAsync(songMeta);
-            StartSingSceneWithGivenSongAndSettings(songMeta, false, true);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            Debug.LogError( $"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
-                "name", songMeta.Audio,
-                "supportedFormats", ApplicationUtils.allSupportedAudioFiles.JoinWith(", ")));
-        }
+        // Start singing. Checking whether the audio can be loaded is done in SingScene.
+        StartSingSceneWithGivenSongAndSettings(songMeta, false, true);
     }
 
     private void ShowFailedToLoadVoicesDialog(SongMeta songMeta)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using PrimeInputActions;
 using UniInject;
 using UniRx;
@@ -38,6 +39,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
+    
+    private string customHtml = "initial custom html";
 
     private IWebView webView;
     public IWebView WebView => webView; // Public getter to allow modding
@@ -134,7 +137,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     private string loadedUrl;
     public string LoadedUrl => loadedUrl; // Public getter to allow modding
-
+    
     private bool javaScriptCanLoadUrl;
 
     public bool IsWebViewCanvasControlEnabled => webViewCanvas.renderMode is RenderMode.ScreenSpaceOverlay;
@@ -142,6 +145,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     private CanvasWebViewPrefab webViewPrefabInstance;
 
     private bool hasShownControlsNotification;
+
+    private WebViewSimpleHttpServer webViewSimpleHttpServer;
 
     protected override object GetInstance()
     {
@@ -170,6 +175,25 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             InitializeWebViewConfig();
             InstantiateWebViewPrefab();
         }
+        
+        StartCustomWebViewHttpServer();
+    }
+
+    private void StartCustomWebViewHttpServer()
+    {
+        // YouTube embed did not work when loading the HTML directly via WebView.LoadHtml, possibly because of missing headers.
+        // However, it worked when loading the HTML via WebView.LoadUrl from a simple HTTP server.
+        try
+        {
+            webViewSimpleHttpServer = new WebViewSimpleHttpServer(() => customHtml);
+            webViewSimpleHttpServer.Start();
+            Log.WithClassContext().Information(() => $"Started http server for custom WebView HTML pages. url: '{webViewSimpleHttpServer.Url}'");
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            Debug.LogError($"Failed to start http server for custom WebView HTML pages: {e.Message}");
+        }
     }
 
     protected override void OnDestroySingleton()
@@ -180,6 +204,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             webViewPrefabInstance.Initialized -= OnWebViewPrefabInstanceInitialized;
         }
         WebViewUtils.ClearCache();
+        webViewSimpleHttpServer?.Stop();
     }
 
     private void InitializeWebViewConfig()
@@ -455,6 +480,12 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                         volumeInPercent = (int)numberWebViewMessageDto.value;
                         break;
                     }
+                    case WebViewMessageType.Click:
+                    {
+                        ClickWebViewMessageDto clickWebViewMessageDto = JsonConverter.FromJson<ClickWebViewMessageDto>(json);
+                        webView.Click((int)clickWebViewMessageDto.x, (int)clickWebViewMessageDto.y, true);
+                        break;
+                    }
                 }
             }
         }
@@ -513,7 +544,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         string webViewScript = WebViewUtils.GetWebViewScript(url);
         if (webViewScript.IsNullOrEmpty())
         {
-            Debug.LogError($"Failed to load WebView script code for url: {url}");
+            Debug.LogError($"Failed to load WebView script code. url: '{url}'");
             return false;
         }
 
@@ -525,7 +556,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         if (loadedUrl == url)
         {
             // Already loaded.
-            Debug.Log($"Reusing already loaded web page for URL {url}");
+            Debug.Log($"Reusing already loaded web page. url: '{url}'");
             SetPositionInMillis(0);
             return true;
         }
@@ -556,19 +587,56 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
             if (isContentLoaded && isLoadingUrlOfSameHost && javaScriptCanLoadUrl)
             {
-                Debug.Log("Loading new URL via JavaScript");
+                Debug.Log($"Loading new URL via already loaded JavaScript. url: '{url}'");
                 ExecuteSetVolume(0);
                 ExecuteJavaScript($"loadUrl('{url}')");
             }
+            else if (TryLoadCustomHtml(url, out customHtml))
+            {
+                Debug.Log($"Loading custom HTML page into WebView. url: '{url}'");
+                webView.PageLoadScripts.Clear();
+                webView.PageLoadScripts.Add(webViewScript);
+                webView.LoadUrl(webViewSimpleHttpServer.Url);
+            }
             else
             {
-                Debug.Log("Loading new URL into WebView");
+                Debug.Log($"Loading new URL into WebView. url: '{url}'");
                 webView.PageLoadScripts.Clear();
                 webView.PageLoadScripts.Add(webViewScript);
                 webView.LoadUrl(url);
             }
         });
         return true;
+    }
+
+    // TODO: Cache HTML template in memory, similar to JavaScript files. See WebViewUtils.cs
+    private static bool TryLoadCustomHtml(string uri, out string html)
+    {
+        try
+        {
+            string host = new Uri(uri).Host.Replace("www.", "");
+            if (host.IsNullOrEmpty())
+            {
+                html = "";
+                return false;
+            }
+
+            string filePath = ApplicationUtils.GetStreamingAssetsPath($"WebViewScripts/{host}.html");
+            if (!FileUtils.Exists(filePath))
+            {
+                html = "";
+                return false;
+            }
+
+            html = File.ReadAllText(filePath).Replace("{{uri}}", uri);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            html = "";
+            return false;
+        }
     }
 
     private void UpdateWebViewCameraActive()

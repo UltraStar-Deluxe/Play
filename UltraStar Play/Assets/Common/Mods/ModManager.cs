@@ -557,6 +557,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                             && entry.Key is T)
             .Where(entry => !onlyEnabledMods || IsModEnabled(entry.Key))
             .Select(entry => (T)entry.Key)
+            .OrderBy(entry => entry.GetType().Name)
             .ToList();
     }
 

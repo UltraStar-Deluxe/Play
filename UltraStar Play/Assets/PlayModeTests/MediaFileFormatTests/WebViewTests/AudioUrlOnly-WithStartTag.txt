@@ -1,0 +1,11 @@
+﻿#VERSION:2.0.0
+#TITLE:AudioUrlOnly format test with START tag
+#ARTIST:Test Artist
+#AUDIOURL:https://www.youtube.com/watch?v=jNQXAC9IVRw
+#BPM:200
+#START:8000
+- 0
+: 4 3 9 Hel
+: 8 3 9  lo
+: 12 3 9  world!
+E

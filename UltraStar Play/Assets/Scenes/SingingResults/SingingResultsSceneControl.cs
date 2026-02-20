@@ -117,6 +117,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 	[Inject]
     private AchievementEventStream achievementEventStream;
 
+    [Inject]
+    private SongCoverImageManager songCoverImageManager;
+    
     private readonly Subject<CancelableEvent> beforeRestartEventStream = new();
     public IObservable<CancelableEvent> BeforeRestartEventStream => beforeRestartEventStream;
 
@@ -365,7 +368,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
         artistLabel.SetTranslatedText(Translation.Of(songMeta.Artist));
         titleLabel.SetTranslatedText(Translation.Of(songMeta.Title));
-        SongMetaImageUtils.SetCoverOrBackgroundImageAsync(new CancellationToken(), songMeta, coverImage);
+        songCoverImageManager.SetCoverOrBackgroundImageAsync(new CancellationToken(), songMeta, coverImage);
     }
 
     private void FillLayout()
