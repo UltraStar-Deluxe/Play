@@ -28,3 +28,6 @@
 # C# scripts and text
 *.cs text eol=lf
 *.shader text eol=lf
+
+# Markdown
+*.md text eol=lf
