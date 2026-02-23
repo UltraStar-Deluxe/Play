@@ -1,19 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
-using UniRx;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class YouTubeCoverUriProvider : ICoverUriProvider
 {
     public async Awaitable<string> GetCoverUriAsync(SongMeta songMeta)
     {
-        string webViewUri = SongMetaUtils.GetWebViewUrl(songMeta);
+        string webViewUri = GetWebViewUri(songMeta);
         if (TryGetYouTubeUri(webViewUri, out Uri uri))
         {
             return GetCoverImageFromYouTube(uri);
         }
 
         return "";
+    }
+
+    private static string GetWebViewUri(SongMeta songMeta)
+    {
+        string webViewUrl = SongMetaUtils.GetWebViewUrl(songMeta);
+        if (!webViewUrl.IsNullOrEmpty())
+        {
+            return webViewUrl;
+        }
+        
+        // Try to get YouTube URI from #VIDEO tag syntax used on USDB
+        string mediaId = GetMediaId(SongMetaUtils.GetVideoUri(songMeta), "v") ?? "";
+        if (mediaId.IsNullOrEmpty())
+        {
+            return null;
+        }
+        
+        if (mediaId.StartsWith("http://") || mediaId.StartsWith("https://"))
+        {
+            return mediaId;
+        }
+        
+        // Assume YouTube video.
+        return $"https://www.youtube.com/watch?v={mediaId}";
     }
 
     private static string GetCoverImageFromYouTube(Uri uri)
@@ -106,5 +130,23 @@ public class YouTubeCoverUriProvider : ICoverUriProvider
         }
 
         return parsedParameters;
+    }
+    
+    private static string GetMediaId(string usdbVideoTag, string tagId)
+    {
+        try
+        {
+            Match match = Regex.Match(usdbVideoTag, $"{tagId}=([^&,]+)");
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
+
+        return null;
     }
 }

@@ -6,8 +6,8 @@ public class UsdbVideoTagSyntaxMediaResolver : IAudioUriProvider, IVideoUriProvi
 {
     public string GetAudioUri(SongMeta songMeta)
     {
-        string mediaId = TryGetMediaId(songMeta.Video, "a")
-            ?? TryGetMediaId(songMeta.Video, "v");
+        string mediaId = GetMediaId(songMeta.Video, "a")
+            ?? GetMediaId(songMeta.Video, "v");
         if (mediaId.IsNullOrEmpty())
         {
             return null;
@@ -29,27 +29,39 @@ public class UsdbVideoTagSyntaxMediaResolver : IAudioUriProvider, IVideoUriProvi
 
     public async Awaitable<string> GetCoverUriAsync(SongMeta songMeta)
     {
-        string mediaId = TryGetMediaId(songMeta.Video, "co");
+        string mediaId = GetMediaId(songMeta.Video, "co");
+        if (mediaId.IsNullOrEmpty())
+        {
+            return null;
+        }
+        
         if (mediaId.StartsWith("http://") || mediaId.StartsWith("https://"))
         {
             return mediaId;
         }
         
+        // Assume fanart.tv
         return $"https://assets.fanart.tv/fanart/{mediaId}";
     }
 
     public async Awaitable<string> GetBackgroundUriAsync(SongMeta songMeta)
     {
-        string mediaId = TryGetMediaId(songMeta.Video, "bg");
-        if (mediaId.StartsWith("http://") || mediaId.StartsWith("https://"))
+        string mediaId = GetMediaId(songMeta.Video, "bg");
+        if (mediaId.IsNullOrEmpty())
+        {
+            return null;
+        }
+        
+        if (!mediaId.IsNullOrEmpty() && mediaId.StartsWith("http://") || mediaId.StartsWith("https://"))
         {
             return mediaId;
         }
         
+        // Assume fanart.tv
         return $"https://assets.fanart.tv/fanart/{mediaId}";
     }
     
-    private static string TryGetMediaId(string usdbVideoTag, string tagId)
+    private static string GetMediaId(string usdbVideoTag, string tagId)
     {
         try
         {
