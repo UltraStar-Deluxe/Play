@@ -1,7 +1,7 @@
 "appbuild"
 {
 	"appid" "2394070"
-	"desc" "Melody_Mania-1.5.3-beta4-6ec3ddce0-2601061748"
+	"desc" "Melody_Mania-1.5.3-beta8-1e560c906-2602230858"
 	"buildoutput" "C:\Dev\Projects\GitHub\achimmihca\MelodyMania\Tools\steamworks_sdk_157\sdk\tools\ContentBuilder\output"
 	"contentroot" ""
 	"setlive" "private-beta"
