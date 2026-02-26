@@ -801,6 +801,38 @@
 }
 
 /**************************************************/
+/* OPTIONS SCENE SONG PACKAGE CARD */
+/**************************************************/
+
+.song-package-card {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    border-color: rgba(255, 255, 255, 0.1);
+    border-width: 2px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.default-pack .song-package-card {
+    border-color: #00e676;
+}
+
+.default-pack Shadow {
+    color: #00E67620;
+}
+
+.community-pack .song-package-card {
+    border-color: #2979ff;
+}
+
+.community-pack Shadow {
+    color: #2979FF20;
+}
+
+/**************************************************/
 /* ABOUT SCENE */
 /**************************************************/
 .aboutTextField {

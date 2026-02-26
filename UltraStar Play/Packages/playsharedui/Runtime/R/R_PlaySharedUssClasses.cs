@@ -38,6 +38,7 @@ public static partial class R_PlayShared
         public const string circleButton = "circleButton";
         public const string comboBoxButton = "comboBoxButton";
         public const string comboBoxTextField = "comboBoxTextField";
+        public const string community_pack = "community-pack";
         public const string contextMenu = "contextMenu";
         public const string contextMenuButton = "contextMenuButton";
         public const string contextMenuSeparator = "contextMenuSeparator";
@@ -52,6 +53,7 @@ public static partial class R_PlayShared
         public const string currentLyrics = "currentLyrics";
         public const string currentNoteLyrics = "currentNoteLyrics";
         public const string dangerButton = "dangerButton";
+        public const string default_pack = "default-pack";
         public const string deviceInfoLabel = "deviceInfoLabel";
         public const string dialogBackground = "dialogBackground";
         public const string dialogButton = "dialogButton";
@@ -166,6 +168,7 @@ public static partial class R_PlayShared
         public const string songIssueMessage = "songIssueMessage";
         public const string songIssueSongMetaTitle = "songIssueSongMetaTitle";
         public const string songLibraryNoSongsButton = "songLibraryNoSongsButton";
+        public const string song_package_card = "song-package-card";
         public const string songSelectLyricsPreview = "songSelectLyricsPreview";
         public const string songSelectSongEntryIcon = "songSelectSongEntryIcon";
         public const string squareButton = "squareButton";

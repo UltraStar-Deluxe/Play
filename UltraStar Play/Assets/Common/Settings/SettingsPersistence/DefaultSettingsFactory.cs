@@ -39,6 +39,7 @@ public static class DefaultSettingsFactory
         if (DirectoryUtils.Exists(demoSongFolder))
         {
             defaultSettings.SongDirs.Add(demoSongFolder);
+            defaultSettings.DisabledSongFolders.Add(demoSongFolder);
         }
 
         // Add player profiles

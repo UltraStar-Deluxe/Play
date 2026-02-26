@@ -8,6 +8,7 @@ public static partial class R
         public const string aboutTextScrollView = "aboutTextScrollView";
         public const string aboutTextsScrollView = "aboutTextsScrollView";
         public const string aboutTheGameButton = "aboutTheGameButton";
+        public const string actionButton = "actionButton";
         public const string addButton = "addButton";
         public const string addGuestButton = "addGuestButton";
         public const string addPlayerIcon = "addPlayerIcon";
@@ -84,6 +85,7 @@ public static partial class R
         public const string cancelIcon = "cancelIcon";
         public const string cancelJobButton = "cancelJobButton";
         public const string cancelJobIcon = "cancelJobIcon";
+        public const string card = "card";
         public const string categoryNameContainer = "categoryNameContainer";
         public const string categoryNameLabel = "categoryNameLabel";
         public const string center = "center";
@@ -110,6 +112,7 @@ public static partial class R
         public const string commitHashLabel = "commitHashLabel";
         public const string commonScoreIcon = "commonScoreIcon";
         public const string commonScoreSentenceRatingContainer = "commonScoreSentenceRatingContainer";
+        public const string communitySongPackageList = "communitySongPackageList";
         public const string companionClientCountLabel = "companionClientCountLabel";
         public const string companionClientList = "companionClientList";
         public const string companionClientListEntryUiRoot = "companionClientListEntryUiRoot";
@@ -148,6 +151,7 @@ public static partial class R
         public const string defaultMedleyTargetDurationChooser = "defaultMedleyTargetDurationChooser";
         public const string defaultPermissionsContainer = "defaultPermissionsContainer";
         public const string defaultPermissionsTitle = "defaultPermissionsTitle";
+        public const string defaultSongPackageTemplate = "defaultSongPackageTemplate";
         public const string defaultUltraStarFormatVersionForSave = "defaultUltraStarFormatVersionForSave";
         public const string delayChooser = "delayChooser";
         public const string deleteButton = "deleteButton";
@@ -155,6 +159,7 @@ public static partial class R
         public const string deleteIcon = "deleteIcon";
         public const string deletePlaylistButton = "deletePlaylistButton";
         public const string deleteTeamButton = "deleteTeamButton";
+        public const string description = "description";
         public const string designOptionsButton = "designOptionsButton";
         public const string detailedTimeBar = "detailedTimeBar";
         public const string detectBpmButton = "detectBpmButton";
@@ -182,6 +187,7 @@ public static partial class R
         public const string dragToChangeWidthArea = "dragToChangeWidthArea";
         public const string drawNoteLayerChooser = "drawNoteLayerChooser";
         public const string driveButton = "driveButton";
+        public const string dummyCommunitySongPackage = "dummyCommunitySongPackage";
         public const string dummyCurrentLobbyControls = "dummyCurrentLobbyControls";
         public const string dummyHostLobbyControls = "dummyHostLobbyControls";
         public const string dummyJoinLobbyControls = "dummyJoinLobbyControls";
@@ -828,6 +834,9 @@ public static partial class R
         public const string songListContainer = "songListContainer";
         public const string songListView = "songListView";
         public const string songOrderDropdownField = "songOrderDropdownField";
+        public const string SongPackageCardUi = "SongPackageCardUi";
+        public const string songPackageContainer = "songPackageContainer";
+        public const string songPackagesTitle = "songPackagesTitle";
         public const string songPreviewBackgroundImage = "songPreviewBackgroundImage";
         public const string songPreviewContainer = "songPreviewContainer";
         public const string songPreviewVideoImage = "songPreviewVideoImage";
@@ -992,6 +1001,7 @@ public static partial class R
         public const string upgradeUltraStarFormatVersionForSave = "upgradeUltraStarFormatVersionForSave";
         public const string uploadProgressBar = "uploadProgressBar";
         public const string uploadWorkshopItemButton = "uploadWorkshopItemButton";
+        public const string url = "url";
         public const string urlChooserButton = "urlChooserButton";
         public const string urlTextField = "urlTextField";
         public const string urlTextFieldHint = "urlTextFieldHint";

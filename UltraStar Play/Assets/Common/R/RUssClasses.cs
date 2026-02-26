@@ -47,6 +47,7 @@ public static partial class R
         public const string circleButton = "circleButton";
         public const string comboBoxButton = "comboBoxButton";
         public const string comboButton = "comboButton";
+        public const string community_pack = "community-pack";
         public const string contents = "contents";
         public const string controlLabel = "controlLabel";
         public const string controlMinWidth = "controlMinWidth";
@@ -61,6 +62,7 @@ public static partial class R
         public const string cursor_pan = "cursor-pan";
         public const string dangerButton = "dangerButton";
         public const string default_bg_color = "default-bg-color";
+        public const string default_pack = "default-pack";
         public const string default_text_color = "default-text-color";
         public const string dialogBackground = "dialogBackground";
         public const string dialogButton = "dialogButton";
@@ -251,6 +253,7 @@ public static partial class R
         public const string smallFont = "smallFont";
         public const string songEditorRoot = "songEditorRoot";
         public const string songIssueSongMetaTitle = "songIssueSongMetaTitle";
+        public const string song_package_card = "song-package-card";
         public const string songSelectSongEntryIcon = "songSelectSongEntryIcon";
         public const string squareButton = "squareButton";
         public const string startPreviewIcon = "startPreviewIcon";

@@ -17,6 +17,7 @@ public static partial class R
         public static readonly string action_continue = "action_continue";
         public static readonly string action_delete = "action_delete";
         public static readonly string action_doubleTap = "action_doubleTap";
+        public static readonly string action_download = "action_download";
         public static readonly string action_downloadArchive = "action_downloadArchive";
         public static readonly string action_exitSong = "action_exitSong";
         public static readonly string action_import = "action_import";
