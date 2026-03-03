@@ -4,7 +4,7 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class TimeBarControl : INeedInjection
+public class TimeBarControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject(UxmlName = R.UxmlNames.innerTimeBarSentenceEntryContainer)]
     private VisualElement innerTimeBarSentenceEntryContainer;
@@ -14,15 +14,27 @@ public class TimeBarControl : INeedInjection
 
     [Inject(UxmlName = R.UxmlNames.timeValueLabel)]
     private Label timeValueLabel;
+    
+    [Inject(UxmlName = R.UxmlNames.timeBarsContainer)]
+    private VisualElement timeBarsContainer;
 
     [Inject]
     private SingSceneMedleyControl medleyControl;
 
     [Inject]
     private SongMeta songMeta;
+    
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
 
     private double LateStartInSongInMillis => songMeta?.StartInMillis ?? 0;
     private double EarlyEndInSongInMillis => songMeta?.EndInMillis ?? 0;
+
+    public void OnInjectionFinished()
+    {
+        // Change positon in audio by clicking time bar
+        timeBarsContainer.RegisterCallback<PointerDownEvent>(OnTimeBarClicked, TrickleDown.NoTrickleDown);
+    }
 
     public void UpdateTimeValueLabel(double positionInMillis, double durationInMillis)
     {
@@ -83,6 +95,39 @@ public class TimeBarControl : INeedInjection
         }
     }
 
+    private void OnTimeBarClicked(IPointerEvent evt)
+    {
+        if (songAudioPlayer == null || songMeta == null)
+        {
+            return;
+        }
+
+        // Calculate click position as percentage within the time bar
+        float width = timeBarsContainer.contentRect.width;
+        if (width <= 0f)
+        {
+            return;
+        }
+
+        float x = evt.localPosition.x;
+        float ratio = Mathf.Clamp01(x / width);
+
+        double startTagInMillis = songMeta.StartInMillis;
+        double endTagInMillis = songMeta.EndInMillis;
+        double durationInMillisConsideringStartAndEndTag = songAudioPlayer.DurationInMillis - startTagInMillis - endTagInMillis;
+        if (durationInMillisConsideringStartAndEndTag <= 0)
+        {
+            return;
+        }
+
+        double targetPositionConsideringStartAndEnd = ratio * durationInMillisConsideringStartAndEndTag;
+        double targetPositionInMillis = startTagInMillis + targetPositionConsideringStartAndEnd;
+        songAudioPlayer.PositionInMillis = targetPositionInMillis;
+        
+        // Do not trigger other events, e.g., do not trigger play / pause
+        (evt as EventBase)?.StopImmediatePropagation();
+    }
+    
     private void CreateRectangles(SongMeta songMeta, PlayerControl playerControl, double durationInMillis, int playerIndex, int playerCount)
     {
         foreach (Sentence sentence in playerControl.Voice.Sentences)
