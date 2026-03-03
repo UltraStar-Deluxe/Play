@@ -28,6 +28,16 @@ public static class AudioSupportProviderSelectionStrategy
 
         // Select the audio support provider of the API that has highest priority
         List<EMediaApi> mediaApis = MediaApiPriorityUtils.GetMediaApisOrderedByPriority(settings);
+        
+        // Prefer to use Unity API for ogg and mp3 files even if not configured with highest priority.
+        // Unity API just works best for these formats.
+        // Users reported lag in song editor, when AVPro handles the ogg resp. mp3 file.
+        if (mediaApis.Contains(EMediaApi.Unity)
+            && TryGetOggOrMp3Provider(availableProviders, audioUri, out IAudioSupportProvider oggOrMp3Provider))
+        {
+            return oggOrMp3Provider;
+        }
+        
         foreach (EMediaApi mediaApi in mediaApis)
         {
             if (mediaApi == EMediaApi.Unity
@@ -76,6 +86,24 @@ public static class AudioSupportProviderSelectionStrategy
         
         if (ApplicationUtils.IsSupportedMidiFormat(extension)
             && TryGetProvider<MidiAudioSupportProvider>(availableProviders, out provider))
+        {
+            return true;
+        }
+
+        provider = null;
+        return false;
+    }
+
+    private static bool TryGetOggOrMp3Provider(
+        IAudioSupportProvider[] availableProviders,
+        string audioUri,
+        out IAudioSupportProvider provider)
+    {
+        string extension = Path.GetExtension(audioUri);
+        string extensionWithoutDot = extension.TrimStart(".").ToLowerInvariant();
+
+        if ((extensionWithoutDot == "ogg" || extensionWithoutDot == "mp3")
+            && TryGetProvider<AudioSourceAudioSupportProvider>(availableProviders, out provider))
         {
             return true;
         }

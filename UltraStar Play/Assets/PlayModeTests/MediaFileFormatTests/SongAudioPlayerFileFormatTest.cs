@@ -24,6 +24,13 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
         new TestCaseData("webm-vp8.txt", typeof(VideoPlayerAudioSupportProvider)).Returns(null),
     };
 
+    // ogg and mp3 use Unity API preferred even if configured otherwise because Unity API works best for them.
+    private static readonly List<TestCaseData> preferredByUnity = new List<TestCaseData>()
+    {
+        new TestCaseData("mp3-ConstantBitRate.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
+        new TestCaseData("ogg.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
+    };
+    
     private static readonly List<TestCaseData> supportedByVlc = new List<TestCaseData>()
     {
         new TestCaseData("aac.txt").Returns(null),
@@ -66,7 +73,7 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
     {
         new TestCaseData("midi.txt").Returns(null),
     };
-
+    
     [UnityTest]
     [TestCaseSource(nameof(supportedByUnity))]
     public IEnumerator ShouldLoadViaUnity(string txtFilePath, Type expectedAudioSupportProviderType)
@@ -116,6 +123,15 @@ public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
     {
         ConfigureMediaApiSettings(EApiUsage.Enabled, EApiUsage.Enabled, EApiUsage.Disabled);
         yield return SongAudioPlayerShouldLoadFileAsync("flac.txt", typeof(AvproAudioSupportProvider));
+    }
+    
+    [UnityTest]
+    [TestCaseSource(nameof(preferredByUnity))]
+    public IEnumerator ShouldLoadOggAndMp3ViaUnityPreferred(string txtFilePath, Type expectedAudioSupportProviderType)
+    {
+        // Unity is not configured as preferred, but ogg and mp3 are hard corded to still use Unity API.
+        ConfigureMediaApiSettings(EApiUsage.Enabled, EApiUsage.Preferred, EApiUsage.Preferred);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, expectedAudioSupportProviderType);
     }
     
     private static void ConfigureMediaApiSettings(EApiUsage unity, EApiUsage avpro, EApiUsage vlc)
