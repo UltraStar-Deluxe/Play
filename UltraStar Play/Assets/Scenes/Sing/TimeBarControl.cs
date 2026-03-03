@@ -26,6 +26,12 @@ public class TimeBarControl : INeedInjection, IInjectionFinishedListener
     
     [Inject]
     private SongAudioPlayer songAudioPlayer;
+    
+    [Inject]
+    private CursorManager cursorManager;
+    
+    [Inject]
+    private SingSceneControl singSceneControl;
 
     private double LateStartInSongInMillis => songMeta?.StartInMillis ?? 0;
     private double EarlyEndInSongInMillis => songMeta?.EndInMillis ?? 0;
@@ -33,7 +39,9 @@ public class TimeBarControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         // Change positon in audio by clicking time bar
-        timeBarsContainer.RegisterCallback<PointerDownEvent>(OnTimeBarClicked, TrickleDown.NoTrickleDown);
+        timeBarsContainer.RegisterCallback<PointerDownEvent>(OnTimeBarClicked);
+        timeBarsContainer.RegisterCallback<PointerEnterEvent>(_ => cursorManager.SetCursorHand());
+        timeBarsContainer.RegisterCallback<PointerLeaveEvent>(_ => cursorManager.SetDefaultCursor());
     }
 
     public void UpdateTimeValueLabel(double positionInMillis, double durationInMillis)
