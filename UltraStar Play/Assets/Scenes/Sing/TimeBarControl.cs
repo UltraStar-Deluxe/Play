@@ -30,8 +30,6 @@ public class TimeBarControl : INeedInjection, IInjectionFinishedListener
 
     [Inject] private SongAudioPlayer songAudioPlayer;
 
-    [Inject] private CursorManager cursorManager;
-
     [Inject] private SingSceneControl singSceneControl;
 
     private double LateStartInSongInMillis => songMeta?.StartInMillis ?? 0;
@@ -39,7 +37,7 @@ public class TimeBarControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-        timeBarLyricsPreviewLabel.HideByDisplay();
+        timeBarLyricsPreviewShadow.HideByDisplay();
 
         // Change positon in audio by clicking time bar
         timeBarsContainer.RegisterCallback<PointerDownEvent>(OnTimeBarClicked);
@@ -141,14 +139,12 @@ public class TimeBarControl : INeedInjection, IInjectionFinishedListener
 
     private void OnTimeBarEnter(PointerEnterEvent evt)
     {
-        cursorManager.SetCursorHand();
         UpdateLyricsPreviewForPointer(evt.localPosition.x);
     }
 
     private void OnTimeBarLeave(PointerLeaveEvent evt)
     {
-        cursorManager.SetDefaultCursor();
-        timeBarLyricsPreviewLabel.HideByDisplay();
+        timeBarLyricsPreviewShadow.HideByDisplay();
     }
 
     private void OnTimeBarPointerMove(PointerMoveEvent evt)
@@ -163,7 +159,7 @@ public class TimeBarControl : INeedInjection, IInjectionFinishedListener
             || songMeta == null
             || songAudioPlayer == null)
         {
-            timeBarLyricsPreviewLabel.HideByDisplay();
+            timeBarLyricsPreviewShadow.HideByDisplay();
             return;
         }
 
@@ -178,7 +174,7 @@ public class TimeBarControl : INeedInjection, IInjectionFinishedListener
             songAudioPlayer.DurationInMillis - startTagInMillis - endTagInMillis;
         if (durationInMillisConsideringStartAndEndTag <= 0)
         {
-            timeBarLyricsPreviewLabel.HideByDisplay();
+            timeBarLyricsPreviewShadow.HideByDisplay();
             return;
         }
 
@@ -188,11 +184,11 @@ public class TimeBarControl : INeedInjection, IInjectionFinishedListener
         string preview = GetUpcomingLyricsAt(positionInMillis);
         if (preview.IsNullOrEmpty())
         {
-            timeBarLyricsPreviewLabel.HideByDisplay();
+            timeBarLyricsPreviewShadow.HideByDisplay();
         }
         else
         {
-            timeBarLyricsPreviewLabel.ShowByDisplay();
+            timeBarLyricsPreviewShadow.ShowByDisplay();
             timeBarLyricsPreviewLabel.text = preview;
         }
     }
