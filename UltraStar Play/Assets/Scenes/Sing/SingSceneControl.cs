@@ -1421,6 +1421,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         double oldPositionInMillis = songAudioPlayer.PositionInMillis;
         songAudioPlayer.PositionInMillis = newPositionInMillis;
+        singingLyricsControls.ForEach(singingLyricsControl => 
+            singingLyricsControl?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis));
         PlayerControls.ForEach(playerControl =>
             playerControl.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis));
     }

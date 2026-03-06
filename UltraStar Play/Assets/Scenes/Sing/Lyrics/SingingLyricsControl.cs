@@ -493,4 +493,59 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         fadeOutLyricsAnimationIds.Add(AnimationUtils.FadeInVisualElement(gameObject, currentSentenceContainer, animTimeInSeconds));
         fadeOutLyricsAnimationIds.Add(AnimationUtils.FadeInVisualElement(gameObject, nextSentenceContainer, animTimeInSeconds));
     }
+
+    public void JumpToAudioPositionByUserAction(double oldPositionInMillis, double newPositionInMillis)
+    {
+        if (newPositionInMillis >= oldPositionInMillis)
+        {
+            // Jump forward is handled by existing logic.
+            return;
+        }
+        
+        // Jumped backwards: Recompute display sentence and refresh lyrics UI accordingly.
+        // Determine the sentence that should be displayed at the new position
+        double newBeat = SongMetaBpmUtils.MillisToBeats(songMeta, newPositionInMillis);
+
+        // Find the first sentence whose line break is after the current beat
+        Sentence targetDisplaySentence = playerControl.SortedSentences
+            .FirstOrDefault(sentence => newBeat < sentence.LinebreakBeat);
+
+        int targetIndex = (targetDisplaySentence != null)
+            ? playerControl.SortedSentences.IndexOf(targetDisplaySentence)
+            : playerControl.SortedSentences.Count; // After last sentence
+
+        // If we are after the last sentence, clear current and next; else set both accordingly
+        if (targetIndex >= playerControl.SortedSentences.Count)
+        {
+            SetCurrentSentence(null);
+            SetNextSentence(null);
+        }
+        else
+        {
+            // Only rebuild UI if the target sentence differs, to avoid unnecessary flicker
+            if (CurrentSentence != targetDisplaySentence)
+            {
+                SetCurrentSentence(targetDisplaySentence);
+                SetNextSentence(playerControl.GetSentence(targetIndex + 1));
+            }
+
+            // Ensure the reference to the previous sentence matches the new index (used by before-lyrics indicator)
+            previousSentence = (targetIndex - 1) >= 0
+                ? playerControl.SortedSentences[targetIndex - 1]
+                : null;
+        }
+
+        // Reset wipe progress to avoid leftover width from later positions when no current note is active yet
+        if (settings.WipeLyrics)
+        {
+            highlightLabelContainer.style.width = 0;
+        }
+        else
+        {
+            highlightLabelContainer.style.width = new StyleLength(StyleKeyword.Auto);
+        }
+
+        // Finally, update highlighting and the before-lyrics indicator for the new position
+        Update(newPositionInMillis);
+    }
 }
