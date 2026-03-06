@@ -105,11 +105,9 @@ public class TimeBarControl : INeedInjection, IInjectionFinishedListener
 
     private void OnTimeBarClicked(IPointerEvent evt)
     {
-        if (songAudioPlayer == null || songMeta == null)
-        {
-            return;
-        }
-
+        // Do not trigger other events, e.g., do not trigger play / pause
+        (evt as EventBase)?.StopImmediatePropagation();
+        
         // Calculate click position as percentage within the time bar
         float width = timeBarsContainer.contentRect.width;
         if (width <= 0f)
@@ -130,10 +128,7 @@ public class TimeBarControl : INeedInjection, IInjectionFinishedListener
 
         double targetPositionConsideringStartAndEnd = ratio * durationInMillisConsideringStartAndEndTag;
         double targetPositionInMillis = startTagInMillis + targetPositionConsideringStartAndEnd;
-        songAudioPlayer.PositionInMillis = targetPositionInMillis;
-        
-        // Do not trigger other events, e.g., do not trigger play / pause
-        (evt as EventBase)?.StopImmediatePropagation();
+        singSceneControl.JumpToAudioPositionByUserAction(targetPositionInMillis);
     }
     
     private void CreateRectangles(SongMeta songMeta, PlayerControl playerControl, double durationInMillis, int playerIndex, int playerCount)

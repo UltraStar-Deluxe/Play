@@ -1416,4 +1416,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             }
         }
     }
+
+    public void JumpToAudioPositionByUserAction(double newPositionInMillis)
+    {
+        double oldPositionInMillis = songAudioPlayer.PositionInMillis;
+        songAudioPlayer.PositionInMillis = newPositionInMillis;
+        PlayerControls.ForEach(playerControl =>
+            playerControl.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis));
+    }
 }

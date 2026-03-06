@@ -336,4 +336,10 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
             SentenceIndex = sentenceIndex;
         }
     }
+
+    public void JumpToAudioPositionByUserAction(double oldPositionInMillis, double newPositionInMillis)
+    {
+        PlayerScoreControl?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+        PlayerMicPitchTracker?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+    }
 }

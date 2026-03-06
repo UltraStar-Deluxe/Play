@@ -28,6 +28,9 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     private Voice voice;
 
     [Inject]
+    private SongMeta songMeta;
+
+    [Inject]
     private SingSceneMedleyControl medleyControl;
 
     [Inject]
@@ -60,8 +63,11 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    private readonly HashSet<int> processedBeats = new();
     private int firstBeatToScoreInclusive;
+
+    // Tracks which beats have already been scored and whether they were counted as golden or normal
+    private readonly Dictionary<int, bool> processedBeatsIsGoldenMap = new();
+    private readonly HashSet<Sentence> awardedPerfectSentences = new();
 
     private void Awake()
     {
@@ -107,12 +113,13 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
 
-        if (processedBeats.Contains(beat))
+        if (processedBeatsIsGoldenMap.ContainsKey(beat))
         {
             Debug.LogWarning($"Attempt to score beat multiple times: {beat}");
             return;
         }
-        processedBeats.Add(beat);
+        bool isGolden = note.IsGolden;
+        processedBeatsIsGoldenMap[beat] = isGolden;
 
         if (TotalScore >= maxScore)
         {
@@ -159,7 +166,11 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
         if (evt.IsPerfect)
         {
-            calculationData.PerfectSentenceCount++;
+            if (!awardedPerfectSentences.Contains(sentence))
+            {
+                awardedPerfectSentences.Add(sentence);
+                calculationData.PerfectSentenceCount++;
+            }
         }
 
         // Check score is within expected bounds
@@ -373,5 +384,66 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
                                  + GoldenNotesTotalScore
                                  + PerfectSentenceBonusTotalScore
                                  + ModTotalScore;
+    }
+
+    public void JumpToAudioPositionByUserAction(double oldPositionInMillis, double newPositionInMillis)
+    {
+        if (newPositionInMillis >= oldPositionInMillis)
+        {
+            // Jump forward is handled by existing logic.
+            return;
+        }
+
+        // Jumped backwards: revert scored beats and perfect sentences that are at/after the new position
+        int newBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, newPositionInMillis);
+        RevertScoresToBeatExclusive(newBeat);
+        firstBeatToScoreInclusive = newBeat;
+    }
+
+    private void RevertScoresToBeatExclusive(int newBeat)
+    {
+        // Remove processed beats >= targetBeat and adjust counters
+        if (processedBeatsIsGoldenMap.Count == 0)
+        {
+            calculationData.HighestScoredBeat = Math.Min(calculationData.HighestScoredBeat, newBeat - 1);
+            return;
+        }
+
+        List<int> beatsToRemove = processedBeatsIsGoldenMap.Keys
+            .Where(beat => beat >= newBeat)
+            .ToList();
+        foreach (int beat in beatsToRemove)
+        {
+            bool wasGolden = processedBeatsIsGoldenMap[beat];
+            if (wasGolden)
+            {
+                calculationData.CorrectlySungGoldenNoteLengthTotal = Math.Max(0, calculationData.CorrectlySungGoldenNoteLengthTotal - 1);
+            }
+            else
+            {
+                calculationData.CorrectlySungNormalNoteLengthTotal = Math.Max(0, calculationData.CorrectlySungNormalNoteLengthTotal - 1);
+            }
+            processedBeatsIsGoldenMap.Remove(beat);
+        }
+
+        // Recompute highest scored beat
+        calculationData.HighestScoredBeat = processedBeatsIsGoldenMap.Count > 0
+            ? processedBeatsIsGoldenMap.Keys.Max()
+            : 0;
+
+        // Revert perfect sentence bonuses if we jumped before their end
+        if (awardedPerfectSentences.Count > 0)
+        {
+            List<Sentence> sentencesToRevert = awardedPerfectSentences
+                .Where(s => s.MaxBeat >= newBeat)
+                .ToList();
+            foreach (Sentence s in sentencesToRevert)
+            {
+                awardedPerfectSentences.Remove(s);
+                calculationData.PerfectSentenceCount = Math.Max(0, calculationData.PerfectSentenceCount - 1);
+            }
+        }
+
+        FireScoreCalculatedEvent();
     }
 }

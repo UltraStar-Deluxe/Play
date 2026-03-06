@@ -767,4 +767,58 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker
         public BeatPitchEvent beatPitchEvent;
         public long unixTimeInMillis;
     }
+
+    public void JumpToAudioPositionByUserAction(double oldPositionInMillis, double newPositionInMillis)
+    {
+        if (newPositionInMillis >= oldPositionInMillis)
+        {
+            // Jump forward is handled by existing logic.
+            return;
+        }
+
+        // Recompute recording context based on the new position
+        double newBeat = SongMetaBpmUtils.MillisToBeats(songMeta, newPositionInMillis);
+
+        // Find sentence to analyze next.
+        Sentence newRecordingSentence = playerControl.SortedSentences
+            .FirstOrDefault(sentence => newBeat <= sentence.MaxBeat);
+        if (newRecordingSentence == null)
+        {
+            return;
+        }
+
+        RecordingSentence = newRecordingSentence;
+        recordingSentenceIndex = playerControl.SortedSentences.IndexOf(RecordingSentence);
+
+        // Find note to analyze next within the recording sentence
+        currentAndUpcomingNotesInRecordingSentence = RecordingSentence.Notes
+            .Where(note => newBeat <= note.EndBeat)
+            .OrderBy(note => note.StartBeat)
+            .ToList();
+
+        if (currentAndUpcomingNotesInRecordingSentence.Count > 0)
+        {
+            if (currentAndUpcomingNotesInRecordingSentence[0].StartBeat < newBeat)
+            {
+                // currentBeat is inside note
+                BeatToAnalyze = (int)newBeat;
+            }
+            else
+            {
+                // The note is upcoming, analyze its first beat next.
+                BeatToAnalyze = currentAndUpcomingNotesInRecordingSentence[0].StartBeat;
+            }
+        }
+        else
+        {
+            // No more notes in this sentence after the new position
+            BeatToAnalyze = RecordingSentence.MaxBeat;
+        }
+
+        // Reset client sync helpers when applicable
+        if (micProfile != null && micProfile.IsInputFromConnectedClient)
+        {
+            SendPositionToClientRapidly();
+        }
+    }
 }
