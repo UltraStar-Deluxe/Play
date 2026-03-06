@@ -943,6 +943,8 @@ public static partial class R
         public const string thirdTeamUi = "thirdTeamUi";
         public const string threePlayerLayout = "threePlayerLayout";
         public const string timeBarAndLabelContainer = "timeBarAndLabelContainer";
+        public const string timeBarLyricsPreviewLabel = "timeBarLyricsPreviewLabel";
+        public const string timeBarLyricsPreviewShadow = "timeBarLyricsPreviewShadow";
         public const string timeBarPositionIndicator = "timeBarPositionIndicator";
         public const string timeBarsContainer = "timeBarsContainer";
         public const string timeLabelFormatChooser = "timeLabelFormatChooser";

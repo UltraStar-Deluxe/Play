@@ -67,13 +67,16 @@
                         <ui:SliderInt picking-mode="Ignore" value="42" high-value="100" name="volumeSlider" style="width: 100%;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="verticalSeparator" class="fontColor mx-2" style="background-color: rgb(188, 188, 188); width: 2px; height: 75%; opacity: 0.5; color: rgb(255, 255, 255); flex-shrink: 0;"/>
-                    <ui:VisualElement name="timeBarAndLabelContainer" class="tinyFont timeBar" style="flex-direction: row; display: flex; flex-grow: 1; align-items: center; justify-content: space-around;">
-                        <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" class="mr-1" style="min-width: 30px;"/>
+                    <ui:VisualElement name="timeBarAndLabelContainer" class="timeBar" style="flex-direction: row; display: flex; flex-grow: 1; align-items: center; justify-content: space-around;">
+                        <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" class="mr-1 tinyFont" style="min-width: 30px;"/>
                         <ui:VisualElement name="timeBarsContainer" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; justify-content: center; padding-top: 5px; padding-bottom: 5px;">
                             <ui:VisualElement name="governanceOverlayDetailedTimeBar" style="justify-content: center; height: 5px;">
                                 <ui:VisualElement name="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;"/>
                                 <ui:VisualElement name="timeBarPositionIndicator" style="position: absolute; width: 4px;"/>
                             </ui:VisualElement>
+                            <Shadow name="timeBarLyricsPreviewShadow" style="position: absolute; bottom: 120%; left: 94px; background-color: rgba(32, 32, 32, 0.25);">
+                                <ui:Label text="Lyrics Preview" name="timeBarLyricsPreviewLabel" class="smallFont" style="-unity-font-style: bold;"/>
+                            </Shadow>
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:Button display-tooltip-when-elided="true" name="openControlsMenuButton" class="transparentBackgroundColor">
