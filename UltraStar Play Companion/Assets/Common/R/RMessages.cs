@@ -17,6 +17,7 @@ public static partial class R
         public static readonly string action_continue = "action_continue";
         public static readonly string action_delete = "action_delete";
         public static readonly string action_doubleTap = "action_doubleTap";
+        public static readonly string action_download = "action_download";
         public static readonly string action_downloadArchive = "action_downloadArchive";
         public static readonly string action_exitSong = "action_exitSong";
         public static readonly string action_import = "action_import";
@@ -376,6 +377,7 @@ public static partial class R
         public static readonly string options_recording_noConnectedMic = "options_recording_noConnectedMic";
         public static readonly string options_recording_noConnectedMic_hint = "options_recording_noConnectedMic_hint";
         public static readonly string options_recording_title = "options_recording_title";
+        public static readonly string options_recordingDevices = "options_recordingDevices";
         public static readonly string options_reduceAudioVolume = "options_reduceAudioVolume";
         public static readonly string options_reloadModsOnFileChange = "options_reloadModsOnFileChange";
         public static readonly string options_replayGainLoudnessNormalization = "options_replayGainLoudnessNormalization";
@@ -509,6 +511,7 @@ public static partial class R
         public static readonly string singScene_options_showLyricsOnNotes = "singScene_options_showLyricsOnNotes";
         public static readonly string singScene_options_showPitchArrow = "singScene_options_showPitchArrow";
         public static readonly string singScene_options_showPlayerAlongsideNotes = "singScene_options_showPlayerAlongsideNotes";
+        public static readonly string singScene_options_showPlayerImages = "singScene_options_showPlayerImages";
         public static readonly string singScene_options_showPlayerName = "singScene_options_showPlayerName";
         public static readonly string singScene_options_showPlayerScore = "singScene_options_showPlayerScore";
         public static readonly string singScene_options_showProgressBar = "singScene_options_showProgressBar";
