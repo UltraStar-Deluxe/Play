@@ -52,7 +52,7 @@ public static class FileScanner
         List<string> filteredResult = unfilteredResult
             // Ignore hidden files and folders
             .Where(filePath => (!config.ExcludeHiddenFiles || !IsHiddenFile(filePath))
-                               && (!config.ExcludeHiddenFolders || !IsInsideHiddenFolder(filePath)))
+                               && (!config.ExcludeHiddenFolders || !IsInsideHiddenFolder(filePath, folder)))
             .ToList();
 
         return filteredResult;
@@ -64,10 +64,11 @@ public static class FileScanner
         return Path.GetFileName(filePath).StartsWith(".");
     }
 
-    private static bool IsInsideHiddenFolder(string filePath)
+    private static bool IsInsideHiddenFolder(string filePath, string rootPath)
     {
         // On Unix based operating systems, files and folders that start with a dot are hidden.
-        string folderPath = Path.GetDirectoryName(filePath);
-        return folderPath.Contains("\\.") || folderPath.Contains("/.");
+        // Only check for hidden folders that are children of the root path, not the root path itself or its parents.
+        string folderPath = Path.GetDirectoryName(filePath).Substring(rootPath.Length);
+        return folderPath.StartsWith(".") || folderPath.Contains("\\.") || folderPath.Contains("/.");
     }
 }
