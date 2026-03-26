@@ -106,7 +106,8 @@ public class EditLyricsUtils
     private static List<int> AllIndexesOfCharacterBeforeTextEnd(string text, char searchChar)
     {
         List<int> result = new();
-        for (int i = 0; i < text.Length - 1; i++)
+        // Skip first and last character
+        for (int i = 1; i < text.Length - 1; i++)
         {
             char c = text[i];
             if (c == searchChar)
