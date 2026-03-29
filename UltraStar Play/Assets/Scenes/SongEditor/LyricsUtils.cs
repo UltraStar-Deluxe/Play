@@ -54,7 +54,11 @@ public static class LyricsUtils
                     stringBuilder.Append(syllableSeparator);
                 }
             }
-            stringBuilder.Append(note.Text.Trim());
+            string escapedNote = note.Text.Trim()
+                .Replace("\\", "\\\\")
+                .Replace(";", "\\;")
+                .Replace(" ", "\\ ");
+            stringBuilder.Append(escapedNote);
 
             lastNote = note;
         }
@@ -77,6 +81,7 @@ public static class LyricsUtils
             : new List<Note>();
 
         StringBuilder stringBuilder = new();
+        bool escapeInProgress = false;
 
         void ApplyNoteText()
         {
@@ -115,19 +120,25 @@ public static class LyricsUtils
         {
             if (c == LyricsUtils.sentenceSeparator)
             {
+                escapeInProgress = false;
                 SelectNextSentence();
             }
-            else if (c == LyricsUtils.syllableSeparator)
+            else if (c == LyricsUtils.syllableSeparator && !escapeInProgress)
             {
                 SelectNextNote();
             }
-            else if (c == ' ')
+            else if (c == ' ' && !escapeInProgress)
             {
                 stringBuilder.Append(c);
                 SelectNextNote();
             }
+            else if (c == '\\' && !escapeInProgress)
+            {
+                escapeInProgress = true;
+            }
             else
             {
+                escapeInProgress = false;
                 stringBuilder.Append(c);
             }
         }

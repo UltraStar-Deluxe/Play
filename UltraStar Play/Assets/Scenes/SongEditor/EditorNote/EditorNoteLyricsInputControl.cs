@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
 using UniInject;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -26,15 +28,41 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
     
     protected override string GetInitialText()
     {
-        return ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(editorNoteControl.Note.Text);
+        return ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(
+            Regex.Replace(
+                editorNoteControl.Note.Text
+                    .Replace("\\", "\\\\")
+                    .Replace(";", "\\;"),
+                // Regex to match spaces that are not at the ends of the string
+                @"(?<!^) (?!$)", "\\ "
+            )
+        );
     }
 
     protected override void PreviewNewText(string newText)
     {
         // Immediately apply changed lyrics to notes, but do not record it in the history.
         string whiteSpaceText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(newText);
-        editorNoteControl.Note.SetText(whiteSpaceText);
-        editorNoteControl.SetLyrics(whiteSpaceText);
+        StringBuilder stringBuilder = new();
+        bool escapeInProgress = false;
+        foreach (char c in whiteSpaceText)
+        {
+            if (c == '\\' && !escapeInProgress)
+            {
+                escapeInProgress = true;
+            }
+            else if (c == ';' && !escapeInProgress)
+            {
+                escapeInProgress = false;
+            }
+            else
+            {
+                escapeInProgress = false;
+                stringBuilder.Append(c);
+            }
+        }
+        editorNoteControl.Note.SetText(stringBuilder.ToString());
+        editorNoteControl.SetLyrics(stringBuilder.ToString());
         songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = false});
     }
 
@@ -65,8 +93,6 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
         }
         else
         {
-            viewModeText = viewModeText.Replace(";", "");
-            editorNoteControl.Note.SetText(viewModeText);
             editorNoteControl.SyncWithNote();
             songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable});
         }
