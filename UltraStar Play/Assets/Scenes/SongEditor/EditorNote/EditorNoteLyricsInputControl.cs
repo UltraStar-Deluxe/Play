@@ -32,9 +32,9 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
     protected override void PreviewNewText(string newText)
     {
         // Immediately apply changed lyrics to notes, but do not record it in the history.
-        string visibleWhiteSpaceText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(newText);
-        editorNoteControl.Note.SetText(visibleWhiteSpaceText);
-        editorNoteControl.SetLyrics(visibleWhiteSpaceText);
+        string whiteSpaceText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(newText);
+        editorNoteControl.Note.SetText(whiteSpaceText);
+        editorNoteControl.SetLyrics(whiteSpaceText);
         songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = false});
     }
 
