@@ -37,7 +37,49 @@ namespace Videolabs.VLCUnity.Editor
 #if UNITY_SUPPORTS_BUILD_REPORT
         public void OnPreprocessBuild(BuildReport report)
         {
+#if UNITY_IPHONE
+            PatchIOSFrameworkMinimumOSVersion();
+#endif
         }
+
+#if UNITY_IPHONE
+        internal static void PatchIOSFrameworkMinimumOSVersion()
+        {
+            string targetVersion = PlayerSettings.iOS.targetOSVersionString;
+            if (string.IsNullOrEmpty(targetVersion))
+                return;
+
+            string iosPluginsPath = Path.Combine(Application.dataPath, IOS_PATH);
+            if (!Directory.Exists(iosPluginsPath))
+                return;
+
+            string[] plists = Directory.GetFiles(iosPluginsPath, "Info.plist", SearchOption.AllDirectories);
+            int updated = 0;
+            foreach (string plistPath in plists)
+            {
+                if (!plistPath.Replace("\\", "/").Contains(".framework/"))
+                    continue;
+
+                PlistDocument plist = new PlistDocument();
+                plist.ReadFromFile(plistPath);
+
+                PlistElementDict root = plist.root;
+                if (root["MinimumOSVersion"] == null)
+                    continue;
+
+                string currentVersion = root["MinimumOSVersion"].AsString();
+                if (currentVersion == targetVersion)
+                    continue;
+
+                root.SetString("MinimumOSVersion", targetVersion);
+                plist.WriteToFile(plistPath);
+                updated++;
+            }
+
+            if (updated > 0)
+                Debug.Log($"[VLCUnity] Updated MinimumOSVersion to {targetVersion} in {updated} framework Info.plist files");
+        }
+#endif
 #endif
         internal static void CopyAndReplaceDirectory(string srcPath, string dstPath)
         {
