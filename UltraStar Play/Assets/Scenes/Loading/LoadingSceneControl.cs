@@ -83,6 +83,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         
         // Log version info
         Debug.Log($"VERSION.txt file content:\n{localVersionTextAsset.text}");
+        Debug.Log($"Platform: {PlatformDetector.Detect()}");
 
         // The next scene should show up automatically.
         // However, in case of an Exception (e.g. song folder not found)

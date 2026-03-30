@@ -54,6 +54,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.httpEndpointExampleLabel)]
     private Label httpEndpointExampleLabel;
 
+    [Inject(UxmlName = R.UxmlNames.platformLabel)]
+    private Label platformLabel;
+
     [Inject(UxmlName = R.UxmlNames.showConsoleButton)]
     private Button showConsoleButton;
 
@@ -289,6 +292,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         {
             httpEndpointExampleLabel.text = Translation.Get(R.Messages.options_httpServerNotSupported);
         }
+
+        platformLabel.text = $"Platform: {PlatformDetector.Detect()}";
 
         // View and copy log
         showConsoleButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());

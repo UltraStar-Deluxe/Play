@@ -581,6 +581,7 @@ public static partial class R
         public const string permissionsContainer = "permissionsContainer";
         public const string phraseBonusScore = "phraseBonusScore";
         public const string pitchDetectionAlgorithmChooser = "pitchDetectionAlgorithmChooser";
+        public const string platformLabel = "platformLabel";
         public const string pitchDetectionAudioChooser = "pitchDetectionAudioChooser";
         public const string pitchDetectionGroup = "pitchDetectionGroup";
         public const string pitchDetectionUsingBasicPitchButton = "pitchDetectionUsingBasicPitchButton";

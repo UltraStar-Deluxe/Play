@@ -26,6 +26,7 @@
                 <ui:Button text="Show Console" display-tooltip-when-elided="true" name="showConsoleButton" class="controlMinWidth" style="margin-right: 5px;"/>
                 <ui:Button text="Publish Steam Workshop Item" name="uploadWorkshopItemButton" class="controlMinWidth" style="margin-right: 5px; align-self: flex-end;"/>
             </ui:VisualElement>
+            <ui:Label text="Platform: ????" name="platformLabel" class="noBackgroundInHierarchy largeFont" style="margin-bottom: 10px;"/>
             <Chooser name="minimumLogLevelChooser" label="Minimum Log Level¹" wrap-around="true" class="noBackgroundInHierarchy"/>
             <ui:TextField picking-mode="Ignore" label="Absolute Path to Folder&#10;with Generated Files¹" name="generatedFolderPathTextField" is-delayed="true" class="noBackgroundInHierarchy" style="align-items: center; flex-grow: 1; margin-bottom: 4px;">
                 <ui:Label tabindex="-1" text="Default path" display-tooltip-when-elided="true" name="generatedFolderPathHintLabel" class="textFieldHint secondaryFontColor" style="left: auto; right: 10px;"/>
