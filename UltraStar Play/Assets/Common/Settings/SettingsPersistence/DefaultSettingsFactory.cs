@@ -86,6 +86,22 @@ public static class DefaultSettingsFactory
                 ApplicationUtils.GetStreamingAssetsPath("SpeechRecognitionModels/WhisperModels/ggml-tiny.bin");
         }
 
+        try
+        {
+            // Disable AVPro on SteamDeck (e.g. when running Windows version via compatibility layer)
+            PlatformDetector.RunEnvironment runEnvironment = PlatformDetector.Detect();
+            if (runEnvironment is not PlatformDetector.RunEnvironment.Windows)
+            {
+                defaultSettings.UnityMediaApiUsage = EApiUsage.Preferred;
+                defaultSettings.AvProApiUsage = EApiUsage.Disabled;
+                defaultSettings.VlcApiUsage = EApiUsage.Enabled;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
+
         return defaultSettings;
     }
 
