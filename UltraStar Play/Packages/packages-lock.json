@@ -74,6 +74,13 @@
       "dependencies": {},
       "hash": "276095b3b212d7c33106b53d71b93b5a72d1e1d3"
     },
+    "com.eitan.sherpa-onnx-unity": {
+      "version": "https://github.com/EitanWong/com.eitan.sherpa-onnx-unity.git?path=SherpaONNXUnity/Packages/com.eitan.sherpa-onnx-unity#dev",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "ef88976b6329da6eb529854ed8594f615c54f6da"
+    },
     "com.singularitygroup.hotreload": {
       "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.5",
       "depth": 0,
