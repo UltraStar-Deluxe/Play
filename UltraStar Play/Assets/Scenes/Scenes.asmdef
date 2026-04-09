@@ -31,7 +31,8 @@
         "ICSharpCode.SharpZipLib.dll",
         "System.Linq.Dynamic.Core.dll",
         "LibVLCSharp.dll",
-        "TagLibSharp.dll"
+        "TagLibSharp.dll",
+        "Microsoft.ML.OnnxRuntime.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
