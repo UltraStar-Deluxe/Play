@@ -264,7 +264,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     {
         // Map edit-mode text to lyrics of notes
         string text = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
-        LyricsUtils.MapEditModeTextToNotes(text, Voice.Sentences);
+        LyricsUtils.MapEditModeTextToNotes(text, Voice);
         songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }
 
@@ -314,7 +314,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         for (int i = relevantSentenceTextStartIndex; i < text.Length && i < caretPosition; i++)
         {
             char c = text[i];
-            if (c == LyricsUtils.spaceCharacter
+            if (c == LyricsUtils.wordSeparator
                 || c == ShowWhiteSpaceUtils.spaceReplacement[0]
                 || c == LyricsUtils.syllableSeparator)
             {

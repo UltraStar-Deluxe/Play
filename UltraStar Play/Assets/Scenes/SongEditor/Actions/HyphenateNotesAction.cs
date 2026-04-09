@@ -30,7 +30,7 @@ public class HyphenateNotesAction : INeedInjection
         
         int spaceBetweenNotesInMillis = settings.SongEditorSettings.SpaceBetweenNotesInMillis;
 
-        Dictionary<Note,List<Note>> noteToNotesAfterSplit = HyphenateNotesUtils.HypenateNotes(songMeta, notes, hyphenator);
+        Dictionary<Note,List<Note>> noteToNotesAfterSplit = HyphenateNotesUtils.HypenateNotes(notes, hyphenator);
         noteToNotesAfterSplit.ForEach(entry =>
         {
             Note note = entry.Key;

@@ -209,7 +209,7 @@ public static class SettingsUtils
 
         Hyphenator hyphenator = new Hyphenator(
             hyphenatePatternsLoader,
-            EditLyricsUtils.syllableSeparator,
+            LyricsUtils.syllableSeparator.ToString(),
             5,
             0,
             true,

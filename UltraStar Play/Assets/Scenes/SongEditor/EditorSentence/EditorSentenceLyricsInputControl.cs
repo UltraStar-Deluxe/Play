@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UniInject;
+﻿using UniInject;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -34,8 +33,8 @@ public class EditorSentenceLyricsInputControl : EditorLyricsInputPopupControl
     private void ApplyEditModeText(string editModeText, bool undoable)
     {
         // Map edit-mode text to lyrics of notes
-        string visibleWhiteSpaceText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
-        LyricsUtils.MapEditModeTextToNotes(visibleWhiteSpaceText, new List<Sentence> { editorSentenceControl.Sentence });
+        string whiteSpaceText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
+        LyricsUtils.MapEditModeTextToNotes(whiteSpaceText, editorSentenceControl.Sentence);
         songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }
 }
