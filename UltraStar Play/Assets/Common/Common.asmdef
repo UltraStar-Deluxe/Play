@@ -46,7 +46,8 @@
         "Serilog.dll",
         "Serilog.Sinks.File.dll",
         "System.Text.Encoding.CodePages.dll",
-        "Utf8Json.dll"
+        "Utf8Json.dll",
+        "Microsoft.ML.OnnxRuntime.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

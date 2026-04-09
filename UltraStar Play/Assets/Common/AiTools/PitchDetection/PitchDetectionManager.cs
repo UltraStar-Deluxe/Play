@@ -33,6 +33,8 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
     private readonly Subject<PitchDetectionFinishedEvent> pitchDetectionFinishedEventStream = new();
     public Subject<PitchDetectionFinishedEvent> PitchDetectionFinishedEventStream => pitchDetectionFinishedEventStream;
 
+    private RmvpePitchDetector rmvpePitchDetector;
+
     public Job<PitchDetectionResult> ProcessSongMetaJob(SongMeta songMeta)
     {
         Job<PitchDetectionResult> job = new Job<PitchDetectionResult>(
@@ -118,33 +120,102 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
 
         try
         {
-            Debug.Log($"Running basic pitch on vocals audio: {songMeta.VocalsAudio}");
-
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
-
-            BasicPitchParameters basicPitchParameters = new();
-            basicPitchParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
-            basicPitchParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}";
-            DirectoryUtils.CreateDirectory(basicPitchParameters.OutputFolder);
-
-            Debug.Log($"Calling BasicPitchRunner with parameters {JsonConverter.ToJson(basicPitchParameters)}");
-            BasicPitchRunner.BasicPitchRunner basicPitchRunner = new(GetBasicPitchCommand(fallbackCommand), GetBasicPitchLogAction());
-            BasicPitchResult basicPitchResult = await basicPitchRunner.RunAsync(basicPitchParameters, cancellationToken);
-            Debug.Log($"Call to BasicPitchRunner finished: ExitCode={basicPitchResult.ExitCode}");
-
-            if (TryMoveFilesOfBasicPitchResult(songMeta, generatedSongFolderAbsolutePath, basicPitchResult, out string midiFilePath))
+            if (rmvpePitchDetector == null)
             {
-                return new PitchDetectionResult(midiFilePath);
+                string modelPath = ApplicationUtils.GetStreamingAssetsPath("AiModels/rmvpe/rmvpe_20231006.onnx");
+                Debug.Log($"Preparing RMVPE pitch detection. modelPath: '{modelPath}'");
+                rmvpePitchDetector = new RmvpePitchDetector(modelPath);
             }
-            else
-            {
-                throw new PitchDetectionException("MIDI file output of Basic Pitch not found");
-            }
+
+            Debug.Log($"Running RMVPE pitch detection on vocals audio. path: '{songMeta.VocalsAudio}'");
+            // TODO: AudioClip API can only be done on the main thread. Use a more flexible library to load the audio samples from file.
+            await Awaitable.MainThreadAsync();
+            string audioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
+            Debug.Log($"Loading audio samples for pitch detection on main thread. path: '{songMeta.VocalsAudio}'");
+            AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(audioFilePath, false);
+            float lengthInSeconds = audioClip.length;
+            float[] monoAudioSamples = AudioSampleUtils.GetAudioSamples(audioClip, 0, lengthInSeconds * 1000, true);
+            float[] monoAudioSamplesResampled = AudioSampleUtils.Resample(monoAudioSamples, audioClip.frequency, RmvpePitchDetector.ExpectedSampleRate);
+            Debug.Log("Resampled mono audio samples for pitch detection: " + monoAudioSamplesResampled.Length);
+            await Awaitable.BackgroundThreadAsync();
+
+            RmvpePitchResult rmvpePitchResult = rmvpePitchDetector.DetectPitch(monoAudioSamplesResampled);
+            // TODO: Do not generate wav file when stuff is working as expected.
+            RmvpePitchResultAudioGenerator.GenerateWav(rmvpePitchResult.Estimates, ApplicationUtils.GetPersistentDataPath("RmvpePitchDetectionResult.wav"), lengthInSeconds);
+            return ToPitchDetectionResult(rmvpePitchResult);
         }
         finally
         {
             pitchDetectionProcessSemaphore.Release();
         }
+    }
+
+    private PitchDetectionResult ToPitchDetectionResult(RmvpePitchResult rmvpePitchResult)
+    {
+        if (rmvpePitchResult.Estimates.IsNullOrEmpty())
+        {
+            return new PitchDetectionResult();
+        }
+
+        List<PitchDetectionResultNote> notes = new();
+        PitchDetectionResultNote currentNote = null;
+
+        foreach (RmvpePitchEstimate estimate in rmvpePitchResult.Estimates)
+        {
+            if (estimate.Confidence <= 0 || estimate.Frequency <= 0)
+            {
+                currentNote = null;
+                continue;
+            }
+
+            int midiNote = (int)Math.Round(MidiUtils.CalculateMidiNote((float)estimate.Frequency));
+            double timeInMillis = estimate.Time * 1000;
+
+            if (currentNote != null && currentNote.MidiNote == midiNote)
+            {
+                // Update length of current note.
+                // We assume estimates are sorted by time.
+                currentNote.LengthInMillis = timeInMillis - currentNote.StartInMillis;
+                // Also update confidence as average? Or keep max? 
+                // Let's just keep the initial or update if we have multiple.
+                // For now, let's just keep it simple.
+            }
+            else
+            {
+                // Start a new note
+                currentNote = new PitchDetectionResultNote
+                {
+                    StartInMillis = timeInMillis,
+                    MidiNote = midiNote,
+                    Confidence = estimate.Confidence,
+                    LengthInMillis = 0, // Will be updated by next estimate or at the end
+                };
+                notes.Add(currentNote);
+            }
+        }
+
+        // Finalize lengths.
+        if (rmvpePitchResult.Estimates.Count > 1)
+        {
+            double hopSizeInMillis = (rmvpePitchResult.Estimates[1].Time - rmvpePitchResult.Estimates[0].Time) * 1000;
+            foreach (PitchDetectionResultNote note in notes)
+            {
+                note.LengthInMillis += hopSizeInMillis;
+            }
+        }
+        else if (rmvpePitchResult.Estimates.Count == 1)
+        {
+            // Fallback for a single estimate. HopLength is 160, SampleRate is 16000 => 10ms.
+            foreach (PitchDetectionResultNote note in notes)
+            {
+                note.LengthInMillis = 10;
+            }
+        }
+
+        return new PitchDetectionResult
+        {
+            Notes = notes,
+        };
     }
 
     private bool TryMoveFilesOfBasicPitchResult(

@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using UniInject;
-using UniRx;
-using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -31,35 +27,26 @@ public class PitchDetectionAction : AbstractAudioClipAction
     [Inject]
     private SongEditorMidiFileImporter songEditorMidiFileImporter;
 
-    public async void CreateNotesUsingBasicPitch(bool notify)
+    public async void CreateNotesUsingAi(bool notify)
     {
         PitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta).GetResultAsync();
-        ImportBasicPitchMidiFile(pitchDetectionResult.MidiFilePath);
+        List<Note> notes = PitchDetectionResultMapper.ToSongMetaNotes(songMeta, pitchDetectionResult);
+        
+        // Remove old notes
+        editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.PitchDetection);
+        songEditorLayerManager.ClearEnumLayer(ESongEditorLayer.PitchDetection);
+        
+        // Add notes to layer
+        notes.ForEach(note =>
+        {
+            songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.PitchDetection, note);
+            note.IsEditable = songEditorLayerManager.IsLayerEditable(songEditorLayerManager.GetEnumLayer(ESongEditorLayer.PitchDetection));
+        });
 
         if (notify)
         {
             songMetaChangedEventStream.OnNext(new NotesChangedEvent());
         }
-    }
-
-    private void ImportBasicPitchMidiFile(string midiFilePath)
-    {
-        if (!FileUtils.Exists(midiFilePath))
-        {
-            Debug.LogError($"Failed to import MIDI file created by Basic Pitch. File not found: {midiFilePath}");
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_fileNotFoundWithName,
-                "name", midiFilePath));
-            return;
-        }
-        songEditorMidiFileImporter.ImportMidiFile(
-            midiFilePath,
-            1,
-            0,
-            false,
-            true,
-            null,
-            false,
-            ESongEditorLayer.PitchDetection);
     }
 
     public void MoveNotesToDetectedPitchUsingPitchDetectionLayer(List<Note> notes, bool notify)

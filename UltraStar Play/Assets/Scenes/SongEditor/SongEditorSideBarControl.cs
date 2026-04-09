@@ -219,7 +219,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             return;
         }
 
-        pitchDetectionAction.CreateNotesUsingBasicPitch(true);
+        pitchDetectionAction.CreateNotesUsingAi(true);
     }
 
     private void ShowSongEditorHelpDialog()

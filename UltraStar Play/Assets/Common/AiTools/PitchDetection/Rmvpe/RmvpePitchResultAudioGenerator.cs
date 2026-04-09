@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-public class PitchAudioGenerator
+public static class RmvpePitchResultAudioGenerator
 {
-    public void GenerateWav(List<RmvpePitchEstimate> estimates, string outputPath, double totalDurationInSeconds,
-        int sampleRate = 44100)
+    public static void GenerateWav(
+        List<RmvpePitchEstimate> estimates,
+        string outputPath,
+        double totalDurationInSeconds)
     {
         if (estimates == null) throw new ArgumentNullException(nameof(estimates));
 
+        int sampleRate = 16000;
         int totalSamples = (int)(totalDurationInSeconds * sampleRate);
         float[] outputBuffer = new float[totalSamples];
 
@@ -60,7 +63,7 @@ public class PitchAudioGenerator
         SaveWav(outputPath, outputBuffer, sampleRate);
     }
 
-    private void SaveWav(string filePath, float[] buffer, int sampleRate)
+    private static void SaveWav(string filePath, float[] buffer, int sampleRate)
     {
         using (var fs = new FileStream(filePath, FileMode.Create))
         using (var bw = new BinaryWriter(fs))

@@ -104,7 +104,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         Job<VoidEvent> pitchDetectionJob = new(Translation.Of("Pitch detection"));
         pitchDetectionJob.SetAwaitable(async () =>
         {
-            List<Note> loadedPitchDetectionNotes = await pitchDetectionNoteCreator.CreateNotesUsingBasicPitchAsync(songMeta);
+            List<Note> loadedPitchDetectionNotes = await pitchDetectionNoteCreator.CreateNotesUsingAiAsync(songMeta);
 
             // Move notes of first player to detected pitch
             MoveNotesToDetectedPitch(songMeta, pipelineData.CreatedNotes, loadedPitchDetectionNotes);
