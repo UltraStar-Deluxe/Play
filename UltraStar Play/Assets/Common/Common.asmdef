@@ -28,7 +28,8 @@
         "VLCUnity",
         "OneJS.Common",
         "OneJS.CustomStyleSheets.6.3",
-        "AVProVideo.Runtime"
+        "AVProVideo.Runtime",
+        "Eitan.SherpaONNXUnity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

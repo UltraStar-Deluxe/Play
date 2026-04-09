@@ -9429,6 +9429,74 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!1 &6807536834274192948
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4191333704897788580}
+  - component: {fileID: 5779829926072839629}
+  m_Layer: 0
+  m_Name: OfflineSpeechRecognizer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4191333704897788580
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6807536834274192948}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -310.12363, y: -354.77222, z: 119.334206}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6169907629867958379}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5779829926072839629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6807536834274192948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd0dd5ed107a4deeb7b21794bdec3ff6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Eitan.SherpaONNXUnity::Eitan.Sherpa.Onnx.Unity.Mono.Components.OfflineSpeechRecognizerComponent
+  modelId: sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8
+  sampleRate: 16000
+  loadOnAwake: 1
+  disposeOnDestroy: 1
+  logFeedbackToConsole: 1
+  onInitializationStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onFeedbackMessage:
+    m_PersistentCalls:
+      m_Calls: []
+  onError:
+    m_PersistentCalls:
+      m_Calls: []
+  voiceActivitySource: {fileID: 0}
+  autoBindVoiceActivitySource: 0
+  startModuleImmediately: 1
+  maxPendingSegments: 32
+  onTranscriptReady:
+    m_PersistentCalls:
+      m_Calls: []
+  onTranscriptionFailed:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &6992093993498788865
 GameObject:
   m_ObjectHideFlags: 0
@@ -10129,6 +10197,7 @@ Transform:
   - {fileID: 9165910748735724824}
   - {fileID: 6834252709226510417}
   - {fileID: 862645136211456301}
+  - {fileID: 4191333704897788580}
   m_Father: {fileID: 5483831765678408185}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4064531691309379963
@@ -10143,6 +10212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2b0cc51ba6cdf44a91a7f831afdf2c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  offlineRecognizer: {fileID: 5779829926072839629}
 --- !u!1 &8811285264585202488
 GameObject:
   m_ObjectHideFlags: 0
