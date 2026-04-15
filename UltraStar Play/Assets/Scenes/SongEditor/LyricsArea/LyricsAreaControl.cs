@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -310,17 +311,14 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         Sentence relevantSentence = sortedSentences[relevantSentenceIndex];
 
         // Count note borders
-        int noteIndex = 0;
-        for (int i = relevantSentenceTextStartIndex; i < text.Length && i < caretPosition; i++)
-        {
-            char c = text[i];
-            if (c == LyricsUtils.wordSeparator
-                || c == ShowWhiteSpaceUtils.spaceReplacement[0]
-                || c == LyricsUtils.syllableSeparator)
-            {
-                noteIndex++;
-            }
-        }
+        int sentenceLengthBeforeCaret = Math.Min(text.Length - relevantSentenceTextStartIndex,
+                                                 caretPosition - relevantSentenceTextStartIndex);
+        string sentenceBeforeCaret = text.Substring(relevantSentenceTextStartIndex, sentenceLengthBeforeCaret);
+        int sentenceSyllablesBeforeCaret = LyricsUtils.ParseEditable(
+            ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(sentenceBeforeCaret)
+        ).Count;
+
+        int noteIndex = sentenceSyllablesBeforeCaret - 1;
 
         // Get relevant note
         List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(relevantSentence);
