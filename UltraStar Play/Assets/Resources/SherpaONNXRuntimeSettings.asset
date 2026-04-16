@@ -21,6 +21,6 @@ MonoBehaviour:
   _githubProxyUrl: 
   _checksumCacheDirectory: 
   _checksumCacheTtlSeconds: 3600
-  _loggingEnabled: 0
+  _loggingEnabled: 1
   _loggingLevel: 3
-  _traceWithStacks: 1
+  _traceWithStacks: 0
