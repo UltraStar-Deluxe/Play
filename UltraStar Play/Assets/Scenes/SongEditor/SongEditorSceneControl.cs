@@ -90,6 +90,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private CursorManager cursorManager;
 
     [Inject]
+    private SpeechRecognitionManager speechRecognitionManager;
+    
+    [Inject]
     private AchievementEventStream achievementEventStream;
 
     private IDisposable autoSaveDisposable;
@@ -149,6 +152,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
         InitSongEditorStyleSheet();
 
+        speechRecognitionManager.Initialize();
+        
         try
         {
             await songAudioPlayer.LoadAndPlayAsync(SongMeta, sceneData.PositionInMillis, false);

@@ -27,6 +27,8 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
     private readonly SemaphoreSlim speechRecognitionProcessSemaphore = new(1, 1);
     public bool IsSpeechRecognitionRunning => speechRecognitionProcessSemaphore.CurrentCount > 0;
 
+    private bool isInitialized;
+    
     void OnEnable()
     {
         if (offlineRecognizer != null)
@@ -213,5 +215,23 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
     private void HandleFeedback(SherpaFeedback feedback)
     {
         Debug.Log($"HandleFeedback: {feedback.Message}");
+    }
+
+    public void Initialize()
+    {
+        if (isInitialized)
+        {
+            return;
+        }
+        isInitialized = true;
+
+        try
+        {
+            _ = offlineRecognizer.StartModuleInitializationAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
     }
 }

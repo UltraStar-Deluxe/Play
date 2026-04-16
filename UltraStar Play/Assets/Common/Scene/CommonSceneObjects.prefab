@@ -9475,7 +9475,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Eitan.SherpaONNXUnity::Eitan.Sherpa.Onnx.Unity.Mono.Components.OfflineSpeechRecognizerComponent
   modelId: sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8
   sampleRate: 16000
-  loadOnAwake: 1
+  loadOnAwake: 0
   disposeOnDestroy: 1
   logFeedbackToConsole: 1
   onInitializationStateChanged:
