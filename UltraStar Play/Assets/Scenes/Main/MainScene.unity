@@ -120,6 +120,51 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &34259674
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 34259675}
+  - component: {fileID: 34259676}
+  m_Layer: 0
+  m_Name: SourceSeparationDemo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &34259675
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 34259674}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &34259676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 34259674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51bf7bb1a88bca443a1b0a47a695f035, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Scenes::SourceSeparationDemo
+  sourceSeparationComponent: {fileID: 1795896967}
 --- !u!1 &1203774096
 GameObject:
   m_ObjectHideFlags: 0
@@ -176,6 +221,77 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
+--- !u!1 &1795896966
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1795896968}
+  - component: {fileID: 1795896967}
+  m_Layer: 0
+  m_Name: SourceSeparation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1795896967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795896966}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df41d536edbe4ceba38740d44fd3ce99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Eitan.SherpaONNXUnity::Eitan.Sherpa.Onnx.Unity.Mono.Components.SourceSeparationComponent
+  modelId: UVR_MDXNET_KARA_2
+  sampleRate: 16000
+  loadOnAwake: 0
+  disposeOnDestroy: 1
+  logFeedbackToConsole: 1
+  onInitializationStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onFeedbackMessage:
+    m_PersistentCalls:
+      m_Calls: []
+  onError:
+    m_PersistentCalls:
+      m_Calls: []
+  playbackAudioSources: []
+  autoplay: 0
+  clipReference: {fileID: 0}
+  separateOnEnable: 0
+  enableOutputProcessing: 1
+  outputFadeInMilliseconds: 4
+  outputFadeOutMilliseconds: 8
+  removeOutputDcOffset: 0
+  clampOutputToUnitRange: 1
+  outputFadeCurve: 1
+  onSeparationReady:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &1795896968
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795896966}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &3044738762556568908
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -533,7 +649,7 @@ PrefabInstance:
     - target: {fileID: 6394043851129678520, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000061035156
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6602900608042437802, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
@@ -688,3 +804,5 @@ SceneRoots:
   - {fileID: 5663158625272198871}
   - {fileID: 1203774100}
   - {fileID: 3044738762556568908}
+  - {fileID: 1795896968}
+  - {fileID: 34259675}

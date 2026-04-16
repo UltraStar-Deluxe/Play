@@ -12,6 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12e91a813144249ed868272f6ca9a391, type: 3}
   m_Name: SherpaONNXCustomModels
   m_EditorClassIdentifier: Eitan.SherpaONNXUnity::Eitan.SherpaONNXUnity.Runtime.SherpaONNXCustomModelSettings
-  _entries: []
+  _entries:
+  - enabled: 1
+    entryType: 0
+    name: UVR_MDXNET_KARA_2
+    modelId: UVR_MDXNET_KARA_2
+    moduleType: 3
+    moduleTypeHint: 
+    downloadUrl: 
+    downloadFileHash: 
+    numberOfSpeakers: 0
+    sampleRate: 0
+    modelTypeHint: 
+    fileBindings:
+    - key: 1
+      path: UVR_MDXNET_KARA_2.onnx
+    remoteManifestUrl: 
   _models: []
   _remoteManifests: []
