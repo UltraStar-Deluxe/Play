@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -13,6 +14,9 @@ using UnityEngine;
 
 public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
+    private const string InstrumentalStemName = "non-vocals";
+    private const string VocalsStemName = "vocals";
+    
     public static AudioSeparationManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<AudioSeparationManager>();
 
     private readonly SemaphoreSlim audioSeparationProcessSemaphore = new(1, 1);
@@ -98,7 +102,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
         
         // Estimate duration
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
-        jobProgress.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
+        jobProgress.EstimatedTotalDurationInMillis = (int)Math.Ceiling((double)lengthInMillis);
 
         // Set path to Spleeter executable if needed
         string fallbackAudioSeparationCommand = PlatformUtils.IsWindows
@@ -111,7 +115,13 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
             throw new AudioSeparationException($"Vocals isolation not supported for this audio file. Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.JoinWith(", ")}");
         }
 
-        await Awaitable.BackgroundThreadAsync();
+        // Make sure source separation module has been loaded.
+        if (!isSourceSeparationModuleReady)
+        {
+            Initialize();
+            await ConditionUtils.WaitForConditionAsync(() => isSourceSeparationModuleReady);
+        }
+
         AudioSeparationResult audioSeparationResult = await ProcessSongMetaWithAiAsync(
             songMeta,
             generatedSongFolderAbsolutePath,
@@ -120,7 +130,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
             saveSong,
             audioClip);
 
-        await Awaitable.MainThreadAsync();
         audioSeparationFinishedEventStream.OnNext(new AudioSeparationFinishedEvent(songMeta));
         return audioSeparationResult;
     }
@@ -159,8 +168,12 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
 
             string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
 
-            Debug.Log($"Starting source separation of AudioClip. name: '{audioClip.name}', length: {audioClip.length} s, channels: {audioClip.channels}, sampleRate: {audioClip.frequency}");
-            SourceSeparationComponent.SeparatedClipSet separatedClipSet = await sourceSeparationComponent.SeparateClipAsync(audioClip);
+            // Debug.Log($"Starting source separation of AudioClip. name: '{audioClip.name}', length: {audioClip.length} s, channels: {audioClip.channels}, sampleRate: {audioClip.frequency}");
+            SourceSeparationComponent.SeparatedClipSet separatedClipSet = await sourceSeparationComponent.SeparateClipAsync(audioClip, false, cancellationToken);
+            if (separatedClipSet == null)
+            {
+                throw new AudioSeparationException("separatedClipSet is null");
+            }
 
             SaveAudioFilesAndUpdateSongMeta(songMeta, generatedSongFolderAbsolutePath, saveSong, separatedClipSet);
 
@@ -196,7 +209,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
         bool songMetaChanged = false;
         foreach (SourceSeparationComponent.SeparatedStemClip stem in separatedClipSet.stems)
         {
-            string outputPath = $"{destinationFolder}/{stem.stemName}.ogg";
+            string fileBaseName = stem.stemName.Replace(InstrumentalStemName, "instrumental");
+            string outputPath = $"{destinationFolder}/{fileBaseName}.ogg";
             Debug.Log($"Saving separated audio file. stem: '{stem.stemName}', outputPath: '{outputPath}'");
             OggFileWriter.WriteFile(outputPath, stem.clip);
 
@@ -206,12 +220,12 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
                 relativeOrAbsoluteOutputPath = PathUtils.MakeRelativePath(SongMetaUtils.GetDirectoryPath(songMeta), outputPath);
             }
 
-            if (stem.stemName == "non-vocals")
+            if (stem.stemName == InstrumentalStemName)
             {
                 songMeta.InstrumentalAudio = relativeOrAbsoluteOutputPath;
                 songMetaChanged = true;
             }
-            else if (stem.stemName.Contains("vocals"))
+            else if (stem.stemName == VocalsStemName)
             {
                 songMeta.VocalsAudio = relativeOrAbsoluteOutputPath;
                 songMetaChanged = true;

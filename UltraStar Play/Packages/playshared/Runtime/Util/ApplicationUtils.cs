@@ -171,16 +171,6 @@ public static class ApplicationUtils
         "wav",
     }.ToHashSet();
 
-    public static readonly IReadOnlyCollection<string> supportedVocalsSeparationAudioFiles = new HashSet<string>
-    {
-        "wav",
-        "mp3",
-        "ogg",
-        "m4a",
-        "wma",
-        "flac",
-    }.ToHashSet();
-
     public static readonly IReadOnlyCollection<string> supportedBasicPitchDetectionAudioFiles = new HashSet<string>
     {
         "wav",
@@ -215,6 +205,10 @@ public static class ApplicationUtils
         .Distinct()
         .OrderBy(format => format)
         .ToList();
+
+    public static readonly IReadOnlyCollection<string> supportedVocalsSeparationAudioFiles = allSupportedAudioFiles
+        .Union(allSupportedVideoFiles)
+        .ToHashSet(); 
 
     public static void OpenDirectory(string path)
     {
