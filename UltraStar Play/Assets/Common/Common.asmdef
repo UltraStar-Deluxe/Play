@@ -29,7 +29,8 @@
         "OneJS.Common",
         "OneJS.CustomStyleSheets.6.3",
         "AVProVideo.Runtime",
-        "Eitan.SherpaONNXUnity"
+        "Eitan.SherpaONNXUnity",
+        "FfmpegAudioSamplesLoader"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
