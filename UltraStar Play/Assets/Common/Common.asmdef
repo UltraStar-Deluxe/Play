@@ -30,7 +30,8 @@
         "OneJS.CustomStyleSheets.6.3",
         "AVProVideo.Runtime",
         "Eitan.SherpaONNXUnity",
-        "FfmpegAudioSamplesLoader"
+        "FfmpegAudioSamplesLoader",
+        "VorbisPluginImpl"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -49,8 +50,7 @@
         "Serilog.Sinks.File.dll",
         "System.Text.Encoding.CodePages.dll",
         "Utf8Json.dll",
-        "Microsoft.ML.OnnxRuntime.dll",
-        "OggVorbisEncoder.dll"
+        "Microsoft.ML.OnnxRuntime.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

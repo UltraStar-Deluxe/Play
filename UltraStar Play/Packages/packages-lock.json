@@ -81,6 +81,13 @@
       "dependencies": {},
       "hash": "ef88976b6329da6eb529854ed8594f615c54f6da"
     },
+    "com.gindemit.vorbis": {
+      "version": "https://github.com/gindemit/unity-vorbis.git?path=/unity/Assets/VorbisPlugin/#0.4.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "8cdd8f247b2a29c9e02d0d56b016ced5c5fa73b9"
+    },
     "com.singularitygroup.hotreload": {
       "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.5",
       "depth": 0,
