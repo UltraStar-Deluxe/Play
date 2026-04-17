@@ -30,13 +30,11 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         {
             SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(config.SpeechRecognizerConfig).GetResultAsync();
 
-            await Awaitable.BackgroundThreadAsync();
             SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
                 config.InputSamples,
                 speechRecognizer)
                 .GetResultAsync();
 
-            await Awaitable.MainThreadAsync();
             List<Note> createdNotes = CreateNotesFromSpeechRecognitionResult(
                 speechRecognitionResult,
                 config);

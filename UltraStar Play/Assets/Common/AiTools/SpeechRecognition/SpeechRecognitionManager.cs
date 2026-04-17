@@ -61,7 +61,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
             new CancellationTokenSource());
         JobManager.Instance.AddJob(job);
         job.SetAwaitable(() => ProcessSongMetaAsync(samples, speechRecognizer, job.Progress));
-        job.Progress.EstimatedTotalDurationInMillis = GetEstimatedSpeechRecognitionDurationInMillis(lengthInMillis);
+        job.Progress.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis);
 
         return job;
     }
@@ -175,11 +175,6 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
         );
     }
 
-    private int GetEstimatedSpeechRecognitionDurationInMillis(double lengthInMillis)
-    {
-        return (int)Math.Ceiling(lengthInMillis);
-    }
-
     private void OnApplicationQuit()
     {
         SemaphoreUtils.SleepUntilSemaphoreIsFree(
@@ -193,7 +188,6 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
         int sampleRate,
         CancellationToken cancellationToken)
     {
-        await Awaitable.MainThreadAsync();
         Debug.Log("Creating AudioClip for speech recognition on main thread.");
         AudioClip clip = AudioClip.Create("SpeechRecognitionMonoAudioSamplesClip", audioSamples.Length, 1, sampleRate, false);
         clip.SetData(audioSamples, 0);
@@ -201,7 +195,10 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
         Debug.Log("Running speech recognition");
         SpeechRecognition.TranscriptionResult result = await offlineRecognizer
             .TranscribeClipAsync(clip, cancellationToken).ConfigureAwait(true);
-        await Awaitable.BackgroundThreadAsync();
+        
+        Debug.Log("Destroying AudioClip for speech recognition ");
+        Destroy(clip);
+        
         return result;
     }
 
