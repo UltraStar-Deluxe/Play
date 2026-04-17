@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.IO;
+﻿using System.IO;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 
-[TestFixture]
 public class OggFileWriterTest
 {
-    [UnityTest]
-    public IEnumerator WriteAndLoadOggFileTest(
+    [Test]
+    public async Task WriteAndLoadOggFileTest(
         [Values(1, 2)] int channels,
         [Values(16000, 44100, 48000, 96000)] int sampleRate,
         [Values(0.1f, 0.4f, 0.9f, 1f)] float quality)
@@ -33,9 +29,7 @@ public class OggFileWriterTest
         Assert.IsTrue(File.Exists(outputPath), "Ogg file was not created.");
 
         // Load the file with Unity API
-        Awaitable<AudioClip> loadAwaitable = LoadAudioClipAsync(outputPath);
-        yield return loadAwaitable;
-        AudioClip loadedAudioClip = loadAwaitable.GetAwaiter().GetResult();
+        AudioClip loadedAudioClip = await AudioClipTestUtils.LoadAudioClipAsync(outputPath);
 
         Assert.IsNotNull(loadedAudioClip, "Loaded AudioClip is null.");
         Assert.AreEqual(channels, loadedAudioClip.channels, "Channel count mismatch.");
@@ -62,24 +56,5 @@ public class OggFileWriterTest
         }
 
         return samples;
-    }
-
-    private static async Awaitable<AudioClip> LoadAudioClipAsync(string path)
-    {
-        if (!File.Exists(path))
-        {
-            throw new FileNotFoundException("Audio file not found", path);
-        }
-
-        string uri = "file://" + path;
-        using UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS);
-        await webRequest.SendWebRequest();
-
-        if (webRequest.result != UnityWebRequest.Result.Success)
-        {
-            throw new Exception($"Failed to load AudioClip from {path}: {webRequest.error}");
-        }
-
-        return DownloadHandlerAudioClip.GetContent(webRequest);
     }
 }
