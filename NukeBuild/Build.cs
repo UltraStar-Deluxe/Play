@@ -120,6 +120,7 @@ class Build : NukeBuild
                 "TagLibSharp.dll",
                 "Microsoft.ML.OnnxRuntime.dll",
                 "Ffmpeg.Autogen.dll",
+                "OggVorbisEncoder.dll",
                 "WindowsInput.dll" // Only used in mod "TriggerKeyStrokeToToggleMicWhenSinging"
                 );
         });
