@@ -27,7 +27,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
     private readonly SemaphoreSlim speechRecognitionProcessSemaphore = new(1, 1);
     public bool IsSpeechRecognitionRunning => speechRecognitionProcessSemaphore.CurrentCount > 0;
 
-    private bool isInitialized;
+    private bool isSpeechRecognitionModuleReady;
     
     void OnEnable()
     {
@@ -92,6 +92,14 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
 
         try
         {
+            // Make sure speech recognition module has been loaded.
+            if (!isSpeechRecognitionModuleReady)
+            {
+                await offlineRecognizer.StartModuleInitializationAsync();
+                await ConditionUtils.WaitForConditionAsync(() => isSpeechRecognitionModuleReady, 
+                    new WaitForConditionConfig {timeoutInMillis = 30_000});
+            }
+            
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             // TODO: Clean up speech recognition code. Remove code for Whisper integration.
@@ -205,6 +213,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
     private void HandleRecognizerReadyState(bool ready)
     {
         Debug.Log($"HandleRecognizerReadyState: {ready}");
+        isSpeechRecognitionModuleReady = ready;
     }
 
     private void HandleFeedbackMessage(string message)
@@ -215,23 +224,5 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
     private void HandleFeedback(SherpaFeedback feedback)
     {
         Debug.Log($"HandleFeedback: {feedback.Message}");
-    }
-
-    public void Initialize()
-    {
-        if (isInitialized)
-        {
-            return;
-        }
-        isInitialized = true;
-
-        try
-        {
-            _ = offlineRecognizer.StartModuleInitializationAsync();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-        }
     }
 }

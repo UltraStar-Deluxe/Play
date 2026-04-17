@@ -48,12 +48,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
         sourceSeparationComponent.ErrorEvent.AddListener(OnError);
         sourceSeparationComponent.InitializationStateChangedEvent.AddListener(OnInitializationStateChangedEvent);
     }
-
-    public void Initialize()
-    {
-        Debug.Log("Loading source separation module");
-        sourceSeparationComponent.TryLoadModule();
-    }
     
     public Job<AudioSeparationResult> ProcessSongMetaJob(
         SongMeta songMeta,
@@ -115,13 +109,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
             throw new AudioSeparationException($"Vocals isolation not supported for this audio file. Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.JoinWith(", ")}");
         }
 
-        // Make sure source separation module has been loaded.
-        if (!isSourceSeparationModuleReady)
-        {
-            Initialize();
-            await ConditionUtils.WaitForConditionAsync(() => isSourceSeparationModuleReady);
-        }
-
         AudioSeparationResult audioSeparationResult = await ProcessSongMetaWithAiAsync(
             songMeta,
             generatedSongFolderAbsolutePath,
@@ -146,6 +133,14 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
         if (!await audioSeparationProcessSemaphore.WaitAsync(0, cancellationToken))
         {
             throw new JobAlreadyRunningException(new AudioSeparationException("Already performing vocals isolation"));
+        }
+
+        // Make sure source separation module has been loaded.
+        if (!isSourceSeparationModuleReady)
+        {
+            sourceSeparationComponent.TryLoadModule();
+            await ConditionUtils.WaitForConditionAsync(() => isSourceSeparationModuleReady,
+                new WaitForConditionConfig { timeoutInMillis = 30_000 });
         }
 
         try

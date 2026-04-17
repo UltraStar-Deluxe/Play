@@ -152,8 +152,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
         InitSongEditorStyleSheet();
 
-        speechRecognitionManager.Initialize();
-        
         try
         {
             await songAudioPlayer.LoadAndPlayAsync(SongMeta, sceneData.PositionInMillis, false);
