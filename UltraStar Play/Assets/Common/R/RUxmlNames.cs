@@ -511,6 +511,7 @@ public static partial class R
         public const string notConnectedLabel = "notConnectedLabel";
         public const string note = "note";
         public const string noteArea = "noteArea";
+        public const string noteAreaDetectedPitch = "noteAreaDetectedPitch";
         public const string noteAreaIssues = "noteAreaIssues";
         public const string noteAreaNotes = "noteAreaNotes";
         public const string noteAreaNotesBackground = "noteAreaNotesBackground";
@@ -581,7 +582,6 @@ public static partial class R
         public const string permissionsContainer = "permissionsContainer";
         public const string phraseBonusScore = "phraseBonusScore";
         public const string pitchDetectionAlgorithmChooser = "pitchDetectionAlgorithmChooser";
-        public const string platformLabel = "platformLabel";
         public const string pitchDetectionAudioChooser = "pitchDetectionAudioChooser";
         public const string pitchDetectionGroup = "pitchDetectionGroup";
         public const string pitchDetectionUsingBasicPitchButton = "pitchDetectionUsingBasicPitchButton";
@@ -590,6 +590,7 @@ public static partial class R
         public const string pitchLabel = "pitchLabel";
         public const string pitchLabelFormatChooser = "pitchLabelFormatChooser";
         public const string plainLabelContainer = "plainLabelContainer";
+        public const string platformLabel = "platformLabel";
         public const string playbackAudioChooser = "playbackAudioChooser";
         public const string playbackPostEndTimeInMillisTextField = "playbackPostEndTimeInMillisTextField";
         public const string playbackPreBeginTimeInMillisTextField = "playbackPreBeginTimeInMillisTextField";

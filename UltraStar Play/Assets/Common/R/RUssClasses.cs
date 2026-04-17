@@ -162,6 +162,7 @@ public static partial class R
         public const string mx_1 = "mx-1";
         public const string mx_2 = "mx-2";
         public const string mx_3 = "mx-3";
+        public const string my_1 = "my-1";
         public const string my_2 = "my-2";
         public const string my_3 = "my-3";
         public const string nBackgroundInHierarchy = "nBackgroundInHierarchy";

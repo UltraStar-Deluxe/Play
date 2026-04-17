@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UniInject;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -27,7 +28,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
     [Inject]
     private SongEditorMidiFileImporter songEditorMidiFileImporter;
 
-    public async void CreateNotesUsingAi(bool notify)
+    public async Awaitable<PitchDetectionResult> CreateNotesUsingAi(bool notify)
     {
         PitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta).GetResultAsync();
         List<Note> notes = PitchDetectionResultMapper.ToSongMetaNotes(songMeta, pitchDetectionResult);
@@ -47,6 +48,8 @@ public class PitchDetectionAction : AbstractAudioClipAction
         {
             songMetaChangedEventStream.OnNext(new NotesChangedEvent());
         }
+
+        return pitchDetectionResult;
     }
 
     public void MoveNotesToDetectedPitchUsingPitchDetectionLayer(List<Note> notes, bool notify)
