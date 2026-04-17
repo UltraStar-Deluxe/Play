@@ -83,30 +83,6 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         textField.doubleClickSelectsWord = true;
         textField.tripleClickSelectsLine = true;
 
-        // Check when a newline has been added. This requires adding an additional character to show white space.
-        bool pasted = false;
-        bool addedNewline = false;
-        bool removeCharacter = false;
-        textField.RegisterCallback<KeyDownEvent>(evt =>
-        {
-            if (evt.keyCode == KeyCode.Return)
-            {
-                addedNewline = true;
-            }
-            else if (evt.keyCode == KeyCode.Delete
-                    || evt.keyCode == KeyCode.Backspace)
-            {
-                removeCharacter = true;
-            }
-            else if (evt.keyCode == KeyCode.V
-                     && evt.ctrlKey
-                     && !evt.shiftKey
-                     && !evt.altKey)
-            {
-                pasted = true;
-            }
-        });
-
         // Replace white space with visible characters when in edit mode
         textField.RegisterValueChangedCallback(evt =>
         {
@@ -116,25 +92,6 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             }
 
             string newText = evt.newValue;
-            if (addedNewline
-                || pasted)
-            {
-                addedNewline = false;
-                pasted = false;
-                // Add whitespace character for newly added newline character
-                newText = newText.Replace(ShowWhiteSpaceUtils.newlineReplacement, "⌇")
-                    .Replace("\n", "⌇")
-                    .Replace("⌇", ShowWhiteSpaceUtils.newlineReplacement);
-            }
-            else if (removeCharacter)
-            {
-                removeCharacter = false;
-                // Remove whitespace character or newline character where the counterpart is missing
-                newText = newText.Replace(ShowWhiteSpaceUtils.newlineReplacement, "⌇")
-                    .Replace("\n", "")
-                    .Replace(ShowWhiteSpaceUtils.newlineVisibleWhiteSpaceCharacter, "")
-                    .Replace("⌇", ShowWhiteSpaceUtils.newlineReplacement);
-            }
             string normalText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(newText);
             string visibleWhiteSpaceText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(normalText);
             textField.SetValueWithoutNotify(visibleWhiteSpaceText);
