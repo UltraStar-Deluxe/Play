@@ -162,7 +162,8 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
         {
             string token = sherpaOnnxResult.Tokens[i];
             float startTimeInSeconds = sherpaOnnxResult.Timestamps[i];
-            float lengthInSeconds = sherpaOnnxResult.Durations[i];
+            // Sometimes returned duration values are very small for some reason.
+            float lengthInSeconds = Mathf.Max(0.01f, sherpaOnnxResult.Durations[i]);
             wordResults.Add(new SpeechRecognitionWordResult(
                 token,
                 TimeSpan.FromSeconds(startTimeInSeconds),
