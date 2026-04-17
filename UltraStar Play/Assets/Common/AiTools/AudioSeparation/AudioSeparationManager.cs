@@ -94,7 +94,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
 
-        AudioClip audioClip = await AudioSamplesLoader.Instance.LoadAsAudioClip(audioUri);
+        AudioClip audioClip = await AudioSampleLoader.Instance.LoadAsAudioClip(audioUri);
         
         // Estimate duration
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);

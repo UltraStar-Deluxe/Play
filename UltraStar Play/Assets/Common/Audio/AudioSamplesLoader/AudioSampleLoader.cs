@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class AudioSamplesLoader : AbstractSingletonBehaviour
+public class AudioSampleLoader : AbstractSingletonBehaviour
 {
-    public static AudioSamplesLoader Instance => DontDestroyOnLoadManager.Instance.DoFindComponentOrThrow<AudioSamplesLoader>();
+    public static AudioSampleLoader Instance => DontDestroyOnLoadManager.Instance.DoFindComponentOrThrow<AudioSampleLoader>();
 
-    private FfmpegAudioSamplesLoader ffmpegAudioSamplesLoader;
+    private FfmpegAudioSampleLoader ffmpegAudioSampleLoader;
 
     private readonly Dictionary<string, AudioClip> ffmpegLoadedAudioClips = new(); 
     
@@ -42,7 +42,7 @@ public class AudioSamplesLoader : AbstractSingletonBehaviour
 
         InitializeFfmpegAudioSamplesLoader();
 
-        FfmpegAudioSamplesLoader.FfmpegAudioSamplesData ffmpegAudioSamplesData = ffmpegAudioSamplesLoader.Load(uri);
+        FfmpegAudioSampleLoader.FfmpegAudioSamplesData ffmpegAudioSamplesData = ffmpegAudioSampleLoader.Load(uri);
         AudioClip audioClip = AudioClip.Create(
             Path.GetFileName(uri),
             ffmpegAudioSamplesData.Samples.Length,
@@ -59,13 +59,13 @@ public class AudioSamplesLoader : AbstractSingletonBehaviour
 
     private void InitializeFfmpegAudioSamplesLoader()
     {
-        if (ffmpegAudioSamplesLoader != null)
+        if (ffmpegAudioSampleLoader != null)
         {
             return;
         }
 
-        ffmpegAudioSamplesLoader = new();
-        ffmpegAudioSamplesLoader.ConfigureFfmpeg(ApplicationUtils.GetStreamingAssetsPath("FfmpegLibraries/Windows"));
+        ffmpegAudioSampleLoader = new();
+        ffmpegAudioSampleLoader.ConfigureFfmpeg(ApplicationUtils.GetStreamingAssetsPath("FfmpegLibraries/Windows"));
     }
 
     private void OnDestroy()

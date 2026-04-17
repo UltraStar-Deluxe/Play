@@ -15,7 +15,8 @@
         "playsharedui.Editor.Tests",
         "Common",
         "Scenes",
-        "SongEditorScene"
+        "SongEditorScene",
+        "FfmpegAudioSamplesLoader"
     ],
     "includePlatforms": [
         "Editor"

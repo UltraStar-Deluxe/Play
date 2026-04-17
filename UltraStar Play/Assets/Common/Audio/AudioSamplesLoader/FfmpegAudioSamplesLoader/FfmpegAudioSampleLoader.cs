@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FFmpeg.AutoGen;
 
-public unsafe class FfmpegAudioSamplesLoader
+public unsafe class FfmpegAudioSampleLoader
 {
     public void ConfigureFfmpeg(string rootPath)
     {

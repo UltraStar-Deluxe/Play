@@ -10157,7 +10157,7 @@ GameObject:
   - component: {fileID: 5250729205396294990}
   - component: {fileID: 5493378440480339887}
   m_Layer: 0
-  m_Name: AudioSamplesLoader
+  m_Name: AudioSampleLoader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10187,7 +10187,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8368697271479041638}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 036ca43a7de4494884224cd1e7963ad4, type: 3}
+  m_Script: {fileID: 11500000, guid: 545e1fe69fed40d4c80a94d3f594f030, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Common::AudioSamplesLoader
 --- !u!1 &8385920816256150919
