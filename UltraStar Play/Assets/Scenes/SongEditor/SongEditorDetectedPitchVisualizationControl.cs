@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UniRx.Triggers;
@@ -32,6 +34,9 @@ public class SongEditorDetectedPitchVisualizationControl : INeedInjection, IInje
     
     [Inject]
     private SongEditorLayerManager songEditorLayerManager;
+    
+    [Inject]
+    private PitchDetectionManager pitchDetectionManager;
 
     private int lastNoteAreaX;
     private int lastNoteAreaY;
@@ -42,15 +47,25 @@ public class SongEditorDetectedPitchVisualizationControl : INeedInjection, IInje
 
     private VisualElement TargetElement => noteAreaDetectedPitch;
 
-    public PitchDetectionResult pitchDetectionResult;
+    private PitchDetectionResult pitchDetectionResult;
 
     private int textureWidth = 512;
-    private int textureHeight = 128;
+    private int textureHeight = 256;
 
     private DynamicTexture dynamicTexture;
 
     public void OnInjectionFinished()
     {
+        pitchDetectionManager.PitchDetectionFinishedEventStream
+            .Subscribe(evt =>
+            {
+                pitchDetectionResult = evt.PitchDetectionResult;
+                UpdateVisualization();
+
+                ScrollPitchDetectionResultIntoView();
+            })
+            .AddTo(gameObject);
+
         noteAreaControl.ViewportEventStream
             .Subscribe(evt =>
             {
@@ -94,6 +109,14 @@ public class SongEditorDetectedPitchVisualizationControl : INeedInjection, IInje
         TargetElement.RegisterCallbackOneShot<GeometryChangedEvent>(
             _ => UpdateVisualization());
         gameObject.OnDestroyAsObservable().Subscribe(_ => Dispose());
+    }
+
+    private void ScrollPitchDetectionResultIntoView()
+    {
+        double fromMillis = pitchDetectionResult.Notes.Min(note => note.StartInMillis);
+        double toMillis = pitchDetectionResult.Notes.Max(note => note.StartInMillis + note.LengthInMillis);
+        double midiNote = pitchDetectionResult.Notes.Min(note => note.MidiNote);
+        noteAreaControl.ScrollIntoView(fromMillis, toMillis, midiNote, midiNote);
     }
 
     public void UpdateVisualization()
@@ -145,11 +168,12 @@ public class SongEditorDetectedPitchVisualizationControl : INeedInjection, IInje
             xStart = NumberUtils.Limit(xStart, 0, dynamicTexture.TextureWidth - 1);
             xEnd = NumberUtils.Limit(xEnd, 0, dynamicTexture.TextureWidth - 1);
 
-            float padding = 0.2f;
-            float yNormStart = (float)(note.MidiNote - (0.5f + padding) - noteAreaControl.ViewportY) / noteAreaControl.ViewportHeight;
-            float yNormEnd = (float)(note.MidiNote + (0.5f + padding) - noteAreaControl.ViewportY) / noteAreaControl.ViewportHeight;
-            int yStart = (int)(yNormStart * dynamicTexture.TextureHeight);
-            int yEnd = (int)(yNormEnd * dynamicTexture.TextureHeight);
+            double heightPercent = noteAreaControl.HeightForSingleNote * 0.1;
+            int yOffsetPx = (int)Math.Ceiling(heightPercent * dynamicTexture.TextureHeight * 0.5);
+            double yPercent = 1 - noteAreaControl.GetVerticalPositionForMidiNote(note.MidiNote);
+            int yPx = (int)(yPercent * dynamicTexture.TextureHeight);
+            int yStart = yPx - yOffsetPx;
+            int yEnd = yPx + yOffsetPx;
 
             if (yStart >= 0 && yStart < dynamicTexture.TextureHeight
                 && xEnd >= xStart)

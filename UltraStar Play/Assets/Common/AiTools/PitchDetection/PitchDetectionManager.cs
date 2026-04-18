@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using BasicPitchRunner;
 using UniInject;
 using UniRx;
@@ -103,7 +102,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
 
         await Awaitable.MainThreadAsync();
 
-        pitchDetectionFinishedEventStream.OnNext(new PitchDetectionFinishedEvent(songMeta));
+        pitchDetectionFinishedEventStream.OnNext(new PitchDetectionFinishedEvent(songMeta, pitchDetectionResult));
         return pitchDetectionResult;
     }
 

@@ -131,7 +131,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     private readonly SongEditorSideBarPropertiesControl propertiesControl = new();
     private readonly SongEditorSideBarLayersControl sideBarLayersControl = new();
     private readonly SongEditorSideBarSettingsControl sideBarSettingsControl = new();
-    private readonly SongEditorDetectedPitchVisualizationControl songEditorDetectedPitchVisualizationControl = new();
 
     public bool IsAnySideBarContainerVisible => sideBarTabGroupControl.IsAnyContainerVisible;
 
@@ -145,7 +144,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         injector.Inject(propertiesControl);
         injector.Inject(sideBarLayersControl);
         injector.Inject(sideBarSettingsControl);
-        injector.Inject(songEditorDetectedPitchVisualizationControl);
 
         sideBarSecondaryColumnUi.ShowByDisplay();
 
@@ -221,9 +219,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             return;
         }
 
-        PitchDetectionResult pitchDetectionResult = await pitchDetectionAction.CreateNotesUsingAi(true);
-        songEditorDetectedPitchVisualizationControl.pitchDetectionResult = pitchDetectionResult;
-        songEditorDetectedPitchVisualizationControl.UpdateVisualization();
+        await pitchDetectionAction.CreateNotesUsingAi(true);
     }
 
     private void ShowSongEditorHelpDialog()
