@@ -548,6 +548,8 @@ public static partial class R
         public static readonly string songEditor_action_showPlaybackAudio = "songEditor_action_showPlaybackAudio";
         public static readonly string songEditor_action_showVocalsAudio = "songEditor_action_showVocalsAudio";
         public static readonly string songEditor_action_speechRecognitionOnAudio = "songEditor_action_speechRecognitionOnAudio";
+        public static readonly string songEditor_audioSeparation_confirmationDialog_message = "songEditor_audioSeparation_confirmationDialog_message";
+        public static readonly string songEditor_audioSeparation_confirmationDialog_title = "songEditor_audioSeparation_confirmationDialog_title";
         public static readonly string songEditor_clickToFindBpm_firstClicks = "songEditor_clickToFindBpm_firstClicks";
         public static readonly string songEditor_clickToFindBpm_initialValue = "songEditor_clickToFindBpm_initialValue";
         public static readonly string songEditor_clickToFindBpm_setChangingNoteDuration = "songEditor_clickToFindBpm_setChangingNoteDuration";

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using NHyphenator;
 using UniInject;
 using UniRx;
@@ -175,6 +176,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
+
+    [Inject]
+    private DialogManager dialogManager;
 
     [Inject]
     private GameObject gameObject;
@@ -425,22 +429,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.PitchDetectionSamplesSource,
             newValue => settings.SongEditorSettings.PitchDetectionSamplesSource = newValue);
 
-        audioSeparationButton.RegisterCallbackButtonTriggered(async _ =>
-        {
-            if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
-                && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
-            {
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingInstrumentalAudio));
-                return;
-            }
-            await audioSeparationManager.ProcessSongMetaJob(songMeta, true).GetResultAsync();
-            audioSeparationButton.SetEnabled(false);
-        });
-        if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
-            && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
-        {
-            audioSeparationButton.SetEnabled(false);
-        }
+        audioSeparationButton.RegisterCallbackButtonTriggered(OnAudioSeparationButtonClicked);
 
         // Lyrics editing separators
         Bind(wordSeparatorTextField,
@@ -522,6 +511,29 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(playbackPostEndTimeInMillisTextField,
             () => settings.SongEditorSettings.PlaybackPostEndInMillis,
             newValue => settings.SongEditorSettings.PlaybackPostEndInMillis = newValue);
+    }
+
+    private async void OnAudioSeparationButtonClicked(EventBase evt)
+    {
+        if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
+            && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
+        {
+            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+            dialogManager.CreateConfirmationDialogControl(
+                Translation.Get(R.Messages.songEditor_audioSeparation_confirmationDialog_title),
+                Translation.Get(R.Messages.songEditor_audioSeparation_confirmationDialog_message),
+                Translation.Get(R.Messages.common_ok),
+                _ => tcs.SetResult(true),
+                Translation.Get(R.Messages.action_cancel),
+                _ => tcs.SetResult(false));
+
+            if (!await tcs.Task)
+            {
+                return;
+            }
+        }
+
+        await audioSeparationManager.ProcessSongMetaJob(songMeta, true).GetResultAsync();
     }
 
     private void SplitSyllablesInSelection()
