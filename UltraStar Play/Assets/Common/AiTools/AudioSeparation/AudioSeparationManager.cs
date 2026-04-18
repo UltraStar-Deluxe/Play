@@ -230,7 +230,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
         // Update song meta
         if (songMetaChanged && saveSong)
         {
-            songMetaManager.SaveSong(songMeta, false);
+            songMetaManager.SaveSong(songMeta, true);
         }
     }
 
