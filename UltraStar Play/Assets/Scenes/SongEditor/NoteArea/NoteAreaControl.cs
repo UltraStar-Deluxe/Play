@@ -183,6 +183,11 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         {
             SetViewportHorizontal(ViewportX, ViewportWidth);
         }
+
+        if (changedEvent is ImportedNotesEvent importedNotesEvent)
+        {
+            ScrollIntoView(importedNotesEvent.Notes);
+        }
     }
 
     public void FitViewportVerticalToNotes()
@@ -652,5 +657,63 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public bool IsPointerOver()
     {
         return InputUtils.IsPointerOverVisualElement(VisualElement, panelHelper);
+    }
+
+    /**
+     * Makes sure that some of the area defined by left/right/top/bottom is inside the viewport.
+     */
+    public void ScrollIntoView(double leftMillis, double rightMillis, double bottomMidiNote, double topMidiNote)
+    {
+        int paddingX = (int)(ViewportWidth * 0.5);
+        int paddingY = (int)(ViewportHeight * 0.5);
+
+        int newViewportX = ViewportX;
+        int newViewportY = ViewportY;
+
+        if (leftMillis < ViewportX + paddingX)
+        {
+            newViewportX = (int)(leftMillis - paddingX);
+        }
+        else if (rightMillis > ViewportX + ViewportWidth - paddingX)
+        {
+            newViewportX = (int)(rightMillis + paddingX - ViewportWidth);
+        }
+
+        if (bottomMidiNote < ViewportY + paddingY)
+        {
+            newViewportY = (int)(bottomMidiNote - paddingY);
+        }
+        else if (topMidiNote > ViewportY + ViewportHeight - paddingY)
+        {
+            newViewportY = (int)(topMidiNote + paddingY - ViewportHeight);
+        }
+
+        if (newViewportX == ViewportX && newViewportY == ViewportY)
+        {
+            return;
+        }
+
+        double scrollDurationInSeconds = 0.5;
+        Vector2 startPos = new Vector2(ViewportX, ViewportY);
+        Vector2 endPos = new Vector2(newViewportX, newViewportY);
+        LeanTween.value(songEditorSceneControl.gameObject, startPos, endPos, (float)scrollDurationInSeconds)
+            .setOnUpdate((Vector2 val) => SetViewport((int)val.x, (int)val.y, ViewportWidth, ViewportHeight));
+    }
+
+    public void ScrollIntoView(List<Note> notes)
+    {
+        if (notes.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        double fromBeat = notes.Min(note => note.StartBeat);
+        double toBeat = notes.Max(note => note.EndBeat);
+        double fromMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, fromBeat);
+        double toMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, toBeat);
+        
+        double fromMidiNote = notes.Min(note => note.MidiNote);
+        double toMidiNote = notes.Max(note => note.MidiNote);
+        ScrollIntoView(fromMillis, toMillis, fromMidiNote, toMidiNote);
     }
 }

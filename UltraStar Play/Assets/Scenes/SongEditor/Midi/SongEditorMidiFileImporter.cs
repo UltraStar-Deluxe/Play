@@ -100,7 +100,7 @@ public class SongEditorMidiFileImporter : INeedInjection
                 ShiftNotesToPlaybackPosition(loadedNotes);
             }
 
-            songMetaChangedEventStream.OnNext(new ImportedMidiFileEvent());
+            songMetaChangedEventStream.OnNext(new ImportedMidiFileEvent(loadedNotes));
         }
         catch (Exception ex)
         {

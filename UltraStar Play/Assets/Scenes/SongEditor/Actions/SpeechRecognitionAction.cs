@@ -167,7 +167,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         }
     }
 
-    public async void CreateNotesFromSpeechRecognition(
+    public async Awaitable<List<Note>> CreateNotesFromSpeechRecognition(
         int startBeat,
         int lengthInBeats,
         ESongEditorSamplesSource speechRecognitionSampleSource,
@@ -177,7 +177,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     {
         try
         {
-            await CreateNotesFromSpeechRecognitionAsync(startBeat,
+            return await CreateNotesFromSpeechRecognitionAsync(startBeat,
                 lengthInBeats,
                 speechRecognitionSampleSource,
                 spaceBetweenNotesInMillis,
@@ -195,6 +195,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_speechRecognition_errorWithReason,
                     "reason", ex.Message)));
             }
+
+            return new List<Note>();
         }
     }
 
