@@ -44,6 +44,9 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     private PitchDetectionAction pitchDetectionAction;
 
     [Inject]
+    private MoveNotesToPitchDetectionResultAction moveNotesToPitchDetectionResultAction;
+    
+    [Inject]
     private SpeechRecognitionAction speechRecognitionAction;
 
     [Inject]
@@ -109,7 +112,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
                 "audio", settings.SongEditorSettings.SpeechRecognitionSamplesSource),
             () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveToDetectedPitch),
-            () => pitchDetectionAction.MoveNotesToDetectedPitchUsingPitchDetectionLayer(selectedNotes, true));
+            () => moveNotesToPitchDetectionResultAction.MoveNotesToDetectedPitch(selectedNotes, true));
     }
 
     private void FillContextMenuToMergeAndAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)

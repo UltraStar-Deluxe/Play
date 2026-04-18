@@ -12,9 +12,14 @@ public class SongEditorPitchDetectionControl : INeedInjection, IInjectionFinishe
     [Inject]
     private PitchDetectionManager pitchDetectionManager;
 
+    [Inject]
+    private GameObject gameObject;
+
     private readonly Subject<PitchDetectionFinishedEvent> pitchDetectionFinishedEventStream = new();
     public Subject<PitchDetectionFinishedEvent> PitchDetectionFinishedEventStream => pitchDetectionFinishedEventStream;
 
+    public PitchDetectionResult LastPitchDetectionResult { get; private set; }
+    
     public void OnInjectionFinished()
     {
         pitchDetectionManager.PitchDetectionFinishedEventStream
@@ -22,7 +27,13 @@ public class SongEditorPitchDetectionControl : INeedInjection, IInjectionFinishe
             {
                 SavePitchDetectionResultToFile(evt.SongMeta, evt.PitchDetectionResult);
                 pitchDetectionFinishedEventStream.OnNext(evt);
-            });
+            })
+            .AddTo(gameObject);
+
+        // Subscribe to the event stream of this class, because it fires also when loading the PitchDetectionResult from file.
+        PitchDetectionFinishedEventStream
+            .Subscribe(evt => LastPitchDetectionResult = evt.PitchDetectionResult)
+            .AddTo(gameObject);
 
         RestoreSavedPitchDetectionResult(songMeta);
     }

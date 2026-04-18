@@ -51,24 +51,4 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
         return pitchDetectionResult;
     }
-
-    public void MoveNotesToDetectedPitchUsingPitchDetectionLayer(List<Note> notes, bool notify)
-    {
-        List<Note> pitchDetectionLayerNotes = songEditorLayerManager.GetLayerNotes(songEditorLayerManager.GetEnumLayer(ESongEditorLayer.PitchDetection));
-        if (pitchDetectionLayerNotes.IsNullOrEmpty())
-        {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingPitchDetection));
-            return;
-        }
-
-        PitchDetectionNoteMover.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
-            songMeta,
-            notes,
-            pitchDetectionLayerNotes);
-
-        if (notify)
-        {
-            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
-        }
-    }
 }

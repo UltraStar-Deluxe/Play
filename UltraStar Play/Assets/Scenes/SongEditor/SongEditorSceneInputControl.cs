@@ -30,6 +30,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private PitchDetectionAction pitchDetectionAction;
+    
+    [Inject]
+    private MoveNotesToPitchDetectionResultAction moveNotesToPitchDetectionResultAction;
 
     [Inject]
     private SpeechRecognitionAction speechRecognitionAction;
@@ -294,7 +297,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private void MoveSelectedNotesToDetectedPitch()
     {
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
-        pitchDetectionAction.MoveNotesToDetectedPitchUsingPitchDetectionLayer(selectedNotes, true);
+        moveNotesToPitchDetectionResultAction.MoveNotesToDetectedPitch(selectedNotes, true);
     }
 
     private void OnBack(InputAction.CallbackContext context)
