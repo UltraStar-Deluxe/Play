@@ -9,7 +9,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedListener
+public class CreateSingAlongSongControl : INeedInjection
 {
     [Inject]
     private AudioSeparationManager audioSeparationManager;
@@ -36,13 +36,6 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
     private readonly Subject<SongMeta> createdSingAlongVersionEventStream = new();
     public IObservable<SongMeta> CreatedSingAlongVersionEventStream => createdSingAlongVersionEventStream;
-
-    private PitchDetectionNoteCreator pitchDetectionNoteCreator;
-
-    public void OnInjectionFinished()
-    {
-        pitchDetectionNoteCreator = new PitchDetectionNoteCreator(pitchDetectionManager);
-    }
 
     public async void CreateSingAlongSong(SongMeta songMeta, bool saveSongFile)
     {
@@ -104,10 +97,10 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         Job<VoidEvent> pitchDetectionJob = new(Translation.Of("Pitch detection"));
         pitchDetectionJob.SetAwaitable(async () =>
         {
-            List<Note> loadedPitchDetectionNotes = await pitchDetectionNoteCreator.CreateNotesUsingAiAsync(songMeta);
+            PitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta).GetResultAsync();
 
             // Move notes of first player to detected pitch
-            MoveNotesToDetectedPitch(songMeta, pipelineData.CreatedNotes, loadedPitchDetectionNotes);
+            MoveNotesToDetectedPitch(songMeta, pipelineData.CreatedNotes, pitchDetectionResult);
 
             return VoidEvent.instance;
         });
@@ -166,14 +159,14 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         return audioSeparationJob;
     }
 
-    private static void MoveNotesToDetectedPitch(SongMeta songMeta, List<Note> createdNotes, List<Note> loadedPitchDetectionNotes)
+    private static void MoveNotesToDetectedPitch(SongMeta songMeta, List<Note> createdNotes, PitchDetectionResult pitchDetectionResult)
     {
         try
         {
-            PitchDetectionNoteMover.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
+            PitchDetectionNoteMover.MoveNotesToDetectedPitch(
                 songMeta,
                 createdNotes,
-                loadedPitchDetectionNotes);
+                pitchDetectionResult);
         }
         catch (Exception ex)
         {

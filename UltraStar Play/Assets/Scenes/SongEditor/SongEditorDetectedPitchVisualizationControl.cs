@@ -36,7 +36,7 @@ public class SongEditorDetectedPitchVisualizationControl : INeedInjection, IInje
     private SongEditorLayerManager songEditorLayerManager;
     
     [Inject]
-    private PitchDetectionManager pitchDetectionManager;
+    private SongEditorPitchDetectionControl songEditorPitchDetectionControl;
 
     private int lastNoteAreaX;
     private int lastNoteAreaY;
@@ -56,13 +56,11 @@ public class SongEditorDetectedPitchVisualizationControl : INeedInjection, IInje
 
     public void OnInjectionFinished()
     {
-        pitchDetectionManager.PitchDetectionFinishedEventStream
+        songEditorPitchDetectionControl.PitchDetectionFinishedEventStream
             .Subscribe(evt =>
             {
                 pitchDetectionResult = evt.PitchDetectionResult;
                 UpdateVisualization();
-
-                ScrollPitchDetectionResultIntoView();
             })
             .AddTo(gameObject);
 
@@ -109,14 +107,6 @@ public class SongEditorDetectedPitchVisualizationControl : INeedInjection, IInje
         TargetElement.RegisterCallbackOneShot<GeometryChangedEvent>(
             _ => UpdateVisualization());
         gameObject.OnDestroyAsObservable().Subscribe(_ => Dispose());
-    }
-
-    private void ScrollPitchDetectionResultIntoView()
-    {
-        double fromMillis = pitchDetectionResult.Notes.Min(note => note.StartInMillis);
-        double toMillis = pitchDetectionResult.Notes.Max(note => note.StartInMillis + note.LengthInMillis);
-        double midiNote = pitchDetectionResult.Notes.Min(note => note.MidiNote);
-        noteAreaControl.ScrollIntoView(fromMillis, toMillis, midiNote, midiNote);
     }
 
     public void UpdateVisualization()

@@ -114,6 +114,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new();
     private readonly SongEditorStatusBarControl statusBarControl = new();
     private readonly SongEditorBackgroundAudioWaveFormControl songEditorBackgroundAudioWaveFormControl = new();
+    private readonly SongEditorPitchDetectionControl songEditorPitchDetectionControl = new();
     private readonly SongEditorDetectedPitchVisualizationControl songEditorDetectedPitchVisualizationControl = new();
     private readonly SongEditorSearchControl songEditorSearchControl = new();
     private readonly ImportLrcDialogControl importLrcDialogControl = new();
@@ -142,6 +143,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(songEditorSearchControl);
         injector.Inject(importLrcDialogControl);
         injector.Inject(positionHistoryNavigationControl);
+        injector.Inject(songEditorPitchDetectionControl);
         injector.Inject(songEditorDetectedPitchVisualizationControl);
         injector
             .WithRootVisualElement(rightSideBar)
@@ -497,6 +499,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(issueAnalyzerControl);
         bb.BindExistingInstance(statusBarControl);
         bb.BindExistingInstance(editModeLyricsConverter);
+        bb.BindExistingInstance(songEditorPitchDetectionControl);
         bb.BindExistingInstance(this);
         bb.Bind(nameof(issueSideBarEntryUi)).ToExistingInstance(issueSideBarEntryUi);
         bb.Bind(nameof(songPropertySideBarEntryUi)).ToExistingInstance(songPropertySideBarEntryUi);

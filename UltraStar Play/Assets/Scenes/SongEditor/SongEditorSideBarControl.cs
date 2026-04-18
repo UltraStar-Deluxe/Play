@@ -222,7 +222,16 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             return;
         }
 
-        await pitchDetectionAction.CreateNotesUsingAi(true);
+        PitchDetectionResult pitchDetectionResult = await pitchDetectionAction.CreateNotesUsingAi(true);
+        ScrollPitchDetectionResultIntoView(pitchDetectionResult);
+    }
+
+    private void ScrollPitchDetectionResultIntoView(PitchDetectionResult pitchDetectionResult)
+    {
+        double fromMillis = pitchDetectionResult.Notes.Min(note => note.StartInMillis);
+        double toMillis = pitchDetectionResult.Notes.Max(note => note.StartInMillis + note.LengthInMillis);
+        double midiNote = pitchDetectionResult.Notes.Min(note => note.MidiNote);
+        noteAreaControl.ScrollIntoView(fromMillis, toMillis, midiNote, midiNote);
     }
 
     private void ShowSongEditorHelpDialog()
