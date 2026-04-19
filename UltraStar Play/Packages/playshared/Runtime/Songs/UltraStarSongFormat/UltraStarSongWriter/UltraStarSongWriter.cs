@@ -59,13 +59,18 @@ public static class UltraStarFormatWriter
         }
         List<Sentence> sortedSentences = new(voice.Sentences);
         sortedSentences.Sort(Sentence.comparerByStartBeat);
-        foreach (Sentence sentence in sortedSentences)
+        // Process the last sentence separately. A linebreak should not be appended after the last sentence.
+        foreach (Sentence sentence in sortedSentences.SkipLast(1))
         {
-            AppendSentence(sb, sentence);
+            AppendSentence(sb, sentence, true);
+        }
+        if (sortedSentences.Count > 0)
+        {
+            AppendSentence(sb, sortedSentences.Last(), false);
         }
     }
 
-    private static void AppendSentence(StringBuilder sb, Sentence sentence)
+    private static void AppendSentence(StringBuilder sb, Sentence sentence, bool appendLinebreak)
     {
         bool isEmpty = sentence.Notes.Count == 0;
         if (isEmpty)
@@ -79,15 +84,17 @@ public static class UltraStarFormatWriter
         {
             AppendNote(sb, note);
         }
-
-        // TODO: Linebreak timing could be optional but is required by some other tools, https://github.com/UltraStar-Deluxe/format/issues/64
-        sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
-        // if (sentence.ExtendedMaxBeat > sentence.MaxBeat)
-        // {
-        //     sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
-        // } else {
-        //     sb.AppendLine($"-");
-        // }
+        if (appendLinebreak)
+        {
+            // TODO: Linebreak timing could be optional but is required by some other tools, https://github.com/UltraStar-Deluxe/format/issues/64
+            sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+            // if (sentence.ExtendedMaxBeat > sentence.MaxBeat)
+            // {
+            //     sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+            // } else {
+            //     sb.AppendLine($"-");
+            // }
+        }
     }
 
     private static bool IsNotEmpty(Voice voice)
