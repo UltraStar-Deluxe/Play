@@ -140,7 +140,8 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
                 throw new SpeechRecognitionException("Speech recognition result is empty");
             }
 
-            SpeechRecognitionResult speechRecognitionResult = ToSpeechRecognitionResult(sherpaOnnxResult);
+            float audioDurationInSeconds = (float)monoSamplesExcerptResampled.Length / ParakeetV3ExpectedSampleRate;
+            SpeechRecognitionResult speechRecognitionResult = ToSpeechRecognitionResult(sherpaOnnxResult, audioDurationInSeconds);
 
             double startSecond = (double)samples.StartIndex / samples.SampleRate;
             double endSecond = (double)samples.EndIndex / samples.SampleRate;
@@ -155,7 +156,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private SpeechRecognitionResult ToSpeechRecognitionResult(SpeechRecognition.TranscriptionResult sherpaOnnxResult)
+    private SpeechRecognitionResult ToSpeechRecognitionResult(SpeechRecognition.TranscriptionResult sherpaOnnxResult, float maxDurationInSeconds)
     {
         List<SpeechRecognitionWordResult> wordResults = new();
         for (int i = 0; i < sherpaOnnxResult.Tokens.Length; i++)
@@ -164,6 +165,16 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
             float startTimeInSeconds = sherpaOnnxResult.Timestamps[i];
             // Sometimes returned duration values are very small for some reason.
             float lengthInSeconds = Mathf.Max(0.01f, sherpaOnnxResult.Durations[i]);
+
+            if (!float.IsFinite(startTimeInSeconds)
+                || !float.IsFinite(lengthInSeconds)
+                || startTimeInSeconds > maxDurationInSeconds * 2
+                || (startTimeInSeconds + lengthInSeconds) > maxDurationInSeconds * 2)
+            {
+                Log.Warning(() => $"Discarding speech recognition token '{token}' because its time values are invalid or too large: start={startTimeInSeconds}, length={lengthInSeconds}, maxDuration={maxDurationInSeconds}");
+                continue;
+            }
+
             wordResults.Add(new SpeechRecognitionWordResult(
                 token,
                 TimeSpan.FromSeconds(startTimeInSeconds),
