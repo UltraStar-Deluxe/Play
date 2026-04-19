@@ -1,3 +1,6 @@
+using System;
+
+[Serializable] // Serializable is required for UnityEngine.JsonUtility
 public class BeatPitchEventDto : JsonSerializable
 {
     public int Beat { get; set; }

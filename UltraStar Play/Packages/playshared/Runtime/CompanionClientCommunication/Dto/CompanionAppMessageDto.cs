@@ -1,4 +1,7 @@
-﻿public class CompanionAppMessageDto : JsonSerializable
+﻿using System;
+
+[Serializable] // Serializable is required for UnityEngine.JsonUtility
+public class CompanionAppMessageDto : JsonSerializable
 {
     public CompanionAppMessageType MessageType { get; set; }
 

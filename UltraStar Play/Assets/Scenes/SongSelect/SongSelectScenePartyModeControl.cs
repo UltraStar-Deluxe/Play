@@ -85,7 +85,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     private SongMeta GetRandomSong()
     {
-        List<SongMeta> availableSongMetas = playlistManager.GetSongMetas(songSelectSceneControl.PartyModeSettings.SongSelectionSettings.SongPoolPlaylist);
+        List<SongMeta> availableSongMetas = playlistManager.GetSongMetas(playlistManager.GetPlaylistByName(songSelectSceneControl.PartyModeSettings.SongSelectionSettings.SongPoolPlaylistName, UltraStarAllSongsPlaylist.Instance));
         if (availableSongMetas.IsNullOrEmpty())
         {
             Debug.LogWarning("No songs available for random song selection. Consider using another playlist or add more songs");

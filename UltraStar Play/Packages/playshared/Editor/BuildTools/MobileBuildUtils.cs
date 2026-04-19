@@ -7,10 +7,10 @@ using UnityEngine;
 
 public class MobileBuildUtils
 {
-    private const string KeystorePathEnvironmentVariable = "UNITY_KEYSTORE_PATH";
-    private const string KeystorePasswordEnvironmentVariable = "UNITY_KEYSTORE_PASSWORD";
-    private const string KeystoreKeyAliasEnvironmentVariable = "UNITY_KEYSTORE_KEY_ALIAS";
-    private const string KeystoreKeyAliasPasswordEnvironmentVariable = "UNITY_KEYSTORE_KEY_ALIAS_PASSWORD";
+    private const string KeystorePathEnvironmentVariable = "USPLAY_UNITY_KEYSTORE_PATH";
+    private const string KeystorePasswordEnvironmentVariable = "USPLAY_UNITY_KEYSTORE_PASSWORD";
+    private const string KeystoreKeyAliasEnvironmentVariable = "USPLAY_UNITY_KEYSTORE_KEY_ALIAS";
+    private const string KeystoreKeyAliasPasswordEnvironmentVariable = "USPLAY_UNITY_KEYSTORE_KEY_ALIAS_PASSWORD";
 
     private static string IgnoredAssetsOfMobileBuildFolder => "IgnoredAssetsOfMobileBuild";
 

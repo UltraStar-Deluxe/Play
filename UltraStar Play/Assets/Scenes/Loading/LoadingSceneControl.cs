@@ -25,6 +25,9 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     private SongMetaManager songMetaManager;
 
     [Inject]
+    private InGameDebugConsoleManager inGameDebugConsoleManager;
+
+    [Inject]
     private PlaylistManager playlistManager;
 
     [Inject(UxmlName = R.UxmlNames.unexpectedErrorLabel)]
@@ -33,9 +36,12 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.unexpectedErrorContainer)]
     private VisualElement unexpectedErrorContainer;
 
-    [Inject(UxmlName = R.UxmlNames.viewMoreButton)]
-    private Button viewMoreButton;
+    [Inject(UxmlName = R.UxmlNames.learnMoreButton)]
+    private Button learnMoreButton;
 
+    [Inject(UxmlName = R.UxmlNames.viewLogButton)]
+    private Button viewLogButton;
+    
     [Inject(UxmlName = R.UxmlNames.copyLogButton)]
     private Button copyLogButton;
 
@@ -72,7 +78,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         {
             settings.SongDirs = CreateInitialSongFolders();
         }
-
+        
         // Create custom player profile images folder
         DirectoryUtils.CreateDirectory(PlayerProfileUtils.GetDefaultPlayerProfileImageFolderAbsolutePath());
 
@@ -212,8 +218,9 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         unexpectedErrorContainer.ShowByDisplay();
         unexpectedErrorLabel.text = Translation.Get(R.Messages.loadingScene_unexpectedErrorMessage,
             "path", ApplicationUtils.ReplacePathsWithDisplayString(Log.logFilePath));
-        viewMoreButton.text = Translation.Get(R.Messages.action_learnMore);
-        viewMoreButton.RegisterCallbackButtonTriggered(_ => Application.OpenURL(Translation.Get(R.Messages.uri_logFiles)));
+        learnMoreButton.text = Translation.Get(R.Messages.action_learnMore);
+        learnMoreButton.RegisterCallbackButtonTriggered(_ => Application.OpenURL(Translation.Get(R.Messages.uri_logFiles)));
+        viewLogButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(ELogEventLevel.Verbose));

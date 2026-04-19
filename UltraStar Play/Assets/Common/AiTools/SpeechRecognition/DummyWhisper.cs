@@ -1,6 +1,4 @@
-﻿#if UNITY_ANDROID
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -63,5 +61,3 @@ namespace Whisper
         public TimeSpan End { get; set; }
     }
 }
-
-#endif

@@ -61,19 +61,9 @@ MonoBehaviour:
       - rid: 330486282909122563
       - rid: 330486282909122564
       - rid: 330486282909122565
+      - rid: 4702696107970396160
     m_RuntimeSettings:
-      m_List:
-      - rid: 1431971086813102081
-      - rid: 1431971086813102082
-      - rid: 1431971086813102083
-      - rid: 1431971086813102085
-      - rid: 1431971086813102086
-      - rid: 1431971086813102088
-      - rid: 1431971086813102089
-      - rid: 1431971086813102092
-      - rid: 1431971086813102097
-      - rid: 1431971086813102100
-      - rid: 330486282909122564
+      m_List: []
   m_AssetVersion: 8
   m_ObsoleteDefaultVolumeProfile: {fileID: 0}
   m_RenderingLayerNames:
@@ -250,12 +240,6 @@ MonoBehaviour:
         m_AutodeskInteractiveTransparent: {fileID: 4800000, guid: 5c81372d981403744adbdda4433c9c11,
           type: 3}
         m_AutodeskInteractiveMasked: {fileID: 4800000, guid: 80aa867ac363ac043847b06ad71604cd,
-          type: 3}
-        m_TerrainDetailLit: {fileID: 4800000, guid: f6783ab646d374f94b199774402a5144,
-          type: 3}
-        m_TerrainDetailGrassBillboard: {fileID: 4800000, guid: 29868e73b638e48ca99a19ea58c48d90,
-          type: 3}
-        m_TerrainDetailGrass: {fileID: 4800000, guid: e507fdfead5ca47e8b9a768b51c291a1,
           type: 3}
         m_DefaultSpeedTree7Shader: {fileID: 4800000, guid: 0f4122b9a743b744abe2fb6a0a88868b,
           type: 3}
@@ -496,3 +480,8 @@ MonoBehaviour:
         m_ExportShaderVariants: 1
         m_ShaderVariantLogLevel: 0
         m_StripRuntimeDebugShaders: 1
+    - rid: 4702696107970396160
+      type: {class: RenderingDebuggerRuntimeResources, ns: UnityEngine.Rendering,
+        asm: Unity.RenderPipelines.Core.Runtime}
+      data:
+        m_version: 0

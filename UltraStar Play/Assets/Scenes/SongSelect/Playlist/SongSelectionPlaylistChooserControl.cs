@@ -80,7 +80,7 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
         IPlaylist newSelection;
         if (songSelectSceneControl.UsePartyModePlaylist)
         {
-            newSelection = songSelectSceneControl.PartyModeSettings.SongSelectionSettings.SongPoolPlaylist;
+            newSelection = playlistManager.GetPlaylistByName(songSelectSceneControl.PartyModeSettings.SongSelectionSettings.SongPoolPlaylistName, UltraStarAllSongsPlaylist.Instance);
         }
         else
         {

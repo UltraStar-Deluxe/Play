@@ -32,6 +32,9 @@ Shader "UltraStar Play/Background Shader"
         [Header(Animation)]
         [Space]
         _TransitionTime ("Transition Time", Range(0,1)) = 0
+        
+        // _MainTex is not really used. Unity expects this property to set the texture of RawImage component that has been added to the Canvas.
+        [NoScaleOffset][HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
     }
     SubShader
     {

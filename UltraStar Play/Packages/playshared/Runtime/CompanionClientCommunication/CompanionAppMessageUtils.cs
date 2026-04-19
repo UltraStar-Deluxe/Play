@@ -7,7 +7,8 @@ public static class CompanionAppMessageUtils
     {
         try
         {
-            HasMessageType hasMessageType = JsonConverter.FromJson<HasMessageType>(json);
+            // Use UnityEngine.JsonUtility for better performance. There can be hundreds of messages per second such that Newtonsoft.Json is too slow in this case.
+            HasMessageType hasMessageType = JsonUtility.FromJson<HasMessageType>(json);
             if (Enum.TryParse(hasMessageType.MessageType, out messageType))
             {
                 // OK. MessageType is valid.
@@ -27,7 +28,8 @@ public static class CompanionAppMessageUtils
         }
     }
 
-    private class HasMessageType
+    [Serializable] // Serializable is required for UnityEngine.JsonUtility
+    public class HasMessageType
     {
         public string MessageType { get; set; }
     }

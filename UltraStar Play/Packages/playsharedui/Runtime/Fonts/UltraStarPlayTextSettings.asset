@@ -27,9 +27,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 97fef952c6afcd94985aad38dfce85a4, type: 2}
   - {fileID: 11400000, guid: 2a8f0b758debe134493cddb517c457b1, type: 2}
   - {fileID: 11400000, guid: fa68a629f5318214cbd3b3fa9799f29d, type: 2}
-  m_MatchMaterialPreset: 1
+  m_MatchMaterialPreset: 0
   m_MissingCharacterUnicode: 0
   m_ClearDynamicDataOnBuild: 1
+  m_EnableEmojiSupport: 0
+  m_EmojiFallbackTextAssets: []
   m_DefaultSpriteAsset: {fileID: 0}
   m_DefaultSpriteAssetPath: Sprite Assets/
   m_FallbackSpriteAssets: []
@@ -42,5 +44,4 @@ MonoBehaviour:
     m_LeadingCharacters: {fileID: 0}
     m_FollowingCharacters: {fileID: 0}
     m_UseModernHangulLineBreakingRules: 0
-  m_UseModernHangulLineBreakingRules: 0
   m_DisplayWarnings: 1

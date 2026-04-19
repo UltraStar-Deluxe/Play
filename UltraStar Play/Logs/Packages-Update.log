@@ -303,3 +303,15 @@ The following packages were updated:
   com.unity.mobile.android-logcat from version 1.4.4 to 1.4.5
   com.unity.render-pipelines.universal from version 17.0.3 to 17.1.0
   com.unity.test-framework from version 1.4.6 to 1.5.1
+
+=== Sun Nov  9 11:14:50 2025
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.ide.rider from version 3.0.36 to 3.0.38
+  com.unity.ide.visualstudio from version 2.0.23 to 2.0.25
+  com.unity.inputsystem from version 1.14.0 to 1.14.2
+  com.unity.mobile.android-logcat from version 1.4.5 to 1.4.6
+  com.unity.render-pipelines.universal from version 17.1.0 to 17.2.0
