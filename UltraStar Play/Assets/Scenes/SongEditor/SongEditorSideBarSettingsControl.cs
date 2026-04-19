@@ -86,6 +86,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.showAudioWaveformInBackgroundToggle)]
     private Toggle showAudioWaveformInBackgroundToggle;
+    
+    [Inject(UxmlName = R.UxmlNames.showPitchDetectionResultToggle)]
+    private Toggle showPitchDetectionResultToggle;
 
     [Inject(UxmlName = R.UxmlNames.showStatusBarToggle)]
     private Toggle showStatusBarToggle;
@@ -455,6 +458,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(showAudioWaveformInBackgroundToggle,
             () => settings.SongEditorSettings.ShowAudioWaveformInBackground,
             newValue => settings.SongEditorSettings.ShowAudioWaveformInBackground = newValue);
+        Bind(showPitchDetectionResultToggle,
+            () => settings.SongEditorSettings.ShowPitchDetectionResult,
+            newValue => settings.SongEditorSettings.ShowPitchDetectionResult = newValue);
         Bind(showStatusBarToggle,
             () => settings.SongEditorSettings.ShowStatusBar,
             newValue => settings.SongEditorSettings.ShowStatusBar = newValue);

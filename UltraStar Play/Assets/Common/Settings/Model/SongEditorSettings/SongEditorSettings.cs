@@ -41,6 +41,7 @@ public class SongEditorSettings
 
     public bool ShowRightSideBar { get; set; } = true;
     public bool ShowAudioWaveformInBackground { get; set; } = true;
+    public bool ShowPitchDetectionResult { get; set; } = true;
     public bool ShowVideoArea { get; set; } = true;
     public bool ShowStatusBar { get; set; } = true;
     public bool ShowVirtualPianoArea { get; set; }

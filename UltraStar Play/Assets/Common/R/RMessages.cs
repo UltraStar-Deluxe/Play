@@ -603,6 +603,7 @@ public static partial class R
         public static readonly string songEditor_options_labels_time = "songEditor_options_labels_time";
         public static readonly string songEditor_options_labels_title = "songEditor_options_labels_title";
         public static readonly string songEditor_options_layout_showControlHints = "songEditor_options_layout_showControlHints";
+        public static readonly string songEditor_options_layout_showPitchDetectionResult = "songEditor_options_layout_showPitchDetectionResult";
         public static readonly string songEditor_options_layout_showPitchOnNotes = "songEditor_options_layout_showPitchOnNotes";
         public static readonly string songEditor_options_layout_showPreview = "songEditor_options_layout_showPreview";
         public static readonly string songEditor_options_layout_showRightSide = "songEditor_options_layout_showRightSide";

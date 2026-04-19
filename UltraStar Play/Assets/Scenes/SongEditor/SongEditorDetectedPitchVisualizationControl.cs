@@ -56,6 +56,10 @@ public class SongEditorDetectedPitchVisualizationControl : INeedInjection, IInje
 
     public void OnInjectionFinished()
     {
+        settings.SongEditorSettings.ObserveEveryValueChanged(it => it.ShowPitchDetectionResult)
+            .Subscribe(_ => noteAreaDetectedPitch.SetVisibleByDisplay(settings.SongEditorSettings.ShowPitchDetectionResult))
+            .AddTo(gameObject);
+
         songEditorPitchDetectionControl.PitchDetectionFinishedEventStream
             .Subscribe(evt =>
             {
@@ -115,7 +119,8 @@ public class SongEditorDetectedPitchVisualizationControl : INeedInjection, IInje
             || noteAreaControl.MinMillisecondsInViewport == noteAreaControl.MaxMillisecondsInViewport
             || !songAudioPlayer.IsFullyLoaded
             || !SongEditorAudioWaveformUtils.IsSupportedAudioFormat(songMeta, settings)
-            || lastUpdateFrameCount == Time.frameCount)
+            || lastUpdateFrameCount == Time.frameCount
+            || !settings.SongEditorSettings.ShowPitchDetectionResult)
         {
             return;
         }

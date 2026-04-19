@@ -778,6 +778,7 @@ public static partial class R
         public const string showHighscoreButton = "showHighscoreButton";
         public const string showNotePitchLabelToggle = "showNotePitchLabelToggle";
         public const string showOnlyDuetsToggle = "showOnlyDuetsToggle";
+        public const string showPitchDetectionResultToggle = "showPitchDetectionResultToggle";
         public const string showRightSideBarToggle = "showRightSideBarToggle";
         public const string showScrollBarInSongSelectToggle = "showScrollBarInSongSelectToggle";
         public const string showSearchExpressionInfoButton = "showSearchExpressionInfoButton";
