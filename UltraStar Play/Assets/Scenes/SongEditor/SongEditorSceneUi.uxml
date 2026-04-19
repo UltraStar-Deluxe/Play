@@ -30,7 +30,7 @@
                     <ui:VisualElement name="noteAreaSentences" picking-mode="Ignore" style="width: 100%; height: 10px; position: absolute; background-color: rgba(0, 0, 0, 0); bottom: 0;"/>
                     <ui:VisualElement name="noteAreaIssues" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);"/>
                     <ui:VisualElement name="noteAreaSelectionFrame" picking-mode="Ignore" style="background-color: rgba(21, 88, 219, 0.5); position: absolute; display: none;"/>
-                    <ui:VisualElement name="lastNoteAreaSelectionFrame" picking-mode="Ignore" style="background-color: rgba(21, 88, 219, 0.25); position: absolute; display: none; top: 0; height: 4px; width: 218px;"/>
+                    <ui:VisualElement name="lastNoteAreaSelectionFrame" picking-mode="Ignore" style="background-color: rgb(21, 88, 219); position: absolute; display: none; top: 0; width: 218px; height: 100%; opacity: 0.1;"/>
                     <ui:VisualElement name="noteAreaPositionIndicator" picking-mode="Ignore" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute; left: 100px;"/>
                     <ui:VisualElement name="mitPitchIndicatorContainer" picking-mode="Ignore" style="width: 100%; height: 100%;">
                         <MaterialIcon name="micPitchOutOfRangeIndicatorTop" icon="mic" class="errorFontColor" style="position: absolute; top: 5px;"/>
