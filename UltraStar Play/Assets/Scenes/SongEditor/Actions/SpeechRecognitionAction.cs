@@ -37,6 +37,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     [Inject] private SpeechRecognizerProvider speechRecognizerProvider;
 
+    [Inject] private NoteAreaControl noteAreaControl;
+
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
     private TextField speechRecognitionModelPathTextField;
 
@@ -66,13 +68,11 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
             float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, audioClip, minBeat, lengthInBeats);
 
-            await Awaitable.BackgroundThreadAsync();
             SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
                 new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, audioClipFrequency),
                 speechRecognizer)
                 .GetResultAsync();
 
-            await Awaitable.MainThreadAsync();
             SpeechRecognitionResultTextToNotesMapper.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words, selectedNotes, minBeat);
             if (notify)
             {
@@ -167,7 +167,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         }
     }
 
-    public async Awaitable<List<Note>> CreateNotesFromSpeechRecognition(
+    public async void CreateNotesFromSpeechRecognition(
         int startBeat,
         int lengthInBeats,
         ESongEditorSamplesSource speechRecognitionSampleSource,
@@ -177,12 +177,14 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     {
         try
         {
-            return await CreateNotesFromSpeechRecognitionAsync(startBeat,
+            List<Note> notes = await CreateNotesFromSpeechRecognitionAsync(startBeat,
                 lengthInBeats,
                 speechRecognitionSampleSource,
                 spaceBetweenNotesInMillis,
                 notify,
                 speechRecognizerConfig);
+            
+            noteAreaControl.ScrollIntoView(notes);
         }
         catch (Exception ex)
         {
@@ -195,8 +197,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 NotificationManager.CreateNotification(Translation.Get(Translation.Get(R.Messages.job_speechRecognition_errorWithReason,
                     "reason", ex.Message)));
             }
-
-            return new List<Note>();
         }
     }
 

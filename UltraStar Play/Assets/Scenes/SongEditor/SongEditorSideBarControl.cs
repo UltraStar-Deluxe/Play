@@ -273,7 +273,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToSongEditor)));
     }
 
-    private async void DoSpeechRecognition()
+    private void DoSpeechRecognition()
     {
         if (NoteAreaSelectionDragListener.lastSelectionRect.Value == null
             || NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats <= 0)
@@ -282,14 +282,13 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         }
 
         SpeechRecognizerConfig speechRecognizerConfig = speechRecognitionAction.CreateSpeechRecognizerParameters();
-        List<Note> notes = await speechRecognitionAction.CreateNotesFromSpeechRecognition(
+        speechRecognitionAction.CreateNotesFromSpeechRecognition(
             NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
             NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
             settings.SongEditorSettings.SpeechRecognitionSamplesSource,
             150,
             true,
             speechRecognizerConfig);
-        noteAreaControl.ScrollIntoView(notes);
     }
 
     private void UpdateRecordingButton()

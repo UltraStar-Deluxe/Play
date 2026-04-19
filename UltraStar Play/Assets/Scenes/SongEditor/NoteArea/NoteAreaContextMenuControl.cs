@@ -35,6 +35,12 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     private SongEditorCopyPasteManager songEditorCopyPasteManager;
 
     [Inject]
+    private SpeechRecognitionAction speechRecognitionAction;
+
+    [Inject]
+    private Settings settings;
+
+    [Inject]
     private NoteAreaDragControl noteAreaDragControl;
 
     [Inject]
@@ -52,6 +58,7 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
     {
         int beat = (int)noteAreaControl.GetHorizontalMousePositionInBeats();
+        double millis = (int)noteAreaControl.GetHorizontalMousePositionInMillis();
         int midiNote = noteAreaControl.GetVerticalMousePositionInMidiNote();
 
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_fitViewVertically), () => noteAreaControl.FitViewportVerticalToNotes());
@@ -96,6 +103,33 @@ public class NoteAreaContextMenuControl : ContextMenuControl
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setGapKeepNotePosition), () => setMusicGapAction.ExecuteAndNotify(positionInMillis, true));
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyStart), () => setSongPropertyAction.SetMedleyStartAndNotify(positionInMillis));
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyEnd), () => setSongPropertyAction.SetMedleyEndAndNotify(positionInMillis));
+        }
+
+        AddSpeechRecognitionInSelectionButton(contextMenu, millis);
+    }
+
+    private void AddSpeechRecognitionInSelectionButton(ContextMenuPopupControl contextMenu, double clickPositionInMillis)
+    {
+        NoteAreaRect lastSelectionRect = NoteAreaSelectionDragListener.lastSelectionRect.Value;
+        if (lastSelectionRect == null)
+        {
+            return;
+        }
+
+        if (clickPositionInMillis >= lastSelectionRect.MinMillis
+            && clickPositionInMillis <= lastSelectionRect.MaxMillis)
+        {
+            contextMenu.AddSeparator();
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_speechRecognitionInSelection), () =>
+            {
+                speechRecognitionAction.CreateNotesFromSpeechRecognition(
+                    lastSelectionRect.MinBeat,
+                    lastSelectionRect.LengthInBeats,
+                    settings.SongEditorSettings.SpeechRecognitionSamplesSource,
+                    settings.SongEditorSettings.SpaceBetweenNotesInMillis,
+                    true,
+                    speechRecognitionAction.CreateSpeechRecognizerParameters());
+            });
         }
     }
 }
