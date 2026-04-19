@@ -120,6 +120,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly ImportLrcDialogControl importLrcDialogControl = new();
     private readonly SongEditorPositionHistoryNavigationControl positionHistoryNavigationControl = new();
     private readonly EditModeLyricsConverter editModeLyricsConverter = new();
+    private readonly SongEditorPlaybackSampleSourceSwitcher songEditorPlaybackSampleSourceSwitcher = new();
 
     [Inject]
     private SongEditorSceneData sceneData;
@@ -145,6 +146,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(positionHistoryNavigationControl);
         injector.Inject(songEditorPitchDetectionControl);
         injector.Inject(songEditorDetectedPitchVisualizationControl);
+        injector.Inject(songEditorPlaybackSampleSourceSwitcher);
         injector
             .WithRootVisualElement(rightSideBar)
             .CreateAndInject<DragToChangeRightSideBarWidthControl>();
