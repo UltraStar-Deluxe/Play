@@ -57,8 +57,7 @@ public static class UltraStarFormatWriter
             // P1 is optional when only having one voice
             sb.AppendLine(voice.Id.ToString());
         }
-        List<Sentence> sortedSentences = new(voice.Sentences);
-        sortedSentences.Sort(Sentence.comparerByStartBeat);
+        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(voice);
         // Process the last sentence separately. A linebreak should not be appended after the last sentence.
         foreach (Sentence sentence in sortedSentences.SkipLast(1))
         {
@@ -78,8 +77,7 @@ public static class UltraStarFormatWriter
             return;
         }
 
-        List<Note> sortedNotes = new(sentence.Notes);
-        sortedNotes.Sort(Note.comparerByStartBeat);
+        List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(sentence);
         foreach (Note note in sortedNotes)
         {
             AppendNote(sb, note);
