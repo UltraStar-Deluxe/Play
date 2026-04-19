@@ -74,16 +74,19 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
         // Update music volume (instrumental, vocals, songAudioPlayer) when corresponding settings change
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource)
-            .Subscribe(_ => UpdateVolume());
+            .Subscribe(_ => UpdateVolume())
+            .AddTo(gameObject);
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.MusicVolumePercent)
-            .Subscribe(_ => UpdateVolume());
+            .Subscribe(_ => UpdateVolume())
+            .AddTo(gameObject);
 
         songAudioPlayer.PlaybackStartedEventStream
             .Subscribe(_ =>
             {
                 UpdateVolume();
                 UpdateAudioClip();
-            });
+            })
+            .AddTo(gameObject);
     }
 
     private void Update()
