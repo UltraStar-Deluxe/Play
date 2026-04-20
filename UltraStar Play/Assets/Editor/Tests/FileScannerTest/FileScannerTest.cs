@@ -55,6 +55,14 @@ public class FileScannerTest
     }
 
     [Test]
+    public void RecursiveExcludeHiddenFoldersExtraSlashes()
+    {
+        List<string> files = FileScanner.GetFiles($"{Application.dataPath}/Editor/Tests//FileScannerTest//",
+            new FileScannerConfig(txtFilePattern) { ExcludeHiddenFiles = false, ExcludeHiddenFolders = true, Recursive = true });
+        Assert.AreEqual(4, files.Count);
+    }
+
+    [Test]
     public void RecursiveExcludeHiddenFiles()
     {
         List<string> files = FileScanner.GetFiles(folderPath,

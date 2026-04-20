@@ -67,8 +67,12 @@ public static class FileScanner
     private static bool IsInsideHiddenFolder(string filePath, string rootPath)
     {
         // On Unix based operating systems, files and folders that start with a dot are hidden.
-        // Only check for hidden folders that are children of the root path, not the root path itself or its parents.
-        string folderPath = Path.GetDirectoryName(filePath).Substring(rootPath.Length);
+        // Only check for hidden folders that are children of the root path, not the root path
+        // itself or its parents.
+        // We know rootPath is always a prefix of filePath, so it can be cut out with Substring().
+        // We also need to cut out the filename. Path.GetDirectoryName() can not be used here
+        // because it removes duplicate and trailing slashes, changing the string length.
+        string folderPath = filePath.Substring(rootPath.Length, filePath.LastIndexOfAny(new[] { '/', '\\' }) + 1 - rootPath.Length);
         return folderPath.StartsWith(".") || folderPath.Contains("\\.") || folderPath.Contains("/.");
     }
 }
