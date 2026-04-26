@@ -50,7 +50,8 @@
         "Serilog.Sinks.File.dll",
         "System.Text.Encoding.CodePages.dll",
         "Utf8Json.dll",
-        "Microsoft.ML.OnnxRuntime.dll"
+        "Microsoft.ML.OnnxRuntime.dll",
+        "NWaves.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
