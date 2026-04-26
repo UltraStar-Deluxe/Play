@@ -90,6 +90,8 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
             throw new SpeechRecognitionException("No samples for speech recognition");
         }
 
+        SherpaLog.Configure(SherpaLogLevel.Verbose, true, false);
+        
         try
         {
             // Make sure speech recognition module has been loaded.

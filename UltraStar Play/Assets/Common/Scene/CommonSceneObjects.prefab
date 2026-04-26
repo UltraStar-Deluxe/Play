@@ -1089,6 +1089,7 @@ Transform:
   - {fileID: 6169907629867958379}
   - {fileID: 1199472798513005511}
   - {fileID: 6186306770007941945}
+  - {fileID: 7374955789227209409}
   - {fileID: 1963245333797147550}
   - {fileID: 3405312177106734287}
   - {fileID: 1873797141292969039}
@@ -1341,6 +1342,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42d66b27d500e984e870d09e6bf3e2d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1249715087607315014
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7374955789227209409}
+  - component: {fileID: 2620156506303242449}
+  m_Layer: 0
+  m_Name: ForcedAlignmentManager
+  m_TagString: MelodyManiaOnly
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7374955789227209409
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1249715087607315014}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5483831765678408185}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2620156506303242449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1249715087607315014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4756e595382403abe5a16eef9e81ed2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Common::ForcedAlignmentManager
 --- !u!1 &1405519046195825746
 GameObject:
   m_ObjectHideFlags: 0

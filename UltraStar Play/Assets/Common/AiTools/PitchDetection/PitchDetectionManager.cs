@@ -139,8 +139,6 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
             await Awaitable.BackgroundThreadAsync();
 
             RmvpePitchResult rmvpePitchResult = rmvpePitchDetector.DetectPitch(monoAudioSamplesResampled);
-            // TODO: Do not generate wav file when stuff is working as expected.
-            RmvpePitchResultAudioGenerator.GenerateWav(rmvpePitchResult.Estimates, ApplicationUtils.GetPersistentDataPath("RmvpePitchDetectionResult.wav"), lengthInSeconds);
             return ToPitchDetectionResult(rmvpePitchResult);
         }
         finally

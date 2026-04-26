@@ -247,6 +247,9 @@ public static partial class R
         public static readonly string job_convertVocalsAudioWithName = "job_convertVocalsAudioWithName";
         public static readonly string job_createSingAlongDataWithName = "job_createSingAlongDataWithName";
         public static readonly string job_error_alreadyInProgress = "job_error_alreadyInProgress";
+        public static readonly string job_forcedAlignment = "job_forcedAlignment";
+        public static readonly string job_forcedAlignment_errorWithReason = "job_forcedAlignment_errorWithReason";
+        public static readonly string job_forcedAlignmentWithName = "job_forcedAlignmentWithName";
         public static readonly string job_loadSpeechRecognitionModel = "job_loadSpeechRecognitionModel";
         public static readonly string job_pitchDetection = "job_pitchDetection";
         public static readonly string job_pitchDetection_errorWithReason = "job_pitchDetection_errorWithReason";
