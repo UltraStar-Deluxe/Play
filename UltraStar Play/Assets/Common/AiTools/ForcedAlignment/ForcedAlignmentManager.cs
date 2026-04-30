@@ -134,13 +134,26 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
             NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignmentResult = nemoForcedAligner.Run(audioData, lyrics);
 
             Debug.Log($"Forced Alignment finished: {nemoForcedAlignmentResult.Words.Select(w => $"{w.Word}: {w.StartTime:F2} - {w.EndTime:F2}").JoinWith(", ")}");
-            
-            return ToForcedAlignmentResult(nemoForcedAlignmentResult);
+
+            NemoForcedAligner.ForcedAlignmentResult paddedNemoForcedAlignmentResult = ToPaddedNemoForcedAlignmentResult(nemoForcedAlignmentResult, audioData);
+            return ToForcedAlignmentResult(paddedNemoForcedAlignmentResult);
         }
         finally
         {
             forcedAlignmentProcessSemaphore.Release();
         }
+    }
+
+    private static NemoForcedAligner.ForcedAlignmentResult ToPaddedNemoForcedAlignmentResult(
+        NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignmentResult,
+        NemoForcedAligner.AudioData audioData
+    ) {
+        double maxWordLengthForPaddingMs = 500;
+        double paddingMs = 100;
+        double audioDurationSec = (double)audioData.Samples.Length / audioData.ChannelCount / audioData.SampleRate;
+        double audioDurationMs = audioDurationSec * 1000.0;
+        return new WordTimestampPadder(paddingMs, paddingMs, maxWordLengthForPaddingMs, audioDurationMs)
+            .PadTimestamps(nemoForcedAlignmentResult);
     }
 
     private NemoForcedAlignerConfiguration GetNemoForcedAlignerConfiguration(string language)
