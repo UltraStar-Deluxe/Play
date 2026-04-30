@@ -50,6 +50,9 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     private SpeechRecognitionAction speechRecognitionAction;
 
     [Inject]
+    private ForcedAlignmentAction forcedAlignmentAction;
+    
+    [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
 
     [Inject]
@@ -108,6 +111,8 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         contextMenu.AddSeparator();
 
+        contextMenu.AddButton(Translation.Get(R.Messages.job_forcedAlignment), () => _ =
+            forcedAlignmentAction.RunForcedAlignment(selectedNotes, true));
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveToDetectedPitch),
             () => moveNotesToPitchDetectionResultAction.MoveNotesToDetectedPitch(selectedNotes, true));
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_speechRecognitionInSelection),

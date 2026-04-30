@@ -23,10 +23,12 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
 
     [Inject] private ForcedAlignmentManager forcedAlignmentManager;
 
-    public async Awaitable<ForcedAlignmentResult> CreateNotesUsingAi(bool notify)
+    public async Awaitable<ForcedAlignmentResult> RunForcedAlignment(string lyrics, bool notify)
     {
-        ForcedAlignmentResult forcedAlignmentResult =
-            await forcedAlignmentManager.ProcessSongMetaJob(songMeta).GetResultAsync();
+        ForcedAlignmentResult forcedAlignmentResult = await forcedAlignmentManager.ProcessSongMetaJob(
+                songMeta,
+                lyrics)
+            .GetResultAsync();
 
         List<Note> notes = forcedAlignmentResult.Words
             .Select(wordTimestamp =>
@@ -46,15 +48,16 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
             .ToList();
 
         // Remove old notes
-        editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.SpeechRecognition);
-        songEditorLayerManager.ClearEnumLayer(ESongEditorLayer.SpeechRecognition);
+        ESongEditorLayer layerEnum = ESongEditorLayer.ForcedAlignment;
+        editorNoteDisplayer.ClearNotesInLayer(layerEnum);
+        songEditorLayerManager.ClearEnumLayer(layerEnum);
 
         // Add notes to layer
         notes.ForEach(note =>
         {
-            songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, note);
+            songEditorLayerManager.AddNoteToEnumLayer(layerEnum, note);
             note.IsEditable = songEditorLayerManager.IsLayerEditable(
-                songEditorLayerManager.GetEnumLayer(ESongEditorLayer.SpeechRecognition));
+                songEditorLayerManager.GetEnumLayer(layerEnum));
         });
 
         if (notify)
@@ -63,5 +66,11 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
         }
 
         return forcedAlignmentResult;
+    }
+
+    public Awaitable<ForcedAlignmentResult> RunForcedAlignment(List<Note> selectedNotes, bool notify)
+    {
+        // TODO: Implement, do force alignment with note lyrics, then move notes accordingly
+        return null;
     }
 }

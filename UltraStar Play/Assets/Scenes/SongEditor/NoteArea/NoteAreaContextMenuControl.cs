@@ -36,9 +36,6 @@ public class NoteAreaContextMenuControl : ContextMenuControl
 
     [Inject]
     private SpeechRecognitionAction speechRecognitionAction;
-
-    [Inject]
-    private ForcedAlignmentAction forcedAlignmentAction;
     
     [Inject]
     private Settings settings;
@@ -107,9 +104,6 @@ public class NoteAreaContextMenuControl : ContextMenuControl
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyStart), () => setSongPropertyAction.SetMedleyStartAndNotify(positionInMillis));
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyEnd), () => setSongPropertyAction.SetMedleyEndAndNotify(positionInMillis));
         }
-
-        contextMenu.AddSeparator();
-        contextMenu.AddButton(Translation.Get(R.Messages.job_forcedAlignment), () => _ = forcedAlignmentAction.CreateNotesUsingAi(true));
 
         AddSpeechRecognitionInSelectionButton(contextMenu, millis);
     }

@@ -115,6 +115,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         songEditorLayerToParentElement.Add(ESongEditorLayer.Import, noteAreaNotesBackground);
         songEditorLayerToParentElement.Add(ESongEditorLayer.PitchDetection, noteAreaNotesBackground);
         songEditorLayerToParentElement.Add(ESongEditorLayer.SpeechRecognition, noteAreaNotesBackground);
+        songEditorLayerToParentElement.Add(ESongEditorLayer.ForcedAlignment, noteAreaNotesBackground);
 
         UpdateNotesAndSentences();
         noteAreaControl.ViewportEventStream

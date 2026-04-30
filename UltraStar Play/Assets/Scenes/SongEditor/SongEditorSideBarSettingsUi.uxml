@@ -25,6 +25,15 @@
             <ui:Toggle name="speechRecognitionWhenRecordingToggle" label="$songEditor_options_speechRecognitionWhenRecording"/>
             <ui:TextField picking-mode="Ignore" value="A#4" name="micRecordingPitchTextField" is-delayed="true" label="$songEditor_options_defaultPitch" class="smallControl" style="flex-grow: 1; flex-direction: column;"/>
         </SongEditorSideBarGroup>
+        <SongEditorSideBarGroup name="forcedAlignmentGroup" label="$songEditor_options_forcedAlignment_title">
+            <ui:TextField name="forcedAlignmentModelPathTextField" label="$songEditor_options_forcedAlignment_modelPath" placeholder-text="stt_en_conformer_ctc_large" is-delayed="true" class="smallControl" style="flex-direction: column;"/>
+            <ui:Button text="$songEditor_options_forcedAlignment_modelPath_change" display-tooltip-when-elided="true" name="selectModelPathButton"/>
+            <ui:TextField name="forcedAlignmentLyricsTextField" is-delayed="true" multiline="true" label="$songEditor_options_forcedAlignment_lyrics" picking-mode="Position" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column;"/>
+            <ui:SliderInt label="Word Start Padding (ms)" name="forcedAlignmentWordStartPaddingMsSlider" high-value="1000" show-input-field="true" style="flex-direction: column;"/>
+            <ui:SliderInt label="Word End Padding (ms)" name="forcedAlignmentWordEndPaddingMsSlider" high-value="1000" show-input-field="true" style="flex-direction: column;"/>
+            <ui:SliderInt label="Max Length for Padding (ms)" name="forcedAlignmentPaddingMaxWordLengthMsSlider" high-value="1000" show-input-field="true" style="flex-direction: column;"/>
+            <ui:Button text="$songEditor_options_forcedAlignment_perform" name="performForcedAlignmentButton" style="width: 100%; height: auto;"/>
+        </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="speechRecognitionGroup" label="$songEditor_options_speechRecognition_title">
             <ui:EnumField label="$songEditor_options_speechRecognition_language" type="EWhisperLanguage, Common" value="English" name="speechRecognitionLanguageChooser" style="flex-direction: column;"/>
             <ui:TextField name="speechRecognitionModelPathTextField" is-delayed="true" label="$songEditor_options_speechRecognition_modelPath" value="vosk-model-small-en-us-0.15" class="smallControl" style="flex-direction: column;"/>

@@ -45,6 +45,24 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.speechRecognitionPromptTextField)]
     private TextField speechRecognitionPromptTextField;
 
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentModelPathTextField)]
+    private TextField forcedAlignmentModelPathTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentLyricsTextField)]
+    private TextField forcedAlignmentLyricsTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.performForcedAlignmentButton)]
+    private Button performForcedAlignmentButton;
+    
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentWordStartPaddingMsSlider)]
+    private SliderInt forcedAlignmentWordStartPaddingMsSlider;
+
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentWordEndPaddingMsSlider)]
+    private SliderInt forcedAlignmentWordEndPaddingMsSlider;
+    
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentPaddingMaxWordLengthMsSlider)]
+    private SliderInt forcedAlignmentPaddingMaxWordLengthMsSlider;
+    
     [Inject(UxmlName = R.UxmlNames.micDeviceChooser)]
     private Chooser micDeviceChooser;
 
@@ -209,6 +227,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject]
     private HyphenateNotesAction hyphenateNotesAction;
+    
+    [Inject]
+    private ForcedAlignmentAction forcedAlignmentAction;
 
     [Inject]
     private SongMetaChangedEventStream songMetaChangedEventStream;
@@ -434,6 +455,30 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
         audioSeparationButton.RegisterCallbackButtonTriggered(OnAudioSeparationButtonClicked);
 
+        // Forced Alignment
+        Bind(forcedAlignmentModelPathTextField,
+            () => settings.SongEditorSettings.ForcedAlignmentModelPath,
+            newValue => settings.SongEditorSettings.ForcedAlignmentModelPath = newValue);
+        
+        Bind(forcedAlignmentLyricsTextField,
+            () => settings.SongEditorSettings.ForcedAlignmentLyrics,
+            newValue => settings.SongEditorSettings.ForcedAlignmentLyrics = newValue);
+
+        Bind(forcedAlignmentWordStartPaddingMsSlider,
+            () => settings.SongEditorSettings.ForcedAlignmentStartPaddingMs,
+            newValue => settings.SongEditorSettings.ForcedAlignmentStartPaddingMs = newValue);
+        
+        Bind(forcedAlignmentWordEndPaddingMsSlider,
+            () => settings.SongEditorSettings.ForcedAlignmentEndPaddingMs,
+            newValue => settings.SongEditorSettings.ForcedAlignmentEndPaddingMs = newValue);
+        
+        Bind(forcedAlignmentPaddingMaxWordLengthMsSlider,
+            () => settings.SongEditorSettings.ForcedAlignmentPaddingMaxWordLengthMs,
+            newValue => settings.SongEditorSettings.ForcedAlignmentPaddingMaxWordLengthMs = newValue);
+        
+        performForcedAlignmentButton.RegisterCallbackButtonTriggered(_ =>
+            forcedAlignmentAction.RunForcedAlignment(settings.SongEditorSettings.ForcedAlignmentLyrics, true));
+        
         // Lyrics editing separators
         Bind(wordSeparatorTextField,
             () => settings.SongEditorSettings.WordSeparator == SongEditorSettings.DefaultWordSeparator

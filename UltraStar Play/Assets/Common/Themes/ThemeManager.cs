@@ -1192,6 +1192,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             { "Import", Colors.CreateColor("#0F9799")},
             { "PitchDetection", Colors.CreateColor("#ADBBE0", 200)},
             { "SpeechRecognition", Colors.CreateColor("#D4A994", 200)},
+            { "ForcedAlignment", Colors.CreateColor("#94D4CF", 200)},
         };
 
         Dictionary<string, Color32> layerNameToColor = GetCurrentTheme()?.ThemeJson?.songEditorLayerColors;

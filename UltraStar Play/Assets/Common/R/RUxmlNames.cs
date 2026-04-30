@@ -219,6 +219,12 @@ public static partial class R
         public const string firstTeamUi = "firstTeamUi";
         public const string folderImage = "folderImage";
         public const string folderPreviewImage = "folderPreviewImage";
+        public const string forcedAlignmentGroup = "forcedAlignmentGroup";
+        public const string forcedAlignmentLyricsTextField = "forcedAlignmentLyricsTextField";
+        public const string forcedAlignmentModelPathTextField = "forcedAlignmentModelPathTextField";
+        public const string forcedAlignmentPaddingMaxWordLengthMsSlider = "forcedAlignmentPaddingMaxWordLengthMsSlider";
+        public const string forcedAlignmentWordEndPaddingMsSlider = "forcedAlignmentWordEndPaddingMsSlider";
+        public const string forcedAlignmentWordStartPaddingMsSlider = "forcedAlignmentWordStartPaddingMsSlider";
         public const string freeForAllItemToggle = "freeForAllItemToggle";
         public const string fullscreenModeChooser = "fullscreenModeChooser";
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
@@ -578,6 +584,7 @@ public static partial class R
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
         public const string performanceAndEffectsGroup = "performanceAndEffectsGroup";
+        public const string performForcedAlignmentButton = "performForcedAlignmentButton";
         public const string permissionsAccordionItem = "permissionsAccordionItem";
         public const string permissionsContainer = "permissionsContainer";
         public const string phraseBonusScore = "phraseBonusScore";

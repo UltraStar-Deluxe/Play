@@ -4,4 +4,5 @@
     Import = 3,
     PitchDetection = 4,
     SpeechRecognition = 5,
+    ForcedAlignment = 6,
 }

@@ -34,7 +34,7 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
 
     private NemoForcedAligner nemoForcedAligner;
 
-    public Job<ForcedAlignmentResult> ProcessSongMetaJob(SongMeta songMeta)
+    public Job<ForcedAlignmentResult> ProcessSongMetaJob(SongMeta songMeta, string lyrics)
     {
         Job<ForcedAlignmentResult> job = new Job<ForcedAlignmentResult>(
             Translation.Get(R.Messages.job_forcedAlignmentWithName, "name", Path.GetFileName(songMeta.Audio)),
@@ -45,7 +45,7 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
         {
             try
             {
-                return await ProcessSongMetaAsync(songMeta, job.Progress);
+                return await ProcessSongMetaAsync(songMeta, job.Progress, lyrics);
             }
             catch (Exception ex)
             {
@@ -68,8 +68,14 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
 
     private async Awaitable<ForcedAlignmentResult> ProcessSongMetaAsync(
         SongMeta songMeta,
-        JobProgress jobProgress)
+        JobProgress jobProgress,
+        string lyrics)
     {
+        if (lyrics.IsNullOrEmpty())
+        {
+            return new ForcedAlignmentResult();
+        }
+        
         string vocalsAudioUri = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
         if (!FileUtils.Exists(vocalsAudioUri))
         {
@@ -83,14 +89,16 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
 
         ForcedAlignmentResult forcedAlignmentResult = await DoProcessSongMetaAsync(
             songMeta,
-            jobProgress.CancellationTokenSource.Token);
+            jobProgress.CancellationTokenSource.Token,
+            lyrics);
 
         forcedAlignmentFinishedEventStream.OnNext(new ForcedAlignmentFinishedEvent(songMeta, forcedAlignmentResult));
         return forcedAlignmentResult;
     }
 
     private async Awaitable<ForcedAlignmentResult> DoProcessSongMetaAsync(SongMeta songMeta,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string lyrics)
     {
         // Instant fail if already locked (timeout 0)
         if (!await forcedAlignmentProcessSemaphore.WaitAsync(0, cancellationToken))
@@ -128,9 +136,6 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
                 Samples = monoAudioSamplesResampled,
             };
             
-            string lyrics = SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1, true)
-                .Replace("\n", " ");
-            
             NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignmentResult = nemoForcedAligner.Run(audioData, lyrics);
 
             Debug.Log($"Forced Alignment finished: {nemoForcedAlignmentResult.Words.Select(w => $"{w.Word}: {w.StartTime:F2} - {w.EndTime:F2}").JoinWith(", ")}");
@@ -144,21 +149,35 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private static NemoForcedAligner.ForcedAlignmentResult ToPaddedNemoForcedAlignmentResult(
+    private NemoForcedAligner.ForcedAlignmentResult ToPaddedNemoForcedAlignmentResult(
         NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignmentResult,
         NemoForcedAligner.AudioData audioData
     ) {
-        double maxWordLengthForPaddingMs = 500;
-        double paddingMs = 100;
+        double maxWordLengthForPaddingMs = settings.SongEditorSettings.ForcedAlignmentPaddingMaxWordLengthMs;
+        double startPaddingMs = settings.SongEditorSettings.ForcedAlignmentStartPaddingMs;
+        double endPaddingMs = settings.SongEditorSettings.ForcedAlignmentEndPaddingMs;
         double audioDurationSec = (double)audioData.Samples.Length / audioData.ChannelCount / audioData.SampleRate;
         double audioDurationMs = audioDurationSec * 1000.0;
-        return new WordTimestampPadder(paddingMs, paddingMs, maxWordLengthForPaddingMs, audioDurationMs)
+        return new WordTimestampPadder(startPaddingMs, endPaddingMs, maxWordLengthForPaddingMs, audioDurationMs)
             .PadTimestamps(nemoForcedAlignmentResult);
     }
 
     private NemoForcedAlignerConfiguration GetNemoForcedAlignerConfiguration(string language)
     {
-        string modelName = "stt_en_conformer_ctc_large";
+        string modelPath = settings.SongEditorSettings.ForcedAlignmentModelPath.IsNullOrEmpty() ?
+            "stt_en_conformer_ctc_large.onnx"
+            : settings.SongEditorSettings.ForcedAlignmentModelPath;
+        if (!FileUtils.Exists(modelPath))
+        {
+            throw new FileNotFoundException("NeMo Forced Aligner ONNX model not found", modelPath);
+        }
+        
+        string tokensPath = modelPath.Replace(".onnx", ".txt");
+        if (!FileUtils.Exists(tokensPath))
+        {
+            throw new FileNotFoundException("NeMo Forced Aligner tokens file not found", tokensPath);
+        }
+        
         // if (language == "de")
         // {
         //     modelName = "stt_de_conformer_ctc_large.";
@@ -168,9 +187,7 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
         //     modelName = "stt_es_conformer_ctc_large.";
         // }
 
-        return new NemoForcedAlignerConfiguration(
-            ApplicationUtils.GetStreamingAssetsPath($"AiModels/NeMoForcedAligner/{modelName}.onnx"),
-            ApplicationUtils.GetStreamingAssetsPath($"AiModels/NeMoForcedAligner/tokens_{modelName}.txt"));
+        return new NemoForcedAlignerConfiguration(modelPath, tokensPath);
     }
 
     private ForcedAlignmentResult ToForcedAlignmentResult(NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignerResult)

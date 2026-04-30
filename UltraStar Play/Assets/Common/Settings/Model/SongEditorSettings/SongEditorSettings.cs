@@ -68,6 +68,13 @@ public class SongEditorSettings
     // Audio separation
     public string AudioSeparationCommand { get; set; } = "";
 
+    // Forced Alignemnt
+    public string ForcedAlignmentLyrics { get; set; } = "";
+    public string ForcedAlignmentModelPath { get; set; } = "";
+    public int ForcedAlignmentStartPaddingMs { get; set; } = 100;
+    public int ForcedAlignmentEndPaddingMs { get; set; } = 100;
+    public int ForcedAlignmentPaddingMaxWordLengthMs { get; set; } = 500;
+
     // Editing
     public int SpaceBetweenNotesInMillis { get; set; } = SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis;
 
