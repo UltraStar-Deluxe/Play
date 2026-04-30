@@ -3,7 +3,6 @@
 public class ForcedAlignmentResult
 {
     public List<WordTimestamp> Words { get; set; } = new List<WordTimestamp>();
-    public List<TokenTimestamp> Tokens { get; set; } = new List<TokenTimestamp>();
 }
 
 public class TokenTimestamp

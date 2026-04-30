@@ -103,7 +103,7 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
             if (nemoForcedAligner == null)
             {
                 // TODO: Handle different languages
-                NemoForcedAligner.Configuration config = GetNemoForcedAlignerConfiguration("en");
+                NemoForcedAlignerConfiguration config = GetNemoForcedAlignerConfiguration("en");
                 Debug.Log($"Preparing NeMo Forced Aligner (NFA). modelPath: '{config.ModelPath}'");
                 nemoForcedAligner = new NemoForcedAligner(config.ModelPath, config.TokensPath);
             }
@@ -143,19 +143,19 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private NemoForcedAligner.Configuration GetNemoForcedAlignerConfiguration(string language)
+    private NemoForcedAlignerConfiguration GetNemoForcedAlignerConfiguration(string language)
     {
-        string modelName = "stt_en_conformer_ctc_small";
-        if (language == "en")
-        {
-            modelName = "stt_de_conformer_ctc_large";
-        }
-        else if (language == "es")
-        {
-            modelName = "stt_es_conformer_ctc_large";
-        }
+        string modelName = "stt_en_conformer_ctc_large";
+        // if (language == "de")
+        // {
+        //     modelName = "stt_de_conformer_ctc_large.";
+        // }
+        // else if (language == "es")
+        // {
+        //     modelName = "stt_es_conformer_ctc_large.";
+        // }
 
-        return new NemoForcedAligner.Configuration(
+        return new NemoForcedAlignerConfiguration(
             ApplicationUtils.GetStreamingAssetsPath($"AiModels/NeMoForcedAligner/{modelName}.onnx"),
             ApplicationUtils.GetStreamingAssetsPath($"AiModels/NeMoForcedAligner/tokens_{modelName}.txt"));
     }
@@ -164,8 +164,9 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
     {
         return new ForcedAlignmentResult
         {
-            Tokens = nemoForcedAlignerResult.Tokens.Select(token => ToForcedAlignmentTokenResult(token)).ToList(),
-            Words = nemoForcedAlignerResult.Words.Select(word => ToForcedAlignmentWordResult(word)).ToList(),
+            Words = nemoForcedAlignerResult.Words
+                .Where(word => !string.IsNullOrWhiteSpace(word.Word))
+                .Select(word => ToForcedAlignmentWordResult(word)).ToList(),
         };
     }
 
@@ -188,5 +189,17 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
             StartTime = token.StartTime,
             EndTime = token.EndTime,
         };
+    }
+    
+    private class NemoForcedAlignerConfiguration
+    {
+        public string ModelPath { get; set; }
+        public string TokensPath { get; set; }
+
+        public NemoForcedAlignerConfiguration(string modelPath, string tokensPath)
+        {
+            ModelPath = modelPath;
+            TokensPath = tokensPath;
+        }
     }
 }
