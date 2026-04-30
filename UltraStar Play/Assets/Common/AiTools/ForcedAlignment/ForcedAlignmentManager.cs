@@ -164,18 +164,18 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
 
     private NemoForcedAlignerConfiguration GetNemoForcedAlignerConfiguration(string language)
     {
-        string modelPath = settings.SongEditorSettings.ForcedAlignmentModelPath.IsNullOrEmpty() ?
-            "stt_en_conformer_ctc_large.onnx"
-            : settings.SongEditorSettings.ForcedAlignmentModelPath;
+        string modelPath = !settings.SongEditorSettings.ForcedAlignmentModelPath.IsNullOrEmpty()
+            ? settings.SongEditorSettings.ForcedAlignmentModelPath
+            : ApplicationUtils.GetStreamingAssetsPath("AiModels/NemoForcedAligner/stt_en_conformer_ctc_large.onnx");
         if (!FileUtils.Exists(modelPath))
         {
-            throw new FileNotFoundException("NeMo Forced Aligner ONNX model not found", modelPath);
+            throw new FileNotFoundException($"NeMo Forced Aligner ONNX model not found. path: '{modelPath}'", modelPath);
         }
         
         string tokensPath = modelPath.Replace(".onnx", ".txt");
         if (!FileUtils.Exists(tokensPath))
         {
-            throw new FileNotFoundException("NeMo Forced Aligner tokens file not found", tokensPath);
+            throw new FileNotFoundException($"NeMo Forced Aligner tokens file not found. path: '{tokensPath}'", tokensPath);
         }
         
         // if (language == "de")
