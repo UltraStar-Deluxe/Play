@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using BasicPitchRunner;
 using UniInject;
@@ -135,8 +136,10 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
                 SampleRate = NemoForcedAligner.SampleRate,
                 Samples = monoAudioSamplesResampled,
             };
-            
-            NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignmentResult = nemoForcedAligner.Run(audioData, lyrics);
+
+            // Newline is not a word separator in the forced alignment model.
+            string normalizedLyrics = Regex.Replace(lyrics, @"\n", " ");
+            NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignmentResult = nemoForcedAligner.Run(audioData, normalizedLyrics);
 
             Debug.Log($"Forced Alignment finished: {nemoForcedAlignmentResult.Words.Select(w => $"{w.Word}: {w.StartTime:F2} - {w.EndTime:F2}").JoinWith(", ")}");
 
