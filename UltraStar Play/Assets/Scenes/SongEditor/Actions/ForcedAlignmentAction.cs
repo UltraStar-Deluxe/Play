@@ -68,9 +68,66 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
         return forcedAlignmentResult;
     }
 
-    public Awaitable<ForcedAlignmentResult> RunForcedAlignment(List<Note> selectedNotes, bool notify)
+    public async Awaitable<ForcedAlignmentResult> RunForcedAlignment(List<Note> selectedNotes, bool notify)
     {
-        // TODO: Implement, do force alignment with note lyrics, then move notes accordingly
-        return null;
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        List<Note> sortedSelectedNotes = selectedNotes
+            .OrderBy(it => it.StartBeat)
+            .ToList();
+
+        string lyrics = sortedSelectedNotes
+            .Select(it => it.Text.Replace("-", "").Replace("~", "").Trim())
+            .Where(it => !it.IsNullOrEmpty())
+            .JoinWith(" ");
+
+        if (lyrics.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        ForcedAlignmentResult forcedAlignmentResult = await forcedAlignmentManager.ProcessSongMetaJob(
+                songMeta,
+                lyrics)
+            .GetResultAsync();
+
+        if (forcedAlignmentResult == null || forcedAlignmentResult.Words.IsNullOrEmpty())
+        {
+            return forcedAlignmentResult;
+        }
+
+        List<Note> notesWithText = sortedSelectedNotes
+            .Where(it => !it.Text.Replace("-", "").Replace("~", "").Trim().IsNullOrEmpty())
+            .ToList();
+
+        if (forcedAlignmentResult.Words.Count == notesWithText.Count)
+        {
+            for (int i = 0; i < notesWithText.Count; i++)
+            {
+                Note note = notesWithText[i];
+                WordTimestamp wordTimestamp = forcedAlignmentResult.Words[i];
+
+                double startInMillis = wordTimestamp.StartTime * 1000;
+                double endInMillis = wordTimestamp.EndTime * 1000;
+                int startBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, startInMillis);
+                int endBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, endInMillis);
+
+                note.SetStartAndEndBeat(startBeat, endBeat);
+            }
+        }
+        else
+        {
+            Log.Warning(() => $"Forced alignment returned {forcedAlignmentResult.Words.Count} words, but {notesWithText.Count} notes with text were selected.");
+        }
+
+        if (notify)
+        {
+            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
+        }
+
+        return forcedAlignmentResult;
     }
 }
