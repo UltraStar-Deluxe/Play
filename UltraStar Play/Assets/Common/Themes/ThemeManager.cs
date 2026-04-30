@@ -1190,7 +1190,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             { "ButtonRecording", Colors.CreateColor("#138BBA")},
             { "CopyPaste", Colors.CreateColor("#F08080")},
             { "Import", Colors.CreateColor("#0F9799")},
-            { "PitchDetection", Colors.CreateColor("#ADBBE0", 200)},
+            { "PitchDetection", Colors.CreateColor("#FF8033")},
             { "SpeechRecognition", Colors.CreateColor("#D4A994", 200)},
             { "ForcedAlignment", Colors.CreateColor("#94D4CF", 200)},
         };
