@@ -115,8 +115,6 @@ public class EditorNoteContextMenuControl : ContextMenuControl
             forcedAlignmentAction.RunForcedAlignment(selectedNotes, true));
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveToDetectedPitch),
             () => moveNotesToPitchDetectionResultAction.MoveNotesToDetectedPitch(selectedNotes, true));
-        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_speechRecognitionInSelection),
-            () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
     }
 
     private void FillContextMenuToMergeAndAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)

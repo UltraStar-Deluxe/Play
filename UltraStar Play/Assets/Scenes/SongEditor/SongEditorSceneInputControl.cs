@@ -173,10 +173,6 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => MoveSelectedNotesToDetectedPitch());
 
-        InputManager.GetInputAction(R.InputActions.songEditor_speechRecognition).PerformedAsObservable()
-            .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => SetTextOfSelectedNotesToAnalyzedSpeech());
-
         // Change position in song
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
@@ -286,12 +282,6 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, EVoiceId.P1);
         }
         moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes);
-    }
-
-    private void SetTextOfSelectedNotesToAnalyzedSpeech()
-    {
-        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
-        speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true);
     }
 
     private void MoveSelectedNotesToDetectedPitch()

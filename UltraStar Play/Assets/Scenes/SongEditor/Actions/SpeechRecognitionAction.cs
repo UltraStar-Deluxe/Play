@@ -42,49 +42,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
     private TextField speechRecognitionModelPathTextField;
 
-    public async void SetTextToAnalyzedSpeech(List<Note> selectedNotes, ESongEditorSamplesSource samplesSource, bool notify)
-    {
-        if (selectedNotes.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        AudioClip audioClip = await GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
-        if (audioClip == null)
-        {
-            return;
-        }
-
-        int audioClipFrequency = audioClip.frequency;
-        int minBeat = SongMetaUtils.GetMinBeat(selectedNotes);
-        int lengthInBeats = SongMetaUtils.GetLengthInBeats(selectedNotes);
-
-        SpeechRecognizerConfig speechRecognizerConfig = CreateSpeechRecognizerParameters();
-
-        try
-        {
-            SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(speechRecognizerConfig)
-                .GetResultAsync();
-
-            float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, audioClip, minBeat, lengthInBeats);
-
-            SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
-                new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, audioClipFrequency),
-                speechRecognizer)
-                .GetResultAsync();
-
-            SpeechRecognitionResultTextToNotesMapper.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words, selectedNotes, minBeat);
-            if (notify)
-            {
-                songMetaChangedEventStream.OnNext(new LyricsChangedEvent());
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new SpeechRecognitionException("Set text to analyzed speech failed", ex);
-        }
-    }
-
     public async void CreateNotesFromSpeechRecognition(
         float[] monoAudioSamples,
         int startIndex,

@@ -51,8 +51,6 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
         contextMenu.AddSeparator();
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveToDetectedPitch),
             () => moveNotesToPitchDetectionResultAction.MoveNotesToDetectedPitch(sentenceControl.Sentence.Notes.ToList(),true));
-        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_speechRecognitionInSelection),
-            () => speechRecognitionAction.SetTextToAnalyzedSpeech(sentenceControl.Sentence.Notes.ToList(), settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
         contextMenu.AddSeparator();
         contextMenu.AddButton(Translation.Get(R.Messages.action_delete), () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }
