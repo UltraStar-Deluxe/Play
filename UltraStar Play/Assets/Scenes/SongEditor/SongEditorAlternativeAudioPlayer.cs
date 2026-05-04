@@ -28,6 +28,9 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
+    [Inject]
+    private AudioSampleLoader audioSampleLoader;
+
     private readonly HashSet<string> failedAudioClipPaths = new();
 
     private void Start()
@@ -181,7 +184,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             return null;
         }
 
-        AudioClip loadedAudioClip = await AudioManager.LoadAudioClipFromUriAsync(audioClipUri, false);
+        AudioClip loadedAudioClip = await audioSampleLoader.LoadAsAudioClip(audioClipUri);
         if (loadedAudioClip == null)
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_failedToLoadWithName,

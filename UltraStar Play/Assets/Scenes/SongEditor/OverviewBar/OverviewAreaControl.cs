@@ -38,6 +38,9 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private GameObject gameObject;
 
+    [Inject]
+    private AudioSampleLoader audioSampleLoader;
+
     private AudioWaveFormVisualization audioWaveFormVisualization;
     private ContextMenuControl contextMenuControl;
 
@@ -99,7 +102,6 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
     public async void UpdateAudioWaveForm()
     {
         if (!songAudioPlayer.IsFullyLoaded
-            // Must be an audio format. Getting all the samples does not work with video files.
             || !SongEditorAudioWaveformUtils.IsSupportedAudioFormat(songMeta, settings)
             || !VisualElementUtils.HasGeometry(overviewArea))
         {
@@ -120,7 +122,7 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
             audioWaveFormVisualization.WaveformColor = overviewAreaLabel.resolvedStyle.color;
         }
 
-        AudioClip audioClip = await SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
+        AudioClip audioClip = await SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings, audioSampleLoader);
         SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioClip);
     }
 

@@ -20,6 +20,7 @@ public class AudioSampleLoader : AbstractSingletonBehaviour
     {
         if (ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))
         {
+            // To query all audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
             return await AudioManager.LoadAudioClipFromUriAsync(uri, false);
         }
 

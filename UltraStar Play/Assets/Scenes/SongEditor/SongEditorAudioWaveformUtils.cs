@@ -6,14 +6,27 @@ public static class SongEditorAudioWaveformUtils
 {
     public static bool IsSupportedAudioFormat(SongMeta songMeta, Settings settings)
     {
+        return IsSupportedAudioFormat(GetAudioUri(songMeta, GetAudioWaveformSamplesSource(settings)));
+    }
+
+    public static bool IsSupportedAudioFormat(string audioUri)
+    {
+        if (ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(new Uri(audioUri).LocalPath)))
+        {
+            return false;
+        }
+
+        // Melody Mania can handle all common formats since ffmpeg integration.
+        return true;
+
         // Must be an audio format supported by Unity to get all the samples
-        string audioUri = GetAudioUri(songMeta, GetAudioWaveformSamplesSource(settings));
-        return ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(audioUri));
+        // return ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(audioUri));
     }
     
     public static async Awaitable<AudioClip> GetAudioClipToDrawAudioWaveform(
         SongMeta songMeta,
-        Settings settings)
+        Settings settings,
+        AudioSampleLoader audioSampleLoader)
     {
         // using IDisposable d = new DisposableStopwatch($"Get audio clip to draw audio wave form");
 
@@ -31,21 +44,12 @@ public static class SongEditorAudioWaveformUtils
             return null;
         }
 
-        string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
-        if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
+        if (!IsSupportedAudioFormat(audioUri))
         {
-            // Cannot draw audio wave form of MIDI file.
             return null;
         }
 
-        if (!ApplicationUtils.IsUnitySupportedAudioFormat(fileExtension))
-        {
-            // Cannot load this format using Unity API.
-            return null;
-        }
-
-        // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-        AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(audioUri, false);
+        AudioClip audioClip = await audioSampleLoader.LoadAsAudioClip(audioUri);
         return audioClip;
     }
 
