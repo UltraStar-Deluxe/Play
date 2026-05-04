@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using UniInject;
 using UnityEngine;
@@ -17,12 +16,13 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
 {
     private const int ParakeetV3ExpectedSampleRate = 16000;
 
-    public static SpeechRecognitionManager Instance =>
-        DontDestroyOnLoadManager.FindComponentOrThrow<SpeechRecognitionManager>();
+    public static SpeechRecognitionManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<SpeechRecognitionManager>();
 
-    [Inject] private Settings settings;
+    [Inject]
+    private Settings settings;
 
-    [InjectedInInspector] public OfflineSpeechRecognizerComponent offlineRecognizer;
+    [InjectedInInspector]
+    public OfflineSpeechRecognizerComponent offlineRecognizer;
 
     private readonly SemaphoreSlim speechRecognitionProcessSemaphore = new(1, 1);
     public bool IsSpeechRecognitionRunning => speechRecognitionProcessSemaphore.CurrentCount > 0;
@@ -51,16 +51,14 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
         }
     }
 
-    public Job<SpeechRecognitionResult> ProcessSongMetaJob(
-        SpeechRecognitionInputSamples samples,
-        SpeechRecognizer speechRecognizer)
+    public Job<SpeechRecognitionResult> ProcessSongMetaJob(SpeechRecognitionInputSamples samples)
     {
         double lengthInMillis = ((double)(samples.EndIndex - samples.StartIndex) / samples.SampleRate) * 1000.0;
 
         Job<SpeechRecognitionResult> job = new(Translation.Get(R.Messages.job_speechRecognition),
             new CancellationTokenSource());
         JobManager.Instance.AddJob(job);
-        job.SetAwaitable(() => ProcessSongMetaAsync(samples, speechRecognizer, job.Progress));
+        job.SetAwaitable(() => ProcessSongMetaAsync(samples, job.Progress));
         job.Progress.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis);
 
         return job;
@@ -68,7 +66,6 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
 
     private async Awaitable<SpeechRecognitionResult> ProcessSongMetaAsync(
         SpeechRecognitionInputSamples samples,
-        SpeechRecognizer speechRecognizer,
         JobProgress jobProgress)
     {
         // Instant fail if already locked (timeout 0)
@@ -103,12 +100,6 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
             }
             
             Stopwatch stopwatch = Stopwatch.StartNew();
-
-            // TODO: Clean up speech recognition code. Remove code for Whisper integration.
-            // SpeechRecognitionResult speechRecognitionResult = await speechRecognizer.GetSpeechRecognitionResultAsync(
-            //     samples,
-            //     jobProgress.CancellationTokenSource.Token,
-            //     progressInPercent => jobProgress.EstimatedCurrentProgressInPercent = progressInPercent);
 
             float[] monoSamplesExcerpt = new float[samples.EndIndex - samples.StartIndex];
             for (int i = 0; i < monoSamplesExcerpt.Length; i++)

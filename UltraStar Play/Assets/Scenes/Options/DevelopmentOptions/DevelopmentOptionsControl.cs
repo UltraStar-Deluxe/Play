@@ -111,9 +111,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.audioSeparationCommandTextField)]
     private TextField audioSeparationCommandTextField;
 
-    [Inject(UxmlName = R.UxmlNames.basicPitchCommandTextField)]
-    private TextField basicPitchCommandTextField;
-
     [Inject(UxmlName = R.UxmlNames.clientDiscoveryPortTextField)]
     private IntegerField clientDiscoveryPortTextField;
 
@@ -336,12 +333,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(audioSeparationCommandTextField,
             () => settings.SongEditorSettings.AudioSeparationCommand,
             newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
-
-        // Basic Pitch command (pitch detection)
-        basicPitchCommandTextField.DisableParseEscapeSequences();
-        FieldBindingUtils.Bind(basicPitchCommandTextField,
-            () => settings.SongEditorSettings.BasicPitchCommand,
-            newValue => settings.SongEditorSettings.BasicPitchCommand = newValue);
 
         // Network config
         FieldBindingUtils.Bind(clientDiscoveryPortTextField,

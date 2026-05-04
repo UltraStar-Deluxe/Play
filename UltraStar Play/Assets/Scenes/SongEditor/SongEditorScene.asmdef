@@ -14,7 +14,6 @@
         "playshared",
         "playsharedui",
         "UnityStandaloneFileBrowser",
-        "com.whisper.unity",
         "Eitan.SherpaONNXUnity"
     ],
     "includePlatforms": [],

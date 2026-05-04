@@ -127,8 +127,7 @@ public class NoteAreaContextMenuControl : ContextMenuControl
                     lastSelectionRect.LengthInBeats,
                     settings.SongEditorSettings.SpeechRecognitionSamplesSource,
                     settings.SongEditorSettings.SpaceBetweenNotesInMillis,
-                    true,
-                    speechRecognitionAction.CreateSpeechRecognizerParameters());
+                    true);
             });
         }
     }

@@ -23,6 +23,7 @@ public static partial class R
         public const string addToSongQueueAsNewLabel = "addToSongQueueAsNewLabel";
         public const string adjustFollowingNotesToggle = "adjustFollowingNotesToggle";
         public const string advancedSearchAccordionItem = "advancedSearchAccordionItem";
+        public const string aiPitchDetectionButton = "aiPitchDetectionButton";
         public const string allCharactersContainer = "allCharactersContainer";
         public const string amplificationChooser = "amplificationChooser";
         public const string analyzeBeatsWithoutTargetNoteToggle = "analyzeBeatsWithoutTargetNoteToggle";
@@ -51,7 +52,6 @@ public static partial class R
         public const string backgroundMusicVolumeChooser = "backgroundMusicVolumeChooser";
         public const string backIcon = "backIcon";
         public const string banner = "banner";
-        public const string basicPitchCommandTextField = "basicPitchCommandTextField";
         public const string beatAnalyzedEventNetworkDeliveryChooser = "beatAnalyzedEventNetworkDeliveryChooser";
         public const string bestMatchnigTrackAndChannelLabel = "bestMatchnigTrackAndChannelLabel";
         public const string blackBackground = "blackBackground";
@@ -591,7 +591,6 @@ public static partial class R
         public const string pitchDetectionAlgorithmChooser = "pitchDetectionAlgorithmChooser";
         public const string pitchDetectionAudioChooser = "pitchDetectionAudioChooser";
         public const string pitchDetectionGroup = "pitchDetectionGroup";
-        public const string pitchDetectionUsingBasicPitchButton = "pitchDetectionUsingBasicPitchButton";
         public const string pitchIndicator = "pitchIndicator";
         public const string pitchIndicatorIcon = "pitchIndicatorIcon";
         public const string pitchLabel = "pitchLabel";
@@ -892,10 +891,6 @@ public static partial class R
         public const string spacer = "spacer";
         public const string speechRecognitionAudioChooser = "speechRecognitionAudioChooser";
         public const string speechRecognitionGroup = "speechRecognitionGroup";
-        public const string speechRecognitionLanguageChooser = "speechRecognitionLanguageChooser";
-        public const string speechRecognitionModelPathTextField = "speechRecognitionModelPathTextField";
-        public const string speechRecognitionPhrasesTextField = "speechRecognitionPhrasesTextField";
-        public const string speechRecognitionPromptTextField = "speechRecognitionPromptTextField";
         public const string speechRecognitionWhenRecordingToggle = "speechRecognitionWhenRecordingToggle";
         public const string splitSyllablesAfterSpeechRecognitionToggle = "splitSyllablesAfterSpeechRecognitionToggle";
         public const string splitSyllablesInSelectionButton = "splitSyllablesInSelectionButton";

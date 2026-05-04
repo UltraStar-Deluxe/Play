@@ -18,7 +18,6 @@
         "AndroidRuntimePermissions.Runtime",
         "UnityStandaloneFileBrowser",
         "Vuplex.WebView",
-        "com.whisper.unity",
         "Eitan.SherpaONNXUnity"
     ],
     "includePlatforms": [],

@@ -18,8 +18,6 @@ public class MainGameDependencyDownloader(
 
         DownloadCSharpSynthForUnity();
         DownloadUnityStandaloneFileBrowser();
-
-        await DownloadSpleeterMsvcExeAsync();
     }
 
     private void DownloadCSharpSynthForUnity()
@@ -46,33 +44,6 @@ public class MainGameDependencyDownloader(
         };
 
         downloader.Download();
-    }
-
-    private async Task DownloadSpleeterMsvcExeAsync()
-    {
-        var targetDir = unityProjectDir / "Assets" / "StreamingAssets" / "SpleeterMsvcExe";
-        Console.WriteLine($"Downloading SpleeterMsvcExe: TargetDir='{targetDir}'");
-
-        DirectoryUtils.DeleteDirectory(targetDir);
-        DirectoryUtils.CreateDirectory(targetDir);
-        var zipFile = targetDir / "SpleeterMsvcExe.zip";
-
-        using (var client = new HttpClient())
-        {
-            using (var response = await client.GetAsync("https://github.com/achimmihca/SpleeterMsvcExe/releases/download/v1.0/SpleeterMsvcExe-v1.0-2stems-only.zip"))
-            {
-                response.EnsureSuccessStatusCode();
-                await using (var fileStream = File.Create(zipFile))
-                {
-                    await response.Content.CopyToAsync(fileStream);
-                }
-            }
-        }
-
-        ZipFile.ExtractToDirectory(zipFile, targetDir);
-        File.Delete(zipFile);
-
-        Console.WriteLine("Downloading SpleeterMsvcExe done");
     }
 
     private void DownloadUnityStandaloneFileBrowser()

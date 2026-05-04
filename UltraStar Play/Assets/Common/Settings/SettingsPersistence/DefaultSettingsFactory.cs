@@ -79,13 +79,6 @@ public static class DefaultSettingsFactory
                 .Subscribe(_ => FillSettingsFromSteamManager(defaultSettings, steamManager));
         }
 
-        // Set speech recognition model
-        if (PlatformUtils.IsStandalone)
-        {
-            defaultSettings.SongEditorSettings.SpeechRecognitionModelPath =
-                ApplicationUtils.GetStreamingAssetsPath("SpeechRecognitionModels/WhisperModels/ggml-tiny.bin");
-        }
-
         try
         {
             // Disable AVPro on SteamDeck (e.g. when running Windows version via compatibility layer)

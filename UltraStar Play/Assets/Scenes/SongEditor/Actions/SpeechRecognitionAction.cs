@@ -35,12 +35,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     [Inject] private JobManager jobManager;
 
-    [Inject] private SpeechRecognizerProvider speechRecognizerProvider;
-
     [Inject] private NoteAreaControl noteAreaControl;
-
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
-    private TextField speechRecognitionModelPathTextField;
 
     public async void CreateNotesFromSpeechRecognition(
         float[] monoAudioSamples,
@@ -49,7 +44,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int sampleRate,
         int spaceBetweenNotesInMillis,
         bool notify,
-        SpeechRecognizerConfig speechRecognizerConfig,
         int offsetInBeats)
     {
         await CreateNotesFromSpeechRecognitionAsync(
@@ -59,7 +53,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             sampleRate,
             spaceBetweenNotesInMillis,
             notify,
-            speechRecognizerConfig,
             offsetInBeats);
     }
 
@@ -70,7 +63,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int sampleRate,
         int spaceBetweenNotesInMillis,
         bool notify,
-        SpeechRecognizerConfig speechRecognizerConfig,
         int offsetInBeats)
     {
         int lengthInSamples = endIndex - startIndex;
@@ -89,7 +81,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             List<Note> createdNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
                     new CreateNotesFromSpeechRecognitionConfig
                     {
-                        SpeechRecognizerConfig = speechRecognizerConfig,
                         InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, startIndex, endIndex, sampleRate),
                         MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                         SongMeta = songMeta,
@@ -129,8 +120,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int lengthInBeats,
         ESongEditorSamplesSource speechRecognitionSampleSource,
         int spaceBetweenNotesInMillis,
-        bool notify,
-        SpeechRecognizerConfig speechRecognizerConfig)
+        bool notify)
     {
         try
         {
@@ -138,8 +128,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 lengthInBeats,
                 speechRecognitionSampleSource,
                 spaceBetweenNotesInMillis,
-                notify,
-                speechRecognizerConfig);
+                notify);
             
             noteAreaControl.ScrollIntoView(notes);
         }
@@ -162,8 +151,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int lengthInBeats,
         ESongEditorSamplesSource speechRecognitionSampleSource,
         int spaceBetweenNotesInMillis,
-        bool notify,
-        SpeechRecognizerConfig speechRecognizerConfig)
+        bool notify)
     {
         AudioClip audioClip = await GetAudioClip(speechRecognitionSampleSource);
         if (audioClip == null
@@ -191,7 +179,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         List<Note> createdNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
                 new CreateNotesFromSpeechRecognitionConfig
                 {
-                    SpeechRecognizerConfig = speechRecognizerConfig,
                     InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, audioClip.frequency),
                     MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                     SongMeta = songMeta,
@@ -218,13 +205,5 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         }
 
         return createdNotes;
-    }
-
-    public SpeechRecognizerConfig CreateSpeechRecognizerParameters()
-    {
-        return new SpeechRecognizerConfig(
-            SettingsUtils.GetSpeechRecognitionModelPath(settings),
-            SettingsUtils.GetSpeechRecognitionLanguage(settings),
-            settings.SongEditorSettings.SpeechRecognitionPrompt);
     }
 }

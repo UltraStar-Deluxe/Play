@@ -15,7 +15,7 @@
                 <MaterialIcon name="icon" icon="call_split"/>
                 <ui:Label text="$songEditor_sideBar_splitAudio" display-tooltip-when-elided="true" name="label"/>
             </ui:Button>
-            <ui:Button display-tooltip-when-elided="true" name="pitchDetectionUsingBasicPitchButton">
+            <ui:Button display-tooltip-when-elided="true" name="aiPitchDetectionButton">
                 <MaterialIcon name="icon" icon="timeline"/>
                 <ui:Label text="$songEditor_sideBar_analyzePitch" display-tooltip-when-elided="true" name="label"/>
             </ui:Button>

@@ -22,8 +22,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.doPitchDetectionInSelectionButton)]
     private Button doPitchDetectionInSelectionButton;
 
-    [Inject(UxmlName = R.UxmlNames.pitchDetectionUsingBasicPitchButton)]
-    private Button pitchDetectionUsingBasicPitchButton;
+    [Inject(UxmlName = R.UxmlNames.aiPitchDetectionButton)]
+    private Button aiPitchDetectionButton;
 
     [Inject(UxmlName = R.UxmlNames.doSpeechRecognitionButton)]
     private Button doSpeechRecognitionButton;
@@ -167,7 +167,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         });
         UpdateRecordingButton();
 
-        pitchDetectionUsingBasicPitchButton.RegisterCallbackButtonTriggered(_ => AnalyzePitchUsingBasicPitch());
+        aiPitchDetectionButton.RegisterCallbackButtonTriggered(_ => AnalyzePitchUsingAi());
         doSpeechRecognitionButton.RegisterCallbackButtonTriggered(_ => DoSpeechRecognition());
 
         undoButton.RegisterCallbackButtonTriggered(_ => historyManager.Undo());
@@ -214,7 +214,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         InitTabGroup();
     }
 
-    private async void AnalyzePitchUsingBasicPitch()
+    private async void AnalyzePitchUsingAi()
     {
         if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
         {
@@ -281,14 +281,12 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             return;
         }
 
-        SpeechRecognizerConfig speechRecognizerConfig = speechRecognitionAction.CreateSpeechRecognizerParameters();
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
             NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
             NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
             settings.SongEditorSettings.SpeechRecognitionSamplesSource,
             150,
-            true,
-            speechRecognizerConfig);
+            true);
     }
 
     private void UpdateRecordingButton()

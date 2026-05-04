@@ -35,11 +35,6 @@
             <ui:Button text="$songEditor_options_forcedAlignment_perform" name="performForcedAlignmentButton" style="width: 100%; height: auto;"/>
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="speechRecognitionGroup" label="$songEditor_options_speechRecognition_title">
-            <ui:EnumField label="$songEditor_options_speechRecognition_language" type="EWhisperLanguage, Common" value="English" name="speechRecognitionLanguageChooser" style="flex-direction: column;"/>
-            <ui:TextField name="speechRecognitionModelPathTextField" is-delayed="true" label="$songEditor_options_speechRecognition_modelPath" value="vosk-model-small-en-us-0.15" class="smallControl" style="flex-direction: column;"/>
-            <ui:Button text="$songEditor_options_speechRecognition_modelPath_change" display-tooltip-when-elided="true" name="selectModelPathButton"/>
-            <ui:TextField name="speechRecognitionPromptTextField" is-delayed="true" multiline="true" label="$songEditor_options_speechRecognition_prompt" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column;"/>
-            <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" label="$songEditor_options_speechRecognition_phrases" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column; display: none;"/>
             <Chooser name="speechRecognitionAudioChooser" no-previous-button="true" wrapAround="true" label="$songEditor_options_speechRecognition_audio" class="controlWithLabelVertical"/>
             <ui:Button text="$songEditor_options_speechRecognition_perform" display-tooltip-when-elided="true" name="doSpeechRecognitionButton" style="width: 100%; height: auto;"/>
             <ui:Toggle name="splitSyllablesAfterSpeechRecognitionToggle" label="$songEditor_options_speechRecognition_splitSyllablesAfterwards"/>

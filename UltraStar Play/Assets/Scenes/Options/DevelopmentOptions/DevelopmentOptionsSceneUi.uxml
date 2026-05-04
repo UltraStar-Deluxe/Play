@@ -80,7 +80,6 @@
             </AccordionItem>
             <AccordionItem name="externalToolsGroup" label="External Tools" class="child-mb-3">
                 <ui:TextField name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" value="python -m spleeter" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;"/>
-                <ui:TextField name="basicPitchCommandTextField" is-delayed="true" label="Basic Pitch Command&#10;(pitch detection)" value="python -m spleeter" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;"/>
             </AccordionItem>
             <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);"/>
             <ui:Label tabindex="-1" text="¹ requires restart" display-tooltip-when-elided="true" name="requiresRestartLabel" class="noBackgroundInHierarchy"/>

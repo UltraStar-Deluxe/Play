@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using BasicPitchRunner;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -28,6 +26,9 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
 
     [Inject]
     private SongMetaManager songMetaManager;
+
+    [Inject]
+    private AudioSampleLoader audioSampleLoader;
 
     private readonly Subject<PitchDetectionFinishedEvent> pitchDetectionFinishedEventStream = new();
     public Subject<PitchDetectionFinishedEvent> PitchDetectionFinishedEventStream => pitchDetectionFinishedEventStream;
@@ -75,41 +76,21 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         {
             throw new PitchDetectionException($"Vocals audio for '{Path.GetFileName(songMeta.Audio)}' does not exist at path '{vocalsAudioUri}'");
         }
-        if (!ApplicationUtils.IsSupportedBasicPitchDetectionAudioFormat(Path.GetExtension(vocalsAudioUri)))
-        {
-            throw new PitchDetectionException(
-                $"Pitch Detection using Basic Pitch not supported for this audio file. Requires one of {ApplicationUtils.supportedBasicPitchDetectionAudioFiles.JoinWith(", ")}");
-        }
-
-        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
 
         // Estimate duration
         AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(vocalsAudioUri);
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
         jobProgress.EstimatedCurrentProgressInPercent = (int)Math.Ceiling(lengthInMillis / 3.0);
 
-        // Set path to Basic Pitch executable if needed
-        string fallbackPitchDetectionCommand = PlatformUtils.IsWindows
-            ? $"\"{ApplicationUtils.GetStreamingAssetsPath("BasicPitchExe/basic_pitch_exe.exe").Replace("/", "\\")}\" --onset_threshold 0.3 --frame_threshold 0.3"
-            : "";
-
-        await Awaitable.BackgroundThreadAsync();
         PitchDetectionResult pitchDetectionResult = await DoProcessSongMetaAsync(
             songMeta,
-            generatedSongFolderAbsolutePath,
-            jobProgress.CancellationTokenSource.Token,
-            fallbackPitchDetectionCommand);
-
-        await Awaitable.MainThreadAsync();
-
+            jobProgress.CancellationTokenSource.Token);
+        
         pitchDetectionFinishedEventStream.OnNext(new PitchDetectionFinishedEvent(songMeta, pitchDetectionResult));
         return pitchDetectionResult;
     }
 
-    private async Awaitable<PitchDetectionResult> DoProcessSongMetaAsync(SongMeta songMeta,
-        string generatedSongFolderAbsolutePath,
-        CancellationToken cancellationToken,
-        string fallbackCommand)
+    private async Awaitable<PitchDetectionResult> DoProcessSongMetaAsync(SongMeta songMeta, CancellationToken cancellationToken)
     {
         // Instant fail if already locked (timeout 0)
         if (!await pitchDetectionProcessSemaphore.WaitAsync(0, cancellationToken))
@@ -126,19 +107,18 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
                 rmvpePitchDetector = new RmvpePitchDetector(modelPath);
             }
 
-            Debug.Log($"Running RMVPE pitch detection on vocals audio. path: '{songMeta.VocalsAudio}'");
-            // TODO: AudioClip API can only be done on the main thread. Use a more flexible library to load the audio samples from file.
-            await Awaitable.MainThreadAsync();
             string audioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
-            Debug.Log($"Loading audio samples for pitch detection on main thread. path: '{songMeta.VocalsAudio}'");
-            AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(audioFilePath, false);
+            Debug.Log($"Loading audio samples for pitch detection on main thread. path: '{audioFilePath}'");
+            AudioClip audioClip = await audioSampleLoader.LoadAsAudioClip(audioFilePath);
             float lengthInSeconds = audioClip.length;
             float[] monoAudioSamples = AudioSampleUtils.GetAudioSamples(audioClip, 0, lengthInSeconds * 1000, true);
             float[] monoAudioSamplesResampled = AudioSampleUtils.Resample(monoAudioSamples, audioClip.frequency, RmvpePitchDetector.ExpectedSampleRate);
             Debug.Log("Resampled mono audio samples for pitch detection: " + monoAudioSamplesResampled.Length);
-            await Awaitable.BackgroundThreadAsync();
 
+            Debug.Log($"Running RMVPE pitch detection on vocals audio. path: '{songMeta.VocalsAudio}'");
+            await Awaitable.BackgroundThreadAsync();
             RmvpePitchResult rmvpePitchResult = rmvpePitchDetector.DetectPitch(monoAudioSamplesResampled);
+            await Awaitable.MainThreadAsync();
             return ToPitchDetectionResult(rmvpePitchResult);
         }
         finally
@@ -171,11 +151,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
             if (currentNote != null && currentNote.MidiNote == midiNote)
             {
                 // Update length of current note.
-                // We assume estimates are sorted by time.
                 currentNote.LengthInMillis = timeInMillis - currentNote.StartInMillis;
-                // Also update confidence as average? Or keep max? 
-                // Let's just keep the initial or update if we have multiple.
-                // For now, let's just keep it simple.
             }
             else
             {
@@ -213,66 +189,5 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         {
             Notes = notes,
         };
-    }
-
-    private bool TryMoveFilesOfBasicPitchResult(
-        SongMeta songMeta,
-        string generatedSongFolderAbsolutePath,
-        BasicPitchResult basicPitchResult,
-        out string midiFilePath)
-    {
-        if (basicPitchResult.ExitCode != 0
-            || !basicPitchResult.Errors.IsNullOrEmpty())
-        {
-            throw new PitchDetectionException($"Basic Pitch terminated with exit code {basicPitchResult.ExitCode}. Output:\n{basicPitchResult.Output}");
-        }
-
-        if (basicPitchResult.WrittenFiles.IsNullOrEmpty())
-        {
-            throw new PitchDetectionException($"BasicPitchResult.WrittenFiles is empty. Output:\n{basicPitchResult.Output}");
-        }
-
-        // Prepare directory to move created audio files.
-        string destinationFolder = DirectoryUtils.IsSubDirectory(SongMetaUtils.GetDirectoryPath(songMeta), generatedSongFolderAbsolutePath)
-            ? SongMetaUtils.GetDirectoryPath(songMeta)
-            : ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, SongMetaUtils.GetDirectoryPath(songMeta));
-        if (!destinationFolder.IsNullOrEmpty()
-            && !Directory.Exists(destinationFolder))
-        {
-            Directory.CreateDirectory(destinationFolder);
-        }
-
-        // Check voice audio
-        string writtenMidiFilePath = basicPitchResult.WrittenFiles
-            .FirstOrDefault(filePath => Path.GetFileName(filePath).EndsWith(".mid"));
-        if (!writtenMidiFilePath.IsNullOrEmpty()
-            && File.Exists(writtenMidiFilePath))
-        {
-            Debug.Log("MIDI file written to: " + writtenMidiFilePath);
-
-            string destinationMidiFilePath = destinationFolder + $"/{Path.GetFileNameWithoutExtension(writtenMidiFilePath)}.mid";
-            Debug.Log("Moving MIDI file to: " + destinationMidiFilePath);
-            FileUtils.MoveFileOverwriteIfExists(writtenMidiFilePath, destinationMidiFilePath);
-            midiFilePath = destinationMidiFilePath;
-            return true;
-        }
-        else
-        {
-            Debug.LogError($"MIDI file of Basic Pitch not found. Written files: {basicPitchResult.WrittenFiles.JoinWith(", ")}");
-            midiFilePath = "";
-            return false;
-        }
-    }
-
-    private string GetBasicPitchCommand(string fallbackCommand)
-    {
-        return !settings.SongEditorSettings.BasicPitchCommand.IsNullOrEmpty()
-            ? settings.SongEditorSettings.BasicPitchCommand
-            : fallbackCommand;
-    }
-
-    private Action<string> GetBasicPitchLogAction()
-    {
-        return message => Debug.Log($"BasicPitchRunner: {message}");
     }
 }

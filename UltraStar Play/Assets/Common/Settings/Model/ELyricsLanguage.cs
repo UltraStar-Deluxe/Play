@@ -1,7 +1,5 @@
-﻿public enum EWhisperLanguage
+﻿public enum ELyricsLanguage
 {
-    // See https://help.openai.com/en/articles/7031512-whisper-api-faq
-    // "What languages are supported?"
     Afrikaans,
     Arabic,
     Armenian,

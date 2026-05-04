@@ -25,8 +25,7 @@ public class SongEditorSettings
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
     public string ButtonRecordingLyrics { get; set; } = "";
     public bool SpeechRecognitionWhenRecording { get; set; } = true;
-    public string SpeechRecognitionLanguage { get; set; } = EWhisperLanguage.English.ToString().ToLowerInvariant();
-    public string SpeechRecognitionPrompt { get; set; } = "";
+    public string LyricsLanguage { get; set; } = ELyricsLanguage.English.ToString().ToLowerInvariant();
 
     public bool AdjustFollowingNotes { get; set; }
 
@@ -55,15 +54,12 @@ public class SongEditorSettings
     public float SentenceLineSizeInPx { get; set; } = 2;
 
     // Speech recognition
-    public string SpeechRecognitionModelPath { get; set; } = "";
-    public string SpeechRecognitionPhrases { get; set; } = "";
     public ESongEditorSamplesSource SpeechRecognitionSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
     public bool SplitSyllablesAfterSpeechRecognition { get; set; } = true;
 
     // Pitch detection
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;
     public ESongEditorSamplesSource PitchDetectionSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
-    public string BasicPitchCommand { get; set; } = "";
 
     // Audio separation
     public string AudioSeparationCommand { get; set; } = "";

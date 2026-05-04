@@ -112,12 +112,6 @@ public class CreateSingAlongSongControl : INeedInjection
         Job<VoidEvent> speechRecognitionJob = new(Translation.Of("Speech recognition"));
         speechRecognitionJob.SetAwaitable(async () =>
         {
-            // Load speech recognition model
-            SpeechRecognizerConfig speechRecognizerConfig = new(
-                SettingsUtils.GetSpeechRecognitionModelPath(settings),
-                SettingsUtils.GetSpeechRecognitionLanguage(settings),
-                settings.SongEditorSettings.SpeechRecognitionPrompt);
-
             // Load vocals audio
             AudioClip vocalsAudioClip = await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
             int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * SongMetaBpmUtils.BeatsPerSecond(songMeta));
@@ -127,7 +121,6 @@ public class CreateSingAlongSongControl : INeedInjection
             pipelineData.CreatedNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
                 new CreateNotesFromSpeechRecognitionConfig
                 {
-                    SpeechRecognizerConfig = speechRecognizerConfig,
                     InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, vocalsAudioClip.frequency),
                     MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                     SongMeta = songMeta,

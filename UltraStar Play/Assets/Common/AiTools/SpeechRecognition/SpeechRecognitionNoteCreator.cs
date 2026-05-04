@@ -11,9 +11,6 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
     private SpeechRecognitionManager speechRecognitionManager;
 
     [Inject]
-    private SpeechRecognizerProvider speechRecognizerProvider;
-    
-    [Inject]
     private NoteHyphenator noteHyphenator;
 
     protected override object GetInstance()
@@ -28,11 +25,8 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
 
         job.SetAwaitable(async () =>
         {
-            SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(config.SpeechRecognizerConfig).GetResultAsync();
-
             SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
-                config.InputSamples,
-                speechRecognizer)
+                config.InputSamples)
                 .GetResultAsync();
 
             List<Note> createdNotes = CreateNotesFromSpeechRecognitionResult(

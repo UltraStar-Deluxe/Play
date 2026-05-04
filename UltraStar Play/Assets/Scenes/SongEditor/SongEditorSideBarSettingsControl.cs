@@ -36,15 +36,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.resetMusicPlaybackSpeedButton)]
     private Button resetMusicPlaybackSpeedButton;
 
-    [Inject(UxmlName = R.UxmlNames.selectModelPathButton)]
-    private Button selectModelPathButton;
-
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionLanguageChooser)]
-    private EnumField speechRecognitionLanguageChooser;
-
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionPromptTextField)]
-    private TextField speechRecognitionPromptTextField;
-
     [Inject(UxmlName = R.UxmlNames.forcedAlignmentModelPathTextField)]
     private TextField forcedAlignmentModelPathTextField;
     
@@ -143,12 +134,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.importMidiFileButton)]
     private Button importMidiFileButton;
-
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
-    private TextField speechRecognitionModelPathTextField;
-
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionPhrasesTextField)]
-    private TextField speechRecognitionPhrasesTextField;
 
     [Inject(UxmlName = R.UxmlNames.audioSeparationButton)]
     private Button audioSeparationButton;
@@ -377,57 +362,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MidiPlaybackOffsetInMillis = newIntValue));
 
         importMidiFileButton.RegisterCallbackButtonTriggered(_ => importMidiFileDialogControl.OpenDialog());
-
-        // Speech recognition
-        Bind(speechRecognitionLanguageChooser,
-            () =>
-            {
-                if (Enum.TryParse(settings.SongEditorSettings.SpeechRecognitionLanguage, out EWhisperLanguage whisperLanguage))
-                {
-                    return whisperLanguage;
-                }
-                return EWhisperLanguage.English;
-            },
-            newValue => settings.SongEditorSettings.SpeechRecognitionLanguage = newValue.ToString());
-
-        Bind(speechRecognitionPromptTextField,
-            () => settings.SongEditorSettings.SpeechRecognitionPrompt,
-            newValue => settings.SongEditorSettings.SpeechRecognitionPrompt = newValue);
-
-        sentenceLineSizeTextField.DisableParseEscapeSequences();
-        Bind(speechRecognitionModelPathTextField,
-            () => settings.SongEditorSettings.SpeechRecognitionModelPath,
-            newValue => settings.SongEditorSettings.SpeechRecognitionModelPath = newValue);
-
-        speechRecognitionPhrasesTextField.DisableParseEscapeSequences();
-        Bind(speechRecognitionPhrasesTextField,
-            () => settings.SongEditorSettings.SpeechRecognitionPhrases,
-            newValue => settings.SongEditorSettings.SpeechRecognitionPhrases = newValue);
-
-        if (PlatformUtils.IsStandalone)
-        {
-            selectModelPathButton.RegisterCallbackButtonTriggered(_ =>
-            {
-                string oldFolder = FileUtils.Exists(speechRecognitionModelPathTextField.value)
-                    ? new FileInfo(speechRecognitionModelPathTextField.value).DirectoryName
-                    : "";
-                string selectedFile = FileSystemDialogUtils.OpenFileDialog(
-                    "Select Speech Recognition Model",
-                    oldFolder,
-                    FileSystemDialogUtils.CreateExtensionFilters("Model files", "bin"));
-                if (selectedFile.IsNullOrEmpty()
-                    || !FileUtils.Exists(selectedFile))
-                {
-                    return;
-                }
-
-                speechRecognitionModelPathTextField.value = selectedFile;
-            });
-        }
-        else
-        {
-            selectModelPathButton.HideByDisplay();
-        }
 
         List<ESongEditorSamplesSource> speechAndPitchAnalysisSampleSources = new List<ESongEditorSamplesSource>
         {
