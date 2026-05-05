@@ -46,11 +46,12 @@ public class AudioSampleLoader : AbstractSingletonBehaviour
         FfmpegAudioSampleLoader.FfmpegAudioSamplesData ffmpegAudioSamplesData = ffmpegAudioSampleLoader.Load(uri);
         AudioClip audioClip = AudioClip.Create(
             Path.GetFileName(uri),
-            ffmpegAudioSamplesData.Samples.Length,
+            ffmpegAudioSamplesData.Samples.Length / ffmpegAudioSamplesData.Channels,
             ffmpegAudioSamplesData.Channels,
             ffmpegAudioSamplesData.SampleRate,
             _3D: false,
             stream: false);
+        audioClip.SetData(ffmpegAudioSamplesData.Samples, 0);
         
         // Add to cache
         ffmpegLoadedAudioClips[uri] = audioClip;
