@@ -31,19 +31,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
     public async Awaitable<PitchDetectionResult> CreateNotesUsingAi(bool notify)
     {
         PitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta).GetResultAsync();
-        List<Note> notes = PitchDetectionResultMapper.ToSongMetaNotes(songMeta, pitchDetectionResult);
         
-        // Remove old notes
-        editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.PitchDetection);
-        songEditorLayerManager.ClearEnumLayer(ESongEditorLayer.PitchDetection);
-        
-        // Add notes to layer
-        notes.ForEach(note =>
-        {
-            songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.PitchDetection, note);
-            note.IsEditable = songEditorLayerManager.IsLayerEditable(songEditorLayerManager.GetEnumLayer(ESongEditorLayer.PitchDetection));
-        });
-
         if (notify)
         {
             songMetaChangedEventStream.OnNext(new NotesChangedEvent());

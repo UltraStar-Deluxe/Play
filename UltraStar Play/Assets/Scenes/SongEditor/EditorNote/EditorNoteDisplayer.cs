@@ -113,7 +113,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         songEditorLayerToParentElement.Add(ESongEditorLayer.ButtonRecording, noteAreaNotesBackground);
         songEditorLayerToParentElement.Add(ESongEditorLayer.Import, noteAreaNotesBackground);
-        songEditorLayerToParentElement.Add(ESongEditorLayer.PitchDetection, noteAreaNotesBackground);
         songEditorLayerToParentElement.Add(ESongEditorLayer.SpeechRecognition, noteAreaNotesBackground);
         songEditorLayerToParentElement.Add(ESongEditorLayer.ForcedAlignment, noteAreaNotesBackground);
 
@@ -620,9 +619,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         if (noteAreaControl.ViewportWidth < HideElementThresholdInMillis)
         {
-            if (settings.SongEditorSettings.ShowNotePitchLabel
-                && (!songEditorLayerManager.TryGetEnumLayer(editorNoteControl.Note, out SongEditorEnumLayer enumLayer)
-                    || enumLayer.LayerEnum is not ESongEditorLayer.PitchDetection))
+            if (settings.SongEditorSettings.ShowNotePitchLabel)
             {
                 editorNoteControl.ShowPitchLabel();
             }

@@ -38,6 +38,9 @@ public class SongEditorDetectedPitchVisualizationControl : INeedInjection, IInje
     [Inject]
     private SongEditorPitchDetectionControl songEditorPitchDetectionControl;
 
+    [Inject]
+    private ThemeManager themeManager;
+
     private int lastNoteAreaX;
     private int lastNoteAreaY;
     private int lastNoteAreaWidth;
@@ -149,7 +152,7 @@ public class SongEditorDetectedPitchVisualizationControl : INeedInjection, IInje
             return;
         }
 
-        Color color = songEditorLayerManager.GetEnumLayerColor(ESongEditorLayer.PitchDetection);
+        Color color = themeManager.GetSongEditorLayerColors()["PitchDetection"];
         foreach (PitchDetectionResultNote note in pitchDetectionResult.Notes)
         {
             if (note.StartInMillis + note.LengthInMillis < minMs || note.StartInMillis > maxMs)
