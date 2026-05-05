@@ -153,9 +153,13 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int spaceBetweenNotesInMillis,
         bool notify)
     {
+        if (lengthInBeats <= 0)
+        {
+            return new List<Note>();
+        }
+        
         AudioClip audioClip = await GetAudioClip(speechRecognitionSampleSource);
-        if (audioClip == null
-            || lengthInBeats <= 0)
+        if (audioClip == null)
         {
             return new List<Note>();
         }

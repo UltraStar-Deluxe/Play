@@ -38,6 +38,9 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     private SpeechRecognitionAction speechRecognitionAction;
     
     [Inject]
+    private ForcedAlignmentAction forcedAlignmentAction;
+    
+    [Inject]
     private Settings settings;
 
     [Inject]
@@ -105,10 +108,10 @@ public class NoteAreaContextMenuControl : ContextMenuControl
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyEnd), () => setSongPropertyAction.SetMedleyEndAndNotify(positionInMillis));
         }
 
-        AddSpeechRecognitionInSelectionButton(contextMenu, millis);
+        FillMenuForCurrentSelectionArea(contextMenu, millis);
     }
 
-    private void AddSpeechRecognitionInSelectionButton(ContextMenuPopupControl contextMenu, double clickPositionInMillis)
+    private void FillMenuForCurrentSelectionArea(ContextMenuPopupControl contextMenu, double clickPositionInMillis)
     {
         NoteAreaRect lastSelectionRect = NoteAreaSelectionDragListener.lastSelectionRect.Value;
         if (lastSelectionRect == null)
@@ -120,6 +123,7 @@ public class NoteAreaContextMenuControl : ContextMenuControl
             && clickPositionInMillis <= lastSelectionRect.MaxMillis)
         {
             contextMenu.AddSeparator();
+            
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_speechRecognitionInSelection), () =>
             {
                 speechRecognitionAction.CreateNotesFromSpeechRecognition(
@@ -127,6 +131,15 @@ public class NoteAreaContextMenuControl : ContextMenuControl
                     lastSelectionRect.LengthInBeats,
                     settings.SongEditorSettings.SpeechRecognitionSamplesSource,
                     settings.SongEditorSettings.SpaceBetweenNotesInMillis,
+                    true);
+            });
+            
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_forcedAlignmentInSelection), () =>
+            {
+                forcedAlignmentAction.CreateNotesViaForcedAlignmentInSelection(
+                    settings.SongEditorSettings.ForcedAlignmentLyrics,
+                    lastSelectionRect.MinBeat,
+                    lastSelectionRect.LengthInBeats,
                     true);
             });
         }

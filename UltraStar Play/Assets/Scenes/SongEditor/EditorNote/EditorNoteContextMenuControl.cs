@@ -111,8 +111,18 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         contextMenu.AddSeparator();
 
+        NoteAreaRect lastSelectionRect = NoteAreaSelectionDragListener.lastSelectionRect.Value;
+        if (lastSelectionRect == null)
+        {
+            return;
+        }
+        
         contextMenu.AddButton(Translation.Get(R.Messages.job_forcedAlignment), () => _ =
-            forcedAlignmentAction.RunForcedAlignment(selectedNotes, true));
+            forcedAlignmentAction.MoveNotesViaForcedAlignmentInSelection(
+                selectedNotes,
+                lastSelectionRect.MinBeat,
+                lastSelectionRect.LengthInBeats,
+                true));
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveToDetectedPitch),
             () => moveNotesToPitchDetectionResultAction.MoveNotesToDetectedPitch(selectedNotes, true));
     }

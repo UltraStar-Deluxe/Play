@@ -33,7 +33,7 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
 
     private NemoForcedAligner nemoForcedAligner;
 
-    public Job<ForcedAlignmentResult> ProcessSongMetaJob(SongMeta songMeta, string lyrics)
+    public Job<ForcedAlignmentResult> ProcessSongMetaJob(SongMeta songMeta, ForcedAlignmentInput forcedAlignmentInput)
     {
         Job<ForcedAlignmentResult> job = new Job<ForcedAlignmentResult>(
             Translation.Get(R.Messages.job_forcedAlignmentWithName, "name", Path.GetFileName(songMeta.Audio)),
@@ -44,7 +44,7 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
         {
             try
             {
-                return await ProcessSongMetaAsync(songMeta, job.Progress, lyrics);
+                return await ProcessSongMetaAsync(songMeta, job.Progress, forcedAlignmentInput);
             }
             catch (Exception ex)
             {
@@ -68,28 +68,21 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
     private async Awaitable<ForcedAlignmentResult> ProcessSongMetaAsync(
         SongMeta songMeta,
         JobProgress jobProgress,
-        string lyrics)
+        ForcedAlignmentInput forcedAlignmentInput)
     {
-        if (lyrics.IsNullOrEmpty())
+        if (forcedAlignmentInput.Lyrics.IsNullOrEmpty())
         {
             return new ForcedAlignmentResult();
         }
         
-        string vocalsAudioUri = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
-        if (!FileUtils.Exists(vocalsAudioUri))
-        {
-            throw new ForcedAlignmentException($"Vocals audio for '{Path.GetFileName(songMeta.Audio)}' does not exist at path '{vocalsAudioUri}'");
-        }
-        
         // Estimate duration
-        AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(vocalsAudioUri);
-        int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
+        int lengthInMillis = (int)Math.Floor((double)forcedAlignmentInput.MonoSamples.Length / forcedAlignmentInput.SampleRate * 1000.0);
         jobProgress.EstimatedCurrentProgressInPercent = (int)Math.Ceiling(lengthInMillis / 2.0);
 
         ForcedAlignmentResult forcedAlignmentResult = await DoProcessSongMetaAsync(
             songMeta,
             jobProgress.CancellationTokenSource.Token,
-            lyrics);
+            forcedAlignmentInput);
 
         forcedAlignmentFinishedEventStream.OnNext(new ForcedAlignmentFinishedEvent(songMeta, forcedAlignmentResult));
         return forcedAlignmentResult;
@@ -97,7 +90,7 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
 
     private async Awaitable<ForcedAlignmentResult> DoProcessSongMetaAsync(SongMeta songMeta,
         CancellationToken cancellationToken,
-        string lyrics)
+        ForcedAlignmentInput forcedAlignmentInput)
     {
         // Instant fail if already locked (timeout 0)
         if (!await forcedAlignmentProcessSemaphore.WaitAsync(0, cancellationToken))
@@ -115,18 +108,8 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
                 nemoForcedAligner = new NemoForcedAligner(config.ModelPath, config.TokensPath);
             }
 
-            Debug.Log($"Running forced alignment on vocals audio. path: '{songMeta.VocalsAudio}'");
-            
-            // TODO: AudioClip API can only be done on the main thread. Use a more flexible library to load the audio samples from file.
-            await Awaitable.MainThreadAsync();
-            string audioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
-            Debug.Log($"Loading audio samples for pitch detection on main thread. path: '{songMeta.VocalsAudio}'");
-            AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(audioFilePath, false);
-            float lengthInSeconds = audioClip.length;
-            float[] monoAudioSamples = AudioSampleUtils.GetAudioSamples(audioClip, 0, lengthInSeconds * 1000, true);
-            float[] monoAudioSamplesResampled = AudioSampleUtils.Resample(monoAudioSamples, audioClip.frequency, NemoForcedAligner.SampleRate);
+            float[] monoAudioSamplesResampled = AudioSampleUtils.Resample(forcedAlignmentInput.MonoSamples, forcedAlignmentInput.SampleRate, NemoForcedAligner.SampleRate);
             Debug.Log("Resampled mono audio samples for forced alignment: " + monoAudioSamplesResampled.Length);
-            await Awaitable.BackgroundThreadAsync();
 
             NemoForcedAligner.AudioData audioData = new NemoForcedAligner.AudioData
             {
@@ -136,7 +119,7 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
             };
 
             // Newline is not a word separator in the forced alignment model.
-            string normalizedLyrics = Regex.Replace(lyrics, @"\n", " ");
+            string normalizedLyrics = Regex.Replace(forcedAlignmentInput.Lyrics, @"\n", " ");
             NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignmentResult = nemoForcedAligner.Run(audioData, normalizedLyrics);
 
             Debug.Log($"Forced Alignment finished: {nemoForcedAlignmentResult.Words.Select(w => $"{w.Word}: {w.StartTime:F2} - {w.EndTime:F2}").JoinWith(", ")}");
