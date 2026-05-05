@@ -23,13 +23,76 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
 
     [Inject] private ForcedAlignmentManager forcedAlignmentManager;
 
+    [Inject] private NoteAreaControl noteAreaControl;
+
     public async Awaitable<ForcedAlignmentResult> RunForcedAlignment(string lyrics, bool notify)
+    {
+        ForcedAlignmentResult forcedAlignmentResult = await RunForcedAlignmentInternal(lyrics);
+        if (forcedAlignmentResult == null || forcedAlignmentResult.Words.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        List<Note> notes = CreateNotesFromForcedAlignmentResult(forcedAlignmentResult);
+        noteAreaControl.ScrollIntoView(notes);
+
+        if (notify)
+        {
+            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
+        }
+
+        return forcedAlignmentResult;
+    }
+
+    public async Awaitable<ForcedAlignmentResult> RunForcedAlignment(List<Note> notes, bool notify)
+    {
+        if (notes.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        List<Note> sortedNotes = notes
+            .OrderBy(it => it.StartBeat)
+            .ToList();
+
+        string lyrics = sortedNotes
+            .Select(it => it.Text.Replace("-", "").Replace("~", "").Trim())
+            .Where(it => !it.IsNullOrEmpty())
+            .JoinWith(" ");
+
+        if (lyrics.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        ForcedAlignmentResult forcedAlignmentResult = await RunForcedAlignmentInternal(lyrics);
+        if (forcedAlignmentResult == null || forcedAlignmentResult.Words.IsNullOrEmpty())
+        {
+            return forcedAlignmentResult;
+        }
+
+        MoveNotesToForcedAlignmentResult(sortedNotes, forcedAlignmentResult);
+
+        if (notify)
+        {
+            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
+        }
+        
+        return forcedAlignmentResult;
+    }
+
+    private async Awaitable<ForcedAlignmentResult> RunForcedAlignmentInternal(string lyrics)
     {
         ForcedAlignmentResult forcedAlignmentResult = await forcedAlignmentManager.ProcessSongMetaJob(
                 songMeta,
                 lyrics)
             .GetResultAsync();
 
+        return forcedAlignmentResult;
+    }
+    
+    private List<Note> CreateNotesFromForcedAlignmentResult(ForcedAlignmentResult forcedAlignmentResult)
+    {
         List<Note> notes = forcedAlignmentResult.Words
             .Select(wordTimestamp =>
             {
@@ -60,46 +123,12 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
                 songEditorLayerManager.GetEnumLayer(layerEnum));
         });
 
-        if (notify)
-        {
-            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
-        }
-
-        return forcedAlignmentResult;
+        return notes;
     }
-
-    public async Awaitable<ForcedAlignmentResult> RunForcedAlignment(List<Note> selectedNotes, bool notify)
+    
+    private void MoveNotesToForcedAlignmentResult(List<Note> sortedNotes, ForcedAlignmentResult forcedAlignmentResult)
     {
-        if (selectedNotes.IsNullOrEmpty())
-        {
-            return null;
-        }
-
-        List<Note> sortedSelectedNotes = selectedNotes
-            .OrderBy(it => it.StartBeat)
-            .ToList();
-
-        string lyrics = sortedSelectedNotes
-            .Select(it => it.Text.Replace("-", "").Replace("~", "").Trim())
-            .Where(it => !it.IsNullOrEmpty())
-            .JoinWith(" ");
-
-        if (lyrics.IsNullOrEmpty())
-        {
-            return null;
-        }
-
-        ForcedAlignmentResult forcedAlignmentResult = await forcedAlignmentManager.ProcessSongMetaJob(
-                songMeta,
-                lyrics)
-            .GetResultAsync();
-
-        if (forcedAlignmentResult == null || forcedAlignmentResult.Words.IsNullOrEmpty())
-        {
-            return forcedAlignmentResult;
-        }
-
-        List<Note> notesWithText = sortedSelectedNotes
+        List<Note> notesWithText = sortedNotes
             .Where(it => !it.Text.Replace("-", "").Replace("~", "").Trim().IsNullOrEmpty())
             .ToList();
 
@@ -122,12 +151,5 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
         {
             Log.Warning(() => $"Forced alignment returned {forcedAlignmentResult.Words.Count} words, but {notesWithText.Count} notes with text were selected.");
         }
-
-        if (notify)
-        {
-            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
-        }
-
-        return forcedAlignmentResult;
     }
 }
