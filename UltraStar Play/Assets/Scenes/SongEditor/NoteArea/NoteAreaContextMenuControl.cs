@@ -136,11 +136,19 @@ public class NoteAreaContextMenuControl : ContextMenuControl
             
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_forcedAlignmentInSelection), () =>
             {
-                forcedAlignmentAction.CreateNotesViaForcedAlignmentInSelection(
-                    settings.SongEditorSettings.ForcedAlignmentLyrics,
-                    lastSelectionRect.MinBeat,
-                    lastSelectionRect.LengthInBeats,
-                    true);
+                songEditorSceneControl.CreateTextInputDialog(
+                    Translation.Get(R.Messages.songEditor_action_forcedAlignmentInSelection_dialog_title),
+                    Translation.Get(R.Messages.songEditor_action_forcedAlignmentInSelection_dialog_message),
+                    newLyrics =>
+                    {
+                        settings.SongEditorSettings.ForcedAlignmentLyrics = newLyrics;
+                        forcedAlignmentAction.CreateNotesViaForcedAlignmentInSelection(
+                            settings.SongEditorSettings.ForcedAlignmentLyrics,
+                            lastSelectionRect.MinBeat,
+                            lastSelectionRect.LengthInBeats,
+                            true);
+                    },
+                    settings.SongEditorSettings.ForcedAlignmentLyrics);
             });
         }
     }

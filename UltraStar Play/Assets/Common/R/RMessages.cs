@@ -530,6 +530,8 @@ public static partial class R
         public static readonly string songEditor_action_fitViewHorizontallyToSentence = "songEditor_action_fitViewHorizontallyToSentence";
         public static readonly string songEditor_action_fitViewVertically = "songEditor_action_fitViewVertically";
         public static readonly string songEditor_action_forcedAlignmentInSelection = "songEditor_action_forcedAlignmentInSelection";
+        public static readonly string songEditor_action_forcedAlignmentInSelection_dialog_message = "songEditor_action_forcedAlignmentInSelection_dialog_message";
+        public static readonly string songEditor_action_forcedAlignmentInSelection_dialog_title = "songEditor_action_forcedAlignmentInSelection_dialog_title";
         public static readonly string songEditor_action_mergeNotes = "songEditor_action_mergeNotes";
         public static readonly string songEditor_action_mergeSentences = "songEditor_action_mergeSentences";
         public static readonly string songEditor_action_moveNotesToNextSentence = "songEditor_action_moveNotesToNextSentence";
