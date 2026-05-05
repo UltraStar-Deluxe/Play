@@ -74,11 +74,18 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
                 {
                     return;
                 }
+                
+                // Extend selection to rect to include selected notes.
                 int minBeat = newSelection.SelectedNotes.Min(note => note.StartBeat);
                 int maxBeat = newSelection.SelectedNotes.Max(note => note.EndBeat);
                 int minMidiNote = newSelection.SelectedNotes.Min(note => note.MidiNote);
                 int maxMidiNote = newSelection.SelectedNotes.Max(note => note.MidiNote);
-                lastSelectionRect.Value = NoteAreaRect.CreateFromBeats(songMeta, minBeat, maxBeat, minMidiNote, maxMidiNote);
+                lastSelectionRect.Value = NoteAreaRect.CreateFromBeats(
+                    songMeta,
+                    Math.Min(lastSelectionRect.Value.MinBeat, minBeat),
+                    Math.Max(lastSelectionRect.Value.MaxBeat, maxBeat),
+                    Math.Min(lastSelectionRect.Value.MinMidiNote, minMidiNote),
+                    Math.Max(lastSelectionRect.Value.MaxMidiNote, maxMidiNote));
             });
     }
 
