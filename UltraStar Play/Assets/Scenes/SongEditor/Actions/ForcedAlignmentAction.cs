@@ -62,10 +62,7 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
             .OrderBy(it => it.StartBeat)
             .ToList();
 
-        string lyrics = sortedNotes
-            .Select(it => it.Text.Replace("-", "").Replace("~", "").Trim())
-            .Where(it => !it.IsNullOrEmpty())
-            .JoinWith(" ");
+        string lyrics = ForcedAlignmentUtils.GetLyricsFromNotes(sortedNotes);
 
         if (lyrics.IsNullOrEmpty())
         {
@@ -79,7 +76,7 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
             return forcedAlignmentResult;
         }
 
-        MoveNotesToForcedAlignmentResult(sortedNotes, forcedAlignmentResult, startBeat);
+        ForcedAlignmentUtils.MoveNotesToForcedAlignmentResult(songMeta, sortedNotes, forcedAlignmentResult, startBeat);
 
         if (notify)
         {
@@ -162,32 +159,6 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
         return notes;
     }
     
-    private void MoveNotesToForcedAlignmentResult(List<Note> sortedNotes, ForcedAlignmentResult forcedAlignmentResult, int offsetInBeats)
-    {
-        List<Note> notesWithText = sortedNotes
-            .Where(it => !it.Text.Replace("-", "").Replace("~", "").Trim().IsNullOrEmpty())
-            .ToList();
-
-        if (forcedAlignmentResult.Words.Count == notesWithText.Count)
-        {
-            for (int i = 0; i < notesWithText.Count; i++)
-            {
-                Note note = notesWithText[i];
-                WordTimestamp wordTimestamp = forcedAlignmentResult.Words[i];
-
-                double startInMillis = wordTimestamp.StartTime * 1000;
-                double endInMillis = wordTimestamp.EndTime * 1000;
-                int startBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, startInMillis) + offsetInBeats;
-                int endBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, endInMillis) + offsetInBeats;
-
-                note.SetStartAndEndBeat(startBeat, endBeat);
-            }
-        }
-        else
-        {
-            Log.Warning(() => $"Forced alignment returned {forcedAlignmentResult.Words.Count} words, but {notesWithText.Count} notes with text were selected.");
-        }
-    }
 
     private async Awaitable<ForcedAlignmentInput> GetForcedAlignmentInput(
         string lyrics,

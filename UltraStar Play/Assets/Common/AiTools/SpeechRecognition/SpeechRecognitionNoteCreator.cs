@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UniInject;
 using UnityEngine;
 
@@ -12,6 +14,9 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
 
     [Inject]
     private NoteHyphenator noteHyphenator;
+
+    [Inject]
+    private ForcedAlignmentManager forcedAlignmentManager;
 
     protected override object GetInstance()
     {
@@ -33,10 +38,48 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
                 speechRecognitionResult,
                 config);
 
+            try
+            {
+                await PerformForcedAlignment(config, createdNotes);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError("Failed to perform forced alignment to optimize note positions of speech recognition result.");
+            }
+
             return createdNotes;
         });
 
         return job;
+    }
+
+    private async Awaitable PerformForcedAlignment(CreateNotesFromSpeechRecognitionConfig config, List<Note> createdNotes)
+    {
+        string lyrics = ForcedAlignmentUtils.GetLyricsFromNotes(createdNotes);
+        if (!lyrics.IsNullOrEmpty())
+        {
+            ForcedAlignmentInput forcedAlignmentInput = new ForcedAlignmentInput(
+                lyrics,
+                config.InputSamples.MonoSamples,
+                config.InputSamples.StartIndex,
+                config.InputSamples.EndIndex,
+                config.InputSamples.SampleRate);
+
+            ForcedAlignmentResult forcedAlignmentResult = await forcedAlignmentManager.ProcessSongMetaJob(
+                    config.SongMeta,
+                    forcedAlignmentInput)
+                .GetResultAsync();
+
+            if (forcedAlignmentResult != null && !forcedAlignmentResult.Words.IsNullOrEmpty())
+            {
+                ForcedAlignmentUtils.MoveNotesToForcedAlignmentResult(
+                    config.SongMeta,
+                    createdNotes.OrderBy(it => it.StartBeat).ToList(),
+                    forcedAlignmentResult,
+                    config.OffsetInBeats);
+            }
+        }
     }
 
     private List<Note> CreateNotesFromSpeechRecognitionResult(
