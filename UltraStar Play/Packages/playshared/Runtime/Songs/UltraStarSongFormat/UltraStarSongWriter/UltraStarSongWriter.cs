@@ -58,14 +58,12 @@ public static class UltraStarFormatWriter
             sb.AppendLine(voice.Id.ToString());
         }
         List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(voice);
-        // Process the last sentence separately. A linebreak should not be appended after the last sentence.
-        foreach (Sentence sentence in sortedSentences.SkipLast(1))
+        for (int i = 0; i < sortedSentences.Count; i++)
         {
-            AppendSentence(sb, sentence, true);
-        }
-        if (sortedSentences.Count > 0)
-        {
-            AppendSentence(sb, sortedSentences.Last(), false);
+            Sentence sentence = sortedSentences[i];
+            // A linebreak should not be appended after the last sentence.
+            bool appendLinebreak = i < sortedSentences.Count - 1;
+            AppendSentence(sb, sentence, appendLinebreak);
         }
     }
 
