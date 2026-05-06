@@ -152,27 +152,47 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
     private SpeechRecognitionResult ToSpeechRecognitionResult(SpeechRecognition.TranscriptionResult sherpaOnnxResult, float maxDurationInSeconds)
     {
         List<SpeechRecognitionWordResult> wordResults = new();
+        SpeechRecognitionWordResult currentWordResult = null;
+
         for (int i = 0; i < sherpaOnnxResult.Tokens.Length; i++)
         {
             string token = sherpaOnnxResult.Tokens[i];
             float startTimeInSeconds = sherpaOnnxResult.Timestamps[i];
             // Sometimes returned duration values are very small for some reason.
             float lengthInSeconds = Mathf.Max(0.01f, sherpaOnnxResult.Durations[i]);
+            float endTimeInSeconds = startTimeInSeconds + lengthInSeconds;
 
             if (!float.IsFinite(startTimeInSeconds)
                 || !float.IsFinite(lengthInSeconds)
                 || startTimeInSeconds > maxDurationInSeconds * 2
-                || (startTimeInSeconds + lengthInSeconds) > maxDurationInSeconds * 2)
+                || endTimeInSeconds > maxDurationInSeconds * 2)
             {
                 Log.Warning(() => $"Discarding speech recognition token '{token}' because its time values are invalid or too large: start={startTimeInSeconds}, length={lengthInSeconds}, maxDuration={maxDurationInSeconds}");
                 continue;
             }
 
-            wordResults.Add(new SpeechRecognitionWordResult(
-                token,
-                TimeSpan.FromSeconds(startTimeInSeconds),
-                TimeSpan.FromSeconds(startTimeInSeconds + lengthInSeconds)));
+            // SherpaOnnx often uses ' ' (U+2581) to indicate the start of a new word.
+            // Some models might just use a space.
+            bool startsNewWord = token.StartsWith(" ") || token.StartsWith(" ");
+            if (startsNewWord || currentWordResult == null)
+            {
+                // Start a new word
+                currentWordResult = new SpeechRecognitionWordResult(
+                    token.Trim().Trim(' '),
+                    TimeSpan.FromSeconds(startTimeInSeconds),
+                    TimeSpan.FromSeconds(endTimeInSeconds));
+                wordResults.Add(currentWordResult);
+            }
+            else
+            {
+                // Append to current word
+                currentWordResult.Text += token.Trim().Trim(' ');
+                currentWordResult.End = TimeSpan.FromSeconds(endTimeInSeconds);
+            }
         }
+
+        // Filter out empty words that might have been created by trimming spaces from space-only tokens
+        wordResults.RemoveAll(word => string.IsNullOrEmpty(word.Text));
 
         return new SpeechRecognitionResult(
             sherpaOnnxResult.Text,
