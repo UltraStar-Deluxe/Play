@@ -1430,50 +1430,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50a963030a7a4b5e949793b71ea114f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1564061784973108536
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 9165910748735724824}
-  - component: {fileID: 8747471743642664529}
-  m_Layer: 0
-  m_Name: SpeechRecognizerProvider
-  m_TagString: MelodyManiaOnly
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &9165910748735724824
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1564061784973108536}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6169907629867958379}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8747471743642664529
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1564061784973108536}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 988e9d6478d94d4bbfa71fba39e0f793, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1580249462584706206
 GameObject:
   m_ObjectHideFlags: 0
@@ -9279,52 +9235,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd386d2a21c62d249a0f3c20661eba73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &6470401398078465020
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6834252709226510417}
-  - component: {fileID: 1415475467521244222}
-  m_Layer: 0
-  m_Name: WhisperSpeechRecognizerProvider
-  m_TagString: MelodyManiaOnly
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6834252709226510417
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6470401398078465020}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6169907629867958379}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1415475467521244222
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6470401398078465020}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d422b6f40a74b70b6835ad573f44df0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  whisperManagerPrefab: {fileID: 4159576471388054935, guid: cbc5e63d248305843853deae3bbaa2db,
-    type: 3}
 --- !u!1 &6606244263046340597
 GameObject:
   m_ObjectHideFlags: 0
@@ -10357,8 +10267,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 9165910748735724824}
-  - {fileID: 6834252709226510417}
   - {fileID: 862645136211456301}
   - {fileID: 4191333704897788580}
   m_Father: {fileID: 5483831765678408185}
