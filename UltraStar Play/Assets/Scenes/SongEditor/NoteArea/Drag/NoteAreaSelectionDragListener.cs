@@ -65,12 +65,12 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
             }
             UpdateSelectionFrame(lastSelectionRect.Value, lastNoteAreaSelectionFrame, false, true);
         });
-        lastSelectionRect
-            .Subscribe(_ =>  UpdateSelectionFrame(lastSelectionRect.Value, lastNoteAreaSelectionFrame, false, true));
+        lastSelectionRect.Subscribe(_ => UpdateSelectionFrame(lastSelectionRect.Value, lastNoteAreaSelectionFrame, false, true));
         selectionControl.NoteSelectionChangedEventStream
             .Subscribe(newSelection =>
             {
-                if (newSelection.SelectedNotes.IsNullOrEmpty())
+                if (newSelection.SelectedNotes.IsNullOrEmpty()
+                    || lastSelectionRect == null)
                 {
                     return;
                 }
