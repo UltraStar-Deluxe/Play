@@ -153,9 +153,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.forcedAlignmentAudioChooser)]
     private Chooser forcedAlignmentAudioChooser;
 
-    [Inject(UxmlName = R.UxmlNames.pitchDetectionAudioChooser)]
-    private Chooser pitchDetectionAudioChooser;
-
     [Inject(UxmlName = R.UxmlNames.timeLabelFormatChooser)]
     private Chooser timeLabelFormatChooser;
 
