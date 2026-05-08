@@ -56,6 +56,7 @@ public class SongEditorSettings
     // Speech recognition
     public ESongEditorSamplesSource SpeechRecognitionSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
     public bool SplitSyllablesAfterSpeechRecognition { get; set; } = true;
+    public bool ForcedAlignmentAfterSpeechRecognition { get; set; } = true;
 
     // Pitch detection
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;

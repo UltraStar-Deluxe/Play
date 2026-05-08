@@ -25,9 +25,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.aiPitchDetectionButton)]
     private Button aiPitchDetectionButton;
 
-    [Inject(UxmlName = R.UxmlNames.doSpeechRecognitionButton)]
-    private Button doSpeechRecognitionButton;
-
     [Inject(UxmlName = R.UxmlNames.undoButton)]
     private Button undoButton;
 
@@ -168,7 +165,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         UpdateRecordingButton();
 
         aiPitchDetectionButton.RegisterCallbackButtonTriggered(_ => AnalyzePitchUsingAi());
-        doSpeechRecognitionButton.RegisterCallbackButtonTriggered(_ => DoSpeechRecognition());
 
         undoButton.RegisterCallbackButtonTriggered(_ => historyManager.Undo());
         redoButton.RegisterCallbackButtonTriggered(_ => historyManager.Redo());

@@ -158,9 +158,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.splitSyllablesAfterSpeechRecognitionToggle)]
     private Toggle splitSyllablesAfterSpeechRecognitionToggle;
-
-    [Inject(UxmlName = R.UxmlNames.splitSyllablesInSelectionButton)]
-    private Button splitSyllablesInSelectionButton;
+    
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentAfterSpeechRecognitionToggle)]
+    private Toggle forcedAlignmentAfterSpeechRecognitionToggle;
 
     [Inject(UxmlName = R.UxmlNames.playbackPreBeginTimeInMillisTextField)]
     private IntegerField playbackPreBeginTimeInMillisTextField;
@@ -379,7 +379,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition,
             newValue => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition = newValue);
 
-        splitSyllablesInSelectionButton.RegisterCallbackButtonTriggered(_ => SplitSyllablesInSelection());
+        Bind(forcedAlignmentAfterSpeechRecognitionToggle,
+            () => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition,
+            newValue => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition = newValue);
 
         // Pitch detection
         pitchDetectionAudioChooserControl = new(pitchDetectionAudioChooser, speechAndPitchAnalysisSampleSources);
@@ -519,24 +521,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         }
 
         await audioSeparationManager.ProcessSongMetaJob(songMeta, true).GetResultAsync();
-    }
-
-    private void SplitSyllablesInSelection()
-    {
-        Hyphenator hyphenator = SettingsUtils.CreateHyphenator(settings);
-        if (hyphenator == null)
-        {
-            return;
-        }
-
-        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
-        if (selectedNotes.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        hyphenateNotesAction.ExecuteAndNotify(songMeta, selectedNotes, hyphenator);
-        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 
     private void AddSpaceBetweenNotesInSelection()

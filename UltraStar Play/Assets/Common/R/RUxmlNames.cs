@@ -41,6 +41,7 @@ public static partial class R
         public const string assignToPlayerDropdownField = "assignToPlayerDropdownField";
         public const string assignToPlayerToggle = "assignToPlayerToggle";
         public const string audioFileTextField = "audioFileTextField";
+        public const string audioSelectionFrame = "audioSelectionFrame";
         public const string audioSeparationButton = "audioSeparationButton";
         public const string audioSeparationCommandTextField = "audioSeparationCommandTextField";
         public const string audioWaveForm = "audioWaveForm";
@@ -180,7 +181,6 @@ public static partial class R
         public const string difficultyChooser = "difficultyChooser";
         public const string disconnectOnlineGameButton = "disconnectOnlineGameButton";
         public const string doPitchDetectionInSelectionButton = "doPitchDetectionInSelectionButton";
-        public const string doSpeechRecognitionButton = "doSpeechRecognitionButton";
         public const string downloadSongArchiveButton = "downloadSongArchiveButton";
         public const string downloadSongArchiveIcon = "downloadSongArchiveIcon";
         public const string downloadSongsButtonLabel = "downloadSongsButtonLabel";
@@ -219,6 +219,7 @@ public static partial class R
         public const string firstTeamUi = "firstTeamUi";
         public const string folderImage = "folderImage";
         public const string folderPreviewImage = "folderPreviewImage";
+        public const string forcedAlignmentAfterSpeechRecognitionToggle = "forcedAlignmentAfterSpeechRecognitionToggle";
         public const string forcedAlignmentGroup = "forcedAlignmentGroup";
         public const string forcedAlignmentLyricsTextField = "forcedAlignmentLyricsTextField";
         public const string forcedAlignmentModelPathTextField = "forcedAlignmentModelPathTextField";
@@ -359,7 +360,6 @@ public static partial class R
         public const string labelsGroup = "labelsGroup";
         public const string languageDropdownField = "languageDropdownField";
         public const string languagePropertyToggle = "languagePropertyToggle";
-        public const string audioSelectionFrame = "audioSelectionFrame";
         public const string layerColor = "layerColor";
         public const string layerEditableButton = "layerEditableButton";
         public const string layerEditableIcon = "layerEditableIcon";
@@ -893,7 +893,6 @@ public static partial class R
         public const string speechRecognitionGroup = "speechRecognitionGroup";
         public const string speechRecognitionWhenRecordingToggle = "speechRecognitionWhenRecordingToggle";
         public const string splitSyllablesAfterSpeechRecognitionToggle = "splitSyllablesAfterSpeechRecognitionToggle";
-        public const string splitSyllablesInSelectionButton = "splitSyllablesInSelectionButton";
         public const string starIcons = "starIcons";
         public const string stars = "stars";
         public const string startButton = "startButton";

@@ -18,6 +18,9 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
     [Inject]
     private ForcedAlignmentManager forcedAlignmentManager;
 
+    [Inject]
+    private Settings settings;
+
     protected override object GetInstance()
     {
         return Instance;
@@ -46,6 +49,11 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
 
     private async Awaitable PerformForcedAlignment(CreateNotesFromSpeechRecognitionConfig config, List<Note> createdNotes)
     {
+        if (!settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition)
+        {
+            return;
+        }
+        
         string lyrics = ForcedAlignmentUtils.GetLyricsFromNotes(createdNotes);
         if (!lyrics.IsNullOrEmpty())
         {

@@ -36,9 +36,8 @@
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="speechRecognitionGroup" label="$songEditor_options_speechRecognition_title">
             <Chooser name="speechRecognitionAudioChooser" no-previous-button="true" wrapAround="true" label="$songEditor_options_speechRecognition_audio" class="controlWithLabelVertical"/>
-            <ui:Button text="$songEditor_options_speechRecognition_perform" display-tooltip-when-elided="true" name="doSpeechRecognitionButton" style="width: 100%; height: auto;"/>
+            <ui:Toggle name="forcedAlignmentAfterSpeechRecognitionToggle" label="$songEditor_options_speechRecognition_forcedAlignmentAfterwards"/>
             <ui:Toggle name="splitSyllablesAfterSpeechRecognitionToggle" label="$songEditor_options_speechRecognition_splitSyllablesAfterwards"/>
-            <ui:Button text="$songEditor_options_speechRecognition_splitSyllables" display-tooltip-when-elided="true" name="splitSyllablesInSelectionButton" style="height: auto;"/>
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="pitchDetectionGroup" label="$songEditor_options_pitchDetection_title">
             <Chooser name="pitchDetectionAudioChooser" no-previous-button="true" wrapAround="true" label="$songEditor_options_pitchDetection_audio" class="controlWithLabelVertical"/>

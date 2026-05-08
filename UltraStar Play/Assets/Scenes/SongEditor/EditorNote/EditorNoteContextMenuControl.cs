@@ -53,6 +53,9 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     private ForcedAlignmentAction forcedAlignmentAction;
     
     [Inject]
+    private HyphenateNotesAction hyphenateNotesAction;
+    
+    [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
 
     [Inject]
@@ -98,6 +101,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
 
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_editLyrics), () => songEditorSceneControl.StartEditingSelectedNoteText());
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_splitSyllablesInSelection), () => hyphenateNotesAction.ExecuteAndNotify(selectedNotes));
         FillContextMenuForAiTools(contextMenu, selectedNotes);
         FillContextMenuToMergeAndAddSpaceBetweenNotes(contextMenu, selectedNotes);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
@@ -108,10 +112,6 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
     private void FillContextMenuForAiTools(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
-        int minBeat = selectedNotes.Select(note => note.StartBeat).Min();
-        int maxBeat = selectedNotes.Select(note => note.EndBeat).Max();
-        int lengthInBeats = maxBeat - minBeat;
-
         contextMenu.AddSeparator();
 
         NoteAreaRect lastSelectionRect = noteAreaControl.SelectionDragListener.LastSelectionRect.Value;

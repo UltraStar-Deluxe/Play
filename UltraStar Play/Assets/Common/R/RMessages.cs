@@ -554,6 +554,7 @@ public static partial class R
         public static readonly string songEditor_action_showPlaybackAudio = "songEditor_action_showPlaybackAudio";
         public static readonly string songEditor_action_showVocalsAudio = "songEditor_action_showVocalsAudio";
         public static readonly string songEditor_action_speechRecognitionInSelection = "songEditor_action_speechRecognitionInSelection";
+        public static readonly string songEditor_action_splitSyllablesInSelection = "songEditor_action_splitSyllablesInSelection";
         public static readonly string songEditor_audioSeparation_confirmationDialog_message = "songEditor_audioSeparation_confirmationDialog_message";
         public static readonly string songEditor_audioSeparation_confirmationDialog_title = "songEditor_audioSeparation_confirmationDialog_title";
         public static readonly string songEditor_clickToFindBpm_firstClicks = "songEditor_clickToFindBpm_firstClicks";
@@ -647,13 +648,13 @@ public static partial class R
         public static readonly string songEditor_options_spaceBetweenNotes_button = "songEditor_options_spaceBetweenNotes_button";
         public static readonly string songEditor_options_spaceBetweenNotes_duration = "songEditor_options_spaceBetweenNotes_duration";
         public static readonly string songEditor_options_speechRecognition_audio = "songEditor_options_speechRecognition_audio";
+        public static readonly string songEditor_options_speechRecognition_forcedAlignmentAfterwards = "songEditor_options_speechRecognition_forcedAlignmentAfterwards";
         public static readonly string songEditor_options_speechRecognition_language = "songEditor_options_speechRecognition_language";
         public static readonly string songEditor_options_speechRecognition_modelPath = "songEditor_options_speechRecognition_modelPath";
         public static readonly string songEditor_options_speechRecognition_modelPath_change = "songEditor_options_speechRecognition_modelPath_change";
         public static readonly string songEditor_options_speechRecognition_perform = "songEditor_options_speechRecognition_perform";
         public static readonly string songEditor_options_speechRecognition_phrases = "songEditor_options_speechRecognition_phrases";
         public static readonly string songEditor_options_speechRecognition_prompt = "songEditor_options_speechRecognition_prompt";
-        public static readonly string songEditor_options_speechRecognition_splitSyllables = "songEditor_options_speechRecognition_splitSyllables";
         public static readonly string songEditor_options_speechRecognition_splitSyllablesAfterwards = "songEditor_options_speechRecognition_splitSyllablesAfterwards";
         public static readonly string songEditor_options_speechRecognition_title = "songEditor_options_speechRecognition_title";
         public static readonly string songEditor_options_speechRecognitionWhenRecording = "songEditor_options_speechRecognitionWhenRecording";
