@@ -237,24 +237,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             return;
         }
 
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { Translation.Get(R.Messages.songEditor_helpDialog_audioSeparation_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_audioSeparation) },
-            { Translation.Get(R.Messages.songEditor_helpDialog_pitchDetection_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_pitchDetection) },
-            { Translation.Get(R.Messages.songEditor_helpDialog_lyricsDictation_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_lyricsDictation) },
-            { Translation.Get(R.Messages.songEditor_helpDialog_buttonTapping_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_buttonTapping) },
-            { Translation.Get(R.Messages.songEditor_helpDialog_editingLyrics_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_editingLyrics) },
-            { Translation.Get(R.Messages.songEditor_helpDialog_layers_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_layers) },
-        };
         helpDialogControl = dialogManager.CreateHelpDialogControl(
             Translation.Get(R.Messages.songEditor_helpDialog_title),
-            titleToContentMap);
+            new Dictionary<string, string>());
         helpDialogControl.DialogClosedEventStream.Subscribe(_ => helpDialogControl = null);
 
         // Add controls info
@@ -264,6 +249,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         AccordionItem controlsAccordionItem = new AccordionItem("Controls");
         controlsAccordionItem.Add(inputLegendContainer);
         helpDialogControl.DialogRootVisualElement.Q<AccordionGroup>().Add(controlsAccordionItem);
+        controlsAccordionItem.ShowAccordionContent();
 
         helpDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
             _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToSongEditor)));
