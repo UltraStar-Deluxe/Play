@@ -359,7 +359,7 @@ public static partial class R
         public const string labelsGroup = "labelsGroup";
         public const string languageDropdownField = "languageDropdownField";
         public const string languagePropertyToggle = "languagePropertyToggle";
-        public const string lastNoteAreaSelectionFrame = "lastNoteAreaSelectionFrame";
+        public const string audioSelectionFrame = "audioSelectionFrame";
         public const string layerColor = "layerColor";
         public const string layerEditableButton = "layerEditableButton";
         public const string layerEditableIcon = "layerEditableIcon";

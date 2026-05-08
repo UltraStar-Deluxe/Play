@@ -39,8 +39,8 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
     [Inject(UxmlName = R.UxmlNames.noteAreaSelectionFrame)]
     private VisualElement noteAreaSelectionFrame;
     
-    [Inject(UxmlName = R.UxmlNames.lastNoteAreaSelectionFrame)]
-    private VisualElement lastNoteAreaSelectionFrame;
+    [Inject(UxmlName = R.UxmlNames.audioSelectionFrame)]
+    private VisualElement audioSelectionFrame;
 
     private bool isCanceled;
 
@@ -53,8 +53,8 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
     {
         noteAreaDragControl.AddListener(this);
         
-        lastNoteAreaSelectionFrame.HideByDisplay();
-        lastNoteAreaSelectionFrame.style.width = 0;
+        audioSelectionFrame.HideByDisplay();
+        audioSelectionFrame.style.width = 0;
         
         // Update selection rect
         noteAreaControl.ViewportEventStream.Subscribe(evt =>
@@ -63,14 +63,13 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
             {
                 return;
             }
-            UpdateSelectionFrame(lastSelectionRect.Value, lastNoteAreaSelectionFrame, false, true);
+            UpdateSelectionFrame(lastSelectionRect.Value, audioSelectionFrame, false, true);
         });
-        lastSelectionRect.Subscribe(_ => UpdateSelectionFrame(lastSelectionRect.Value, lastNoteAreaSelectionFrame, false, true));
+        lastSelectionRect.Subscribe(_ => UpdateSelectionFrame(lastSelectionRect.Value, audioSelectionFrame, false, true));
         selectionControl.NoteSelectionChangedEventStream
             .Subscribe(newSelection =>
             {
-                if (newSelection.SelectedNotes.IsNullOrEmpty()
-                    || lastSelectionRect == null)
+                if (newSelection.SelectedNotes.IsNullOrEmpty())
                 {
                     return;
                 }
@@ -80,6 +79,12 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
                 int maxBeat = newSelection.SelectedNotes.Max(note => note.EndBeat);
                 int minMidiNote = newSelection.SelectedNotes.Min(note => note.MidiNote);
                 int maxMidiNote = newSelection.SelectedNotes.Max(note => note.MidiNote);
+
+                if (lastSelectionRect.Value == null)
+                {
+                    lastSelectionRect.Value = NoteAreaRect.CreateFromMillis(songMeta, 0, 0, 0, 0);
+                }
+                
                 lastSelectionRect.Value = NoteAreaRect.CreateFromBeats(
                     songMeta,
                     Math.Min(lastSelectionRect.Value.MinBeat, minBeat),
@@ -123,7 +128,7 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
         }
 
         noteAreaSelectionFrame.ShowByDisplay();
-        lastNoteAreaSelectionFrame.ShowByDisplay();
+        audioSelectionFrame.ShowByDisplay();
         noteAreaSelectionFrame.style.width = 0;
         noteAreaSelectionFrame.style.height = 0;
         lastDragEvent = dragEvent;
@@ -249,7 +254,7 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
             GetDragEndMidiNote(dragEvent));
 
         UpdateSelectionFrame(lastSelectionRect.Value, noteAreaSelectionFrame, true, true);
-        UpdateSelectionFrame(lastSelectionRect.Value, lastNoteAreaSelectionFrame, false, true);
+        UpdateSelectionFrame(lastSelectionRect.Value, audioSelectionFrame, false, true);
     }
     
     private void UpdateSelectionFrame(
@@ -264,6 +269,7 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
             return;
         }
         selectionFrameElement.ShowByVisibility();
+        selectionFrameElement.ShowByDisplay();
         
         int startBeat = selectionRect.MinBeat;
         int endBeat = selectionRect.MaxBeat;
