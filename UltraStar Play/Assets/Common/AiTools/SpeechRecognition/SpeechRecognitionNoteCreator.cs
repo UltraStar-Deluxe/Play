@@ -34,19 +34,9 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
                 config.InputSamples)
                 .GetResultAsync();
 
-            List<Note> createdNotes = CreateNotesFromSpeechRecognitionResult(
+            List<Note> createdNotes = await CreateNotesFromSpeechRecognitionResult(
                 speechRecognitionResult,
                 config);
-
-            try
-            {
-                await PerformForcedAlignment(config, createdNotes);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError("Failed to perform forced alignment to optimize note positions of speech recognition result.");
-            }
 
             return createdNotes;
         });
@@ -82,7 +72,7 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         }
     }
 
-    private List<Note> CreateNotesFromSpeechRecognitionResult(
+    private async Awaitable<List<Note>> CreateNotesFromSpeechRecognitionResult(
         SpeechRecognitionResult speechRecognitionResult,
         CreateNotesFromSpeechRecognitionConfig config)
     {
@@ -106,6 +96,16 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
             Note createdNote = new(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(config.MidiNote), text);
             return createdNote;
         }).ToList();
+
+        try
+        {
+            await PerformForcedAlignment(config, createdNotes);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError("Failed to perform forced alignment to optimize note positions of speech recognition result.");
+        }
 
         // Shorten new notes left and right to give a little space
         SpaceBetweenNotesUtils.ShortenNotesByMillis(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, config.SongMeta);
