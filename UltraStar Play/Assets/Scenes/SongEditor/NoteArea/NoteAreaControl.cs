@@ -93,6 +93,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public NoteAreaDragControl DragControl { get; private set; }
     private NoteAreaScrollingDragListener scrollingDragListener;
     private NoteAreaSelectionDragListener selectionDragListener;
+    public NoteAreaSelectionDragListener SelectionDragListener => selectionDragListener;
     private NoteAreaDrawNoteDragListener drawNoteDragListener;
     private ManipulateNotesDragListener manipulateNotesDragListener;
     private SongEditorMicPitchIndicatorControl micPitchIndicatorControl;

@@ -13,8 +13,6 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedListener, IDragListener<NoteAreaDragEvent>
 {
-    public static readonly ReactiveProperty<NoteAreaRect> lastSelectionRect = new();
-
     [Inject]
     private SongEditorSelectionControl selectionControl;
 
@@ -49,6 +47,9 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
     
     private NoteAreaDragEvent lastDragEvent;
 
+    private readonly ReactiveProperty<NoteAreaRect> lastSelectionRect = new();
+    public ReactiveProperty<NoteAreaRect> LastSelectionRect => lastSelectionRect;
+    
     public void OnInjectionFinished()
     {
         noteAreaDragControl.AddListener(this);

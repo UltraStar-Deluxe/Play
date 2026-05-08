@@ -60,6 +60,9 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
     [Inject]
     private EditorNoteControl noteControl;
+    
+    [Inject]
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private Settings settings;
@@ -111,7 +114,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         contextMenu.AddSeparator();
 
-        NoteAreaRect lastSelectionRect = NoteAreaSelectionDragListener.lastSelectionRect.Value;
+        NoteAreaRect lastSelectionRect = noteAreaControl.SelectionDragListener.LastSelectionRect.Value;
         if (lastSelectionRect == null)
         {
             return;

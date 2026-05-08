@@ -113,7 +113,7 @@ public class NoteAreaContextMenuControl : ContextMenuControl
 
     private void FillMenuForCurrentSelectionArea(ContextMenuPopupControl contextMenu, double clickPositionInMillis)
     {
-        NoteAreaRect lastSelectionRect = NoteAreaSelectionDragListener.lastSelectionRect.Value;
+        NoteAreaRect lastSelectionRect = noteAreaControl.SelectionDragListener.LastSelectionRect.Value;
         if (lastSelectionRect == null)
         {
             return;

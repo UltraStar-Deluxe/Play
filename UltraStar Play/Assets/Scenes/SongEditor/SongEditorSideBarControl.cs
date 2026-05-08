@@ -275,15 +275,16 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void DoSpeechRecognition()
     {
-        if (NoteAreaSelectionDragListener.lastSelectionRect.Value == null
-            || NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats <= 0)
+        NoteAreaRect lastSelectionRect = noteAreaControl.SelectionDragListener.LastSelectionRect.Value;
+        if (lastSelectionRect == null
+            || lastSelectionRect.LengthInBeats <= 0)
         {
             return;
         }
 
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
-            NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
-            NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
+            lastSelectionRect.MinBeat,
+            lastSelectionRect.LengthInBeats,
             settings.SongEditorSettings.SpeechRecognitionSamplesSource,
             150,
             true);
