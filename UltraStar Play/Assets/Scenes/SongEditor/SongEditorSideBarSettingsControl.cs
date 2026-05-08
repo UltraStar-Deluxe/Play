@@ -222,7 +222,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private LabeledChooserControl<MicProfile> micDeviceChooserControl;
     private EnumChooserControl<ESongEditorSamplesSource> playbackAudioChooserControl;
     private EnumChooserControl<ESongEditorSamplesSource> speechRecognitionAudioChooserControl;
-    private EnumChooserControl<ESongEditorSamplesSource> pitchDetectionAudioChooserControl;
     private EnumChooserControl<ESongEditorDrawNoteLayer> drawNoteLayerChooserControl;
 
     private readonly ImportMidiFileDialogControl importMidiFileDialogControl = new();
@@ -384,11 +383,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition = newValue);
 
         // Pitch detection
-        pitchDetectionAudioChooserControl = new(pitchDetectionAudioChooser, speechAndPitchAnalysisSampleSources);
-        pitchDetectionAudioChooserControl.Bind(
-            () => settings.SongEditorSettings.PitchDetectionSamplesSource,
-            newValue => settings.SongEditorSettings.PitchDetectionSamplesSource = newValue);
-
         audioSeparationButton.RegisterCallbackButtonTriggered(OnAudioSeparationButtonClicked);
 
         // Forced Alignment

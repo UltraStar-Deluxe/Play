@@ -58,10 +58,6 @@ public class SongEditorSettings
     public bool SplitSyllablesAfterSpeechRecognition { get; set; } = true;
     public bool ForcedAlignmentAfterSpeechRecognition { get; set; } = true;
 
-    // Pitch detection
-    public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;
-    public ESongEditorSamplesSource PitchDetectionSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
-
     // Audio separation
     public string AudioSeparationCommand { get; set; } = "";
 
