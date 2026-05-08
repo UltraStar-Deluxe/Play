@@ -102,7 +102,9 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         {
             if (rmvpePitchDetector == null)
             {
-                string modelPath = ApplicationUtils.GetStreamingAssetsPath("AiModels/rmvpe/rmvpe_20231006.onnx");
+                string modelPath = !settings.SongEditorSettings.PitchDetectionModelPath.IsNullOrEmpty()
+                    ? settings.SongEditorSettings.PitchDetectionModelPath
+                    : ApplicationUtils.GetStreamingAssetsPath("AiModels/rmvpe/rmvpe_20231006.onnx");
                 Debug.Log($"Preparing RMVPE pitch detection. modelPath: '{modelPath}'");
                 rmvpePitchDetector = new RmvpePitchDetector(modelPath);
             }

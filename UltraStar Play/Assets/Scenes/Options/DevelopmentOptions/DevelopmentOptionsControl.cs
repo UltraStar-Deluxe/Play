@@ -108,9 +108,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject]
     private InGameDebugConsoleManager inGameDebugConsoleManager;
 
-    [Inject(UxmlName = R.UxmlNames.audioSeparationCommandTextField)]
-    private TextField audioSeparationCommandTextField;
-
     [Inject(UxmlName = R.UxmlNames.clientDiscoveryPortTextField)]
     private IntegerField clientDiscoveryPortTextField;
 
@@ -327,12 +324,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.CompanionClientMessageBufferTimeInMillis,
             newValue => settings.CompanionClientMessageBufferTimeInMillis = newValue);
         messageBufferTimeTextField.DisableChangeValueByDragging();
-
-        // Spleeter command (audio separation)
-        audioSeparationCommandTextField.DisableParseEscapeSequences();
-        FieldBindingUtils.Bind(audioSeparationCommandTextField,
-            () => settings.SongEditorSettings.AudioSeparationCommand,
-            newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
 
         // Network config
         FieldBindingUtils.Bind(clientDiscoveryPortTextField,

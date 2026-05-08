@@ -94,6 +94,11 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
             // Make sure speech recognition module has been loaded.
             if (!isSpeechRecognitionModuleReady)
             {
+                if (!settings.SongEditorSettings.SpeechRecognitionModelName.IsNullOrEmpty())
+                {
+                    offlineRecognizer.ModelId = settings.SongEditorSettings.SpeechRecognitionModelName;
+                }
+
                 await offlineRecognizer.StartModuleInitializationAsync();
                 await ConditionUtils.WaitForConditionAsync(() => isSpeechRecognitionModuleReady, 
                     new WaitForConditionConfig {timeoutInMillis = 30_000});

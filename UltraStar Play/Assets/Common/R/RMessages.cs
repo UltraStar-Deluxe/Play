@@ -584,6 +584,9 @@ public static partial class R
         public static readonly string songEditor_midiImportDialog_importNotes = "songEditor_midiImportDialog_importNotes";
         public static readonly string songEditor_midiImportDialog_success = "songEditor_midiImportDialog_success";
         public static readonly string songEditor_options_adjustFollowingNotes = "songEditor_options_adjustFollowingNotes";
+        public static readonly string songEditor_options_audioSeparation_modelName = "songEditor_options_audioSeparation_modelName";
+        public static readonly string songEditor_options_audioSeparation_perform = "songEditor_options_audioSeparation_perform";
+        public static readonly string songEditor_options_audioSeparation_title = "songEditor_options_audioSeparation_title";
         public static readonly string songEditor_options_autoSave = "songEditor_options_autoSave";
         public static readonly string songEditor_options_buttonTapping_key = "songEditor_options_buttonTapping_key";
         public static readonly string songEditor_options_buttonTapping_lyrics = "songEditor_options_buttonTapping_lyrics";
@@ -624,6 +627,8 @@ public static partial class R
         public static readonly string songEditor_options_midi_title = "songEditor_options_midi_title";
         public static readonly string songEditor_options_midi_velocity = "songEditor_options_midi_velocity";
         public static readonly string songEditor_options_pitchDetection_audio = "songEditor_options_pitchDetection_audio";
+        public static readonly string songEditor_options_pitchDetection_modelPath = "songEditor_options_pitchDetection_modelPath";
+        public static readonly string songEditor_options_pitchDetection_modelPath_change = "songEditor_options_pitchDetection_modelPath_change";
         public static readonly string songEditor_options_pitchDetection_perform = "songEditor_options_pitchDetection_perform";
         public static readonly string songEditor_options_pitchDetection_title = "songEditor_options_pitchDetection_title";
         public static readonly string songEditor_options_playback_title = "songEditor_options_playback_title";
@@ -638,6 +643,7 @@ public static partial class R
         public static readonly string songEditor_options_speechRecognition_audio = "songEditor_options_speechRecognition_audio";
         public static readonly string songEditor_options_speechRecognition_forcedAlignmentAfterwards = "songEditor_options_speechRecognition_forcedAlignmentAfterwards";
         public static readonly string songEditor_options_speechRecognition_language = "songEditor_options_speechRecognition_language";
+        public static readonly string songEditor_options_speechRecognition_modelName = "songEditor_options_speechRecognition_modelName";
         public static readonly string songEditor_options_speechRecognition_modelPath = "songEditor_options_speechRecognition_modelPath";
         public static readonly string songEditor_options_speechRecognition_modelPath_change = "songEditor_options_speechRecognition_modelPath_change";
         public static readonly string songEditor_options_speechRecognition_perform = "songEditor_options_speechRecognition_perform";

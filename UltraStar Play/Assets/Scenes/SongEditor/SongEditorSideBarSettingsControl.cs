@@ -45,6 +45,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.performForcedAlignmentButton)]
     private Button performForcedAlignmentButton;
     
+    [Inject(UxmlName = R.UxmlNames.performPitchDetectionButton)]
+    private Button performPitchDetectionButton;
+    
+    [Inject(UxmlName = R.UxmlNames.performAudioSeparationButton)]
+    private Button performAudioSeparationButton;
+    
     [Inject(UxmlName = R.UxmlNames.forcedAlignmentWordStartPaddingMsSlider)]
     private SliderInt forcedAlignmentWordStartPaddingMsSlider;
 
@@ -143,6 +149,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.speechRecognitionAudioChooser)]
     private Chooser speechRecognitionAudioChooser;
+    
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentAudioChooser)]
+    private Chooser forcedAlignmentAudioChooser;
 
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAudioChooser)]
     private Chooser pitchDetectionAudioChooser;
@@ -217,11 +226,15 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private ForcedAlignmentAction forcedAlignmentAction;
 
     [Inject]
+    private PitchDetectionAction pitchDetectionAction;
+
+    [Inject]
     private SongMetaChangedEventStream songMetaChangedEventStream;
 
     private LabeledChooserControl<MicProfile> micDeviceChooserControl;
     private EnumChooserControl<ESongEditorSamplesSource> playbackAudioChooserControl;
     private EnumChooserControl<ESongEditorSamplesSource> speechRecognitionAudioChooserControl;
+    private EnumChooserControl<ESongEditorSamplesSource> forcedAlignmentAudioChooserControl;
     private EnumChooserControl<ESongEditorDrawNoteLayer> drawNoteLayerChooserControl;
 
     private readonly ImportMidiFileDialogControl importMidiFileDialogControl = new();
@@ -362,18 +375,23 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
         importMidiFileButton.RegisterCallbackButtonTriggered(_ => importMidiFileDialogControl.OpenDialog());
 
-        List<ESongEditorSamplesSource> speechAndPitchAnalysisSampleSources = new List<ESongEditorSamplesSource>
+        List<ESongEditorSamplesSource> aiSampleSources = new List<ESongEditorSamplesSource>
         {
             ESongEditorSamplesSource.OriginalMusic,
             ESongEditorSamplesSource.Vocals,
             ESongEditorSamplesSource.Recording,
         };
 
-        speechRecognitionAudioChooserControl = new(speechRecognitionAudioChooser, speechAndPitchAnalysisSampleSources);
+        speechRecognitionAudioChooserControl = new(speechRecognitionAudioChooser, aiSampleSources);
         speechRecognitionAudioChooserControl.Bind(
             () => settings.SongEditorSettings.AiSamplesSource,
             newValue => settings.SongEditorSettings.AiSamplesSource = newValue);
 
+        forcedAlignmentAudioChooserControl = new(forcedAlignmentAudioChooser, aiSampleSources);
+        forcedAlignmentAudioChooserControl.Bind(
+            () => settings.SongEditorSettings.AiSamplesSource,
+            newValue => settings.SongEditorSettings.AiSamplesSource = newValue);
+        
         Bind(splitSyllablesAfterSpeechRecognitionToggle,
             () => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition,
             newValue => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition = newValue);
@@ -382,8 +400,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition,
             newValue => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition = newValue);
 
-        // Pitch detection
+        // Audio separation (button in main side bar and in options)
         audioSeparationButton.RegisterCallbackButtonTriggered(OnAudioSeparationButtonClicked);
+        performAudioSeparationButton.RegisterCallbackButtonTriggered(OnAudioSeparationButtonClicked);
+
+        // Pitch detection
+        performPitchDetectionButton.RegisterCallbackButtonTriggered(_ => pitchDetectionAction.CreateNotesUsingAi(true));
 
         // Forced Alignment
         Bind(forcedAlignmentModelPathTextField,
@@ -391,8 +413,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.ForcedAlignmentModelPath = newValue);
         
         Bind(forcedAlignmentLyricsTextField,
-            () => settings.SongEditorSettings.ForcedAlignmentLyrics,
-            newValue => settings.SongEditorSettings.ForcedAlignmentLyrics = newValue);
+            () => nonPersistentSettings.ForcedAlignmentLyrics,
+            newValue => nonPersistentSettings.ForcedAlignmentLyrics = newValue);
 
         Bind(forcedAlignmentWordStartPaddingMsSlider,
             () => settings.SongEditorSettings.ForcedAlignmentStartPaddingMs,
@@ -407,7 +429,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.ForcedAlignmentPaddingMaxWordLengthMs = newValue);
         
         performForcedAlignmentButton.RegisterCallbackButtonTriggered(_ =>
-            forcedAlignmentAction.RunForcedAlignment(settings.SongEditorSettings.ForcedAlignmentLyrics, true));
+            forcedAlignmentAction.RunForcedAlignment(nonPersistentSettings.ForcedAlignmentLyrics, true));
         
         // Lyrics editing separators
         Bind(wordSeparatorTextField,

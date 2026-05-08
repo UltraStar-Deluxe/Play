@@ -19,9 +19,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
 
-    [Inject(UxmlName = R.UxmlNames.doPitchDetectionInSelectionButton)]
-    private Button doPitchDetectionInSelectionButton;
-
     [Inject(UxmlName = R.UxmlNames.aiPitchDetectionButton)]
     private Button aiPitchDetectionButton;
 

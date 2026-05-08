@@ -191,16 +191,16 @@ public static class SettingsUtils
 
     public static Hyphenator CreateHyphenator(Settings settings)
     {
-        string speechRecognitionLanguage = settings?.SongEditorSettings?.LyricsLanguage;
-        if (speechRecognitionLanguage.IsNullOrEmpty())
+        string lyricsLanguage = settings?.SongEditorSettings?.LyricsLanguage;
+        if (lyricsLanguage.IsNullOrEmpty())
         {
             return null;
         }
 
-        IHyphenatePatternsLoader hyphenatePatternsLoader = HyphenationPatternsProvider.CreateHyphenationPatternsLoader(speechRecognitionLanguage);
+        IHyphenatePatternsLoader hyphenatePatternsLoader = HyphenationPatternsProvider.CreateHyphenationPatternsLoader(lyricsLanguage);
         if (hyphenatePatternsLoader == null)
         {
-            Debug.LogWarning("No hyphenation patterns found for language: " + speechRecognitionLanguage);
+            Debug.LogWarning("No hyphenation patterns found for language: " + lyricsLanguage);
             return null;
         }
 

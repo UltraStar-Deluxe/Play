@@ -128,6 +128,10 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
         // Make sure source separation module has been loaded.
         if (!isSourceSeparationModuleReady)
         {
+            if (!settings.SongEditorSettings.AudioSeparationModelName.IsNullOrEmpty())
+            {
+                sourceSeparationComponent.ModelId = settings.SongEditorSettings.AudioSeparationModelName;
+            }
             sourceSeparationComponent.TryLoadModule();
             await ConditionUtils.WaitForConditionAsync(() => isSourceSeparationModuleReady,
                 new WaitForConditionConfig { timeoutInMillis = 30_000 });

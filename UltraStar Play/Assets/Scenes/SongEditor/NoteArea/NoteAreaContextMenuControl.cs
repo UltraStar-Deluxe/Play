@@ -44,6 +44,9 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     private Settings settings;
 
     [Inject]
+    private NonPersistentSettings nonPersistentSettings;
+
+    [Inject]
     private NoteAreaDragControl noteAreaDragControl;
 
     [Inject]
@@ -141,14 +144,14 @@ public class NoteAreaContextMenuControl : ContextMenuControl
                     Translation.Get(R.Messages.songEditor_action_forcedAlignmentInSelection_dialog_message),
                     newLyrics =>
                     {
-                        settings.SongEditorSettings.ForcedAlignmentLyrics = newLyrics;
+                        nonPersistentSettings.ForcedAlignmentLyrics = newLyrics;
                         forcedAlignmentAction.CreateNotesViaForcedAlignmentInSelection(
-                            settings.SongEditorSettings.ForcedAlignmentLyrics,
+                            nonPersistentSettings.ForcedAlignmentLyrics,
                             lastSelectionRect.MinBeat,
                             lastSelectionRect.LengthInBeats,
                             true);
                     },
-                    settings.SongEditorSettings.ForcedAlignmentLyrics);
+                    nonPersistentSettings.ForcedAlignmentLyrics);
             });
         }
     }

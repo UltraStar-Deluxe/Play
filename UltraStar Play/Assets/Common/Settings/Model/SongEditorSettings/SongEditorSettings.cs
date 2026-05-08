@@ -8,27 +8,31 @@ public class SongEditorSettings
     public const char DefaultSentenceSeparator = '\n';
     
     public bool AutoSave { get; set; }
+    public string LyricsLanguage { get; set; } = ELyricsLanguage.English.ToString().ToLowerInvariant();
 
+    // Playback
     public int MusicVolumePercent { get; set; } = 100;
     public ESongEditorSamplesSource PlaybackSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
     public ESongEditorAudioWaveformSamplesSource AudioWaveformSamplesSource { get; set; } = ESongEditorAudioWaveformSamplesSource.SameAsPlayback;
+    
+    // Playback of selected range
     public bool GoToLastPlaybackPosition { get; set; }
     public int PlaybackPreBeginInMillis { get; set; }
     public int PlaybackPostEndInMillis { get; set; }
 
+    // Editing
+    public bool AdjustFollowingNotes { get; set; }
     public ESongEditorDrawNoteLayer DrawNoteLayer { get; set; }
+    public int DefaultPitchForCreatedNotes { get; set; } = MidiUtils.MidiNoteConcertPitch;
 
-    // Recording in SongEditorScene
+    // Microphone in SongEditorScene
     public MicProfile MicProfile { get; set; }
     public int MicDelayInMillis { get; set; } = 450;
-    public int DefaultPitchForCreatedNotes { get; set; } = MidiUtils.MidiNoteConcertPitch;
+    
+    // Button tapping
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
     public string ButtonRecordingLyrics { get; set; } = "";
-    public bool SpeechRecognitionWhenRecording { get; set; } = true;
-    public string LyricsLanguage { get; set; } = ELyricsLanguage.English.ToString().ToLowerInvariant();
-
-    public bool AdjustFollowingNotes { get; set; }
-
+    
     // Velocity should be between 0 and 127
     public int MidiVelocity { get; set; } = 100;
 
@@ -38,6 +42,7 @@ public class SongEditorSettings
     public int MidiPlaybackOffsetInMillis { get; set; }
     public string LastMidiFilePath { get; set; } = "";
 
+    // Layout and display options
     public bool ShowRightSideBar { get; set; } = true;
     public bool ShowAudioWaveformInBackground { get; set; } = true;
     public bool ShowPitchDetectionResult { get; set; } = true;
@@ -56,15 +61,19 @@ public class SongEditorSettings
     // AI tools
     public ESongEditorSamplesSource AiSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
     
+    // Audio separation
+    public string AudioSeparationModelName { get; set; } = "";
+    
+    // Pitch Detection
+    public string PitchDetectionModelPath { get; set; } = "";
+
     // Speech recognition
+    public string SpeechRecognitionModelName { get; set; } = "";
     public bool SplitSyllablesAfterSpeechRecognition { get; set; } = true;
     public bool ForcedAlignmentAfterSpeechRecognition { get; set; } = true;
+    public bool SpeechRecognitionWhenRecording { get; set; } = true;
 
-    // Audio separation
-    public string AudioSeparationCommand { get; set; } = "";
-
-    // Forced Alignemnt
-    public string ForcedAlignmentLyrics { get; set; } = "";
+    // Forced Alignment
     public string ForcedAlignmentModelPath { get; set; } = "";
     public int ForcedAlignmentStartPaddingMs { get; set; } = 100;
     public int ForcedAlignmentEndPaddingMs { get; set; } = 100;

@@ -43,7 +43,8 @@ public static partial class R
         public const string audioFileTextField = "audioFileTextField";
         public const string audioSelectionFrame = "audioSelectionFrame";
         public const string audioSeparationButton = "audioSeparationButton";
-        public const string audioSeparationCommandTextField = "audioSeparationCommandTextField";
+        public const string audioSeparationGroup = "audioSeparationGroup";
+        public const string audioSeparationModelNameTextField = "audioSeparationModelNameTextField";
         public const string audioWaveForm = "audioWaveForm";
         public const string autoSaveToggle = "autoSaveToggle";
         public const string avproApiUsageChooser = "avproApiUsageChooser";
@@ -180,7 +181,6 @@ public static partial class R
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string difficultyChooser = "difficultyChooser";
         public const string disconnectOnlineGameButton = "disconnectOnlineGameButton";
-        public const string doPitchDetectionInSelectionButton = "doPitchDetectionInSelectionButton";
         public const string downloadSongArchiveButton = "downloadSongArchiveButton";
         public const string downloadSongArchiveIcon = "downloadSongArchiveIcon";
         public const string downloadSongsButtonLabel = "downloadSongsButtonLabel";
@@ -210,7 +210,6 @@ public static partial class R
         public const string entriesContainer = "entriesContainer";
         public const string entryContainer = "entryContainer";
         public const string exitSceneButton = "exitSceneButton";
-        public const string externalToolsGroup = "externalToolsGroup";
         public const string filterActiveIcon = "filterActiveIcon";
         public const string filterInactiveIcon = "filterInactiveIcon";
         public const string filterListContainer = "filterListContainer";
@@ -220,8 +219,10 @@ public static partial class R
         public const string folderImage = "folderImage";
         public const string folderPreviewImage = "folderPreviewImage";
         public const string forcedAlignmentAfterSpeechRecognitionToggle = "forcedAlignmentAfterSpeechRecognitionToggle";
+        public const string forcedAlignmentAudioChooser = "forcedAlignmentAudioChooser";
         public const string forcedAlignmentGroup = "forcedAlignmentGroup";
         public const string forcedAlignmentLyricsTextField = "forcedAlignmentLyricsTextField";
+        public const string forcedAlignmentModelPathButton = "forcedAlignmentModelPathButton";
         public const string forcedAlignmentModelPathTextField = "forcedAlignmentModelPathTextField";
         public const string forcedAlignmentPaddingMaxWordLengthMsSlider = "forcedAlignmentPaddingMaxWordLengthMsSlider";
         public const string forcedAlignmentWordEndPaddingMsSlider = "forcedAlignmentWordEndPaddingMsSlider";
@@ -584,13 +585,16 @@ public static partial class R
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
         public const string performanceAndEffectsGroup = "performanceAndEffectsGroup";
+        public const string performAudioSeparationButton = "performAudioSeparationButton";
         public const string performForcedAlignmentButton = "performForcedAlignmentButton";
+        public const string performPitchDetectionButton = "performPitchDetectionButton";
         public const string permissionsAccordionItem = "permissionsAccordionItem";
         public const string permissionsContainer = "permissionsContainer";
         public const string phraseBonusScore = "phraseBonusScore";
         public const string pitchDetectionAlgorithmChooser = "pitchDetectionAlgorithmChooser";
-        public const string pitchDetectionAudioChooser = "pitchDetectionAudioChooser";
         public const string pitchDetectionGroup = "pitchDetectionGroup";
+        public const string pitchDetectionModelPathButton = "pitchDetectionModelPathButton";
+        public const string pitchDetectionModelPathTextField = "pitchDetectionModelPathTextField";
         public const string pitchIndicator = "pitchIndicator";
         public const string pitchIndicatorIcon = "pitchIndicatorIcon";
         public const string pitchLabel = "pitchLabel";
@@ -747,7 +751,6 @@ public static partial class R
         public const string selectionIndicator = "selectionIndicator";
         public const string selectionIndicatorInner = "selectionIndicatorInner";
         public const string selectMidiFileButton = "selectMidiFileButton";
-        public const string selectModelPathButton = "selectModelPathButton";
         public const string selectRandomSongButton = "selectRandomSongButton";
         public const string selectRandomSongIcon = "selectRandomSongIcon";
         public const string selectSoundfontButton = "selectSoundfontButton";
@@ -891,6 +894,7 @@ public static partial class R
         public const string spacer = "spacer";
         public const string speechRecognitionAudioChooser = "speechRecognitionAudioChooser";
         public const string speechRecognitionGroup = "speechRecognitionGroup";
+        public const string speechRecognitionModelNameTextField = "speechRecognitionModelNameTextField";
         public const string speechRecognitionWhenRecordingToggle = "speechRecognitionWhenRecordingToggle";
         public const string splitSyllablesAfterSpeechRecognitionToggle = "splitSyllablesAfterSpeechRecognitionToggle";
         public const string starIcons = "starIcons";

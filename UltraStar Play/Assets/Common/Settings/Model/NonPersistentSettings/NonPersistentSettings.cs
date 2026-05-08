@@ -26,6 +26,7 @@ public class NonPersistentSettings
     // Song editor settings
     public ReactiveProperty<float> SongEditorMusicPlaybackSpeed { get; set; } = new(1);
     public ReactiveProperty<bool> IsSongEditorRecordingEnabled { get; set; } = new();
+    public string ForcedAlignmentLyrics { get; set; } = "";
 
     // Online multiplayer related stuff
     public List<LobbyMemberPlayerProfile> LobbyMemberPlayerProfiles { get; set; } = new();

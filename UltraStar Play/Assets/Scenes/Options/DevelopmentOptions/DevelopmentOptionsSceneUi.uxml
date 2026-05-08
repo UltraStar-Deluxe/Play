@@ -78,9 +78,6 @@
                 <Chooser name="beatAnalyzedEventNetworkDeliveryChooser" label="Beat Analyzed Event Network Delivery" class="noBackgroundInHierarchy"/>
                 <ui:IntegerField label="Simulate Jitter (ms)" name="simulateJitterInMillisField"/>
             </AccordionItem>
-            <AccordionItem name="externalToolsGroup" label="External Tools" class="child-mb-3">
-                <ui:TextField name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" value="python -m spleeter" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;"/>
-            </AccordionItem>
             <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);"/>
             <ui:Label tabindex="-1" text="¹ requires restart" display-tooltip-when-elided="true" name="requiresRestartLabel" class="noBackgroundInHierarchy"/>
         </ui:ScrollView>
