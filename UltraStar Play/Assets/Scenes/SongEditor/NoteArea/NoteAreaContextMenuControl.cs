@@ -129,7 +129,7 @@ public class NoteAreaContextMenuControl : ContextMenuControl
                 speechRecognitionAction.CreateNotesFromSpeechRecognition(
                     lastSelectionRect.MinBeat,
                     lastSelectionRect.LengthInBeats,
-                    settings.SongEditorSettings.SpeechRecognitionSamplesSource,
+                    settings.SongEditorSettings.AiSamplesSource,
                     settings.SongEditorSettings.SpaceBetweenNotesInMillis,
                     true);
             });

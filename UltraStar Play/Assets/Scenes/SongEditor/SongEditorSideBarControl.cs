@@ -267,7 +267,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
             lastSelectionRect.MinBeat,
             lastSelectionRect.LengthInBeats,
-            settings.SongEditorSettings.SpeechRecognitionSamplesSource,
+            settings.SongEditorSettings.AiSamplesSource,
             150,
             true);
     }

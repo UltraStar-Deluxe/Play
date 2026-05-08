@@ -53,8 +53,10 @@ public class SongEditorSettings
     public float GridSizeInPx { get; set; } = 1;
     public float SentenceLineSizeInPx { get; set; } = 2;
 
+    // AI tools
+    public ESongEditorSamplesSource AiSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
+    
     // Speech recognition
-    public ESongEditorSamplesSource SpeechRecognitionSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
     public bool SplitSyllablesAfterSpeechRecognition { get; set; } = true;
     public bool ForcedAlignmentAfterSpeechRecognition { get; set; } = true;
 

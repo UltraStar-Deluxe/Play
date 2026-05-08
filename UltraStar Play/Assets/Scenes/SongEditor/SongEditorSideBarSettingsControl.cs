@@ -371,8 +371,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
         speechRecognitionAudioChooserControl = new(speechRecognitionAudioChooser, speechAndPitchAnalysisSampleSources);
         speechRecognitionAudioChooserControl.Bind(
-            () => settings.SongEditorSettings.SpeechRecognitionSamplesSource,
-            newValue => settings.SongEditorSettings.SpeechRecognitionSamplesSource = newValue);
+            () => settings.SongEditorSettings.AiSamplesSource,
+            newValue => settings.SongEditorSettings.AiSamplesSource = newValue);
 
         Bind(splitSyllablesAfterSpeechRecognitionToggle,
             () => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition,

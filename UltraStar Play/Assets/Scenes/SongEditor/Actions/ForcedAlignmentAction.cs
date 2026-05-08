@@ -165,7 +165,7 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
         int startBeat,
         int lengthInBeats)
     {
-        AudioClip audioClip = await GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
+        AudioClip audioClip = await GetAudioClip(settings.SongEditorSettings.AiSamplesSource);
         if (audioClip == null)
         {
             return new ForcedAlignmentInput(lyrics, Array.Empty<float>(), 0, 0, 0);
@@ -177,7 +177,7 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
     
     private async Awaitable<ForcedAlignmentInput> GetForcedAlignmentInput(string lyrics)
     {
-        AudioClip audioClip = await GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
+        AudioClip audioClip = await GetAudioClip(settings.SongEditorSettings.AiSamplesSource);
         if (audioClip == null)
         {
             return new ForcedAlignmentInput(lyrics, Array.Empty<float>(), 0, 0, 0);
