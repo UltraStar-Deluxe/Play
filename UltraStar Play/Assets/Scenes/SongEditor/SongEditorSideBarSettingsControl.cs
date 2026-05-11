@@ -38,13 +38,22 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.forcedAlignmentModelPathTextField)]
     private TextField forcedAlignmentModelPathTextField;
-    
+
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentModelPathButton)]
+    private Button forcedAlignmentModelPathButton;
+
     [Inject(UxmlName = R.UxmlNames.forcedAlignmentLyricsTextField)]
     private TextField forcedAlignmentLyricsTextField;
     
     [Inject(UxmlName = R.UxmlNames.performForcedAlignmentButton)]
     private Button performForcedAlignmentButton;
     
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionModelPathTextField)]
+    private TextField pitchDetectionModelPathTextField;
+
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionModelPathButton)]
+    private Button pitchDetectionModelPathButton;
+
     [Inject(UxmlName = R.UxmlNames.performPitchDetectionButton)]
     private Button performPitchDetectionButton;
     
@@ -402,12 +411,32 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         performAudioSeparationButton.RegisterCallbackButtonTriggered(OnAudioSeparationButtonClicked);
 
         // Pitch detection
+        Bind(pitchDetectionModelPathTextField,
+            () => settings.SongEditorSettings.PitchDetectionModelPath,
+            newValue => settings.SongEditorSettings.PitchDetectionModelPath = newValue);
+
+        pitchDetectionModelPathButton.RegisterCallbackButtonTriggered(_ =>
+            FileSystemDialogUtils.OpenFileDialogToSetPath(
+                Translation.Get(R.Messages.songEditor_options_pitchDetection_modelPath),
+                "",
+                FileSystemDialogUtils.CreateExtensionFilters("ONNX", "onnx"),
+                () => pitchDetectionModelPathTextField.value,
+                newValue => pitchDetectionModelPathTextField.value = newValue));
+
         performPitchDetectionButton.RegisterCallbackButtonTriggered(_ => pitchDetectionAction.CreateNotesUsingAi(true));
 
         // Forced Alignment
         Bind(forcedAlignmentModelPathTextField,
             () => settings.SongEditorSettings.ForcedAlignmentModelPath,
             newValue => settings.SongEditorSettings.ForcedAlignmentModelPath = newValue);
+
+        forcedAlignmentModelPathButton.RegisterCallbackButtonTriggered(_ =>
+            FileSystemDialogUtils.OpenFileDialogToSetPath(
+                Translation.Get(R.Messages.songEditor_options_forcedAlignment_modelPath),
+                "",
+                FileSystemDialogUtils.CreateExtensionFilters("Sherpa-ONNX model", "tar", "tar.gz", "zip", "yaml"),
+                () => forcedAlignmentModelPathTextField.value,
+                newValue => forcedAlignmentModelPathTextField.value = newValue));
         
         Bind(forcedAlignmentLyricsTextField,
             () => nonPersistentSettings.ForcedAlignmentLyrics,
