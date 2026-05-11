@@ -135,6 +135,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.sentenceLineSizeTextField)]
     private TextField sentenceLineSizeTextField;
 
+    [Inject(UxmlName = R.UxmlNames.audioSeparationModelNameTextField)]
+    private TextField audioSeparationModelNameTextField;
+
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionModelNameTextField)]
+    private TextField speechRecognitionModelNameTextField;
+
     [Inject(UxmlName = R.UxmlNames.videoArea)]
     private VisualElement videoArea;
 
@@ -393,6 +399,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.AiSamplesSource,
             newValue => settings.SongEditorSettings.AiSamplesSource = newValue);
 
+        speechRecognitionModelNameTextField.DisableParseEscapeSequences();
+        Bind(speechRecognitionModelNameTextField,
+            () => settings.SongEditorSettings.SpeechRecognitionModelName,
+            newValue => settings.SongEditorSettings.SpeechRecognitionModelName = newValue);
+
         forcedAlignmentAudioChooserControl = new(forcedAlignmentAudioChooser, aiSampleSources);
         forcedAlignmentAudioChooserControl.Bind(
             () => settings.SongEditorSettings.AiSamplesSource,
@@ -409,6 +420,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         // Audio separation (button in main side bar and in options)
         audioSeparationButton.RegisterCallbackButtonTriggered(OnAudioSeparationButtonClicked);
         performAudioSeparationButton.RegisterCallbackButtonTriggered(OnAudioSeparationButtonClicked);
+        
+        audioSeparationModelNameTextField.DisableParseEscapeSequences();
+        Bind(audioSeparationModelNameTextField,
+            () => settings.SongEditorSettings.AudioSeparationModelName,
+            newValue => settings.SongEditorSettings.AudioSeparationModelName = newValue);
 
         // Pitch detection
         Bind(pitchDetectionModelPathTextField,
