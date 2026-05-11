@@ -141,6 +141,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelNameTextField)]
     private TextField speechRecognitionModelNameTextField;
 
+    [Inject(UxmlName = R.UxmlNames.lyricsLanguageChooser)]
+    private EnumField lyricsLanguageChooser;
+
     [Inject(UxmlName = R.UxmlNames.videoArea)]
     private VisualElement videoArea;
 
@@ -490,6 +493,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 ? SongEditorSettings.DefaultSyllableSeparator
                 : newValue[0]);
 
+        // Lyrics language
+        lyricsLanguageChooser.Init(ELyricsLanguage.English);
+        Bind(lyricsLanguageChooser,
+            () => EnumUtils.Parse(settings.SongEditorSettings.LyricsLanguage, ELyricsLanguage.English),
+            newValue => settings.SongEditorSettings.LyricsLanguage = newValue.ToString().ToLowerInvariant());
+        
         // Show / hide VisualElements
         Bind(showRightSideBarToggle,
             () => settings.SongEditorSettings.ShowRightSideBar,

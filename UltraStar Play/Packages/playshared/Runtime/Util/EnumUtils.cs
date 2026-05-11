@@ -14,6 +14,14 @@ public static class EnumUtils
                 result.Add((T)o);
             }
         }
+
         return result;
+    }
+
+    public static T Parse<T>(string text, T fallback) where T : struct
+    {
+        return Enum.TryParse<T>(text, true, out T result)
+            ? result
+            : fallback;
     }
 }

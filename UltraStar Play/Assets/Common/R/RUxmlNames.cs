@@ -412,6 +412,7 @@ public static partial class R
         public const string lyricsContainer = "lyricsContainer";
         public const string lyricsGroup = "lyricsGroup";
         public const string lyricsLabel = "lyricsLabel";
+        public const string lyricsLanguageChooser = "lyricsLanguageChooser";
         public const string lyricsPropertyToggle = "lyricsPropertyToggle";
         public const string main = "main";
         public const string mediaFileFormatGroup = "mediaFileFormatGroup";

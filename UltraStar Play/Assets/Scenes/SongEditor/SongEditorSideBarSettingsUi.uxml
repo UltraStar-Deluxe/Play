@@ -63,6 +63,7 @@
             <ui:Button text="$songEditor_options_midi_import" display-tooltip-when-elided="true" name="importMidiFileButton" style="width: 100%;"/>
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="lyricsGroup" label="$songEditor_options_lyrics_title">
+            <ui:EnumField label="$songEditor_options_lyrics_language" value="English" type="ELyricsLanguage, Common" name="lyricsLanguageChooser" style="flex-direction: column;"/>
             <ui:TextField label="$songEditor_options_lyrics_wordSeparator" placeholder-text="Default (space)" name="wordSeparatorTextField" style="flex-direction: column;"/>
             <ui:TextField label="$songEditor_options_lyrics_syllableSeparator" placeholder-text="Default (semicolon)" name="syllableSeparatorTextField" style="flex-direction: column;"/>
         </SongEditorSideBarGroup>
