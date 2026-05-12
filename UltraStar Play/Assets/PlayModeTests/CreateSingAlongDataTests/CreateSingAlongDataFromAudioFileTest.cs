@@ -5,20 +5,13 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
 {
-    private static readonly string testFolderPath = Application.dataPath + "/PlayModeTests/CreateSingAlongDataTests";
-    private static string OutputFolderPath => $"{Application.temporaryCachePath}/{nameof(CreateSingAlongDataFromAudioFileTest)}/Output";
-
-    private static readonly List<TestCaseData> testCases = new List<TestCaseData>()
-    {
-        new TestCaseData("HoliznaCC0 - To Be an Animal - Excerpt.ogg").Returns(null),
-        new TestCaseData("HoliznaCC0 - To Be an Animal - Excerpt - 测试文件_Тест_αβγ_🌍_äöü_ñ_café.ogg").Returns(null),
-    };
+    private static readonly string testFolderPath = Application.dataPath + "/PlayModeTests/CreateSingAlongDataTests/SpecialCharacters-测_ส_Тест_αβγ_🌍_äß_ñ";
+    private static string OutputFolderPath => $"{Application.temporaryCachePath}/{nameof(CreateSingAlongDataFromAudioFileTest)}/Output/SpecialCharacters-测_ส_Тест_αβγ_🌍_äß_ñ";
 
     [SetUp]
     public void RemoveOldOutputFiles()
@@ -27,12 +20,12 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
     }
 
     [UnityTest]
-    [TestCaseSource(nameof(testCases))]
-    public IEnumerator ShouldCreateSingAlongData(string audioFileName) => ShouldCreateSingAlongDataAsync(audioFileName);
-    private async Awaitable ShouldCreateSingAlongDataAsync(string audioFileName)
+    public IEnumerator ShouldCreateSingAlongData() => ShouldCreateSingAlongDataAsync();
+    private async Awaitable ShouldCreateSingAlongDataAsync()
     {
         LogAssertUtils.IgnoreFailingMessages();
 
+        string audioFileName = "HoliznaCC0 - To Be an Animal - Excerpt - 测_ส_Тест_αβγ_🌍_äß_ñ.ogg";
         string audioFilePath = $"{testFolderPath}/{audioFileName}";
         string txtFilePathToBeCreated = $"{OutputFolderPath}/{Path.GetFileNameWithoutExtension(audioFileName)}";
 

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 
 public static class OggFileWriter
 {
@@ -6,7 +7,11 @@ public static class OggFileWriter
 
     public static void WriteFile(string outputPath, AudioClip audioClip, float quality = DefaultQuality)
     {
-        OggVorbis.VorbisPlugin.Save(outputPath, audioClip, quality);
+        // OggVorbis.VorbisPlugin cannot handle special characters in output folder path.
+        // Workaround: Save in ASCII-only path, then move
+        string temporaryOutputPath = Path.GetTempFileName().Replace(".tmp", ".ogg");
+        OggVorbis.VorbisPlugin.Save(temporaryOutputPath, audioClip, quality);
+        FileUtils.MoveFileOverwriteIfExists(temporaryOutputPath, outputPath);
     }
 
     public static void WriteFile(string outputPath, int sampleRate, int channels, float[] samples,
