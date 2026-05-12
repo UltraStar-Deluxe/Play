@@ -12,7 +12,6 @@
     "com.darrentsung.dtcompiletimetracker": "https://github.com/DarrenTsung/DTCompileTimeTracker.git#276095b3b212d7c33106b53d71b93b5a72d1e1d3",
     "com.eitan.sherpa-onnx-unity": "https://github.com/EitanWong/com.eitan.sherpa-onnx-unity.git?path=SherpaONNXUnity/Packages/com.eitan.sherpa-onnx-unity#ef88976b6329da6eb529854ed8594f615c54f6da",
     "com.gindemit.vorbis": "https://github.com/gindemit/unity-vorbis.git?path=/unity/Assets/VorbisPlugin/#0.4.1",
-    "com.singularitygroup.hotreload": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.5",
     "com.unity.build-report-inspector": "0.3.0-preview",
     "com.unity.burst": "1.8.27",
     "com.unity.ide.rider": "3.0.40",
