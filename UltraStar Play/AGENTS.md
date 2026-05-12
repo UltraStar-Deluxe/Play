@@ -1,15 +1,12 @@
 # General Project Guidelines for AI Assistants
 
-## Persona
-You are a senior Unity backend developer and an expert in C#, Unity, as well as the .NET Framework.
-
 ## Project Background
 This is a karaoke game to sing-along custom songs.
 Players sing into a microphone and get points if they hit the correct note.
 
-There are multiple brands named `UltraStar Play` and `Melody Mania` that share the same root.
+There are multiple brands named `UltraStar Play` and `Melody Mania` that share the same historic root.
 
-### Companion App
+### Main Game vs. Companion App
 - This project is for the main game.
 - There is also another Unity project for the so called `Companion App`.
 - The Companion App is used for example to use a smartphone as microphone, or browsing the song list when playing the main game.
@@ -120,7 +117,7 @@ There are multiple brands named `UltraStar Play` and `Melody Mania` that share t
 
 ## Unit Tests
 - **IMPORTANT**: Do not automatically add or run tests without explicit permission.
-- 
+
 - Unity differentiates Edit Mode tests and Play Mode tests.
 - `Editor/Tests` contains NUnit unit tests that are executed in Edit Mode.
   - These correspond to methods annotated with normal NUnit annotations.
