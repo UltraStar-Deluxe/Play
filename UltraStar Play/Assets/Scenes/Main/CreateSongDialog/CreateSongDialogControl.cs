@@ -27,14 +27,8 @@ public class CreateSongDialogControl : AbstractModalDialogControl, IInjectionFin
     [Inject(UxmlName = R.UxmlNames.titleTextField)]
     private TextField titleTextField;
 
-    [Inject(UxmlName = R.UxmlNames.createCoverToggle)]
-    private Toggle createCoverToggle;
-
-    [Inject(UxmlName = R.UxmlNames.createBackgroundToggle)]
-    private Toggle createBackgroundToggle;
-
-    [Inject(UxmlName = R.UxmlNames.createVideoToggle)]
-    private Toggle createVideoToggle;
+    [Inject(UxmlName = R.UxmlNames.lyricsTextField)]
+    private TextField lyricsTextField;
 
     [Inject(UxmlName = R.UxmlNames.okButton)]
     private Button okButton;
@@ -64,9 +58,8 @@ public class CreateSongDialogControl : AbstractModalDialogControl, IInjectionFin
         artistTextField.DisableParseEscapeSequences();
         titleTextField.value = "";
         titleTextField.DisableParseEscapeSequences();
-        createCoverToggle.value = true;
-        createBackgroundToggle.value = true;
-        createVideoToggle.value = false;
+        lyricsTextField.value = "";
+        lyricsTextField.DisableParseEscapeSequences();
 
         UpdateOkButtonEnabled();
         artistTextField.RegisterValueChangedCallback(evt => UpdateOkButtonEnabled());
@@ -168,9 +161,10 @@ public class CreateSongDialogControl : AbstractModalDialogControl, IInjectionFin
             audioFileTextField.value,
             artistTextField.value,
             titleTextField.value,
-            createCoverToggle.value,
-            createBackgroundToggle.value,
-            createVideoToggle.value);
+            true,
+            true,
+            true,
+            lyricsTextField.value);
         CloseDialog();
     }
 
@@ -178,7 +172,7 @@ public class CreateSongDialogControl : AbstractModalDialogControl, IInjectionFin
     {
         return !artistTextField.value.IsNullOrEmpty()
                && !titleTextField.value.IsNullOrEmpty()
-               && (audioFileTextField.value.IsNullOrEmpty()
-                   || FileUtils.Exists(audioFileTextField.value));
+               && !audioFileTextField.value.IsNullOrEmpty()
+               && FileUtils.Exists(audioFileTextField.value);
     }
 }

@@ -460,3 +460,7 @@ Toggle.smallControl {
     -unity-text-outline-width: 12px;
     -unity-text-outline-color: #0dcaf0;
 }
+
+.unity-base-text-field.fullwidth > .unity-base-text-field__input {
+    width: 100%;
+}

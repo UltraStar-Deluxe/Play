@@ -276,6 +276,8 @@ public static partial class R
         public static readonly string mainScene_newSongDialog_createBackground = "mainScene_newSongDialog_createBackground";
         public static readonly string mainScene_newSongDialog_createCover = "mainScene_newSongDialog_createCover";
         public static readonly string mainScene_newSongDialog_createVideo = "mainScene_newSongDialog_createVideo";
+        public static readonly string mainScene_newSongDialog_lyrics = "mainScene_newSongDialog_lyrics";
+        public static readonly string mainScene_newSongDialog_lyrics_placeholder = "mainScene_newSongDialog_lyrics_placeholder";
         public static readonly string mainScene_newSongDialog_songArtist = "mainScene_newSongDialog_songArtist";
         public static readonly string mainScene_newSongDialog_songPath = "mainScene_newSongDialog_songPath";
         public static readonly string mainScene_newSongDialog_songTitle = "mainScene_newSongDialog_songTitle";

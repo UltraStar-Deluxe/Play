@@ -12,4 +12,5 @@ public class SongEditorSceneData : SceneData
     public List<PlayerProfile> SelectedPlayerProfiles { get; set; } = new();
     public Dictionary<PlayerProfile, MicProfile> PlayerProfileToMicProfileMap { get; set; } = new();
     public bool CreateSingAlongDataViaAiTools { get; set; }
+    public string ForcedAlignmentLyrics { get; set; }
 }

@@ -30,7 +30,13 @@ public class CreateSingAlongSongControl : INeedInjection
     private PitchDetectionManager pitchDetectionManager;
 
     [Inject]
+    private ForcedAlignmentManager forcedAlignmentManager;
+
+    [Inject]
     private SpeechRecognitionNoteCreator speechRecognitionNoteCreator;
+
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     private IJob lastProcessSongJob;
 
@@ -82,8 +88,15 @@ public class CreateSingAlongSongControl : INeedInjection
         // Run vocals isolation
         parentJob.AddChildJob(AudioSeparationJob(songMeta, saveSongFile));
 
-        // Run speech recognition
-        parentJob.AddChildJob(SpeechRecognitionJob(songMeta, pipelineData));
+        // Run speech recognition or forced alignment
+        if (!nonPersistentSettings.ForcedAlignmentLyrics.IsNullOrEmpty())
+        {
+            parentJob.AddChildJob(ForcedAlignmentJob(songMeta, pipelineData));
+        }
+        else
+        {
+            parentJob.AddChildJob(SpeechRecognitionJob(songMeta, pipelineData));
+        }
 
         // Run pitch detection
         Job<VoidEvent> pitchDetectionJob = PitchDetectionJob(songMeta, pipelineData);
@@ -139,6 +152,67 @@ public class CreateSingAlongSongControl : INeedInjection
             return VoidEvent.instance;
         });
         return speechRecognitionJob;
+    }
+
+    private Job<VoidEvent> ForcedAlignmentJob(SongMeta songMeta, PipelineData pipelineData)
+    {
+        Job<VoidEvent> forcedAlignmentJob = new(Translation.Of("Forced alignment"));
+        forcedAlignmentJob.SetAwaitable(async () =>
+        {
+            // Load vocals audio
+            AudioClip vocalsAudioClip = await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
+            int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * SongMetaBpmUtils.BeatsPerSecond(songMeta));
+
+            float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, vocalsAudioClip, 0, lengthInBeats);
+
+            ForcedAlignmentInput forcedAlignmentInput = new ForcedAlignmentInput(
+                nonPersistentSettings.ForcedAlignmentLyrics,
+                monoAudioSamples,
+                0,
+                monoAudioSamples.Length - 1,
+                vocalsAudioClip.frequency);
+
+            ForcedAlignmentResult forcedAlignmentResult = await forcedAlignmentManager.ProcessSongMetaJob(
+                    songMeta,
+                    forcedAlignmentInput)
+                .GetResultAsync();
+
+            if (forcedAlignmentResult == null || forcedAlignmentResult.Words.IsNullOrEmpty())
+            {
+                return VoidEvent.instance;
+            }
+
+            pipelineData.CreatedNotes = CreateNotesFromForcedAlignmentResult(songMeta, forcedAlignmentResult);
+
+            // Split created notes into sentences and assign to first player
+            AssignNotesToFirstPlayer(songMeta, pipelineData.CreatedNotes);
+
+            // Add Space between notes
+            SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(pipelineData.CreatedNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
+
+            return VoidEvent.instance;
+        });
+        return forcedAlignmentJob;
+    }
+
+    private List<Note> CreateNotesFromForcedAlignmentResult(SongMeta songMeta, ForcedAlignmentResult forcedAlignmentResult)
+    {
+        return forcedAlignmentResult.Words
+            .Select(wordTimestamp =>
+            {
+                double startInMillis = wordTimestamp.StartTime * 1000;
+                double endInMillis = wordTimestamp.EndTime * 1000;
+                int startBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, startInMillis);
+                int endBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, endInMillis);
+                int lengthInBeats = Math.Max(1, endBeat - startBeat);
+                return new Note(
+                    ENoteType.Normal,
+                    startBeat,
+                    lengthInBeats,
+                    MidiUtils.GetUltraStarTxtPitch(settings.SongEditorSettings.DefaultPitchForCreatedNotes),
+                    wordTimestamp.Word);
+            })
+            .ToList();
     }
 
     private Job<VoidEvent> AudioSeparationJob(SongMeta songMeta, bool saveSongFile)
