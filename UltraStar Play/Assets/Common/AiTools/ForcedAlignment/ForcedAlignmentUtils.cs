@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 public static class ForcedAlignmentUtils
@@ -33,7 +34,38 @@ public static class ForcedAlignmentUtils
             Log.Warning(() => $"Forced alignment returned {forcedAlignmentResult.Words.Count} words, but {notesWithText.Count} notes with text were selected.");
         }
     }
-
+    
+    public static List<Note> CreateNotesFromForcedAlignmentResult(
+        ForcedAlignmentResult forcedAlignmentResult,
+        SongMeta songMeta,
+        Settings settings,
+        int offsetInBeats = 0)
+    {
+        return forcedAlignmentResult.Words
+            .Select(wordTimestamp =>
+            {
+                double startInMillis = wordTimestamp.StartTime * 1000;
+                double endInMillis = wordTimestamp.EndTime * 1000;
+                int startBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, startInMillis) + offsetInBeats;
+                int endBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, endInMillis) + offsetInBeats;
+                int lengthInBeats = Math.Max(1, endBeat - startBeat);
+                
+                string word = wordTimestamp.Word;
+                if (!word.IsNullOrEmpty())
+                {
+                    word = word.Trim() + " ";
+                }
+                
+                return new Note(
+                    ENoteType.Normal,
+                    startBeat,
+                    lengthInBeats,
+                    MidiUtils.GetUltraStarTxtPitch(settings.SongEditorSettings.DefaultPitchForCreatedNotes),
+                    word);
+            })
+            .ToList();
+    }
+    
     public static string GetLyricsFromNotes(IEnumerable<Note> notes)
     {
         return notes

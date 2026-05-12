@@ -100,7 +100,13 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
                 noteEndInBeats = noteStartInBeats + 1;
             }
             int noteLengthInBeats = noteEndInBeats - noteStartInBeats;
+            
             string text = resultEntry.Text;
+            if (!text.IsNullOrEmpty())
+            {
+                text = text.Trim() + " ";
+            }
+            
             Note createdNote = new(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(config.MidiNote), text);
             return createdNote;
         }).ToList();

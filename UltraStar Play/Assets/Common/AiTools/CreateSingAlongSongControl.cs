@@ -182,7 +182,7 @@ public class CreateSingAlongSongControl : INeedInjection
                 return VoidEvent.instance;
             }
 
-            pipelineData.CreatedNotes = CreateNotesFromForcedAlignmentResult(songMeta, forcedAlignmentResult);
+            pipelineData.CreatedNotes = ForcedAlignmentUtils.CreateNotesFromForcedAlignmentResult(forcedAlignmentResult, songMeta, settings);
 
             // Split created notes into sentences and assign to first player
             AssignNotesToFirstPlayer(songMeta, pipelineData.CreatedNotes);
@@ -193,26 +193,6 @@ public class CreateSingAlongSongControl : INeedInjection
             return VoidEvent.instance;
         });
         return forcedAlignmentJob;
-    }
-
-    private List<Note> CreateNotesFromForcedAlignmentResult(SongMeta songMeta, ForcedAlignmentResult forcedAlignmentResult)
-    {
-        return forcedAlignmentResult.Words
-            .Select(wordTimestamp =>
-            {
-                double startInMillis = wordTimestamp.StartTime * 1000;
-                double endInMillis = wordTimestamp.EndTime * 1000;
-                int startBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, startInMillis);
-                int endBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, endInMillis);
-                int lengthInBeats = Math.Max(1, endBeat - startBeat);
-                return new Note(
-                    ENoteType.Normal,
-                    startBeat,
-                    lengthInBeats,
-                    MidiUtils.GetUltraStarTxtPitch(settings.SongEditorSettings.DefaultPitchForCreatedNotes),
-                    wordTimestamp.Word);
-            })
-            .ToList();
     }
 
     private Job<VoidEvent> AudioSeparationJob(SongMeta songMeta, bool saveSongFile)

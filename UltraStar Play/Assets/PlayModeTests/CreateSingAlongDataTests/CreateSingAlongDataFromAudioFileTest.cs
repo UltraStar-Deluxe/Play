@@ -64,7 +64,10 @@ public class CreateSingAlongDataFromAudioFileTest : AbstractPlayModeTest
         Assert.IsTrue(SongMetaUtils.InstrumentalAudioResourceExists(createdSongMeta), "Instrumental audio resource does not exist after creating sing-along data");
 
         // Speech recognition must have been executed, some lyrics must have been found.
-        Assert.IsNotEmpty(SongMetaUtils.GetLyrics(createdSongMeta, EVoiceId.P1), "Missing lyrics after creating sing-along data");
+        string lyrics = SongMetaUtils.GetLyrics(createdSongMeta, EVoiceId.P1);
+        Debug.Log("Lyrics from speech recognition: " + lyrics);
+        Assert.IsNotEmpty(lyrics, "Missing lyrics after creating sing-along data");
+        Assert.That(lyrics, Contains.Substring(" "), "Lyrics should contain a space for different notes");
 
         // Pitch detection must have been executed, some notes must have been created with different pitch.
         List<Note> createdNotes = SongMetaUtils.GetAllNotes(createdSongMeta);

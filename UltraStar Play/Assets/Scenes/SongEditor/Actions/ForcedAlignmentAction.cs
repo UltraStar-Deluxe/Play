@@ -126,22 +126,7 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
     
     private List<Note> CreateNotesFromForcedAlignmentResult(ForcedAlignmentResult forcedAlignmentResult, int offsetInBeats)
     {
-        List<Note> notes = forcedAlignmentResult.Words
-            .Select(wordTimestamp =>
-            {
-                double startInMillis = wordTimestamp.StartTime * 1000;
-                double endInMillis = wordTimestamp.EndTime * 1000;
-                int startBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, startInMillis) + offsetInBeats;
-                int endBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, endInMillis) + offsetInBeats;
-                int lengthInBeats = Math.Max(1, endBeat - startBeat);
-                return new Note(
-                    ENoteType.Normal,
-                    startBeat,
-                    lengthInBeats,
-                    MidiUtils.GetUltraStarTxtPitch(settings.SongEditorSettings.DefaultPitchForCreatedNotes),
-                    wordTimestamp.Word);
-            })
-            .ToList();
+        List<Note> notes = ForcedAlignmentUtils.CreateNotesFromForcedAlignmentResult(forcedAlignmentResult, songMeta, settings, offsetInBeats);
 
         // Remove old notes
         ESongEditorLayer layerEnum = ESongEditorLayer.ForcedAlignment;
