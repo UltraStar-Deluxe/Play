@@ -173,7 +173,8 @@ public class Settings : ISettings
 
     // Media APIs
     public EApiUsage UnityMediaApiUsage { get; set; } = EApiUsage.Enabled;
-    public EApiUsage AvProApiUsage { get; set; } = EApiUsage.Preferred;
+    // TODO: AVPro is disabled by default due to crashes reported by users
+    public EApiUsage AvProApiUsage { get; set; } = EApiUsage.Disabled;
     public EApiUsage VlcApiUsage { get; set; } = EApiUsage.Preferred;
 
     // Mods
