@@ -31,14 +31,16 @@ public class EditModeLyricsConverterTest
         "Wir be;tre;ten feuer;trun;ken, Him;mli;sche, dein Hei;lig;tum.",
         "Dei;ne Zau;ber bin;den wie;der, was die Mo;de streng ge;teilt,",
         "al;le Men;schen wer;den Brü;der, wo dein sanf;ter Flü;gel weilt.",
-        "К тебе, В этом, С тобой"};
+        // Space inside note is escaped
+        "К\\ тебе, В\\ этом, С\\ тобой"};
 
     private static readonly List<string> expectedCustomEditModeLyrics = new() {
         "Freu`de,|schö`ner|Göt`ter`fun`ken,|Toch`ter|aus|E`ly`si`um",
         "Wir|be`tre`ten|feuer`trun`ken,|Him`mli`sche,|dein|Hei`lig`tum.",
         "Dei`ne|Zau`ber|bin`den|wie`der,|was|die|Mo`de|streng|ge`teilt,",
         "al`le|Men`schen|wer`den|Brü`der,|wo|dein|sanf`ter|Flü`gel|weilt.",
-        "К тебе,|В этом,|С тобой"};
+        // Space inside note is escaped
+        "К\\ тебе,|В\\ этом,|С\\ тобой"};
 
     private static Voice CreateVoice()
     {

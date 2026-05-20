@@ -7,7 +7,10 @@ public class NoteHyphenator : INeedInjection
     [Inject]
     private EditModeLyricsSplitter editModeLyricsSplitter;
     
-    public Dictionary<Note, List<Note>> HypenateNotes(SongMeta songMeta, List<Note> createdNotes, Hyphenator hyphenator)
+    [Inject]
+    private EditModeLyricsConverter editModeLyricsConverter;
+    
+    public Dictionary<Note, List<Note>> HypenateNotes(List<Note> createdNotes, Hyphenator hyphenator)
     {
         Dictionary<Note, List<Note>> noteToNotesAfterSplit = new();
     
@@ -19,7 +22,7 @@ public class NoteHyphenator : INeedInjection
                 continue;
             }
 
-            editModeLyricsSplitter.TryApplyEditModeText(songMeta, note, newText, out List<Note> notesAfterSplit);
+            List<Note> notesAfterSplit = editModeLyricsConverter.SplitNoteAndApplyEditModeText(note, newText);
             noteToNotesAfterSplit[note] = notesAfterSplit;
         }
 

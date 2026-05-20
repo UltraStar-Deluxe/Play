@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class EditModeLyricsSplitterTest
 {
-    private static readonly string testFolderPath = Application.dataPath + "/Tests/EditModeTests";
-    
     [Test]
     public void ShouldSplitNote()
     {
@@ -20,10 +18,8 @@ public class EditModeLyricsSplitterTest
         };
         EditModeLyricsSplitter splitter = CreateEditModeLyricsSplitter(customSettings);
 
-        SongMeta songMeta = LoadSongMeta();
-        
         // When
-        Assert.IsTrue(splitter.TryApplyEditModeText(songMeta, new Note(ENoteType.Normal, 0, 8, 0, "abcdefgi"), "abcdef|gi", out List<Note> notesAfterSplit));
+        Assert.IsTrue(splitter.TryApplyEditModeText(new Note(ENoteType.Normal, 0, 8, 0, "abcdefgi"), "abcdef|gi", out List<Note> notesAfterSplit));
 
         // Then
         Assert.AreEqual(2, notesAfterSplit.Count);
@@ -48,16 +44,29 @@ public class EditModeLyricsSplitterTest
         };
         EditModeLyricsSplitter splitter = CreateEditModeLyricsSplitter(customSettings);
 
-        SongMeta songMeta = LoadSongMeta();
-        
         // When: Russian lyrics with space inside word.
-        Assert.IsTrue(splitter.TryApplyEditModeText(songMeta, new Note(ENoteType.Normal, 0, 10, 0, "К тебе"), "К тебе", out List<Note> notesAfterSplit));
+        Assert.IsTrue(splitter.TryApplyEditModeText(new Note(ENoteType.Normal, 0, 10, 0, "К тебе"), "К тебе", out List<Note> notesAfterSplit));
 
         // Then
         Assert.AreEqual(1, notesAfterSplit.Count);
         Assert.AreEqual("К тебе", notesAfterSplit[0].Text);
     }
 
+    [Test]
+    public void ShouldPreserveNoteWithEscapedSpace()
+    {
+        // Given
+        Settings customSettings = new();
+        EditModeLyricsSplitter splitter = CreateEditModeLyricsSplitter(customSettings);
+
+        // When: Russian lyrics with space inside word.
+        Assert.IsTrue(splitter.TryApplyEditModeText(new Note(ENoteType.Normal, 0, 10, 0, "К\\ тебе"), "К\\ тебе", out List<Note> notesAfterSplit));
+
+        // Then
+        Assert.AreEqual(1, notesAfterSplit.Count);
+        Assert.AreEqual("К\\ тебе", notesAfterSplit[0].Text);
+    }
+    
     private static EditModeLyricsSplitter CreateEditModeLyricsSplitter(Settings settings)
     {
         EditModeLyricsSplitter obj = new();
@@ -65,10 +74,5 @@ public class EditModeLyricsSplitterTest
             .WithBindingForInstance(settings)
             .Inject(obj);
         return obj;
-    }
-    
-    private SongMeta LoadSongMeta()
-    {
-        return UltraStarSongParser.ParseFile(testFolderPath + $"/TestSongs/UTF8-BOM.txt").SongMeta;
     }
 }

@@ -68,7 +68,7 @@ public static class ForcedAlignmentUtils
             .ToList();
 
         // Split syllables if hyphenation is enabled
-        HyphenationUtils.SplitNotesByHyphenation(songMeta, settings, noteHyphenator, notes);
+        HyphenationUtils.SplitNotesByHyphenation(settings, noteHyphenator, notes);
 
         // Shorten new notes left and right to give a little space
         SpaceBetweenNotesUtils.ShortenNotesByMillis(notes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);

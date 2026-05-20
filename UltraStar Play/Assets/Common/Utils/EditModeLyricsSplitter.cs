@@ -11,12 +11,12 @@ public class EditModeLyricsSplitter : INeedInjection
 
     private char WordSeparator => settings.SongEditorSettings.WordSeparator;
     private char SyllableSeparator => settings.SongEditorSettings.SyllableSeparator;
+    private static readonly char escapeCharacter = '\\';
 
     /**
      * Split note on space and semicolon characters.
      */
     public bool TryApplyEditModeText(
-        SongMeta songMeta,
         Note note,
         string newText,
         out List<Note> notesAfterSplit)
@@ -35,12 +35,11 @@ public class EditModeLyricsSplitter : INeedInjection
 
         // Split note to apply space and semicolon control characters.
         // Otherwise the text would mess up following notes when using the LyricsArea.
-        notesAfterSplit = SplitNoteForNewText(songMeta, note, viewModeText);
+        notesAfterSplit = SplitNoteForNewText(note, viewModeText);
         return true;
     }
 
     private List<Note> SplitNoteForNewText(
-        SongMeta songMeta,
         Note note,
         string newText)
     {
@@ -111,11 +110,22 @@ public class EditModeLyricsSplitter : INeedInjection
 
     private static List<int> AllIndexesOfCharacterBeforeTextEnd(string text, char searchChar)
     {
+        bool foundEscapeCharacter = false;
         List<int> result = new();
         for (int i = 0; i < text.Length - 1; i++)
         {
+            if (foundEscapeCharacter)
+            {
+                foundEscapeCharacter = false;
+                continue;
+            }
+            
             char c = text[i];
-            if (c == searchChar)
+            if (c == escapeCharacter)
+            {
+                foundEscapeCharacter = true;
+            }
+            else if (c == searchChar)
             {
                 result.Add(i);
             }

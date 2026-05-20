@@ -9,6 +9,9 @@ public class LrcFormatImporter : INeedInjection
     [Inject]
     private EditModeLyricsSplitter editModeLyricsSplitter;
     
+    [Inject]
+    private EditModeLyricsConverter editModeLyricsConverter;
+    
     public Translation GetLrcFormatErrorMessage(string lrcText)
     {
         if (lrcText.IsNullOrEmpty())
@@ -87,7 +90,8 @@ public class LrcFormatImporter : INeedInjection
         Note note = new Note(ENoteType.Normal, currentLineBeat, lengthInBeats, MidiUtils.GetUltraStarTxtPitch(midiNote),
             text);
 
-        editModeLyricsSplitter.TryApplyEditModeText(songMeta, note, note.Text, out List<Note> notesAfterSplit);
+        // Split note on space and semicolon characters
+        List<Note> notesAfterSplit = editModeLyricsConverter.SplitNoteAndApplyEditModeText(note, note.Text);
 
         SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, settings.SongEditorSettings.SpaceBetweenNotesInMillis, songMeta);
 

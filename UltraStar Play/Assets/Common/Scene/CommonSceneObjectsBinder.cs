@@ -117,8 +117,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 
     /**
      * Dependencies for editing lyrics via special syntax.
-     * Ideally, this would only be needed in SongEditor scope. But it is also used in common package to create sing-along data.
      */
+    // TODO: Ideally, this would only be needed in SongEditor scope. But it is also used in common package to create sing-along data.
     private void BindEditLyricsDependencies(BindingBuilder bb)
     {
         // Prepare injector
@@ -129,9 +129,14 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         EditModeLyricsSplitter editModeLyricsSplitter = new();
         injector.Inject(editModeLyricsSplitter);
         bb.BindExistingInstance(editModeLyricsSplitter);
+
+        EditModeLyricsConverter editModeLyricsConverter = new();
+        injector.Inject(editModeLyricsConverter);
+        bb.BindExistingInstance(editModeLyricsConverter);
         
         // TODO: This is super ugly because constructing the dependencies here manually contradicts the idea of using dependency injection.
         injector.AddBindingForInstance(editModeLyricsSplitter);
+        injector.AddBindingForInstance(editModeLyricsConverter);
         NoteHyphenator noteHyphenator = new();
         injector.Inject(noteHyphenator);
         bb.BindExistingInstance(noteHyphenator);

@@ -3,9 +3,7 @@ using NHyphenator;
 
 public static class HyphenationUtils
 {
-    public static void SplitNotesByHyphenation(
-        SongMeta songMeta,
-        Settings settings,
+    public static void SplitNotesByHyphenation(Settings settings,
         NoteHyphenator noteHyphenator,
         List<Note> notes)
     {
@@ -17,7 +15,7 @@ public static class HyphenationUtils
             return;
         }
 
-        Dictionary<Note,List<Note>> noteToNotesAfterSplit = noteHyphenator.HypenateNotes(songMeta, notes, hyphenator);
+        Dictionary<Note,List<Note>> noteToNotesAfterSplit = noteHyphenator.HypenateNotes(notes, hyphenator);
         noteToNotesAfterSplit.ForEach(entry =>
         {
             Note note = entry.Key;
