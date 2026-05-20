@@ -99,7 +99,8 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
     private void SynchronizePositionWithSongAudioPlayer()
     {
-        if (!songAudioPlayer.IsPlaying)
+        if (!songAudioPlayer.IsPlaying
+            || AudioSource.clip == null)
         {
             return;
         }
