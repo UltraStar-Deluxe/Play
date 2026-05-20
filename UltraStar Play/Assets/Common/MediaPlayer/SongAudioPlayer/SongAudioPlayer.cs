@@ -58,7 +58,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
                                                         && ((pair.Previous + MinForwardJumpOffsetInMillis) < pair.Current
                                                             || (!IsPlaying && pair.Previous < pair.Current)));
 
-    // The current position in the song in milliseconds.
+    // The current position in the song in milliseconds, updated once per frame.
     private double positionInMillis;
     public double PositionInMillis
     {
@@ -97,7 +97,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
 
     public double PositionInSeconds
     {
-        get => positionInMillis / 1000.0;
+        get => PositionInMillis / 1000.0;
         set => PositionInMillis = value * 1000.0;
     }
 
