@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -82,30 +83,6 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         textField.doubleClickSelectsWord = true;
         textField.tripleClickSelectsLine = true;
 
-        // Check when a newline has been added. This requires adding an additional character to show white space.
-        bool pasted = false;
-        bool addedNewline = false;
-        bool removeCharacter = false;
-        textField.RegisterCallback<KeyDownEvent>(evt =>
-        {
-            if (evt.keyCode == KeyCode.Return)
-            {
-                addedNewline = true;
-            }
-            else if (evt.keyCode == KeyCode.Delete
-                    || evt.keyCode == KeyCode.Backspace)
-            {
-                removeCharacter = true;
-            }
-            else if (evt.keyCode == KeyCode.V
-                     && evt.ctrlKey
-                     && !evt.shiftKey
-                     && !evt.altKey)
-            {
-                pasted = true;
-            }
-        });
-
         // Replace white space with visible characters when in edit mode
         textField.RegisterValueChangedCallback(evt =>
         {
@@ -115,25 +92,6 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             }
 
             string newText = evt.newValue;
-            if (addedNewline
-                || pasted)
-            {
-                addedNewline = false;
-                pasted = false;
-                // Add whitespace character for newly added newline character
-                newText = newText.Replace(ShowWhiteSpaceUtils.newlineReplacement, "⌇")
-                    .Replace("\n", "⌇")
-                    .Replace("⌇", ShowWhiteSpaceUtils.newlineReplacement);
-            }
-            else if (removeCharacter)
-            {
-                removeCharacter = false;
-                // Remove whitespace character or newline character where the counterpart is missing
-                newText = newText.Replace(ShowWhiteSpaceUtils.newlineReplacement, "⌇")
-                    .Replace("\n", "")
-                    .Replace(ShowWhiteSpaceUtils.newlineVisibleWhiteSpaceCharacter, "")
-                    .Replace("⌇", ShowWhiteSpaceUtils.newlineReplacement);
-            }
             string normalText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(newText);
             string visibleWhiteSpaceText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(normalText);
             textField.SetValueWithoutNotify(visibleWhiteSpaceText);
@@ -264,7 +222,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     {
         // Map edit-mode text to lyrics of notes
         string text = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
-        LyricsUtils.MapEditModeTextToNotes(text, Voice.Sentences);
+        LyricsUtils.MapEditModeTextToNotes(text, Voice);
         songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }
 
@@ -310,17 +268,14 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         Sentence relevantSentence = sortedSentences[relevantSentenceIndex];
 
         // Count note borders
-        int noteIndex = 0;
-        for (int i = relevantSentenceTextStartIndex; i < text.Length && i < caretPosition; i++)
-        {
-            char c = text[i];
-            if (c == LyricsUtils.spaceCharacter
-                || c == ShowWhiteSpaceUtils.spaceReplacement[0]
-                || c == LyricsUtils.syllableSeparator)
-            {
-                noteIndex++;
-            }
-        }
+        int sentenceLengthBeforeCaret = Math.Min(text.Length - relevantSentenceTextStartIndex,
+                                                 caretPosition - relevantSentenceTextStartIndex);
+        string sentenceBeforeCaret = text.Substring(relevantSentenceTextStartIndex, sentenceLengthBeforeCaret);
+        int sentenceSyllablesBeforeCaret = LyricsUtils.ParseEditable(
+            ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(sentenceBeforeCaret)
+        ).Count;
+
+        int noteIndex = sentenceSyllablesBeforeCaret - 1;
 
         // Get relevant note
         List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(relevantSentence);

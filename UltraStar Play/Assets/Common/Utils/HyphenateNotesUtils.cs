@@ -3,7 +3,7 @@ using NHyphenator;
 
 public static class HyphenateNotesUtils
 {
-    public static Dictionary<Note, List<Note>> HypenateNotes(SongMeta songMeta, List<Note> createdNotes, Hyphenator hyphenator)
+    public static Dictionary<Note, List<Note>> HypenateNotes(List<Note> createdNotes, Hyphenator hyphenator)
     {
         Dictionary<Note, List<Note>> noteToNotesAfterSplit = new();
     
@@ -15,7 +15,7 @@ public static class HyphenateNotesUtils
                 continue;
             }
 
-            EditLyricsUtils.TryApplyEditModeText(songMeta, note, newText, out List<Note> notesAfterSplit);
+            List<Note> notesAfterSplit = LyricsUtils.SplitNoteAndApplyEditModeText(note, newText);
             noteToNotesAfterSplit[note] = notesAfterSplit;
         }
 

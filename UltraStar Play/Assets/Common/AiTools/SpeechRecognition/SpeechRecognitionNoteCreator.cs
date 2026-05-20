@@ -75,7 +75,7 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         // Split syllables if hyphenation is enabled
         if (config.Hyphenator != null)
         {
-            Dictionary<Note,List<Note>> noteToNotesAfterSplit = HyphenateNotesUtils.HypenateNotes(config.SongMeta, createdNotes, config.Hyphenator);
+            Dictionary<Note,List<Note>> noteToNotesAfterSplit = HyphenateNotesUtils.HypenateNotes(createdNotes, config.Hyphenator);
             noteToNotesAfterSplit.ForEach(entry =>
             {
                 Note note = entry.Key;

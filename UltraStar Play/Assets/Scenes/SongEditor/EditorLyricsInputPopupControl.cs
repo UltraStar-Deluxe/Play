@@ -54,8 +54,7 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
 
     public void SubmitAndCloseLyricsDialog()
     {
-        string newText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(textField.value);
-        ApplyNewText(newText);
+        ApplyNewText(textField.value);
         CloseLyricsDialog();
     }
 

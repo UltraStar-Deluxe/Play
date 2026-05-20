@@ -85,7 +85,7 @@ public class LrcFormatImporter : INeedInjection
             text);
 
         // Split note on space and semicolon characters
-        EditLyricsUtils.TryApplyEditModeText(songMeta, note, note.Text, out List<Note> notesAfterSplit);
+        List<Note> notesAfterSplit = LyricsUtils.SplitNoteAndApplyEditModeText(note, note.Text);
 
         SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, settings.SongEditorSettings.SpaceBetweenNotesInMillis, songMeta);
 
