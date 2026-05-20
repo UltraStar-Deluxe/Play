@@ -57,15 +57,17 @@ public static class UltraStarFormatWriter
             // P1 is optional when only having one voice
             sb.AppendLine(voice.Id.ToString());
         }
-        List<Sentence> sortedSentences = new(voice.Sentences);
-        sortedSentences.Sort(Sentence.comparerByStartBeat);
-        foreach (Sentence sentence in sortedSentences)
+        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(voice);
+        for (int i = 0; i < sortedSentences.Count; i++)
         {
-            AppendSentence(sb, sentence);
+            Sentence sentence = sortedSentences[i];
+            // A linebreak should not be appended after the last sentence.
+            bool appendLinebreak = i < sortedSentences.Count - 1;
+            AppendSentence(sb, sentence, appendLinebreak);
         }
     }
 
-    private static void AppendSentence(StringBuilder sb, Sentence sentence)
+    private static void AppendSentence(StringBuilder sb, Sentence sentence, bool appendLinebreak)
     {
         bool isEmpty = sentence.Notes.Count == 0;
         if (isEmpty)
@@ -73,21 +75,22 @@ public static class UltraStarFormatWriter
             return;
         }
 
-        List<Note> sortedNotes = new(sentence.Notes);
-        sortedNotes.Sort(Note.comparerByStartBeat);
+        List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(sentence);
         foreach (Note note in sortedNotes)
         {
             AppendNote(sb, note);
         }
-
-        // TODO: Linebreak timing could be optional but is required by some other tools, https://github.com/UltraStar-Deluxe/format/issues/64
-        sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
-        // if (sentence.ExtendedMaxBeat > sentence.MaxBeat)
-        // {
-        //     sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
-        // } else {
-        //     sb.AppendLine($"-");
-        // }
+        if (appendLinebreak)
+        {
+            // TODO: Linebreak timing could be optional but is required by some other tools, https://github.com/UltraStar-Deluxe/format/issues/64
+            sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+            // if (sentence.ExtendedMaxBeat > sentence.MaxBeat)
+            // {
+            //     sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+            // } else {
+            //     sb.AppendLine($"-");
+            // }
+        }
     }
 
     private static bool IsNotEmpty(Voice voice)

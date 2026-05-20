@@ -39,6 +39,15 @@ public class UltraStarSongFormatTest
     }
 
     [Test]
+    public void ShouldNotAddLastEndOfPhrase()
+    {
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/Duet.txt").SongMeta;
+        string txt = UltraStarFormatWriter.ToUltraStarSongFormat(songMeta).Replace("\r\n", "\n");
+        Assert.IsTrue(txt.Contains("First Vocals!\nP2"));
+        Assert.IsTrue(txt.Contains("Second Vocals!\nE"));
+    }
+
+    [Test]
     public void ShouldNotContainP1InSoloSong()
     {
         SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/Solo.txt").SongMeta;
