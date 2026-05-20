@@ -139,15 +139,13 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
     private void SyncAudioPosition()
     {
-        float songAudioPlayerTimeInSeconds = (float)songAudioPlayer.PositionInSeconds;
-        if (instrumentalAudioSource.clip != null
-            && instrumentalAudioSource.isPlaying)
+        float songAudioPlayerTimeInSeconds = (float)GetTargetTimeInSecondsExact();
+        if (instrumentalAudioSource.clip != null)
         {
             instrumentalAudioSource.time = songAudioPlayerTimeInSeconds;
         }
 
-        if (vocalsAudioSource.clip != null
-            && vocalsAudioSource.isPlaying)
+        if (vocalsAudioSource.clip != null)
         {
             vocalsAudioSource.time = songAudioPlayerTimeInSeconds;
         }
@@ -182,15 +180,17 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         if (!hasLoadedInstrumentalAndVocalsAudio)
         {
             hasLoadedInstrumentalAndVocalsAudio = true;
+            float targetTimeInSeconds = (float)GetTargetTimeInSecondsExact();
 
             string instrumentalAudioUri = SongMetaUtils.GetInstrumentalAudioUri(songMeta);
             instrumentalAudioSource.clip = await AudioManager.LoadAudioClipFromUriAsync(instrumentalAudioUri, InaccurateMp3WorkaroundUtils.ShouldStreamAudio(instrumentalAudioUri));
+            instrumentalAudioSource.time = targetTimeInSeconds;
 
             string vocalsAudioUri = SongMetaUtils.GetVocalsAudioUri(songMeta);
             vocalsAudioSource.clip = await AudioManager.LoadAudioClipFromUriAsync(vocalsAudioUri, InaccurateMp3WorkaroundUtils.ShouldStreamAudio(vocalsAudioUri));
+            vocalsAudioSource.time = targetTimeInSeconds;
         }
 
-        songAudioPlayer.VolumeFactor = 0;
         instrumentalAudioSource.volume = NumberUtils.PercentToFactor(settings.MusicVolumePercent)
                                          * NumberUtils.PercentToFactor(singSceneControl.ModifiedVolumePercent.Value)
                                          * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
@@ -231,5 +231,10 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
         errorMessage = "";
         return true;
+    }
+    
+    private double GetTargetTimeInSecondsExact()
+    {
+        return songAudioPlayer?.PositionInMillisExact / 1000.0 ?? 0;
     }
 }

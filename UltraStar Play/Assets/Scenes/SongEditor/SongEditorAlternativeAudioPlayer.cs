@@ -50,7 +50,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             {
                 return;
             }
-            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
+            AudioSource.time = (float)GetTargetTimeInSecondsExact();
         });
         songAudioPlayer.JumpForwardEventStream.Subscribe(_ =>
         {
@@ -58,7 +58,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             {
                 return;
             }
-            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
+            AudioSource.time = (float)GetTargetTimeInSecondsExact();
         });
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ =>
         {
@@ -105,13 +105,12 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             return;
         }
 
-        double targetPositionInMillis = songAudioPlayer.PositionInMillis;
+        double targetPositionInMillis = songAudioPlayer.PositionInMillisExact;
         double actualPositionInMillis = AudioSource.time * 1000;
         double positionDifferenceInMillis = targetPositionInMillis - actualPositionInMillis;
         double positionDistanceInMillis = Math.Abs(positionDifferenceInMillis);
         if (positionDistanceInMillis > 1200)
         {
-            // Re-Synchronize
             AudioSource.time = (float)(targetPositionInMillis / 1000);
         }
     }
@@ -125,7 +124,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         }
         else
         {
-            AudioSource.volume = NumberUtils.PercentToFactor(settings.SongEditorSettings.MusicVolumePercent);
+        AudioSource.volume = NumberUtils.PercentToFactor(settings.SongEditorSettings.MusicVolumePercent);
             songAudioPlayer.VolumeFactor = 0;
         }
     }
@@ -239,5 +238,10 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
         errorMessage = Translation.Empty;
         return true;
+    }
+
+    private double GetTargetTimeInSecondsExact()
+    {
+        return songAudioPlayer?.PositionInMillisExact / 1000.0 ?? 0;
     }
 }
