@@ -7,9 +7,11 @@ public class AudioSampleLoader : AbstractSingletonBehaviour
 {
     public static AudioSampleLoader Instance => DontDestroyOnLoadManager.Instance.DoFindComponentOrThrow<AudioSampleLoader>();
 
+    private const int MaxCachedAudioClipCount = 50;
+    
+    private readonly Dictionary<string, AudioClipCacheEntry> ffmpegLoadedAudioClips = new();
+    
     private FfmpegAudioSampleLoader ffmpegAudioSampleLoader;
-
-    private readonly Dictionary<string, AudioClip> ffmpegLoadedAudioClips = new(); 
     
     protected override object GetInstance()
     {
@@ -30,9 +32,10 @@ public class AudioSampleLoader : AbstractSingletonBehaviour
     private AudioClip LoadAsAudioClipViaFfmpeg(string uri)
     {
         // Cache lookup
-        if (ffmpegLoadedAudioClips.TryGetValue(uri, out AudioClip cachedAudioClip))
+        if (ffmpegLoadedAudioClips.TryGetValue(uri, out AudioClipCacheEntry cacheEntry))
         {
-            return cachedAudioClip;
+            cacheEntry.UpdateLastUsedAt();
+            return cacheEntry.AudioClip;
         }
         
         // Load
@@ -53,8 +56,28 @@ public class AudioSampleLoader : AbstractSingletonBehaviour
             stream: false);
         audioClip.SetData(ffmpegAudioSamplesData.Samples, 0);
         
+        // Evict least recently used entry if cache is full
+        if (ffmpegLoadedAudioClips.Count >= MaxCachedAudioClipCount)
+        {
+            string leastRecentlyUsedKey = null;
+            DateTime oldestLastUsedAt = DateTime.MaxValue;
+            foreach (KeyValuePair<string, AudioClipCacheEntry> kvp in ffmpegLoadedAudioClips)
+            {
+                if (kvp.Value.LastUsedAt < oldestLastUsedAt)
+                {
+                    oldestLastUsedAt = kvp.Value.LastUsedAt;
+                    leastRecentlyUsedKey = kvp.Key;
+                }
+            }
+            if (leastRecentlyUsedKey != null)
+            {
+                Destroy(ffmpegLoadedAudioClips[leastRecentlyUsedKey].AudioClip);
+                ffmpegLoadedAudioClips.Remove(leastRecentlyUsedKey);
+            }
+        }
+
         // Add to cache
-        ffmpegLoadedAudioClips[uri] = audioClip;
+        ffmpegLoadedAudioClips[uri] = new AudioClipCacheEntry(audioClip);
         
         return audioClip;
     }
@@ -72,9 +95,9 @@ public class AudioSampleLoader : AbstractSingletonBehaviour
 
     private void OnDestroy()
     {
-        foreach (AudioClip audioClip in ffmpegLoadedAudioClips.Values)
+        foreach (AudioClipCacheEntry entry in ffmpegLoadedAudioClips.Values)
         {
-            Destroy(audioClip);
+            Destroy(entry.AudioClip);
         }
         ffmpegLoadedAudioClips.Clear();
     }
