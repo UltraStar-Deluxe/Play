@@ -26,6 +26,16 @@ public static class AudioSupportProviderSelectionStrategy
             return provider;
         }
 
+        // Use fully loaded AudioClip for SingScene and SongEditorScene for precise timing.
+        // TODO: Model this more elegantly with the other code
+        if (SceneRecipeManager.Instance != null
+            && SceneRecipeManager.Instance.GetCurrentScene() is EScene.SingScene or EScene.SongEditorScene
+            && settings.FfmpegApiUsage is not EApiUsage.Disabled
+            && TryGetProvider<FfmpegAudioSupportProvider>(availableProviders, out IAudioSupportProvider ffmpegProvider))
+        {
+            return ffmpegProvider;
+        }
+        
         // Select the audio support provider of the API that has highest priority
         List<EMediaApi> mediaApis = MediaApiPriorityUtils.GetMediaApisOrderedByPriority(settings);
         
