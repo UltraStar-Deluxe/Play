@@ -35,7 +35,7 @@ public class FileScannerTest
     {
         List<string> files = FileScanner.GetFiles(folderPath,
             new FileScannerConfig(txtFilePattern) { ExcludeHiddenFiles = false, ExcludeHiddenFolders = false, Recursive = true });
-        Assert.AreEqual(6, files.Count);
+        Assert.AreEqual(7, files.Count);
     }
 
     [Test]
@@ -43,7 +43,7 @@ public class FileScannerTest
     {
         List<string> files = FileScanner.GetFiles(folderPath,
             new FileScannerConfig(patterns) { ExcludeHiddenFiles = false, ExcludeHiddenFolders = false, Recursive = true });
-        Assert.AreEqual(12, files.Count);
+        Assert.AreEqual(14, files.Count);
     }
 
     [Test]
@@ -55,10 +55,34 @@ public class FileScannerTest
     }
 
     [Test]
+    public void RecursiveExcludeHiddenFoldersExtraSlashes()
+    {
+        List<string> files = FileScanner.GetFiles($"{Application.dataPath}/Editor/Tests//FileScannerTest//",
+            new FileScannerConfig(txtFilePattern) { ExcludeHiddenFiles = false, ExcludeHiddenFolders = true, Recursive = true });
+        Assert.AreEqual(4, files.Count);
+    }
+
+    [Test]
+    public void RecursiveDoNotExcludeHiddenFolderBeingScanned()
+    {
+        List<string> files = FileScanner.GetFiles($"{folderPath}.HiddenFolder",
+            new FileScannerConfig(txtFilePattern) { ExcludeHiddenFiles = false, ExcludeHiddenFolders = true, Recursive = true });
+        Assert.AreEqual(3, files.Count);
+    }
+
+    [Test]
+    public void RecursiveDoNotExcludeHiddenFoldersInParents()
+    {
+        List<string> files = FileScanner.GetFiles($"{folderPath}.HiddenFolder/SubfolderInHiddenFolder",
+            new FileScannerConfig(txtFilePattern) { ExcludeHiddenFiles = false, ExcludeHiddenFolders = true, Recursive = true });
+        Assert.AreEqual(1, files.Count);
+    }
+
+    [Test]
     public void RecursiveExcludeHiddenFiles()
     {
         List<string> files = FileScanner.GetFiles(folderPath,
             new FileScannerConfig(txtFilePattern) { ExcludeHiddenFiles = true, ExcludeHiddenFolders = false, Recursive = true });
-        Assert.AreEqual(5, files.Count);
+        Assert.AreEqual(6, files.Count);
     }
 }

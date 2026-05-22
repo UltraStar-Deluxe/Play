@@ -13,7 +13,7 @@ public class DirectoryScannerTest
     {
         List<string> folders = DirectoryScanner.GetFolders(folderPath,
             new DirectoryScannerConfig() { ExcludeHiddenFolders = false, Recursive = false });
-        Assert.AreEqual(2, folders.Count);
+        Assert.AreEqual(3, folders.Count);
     }
 
     [Test]
@@ -29,7 +29,7 @@ public class DirectoryScannerTest
     {
         List<string> folders = DirectoryScanner.GetFolders(folderPath,
             new DirectoryScannerConfig() { ExcludeHiddenFolders = false, Recursive = true });
-        Assert.AreEqual(5, folders.Count);
+        Assert.AreEqual(8, folders.Count);
     }
 
     [Test]
@@ -37,7 +37,7 @@ public class DirectoryScannerTest
     {
         List<string> folders = DirectoryScanner.GetFolders(folderPath,
             new DirectoryScannerConfig(searchPattern) { ExcludeHiddenFolders = false, Recursive = true });
-        Assert.AreEqual(2, folders.Count);
+        Assert.AreEqual(4, folders.Count);
     }
 
     [Test]
@@ -46,5 +46,29 @@ public class DirectoryScannerTest
         List<string> folders = DirectoryScanner.GetFolders(folderPath,
             new DirectoryScannerConfig() { ExcludeHiddenFolders = true, Recursive = true });
         Assert.AreEqual(4, folders.Count);
+    }
+
+    [Test]
+    public void RecursiveExcludeHiddenFoldersExtraSlashes()
+    {
+        List<string> folders = DirectoryScanner.GetFolders($"{Application.dataPath}/Editor/Tests//DirectoryScannerTest//",
+            new DirectoryScannerConfig() { ExcludeHiddenFolders = true, Recursive = true });
+        Assert.AreEqual(4, folders.Count);
+    }
+
+    [Test]
+    public void RecursiveDoNotExcludeHiddenFolderBeingScanned()
+    {
+        List<string> folders = DirectoryScanner.GetFolders($"{folderPath}.HiddenFolderC",
+            new DirectoryScannerConfig() { ExcludeHiddenFolders = true, Recursive = true });
+        Assert.AreEqual(2, folders.Count);
+    }
+
+    [Test]
+    public void RecursiveDoNotExcludeHiddenFoldersInParents()
+    {
+        List<string> folders = DirectoryScanner.GetFolders($"{folderPath}.HiddenFolderC/FolderC_A",
+            new DirectoryScannerConfig() { ExcludeHiddenFolders = true, Recursive = true });
+        Assert.AreEqual(1, folders.Count);
     }
 }
