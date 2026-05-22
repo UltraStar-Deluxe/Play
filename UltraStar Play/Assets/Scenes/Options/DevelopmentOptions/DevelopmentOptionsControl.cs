@@ -134,6 +134,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     
     [Inject(UxmlName = R.UxmlNames.vlcApiUsageChooser)]
     private Chooser vlcApiUsageChooser;
+    
+    [Inject(UxmlName = R.UxmlNames.ffmpegApiUsageChooser)]
+    private Chooser ffmpegApiUsageChooser;
 
     [Inject(UxmlName = R.UxmlNames.logVlcOutputToggle)]
     private Toggle logVlcOutputToggle;
@@ -371,6 +374,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new EnumChooserControl<EApiUsage>(vlcApiUsageChooser)
             .Bind(() => settings.VlcApiUsage,
                 newValue => settings.VlcApiUsage = newValue);
+        
+        new EnumChooserControl<EApiUsage>(ffmpegApiUsageChooser)
+            .Bind(() => settings.FfmpegApiUsage,
+                newValue => settings.FfmpegApiUsage = newValue);
 
         // VLC Settings
         FieldBindingUtils.Bind(logVlcOutputToggle,

@@ -50,6 +50,7 @@
                 <Chooser name="unityApiUsageChooser" label="Use Unity to Play Audio&#10;and Video Files" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy"/>
                 <Chooser name="avproApiUsageChooser" label="Use AVPro to Play Audio&#10;and Video Files" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy"/>
                 <Chooser name="vlcApiUsageChooser" label="Use VLC to Play Audio&#10;and Video Files" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy"/>
+                <Chooser name="ffmpegApiUsageChooser" label="Use FFmpeg  to Load Audio" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy"/>
                 <ui:Toggle name="logVlcOutputToggle" label="Log VLC Output" class="noBackgroundInHierarchy"/>
                 <ui:TextField label="VLC Options, one per line¹" name="vlcOptionsTextField" multiline="true" class="noBackgroundInHierarchy multiline" style="min-height: 128px;"/>
             </AccordionItem>

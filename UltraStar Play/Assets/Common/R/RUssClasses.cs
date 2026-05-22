@@ -85,6 +85,7 @@ public static partial class R
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string fontColor = "fontColor";
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
+        public const string fullwidth = "fullwidth";
         public const string grid = "grid";
         public const string gridLine = "gridLine";
         public const string grow = "grow";

@@ -176,6 +176,7 @@ public class Settings : ISettings
     // TODO: AVPro is disabled by default due to crashes reported by users
     public EApiUsage AvProApiUsage { get; set; } = EApiUsage.Disabled;
     public EApiUsage VlcApiUsage { get; set; } = EApiUsage.Preferred;
+    public EApiUsage FfmpegApiUsage { get; set; } = EApiUsage.Enabled;
 
     // Mods
     public List<string> EnabledMods { get; private set; } = new();

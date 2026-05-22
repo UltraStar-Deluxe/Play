@@ -37,7 +37,6 @@ public static partial class R
         public const string artistLabel = "artistLabel";
         public const string artistPropertyToggle = "artistPropertyToggle";
         public const string artistTextField = "artistTextField";
-        public const string lyricsTextField = "lyricsTextField";
         public const string asioCompatibleLogo = "asioCompatibleLogo";
         public const string assignToPlayerDropdownField = "assignToPlayerDropdownField";
         public const string assignToPlayerToggle = "assignToPlayerToggle";
@@ -131,13 +130,10 @@ public static partial class R
         public const string copyLogButton = "copyLogButton";
         public const string countdownLabel = "countdownLabel";
         public const string coverImage = "coverImage";
-        public const string createBackgroundToggle = "createBackgroundToggle";
-        public const string createCoverToggle = "createCoverToggle";
         public const string createPlaylistButton = "createPlaylistButton";
         public const string createPlaylistIcon = "createPlaylistIcon";
         public const string createSongButton = "createSongButton";
         public const string createSongIcon = "createSongIcon";
-        public const string createVideoToggle = "createVideoToggle";
         public const string creditsButton = "creditsButton";
         public const string CreditsEntryUi = "CreditsEntryUi";
         public const string creditsIcon = "creditsIcon";
@@ -211,6 +207,7 @@ public static partial class R
         public const string entriesContainer = "entriesContainer";
         public const string entryContainer = "entryContainer";
         public const string exitSceneButton = "exitSceneButton";
+        public const string ffmpegApiUsageChooser = "ffmpegApiUsageChooser";
         public const string filterActiveIcon = "filterActiveIcon";
         public const string filterInactiveIcon = "filterInactiveIcon";
         public const string filterListContainer = "filterListContainer";
@@ -415,6 +412,7 @@ public static partial class R
         public const string lyricsLabel = "lyricsLabel";
         public const string lyricsLanguageChooser = "lyricsLanguageChooser";
         public const string lyricsPropertyToggle = "lyricsPropertyToggle";
+        public const string lyricsTextField = "lyricsTextField";
         public const string main = "main";
         public const string mediaFileFormatGroup = "mediaFileFormatGroup";
         public const string messageBufferTimeTextField = "messageBufferTimeTextField";
