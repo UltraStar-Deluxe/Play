@@ -111,6 +111,8 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
             songMetaChangedEventStream.OnNext(new NotesChangedEvent());
         }
         
+        noteAreaControl.ScrollIntoView(notes);
+        
         return notes;
     }
 
