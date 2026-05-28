@@ -32,6 +32,7 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
     public Subject<ForcedAlignmentFinishedEvent> ForcedAlignmentFinishedEventStream => forcedAlignmentFinishedEventStream;
 
     private NemoForcedAligner nemoForcedAligner;
+    private string activeModelPath;
 
     public Job<ForcedAlignmentResult> ProcessSongMetaJob(SongMeta songMeta, ForcedAlignmentInput forcedAlignmentInput)
     {
@@ -100,12 +101,12 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
 
         try
         {
-            if (nemoForcedAligner == null)
+            NemoForcedAlignerConfiguration config = GetNemoForcedAlignerConfiguration();
+            if (nemoForcedAligner == null || activeModelPath != config.ModelPath)
             {
-                // TODO: Handle different languages
-                NemoForcedAlignerConfiguration config = GetNemoForcedAlignerConfiguration("en");
                 Debug.Log($"Preparing NeMo Forced Aligner (NFA). modelPath: '{config.ModelPath}'");
                 nemoForcedAligner = new NemoForcedAligner(config.ModelPath, config.TokensPath);
+                activeModelPath = config.ModelPath;
             }
 
             float[] monoAudioSamplesResampled = AudioSampleUtils.Resample(forcedAlignmentInput.MonoSamples, forcedAlignmentInput.SampleRate, NemoForcedAligner.SampleRate);
@@ -146,30 +147,20 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
             .PadTimestamps(nemoForcedAlignmentResult);
     }
 
-    private NemoForcedAlignerConfiguration GetNemoForcedAlignerConfiguration(string language)
+    private NemoForcedAlignerConfiguration GetNemoForcedAlignerConfiguration()
     {
-        string modelPath = !settings.SongEditorSettings.ForcedAlignmentModelPath.IsNullOrEmpty()
-            ? settings.SongEditorSettings.ForcedAlignmentModelPath
-            : ApplicationUtils.GetStreamingAssetsPath("AiModels/NemoForcedAligner/stt_en_conformer_ctc_large.onnx");
+        string modelPath = ForcedAlignmentConfigurationUtils.GetModelPath(settings);
+
         if (!FileUtils.Exists(modelPath))
         {
             throw new FileNotFoundException($"NeMo Forced Aligner ONNX model not found. path: '{modelPath}'", modelPath);
         }
-        
+
         string tokensPath = modelPath.Replace(".onnx", ".txt");
         if (!FileUtils.Exists(tokensPath))
         {
             throw new FileNotFoundException($"NeMo Forced Aligner tokens file not found. path: '{tokensPath}'", tokensPath);
         }
-        
-        // if (language == "de")
-        // {
-        //     modelName = "stt_de_conformer_ctc_large.";
-        // }
-        // else if (language == "es")
-        // {
-        //     modelName = "stt_es_conformer_ctc_large.";
-        // }
 
         return new NemoForcedAlignerConfiguration(modelPath, tokensPath);
     }
@@ -204,7 +195,7 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
             EndTime = token.EndTime,
         };
     }
-    
+
     private class NemoForcedAlignerConfiguration
     {
         public string ModelPath { get; set; }
