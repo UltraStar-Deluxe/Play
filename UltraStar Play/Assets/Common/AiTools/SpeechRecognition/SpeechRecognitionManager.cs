@@ -120,7 +120,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
             var sherpaOnnxResult = await RunSherpaOnnxSpeechRecognitionAsync(
                 monoSamplesExcerptResampled,
                 ParakeetV3ExpectedSampleRate,
-                new CancellationTokenSource(TimeSpan.FromMinutes(10)).Token);
+                jobProgress.CancellationTokenSource.Token);
             Debug.Log("Speech recognition complete.");
 
             if (sherpaOnnxResult.Error != null)
