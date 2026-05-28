@@ -121,11 +121,13 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
 
             // Newline is not a word separator in the forced alignment model.
             string normalizedLyrics = Regex.Replace(forcedAlignmentInput.Lyrics, @"\n", " ");
+
+            await Awaitable.BackgroundThreadAsync();
             NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignmentResult = nemoForcedAligner.Run(audioData, normalizedLyrics);
-
             Debug.Log($"Forced Alignment finished: {nemoForcedAlignmentResult.Words.Select(w => $"{w.Word}: {w.StartTime:F2} - {w.EndTime:F2}").JoinWith(", ")}");
-
             NemoForcedAligner.ForcedAlignmentResult paddedNemoForcedAlignmentResult = ToPaddedNemoForcedAlignmentResult(nemoForcedAlignmentResult, audioData);
+            await Awaitable.MainThreadAsync();
+            
             return ToForcedAlignmentResult(paddedNemoForcedAlignmentResult);
         }
         finally
