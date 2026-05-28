@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using NWaves.FeatureExtractors;
@@ -45,10 +46,10 @@ public class NemoForcedAligner : IDisposable
     /// Assumes audio is 16kHz Mono (resampled if necessary).
     /// Assumes the ONNX model has an input 'audio_signal' and 'length', and output 'logprobs'.
     /// </summary>
-    public ForcedAlignmentResult Run(AudioData audioData, string transcript)
+    public ForcedAlignmentResult Run(AudioData audioData, string transcript, CancellationToken cancellationToken = default)
     {
         var features = ExtractFeatures(audioData);
-        var logprobs = RunInference(features);
+        var logprobs = RunInference(features, cancellationToken);
         var targetIds = Tokenize(transcript);
 
         Console.WriteLine(
@@ -235,7 +236,7 @@ public class NemoForcedAligner : IDisposable
         }
     }
 
-    private LogProbs RunInference(AudioFeatures features)
+    private LogProbs RunInference(AudioFeatures features, CancellationToken cancellationToken = default)
     {
         int numFrames = features.FrameCount;
         int numBins = features.FeatureCount;
@@ -259,7 +260,9 @@ public class NemoForcedAligner : IDisposable
             NamedOnnxValue.CreateFromTensor("length", lengthTensor)
         };
 
-        using (var results = session.Run(inputs))
+        using (RunOptions runOptions = new RunOptions())
+        using (CancellationTokenRegistration _ = cancellationToken.Register(() => runOptions.Terminate = true))
+        using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> results = session.Run(inputs, new[] { "logprobs" }, runOptions))
         {
             var logprobsTensor = results.First(r => r.Name == "logprobs").AsTensor<float>();
             int outFrames = logprobsTensor.Dimensions[1];
