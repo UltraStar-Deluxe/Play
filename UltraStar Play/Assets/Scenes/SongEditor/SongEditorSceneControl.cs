@@ -196,6 +196,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
         InitSteamAchievement();
 
+        nonPersistentSettings.ForcedAlignmentLyrics = sceneData.ForcedAlignmentLyrics;
+
         if (sceneData.CreateSingAlongDataViaAiTools)
         {
             CreateSingAlongDataViaAiTools();
@@ -206,7 +208,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     {
         try
         {
-            nonPersistentSettings.ForcedAlignmentLyrics = sceneData.ForcedAlignmentLyrics;
             CreateSingAlongSongControl createSingAlongSongControl = injector
                 .CreateAndInject<CreateSingAlongSongControl>();
             await createSingAlongSongControl.CreateSingAlongSongAsync(SongMeta, true);

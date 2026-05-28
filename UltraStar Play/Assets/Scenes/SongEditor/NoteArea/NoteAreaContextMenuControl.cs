@@ -144,14 +144,13 @@ public class NoteAreaContextMenuControl : ContextMenuControl
                     Translation.Get(R.Messages.songEditor_action_forcedAlignmentInSelection_dialog_message),
                     newLyrics =>
                     {
-                        nonPersistentSettings.ForcedAlignmentLyrics = newLyrics;
                         forcedAlignmentAction.CreateNotesViaForcedAlignmentInSelection(
-                            nonPersistentSettings.ForcedAlignmentLyrics,
+                            newLyrics,
                             lastSelectionRect.MinBeat,
                             lastSelectionRect.LengthInBeats,
                             true);
                     },
-                    nonPersistentSettings.ForcedAlignmentLyrics);
+                    SongMetaUtils.GetLyrics(selectionControl.GetSelectedNotes()));
             });
         }
     }
