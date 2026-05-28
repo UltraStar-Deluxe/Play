@@ -16,6 +16,7 @@
                     <ui:TextField picking-mode="Ignore" name="artistTextField" label="$mainScene_newSongDialog_songArtist" style="align-items: center; flex-grow: 1;"/>
                     <ui:TextField picking-mode="Ignore" name="titleTextField" label="$mainScene_newSongDialog_songTitle" style="flex-grow: 1; align-items: center;"/>
                     <ui:TextField name="lyricsTextField" multiline="true" label="$mainScene_newSongDialog_lyrics" placeholder="$mainScene_newSongDialog_lyrics_placeholder" placeholder-text="$mainScene_newSongDialog_lyrics_placeholder" class="multiline fullwidth" style="align-items: flex-start; flex-direction: column; min-height: 120px;"/>
+                    <ui:EnumField label="$mainScene_newSongDialog_lyricsLanguage" value="English" type="ELyricsLanguage, Common" name="lyricsLanguageChooser" style="flex-grow: 1; align-items: center;"/>
                 </ui:VisualElement>
             </ui:ScrollView>
             <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: center; width: 100%; flex-shrink: 0;">

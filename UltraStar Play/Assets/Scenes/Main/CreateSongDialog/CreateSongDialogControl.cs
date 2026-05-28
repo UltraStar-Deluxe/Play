@@ -30,6 +30,9 @@ public class CreateSongDialogControl : AbstractModalDialogControl, IInjectionFin
     [Inject(UxmlName = R.UxmlNames.lyricsTextField)]
     private TextField lyricsTextField;
 
+    [Inject(UxmlName = R.UxmlNames.lyricsLanguageChooser)]
+    private EnumField lyricsLanguageChooser;
+
     [Inject(UxmlName = R.UxmlNames.okButton)]
     private Button okButton;
 
@@ -60,6 +63,10 @@ public class CreateSongDialogControl : AbstractModalDialogControl, IInjectionFin
         titleTextField.DisableParseEscapeSequences();
         lyricsTextField.value = "";
         lyricsTextField.DisableParseEscapeSequences();
+
+        FieldBindingUtils.Bind(lyricsLanguageChooser,
+            () => EnumUtils.Parse(settings.SongEditorSettings.LyricsLanguage, ELyricsLanguage.English),
+            newValue => settings.SongEditorSettings.LyricsLanguage = newValue.ToString());
 
         UpdateOkButtonEnabled();
         artistTextField.RegisterValueChangedCallback(evt => UpdateOkButtonEnabled());
