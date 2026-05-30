@@ -4,6 +4,7 @@
     <ui:Template name="SongEditorAiToolbarUi" src="project://database/Assets/Scenes/SongEditor/AiToolbar/SongEditorAiToolbarUi.uxml?fileID=9197481963319205126&amp;guid=0914d5cd6403be5489269193b83a91bf&amp;type=3#SongEditorAiToolbarUi"/>
     <ui:Template name="SongEditorSideBarMainColumnUi" src="project://database/Assets/Scenes/SongEditor/SongEditorSideBarMainColumnUi.uxml?fileID=9197481963319205126&amp;guid=9015a7e9aa0de9248bb4893d185955a1&amp;type=3#SongEditorSideBarMainColumnUi"/>
     <ui:Template name="SongEditorSideBarSecondaryColumnUi" src="project://database/Assets/Scenes/SongEditor/SongEditorSideBarSecondaryColumnUi.uxml?fileID=9197481963319205126&amp;guid=91ce971b984f18c4fa80c614d2dc32d8&amp;type=3#SongEditorSideBarSecondaryColumnUi"/>
+    <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles"/>
     <ui:VisualElement name="background">
         <ui:VisualElement name="songEditorRoot" class="songEditorRoot overlay" style="width: 100%; height: 100%; align-items: stretch;">
             <ui:VisualElement name="row" style="flex-direction: row; flex-grow: 1;">

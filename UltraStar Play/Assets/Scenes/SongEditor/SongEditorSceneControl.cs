@@ -88,6 +88,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [Inject(UxmlName = R.UxmlNames.rightSideBar)]
     private VisualElement rightSideBar;
+    
+    [Inject(UxmlName = R.UxmlNames.aiToolbarRoot)]
+    private VisualElement aiToolbarRoot;
 
     [Inject]
     private ApplicationManager applicationManager;
@@ -127,6 +130,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorPositionHistoryNavigationControl positionHistoryNavigationControl = new();
     private readonly EditModeLyricsConverter editModeLyricsConverter = new();
     private readonly SongEditorPlaybackSampleSourceSwitcher songEditorPlaybackSampleSourceSwitcher = new();
+    private readonly SongEditorAiToolbarControl songEditorAiToolbarControl = new();
 
     [Inject]
     private SongEditorSceneData sceneData;
@@ -153,6 +157,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(songEditorPitchDetectionControl);
         injector.Inject(songEditorDetectedPitchVisualizationControl);
         injector.Inject(songEditorPlaybackSampleSourceSwitcher);
+        injector
+            .WithRootVisualElement(aiToolbarRoot)
+            .Inject(songEditorAiToolbarControl);
         injector
             .WithRootVisualElement(rightSideBar)
             .CreateAndInject<DragToChangeRightSideBarWidthControl>();

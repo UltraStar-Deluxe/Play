@@ -7,6 +7,14 @@ public static partial class R
         public const string absolutePositionTransition = "absolutePositionTransition";
         public const string accented_bg_color = "accented-bg-color";
         public const string active_text_color = "active-text-color";
+        public const string ai_toolbar_panel = "ai-toolbar-panel";
+        public const string ai_toolbar_step_button = "ai-toolbar-step-button";
+        public const string ai_toolbar_step_icon = "ai-toolbar-step-icon";
+        public const string ai_toolbar_step_indicator = "ai-toolbar-step-indicator";
+        public const string ai_toolbar_step_line = "ai-toolbar-step-line";
+        public const string ai_toolbar_step_row = "ai-toolbar-step-row";
+        public const string ai_toolbar_title = "ai-toolbar-title";
+        public const string ai_toolbar_workflow = "ai-toolbar-workflow";
         public const string backgroundTransition = "backgroundTransition";
         public const string bg__lb__n_00000033_rb_ = "bg-_lb__n_00000033_rb_";
         public const string bg__lb__n_7FFFD4BB_rb_ = "bg-_lb__n_7FFFD4BB_rb_";
@@ -188,6 +196,7 @@ public static partial class R
         public const string p__lb_6px_rb_ = "p-_lb_6px_rb_";
         public const string p_1 = "p-1";
         public const string p_10 = "p-10";
+        public const string p_2 = "p-2";
         public const string p_3 = "p-3";
         public const string p_4 = "p-4";
         public const string p_5 = "p-5";

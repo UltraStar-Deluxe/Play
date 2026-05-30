@@ -252,23 +252,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToSongEditor)));
     }
 
-    private void DoSpeechRecognition()
-    {
-        NoteAreaRect lastSelectionRect = noteAreaControl.SelectionDragListener.LastSelectionRect.Value;
-        if (lastSelectionRect == null
-            || lastSelectionRect.LengthInBeats <= 0)
-        {
-            return;
-        }
-
-        speechRecognitionAction.CreateNotesFromSpeechRecognition(
-            lastSelectionRect.MinBeat,
-            lastSelectionRect.LengthInBeats,
-            settings.SongEditorSettings.AiSamplesSource,
-            150,
-            true);
-    }
-
     private void UpdateRecordingButton()
     {
         if (nonPersistentSettings.IsSongEditorRecordingEnabled.Value)

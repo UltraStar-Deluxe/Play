@@ -1,0 +1,57 @@
+.ai-toolbar-panel {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.ai-toolbar-title {
+    font-weight: bold;
+    margin-right: 16px;
+}
+
+.ai-toolbar-workflow {
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+.ai-toolbar-step-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.ai-toolbar-step-indicator {
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(92, 92, 92);
+    border-style: solid;
+    background-color: rgb(35, 39, 42);
+    margin-right: 12px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 16px;
+    height: 16px;
+}
+
+.ai-toolbar-step-icon {
+    align-self: center;
+    -unity-text-align: middle-center;
+    width: 16px;
+    height: 16px;
+    font-size: 18px;
+}
+
+.ai-toolbar-step-line {
+    width: 2px;
+    background-color: rgb(92, 92, 92);
+    margin-bottom: 0;
+    border-radius: 2px;
+    align-self: flex-start;
+    height: 16px;
+    margin-left: 6px;
+}
+
+.ai-toolbar-step-button {
+    width: 120px;
+}
