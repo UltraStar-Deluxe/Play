@@ -58,6 +58,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [InjectedInInspector]
     public StyleSheet songEditorSmallScreenStyleSheet;
+    
+    [InjectedInInspector]
+    public StyleSheet songEditorStyleSheet;
 
     [Inject]
     private Injector injector;
@@ -228,6 +231,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private void InitSongEditorStyleSheet()
     {
         uiDocument.rootVisualElement.AddToClassList(R.UssClasses.songEditorRoot);
+        
+        uiDocument.rootVisualElement.styleSheets.Add(songEditorStyleSheet);
 
         if (ApplicationUtils.IsSmallScreen()
             && songEditorSmallScreenStyleSheet != null)
