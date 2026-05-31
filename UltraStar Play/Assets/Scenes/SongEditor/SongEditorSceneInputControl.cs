@@ -120,7 +120,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Play only the selected notes
         InputManager.GetInputAction(R.InputActions.songEditor_playSelectedNotes).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => PlayAudioInRangeOfNotes(selectionControl.GetSelectedNotes()));
+            .Subscribe(_ => PlayAudioInSelectedRange());
 
         // Stop playback or return to last scene
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
@@ -633,7 +633,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             }
             else
             {
-                PlayAudioInRangeOfNotes(selectedNotes);
+                PlayAudioInSelectedRange();
             }
         }
 
@@ -648,18 +648,16 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         }
     }
 
-    private void PlayAudioInRangeOfNotes(List<Note> notes)
+    private void PlayAudioInSelectedRange()
     {
         if (songAudioPlayer.IsPlaying
-            || notes.IsNullOrEmpty())
+            || noteAreaControl.LastSelectionRect.Value == null)
         {
             return;
         }
 
-        int minBeat = notes.Select(it => it.StartBeat).Min();
-        int maxBeat = notes.Select(it => it.EndBeat).Max();
-        double maxMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, maxBeat);
-        double minMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, minBeat);
+        double minMillis = noteAreaControl.LastSelectionRect.Value.MinMillis;
+        double maxMillis = noteAreaControl.LastSelectionRect.Value.MaxMillis;
         songEditorSceneControl.StopPlaybackAfterPositionInMillis = maxMillis + settings.SongEditorSettings.PlaybackPostEndInMillis;
         songAudioPlayer.PositionInMillis = Math.Max(0, minMillis - settings.SongEditorSettings.PlaybackPreBeginInMillis);
         songAudioPlayer.PlayAudio();

@@ -58,7 +58,10 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     public double MillisecondsPerBeat { get; private set; }
     public float HeightForSingleNote { get; private set; }
-
+    
+    private readonly ReactiveProperty<NoteAreaRect> lastSelectionRect = new();
+    public ReactiveProperty<NoteAreaRect> LastSelectionRect => lastSelectionRect;
+    
     [Inject]
     private SongMeta songMeta;
 

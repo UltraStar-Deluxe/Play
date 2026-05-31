@@ -47,9 +47,8 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
     
     private NoteAreaDragEvent lastDragEvent;
 
-    private readonly ReactiveProperty<NoteAreaRect> lastSelectionRect = new();
-    public ReactiveProperty<NoteAreaRect> LastSelectionRect => lastSelectionRect;
-    
+    public ReactiveProperty<NoteAreaRect> LastSelectionRect => noteAreaControl.LastSelectionRect;
+
     public void OnInjectionFinished()
     {
         noteAreaDragControl.AddListener(this);
@@ -60,13 +59,13 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
         // Update selection rect
         noteAreaControl.ViewportEventStream.Subscribe(evt =>
         {
-            if (lastSelectionRect.Value == null)
+            if (LastSelectionRect.Value == null)
             {
                 return;
             }
-            UpdateSelectionFrame(lastSelectionRect.Value, audioSelectionFrame, false, true);
+            UpdateSelectionFrame(LastSelectionRect.Value, audioSelectionFrame, false, true);
         });
-        lastSelectionRect.Subscribe(_ => UpdateSelectionFrame(lastSelectionRect.Value, audioSelectionFrame, false, true));
+        LastSelectionRect.Subscribe(_ => UpdateSelectionFrame(LastSelectionRect.Value, audioSelectionFrame, false, true));
         selectionControl.NoteSelectionChangedEventStream
             .Subscribe(newSelection =>
             {
@@ -81,17 +80,17 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
                 int minMidiNote = newSelection.SelectedNotes.Min(note => note.MidiNote);
                 int maxMidiNote = newSelection.SelectedNotes.Max(note => note.MidiNote);
 
-                if (lastSelectionRect.Value == null)
+                if (LastSelectionRect.Value == null)
                 {
-                    lastSelectionRect.Value = NoteAreaRect.CreateFromMillis(songMeta, 0, 0, 0, 0);
+                    LastSelectionRect.Value = NoteAreaRect.CreateFromMillis(songMeta, 0, 0, 0, 0);
                 }
                 
-                lastSelectionRect.Value = NoteAreaRect.CreateFromBeats(
+                LastSelectionRect.Value = NoteAreaRect.CreateFromBeats(
                     songMeta,
-                    Math.Min(lastSelectionRect.Value.MinBeat, minBeat),
-                    Math.Max(lastSelectionRect.Value.MaxBeat, maxBeat),
-                    Math.Min(lastSelectionRect.Value.MinMidiNote, minMidiNote),
-                    Math.Max(lastSelectionRect.Value.MaxMidiNote, maxMidiNote));
+                    Math.Min(LastSelectionRect.Value.MinBeat, minBeat),
+                    Math.Max(LastSelectionRect.Value.MaxBeat, maxBeat),
+                    Math.Min(LastSelectionRect.Value.MinMidiNote, minMidiNote),
+                    Math.Max(LastSelectionRect.Value.MaxMidiNote, maxMidiNote));
             });
     }
 
@@ -248,14 +247,14 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
 
     private void UpdateSelectionFrames(NoteAreaDragEvent dragEvent)
     {
-        lastSelectionRect.Value = NoteAreaRect.CreateFromBeats(songMeta,
+        LastSelectionRect.Value = NoteAreaRect.CreateFromBeats(songMeta,
             GetDragStartBeat(dragEvent),
             GetDragEndBeat(dragEvent),
             GetDragStartMidiNote(dragEvent),
             GetDragEndMidiNote(dragEvent));
 
-        UpdateSelectionFrame(lastSelectionRect.Value, noteAreaSelectionFrame, true, true);
-        UpdateSelectionFrame(lastSelectionRect.Value, audioSelectionFrame, false, true);
+        UpdateSelectionFrame(LastSelectionRect.Value, noteAreaSelectionFrame, true, true);
+        UpdateSelectionFrame(LastSelectionRect.Value, audioSelectionFrame, false, true);
     }
     
     private void UpdateSelectionFrame(
