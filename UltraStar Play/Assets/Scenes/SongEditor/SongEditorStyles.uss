@@ -106,11 +106,13 @@ Button.selected:hover {
 #leftSideBarMainColumn {
     height: 100%;
     align-items: flex-start;
+    padding: 2px;
 }
 
 #leftSideBarMainColumn Button {
-    padding: 6px;
+    padding: 4px 2px;
     margin-bottom: 5px;
+    margin-left: 2px;
     width: 100%;
     flex-direction: row;
     justify-content: flex-start;
@@ -133,9 +135,10 @@ Button.selected:hover {
 }
 
 #leftSideBarMainColumn MaterialIcon {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-l);
     width: auto;
     height: auto;
+    margin-right: 4px;
 }
 
 #leftSideBarMainColumn.small Label {
