@@ -196,7 +196,6 @@ public static partial class R
         public const string p__lb_6px_rb_ = "p-_lb_6px_rb_";
         public const string p_1 = "p-1";
         public const string p_10 = "p-10";
-        public const string p_2 = "p-2";
         public const string p_3 = "p-3";
         public const string p_4 = "p-4";
         public const string p_5 = "p-5";

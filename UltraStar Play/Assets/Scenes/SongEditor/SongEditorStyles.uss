@@ -158,6 +158,18 @@ Button.selected:hover {
     display: flex;
 }
 
+#sideBarMainColumnSeparator {
+    height: 1px;
+    width: auto;
+    margin: 2px 20px;
+    background-color: var(--font-color);
+    opacity: 0.1;
+}
+
+#leftSideBarMainColumn.small #sideBarMainColumnSeparator {
+    margin: 2px 8px;
+}
+
 .unity-toggle {
     justify-content: space-between;
 }

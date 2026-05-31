@@ -159,9 +159,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.importMidiFileButton)]
     private Button importMidiFileButton;
 
-    [Inject(UxmlName = R.UxmlNames.audioSeparationButton)]
-    private Button audioSeparationButton;
-
     [Inject(UxmlName = R.UxmlNames.playbackAudioChooser)]
     private Chooser playbackAudioChooser;
 
@@ -200,6 +197,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject]
     private SongMeta songMeta;
+
+    [Inject]
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private Settings settings;
@@ -421,8 +421,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition = newValue);
 
         // Audio separation (button in main side bar and in options)
-        audioSeparationButton.RegisterCallbackButtonTriggered(OnAudioSeparationButtonClicked);
-        performAudioSeparationButton.RegisterCallbackButtonTriggered(OnAudioSeparationButtonClicked);
+        performAudioSeparationButton.RegisterCallbackButtonTriggered(_ =>
+            SongEditorAudioSeparationUtils.AskToPerformAudioSeparation(songMeta, audioSeparationManager, dialogManager));
         
         audioSeparationModelNameTextField.DisableParseEscapeSequences();
         Bind(audioSeparationModelNameTextField,
@@ -442,7 +442,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 () => pitchDetectionModelPathTextField.value,
                 newValue => pitchDetectionModelPathTextField.value = newValue));
 
-        performPitchDetectionButton.RegisterCallbackButtonTriggered(_ => pitchDetectionAction.CreateNotesUsingAi(true));
+        performPitchDetectionButton.RegisterCallbackButtonTriggered(_ =>
+            SongEditorPitchDetectionUtils.AnalyzePitchUsingAi(songMeta, pitchDetectionAction, noteAreaControl));
 
         // Forced Alignment
         Bind(forcedAlignmentModelPathTextField,
@@ -565,11 +566,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(playbackPostEndTimeInMillisTextField,
             () => settings.SongEditorSettings.PlaybackPostEndInMillis,
             newValue => settings.SongEditorSettings.PlaybackPostEndInMillis = newValue);
-    }
-
-    private async void OnAudioSeparationButtonClicked(EventBase evt)
-    {
-        await SongEditorAudioSeparationUtils.AskToPerformAudioSeparation(songMeta, audioSeparationManager, dialogManager);
     }
 
     private void AddSpaceBetweenNotesInSelection()

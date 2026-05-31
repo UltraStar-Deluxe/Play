@@ -19,9 +19,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
 
-    [Inject(UxmlName = R.UxmlNames.aiPitchDetectionButton)]
-    private Button aiPitchDetectionButton;
-
     [Inject(UxmlName = R.UxmlNames.undoButton)]
     private Button undoButton;
 
@@ -161,8 +158,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         });
         UpdateRecordingButton();
 
-        aiPitchDetectionButton.RegisterCallbackButtonTriggered(_ => AnalyzePitchUsingAi());
-
         undoButton.RegisterCallbackButtonTriggered(_ => historyManager.Undo());
         redoButton.RegisterCallbackButtonTriggered(_ => historyManager.Redo());
         exitSceneButton.RegisterCallbackButtonTriggered(_ => songEditorSceneControl.ReturnToLastScene());
@@ -205,26 +200,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             .Subscribe(_ => UpdatePlayPauseIcon());
 
         InitTabGroup();
-    }
-
-    private async void AnalyzePitchUsingAi()
-    {
-        if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
-        {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingVocalsAudio));
-            return;
-        }
-
-        PitchDetectionResult pitchDetectionResult = await pitchDetectionAction.CreateNotesUsingAi(true);
-        ScrollPitchDetectionResultIntoView(pitchDetectionResult);
-    }
-
-    private void ScrollPitchDetectionResultIntoView(PitchDetectionResult pitchDetectionResult)
-    {
-        double fromMillis = pitchDetectionResult.Notes.Min(note => note.StartInMillis);
-        double toMillis = pitchDetectionResult.Notes.Max(note => note.StartInMillis + note.LengthInMillis);
-        double midiNote = pitchDetectionResult.Notes.Min(note => note.MidiNote);
-        noteAreaControl.ScrollIntoView(fromMillis, toMillis, midiNote, midiNote);
     }
 
     private void ShowSongEditorHelpDialog()

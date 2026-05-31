@@ -28,7 +28,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
     [Inject]
     private SongEditorMidiFileImporter songEditorMidiFileImporter;
 
-    public async Awaitable<PitchDetectionResult> CreateNotesUsingAi(bool notify)
+    public async Awaitable<PitchDetectionResult> AnalyzePitchUsingAi(bool notify)
     {
         PitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta).GetResultAsync();
         

@@ -52,6 +52,9 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
     private PitchDetectionAction pitchDetectionAction;
 
     [Inject]
+    private NoteAreaControl noteAreaControl;
+
+    [Inject]
     private ForcedAlignmentAction forcedAlignmentAction;
 
     [Inject]
@@ -74,7 +77,7 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
     public void OnInjectionFinished()
     {
         vocalsIsolationButton.RegisterCallbackButtonTriggered(_ => OnVocalsIsolationButtonClicked());
-        pitchDetectionButton.RegisterCallbackButtonTriggered(_ => pitchDetectionAction.CreateNotesUsingAi(true));
+        pitchDetectionButton.RegisterCallbackButtonTriggered(_ => OnPitchDetectionButtonClicked());
         lyricsAlignmentButton.RegisterCallbackButtonTriggered(_ =>
         {
             SongEditorForcedAlignmentUtils.ShowForcedAlignmentDialog(
@@ -99,6 +102,11 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
 
         UpdateIndicators();
         UpdateSizeToggle();
+    }
+
+    private void OnPitchDetectionButtonClicked()
+    {
+        SongEditorPitchDetectionUtils.AnalyzePitchUsingAi(songMeta, pitchDetectionAction, noteAreaControl);
     }
 
     private async void OnVocalsIsolationButtonClicked()

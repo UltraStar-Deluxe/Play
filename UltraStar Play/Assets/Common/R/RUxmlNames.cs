@@ -23,7 +23,6 @@ public static partial class R
         public const string addToSongQueueAsNewLabel = "addToSongQueueAsNewLabel";
         public const string adjustFollowingNotesToggle = "adjustFollowingNotesToggle";
         public const string advancedSearchAccordionItem = "advancedSearchAccordionItem";
-        public const string aiPitchDetectionButton = "aiPitchDetectionButton";
         public const string aiToolbar = "aiToolbar";
         public const string aiToolbarRoot = "aiToolbarRoot";
         public const string allCharactersContainer = "allCharactersContainer";
@@ -44,7 +43,6 @@ public static partial class R
         public const string assignToPlayerToggle = "assignToPlayerToggle";
         public const string audioFileTextField = "audioFileTextField";
         public const string audioSelectionFrame = "audioSelectionFrame";
-        public const string audioSeparationButton = "audioSeparationButton";
         public const string audioSeparationGroup = "audioSeparationGroup";
         public const string audioSeparationModelNameTextField = "audioSeparationModelNameTextField";
         public const string audioWaveForm = "audioWaveForm";
@@ -807,6 +805,7 @@ public static partial class R
         public const string showVideoIcon = "showVideoIcon";
         public const string showVirtualPianoToggle = "showVirtualPianoToggle";
         public const string shrinkIcon = "shrinkIcon";
+        public const string sideBarMainColumnSeparator = "sideBarMainColumnSeparator";
         public const string sideBarMainColumnUi = "sideBarMainColumnUi";
         public const string sideBarSecondaryColumnUi = "sideBarSecondaryColumnUi";
         public const string sideBarSettingsUi = "sideBarSettingsUi";
