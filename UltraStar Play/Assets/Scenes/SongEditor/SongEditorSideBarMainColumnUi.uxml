@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="leftSideBarMainColumn" class="panel smallFont leftSideBar" style="border-left-width: 0; border-top-width: 0; border-bottom-width: 0;">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="height: 100%;">
-            <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" class="transparentButton">
+            <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" class="transparentButton" style="margin-top: 5px;">
                 <MaterialIcon name="playIcon" icon="play_arrow"/>
                 <MaterialIcon name="pauseIcon" icon="pause"/>
                 <ui:Label text="$songEditor_sideBar_togglePlayback" display-tooltip-when-elided="true" name="label"/>
