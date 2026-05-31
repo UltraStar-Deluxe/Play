@@ -27,8 +27,8 @@
         string initialLyrics)
     {
         songEditorSceneControl.CreateTextInputDialog(
-            Translation.Get(R.Messages.songEditor_action_forcedAlignmentInSelection_dialog_title),
-            Translation.Get(R.Messages.songEditor_action_forcedAlignmentInSelection_dialog_message),
+            Translation.Get(R.Messages.songEditor_action_forcedAlignment_dialog_title),
+            Translation.Get(R.Messages.songEditor_action_forcedAlignment_dialog_message),
             newLyrics =>
             {
                 forcedAlignmentAction.RunForcedAlignment(newLyrics, true);

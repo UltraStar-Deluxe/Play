@@ -249,6 +249,7 @@ public static partial class R
         public static readonly string job_error_alreadyInProgress = "job_error_alreadyInProgress";
         public static readonly string job_forcedAlignment = "job_forcedAlignment";
         public static readonly string job_forcedAlignment_errorWithReason = "job_forcedAlignment_errorWithReason";
+        public static readonly string job_forcedAlignment_warning_noModelForLanguage = "job_forcedAlignment_warning_noModelForLanguage";
         public static readonly string job_forcedAlignmentWithName = "job_forcedAlignmentWithName";
         public static readonly string job_loadSpeechRecognitionModel = "job_loadSpeechRecognitionModel";
         public static readonly string job_pitchDetection = "job_pitchDetection";
@@ -278,6 +279,7 @@ public static partial class R
         public static readonly string mainScene_newSongDialog_createVideo = "mainScene_newSongDialog_createVideo";
         public static readonly string mainScene_newSongDialog_lyrics = "mainScene_newSongDialog_lyrics";
         public static readonly string mainScene_newSongDialog_lyrics_placeholder = "mainScene_newSongDialog_lyrics_placeholder";
+        public static readonly string mainScene_newSongDialog_lyricsLanguage = "mainScene_newSongDialog_lyricsLanguage";
         public static readonly string mainScene_newSongDialog_songArtist = "mainScene_newSongDialog_songArtist";
         public static readonly string mainScene_newSongDialog_songPath = "mainScene_newSongDialog_songPath";
         public static readonly string mainScene_newSongDialog_songTitle = "mainScene_newSongDialog_songTitle";
@@ -531,6 +533,9 @@ public static partial class R
         public static readonly string songEditor_action_fitViewHorizontallyToSelection = "songEditor_action_fitViewHorizontallyToSelection";
         public static readonly string songEditor_action_fitViewHorizontallyToSentence = "songEditor_action_fitViewHorizontallyToSentence";
         public static readonly string songEditor_action_fitViewVertically = "songEditor_action_fitViewVertically";
+        public static readonly string songEditor_action_forcedAlignment = "songEditor_action_forcedAlignment";
+        public static readonly string songEditor_action_forcedAlignment_dialog_message = "songEditor_action_forcedAlignment_dialog_message";
+        public static readonly string songEditor_action_forcedAlignment_dialog_title = "songEditor_action_forcedAlignment_dialog_title";
         public static readonly string songEditor_action_forcedAlignmentInSelection = "songEditor_action_forcedAlignmentInSelection";
         public static readonly string songEditor_action_forcedAlignmentInSelection_dialog_message = "songEditor_action_forcedAlignmentInSelection_dialog_message";
         public static readonly string songEditor_action_forcedAlignmentInSelection_dialog_title = "songEditor_action_forcedAlignmentInSelection_dialog_title";
