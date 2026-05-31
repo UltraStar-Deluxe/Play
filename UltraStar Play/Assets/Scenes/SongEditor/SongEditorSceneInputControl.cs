@@ -337,7 +337,14 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
 
+        // Scroll towards end of song by 'mouse wheel down' or 'mouse wheel right'.
         int scrollDirection = Math.Sign(context.ReadValue<Vector2>().y);
+        if (scrollDirection == 0)
+        {
+            // Try horizontal scroll direction, e.g., from mouse pad
+            scrollDirection = -Math.Sign(context.ReadValue<Vector2>().x);
+        }
+        
         if (scrollDirection != 0 && noteAreaControl.IsPointerOver())
         {
             // Scroll horizontal in NoteArea with no modifier
