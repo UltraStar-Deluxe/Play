@@ -466,7 +466,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         CreateTextInputDialog(title, message, UseValueCallback);
     }
 
-    public void CreateTextInputDialog(Translation title, Translation message, Action<string> useValueCallback, string initialValue = "")
+    public TextInputDialogControl CreateTextInputDialog(Translation title, Translation message, Action<string> useValueCallback, string initialValue = "")
     {
         VisualElement visualElement = valueInputDialogUi.CloneTree();
         visualElement.AddToClassList("overlay");
@@ -485,6 +485,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         openDialogControls.Add(dialogControl);
         dialogControl.DialogClosedEventStream
             .Subscribe(_ => openDialogControls.Remove(dialogControl));
+
+        return dialogControl;
     }
 
     public void CloseAllOpenDialogs()

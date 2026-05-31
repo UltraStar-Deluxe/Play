@@ -72,6 +72,15 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
     [Inject]
     private DialogManager dialogManager;
 
+    [Inject]
+    private SpeechRecognitionAction speechRecognitionAction;
+
+    [Inject]
+    private Settings settings;
+
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
+
     private bool isExpanded = true;
 
     private bool HasPitchDetectionData => songEditorPitchDetectionControl.LastPitchDetectionResult != null;
@@ -88,7 +97,10 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
             SongEditorForcedAlignmentUtils.ShowForcedAlignmentDialog(
                 songEditorSceneControl,
                 forcedAlignmentAction,
-                SongMetaUtils.GetLyrics(songMeta.Voices.FirstOrDefault()));
+                SongMetaUtils.GetLyrics(songMeta.Voices.FirstOrDefault()),
+                speechRecognitionAction,
+                songAudioPlayer,
+                settings);
         });
 
         toggleAiToolbarButton.RegisterCallbackButtonTriggered(_ => ToggleExpanded());
