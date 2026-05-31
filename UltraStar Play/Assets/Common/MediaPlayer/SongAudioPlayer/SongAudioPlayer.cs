@@ -353,7 +353,14 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
 
     public void ReloadAudio()
     {
+        bool wasPlaying = IsPlaying;
+        
         LoadAndPlay(loadedSongMeta);
+        
+        if (!wasPlaying)
+        {
+            PauseAudio();
+        }
     }
 
     private void StopAudio()
