@@ -7,7 +7,7 @@
         <ui:VisualElement name="dialogMessageContainer" style="max-width: 100%; flex-grow: 1; margin-bottom: 5px;">
             <ui:Label text="Lorem Ipsum" name="dialogMessage" class="dialogMessage" style="white-space: normal;"/>
         </ui:VisualElement>
-        <ui:TextField picking-mode="Ignore" name="valueTextField" multiline="true" class="multiline" style="flex-grow: 1; flex-shrink: 1; max-height: 200px; min-height: auto; white-space: normal;"/>
+        <ui:TextField picking-mode="Ignore" name="valueTextField" multiline="true" vertical-scroller-visibility="Auto" class="multiline" style="flex-grow: 1; flex-shrink: 1; max-height: 200px; min-height: auto; white-space: normal;"/>
         <ui:VisualElement name="validationWarningContainer" class="smallFont mb-1" style="flex-direction: row; width: 100%; align-items: center;">
             <MaterialIcon name="invalidValueIcon" icon="warning" class="rounded warningFontColor"/>
             <ui:Label text="Warning about invalid value" display-tooltip-when-elided="true" name="invalidValueLabel"/>
