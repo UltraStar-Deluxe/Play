@@ -93,7 +93,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionF
 
         // Estimate duration
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
-        jobProgress.EstimatedTotalDurationInMillis = (int)Math.Ceiling((double)lengthInMillis);
+        jobProgress.EstimatedTotalDurationInMillis = (int)Math.Ceiling((double)lengthInMillis * 1.5);
 
         string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
         if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
