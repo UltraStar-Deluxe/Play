@@ -1,33 +1,33 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scenes/SongEditor/AiToolbar/SongEditorAiToolbarStyles.uss?fileID=7433441132597879392&amp;guid=624c4cc7a8cb4e969334c6a4fb5dbcca&amp;type=3#SongEditorAiToolbarStyles"/>
-    <ui:VisualElement name="aiToolbarRoot" class="ai-toolbar-panel panel p-2 roundCorners">
-        <ui:VisualElement name="titleRow" class="row mb-2" style="flex-grow: 1; width: 100%;">
+    <ui:VisualElement name="aiToolbarRoot" class="ai-toolbar-panel panel roundCorners p-1">
+        <ui:VisualElement name="titleRow" class="row" style="flex-grow: 1; width: 100%;">
             <ui:Label name="titleLabel" text="AI Workflow" class="ai-toolbar-title"/>
             <ui:Button name="toggleAiToolbarButton" class="squareButton transparentButton" style="margin-left: auto;">
-                <MaterialIcon icon="keyboard_double_arrow_up" name="shrinkIcon"/>
-                <MaterialIcon icon="keyboard_double_arrow_down" name="expandIcon"/>
+                <MaterialIcon icon="keyboard_double_arrow_up" name="shrinkIcon" style="position: absolute;"/>
+                <MaterialIcon icon="keyboard_double_arrow_down" name="expandIcon" style="position: absolute;"/>
             </ui:Button>
         </ui:VisualElement>
-        <ui:VisualElement name="workflowContainer" class="ai-toolbar-workflow">
+        <ui:VisualElement name="workflowContainer" class="ai-toolbar-workflow mt-1">
             <ui:VisualElement name="stepRow" class="ai-toolbar-step-row">
                 <ui:VisualElement name="vocalsIsolationStepIndicator" class="ai-toolbar-step-indicator">
                     <MaterialIcon name="checkIcon" icon="check_circle" class="ai-toolbar-step-icon"/>
                 </ui:VisualElement>
-                <ui:Button name="vocalsIsolationButton" text="Vocals Isolation" class="ai-toolbar-step-button"/>
+                <ui:Button name="vocalsIsolationButton" text="Vocals Isolation" class="ai-toolbar-step-button transparentButton"/>
             </ui:VisualElement>
             <ui:VisualElement name="stepLine" class="ai-toolbar-step-line"/>
             <ui:VisualElement name="stepRow" class="ai-toolbar-step-row">
                 <ui:VisualElement name="pitchDetectionStepIndicator" class="ai-toolbar-step-indicator">
                     <MaterialIcon name="checkIcon" icon="check_circle" class="ai-toolbar-step-icon"/>
                 </ui:VisualElement>
-                <ui:Button name="pitchDetectionButton" text="Pitch Detection" class="ai-toolbar-step-button"/>
+                <ui:Button name="pitchDetectionButton" text="Pitch Detection" class="ai-toolbar-step-button transparentButton"/>
             </ui:VisualElement>
             <ui:VisualElement name="stepLine" class="ai-toolbar-step-line"/>
             <ui:VisualElement name="stepRow" class="ai-toolbar-step-row">
                 <ui:VisualElement name="lyricsAlignmentStepIndicator" class="ai-toolbar-step-indicator">
                     <MaterialIcon name="checkIcon" icon="check_circle" class="ai-toolbar-step-icon" style="visibility: hidden;"/>
                 </ui:VisualElement>
-                <ui:Button name="lyricsAlignmentButton" text="Lyrics Alignment" class="ai-toolbar-step-button"/>
+                <ui:Button name="lyricsAlignmentButton" text="Lyrics Alignment" class="ai-toolbar-step-button transparentButton"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

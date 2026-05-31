@@ -26,12 +26,15 @@
     border-color: rgb(92, 92, 92);
     border-style: solid;
     background-color: rgb(35, 39, 42);
-    margin-right: 12px;
     justify-content: center;
     align-items: center;
     display: flex;
     width: 16px;
     height: 16px;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 4px;
 }
 
 .ai-toolbar-step-icon {
@@ -40,6 +43,10 @@
     width: 16px;
     height: 16px;
     font-size: 18px;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
 }
 
 .ai-toolbar-step-line {
@@ -53,5 +60,10 @@
 }
 
 .ai-toolbar-step-button {
-    width: 120px;
+    -unity-text-align: middle-left;
+    padding-top: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-bottom: 4px;
+    width: 110px;
 }
