@@ -514,8 +514,8 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     }
 
     protected virtual void RemoveRecordedNote(RecordedNoteControl recordedNoteControl)
-    {
-        recordedNoteToRecordedNoteControlsMap.Remove(recordedNoteControl.RecordedNote);
+            {
+                recordedNoteToRecordedNoteControlsMap.Remove(recordedNoteControl.RecordedNote);
         recordedNoteControl.Dispose();
     }
 
@@ -562,5 +562,17 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
             .value(gameObject, lyricsOnNotesOpacity.Value, 1, animTimeInSeconds)
             .setOnUpdate(interpolatedValue => lyricsOnNotesOpacity.Value = interpolatedValue)
             .id);
+    }
+
+    public virtual void JumpToAudioPositionByUserAction(double oldPositionInMillis, double newPositionInMillis)
+    {
+        if (newPositionInMillis >= oldPositionInMillis)
+        {
+            // Jump forward is handled by existing logic.
+            return;
+        }
+
+        // Jumped backwards: remove recorded notes that are at/after the new position
+        RemoveRecordedNotes();
     }
 }
