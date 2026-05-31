@@ -74,6 +74,11 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
 
     private bool isExpanded = true;
 
+    private bool HasPitchDetectionData => songEditorPitchDetectionControl.LastPitchDetectionResult != null;
+    private bool HasVocalsAndInstrumental => SongMetaUtils.VocalsAudioResourceExists(songMeta)
+                                    && SongMetaUtils.InstrumentalAudioResourceExists(songMeta);
+    private bool HasNotesOrLyrics => SongMetaUtils.GetAllNotes(songMeta).Any();
+    
     public void OnInjectionFinished()
     {
         vocalsIsolationButton.RegisterCallbackButtonTriggered(_ => OnVocalsIsolationButtonClicked());
@@ -102,6 +107,18 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
 
         UpdateIndicators();
         UpdateSizeToggle();
+
+        // Start minified if all AI tools done already
+        AwaitableUtils.ExecuteAfterDelayInFramesAsync(1, () =>
+        {
+            if (HasVocalsAndInstrumental
+                && HasNotesOrLyrics
+                && HasPitchDetectionData)
+            {
+                isExpanded = false;
+                UpdateSizeToggle();
+            }
+        });
     }
 
     private void OnPitchDetectionButtonClicked()
@@ -129,14 +146,8 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
 
     private void UpdateIndicators()
     {
-        bool hasPitchDetectionData = songEditorPitchDetectionControl.LastPitchDetectionResult != null;
-        pitchDetectionStepIndicator.Q(R.UxmlNames.checkIcon).SetVisibleByVisibility(hasPitchDetectionData);
-
-        bool hasVocalsAndInstrumental = SongMetaUtils.VocalsAudioResourceExists(songMeta)
-            && SongMetaUtils.InstrumentalAudioResourceExists(songMeta);
-        vocalsIsolationStepIndicator.Q(R.UxmlNames.checkIcon).SetVisibleByVisibility(hasVocalsAndInstrumental);
-
-        bool hasNotesOrLyrics = SongMetaUtils.GetAllNotes(songMeta).Any();
-        lyricsAlignmentStepIndicator.Q(R.UxmlNames.checkIcon).SetVisibleByVisibility(hasNotesOrLyrics);
+        pitchDetectionStepIndicator.Q(R.UxmlNames.checkIcon).SetVisibleByVisibility(HasPitchDetectionData);
+        vocalsIsolationStepIndicator.Q(R.UxmlNames.checkIcon).SetVisibleByVisibility(HasVocalsAndInstrumental);
+        lyricsAlignmentStepIndicator.Q(R.UxmlNames.checkIcon).SetVisibleByVisibility(HasNotesOrLyrics);
     }
 }
