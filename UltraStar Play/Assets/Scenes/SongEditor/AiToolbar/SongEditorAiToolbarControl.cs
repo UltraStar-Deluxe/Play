@@ -66,6 +66,9 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
     [Inject]
     private ForcedAlignmentManager forcedAlignmentManager;
 
+    [Inject]
+    private DialogManager dialogManager;
+
     private bool isExpanded = true;
 
     public void OnInjectionFinished()
@@ -100,7 +103,7 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
 
     private async void OnVocalsIsolationButtonClicked()
     {
-        await audioSeparationManager.ProcessSongMetaJob(songMeta, true).GetResultAsync();
+        await SongEditorAudioSeparationUtils.AskToPerformAudioSeparation(songMeta, audioSeparationManager, dialogManager);
     }
 
     private void ToggleExpanded()

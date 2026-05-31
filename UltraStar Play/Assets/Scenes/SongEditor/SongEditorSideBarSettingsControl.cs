@@ -569,25 +569,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     private async void OnAudioSeparationButtonClicked(EventBase evt)
     {
-        if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
-            && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
-        {
-            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-            dialogManager.CreateConfirmationDialogControl(
-                Translation.Get(R.Messages.songEditor_audioSeparation_confirmationDialog_title),
-                Translation.Get(R.Messages.songEditor_audioSeparation_confirmationDialog_message),
-                Translation.Get(R.Messages.common_ok),
-                _ => tcs.SetResult(true),
-                Translation.Get(R.Messages.action_cancel),
-                _ => tcs.SetResult(false));
-
-            if (!await tcs.Task)
-            {
-                return;
-            }
-        }
-
-        await audioSeparationManager.ProcessSongMetaJob(songMeta, true).GetResultAsync();
+        await SongEditorAudioSeparationUtils.AskToPerformAudioSeparation(songMeta, audioSeparationManager, dialogManager);
     }
 
     private void AddSpaceBetweenNotesInSelection()

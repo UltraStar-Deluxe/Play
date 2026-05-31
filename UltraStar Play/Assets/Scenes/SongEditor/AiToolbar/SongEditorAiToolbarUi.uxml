@@ -1,4 +1,4 @@
-<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xmlns:material="MaterialIcon" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scenes/SongEditor/AiToolbar/SongEditorAiToolbarStyles.uss?fileID=7433441132597879392&amp;guid=624c4cc7a8cb4e969334c6a4fb5dbcca&amp;type=3#SongEditorAiToolbarStyles"/>
     <ui:VisualElement name="aiToolbarRoot" class="ai-toolbar-panel panel p-2 roundCorners">
         <ui:VisualElement name="titleRow" class="row mb-2" style="flex-grow: 1; width: 100%;">
