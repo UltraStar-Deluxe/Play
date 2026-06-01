@@ -191,6 +191,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             vocalsAudioSource.time = targetTimeInSeconds;
         }
 
+        songAudioPlayer.VolumeFactor = 0;
         instrumentalAudioSource.volume = NumberUtils.PercentToFactor(settings.MusicVolumePercent)
                                          * NumberUtils.PercentToFactor(singSceneControl.ModifiedVolumePercent.Value)
                                          * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
