@@ -1,10 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
 
+<!-- This dotnet project is intended to specify NuGet dependencies in the .csproj file.
+     The dependencies will be downloaded when the csproj project is built
+     such that they can be copied to the Unity Assets folder afterwards -->
+  
   <ItemGroup>
     <PackageReference Include="NHyphenator" Version="2.0.0" />
     <PackageReference Include="Opportunity.LrcParser" Version="1.0.4" />
