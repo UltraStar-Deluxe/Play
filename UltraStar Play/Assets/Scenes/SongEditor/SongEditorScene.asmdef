@@ -14,7 +14,8 @@
         "playshared",
         "playsharedui",
         "UnityStandaloneFileBrowser",
-        "Eitan.SherpaONNXUnity"
+        "Eitan.SherpaONNXUnity",
+        "GeneratedConstants"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

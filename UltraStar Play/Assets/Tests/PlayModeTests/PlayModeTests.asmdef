@@ -19,7 +19,8 @@
         "Common",
         "Scenes",
         "SongEditorScene",
-        "Editor.Tests"
+        "Editor.Tests",
+        "GeneratedConstants"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

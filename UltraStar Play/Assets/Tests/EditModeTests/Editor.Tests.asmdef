@@ -16,7 +16,8 @@
         "Common",
         "Scenes",
         "SongEditorScene",
-        "FfmpegAudioSamplesLoader"
+        "FfmpegAudioSamplesLoader",
+        "GeneratedConstants"
     ],
     "includePlatforms": [
         "Editor"

@@ -7,7 +7,6 @@
         "UnityEditor.TestRunner",
         "Unity.InputSystem",
         "Unity.InputSystem.TestFramework",
-        "Serilog",
         "UniRx",
         "com.achimmihca.uniinject",
         "com.achimmihca.primeinputactions",
@@ -20,7 +19,8 @@
         "Scenes",
         "SongEditorScene",
         "Editor.Tests",
-        "PlayModeTests"
+        "PlayModeTests",
+        "GeneratedConstants"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -28,7 +28,6 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "Moq.dll",
         "Facepunch.Steamworks.Win64.dll"
     ],
     "autoReferenced": false,

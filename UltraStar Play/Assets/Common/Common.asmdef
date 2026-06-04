@@ -30,7 +30,8 @@
         "AVProVideo.Runtime",
         "Eitan.SherpaONNXUnity",
         "FfmpegAudioSamplesLoader",
-        "VorbisPluginImpl"
+        "VorbisPluginImpl",
+        "GeneratedConstants"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
