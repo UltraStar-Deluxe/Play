@@ -47,7 +47,6 @@ public static class GenerateTranslationConstantsMenuItems
         
         Directory.CreateDirectory(generatedConstantsFolder);
         File.WriteAllText(absoluteTargetPath, classCode, Encoding.UTF8);
-        AssetDatabase.ImportAsset(Path.GetRelativePath(Application.dataPath, absoluteTargetPath));
         Debug.Log("Generated file " + absoluteTargetPath);
     }
 
