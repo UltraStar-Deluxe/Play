@@ -355,3 +355,12 @@ Update Mode: updateDependencies
 The following packages were updated:
   com.unity.burst from version 1.8.25 to 1.8.26
   com.unity.mathematics from version 1.3.2 to 1.3.3
+
+=== Fri Jun  5 19:36:47 2026
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.burst from version 1.8.25 to 1.8.26
+  com.unity.mathematics from version 1.3.2 to 1.3.3
