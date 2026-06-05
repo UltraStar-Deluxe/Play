@@ -42,20 +42,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.forcedAlignmentLyricsTextField)]
     private TextField forcedAlignmentLyricsTextField;
     
-    [Inject(UxmlName = R.UxmlNames.performForcedAlignmentButton)]
-    private Button performForcedAlignmentButton;
-    
     [Inject(UxmlName = R.UxmlNames.pitchDetectionModelPathTextField)]
     private TextField pitchDetectionModelPathTextField;
 
     [Inject(UxmlName = R.UxmlNames.pitchDetectionModelPathButton)]
     private Button pitchDetectionModelPathButton;
-
-    [Inject(UxmlName = R.UxmlNames.performPitchDetectionButton)]
-    private Button performPitchDetectionButton;
-    
-    [Inject(UxmlName = R.UxmlNames.performAudioSeparationButton)]
-    private Button performAudioSeparationButton;
     
     [Inject(UxmlName = R.UxmlNames.forcedAlignmentWordStartPaddingMsSlider)]
     private SliderInt forcedAlignmentWordStartPaddingMsSlider;
@@ -417,10 +408,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition,
             newValue => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition = newValue);
 
-        // Audio separation (button in main side bar and in options)
-        performAudioSeparationButton.RegisterCallbackButtonTriggered(_ =>
-            SongEditorAudioSeparationUtils.AskToPerformAudioSeparation(songMeta, audioSeparationManager, dialogManager));
-        
+        // Audio separation
         audioSeparationModelNameTextField.DisableParseEscapeSequences();
         Bind(audioSeparationModelNameTextField,
             () => settings.SongEditorSettings.AudioSeparationModelName,
@@ -438,9 +426,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 FileSystemDialogUtils.CreateExtensionFilters("ONNX", "onnx"),
                 () => pitchDetectionModelPathTextField.value,
                 newValue => pitchDetectionModelPathTextField.value = newValue));
-
-        performPitchDetectionButton.RegisterCallbackButtonTriggered(_ =>
-            SongEditorPitchDetectionUtils.AnalyzePitchUsingAi(songMeta, pitchDetectionAction, noteAreaControl));
 
         // Forced Alignment
         Bind(forcedAlignmentModelPathTextField,
@@ -470,9 +455,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(forcedAlignmentPaddingMaxWordLengthMsSlider,
             () => settings.SongEditorSettings.ForcedAlignmentPaddingMaxWordLengthMs,
             newValue => settings.SongEditorSettings.ForcedAlignmentPaddingMaxWordLengthMs = newValue);
-        
-        performForcedAlignmentButton.RegisterCallbackButtonTriggered(_ =>
-            forcedAlignmentAction.RunForcedAlignment(nonPersistentSettings.ForcedAlignmentLyrics, true));
         
         // Lyrics editing separators
         Bind(wordSeparatorTextField,

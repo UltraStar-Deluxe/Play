@@ -591,9 +591,6 @@ public static partial class R
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
         public const string performanceAndEffectsGroup = "performanceAndEffectsGroup";
-        public const string performAudioSeparationButton = "performAudioSeparationButton";
-        public const string performForcedAlignmentButton = "performForcedAlignmentButton";
-        public const string performPitchDetectionButton = "performPitchDetectionButton";
         public const string permissionsAccordionItem = "permissionsAccordionItem";
         public const string permissionsContainer = "permissionsContainer";
         public const string phraseBonusScore = "phraseBonusScore";
