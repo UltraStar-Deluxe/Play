@@ -409,6 +409,7 @@ public static partial class R
         public const string lyricsArea = "lyricsArea";
         public const string lyricsAreaButtonRow = "lyricsAreaButtonRow";
         public const string lyricsAreaTextField = "lyricsAreaTextField";
+        public const string lyricsAreaTitle = "lyricsAreaTitle";
         public const string lyricsAreaVoice1Button = "lyricsAreaVoice1Button";
         public const string lyricsAreaVoice2Button = "lyricsAreaVoice2Button";
         public const string lyricsContainer = "lyricsContainer";
@@ -559,6 +560,7 @@ public static partial class R
         public const string openPersistentDataPathButton = "openPersistentDataPathButton";
         public const string openPersistentDataPathLabel = "openPersistentDataPathLabel";
         public const string openSongFolderButton = "openSongFolderButton";
+        public const string openSongFolderIcon = "openSongFolderIcon";
         public const string openSongMenuButton = "openSongMenuButton";
         public const string openSongMenuIcon = "openSongMenuIcon";
         public const string openSteamWorkshopButton = "openSteamWorkshopButton";
@@ -905,7 +907,7 @@ public static partial class R
         public const string speechRecognitionGroup = "speechRecognitionGroup";
         public const string speechRecognitionModelNameTextField = "speechRecognitionModelNameTextField";
         public const string speechRecognitionWhenRecordingToggle = "speechRecognitionWhenRecordingToggle";
-        public const string splitSyllablesAfterSpeechRecognitionToggle = "splitSyllablesAfterSpeechRecognitionToggle";
+        public const string splitSyllablesAfterAiToolsToggle = "splitSyllablesAfterAiToolsToggle";
         public const string starIcons = "starIcons";
         public const string stars = "stars";
         public const string startButton = "startButton";

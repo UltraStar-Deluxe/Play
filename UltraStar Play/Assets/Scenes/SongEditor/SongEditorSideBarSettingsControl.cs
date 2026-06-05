@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using NHyphenator;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -177,8 +174,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.settingsSideBarContainer)]
     private VisualElement settingsSideBarContainer;
 
-    [Inject(UxmlName = R.UxmlNames.splitSyllablesAfterSpeechRecognitionToggle)]
-    private Toggle splitSyllablesAfterSpeechRecognitionToggle;
+    [Inject(UxmlName = R.UxmlNames.splitSyllablesAfterAiToolsToggle)]
+    private Toggle splitSyllablesAfterAiToolsToggle;
     
     [Inject(UxmlName = R.UxmlNames.forcedAlignmentAfterSpeechRecognitionToggle)]
     private Toggle forcedAlignmentAfterSpeechRecognitionToggle;
@@ -412,7 +409,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.AiSamplesSource,
             newValue => settings.SongEditorSettings.AiSamplesSource = newValue);
         
-        Bind(splitSyllablesAfterSpeechRecognitionToggle,
+        Bind(splitSyllablesAfterAiToolsToggle,
             () => settings.SongEditorSettings.SplitSyllablesAfterAiTools,
             newValue => settings.SongEditorSettings.SplitSyllablesAfterAiTools = newValue);
 
