@@ -110,8 +110,8 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
 
         if (audioWaveFormVisualization == null)
         {
-            int textureWidth = 512;
-            int textureHeight = 128;
+            int textureWidth = 1024;
+            int textureHeight = 64;
             audioWaveFormVisualization = new AudioWaveFormVisualization(
                 songEditorSceneControl.gameObject,
                 overviewAreaWaveform,
