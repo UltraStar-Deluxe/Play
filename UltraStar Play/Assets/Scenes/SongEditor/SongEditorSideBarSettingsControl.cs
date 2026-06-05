@@ -413,8 +413,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.AiSamplesSource = newValue);
         
         Bind(splitSyllablesAfterSpeechRecognitionToggle,
-            () => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition,
-            newValue => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition = newValue);
+            () => settings.SongEditorSettings.SplitSyllablesAfterAiTools,
+            newValue => settings.SongEditorSettings.SplitSyllablesAfterAiTools = newValue);
 
         Bind(forcedAlignmentAfterSpeechRecognitionToggle,
             () => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition,

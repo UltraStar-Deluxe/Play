@@ -127,15 +127,7 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         // Split syllables if hyphenation is enabled
         if (config.Hyphenator != null)
         {
-            Dictionary<Note,List<Note>> noteToNotesAfterSplit = noteHyphenator.HypenateNotes(config.SongMeta, createdNotes, config.Hyphenator);
-            noteToNotesAfterSplit.ForEach(entry =>
-            {
-                Note note = entry.Key;
-                List<Note> notesAfterSplit = entry.Value;
-                List<Note> newNotes = new List<Note>(notesAfterSplit);
-                newNotes.Remove(note);
-                createdNotes.AddRange(newNotes);
-            });
+            HyphenationUtils.SplitNotesByHyphenation(config.SongMeta, settings, noteHyphenator, createdNotes);
         }
 
         // Shorten new notes left and right to give a little space

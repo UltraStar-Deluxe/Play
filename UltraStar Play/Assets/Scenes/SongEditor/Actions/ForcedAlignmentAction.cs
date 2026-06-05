@@ -25,6 +25,8 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
 
     [Inject] private NoteAreaControl noteAreaControl;
 
+    [Inject] private NoteHyphenator noteHyphenator;
+
     public async Awaitable<ForcedAlignmentResult> RunForcedAlignment(
         string lyrics,
         bool notify)
@@ -128,7 +130,7 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
     
     private List<Note> CreateNotesFromForcedAlignmentResult(ForcedAlignmentResult forcedAlignmentResult, int offsetInBeats)
     {
-        List<Note> notes = ForcedAlignmentUtils.CreateNotesFromForcedAlignmentResult(forcedAlignmentResult, songMeta, settings, offsetInBeats);
+        List<Note> notes = ForcedAlignmentUtils.CreateNotesFromForcedAlignmentResult(forcedAlignmentResult, songMeta, settings, noteHyphenator, offsetInBeats);
 
         // Remove old notes
         ESongEditorLayer layerEnum = ESongEditorLayer.ForcedAlignment;

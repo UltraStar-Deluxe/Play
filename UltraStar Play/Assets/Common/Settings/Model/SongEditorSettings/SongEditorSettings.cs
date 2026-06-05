@@ -60,6 +60,7 @@ public class SongEditorSettings
 
     // AI tools
     public ESongEditorSamplesSource AiSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
+    public bool SplitSyllablesAfterAiTools { get; set; } = true;
     
     // Audio separation
     public string AudioSeparationModelName { get; set; } = "";
@@ -69,7 +70,6 @@ public class SongEditorSettings
 
     // Speech recognition
     public string SpeechRecognitionModelName { get; set; } = "";
-    public bool SplitSyllablesAfterSpeechRecognition { get; set; } = true;
     public bool ForcedAlignmentAfterSpeechRecognition { get; set; } = true;
     public bool SpeechRecognitionWhenRecording { get; set; } = true;
 

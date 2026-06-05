@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NHyphenator;
 
 public static class ForcedAlignmentUtils
 {
@@ -39,9 +40,10 @@ public static class ForcedAlignmentUtils
         ForcedAlignmentResult forcedAlignmentResult,
         SongMeta songMeta,
         Settings settings,
+        NoteHyphenator noteHyphenator,
         int offsetInBeats = 0)
     {
-        return forcedAlignmentResult.Words
+        List<Note> notes = forcedAlignmentResult.Words
             .Select(wordTimestamp =>
             {
                 double startInMillis = wordTimestamp.StartTime * 1000;
@@ -64,8 +66,17 @@ public static class ForcedAlignmentUtils
                     word);
             })
             .ToList();
+
+        // Split syllables if hyphenation is enabled
+        HyphenationUtils.SplitNotesByHyphenation(songMeta, settings, noteHyphenator, notes);
+
+        // Shorten new notes left and right to give a little space
+        SpaceBetweenNotesUtils.ShortenNotesByMillis(notes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
+
+        return notes;
     }
-    
+
+
     public static string GetLyricsFromNotes(IEnumerable<Note> notes)
     {
         return notes

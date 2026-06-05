@@ -25,6 +25,9 @@ public class CreateSingAlongSongControl : INeedInjection
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NoteHyphenator noteHyphenator;
 
     [Inject]
     private PitchDetectionManager pitchDetectionManager;
@@ -182,7 +185,7 @@ public class CreateSingAlongSongControl : INeedInjection
                 return VoidEvent.instance;
             }
 
-            pipelineData.CreatedNotes = ForcedAlignmentUtils.CreateNotesFromForcedAlignmentResult(forcedAlignmentResult, songMeta, settings);
+            pipelineData.CreatedNotes = ForcedAlignmentUtils.CreateNotesFromForcedAlignmentResult(forcedAlignmentResult, songMeta, settings, noteHyphenator);
 
             // Split created notes into sentences and assign to first player
             AssignNotesToFirstPlayer(songMeta, pipelineData.CreatedNotes);

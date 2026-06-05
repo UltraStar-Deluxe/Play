@@ -72,7 +72,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             return new List<Note>();
         }
 
-        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
+        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterAiTools
             ? SettingsUtils.CreateHyphenator(settings)
             : null;
 
@@ -176,7 +176,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, audioClip, startBeat, lengthInBeats);
 
-        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
+        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterAiTools
             ? SettingsUtils.CreateHyphenator(settings)
             : null;
 
