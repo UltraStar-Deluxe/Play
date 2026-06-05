@@ -13,7 +13,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 {
     public const float ViewportAutomaticScrollingBoarderPercent = 0.01f;
     private const float ViewportAutomaticScrollingJumpPercent = 0.2f;
-    private const int DefaultViewportWidthInMillis = 8000;
+    private const int DefaultViewportWidthInMillis = 12000;
 
     private const float DoubleClickToTogglePlayPauseDistanceThresholdInPx = 5f;
 
@@ -583,10 +583,15 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
             minMidiNote = allNotes.Select(note => note.MidiNote).Min();
             maxMidiNote = allNotes.Select(note => note.MidiNote).Max();
         }
+        // Add padding
+        minMidiNote -= 6;
+        maxMidiNote += 6;
+        int height = maxMidiNote - minMidiNote;
+        // Center the notes
+        int y = minMidiNote - 1;
 
-        // 10 seconds
-        int width = DefaultViewportWidthInMillis;
         // Start at the beginning
+        int width = DefaultViewportWidthInMillis;
         int x;
         if (songAudioPlayer.PositionInMillis <= 0)
         {
@@ -598,10 +603,6 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         {
             x = Math.Max(0, (int)songAudioPlayer.PositionInMillis - 1000);
         }
-        // Full range of notes. At least one octave
-        int height = Math.Max(12, maxMidiNote - minMidiNote + 2);
-        // Center the notes
-        int y = minMidiNote - 1;
         SetViewport(x, y, width, height);
     }
 
