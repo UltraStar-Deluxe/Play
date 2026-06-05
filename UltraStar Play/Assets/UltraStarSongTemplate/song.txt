@@ -5,12 +5,4 @@ ${coverTag}
 ${backgroundTag}
 ${videoTag}
 #BPM:300
-: 16 12 0 Do 
-: 32 12 2 re 
-: 48 12 4 mi 
-: 64 12 5 fa 
-- 78
-: 82 12 7 Sol 
-: 98 12 9 la 
-: 114 12 11 si 
 E
