@@ -27,28 +27,6 @@ public class ForcedAlignmentAction : AbstractAudioClipAction
 
     [Inject] private NoteHyphenator noteHyphenator;
 
-    public async Awaitable<ForcedAlignmentResult> RunForcedAlignment(
-        string lyrics,
-        bool notify)
-    {
-        ForcedAlignmentInput forcedAlignmentInput = await GetForcedAlignmentInput(lyrics);
-        ForcedAlignmentResult forcedAlignmentResult = await RunForcedAlignmentInternal(forcedAlignmentInput);
-        if (forcedAlignmentResult == null || forcedAlignmentResult.Words.IsNullOrEmpty())
-        {
-            return null;
-        }
-
-        List<Note> notes = CreateNotesFromForcedAlignmentResult(forcedAlignmentResult, 0);
-        noteAreaControl.ScrollIntoView(notes);
-
-        if (notify)
-        {
-            songMetaChangedEventStream.OnNext(new NotesChangedEvent());
-        }
-
-        return forcedAlignmentResult;
-    }
-
     public async Awaitable<ForcedAlignmentResult> MoveNotesViaForcedAlignmentInSelection(
         List<Note> notes,
         int startBeat,

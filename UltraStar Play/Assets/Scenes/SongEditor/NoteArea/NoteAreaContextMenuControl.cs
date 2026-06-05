@@ -126,17 +126,7 @@ public class NoteAreaContextMenuControl : ContextMenuControl
             && clickPositionInMillis <= lastSelectionRect.MaxMillis)
         {
             contextMenu.AddSeparator();
-            
-            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_speechRecognitionInSelection), () =>
-            {
-                speechRecognitionAction.CreateNotesFromSpeechRecognition(
-                    lastSelectionRect.MinBeat,
-                    lastSelectionRect.LengthInBeats,
-                    settings.SongEditorSettings.AiSamplesSource,
-                    settings.SongEditorSettings.SpaceBetweenNotesInMillis,
-                    true);
-            });
-            
+
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_forcedAlignmentInSelection), () =>
             {
                 SongEditorForcedAlignmentUtils.ShowForcedAlignmentInSelectionDialog(
@@ -144,7 +134,9 @@ public class NoteAreaContextMenuControl : ContextMenuControl
                     forcedAlignmentAction,
                     lastSelectionRect.MinBeat,
                     lastSelectionRect.LengthInBeats,
-                    SongMetaUtils.GetLyrics(selectionControl.GetSelectedNotes()));
+                    SongMetaUtils.GetLyrics(selectionControl.GetSelectedNotes()),
+                    speechRecognitionAction,
+                    settings);
             });
         }
     }

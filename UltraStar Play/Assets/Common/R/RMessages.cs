@@ -534,8 +534,6 @@ public static partial class R
         public static readonly string songEditor_action_fitViewHorizontallyToSentence = "songEditor_action_fitViewHorizontallyToSentence";
         public static readonly string songEditor_action_fitViewVertically = "songEditor_action_fitViewVertically";
         public static readonly string songEditor_action_forcedAlignment = "songEditor_action_forcedAlignment";
-        public static readonly string songEditor_action_forcedAlignment_dialog_message = "songEditor_action_forcedAlignment_dialog_message";
-        public static readonly string songEditor_action_forcedAlignment_dialog_title = "songEditor_action_forcedAlignment_dialog_title";
         public static readonly string songEditor_action_forcedAlignmentInSelection = "songEditor_action_forcedAlignmentInSelection";
         public static readonly string songEditor_action_forcedAlignmentInSelection_dialog_message = "songEditor_action_forcedAlignmentInSelection_dialog_message";
         public static readonly string songEditor_action_forcedAlignmentInSelection_dialog_title = "songEditor_action_forcedAlignmentInSelection_dialog_title";
@@ -591,6 +589,7 @@ public static partial class R
         public static readonly string songEditor_midiImportDialog_importNotes = "songEditor_midiImportDialog_importNotes";
         public static readonly string songEditor_midiImportDialog_success = "songEditor_midiImportDialog_success";
         public static readonly string songEditor_options_adjustFollowingNotes = "songEditor_options_adjustFollowingNotes";
+        public static readonly string songEditor_options_aiTools_splitSyllablesAfterwards = "songEditor_options_aiTools_splitSyllablesAfterwards";
         public static readonly string songEditor_options_audioSeparation_modelName = "songEditor_options_audioSeparation_modelName";
         public static readonly string songEditor_options_audioSeparation_perform = "songEditor_options_audioSeparation_perform";
         public static readonly string songEditor_options_audioSeparation_title = "songEditor_options_audioSeparation_title";
@@ -657,7 +656,6 @@ public static partial class R
         public static readonly string songEditor_options_speechRecognition_perform = "songEditor_options_speechRecognition_perform";
         public static readonly string songEditor_options_speechRecognition_phrases = "songEditor_options_speechRecognition_phrases";
         public static readonly string songEditor_options_speechRecognition_prompt = "songEditor_options_speechRecognition_prompt";
-        public static readonly string songEditor_options_speechRecognition_splitSyllablesAfterwards = "songEditor_options_speechRecognition_splitSyllablesAfterwards";
         public static readonly string songEditor_options_speechRecognition_title = "songEditor_options_speechRecognition_title";
         public static readonly string songEditor_options_speechRecognitionWhenRecording = "songEditor_options_speechRecognitionWhenRecording";
         public static readonly string songEditor_options_syncLyricsArea = "songEditor_options_syncLyricsArea";

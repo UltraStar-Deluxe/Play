@@ -9,7 +9,7 @@
             <Chooser no-previous-button="true" name="drawNoteLayerChooser" wrap-around="true" label="$songEditor_options_drawNoteLayer" class="controlWithLabelVertical mb-2" style="flex-direction: column;"/>
             <ui:IntegerField picking-mode="Ignore" value="100" text="300" name="spaceBetweenNotesTimeInMillisTextField" label="$songEditor_options_spaceBetweenNotes_duration" is-delayed="true" style="flex-direction: column; align-items: stretch;"/>
             <ui:Button text="$songEditor_options_spaceBetweenNotes_button" display-tooltip-when-elided="true" name="addSpaceBetweenNotesButton" style="height: auto;"/>
-            <ui:Toggle name="splitSyllablesAfterAiToolsToggle" label="$songEditor_options_speechRecognition_splitSyllablesAfterwards"/>
+            <ui:Toggle name="splitSyllablesAfterAiToolsToggle" label="$songEditor_options_aiTools_splitSyllablesAfterwards"/>
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="musicGroup" label="$songEditor_options_playback_title">
             <ui:Toggle name="goToLastPlaybackPositionToggle" label="$songEditor_options_goToLastPlaybackPosition"/>

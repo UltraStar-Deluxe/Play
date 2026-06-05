@@ -76,10 +76,10 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
     private SpeechRecognitionAction speechRecognitionAction;
 
     [Inject]
-    private Settings settings;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
-    private SongAudioPlayer songAudioPlayer;
+    private Settings settings;
 
     private bool isExpanded = true;
 
@@ -92,16 +92,7 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
     {
         vocalsIsolationButton.RegisterCallbackButtonTriggered(_ => OnVocalsIsolationButtonClicked());
         pitchDetectionButton.RegisterCallbackButtonTriggered(_ => OnPitchDetectionButtonClicked());
-        lyricsAlignmentButton.RegisterCallbackButtonTriggered(_ =>
-        {
-            SongEditorForcedAlignmentUtils.ShowForcedAlignmentDialog(
-                songEditorSceneControl,
-                forcedAlignmentAction,
-                SongMetaUtils.GetLyrics(songMeta.Voices.FirstOrDefault()),
-                speechRecognitionAction,
-                songAudioPlayer,
-                settings);
-        });
+        lyricsAlignmentButton.RegisterCallbackButtonTriggered(_ => OnForcedAlignmentButtonClicked());
 
         toggleAiToolbarButton.RegisterCallbackButtonTriggered(_ => ToggleExpanded());
 
@@ -131,6 +122,18 @@ public class SongEditorAiToolbarControl : INeedInjection, IInjectionFinishedList
                 UpdateSizeToggle();
             }
         });
+    }
+
+    private void OnForcedAlignmentButtonClicked()
+    {
+        SongEditorForcedAlignmentUtils.ShowForcedAlignmentInSelectionDialog(
+            songEditorSceneControl,
+            forcedAlignmentAction,
+            noteAreaControl.LastSelectionRect.Value.MinBeat,
+            noteAreaControl.LastSelectionRect.Value.LengthInBeats,
+            SongMetaUtils.GetLyrics(selectionControl.GetSelectedNotes()),
+            speechRecognitionAction,
+            settings);
     }
 
     private void OnPitchDetectionButtonClicked()
