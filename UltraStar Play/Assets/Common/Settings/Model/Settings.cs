@@ -23,6 +23,7 @@ public class Settings : ISettings
     public bool PlayRecordedAudio { get; set; }
     public string SoundfontPath { get; set; } = "";
     public float PreviewFadeInDurationInSeconds { get; set; } = 2;
+    public EReplayGainMode ReplayGainMode { get; set; } = EReplayGainMode.Off;
 
     /**
      * Delay of the system audio backend until the samples are audible on the speaker.

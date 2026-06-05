@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.IO;using UniInject;
 using UnityEngine;
 
-public class AudioSampleLoader : AbstractSingletonBehaviour
+public class AudioSampleLoader : AbstractSingletonBehaviour, INeedInjection
 {
     public static AudioSampleLoader Instance => DontDestroyOnLoadManager.Instance.DoFindComponentOrThrow<AudioSampleLoader>();
 
@@ -12,6 +12,9 @@ public class AudioSampleLoader : AbstractSingletonBehaviour
     private readonly Dictionary<string, AudioClipCacheEntry> ffmpegLoadedAudioClips = new();
     
     private FfmpegAudioSampleLoader ffmpegAudioSampleLoader;
+
+    [Inject]
+    private Settings settings;
     
     protected override object GetInstance()
     {
@@ -20,7 +23,10 @@ public class AudioSampleLoader : AbstractSingletonBehaviour
 
     public async Awaitable<AudioClip> LoadAsAudioClip(string uri)
     {
-        if (ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))
+        if (ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri))
+            && settings.UnityMediaApiUsage is not EApiUsage.Disabled
+            // Unity API does not respect Replay Gain.
+            && settings.ReplayGainMode is EReplayGainMode.Off)
         {
             // To query all audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
             return await AudioManager.LoadAudioClipFromUriAsync(uri, false);
@@ -46,7 +52,7 @@ public class AudioSampleLoader : AbstractSingletonBehaviour
 
         InitializeFfmpegAudioSamplesLoader();
 
-        FfmpegAudioSampleLoader.FfmpegAudioSamplesData ffmpegAudioSamplesData = ffmpegAudioSampleLoader.Load(uri);
+        FfmpegAudioSampleLoader.FfmpegAudioSamplesData ffmpegAudioSamplesData = ffmpegAudioSampleLoader.Load(uri, replayGainMode: GetReplayGainMode());
         AudioClip audioClip = AudioClip.Create(
             Path.GetFileName(uri),
             ffmpegAudioSamplesData.Samples.Length / ffmpegAudioSamplesData.Channels,
@@ -82,6 +88,16 @@ public class AudioSampleLoader : AbstractSingletonBehaviour
         return audioClip;
     }
 
+    private FfmpegAudioSampleLoader.ReplayGainMode GetReplayGainMode()
+    {
+        switch (settings.ReplayGainMode)
+        {
+            case EReplayGainMode.Track: return FfmpegAudioSampleLoader.ReplayGainMode.Track;
+            case EReplayGainMode.Album: return FfmpegAudioSampleLoader.ReplayGainMode.Album;
+            default: return FfmpegAudioSampleLoader.ReplayGainMode.Off;
+        }
+    }
+
     private void InitializeFfmpegAudioSamplesLoader()
     {
         if (ffmpegAudioSampleLoader != null)
@@ -93,12 +109,18 @@ public class AudioSampleLoader : AbstractSingletonBehaviour
         ffmpegAudioSampleLoader.ConfigureFfmpeg(ApplicationUtils.GetStreamingAssetsPath("FfmpegLibraries/Windows"));
     }
 
-    private void OnDestroy()
+    public void ClearCache()
     {
         foreach (AudioClipCacheEntry entry in ffmpegLoadedAudioClips.Values)
         {
             Destroy(entry.AudioClip);
         }
+
         ffmpegLoadedAudioClips.Clear();
+    }
+    
+    private void OnDestroy()
+    {
+        ClearCache();
     }
 }

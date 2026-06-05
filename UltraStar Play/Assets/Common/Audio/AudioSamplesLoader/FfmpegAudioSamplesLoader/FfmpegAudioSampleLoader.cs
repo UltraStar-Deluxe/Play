@@ -4,16 +4,25 @@ using FFmpeg.AutoGen;
 
 public unsafe class FfmpegAudioSampleLoader
 {
+    public enum ReplayGainMode
+    {
+        Off,
+        Track,
+        Album
+    }
+
     public void ConfigureFfmpeg(string rootPath)
     {
         ffmpeg.RootPath = rootPath;
     }
 
-    public FfmpegAudioSamplesData Load(string filePath, int? targetSampleRate = null, int? targetChannels = null)
+    public FfmpegAudioSamplesData Load(string filePath, int? targetSampleRate = null, int? targetChannels = null, ReplayGainMode replayGainMode = ReplayGainMode.Off)
     {
         using (var format = new FormatContext(filePath))
         using (var codec = new CodecContext(format.AudioStream))
         {
+            float replayGainMultiplier = GetReplayGainMultiplier(format.AudioStream, replayGainMode);
+
             // Target format: Float
             const AVSampleFormat targetFormat = AVSampleFormat.AV_SAMPLE_FMT_FLT;
             
@@ -51,16 +60,16 @@ public unsafe class FfmpegAudioSampleLoader
                             {
                                 if (ffmpeg.avcodec_send_packet(codec.Context, packet.Pointer) >= 0)
                                 {
-                                    ReceiveAndResample(codec.Context, frame.Pointer, swr.Context, finalSampleRate, finalChannels, targetFormat, allSamples, ref pOutputBuffer, ref currentMaxTargetNbSamples);
+                                    ReceiveAndResample(codec.Context, frame.Pointer, swr.Context, finalSampleRate, finalChannels, targetFormat, allSamples, ref pOutputBuffer, ref currentMaxTargetNbSamples, replayGainMultiplier);
                                 }
                             }
                             ffmpeg.av_packet_unref(packet.Pointer);
                         }
 
                         ffmpeg.avcodec_send_packet(codec.Context, null);
-                        ReceiveAndResample(codec.Context, frame.Pointer, swr.Context, finalSampleRate, finalChannels, targetFormat, allSamples, ref pOutputBuffer, ref currentMaxTargetNbSamples);
+                        ReceiveAndResample(codec.Context, frame.Pointer, swr.Context, finalSampleRate, finalChannels, targetFormat, allSamples, ref pOutputBuffer, ref currentMaxTargetNbSamples, replayGainMultiplier);
 
-                        ReceiveAndResample(codec.Context, null, swr.Context, finalSampleRate, finalChannels, targetFormat, allSamples, ref pOutputBuffer, ref currentMaxTargetNbSamples);
+                        ReceiveAndResample(codec.Context, null, swr.Context, finalSampleRate, finalChannels, targetFormat, allSamples, ref pOutputBuffer, ref currentMaxTargetNbSamples, replayGainMultiplier);
                     }
                     finally
                     {
@@ -213,11 +222,11 @@ public unsafe class FfmpegAudioSampleLoader
 
     private void ReceiveAndResample(AVCodecContext* pCodecContext, AVFrame* pFrame, FFmpeg.AutoGen.SwrContext* pSwrContext,
         int targetSampleRate, int targetChannels, AVSampleFormat targetFormat, List<float> allSamples,
-        ref byte* pOutputBuffer, ref int currentMaxTargetNbSamples)
+        ref byte* pOutputBuffer, ref int currentMaxTargetNbSamples, float replayGainMultiplier)
     {
         if (pFrame == null) // Flush resampler
         {
-            ResampleAndStore(pSwrContext, null, 0, targetSampleRate, pCodecContext->sample_rate, targetChannels, targetFormat, allSamples, ref pOutputBuffer, ref currentMaxTargetNbSamples);
+            ResampleAndStore(pSwrContext, null, 0, targetSampleRate, pCodecContext->sample_rate, targetChannels, targetFormat, allSamples, ref pOutputBuffer, ref currentMaxTargetNbSamples, replayGainMultiplier);
             return;
         }
 
@@ -225,7 +234,7 @@ public unsafe class FfmpegAudioSampleLoader
         {
             try
             {
-                ResampleAndStore(pSwrContext, (byte**)&pFrame->data, pFrame->nb_samples, targetSampleRate, pCodecContext->sample_rate, targetChannels, targetFormat, allSamples, ref pOutputBuffer, ref currentMaxTargetNbSamples);
+                ResampleAndStore(pSwrContext, (byte**)&pFrame->data, pFrame->nb_samples, targetSampleRate, pCodecContext->sample_rate, targetChannels, targetFormat, allSamples, ref pOutputBuffer, ref currentMaxTargetNbSamples, replayGainMultiplier);
             }
             finally
             {
@@ -236,7 +245,7 @@ public unsafe class FfmpegAudioSampleLoader
 
     private void ResampleAndStore(FFmpeg.AutoGen.SwrContext* pSwrContext, byte** pInputData, int inputNbSamples,
         int targetSampleRate, int inputSampleRate, int targetChannels, AVSampleFormat targetFormat, List<float> allSamples,
-        ref byte* pOutputBuffer, ref int currentMaxTargetNbSamples)
+        ref byte* pOutputBuffer, ref int currentMaxTargetNbSamples, float replayGainMultiplier)
     {
         var delay = ffmpeg.swr_get_delay(pSwrContext, inputSampleRate);
         var maxTargetNbSamples = (int)ffmpeg.av_rescale_rnd(delay + inputNbSamples, targetSampleRate, inputSampleRate, AVRounding.AV_ROUND_UP);
@@ -269,10 +278,50 @@ public unsafe class FfmpegAudioSampleLoader
                 var pFloatBuffer = (float*)pOutputBuffer;
                 for (var i = 0; i < totalFloats; i++)
                 {
-                    allSamples.Add(pFloatBuffer[i]);
+                    allSamples.Add(pFloatBuffer[i] * replayGainMultiplier);
                 }
             }
         }
+    }
+
+    private float GetReplayGainMultiplier(AVStream* pStream, ReplayGainMode mode)
+    {
+        if (mode == ReplayGainMode.Off)
+        {
+            return 1.0f;
+        }
+
+        // Try to find ReplayGain in stream side data
+        for (int i = 0; i < pStream->codecpar->nb_coded_side_data; i++)
+        {
+            AVPacketSideData* sideData = &pStream->codecpar->coded_side_data[i];
+            if (sideData->type == AVPacketSideDataType.AV_PKT_DATA_REPLAYGAIN)
+            {
+                // ReplayGain struct: 2 * int32_t for track gain/peak, 2 * int32_t for album gain/peak
+                // gain is in 1/100000 dB
+                int* data = (int*)sideData->data;
+                int trackGain = data[0];
+                int albumGain = data[2];
+
+                int gainVal = 0;
+                if (mode == ReplayGainMode.Track && trackGain != int.MinValue)
+                {
+                    gainVal = trackGain;
+                }
+                else if (mode == ReplayGainMode.Album && albumGain != int.MinValue)
+                {
+                    gainVal = albumGain;
+                }
+
+                if (gainVal != 0)
+                {
+                    double gainDb = gainVal / 100000.0;
+                    return (float)Math.Pow(10, gainDb / 20.0);
+                }
+            }
+        }
+
+        return 1.0f;
     }
 
     private static void Check(int errorCode, string message)
