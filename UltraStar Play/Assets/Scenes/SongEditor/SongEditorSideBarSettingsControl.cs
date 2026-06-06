@@ -110,7 +110,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.showVideoAreaToggle)]
     private Toggle showVideoAreaToggle;
-
+    
     [Inject(UxmlName = R.UxmlNames.showVirtualPianoToggle)]
     private Toggle showVirtualPianoToggle;
 
@@ -132,6 +132,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.lyricsLanguageChooser)]
     private EnumField lyricsLanguageChooser;
 
+    [Inject(UxmlName = R.UxmlNames.dspBufferSizeChooser)]
+    private Chooser dspBufferSizeChooser;
+    
     [Inject(UxmlName = R.UxmlNames.videoArea)]
     private VisualElement videoArea;
 
@@ -239,6 +242,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private EnumChooserControl<ESongEditorSamplesSource> speechRecognitionAudioChooserControl;
     private EnumChooserControl<ESongEditorSamplesSource> forcedAlignmentAudioChooserControl;
     private EnumChooserControl<ESongEditorDrawNoteLayer> drawNoteLayerChooserControl;
+    private EnumChooserControl<EDspBufferSize> dspBufferSizeChooserControl;
 
     private readonly ImportMidiFileDialogControl importMidiFileDialogControl = new();
 
@@ -407,6 +411,15 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(forcedAlignmentAfterSpeechRecognitionToggle,
             () => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition,
             newValue => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition = newValue);
+
+        dspBufferSizeChooserControl = new(dspBufferSizeChooser);
+        dspBufferSizeChooserControl.Bind(
+            () => settings.DspBufferSize,
+            newValue =>
+            {
+                settings.DspBufferSize = newValue;
+                AudioSettingsUtils.UpdateConfiguration(settings.DspBufferSize);
+            });
 
         // Audio separation
         audioSeparationModelNameTextField.DisableParseEscapeSequences();

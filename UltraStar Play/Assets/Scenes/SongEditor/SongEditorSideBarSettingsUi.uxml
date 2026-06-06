@@ -16,6 +16,7 @@
             <ui:Slider picking-mode="Ignore" value="42" high-value="100" name="musicVolumeSlider" label="$songEditor_options_volume" style="flex-direction: column;"/>
             <ui:Slider picking-mode="Ignore" value="42" high-value="1.5" name="musicPlaybackSpeedSlider" low-value="0.5" label="$songEditor_options_playbackSpeed" style="flex-direction: column;"/>
             <ui:Button text="$songEditor_options_playbackSpeed_reset" display-tooltip-when-elided="true" name="resetMusicPlaybackSpeedButton"/>
+            <Chooser name="dspBufferSizeChooser" no-previous-button="true" wrapAround="true" label="$songEditor_options_dspBufferSize" class="controlWithLabelVertical"/>
             <Chooser name="playbackAudioChooser" no-previous-button="true" wrapAround="true" label="$songEditor_options_playbackAudio" class="controlWithLabelVertical"/>
             <ui:IntegerField picking-mode="Ignore" value="100" text="300" name="playbackPreBeginTimeInMillisTextField" label="$songEditor_options_playbackPreBegin_duration" is-delayed="true" style="flex-direction: column; align-items: stretch;"/>
             <ui:IntegerField picking-mode="Ignore" value="100" text="300" name="playbackPostEndTimeInMillisTextField" label="$songEditor_options_playbackPostEnd_duration" is-delayed="true" style="flex-direction: column; align-items: stretch;"/>

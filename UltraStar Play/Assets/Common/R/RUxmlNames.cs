@@ -185,6 +185,7 @@ public static partial class R
         public const string dragToChangeWidthArea = "dragToChangeWidthArea";
         public const string drawNoteLayerChooser = "drawNoteLayerChooser";
         public const string driveButton = "driveButton";
+        public const string dspBufferSizeChooser = "dspBufferSizeChooser";
         public const string dummyCommunitySongPackage = "dummyCommunitySongPackage";
         public const string dummyCurrentLobbyControls = "dummyCurrentLobbyControls";
         public const string dummyHostLobbyControls = "dummyHostLobbyControls";

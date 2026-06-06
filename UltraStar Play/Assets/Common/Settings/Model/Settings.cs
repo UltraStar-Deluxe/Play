@@ -24,6 +24,7 @@ public class Settings : ISettings
     public string SoundfontPath { get; set; } = "";
     public float PreviewFadeInDurationInSeconds { get; set; } = 2;
     public EReplayGainMode ReplayGainMode { get; set; } = EReplayGainMode.Off;
+    public EDspBufferSize DspBufferSize { get; set; } = EDspBufferSize.Default;
 
     /**
      * Delay of the system audio backend until the samples are audible on the speaker.

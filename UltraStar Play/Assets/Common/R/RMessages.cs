@@ -599,6 +599,7 @@ public static partial class R
         public static readonly string songEditor_options_buttonTapping_title = "songEditor_options_buttonTapping_title";
         public static readonly string songEditor_options_defaultPitch = "songEditor_options_defaultPitch";
         public static readonly string songEditor_options_drawNoteLayer = "songEditor_options_drawNoteLayer";
+        public static readonly string songEditor_options_dspBufferSize = "songEditor_options_dspBufferSize";
         public static readonly string songEditor_options_editing_title = "songEditor_options_editing_title";
         public static readonly string songEditor_options_forcedAlignment_lyrics = "songEditor_options_forcedAlignment_lyrics";
         public static readonly string songEditor_options_forcedAlignment_modelPath = "songEditor_options_forcedAlignment_modelPath";
