@@ -87,6 +87,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.songSelectSongPreviewDelay)]
     private IntegerField songSelectSongPreviewDelay;
 
+    [Inject(UxmlName = R.UxmlNames.dspBufferSizeChooser)]
+    private Chooser dspBufferSizeChooser;
+
     [Inject]
     private ThemeManager themeManager;
 
@@ -407,6 +410,17 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.EnableVfx,
             newValue => settings.EnableVfx = newValue);
 
+        // Dsp Buffer Size
+        EnumChooserControl<EDspBufferSize> dspBufferSizeChooserControl = new(dspBufferSizeChooser);
+        dspBufferSizeChooserControl.Bind(
+            () => settings.DspBufferSize,
+            newValue =>
+            {
+                settings.DspBufferSize = newValue;
+                AudioSettingsUtils.UpdateConfiguration(settings.DspBufferSize);
+            });
+
+        
         // Online multiplayer
         new EnumChooserControl<ENetworkDelivery>(beatAnalyzedEventNetworkDeliveryChooser)
             .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,
