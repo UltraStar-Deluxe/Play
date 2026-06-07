@@ -132,6 +132,7 @@ Button.selected:hover {
 
 #leftSideBarMainColumn.small Button {
     width: 30px;
+    justify-content: center;
 }
 
 #leftSideBarMainColumn MaterialIcon {
@@ -143,6 +144,10 @@ Button.selected:hover {
 
 #leftSideBarMainColumn.small Label {
     display: none;
+}
+
+#leftSideBarMainColumn.small MaterialIcon {
+    margin-right: 0;
 }
 
 #leftSideBarMainColumn.small #smallIcon {
