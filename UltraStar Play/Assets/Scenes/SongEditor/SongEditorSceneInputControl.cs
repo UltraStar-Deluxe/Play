@@ -312,6 +312,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         if (selectedNotes.Select(note => note.Sentence?.Voice).AllMatch(voice => voice == null))
         {
             moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, EVoiceId.P1);
+            return;
         }
         moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes);
     }
