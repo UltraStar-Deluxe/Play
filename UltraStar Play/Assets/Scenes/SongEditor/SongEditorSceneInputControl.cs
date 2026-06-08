@@ -372,7 +372,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnScrollWheel(InputAction.CallbackContext context)
     {
-        if (AnyInputFieldHasFocus())
+        if (AnyInputFieldHasFocus()
+            || AbstractDialogControl.AnyDialogOpen)
         {
             return;
         }
