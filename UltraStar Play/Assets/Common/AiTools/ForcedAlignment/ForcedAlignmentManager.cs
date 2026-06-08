@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -128,7 +129,7 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
             NemoForcedAligner.ForcedAlignmentResult paddedNemoForcedAlignmentResult = ToPaddedNemoForcedAlignmentResult(nemoForcedAlignmentResult, audioData);
             await Awaitable.MainThreadAsync();
             
-            return ToForcedAlignmentResult(paddedNemoForcedAlignmentResult);
+            return ToForcedAlignmentResult(paddedNemoForcedAlignmentResult, normalizedLyrics);
         }
         finally
         {
@@ -167,13 +168,50 @@ public class ForcedAlignmentManager : MonoBehaviour, INeedInjection
         return new NemoForcedAlignerConfiguration(modelPath, tokensPath);
     }
 
-    private ForcedAlignmentResult ToForcedAlignmentResult(NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignerResult)
+    private ForcedAlignmentResult ToForcedAlignmentResult(
+        NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignerResult,
+        string inputLyrics)
     {
+        // The NemoForcedAligner might have removed characters from the words because they were not in the vocabulary.
+        // We map the words from the input lyrics to the words from the forced aligner result to restore these characters.
+        // This assumes that the number of words in the input lyrics (when split by space) matches the number of words in the NemoForcedAligner result.
+        // This is a safe assumption because NemoForcedAligner also splits words by spaces (replaced with '▁' tokens).
+        string[] originalWords = inputLyrics.Split(' ');
+        if (originalWords.Length == nemoForcedAlignerResult.Words.Count)
+        {
+            return ToForcedAlignmentResultPreservingOriginalWords(nemoForcedAlignerResult, originalWords);
+        }
+
+        // This should not happen: word count differs, just return result as-is.
         return new ForcedAlignmentResult
         {
             Words = nemoForcedAlignerResult.Words
                 .Where(word => !string.IsNullOrWhiteSpace(word.Word))
                 .Select(word => ToForcedAlignmentWordResult(word)).ToList(),
+        };
+    }
+
+    private ForcedAlignmentResult ToForcedAlignmentResultPreservingOriginalWords(
+        NemoForcedAligner.ForcedAlignmentResult nemoForcedAlignerResult,
+        string[] originalWords)
+    {
+        List<WordTimestamp> wordResults = new();
+        for (int i = 0; i < nemoForcedAlignerResult.Words.Count; i++)
+        {
+            NemoForcedAligner.WordTimestamp nemoWord = nemoForcedAlignerResult.Words[i];
+            WordTimestamp wordResult = ToForcedAlignmentWordResult(nemoWord);
+            if (i < originalWords.Length)
+            {
+                wordResult.Word = originalWords[i];
+            }
+            wordResults.Add(wordResult);
+        }
+
+        return new ForcedAlignmentResult
+        {
+            Words = wordResults
+                .Where(word => !string.IsNullOrWhiteSpace(word.Word))
+                .ToList(),
         };
     }
 
