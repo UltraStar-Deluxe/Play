@@ -9,6 +9,9 @@ public class MoveNoteToAdjacentSentenceAction : INeedInjection
 {
     [Inject]
     private SongMetaChangedEventStream songMetaChangedEventStream;
+    
+    [Inject]
+    private DeleteSentencesAction deleteSentencesAction;
 
     public bool CanMoveToNextSentence(List<Note> selectedNotes, Note targetNote)
     {
@@ -118,7 +121,7 @@ public class MoveNoteToAdjacentSentenceAction : INeedInjection
         // Remove old sentence if not more notes left
         if (oldSentence.Notes.Count == 0)
         {
-            oldSentence.SetVoice(null);
+            deleteSentencesAction.Execute(new List<Sentence> { oldSentence });
         }
         else
         {
