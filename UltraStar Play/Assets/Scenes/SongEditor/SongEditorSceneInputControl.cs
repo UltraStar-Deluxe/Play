@@ -32,6 +32,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private PitchDetectionAction pitchDetectionAction;
     
     [Inject]
+    private ForcedAlignmentAction forcedAlignmentAction;
+    
+    [Inject]
     private MoveNotesToPitchDetectionResultAction moveNotesToPitchDetectionResultAction;
 
     [Inject]
@@ -69,6 +72,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private MoveNoteToOwnSentenceAction moveNoteToOwnSentenceAction;
+
+    [Inject]
+    private MergeNotesAction mergeNotesAction;
 
     [Inject]
     private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
@@ -166,7 +172,15 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Assign to own sentence
         InputManager.GetInputAction(R.InputActions.songEditor_assignToOwnSentence).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => AssignSelectedNotesToOwnSentence());
+            .Subscribe(_ => AssignSelectedNotesToOwnSentence());        // Assign to own sentence
+        
+        InputManager.GetInputAction(R.InputActions.songEditor_mergeNotes).PerformedAsObservable()
+            .Where(_ => !AnyInputFieldHasFocus())
+            .Subscribe(_ => MergeSelectedNotes());
+        
+        InputManager.GetInputAction(R.InputActions.songEditor_forcedAlignment).PerformedAsObservable()
+            .Where(_ => !AnyInputFieldHasFocus())
+            .Subscribe(_ => OpenForcedAlignmentDialog());
 
         // AI tools
         InputManager.GetInputAction(R.InputActions.songEditor_pitchDetection).PerformedAsObservable()
@@ -243,6 +257,24 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(context => noteAreaControl.ZoomVertical(-1));
     }
 
+    private void OpenForcedAlignmentDialog()
+    {
+        NoteAreaRect lastSelectionRect = noteAreaControl.LastSelectionRect.Value;
+        if (lastSelectionRect == null)
+        {
+            return;
+        }
+        
+        SongEditorForcedAlignmentUtils.ShowForcedAlignmentInSelectionDialog(
+            songEditorSceneControl,
+            forcedAlignmentAction,
+            lastSelectionRect.MinBeat,
+            lastSelectionRect.LengthInBeats,
+            SongMetaUtils.GetLyrics(selectionControl.GetSelectedNotes()),
+            speechRecognitionAction,
+            settings);
+    }
+
     private void JumpToEndOfSong()
     {
         int endInBeats = SongMetaUtils.GetMaxBeat(songEditorSceneControl.GetAllNotes());
@@ -282,6 +314,16 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, EVoiceId.P1);
         }
         moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes);
+    }
+    
+    private void MergeSelectedNotes()
+    {
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+        mergeNotesAction.ExecuteAndNotify(selectedNotes, selectedNotes.FirstOrDefault());
     }
 
     private void MoveSelectedNotesToDetectedPitch()

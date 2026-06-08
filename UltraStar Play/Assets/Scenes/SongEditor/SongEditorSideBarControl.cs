@@ -368,13 +368,14 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             inputActionInfos.Add(new InputActionInfo("Draw new Note", "Shift+Drag (no selection)"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_editLyrics, "Edit Lyrics"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_assignToOwnSentence, "Assign To Own Sentence"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_mergeNotes, "Merge notes"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeFreestyle, "Toggle Note Type Freestyle"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeGolden, "Toggle Note Type Golden"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeNormal, "Toggle Note Type Normal"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeRap, "Toggle Note Type Rap"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeRapGolden, "Toggle Note Type Rap Golden"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_pitchDetection, "Pitch Detection"));
-            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_speechRecognition, "Speech Recognition"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_forcedAlignment, "Lyrics Alignment"));
         }
         else if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {
