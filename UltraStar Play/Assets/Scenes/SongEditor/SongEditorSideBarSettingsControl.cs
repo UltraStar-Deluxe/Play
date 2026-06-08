@@ -182,6 +182,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.syllableSeparatorTextField)]
     private TextField syllableSeparatorTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.referenceResolutionScaleFactorChooser)]
+    private Slider referenceResolutionScaleFactorChooser;
 
     [Inject]
     private SongMeta songMeta;
@@ -242,9 +245,13 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     private readonly ImportMidiFileDialogControl importMidiFileDialogControl = new();
 
+    private double referenceResolutionScaleFactor;
+    
     public void OnInjectionFinished()
     {
         injector.Inject(importMidiFileDialogControl);
+
+        referenceResolutionScaleFactor = settings.SongEditorSettings.ReferenceResolutionScaleFactor;
 
         // Fold all AccordionItems
         settingsSideBarContainer.Query<AccordionItem>().ForEach(it => it.HideAccordionContent());
@@ -478,6 +485,14 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(lyricsLanguageChooser,
             () => EnumUtils.Parse(settings.SongEditorSettings.LyricsLanguage, ELyricsLanguage.English),
             newValue => settings.SongEditorSettings.LyricsLanguage = newValue.ToString().ToLowerInvariant());
+        
+        // UI Scale
+        FieldBindingUtils.Bind(referenceResolutionScaleFactorChooser,
+            () => (float)referenceResolutionScaleFactor,
+            newValue => referenceResolutionScaleFactor = newValue);
+        this.ObserveEveryValueChanged(it => it.referenceResolutionScaleFactor)
+            .Throttle(TimeSpan.FromMilliseconds(1000))
+            .Subscribe(newValue => settings.SongEditorSettings.ReferenceResolutionScaleFactor = newValue);
         
         // Show / hide VisualElements
         Bind(showRightSideBarToggle,

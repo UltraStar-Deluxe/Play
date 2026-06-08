@@ -45,6 +45,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(VfxManager.Instance);
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
         bb.BindExistingInstance(BackgroundLightManager.Instance);
+        bb.BindExistingInstance(ReferenceResolutionControl.Instance);
         bb.BindExistingInstance(DefaultFocusableNavigator.Instance);
         bb.BindExistingInstance(MicSampleRecorderManager.Instance);
         bb.BindExistingInstance(AchievementEventStream.Instance);

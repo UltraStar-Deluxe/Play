@@ -681,6 +681,7 @@ public static partial class R
         public const string recordingSettingsProblemHintIcon = "recordingSettingsProblemHintIcon";
         public const string redoButton = "redoButton";
         public const string reduceAudioVolumeChooser = "reduceAudioVolumeChooser";
+        public const string referenceResolutionScaleFactorChooser = "referenceResolutionScaleFactorChooser";
         public const string rem = "rem";
         public const string removeWebCamImageButton = "removeWebCamImageButton";
         public const string removeWebCamImageIcon = "removeWebCamImageIcon";

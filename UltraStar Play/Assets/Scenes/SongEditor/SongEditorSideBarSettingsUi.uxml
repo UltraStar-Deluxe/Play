@@ -64,6 +64,7 @@
             <ui:TextField label="$songEditor_options_lyrics_syllableSeparator" placeholder-text="Default (semicolon)" name="syllableSeparatorTextField" style="flex-direction: column;"/>
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="layoutGroup" label="$songEditor_options_layout_title">
+            <ui:Slider label="UI Scale" value="1" high-value="2" name="referenceResolutionScaleFactorChooser" fill="true" show-input-field="true" low-value="0.5" style="flex-direction: column;"/>
             <ui:Toggle name="showRightSideBarToggle" label="$songEditor_options_layout_showRightSide"/>
             <ui:Toggle name="showAudioWaveformInBackgroundToggle" label="$songEditor_options_layout_showWaveForm"/>
             <ui:Toggle name="showPitchDetectionResultToggle" label="$songEditor_options_layout_showPitchDetectionResult"/>

@@ -759,6 +759,11 @@
     height: auto;
 }
 
+#loadedOptionsRoot > Slider {
+    margin-bottom: 16px;
+    height: auto;
+}
+
 #loadedOptionsRoot > TextField {
     margin-bottom: 16px;
 }

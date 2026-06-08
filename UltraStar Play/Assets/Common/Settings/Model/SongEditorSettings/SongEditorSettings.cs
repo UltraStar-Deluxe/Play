@@ -42,6 +42,9 @@ public class SongEditorSettings
     public int MidiPlaybackOffsetInMillis { get; set; }
     public string LastMidiFilePath { get; set; } = "";
 
+    // UI scale
+    public double ReferenceResolutionScaleFactor { get; set; } = 1;
+    
     // Layout and display options
     public bool ShowRightSideBar { get; set; } = true;
     public bool ShowAudioWaveformInBackground { get; set; } = true;

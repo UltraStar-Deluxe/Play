@@ -7,6 +7,7 @@ public static partial class R
         public const string absolutePositionTransition = "absolutePositionTransition";
         public const string accented_bg_color = "accented-bg-color";
         public const string active_text_color = "active-text-color";
+        public const string ai_toolbar_button_icon = "ai-toolbar-button-icon";
         public const string ai_toolbar_panel = "ai-toolbar-panel";
         public const string ai_toolbar_step_button = "ai-toolbar-step-button";
         public const string ai_toolbar_step_icon = "ai-toolbar-step-icon";
