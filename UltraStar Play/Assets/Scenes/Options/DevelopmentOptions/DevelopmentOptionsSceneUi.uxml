@@ -42,6 +42,7 @@
             </AccordionItem>
             <AccordionItem name="mediaFileFormatGroup" label="File Format Support" class="child-mb-3">
                 <ui:IntegerField label="Song Scan Max Batch Count" value="1" name="songScanMaxBatchCountChooser"/>
+                <ui:Toggle name="searchMidiFilesWithLyricsToggle" label="$options_searchMidiFilesWithLyrics" class="noBackgroundInHierarchy" style="flex-shrink: 0;"/>
                 <ui:Toggle name="useUniversalCharsetDetectorToggle" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings¹" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy"/>
                 <ui:Toggle name="writeUltraStarTxtFileWithByteOrderMarkToggle" label="Write UltraStar txt with BOM" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy"/>
                 <Chooser name="defaultUltraStarFormatVersionForSave" label="Default UltraStar Format on Save" class="noBackgroundInHierarchy"/>

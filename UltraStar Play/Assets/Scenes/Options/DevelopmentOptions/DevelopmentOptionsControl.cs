@@ -90,6 +90,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.dspBufferSizeChooser)]
     private Chooser dspBufferSizeChooser;
 
+    [Inject(UxmlName = R.UxmlNames.searchMidiFilesWithLyricsToggle)]
+    private Toggle searchMidiFilesWithLyricsToggle;
     [Inject]
     private ThemeManager themeManager;
 
@@ -350,6 +352,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(writeUltraStarTxtFileWithByteOrderMarkToggle,
             () => settings.WriteUltraStarTxtFileWithByteOrderMark,
             newValue => settings.WriteUltraStarTxtFileWithByteOrderMark = newValue);
+
+        FieldBindingUtils.Bind(searchMidiFilesWithLyricsToggle,
+            () => settings.SearchMidiFilesWithLyrics,
+            newValue => settings.SearchMidiFilesWithLyrics = newValue);
 
         // UltraStar format versions
         new EnumChooserControl<EKnownUltraStarSongFormatVersion>(defaultUltraStarFormatVersionForSave)
