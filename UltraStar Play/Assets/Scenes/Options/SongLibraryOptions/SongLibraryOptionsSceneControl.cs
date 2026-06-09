@@ -58,9 +58,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject(UxmlName = R.UxmlNames.issuesIcon)]
     private VisualElement issuesIcon;
 
-    [Inject(UxmlName = R.UxmlNames.searchMidiFilesWithLyricsToggle)]
-    private Toggle searchMidiFilesWithLyricsToggle;
-
     [Inject(UxmlName = R.UxmlNames.songDataFetchTypeChooser)]
     private Chooser songDataFetchTypeChooser;
 
@@ -110,10 +107,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         addSongFolderButton.RegisterCallbackButtonTriggered(_ => AddNewSongFolder());
         downloadSongArchiveButton.RegisterCallbackButtonTriggered(_ => CreateDownloadSongArchiveUiControl());
-        
-        FieldBindingUtils.Bind(searchMidiFilesWithLyricsToggle,
-            () => settings.SearchMidiFilesWithLyrics,
-            newValue => settings.SearchMidiFilesWithLyrics = newValue);
 
         new EnumChooserControl<EFetchType>(songDataFetchTypeChooser)
             .Bind(() => settings.SongDataFetchType,

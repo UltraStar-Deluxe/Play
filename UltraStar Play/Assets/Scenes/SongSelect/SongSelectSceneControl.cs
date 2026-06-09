@@ -529,6 +529,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         SongEditorSceneData editorSceneData = new();
         editorSceneData.SongMeta = songMeta;
+        editorSceneData.ForcedAlignmentLyrics = SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1, true);
 
         SingSceneData singSceneData = CreateSingSceneDataWithGivenSongAndSettings(songMeta, false);
         if (singSceneData != null)

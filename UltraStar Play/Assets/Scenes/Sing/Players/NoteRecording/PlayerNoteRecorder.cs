@@ -120,4 +120,16 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
             this.RecordedNote = recordedNote;
         }
     }
+
+    public void JumpToAudioPositionByUserAction(double oldPositionInMillis, double newPositionInMillis)
+    {
+        if (newPositionInMillis >= oldPositionInMillis)
+        {
+            // Jump forward is handled by existing logic.
+            return;
+        }
+
+        lastRecordedNote = null;
+        lastBeatAnalyzedEvent = null;
+    }
 }

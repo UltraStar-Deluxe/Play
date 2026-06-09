@@ -7,6 +7,15 @@ public static partial class R
         public const string absolutePositionTransition = "absolutePositionTransition";
         public const string accented_bg_color = "accented-bg-color";
         public const string active_text_color = "active-text-color";
+        public const string ai_toolbar_button_icon = "ai-toolbar-button-icon";
+        public const string ai_toolbar_panel = "ai-toolbar-panel";
+        public const string ai_toolbar_step_button = "ai-toolbar-step-button";
+        public const string ai_toolbar_step_icon = "ai-toolbar-step-icon";
+        public const string ai_toolbar_step_indicator = "ai-toolbar-step-indicator";
+        public const string ai_toolbar_step_line = "ai-toolbar-step-line";
+        public const string ai_toolbar_step_row = "ai-toolbar-step-row";
+        public const string ai_toolbar_title = "ai-toolbar-title";
+        public const string ai_toolbar_workflow = "ai-toolbar-workflow";
         public const string backgroundTransition = "backgroundTransition";
         public const string bg__lb__n_00000033_rb_ = "bg-_lb__n_00000033_rb_";
         public const string bg__lb__n_7FFFD4BB_rb_ = "bg-_lb__n_7FFFD4BB_rb_";
@@ -85,6 +94,7 @@ public static partial class R
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string fontColor = "fontColor";
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
+        public const string fullwidth = "fullwidth";
         public const string grid = "grid";
         public const string gridLine = "gridLine";
         public const string grow = "grow";
@@ -162,6 +172,7 @@ public static partial class R
         public const string mx_1 = "mx-1";
         public const string mx_2 = "mx-2";
         public const string mx_3 = "mx-3";
+        public const string my_1 = "my-1";
         public const string my_2 = "my-2";
         public const string my_3 = "my-3";
         public const string nBackgroundInHierarchy = "nBackgroundInHierarchy";

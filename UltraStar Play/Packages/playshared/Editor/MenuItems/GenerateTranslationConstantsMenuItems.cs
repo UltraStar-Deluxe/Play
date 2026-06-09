@@ -39,9 +39,14 @@ public static class GenerateTranslationConstantsMenuItems
 
         translationKeys.Sort();
         string classCode = CreateClassCode(subClassName, translationKeys);
+        if (classCode == FileUtils.ReadAllText(absoluteTargetPath))
+        {
+            Debug.Log("Not writing translation constants file because new generated code equal old code");
+            return;
+        }
+        
         Directory.CreateDirectory(generatedConstantsFolder);
         File.WriteAllText(absoluteTargetPath, classCode, Encoding.UTF8);
-        AssetDatabase.ImportAsset(Path.GetRelativePath(Application.dataPath, absoluteTargetPath));
         Debug.Log("Generated file " + absoluteTargetPath);
     }
 

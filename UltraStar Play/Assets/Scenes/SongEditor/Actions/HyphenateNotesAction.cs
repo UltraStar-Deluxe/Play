@@ -5,6 +5,9 @@ using UniInject;
 public class HyphenateNotesAction : INeedInjection
 {
     [Inject]
+    private SongMeta songMeta;
+    
+    [Inject]
     private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
@@ -21,12 +24,16 @@ public class HyphenateNotesAction : INeedInjection
     
     [Inject]
     private NoteHyphenator noteHyphenator;
-    
-    public void Execute(SongMeta songMeta, List<Note> notes, Hyphenator hyphenator)
+
+    public void Execute(List<Note> notes)
     {
-        if (songMeta == null
-            || notes.IsNullOrEmpty()
-            || hyphenator == null)
+        if (notes.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        Hyphenator hyphenator = SettingsUtils.CreateHyphenator(settings);
+        if (hyphenator == null)
         {
             return;
         }
@@ -59,9 +66,9 @@ public class HyphenateNotesAction : INeedInjection
         });
     }
 
-    public void ExecuteAndNotify(SongMeta songMeta, List<Note> selectedNotes, Hyphenator hyphenator)
+    public void ExecuteAndNotify(List<Note> selectedNotes)
     {
-        Execute(songMeta, selectedNotes, hyphenator);
+        Execute(selectedNotes);
         songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 }

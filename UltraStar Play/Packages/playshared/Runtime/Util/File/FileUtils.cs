@@ -59,6 +59,8 @@ public static class FileUtils
             // Wait a moment such that the OS can delete the file
             Thread.Sleep(100);
         }
+
+        DirectoryUtils.CreateDirectory(Path.GetDirectoryName(destinationFile));
         File.Move(sourceFile, destinationFile);
     }
 

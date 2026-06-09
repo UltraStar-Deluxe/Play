@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "UltraStarPlayInputActions",
     "maps": [
         {
@@ -1679,7 +1680,7 @@
                     "name": "jumpToStartOfSong",
                     "type": "Button",
                     "id": "f2bd7a1a-5c8f-4fef-89d6-60aaa36b9cd0",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -1823,16 +1824,25 @@
                     "name": "pitchDetection",
                     "type": "Button",
                     "id": "e7d9fa4d-9718-4504-8475-e60d7439a703",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "speechRecognition",
+                    "name": "forcedAlignment",
                     "type": "Button",
                     "id": "98d8ca68-5c1f-45d6-ad56-b8fb143fdf7c",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "mergeNotes",
+                    "type": "Button",
+                    "id": "638e59c8-f0dd-4287-86e2-61eef1312f57",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -2601,7 +2611,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "speechRecognition",
+                    "action": "forcedAlignment",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "49db8b58-8841-403a-a01c-9ea7a81830bb",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "mergeNotes",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

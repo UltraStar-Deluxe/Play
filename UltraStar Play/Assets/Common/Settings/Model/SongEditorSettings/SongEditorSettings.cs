@@ -8,28 +8,31 @@ public class SongEditorSettings
     public const char DefaultSentenceSeparator = '\n';
     
     public bool AutoSave { get; set; }
+    public string LyricsLanguage { get; set; } = ELyricsLanguage.English.ToString().ToLowerInvariant();
 
+    // Playback
     public int MusicVolumePercent { get; set; } = 100;
     public ESongEditorSamplesSource PlaybackSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
     public ESongEditorAudioWaveformSamplesSource AudioWaveformSamplesSource { get; set; } = ESongEditorAudioWaveformSamplesSource.SameAsPlayback;
+    
+    // Playback of selected range
     public bool GoToLastPlaybackPosition { get; set; }
     public int PlaybackPreBeginInMillis { get; set; }
     public int PlaybackPostEndInMillis { get; set; }
 
+    // Editing
+    public bool AdjustFollowingNotes { get; set; }
     public ESongEditorDrawNoteLayer DrawNoteLayer { get; set; }
+    public int DefaultPitchForCreatedNotes { get; set; } = MidiUtils.MidiNoteConcertPitch;
 
-    // Recording in SongEditorScene
+    // Microphone in SongEditorScene
     public MicProfile MicProfile { get; set; }
     public int MicDelayInMillis { get; set; } = 450;
-    public int DefaultPitchForCreatedNotes { get; set; } = MidiUtils.MidiNoteConcertPitch;
+    
+    // Button tapping
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
     public string ButtonRecordingLyrics { get; set; } = "";
-    public bool SpeechRecognitionWhenRecording { get; set; } = true;
-    public string SpeechRecognitionLanguage { get; set; } = EWhisperLanguage.English.ToString().ToLowerInvariant();
-    public string SpeechRecognitionPrompt { get; set; } = "";
-
-    public bool AdjustFollowingNotes { get; set; }
-
+    
     // Velocity should be between 0 and 127
     public int MidiVelocity { get; set; } = 100;
 
@@ -39,8 +42,13 @@ public class SongEditorSettings
     public int MidiPlaybackOffsetInMillis { get; set; }
     public string LastMidiFilePath { get; set; } = "";
 
+    // UI scale
+    public double ReferenceResolutionScaleFactor { get; set; } = 1;
+    
+    // Layout and display options
     public bool ShowRightSideBar { get; set; } = true;
     public bool ShowAudioWaveformInBackground { get; set; } = true;
+    public bool ShowPitchDetectionResult { get; set; } = true;
     public bool ShowVideoArea { get; set; } = true;
     public bool ShowStatusBar { get; set; } = true;
     public bool ShowVirtualPianoArea { get; set; }
@@ -53,19 +61,26 @@ public class SongEditorSettings
     public float GridSizeInPx { get; set; } = 1;
     public float SentenceLineSizeInPx { get; set; } = 2;
 
-    // Speech recognition
-    public string SpeechRecognitionModelPath { get; set; } = "";
-    public string SpeechRecognitionPhrases { get; set; } = "";
-    public ESongEditorSamplesSource SpeechRecognitionSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
-    public bool SplitSyllablesAfterSpeechRecognition { get; set; } = true;
-
-    // Pitch detection
-    public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;
-    public ESongEditorSamplesSource PitchDetectionSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
-    public string BasicPitchCommand { get; set; } = "";
-
+    // AI tools
+    public ESongEditorSamplesSource AiSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
+    public bool SplitSyllablesAfterAiTools { get; set; } = true;
+    
     // Audio separation
-    public string AudioSeparationCommand { get; set; } = "";
+    public string AudioSeparationModelName { get; set; } = "";
+    
+    // Pitch Detection
+    public string PitchDetectionModelPath { get; set; } = "";
+
+    // Speech recognition
+    public string SpeechRecognitionModelName { get; set; } = "";
+    public bool ForcedAlignmentAfterSpeechRecognition { get; set; } = true;
+    public bool SpeechRecognitionWhenRecording { get; set; } = true;
+
+    // Forced Alignment
+    public string ForcedAlignmentModelPath { get; set; } = "";
+    public int ForcedAlignmentStartPaddingMs { get; set; } = 100;
+    public int ForcedAlignmentEndPaddingMs { get; set; } = 100;
+    public int ForcedAlignmentPaddingMaxWordLengthMs { get; set; } = 500;
 
     // Editing
     public int SpaceBetweenNotesInMillis { get; set; } = SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis;

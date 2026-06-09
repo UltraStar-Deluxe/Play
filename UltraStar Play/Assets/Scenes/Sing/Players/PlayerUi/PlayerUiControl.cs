@@ -524,4 +524,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             nextPlayerProfile = newNextPlayerProfile;
         }
     }
+
+    public void JumpToAudioPositionByUserAction(double oldPositionInMillis, double newPositionInMillis)
+    {
+        NoteDisplayer?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+    }
 }

@@ -35,55 +35,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     [Inject] private JobManager jobManager;
 
-    [Inject] private SpeechRecognizerProvider speechRecognizerProvider;
-
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
-    private TextField speechRecognitionModelPathTextField;
-
-    public async void SetTextToAnalyzedSpeech(List<Note> selectedNotes, ESongEditorSamplesSource samplesSource, bool notify)
-    {
-        if (selectedNotes.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        AudioClip audioClip = await GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
-        if (audioClip == null)
-        {
-            return;
-        }
-
-        int audioClipFrequency = audioClip.frequency;
-        int minBeat = SongMetaUtils.GetMinBeat(selectedNotes);
-        int lengthInBeats = SongMetaUtils.GetLengthInBeats(selectedNotes);
-
-        SpeechRecognizerConfig speechRecognizerConfig = CreateSpeechRecognizerParameters();
-
-        try
-        {
-            SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(speechRecognizerConfig)
-                .GetResultAsync();
-
-            float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, audioClip, minBeat, lengthInBeats);
-
-            await Awaitable.BackgroundThreadAsync();
-            SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
-                new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, audioClipFrequency),
-                speechRecognizer)
-                .GetResultAsync();
-
-            await Awaitable.MainThreadAsync();
-            SpeechRecognitionResultTextToNotesMapper.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words, selectedNotes, minBeat);
-            if (notify)
-            {
-                songMetaChangedEventStream.OnNext(new LyricsChangedEvent());
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new SpeechRecognitionException("Set text to analyzed speech failed", ex);
-        }
-    }
+    [Inject] private NoteAreaControl noteAreaControl;
 
     public async void CreateNotesFromSpeechRecognition(
         float[] monoAudioSamples,
@@ -92,7 +44,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int sampleRate,
         int spaceBetweenNotesInMillis,
         bool notify,
-        SpeechRecognizerConfig speechRecognizerConfig,
         int offsetInBeats)
     {
         await CreateNotesFromSpeechRecognitionAsync(
@@ -102,7 +53,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             sampleRate,
             spaceBetweenNotesInMillis,
             notify,
-            speechRecognizerConfig,
             offsetInBeats);
     }
 
@@ -113,7 +63,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int sampleRate,
         int spaceBetweenNotesInMillis,
         bool notify,
-        SpeechRecognizerConfig speechRecognizerConfig,
         int offsetInBeats)
     {
         int lengthInSamples = endIndex - startIndex;
@@ -123,7 +72,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             return new List<Note>();
         }
 
-        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
+        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterAiTools
             ? SettingsUtils.CreateHyphenator(settings)
             : null;
 
@@ -132,7 +81,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             List<Note> createdNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
                     new CreateNotesFromSpeechRecognitionConfig
                     {
-                        SpeechRecognizerConfig = speechRecognizerConfig,
                         InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, startIndex, endIndex, sampleRate),
                         MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                         SongMeta = songMeta,
@@ -172,17 +120,17 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int lengthInBeats,
         ESongEditorSamplesSource speechRecognitionSampleSource,
         int spaceBetweenNotesInMillis,
-        bool notify,
-        SpeechRecognizerConfig speechRecognizerConfig)
+        bool notify)
     {
         try
         {
-            await CreateNotesFromSpeechRecognitionAsync(startBeat,
+            List<Note> notes = await CreateNotesFromSpeechRecognitionAsync(startBeat,
                 lengthInBeats,
                 speechRecognitionSampleSource,
                 spaceBetweenNotesInMillis,
-                notify,
-                speechRecognizerConfig);
+                notify);
+            
+            noteAreaControl.ScrollIntoView(notes);
         }
         catch (Exception ex)
         {
@@ -203,12 +151,15 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int lengthInBeats,
         ESongEditorSamplesSource speechRecognitionSampleSource,
         int spaceBetweenNotesInMillis,
-        bool notify,
-        SpeechRecognizerConfig speechRecognizerConfig)
+        bool notify)
     {
+        if (lengthInBeats <= 0)
+        {
+            return new List<Note>();
+        }
+        
         AudioClip audioClip = await GetAudioClip(speechRecognitionSampleSource);
-        if (audioClip == null
-            || lengthInBeats <= 0)
+        if (audioClip == null)
         {
             return new List<Note>();
         }
@@ -225,14 +176,13 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, audioClip, startBeat, lengthInBeats);
 
-        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
+        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterAiTools
             ? SettingsUtils.CreateHyphenator(settings)
             : null;
 
         List<Note> createdNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
                 new CreateNotesFromSpeechRecognitionConfig
                 {
-                    SpeechRecognizerConfig = speechRecognizerConfig,
                     InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, audioClip.frequency),
                     MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                     SongMeta = songMeta,
@@ -259,13 +209,5 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         }
 
         return createdNotes;
-    }
-
-    public SpeechRecognizerConfig CreateSpeechRecognizerParameters()
-    {
-        return new SpeechRecognizerConfig(
-            SettingsUtils.GetSpeechRecognitionModelPath(settings),
-            SettingsUtils.GetSpeechRecognitionLanguage(settings),
-            settings.SongEditorSettings.SpeechRecognitionPrompt);
     }
 }

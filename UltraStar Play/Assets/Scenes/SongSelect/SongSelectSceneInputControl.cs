@@ -57,7 +57,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private readonly ReactiveProperty<string> fuzzySearchText = new("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
-    private static readonly float fuzzySearchResetTimeInSeconds = 0.75f;
+    private static readonly float fuzzySearchResetTimeInSeconds = 1.5f;
 
     // ReSharper disable Unity.PerformanceAnalysis
     void Start()

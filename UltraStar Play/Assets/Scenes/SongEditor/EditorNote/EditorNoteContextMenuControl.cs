@@ -44,8 +44,17 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     private PitchDetectionAction pitchDetectionAction;
 
     [Inject]
+    private MoveNotesToPitchDetectionResultAction moveNotesToPitchDetectionResultAction;
+    
+    [Inject]
     private SpeechRecognitionAction speechRecognitionAction;
 
+    [Inject]
+    private ForcedAlignmentAction forcedAlignmentAction;
+    
+    [Inject]
+    private HyphenateNotesAction hyphenateNotesAction;
+    
     [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
 
@@ -54,6 +63,9 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
     [Inject]
     private EditorNoteControl noteControl;
+    
+    [Inject]
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private Settings settings;
@@ -89,6 +101,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
 
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_editLyrics), () => songEditorSceneControl.StartEditingSelectedNoteText());
+        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_splitSyllablesInSelection), () => hyphenateNotesAction.ExecuteAndNotify(selectedNotes));
         FillContextMenuForAiTools(contextMenu, selectedNotes);
         FillContextMenuToMergeAndAddSpaceBetweenNotes(contextMenu, selectedNotes);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
@@ -99,17 +112,22 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
     private void FillContextMenuForAiTools(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
-        int minBeat = selectedNotes.Select(note => note.StartBeat).Min();
-        int maxBeat = selectedNotes.Select(note => note.EndBeat).Max();
-        int lengthInBeats = maxBeat - minBeat;
-
         contextMenu.AddSeparator();
 
-        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_speechRecognitionOnAudio,
-                "audio", settings.SongEditorSettings.SpeechRecognitionSamplesSource),
-            () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
+        NoteAreaRect lastSelectionRect = noteAreaControl.SelectionDragListener.LastSelectionRect.Value;
+        if (lastSelectionRect == null)
+        {
+            return;
+        }
+        
+        contextMenu.AddButton(Translation.Get(R.Messages.job_forcedAlignment), () => _ =
+            forcedAlignmentAction.MoveNotesViaForcedAlignmentInSelection(
+                selectedNotes,
+                lastSelectionRect.MinBeat,
+                lastSelectionRect.LengthInBeats,
+                true));
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveToDetectedPitch),
-            () => pitchDetectionAction.MoveNotesToDetectedPitchUsingPitchDetectionLayer(selectedNotes, true));
+            () => moveNotesToPitchDetectionResultAction.MoveNotesToDetectedPitch(selectedNotes, true));
     }
 
     private void FillContextMenuToMergeAndAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)

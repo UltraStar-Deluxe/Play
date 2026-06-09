@@ -10,9 +10,6 @@ using UnityEngine;
 
 public static class SettingsUtils
 {
-    private const string DefaultSpeechRecognitionModelPathInStreamingAssets = "SpeechRecognitionModels/WhisperModels/ggml-tiny.bin";
-    private const string DefaultSpeechRecognitionLanguage = "auto";
-
     public const string SongFolderNavigationVirtualRootFolderName = "SONG_SELECT_ROOT";
 
     public static bool IsSongFolderNavigationRootFolder(Settings settings, DirectoryInfo directoryInfo)
@@ -194,16 +191,16 @@ public static class SettingsUtils
 
     public static Hyphenator CreateHyphenator(Settings settings)
     {
-        string speechRecognitionLanguage = settings?.SongEditorSettings?.SpeechRecognitionLanguage;
-        if (speechRecognitionLanguage.IsNullOrEmpty())
+        string lyricsLanguage = settings?.SongEditorSettings?.LyricsLanguage;
+        if (lyricsLanguage.IsNullOrEmpty())
         {
             return null;
         }
 
-        IHyphenatePatternsLoader hyphenatePatternsLoader = HyphenationPatternsProvider.CreateHyphenationPatternsLoader(speechRecognitionLanguage);
+        IHyphenatePatternsLoader hyphenatePatternsLoader = HyphenationPatternsProvider.CreateHyphenationPatternsLoader(lyricsLanguage);
         if (hyphenatePatternsLoader == null)
         {
-            Debug.LogWarning("No hyphenation patterns found for language: " + speechRecognitionLanguage);
+            Debug.LogWarning("No hyphenation patterns found for language: " + lyricsLanguage);
             return null;
         }
 
@@ -232,26 +229,6 @@ public static class SettingsUtils
     public static Encoding GetEncodingForWritingUltraStarTxtFile(Settings settings)
     {
         return EncodingUtils.GetUtf8Encoding(settings.WriteUltraStarTxtFileWithByteOrderMark);
-    }
-
-    public static string GetSpeechRecognitionModelPath(Settings settings)
-    {
-        string modelPath = settings.SongEditorSettings.SpeechRecognitionModelPath;
-        if (modelPath.IsNullOrEmpty())
-        {
-            return ApplicationUtils.GetStreamingAssetsPath(DefaultSpeechRecognitionModelPathInStreamingAssets);
-        }
-        return modelPath;
-    }
-
-    public static string GetSpeechRecognitionLanguage(Settings settings)
-    {
-        string language = settings.SongEditorSettings.SpeechRecognitionLanguage;
-        if (language.IsNullOrEmpty())
-        {
-            return DefaultSpeechRecognitionLanguage;
-        }
-        return language;
     }
 
     public static UltraStarSongFormatVersion GetUltraStarSongFormatVersionForSave(Settings settings, UltraStarSongFormatVersion currentVersion)

@@ -532,7 +532,15 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         currentVideoSupportProvider.PositionInMillis = songAudioPlayer.PositionInMillis;
         currentVideoSupportProvider.SetTargetTexture(videoPlayer.targetTexture);
         UpdateVideoSyncStrategy();
-        PlayVideo();
+
+        if (songAudioPlayer.IsPlaying)
+        {
+            PlayVideo();
+        }
+        else
+        {
+            PauseVideo();
+        }
 
         return new SongVideoLoadedEvent(songMeta, evt.VideoUri);
     }

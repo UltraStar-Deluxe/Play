@@ -278,10 +278,19 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             SortedNotes = new List<Note>();
             AwaitableUtils.ExecuteAfterDelayInSecondsAsync(gameObject, 2, () =>
             {
+                // Also hide noteContainers, to hide "scrolling notes current position in lyrics indicator vertical bar"
+                List<VisualElement> noteContainers = UIDocumentUtils.FindUIDocumentOrThrow().rootVisualElement
+                    .Query(R.UxmlNames.noteContainer)
+                    .ToList();
+                
                 LeanTween.value(gameObject, rootVisualElement.resolvedStyle.opacity, 0, 1f)
                     .setOnUpdate(interpolatedValue =>
                     {
                         rootVisualElement.style.opacity = interpolatedValue;
+                        foreach (VisualElement noteContainer in noteContainers)
+                        {
+                            noteContainer.style.opacity = interpolatedValue;
+                        }
                     });
             });
         }

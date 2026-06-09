@@ -770,14 +770,15 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker
 
     public void JumpToAudioPositionByUserAction(double oldPositionInMillis, double newPositionInMillis)
     {
+        // Recompute recording context based on the new position
+        double newBeat = SongMetaBpmUtils.MillisToBeats(songMeta, newPositionInMillis);
+        
         if (newPositionInMillis >= oldPositionInMillis)
         {
             // Jump forward is handled by existing logic.
+            SkipToBeat(newBeat);
             return;
         }
-
-        // Recompute recording context based on the new position
-        double newBeat = SongMetaBpmUtils.MillisToBeats(songMeta, newPositionInMillis);
 
         // Find sentence to analyze next.
         Sentence newRecordingSentence = playerControl.SortedSentences

@@ -28,6 +28,9 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
+    [Inject]
+    private AudioSampleLoader audioSampleLoader;
+
     private readonly HashSet<string> failedAudioClipPaths = new();
 
     private void Start()
@@ -47,7 +50,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             {
                 return;
             }
-            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
+            AudioSource.time = (float)GetTargetTimeInSecondsExact();
         });
         songAudioPlayer.JumpForwardEventStream.Subscribe(_ =>
         {
@@ -55,7 +58,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             {
                 return;
             }
-            AudioSource.time = (float)songAudioPlayer.PositionInSeconds;
+            AudioSource.time = (float)GetTargetTimeInSecondsExact();
         });
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ =>
         {
@@ -74,16 +77,19 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
         // Update music volume (instrumental, vocals, songAudioPlayer) when corresponding settings change
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource)
-            .Subscribe(_ => UpdateVolume());
+            .Subscribe(_ => UpdateVolume())
+            .AddTo(gameObject);
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.MusicVolumePercent)
-            .Subscribe(_ => UpdateVolume());
+            .Subscribe(_ => UpdateVolume())
+            .AddTo(gameObject);
 
         songAudioPlayer.PlaybackStartedEventStream
             .Subscribe(_ =>
             {
                 UpdateVolume();
                 UpdateAudioClip();
-            });
+            })
+            .AddTo(gameObject);
     }
 
     private void Update()
@@ -93,18 +99,18 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
     private void SynchronizePositionWithSongAudioPlayer()
     {
-        if (!songAudioPlayer.IsPlaying)
+        if (!songAudioPlayer.IsPlaying
+            || AudioSource.clip == null)
         {
             return;
         }
 
-        double targetPositionInMillis = songAudioPlayer.PositionInMillis;
+        double targetPositionInMillis = songAudioPlayer.PositionInMillisExact;
         double actualPositionInMillis = AudioSource.time * 1000;
         double positionDifferenceInMillis = targetPositionInMillis - actualPositionInMillis;
         double positionDistanceInMillis = Math.Abs(positionDifferenceInMillis);
         if (positionDistanceInMillis > 1200)
         {
-            // Re-Synchronize
             AudioSource.time = (float)(targetPositionInMillis / 1000);
         }
     }
@@ -118,7 +124,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         }
         else
         {
-            AudioSource.volume = NumberUtils.PercentToFactor(settings.SongEditorSettings.MusicVolumePercent);
+        AudioSource.volume = NumberUtils.PercentToFactor(settings.SongEditorSettings.MusicVolumePercent);
             songAudioPlayer.VolumeFactor = 0;
         }
     }
@@ -178,7 +184,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             return null;
         }
 
-        AudioClip loadedAudioClip = await AudioManager.LoadAudioClipFromUriAsync(audioClipUri, false);
+        AudioClip loadedAudioClip = await audioSampleLoader.LoadAsAudioClip(audioClipUri);
         if (loadedAudioClip == null)
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.common_error_failedToLoadWithName,
@@ -232,5 +238,10 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
         errorMessage = Translation.Empty;
         return true;
+    }
+
+    private double GetTargetTimeInSecondsExact()
+    {
+        return songAudioPlayer?.PositionInMillisExact / 1000.0 ?? 0;
     }
 }

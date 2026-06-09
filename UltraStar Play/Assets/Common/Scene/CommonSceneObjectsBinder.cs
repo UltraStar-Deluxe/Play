@@ -31,6 +31,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(ImageManager.Instance);
         bb.BindExistingInstance(FolderPreviewImageManager.Instance);
         bb.BindExistingInstance(AudioManager.Instance);
+        bb.BindExistingInstance(AudioSampleLoader.Instance);
         bb.BindExistingInstance(SfxManager.Instance);
         bb.BindExistingInstance(TranslationManager.Instance);
         bb.BindExistingInstance(ContextMenuPopupManager.Instance);
@@ -44,6 +45,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(VfxManager.Instance);
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
         bb.BindExistingInstance(BackgroundLightManager.Instance);
+        bb.BindExistingInstance(ReferenceResolutionControl.Instance);
         bb.BindExistingInstance(DefaultFocusableNavigator.Instance);
         bb.BindExistingInstance(MicSampleRecorderManager.Instance);
         bb.BindExistingInstance(AchievementEventStream.Instance);
@@ -79,11 +81,10 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(NetworkManager.Singleton);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
-        bb.BindExistingInstance(SpeechRecognizerProvider.Instance);
-        bb.BindExistingInstance(WhisperSpeechRecognizerProvider.Instance);
         bb.BindExistingInstance(SpeechRecognitionNoteCreator.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);
         bb.BindExistingInstance(PitchDetectionManager.Instance);
+        bb.BindExistingInstance(ForcedAlignmentManager.Instance);
         bb.BindExistingInstance(SongQueueManager.Instance);
         bb.BindExistingInstance(JobManager.Instance);   bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.BindExistingInstance(ThemeManager.Instance);

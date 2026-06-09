@@ -302,11 +302,21 @@ public static class SongMetaUtils
 
     public static string GetLyrics(List<Note> notes, bool removeTilde = false)
     {
+        Note lastNote = null;
+        
         StringBuilder sb = new();
-        notes.ForEach(note =>
+        foreach (Note note in notes)
         {
+            // Add space when sentence changed
+            if (lastNote != null && note.Sentence != lastNote.Sentence)
+            {
+                sb.Append(" ");
+            }
+            
             sb.Append(note.Text);
-        });
+
+            lastNote = note;
+        }
         string lyrics = sb.ToString();
         if (removeTilde)
         {

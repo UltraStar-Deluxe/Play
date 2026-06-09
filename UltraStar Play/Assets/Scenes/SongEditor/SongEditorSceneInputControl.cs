@@ -30,6 +30,12 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private PitchDetectionAction pitchDetectionAction;
+    
+    [Inject]
+    private ForcedAlignmentAction forcedAlignmentAction;
+    
+    [Inject]
+    private MoveNotesToPitchDetectionResultAction moveNotesToPitchDetectionResultAction;
 
     [Inject]
     private SpeechRecognitionAction speechRecognitionAction;
@@ -66,6 +72,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private MoveNoteToOwnSentenceAction moveNoteToOwnSentenceAction;
+
+    [Inject]
+    private MergeNotesAction mergeNotesAction;
 
     [Inject]
     private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
@@ -117,7 +126,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Play only the selected notes
         InputManager.GetInputAction(R.InputActions.songEditor_playSelectedNotes).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => PlayAudioInRangeOfNotes(selectionControl.GetSelectedNotes()));
+            .Subscribe(_ => PlayAudioInSelectedRange());
 
         // Stop playback or return to last scene
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
@@ -163,16 +172,20 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Assign to own sentence
         InputManager.GetInputAction(R.InputActions.songEditor_assignToOwnSentence).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => AssignSelectedNotesToOwnSentence());
+            .Subscribe(_ => AssignSelectedNotesToOwnSentence());        // Assign to own sentence
+        
+        InputManager.GetInputAction(R.InputActions.songEditor_mergeNotes).PerformedAsObservable()
+            .Where(_ => !AnyInputFieldHasFocus())
+            .Subscribe(_ => MergeSelectedNotes());
+        
+        InputManager.GetInputAction(R.InputActions.songEditor_forcedAlignment).PerformedAsObservable()
+            .Where(_ => !AnyInputFieldHasFocus())
+            .Subscribe(_ => OpenForcedAlignmentDialog());
 
         // AI tools
         InputManager.GetInputAction(R.InputActions.songEditor_pitchDetection).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => MoveSelectedNotesToDetectedPitch());
-
-        InputManager.GetInputAction(R.InputActions.songEditor_speechRecognition).PerformedAsObservable()
-            .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => SetTextOfSelectedNotesToAnalyzedSpeech());
 
         // Change position in song
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
@@ -244,6 +257,24 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(context => noteAreaControl.ZoomVertical(-1));
     }
 
+    private void OpenForcedAlignmentDialog()
+    {
+        NoteAreaRect lastSelectionRect = noteAreaControl.LastSelectionRect.Value;
+        if (lastSelectionRect == null)
+        {
+            return;
+        }
+        
+        SongEditorForcedAlignmentUtils.ShowForcedAlignmentInSelectionDialog(
+            songEditorSceneControl,
+            forcedAlignmentAction,
+            lastSelectionRect.MinBeat,
+            lastSelectionRect.LengthInBeats,
+            SongMetaUtils.GetLyrics(selectionControl.GetSelectedNotes()),
+            speechRecognitionAction,
+            settings);
+    }
+
     private void JumpToEndOfSong()
     {
         int endInBeats = SongMetaUtils.GetMaxBeat(songEditorSceneControl.GetAllNotes());
@@ -281,20 +312,25 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         if (selectedNotes.Select(note => note.Sentence?.Voice).AllMatch(voice => voice == null))
         {
             moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, EVoiceId.P1);
+            return;
         }
         moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes);
     }
-
-    private void SetTextOfSelectedNotesToAnalyzedSpeech()
+    
+    private void MergeSelectedNotes()
     {
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
-        speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true);
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+        mergeNotesAction.ExecuteAndNotify(selectedNotes, selectedNotes.FirstOrDefault());
     }
 
     private void MoveSelectedNotesToDetectedPitch()
     {
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
-        pitchDetectionAction.MoveNotesToDetectedPitchUsingPitchDetectionLayer(selectedNotes, true);
+        moveNotesToPitchDetectionResultAction.MoveNotesToDetectedPitch(selectedNotes, true);
     }
 
     private void OnBack(InputAction.CallbackContext context)
@@ -337,14 +373,22 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnScrollWheel(InputAction.CallbackContext context)
     {
-        if (AnyInputFieldHasFocus())
+        if (AnyInputFieldHasFocus()
+            || AbstractDialogControl.AnyDialogOpen)
         {
             return;
         }
 
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
 
+        // Scroll towards end of song by 'mouse wheel down' or 'mouse wheel right'.
         int scrollDirection = Math.Sign(context.ReadValue<Vector2>().y);
+        if (scrollDirection == 0)
+        {
+            // Try horizontal scroll direction, e.g., from mouse pad
+            scrollDirection = -Math.Sign(context.ReadValue<Vector2>().x);
+        }
+        
         if (scrollDirection != 0 && noteAreaControl.IsPointerOver())
         {
             // Scroll horizontal in NoteArea with no modifier
@@ -640,7 +684,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             }
             else
             {
-                PlayAudioInRangeOfNotes(selectedNotes);
+                PlayAudioInSelectedRange();
             }
         }
 
@@ -655,18 +699,16 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         }
     }
 
-    private void PlayAudioInRangeOfNotes(List<Note> notes)
+    private void PlayAudioInSelectedRange()
     {
         if (songAudioPlayer.IsPlaying
-            || notes.IsNullOrEmpty())
+            || noteAreaControl.LastSelectionRect.Value == null)
         {
             return;
         }
 
-        int minBeat = notes.Select(it => it.StartBeat).Min();
-        int maxBeat = notes.Select(it => it.EndBeat).Max();
-        double maxMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, maxBeat);
-        double minMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, minBeat);
+        double minMillis = noteAreaControl.LastSelectionRect.Value.MinMillis;
+        double maxMillis = noteAreaControl.LastSelectionRect.Value.MaxMillis;
         songEditorSceneControl.StopPlaybackAfterPositionInMillis = maxMillis + settings.SongEditorSettings.PlaybackPostEndInMillis;
         songAudioPlayer.PositionInMillis = Math.Max(0, minMillis - settings.SongEditorSettings.PlaybackPreBeginInMillis);
         songAudioPlayer.PlayAudio();

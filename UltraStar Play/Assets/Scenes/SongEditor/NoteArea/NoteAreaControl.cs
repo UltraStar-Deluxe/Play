@@ -13,7 +13,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 {
     public const float ViewportAutomaticScrollingBoarderPercent = 0.01f;
     private const float ViewportAutomaticScrollingJumpPercent = 0.2f;
-    private const int DefaultViewportWidthInMillis = 8000;
+    private const int DefaultViewportWidthInMillis = 12000;
 
     private const float DoubleClickToTogglePlayPauseDistanceThresholdInPx = 5f;
 
@@ -58,7 +58,10 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     public double MillisecondsPerBeat { get; private set; }
     public float HeightForSingleNote { get; private set; }
-
+    
+    private readonly ReactiveProperty<NoteAreaRect> lastSelectionRect = new();
+    public ReactiveProperty<NoteAreaRect> LastSelectionRect => lastSelectionRect;
+    
     [Inject]
     private SongMeta songMeta;
 
@@ -93,6 +96,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public NoteAreaDragControl DragControl { get; private set; }
     private NoteAreaScrollingDragListener scrollingDragListener;
     private NoteAreaSelectionDragListener selectionDragListener;
+    public NoteAreaSelectionDragListener SelectionDragListener => selectionDragListener;
     private NoteAreaDrawNoteDragListener drawNoteDragListener;
     private ManipulateNotesDragListener manipulateNotesDragListener;
     private SongEditorMicPitchIndicatorControl micPitchIndicatorControl;
@@ -182,6 +186,11 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
             or LoadedMementoEvent)
         {
             SetViewportHorizontal(ViewportX, ViewportWidth);
+        }
+
+        if (changedEvent is ImportedNotesEvent importedNotesEvent)
+        {
+            ScrollIntoView(importedNotesEvent.Notes);
         }
     }
 
@@ -574,10 +583,15 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
             minMidiNote = allNotes.Select(note => note.MidiNote).Min();
             maxMidiNote = allNotes.Select(note => note.MidiNote).Max();
         }
+        // Add padding
+        minMidiNote -= 6;
+        maxMidiNote += 6;
+        int height = maxMidiNote - minMidiNote;
+        // Center the notes
+        int y = minMidiNote - 1;
 
-        // 10 seconds
-        int width = DefaultViewportWidthInMillis;
         // Start at the beginning
+        int width = DefaultViewportWidthInMillis;
         int x;
         if (songAudioPlayer.PositionInMillis <= 0)
         {
@@ -589,10 +603,6 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         {
             x = Math.Max(0, (int)songAudioPlayer.PositionInMillis - 1000);
         }
-        // Full range of notes. At least one octave
-        int height = Math.Max(12, maxMidiNote - minMidiNote + 2);
-        // Center the notes
-        int y = minMidiNote - 1;
         SetViewport(x, y, width, height);
     }
 
@@ -652,5 +662,63 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public bool IsPointerOver()
     {
         return InputUtils.IsPointerOverVisualElement(VisualElement, panelHelper);
+    }
+
+    /**
+     * Makes sure that some of the area defined by left/right/top/bottom is inside the viewport.
+     */
+    public void ScrollIntoView(double leftMillis, double rightMillis, double bottomMidiNote, double topMidiNote)
+    {
+        int paddingX = (int)(ViewportWidth * 0.5);
+        int paddingY = (int)(ViewportHeight * 0.5);
+
+        int newViewportX = ViewportX;
+        int newViewportY = ViewportY;
+
+        if (leftMillis < ViewportX + paddingX)
+        {
+            newViewportX = (int)(leftMillis - paddingX);
+        }
+        else if (rightMillis > ViewportX + ViewportWidth - paddingX)
+        {
+            newViewportX = (int)(rightMillis + paddingX - ViewportWidth);
+        }
+
+        if (bottomMidiNote < ViewportY + paddingY)
+        {
+            newViewportY = (int)(bottomMidiNote - paddingY);
+        }
+        else if (topMidiNote > ViewportY + ViewportHeight - paddingY)
+        {
+            newViewportY = (int)(topMidiNote + paddingY - ViewportHeight);
+        }
+
+        if (newViewportX == ViewportX && newViewportY == ViewportY)
+        {
+            return;
+        }
+
+        double scrollDurationInSeconds = 0.5;
+        Vector2 startPos = new Vector2(ViewportX, ViewportY);
+        Vector2 endPos = new Vector2(newViewportX, newViewportY);
+        LeanTween.value(songEditorSceneControl.gameObject, startPos, endPos, (float)scrollDurationInSeconds)
+            .setOnUpdate((Vector2 val) => SetViewport((int)val.x, (int)val.y, ViewportWidth, ViewportHeight));
+    }
+
+    public void ScrollIntoView(List<Note> notes)
+    {
+        if (notes.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        double fromBeat = notes.Min(note => note.StartBeat);
+        double toBeat = notes.Max(note => note.EndBeat);
+        double fromMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, fromBeat);
+        double toMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, toBeat);
+        
+        double fromMidiNote = notes.Min(note => note.MidiNote);
+        double toMidiNote = notes.Max(note => note.MidiNote);
+        ScrollIntoView(fromMillis, toMillis, fromMidiNote, toMidiNote);
     }
 }

@@ -108,6 +108,7 @@ public static partial class R_PlayShared
         public const string modalDialogContainer = "modalDialogContainer";
         public const string mr_1 = "mr-1";
         public const string mt_2 = "mt-2";
+        public const string multiline = "multiline";
         public const string mx_2 = "mx-2";
         public const string nextLyrics = "nextLyrics";
         public const string noBackground = "noBackground";

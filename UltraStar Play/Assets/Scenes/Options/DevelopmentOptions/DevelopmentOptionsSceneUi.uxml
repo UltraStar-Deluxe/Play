@@ -42,6 +42,7 @@
             </AccordionItem>
             <AccordionItem name="mediaFileFormatGroup" label="File Format Support" class="child-mb-3">
                 <ui:IntegerField label="Song Scan Max Batch Count" value="1" name="songScanMaxBatchCountChooser"/>
+                <ui:Toggle name="searchMidiFilesWithLyricsToggle" label="$options_searchMidiFilesWithLyrics" class="noBackgroundInHierarchy" style="flex-shrink: 0;"/>
                 <ui:Toggle name="useUniversalCharsetDetectorToggle" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings¹" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy"/>
                 <ui:Toggle name="writeUltraStarTxtFileWithByteOrderMarkToggle" label="Write UltraStar txt with BOM" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy"/>
                 <Chooser name="defaultUltraStarFormatVersionForSave" label="Default UltraStar Format on Save" class="noBackgroundInHierarchy"/>
@@ -50,6 +51,7 @@
                 <Chooser name="unityApiUsageChooser" label="Use Unity to Play Audio&#10;and Video Files" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy"/>
                 <Chooser name="avproApiUsageChooser" label="Use AVPro to Play Audio&#10;and Video Files" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy"/>
                 <Chooser name="vlcApiUsageChooser" label="Use VLC to Play Audio&#10;and Video Files" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy"/>
+                <Chooser name="ffmpegApiUsageChooser" label="Use FFmpeg  to Load Audio" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy"/>
                 <ui:Toggle name="logVlcOutputToggle" label="Log VLC Output" class="noBackgroundInHierarchy"/>
                 <ui:TextField label="VLC Options, one per line¹" name="vlcOptionsTextField" multiline="true" class="noBackgroundInHierarchy multiline" style="min-height: 128px;"/>
             </AccordionItem>
@@ -59,6 +61,7 @@
             </AccordionItem>
             <AccordionItem name="performanceAndEffectsGroup" label="Performance And Effects" class="child-mb-3">
                 <ui:Toggle name="showFpsToggle" label="Show FPS" class="noBackgroundInHierarchy"/>
+                <Chooser name="dspBufferSizeChooser" wrapAround="true" label="DSP Buffer Size¹"/>
                 <ui:Toggle name="animatedBackgroundItemToggle" label="Enable Animated Background¹" class="noBackgroundInHierarchy"/>
                 <ui:Toggle name="vfxEnabledToggle" label="Enable Visual Effects" class="noBackgroundInHierarchy"/>
                 <ui:Toggle name="enableDynamicThemesToggle" label="Enable Themes¹" class="noBackgroundInHierarchy"/>
@@ -77,10 +80,6 @@
             <AccordionItem name="onlineMultiplayerGroup" label="Online Multiplayer" class="child-mb-3">
                 <Chooser name="beatAnalyzedEventNetworkDeliveryChooser" label="Beat Analyzed Event Network Delivery" class="noBackgroundInHierarchy"/>
                 <ui:IntegerField label="Simulate Jitter (ms)" name="simulateJitterInMillisField"/>
-            </AccordionItem>
-            <AccordionItem name="externalToolsGroup" label="External Tools" class="child-mb-3">
-                <ui:TextField name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" value="python -m spleeter" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;"/>
-                <ui:TextField name="basicPitchCommandTextField" is-delayed="true" label="Basic Pitch Command&#10;(pitch detection)" value="python -m spleeter" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;"/>
             </AccordionItem>
             <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);"/>
             <ui:Label tabindex="-1" text="¹ requires restart" display-tooltip-when-elided="true" name="requiresRestartLabel" class="noBackgroundInHierarchy"/>

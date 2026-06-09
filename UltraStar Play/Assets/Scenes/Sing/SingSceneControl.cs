@@ -849,6 +849,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             SongMeta = SongMeta,
             PlayerProfileToMicProfileMap = sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap,
             SelectedPlayerProfiles = sceneData.SingScenePlayerData.SelectedPlayerProfiles,
+            ForcedAlignmentLyrics = SongMetaUtils.GetLyrics(SongMeta, EVoiceId.P1, true),
         };
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
         sceneNavigator.LoadScene(EScene.SongEditorScene, songEditorSceneData);

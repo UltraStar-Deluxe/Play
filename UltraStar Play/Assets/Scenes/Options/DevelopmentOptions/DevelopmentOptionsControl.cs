@@ -87,6 +87,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.songSelectSongPreviewDelay)]
     private IntegerField songSelectSongPreviewDelay;
 
+    [Inject(UxmlName = R.UxmlNames.dspBufferSizeChooser)]
+    private Chooser dspBufferSizeChooser;
+
+    [Inject(UxmlName = R.UxmlNames.searchMidiFilesWithLyricsToggle)]
+    private Toggle searchMidiFilesWithLyricsToggle;
     [Inject]
     private ThemeManager themeManager;
 
@@ -107,12 +112,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject]
     private InGameDebugConsoleManager inGameDebugConsoleManager;
-
-    [Inject(UxmlName = R.UxmlNames.audioSeparationCommandTextField)]
-    private TextField audioSeparationCommandTextField;
-
-    [Inject(UxmlName = R.UxmlNames.basicPitchCommandTextField)]
-    private TextField basicPitchCommandTextField;
 
     [Inject(UxmlName = R.UxmlNames.clientDiscoveryPortTextField)]
     private IntegerField clientDiscoveryPortTextField;
@@ -140,6 +139,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     
     [Inject(UxmlName = R.UxmlNames.vlcApiUsageChooser)]
     private Chooser vlcApiUsageChooser;
+    
+    [Inject(UxmlName = R.UxmlNames.ffmpegApiUsageChooser)]
+    private Chooser ffmpegApiUsageChooser;
 
     [Inject(UxmlName = R.UxmlNames.logVlcOutputToggle)]
     private Toggle logVlcOutputToggle;
@@ -331,18 +333,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             newValue => settings.CompanionClientMessageBufferTimeInMillis = newValue);
         messageBufferTimeTextField.DisableChangeValueByDragging();
 
-        // Spleeter command (audio separation)
-        audioSeparationCommandTextField.DisableParseEscapeSequences();
-        FieldBindingUtils.Bind(audioSeparationCommandTextField,
-            () => settings.SongEditorSettings.AudioSeparationCommand,
-            newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
-
-        // Basic Pitch command (pitch detection)
-        basicPitchCommandTextField.DisableParseEscapeSequences();
-        FieldBindingUtils.Bind(basicPitchCommandTextField,
-            () => settings.SongEditorSettings.BasicPitchCommand,
-            newValue => settings.SongEditorSettings.BasicPitchCommand = newValue);
-
         // Network config
         FieldBindingUtils.Bind(clientDiscoveryPortTextField,
             () => settings.ConnectionServerPort,
@@ -362,6 +352,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(writeUltraStarTxtFileWithByteOrderMarkToggle,
             () => settings.WriteUltraStarTxtFileWithByteOrderMark,
             newValue => settings.WriteUltraStarTxtFileWithByteOrderMark = newValue);
+
+        FieldBindingUtils.Bind(searchMidiFilesWithLyricsToggle,
+            () => settings.SearchMidiFilesWithLyrics,
+            newValue => settings.SearchMidiFilesWithLyrics = newValue);
 
         // UltraStar format versions
         new EnumChooserControl<EKnownUltraStarSongFormatVersion>(defaultUltraStarFormatVersionForSave)
@@ -389,6 +383,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new EnumChooserControl<EApiUsage>(vlcApiUsageChooser)
             .Bind(() => settings.VlcApiUsage,
                 newValue => settings.VlcApiUsage = newValue);
+        
+        new EnumChooserControl<EApiUsage>(ffmpegApiUsageChooser)
+            .Bind(() => settings.FfmpegApiUsage,
+                newValue => settings.FfmpegApiUsage = newValue);
 
         // VLC Settings
         FieldBindingUtils.Bind(logVlcOutputToggle,
@@ -418,6 +416,17 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.EnableVfx,
             newValue => settings.EnableVfx = newValue);
 
+        // Dsp Buffer Size
+        EnumChooserControl<EDspBufferSize> dspBufferSizeChooserControl = new(dspBufferSizeChooser);
+        dspBufferSizeChooserControl.Bind(
+            () => settings.DspBufferSize,
+            newValue =>
+            {
+                settings.DspBufferSize = newValue;
+                AudioSettingsUtils.UpdateConfiguration(settings.DspBufferSize);
+            });
+
+        
         // Online multiplayer
         new EnumChooserControl<ENetworkDelivery>(beatAnalyzedEventNetworkDeliveryChooser)
             .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,

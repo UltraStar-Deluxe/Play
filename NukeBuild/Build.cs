@@ -118,6 +118,9 @@ class Build : NukeBuild
                 "System.Linq.Dynamic.Core.dll",
                 "System.Text.Encoding.CodePages.dll",
                 "TagLibSharp.dll",
+                "Microsoft.ML.OnnxRuntime.dll",
+                "NWaves.dll",
+                "Ffmpeg.Autogen.dll",
                 "WindowsInput.dll" // Only used in mod "TriggerKeyStrokeToToggleMicWhenSinging"
                 );
         });

@@ -341,6 +341,9 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     {
         PlayerScoreControl?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
         PlayerMicPitchTracker?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+        PlayerUiControl?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+        PlayerNoteRecorder?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+        PlayerPerformanceAssessmentControl?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
 
         if (newPositionInMillis >= oldPositionInMillis)
         {

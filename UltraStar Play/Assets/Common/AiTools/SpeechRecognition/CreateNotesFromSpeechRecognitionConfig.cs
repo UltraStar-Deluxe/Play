@@ -2,7 +2,6 @@
 
 public class CreateNotesFromSpeechRecognitionConfig
 {
-    public SpeechRecognizerConfig SpeechRecognizerConfig { get; set; }
     public SpeechRecognitionInputSamples InputSamples { get; set; }
 
     /**

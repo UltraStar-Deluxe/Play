@@ -43,19 +43,17 @@
 #innerSongEntryUi {
     transition: top 0.3s, width 0.3s, height 0.3s;
     top: 0;
-    width: 142px;
-    height: 142px;
+    width: 181px;
+    height: 181px;
 }
 
 #innerSongEntryUi #songImageOuter {
-    width: 142px;
-    height: 142px;
+    width: 181px;
+    height: 181px;
 }
 
 .unity-collection-view__item--selected #innerSongEntryUi {
     top: -20px;
-    /*width: 150px;*/
-    /*height: 150px;*/
 }
 
 #songEntryDarkOverlay {
@@ -757,6 +755,11 @@
 }
 
 #loadedOptionsRoot > Chooser {
+    margin-bottom: 16px;
+    height: auto;
+}
+
+#loadedOptionsRoot > Slider {
     margin-bottom: 16px;
     height: auto;
 }

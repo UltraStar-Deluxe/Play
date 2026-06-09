@@ -58,6 +58,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [InjectedInInspector]
     public StyleSheet songEditorSmallScreenStyleSheet;
+    
+    [InjectedInInspector]
+    public StyleSheet songEditorStyleSheet;
 
     [Inject]
     private Injector injector;
@@ -67,6 +70,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [Inject]
     private UiManager uiManager;
+
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private Settings settings;
@@ -82,6 +88,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [Inject(UxmlName = R.UxmlNames.rightSideBar)]
     private VisualElement rightSideBar;
+    
+    [Inject(UxmlName = R.UxmlNames.aiToolbarRoot)]
+    private VisualElement aiToolbarRoot;
 
     [Inject]
     private ApplicationManager applicationManager;
@@ -89,6 +98,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [Inject]
     private CursorManager cursorManager;
 
+    [Inject]
+    private SpeechRecognitionManager speechRecognitionManager;
+    
     [Inject]
     private AchievementEventStream achievementEventStream;
 
@@ -111,10 +123,14 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new();
     private readonly SongEditorStatusBarControl statusBarControl = new();
     private readonly SongEditorBackgroundAudioWaveFormControl songEditorBackgroundAudioWaveFormControl = new();
+    private readonly SongEditorPitchDetectionControl songEditorPitchDetectionControl = new();
+    private readonly SongEditorDetectedPitchVisualizationControl songEditorDetectedPitchVisualizationControl = new();
     private readonly SongEditorSearchControl songEditorSearchControl = new();
     private readonly ImportLrcDialogControl importLrcDialogControl = new();
     private readonly SongEditorPositionHistoryNavigationControl positionHistoryNavigationControl = new();
     private readonly EditModeLyricsConverter editModeLyricsConverter = new();
+    private readonly SongEditorPlaybackSampleSourceSwitcher songEditorPlaybackSampleSourceSwitcher = new();
+    private readonly SongEditorAiToolbarControl songEditorAiToolbarControl = new();
 
     [Inject]
     private SongEditorSceneData sceneData;
@@ -138,6 +154,12 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(songEditorSearchControl);
         injector.Inject(importLrcDialogControl);
         injector.Inject(positionHistoryNavigationControl);
+        injector.Inject(songEditorPitchDetectionControl);
+        injector.Inject(songEditorDetectedPitchVisualizationControl);
+        injector.Inject(songEditorPlaybackSampleSourceSwitcher);
+        injector
+            .WithRootVisualElement(aiToolbarRoot)
+            .Inject(songEditorAiToolbarControl);
         injector
             .WithRootVisualElement(rightSideBar)
             .CreateAndInject<DragToChangeRightSideBarWidthControl>();
@@ -184,6 +206,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
         InitSteamAchievement();
 
+        nonPersistentSettings.ForcedAlignmentLyrics = sceneData.ForcedAlignmentLyrics;
+
         if (sceneData.CreateSingAlongDataViaAiTools)
         {
             CreateSingAlongDataViaAiTools();
@@ -214,6 +238,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private void InitSongEditorStyleSheet()
     {
         uiDocument.rootVisualElement.AddToClassList(R.UssClasses.songEditorRoot);
+        
+        uiDocument.rootVisualElement.styleSheets.Add(songEditorStyleSheet);
 
         if (ApplicationUtils.IsSmallScreen()
             && songEditorSmallScreenStyleSheet != null)
@@ -437,6 +463,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             }
         }
 
+        CreateTextInputDialog(title, message, UseValueCallback);
+    }
+
+    public TextInputDialogControl CreateTextInputDialog(Translation title, Translation message, Action<string> useValueCallback, string initialValue = "")
+    {
         VisualElement visualElement = valueInputDialogUi.CloneTree();
         visualElement.AddToClassList("overlay");
         uiDocument.rootVisualElement.Add(visualElement);
@@ -446,13 +477,16 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             .CreateAndInject<TextInputDialogControl>();
         dialogControl.Title = title;
         dialogControl.Message = message;
+        dialogControl.InitialValue = initialValue;
 
         dialogControl.SubmitValueEventStream
-            .Subscribe(newValue => UseValueCallback(newValue));
+            .Subscribe(newValue => useValueCallback(newValue));
 
         openDialogControls.Add(dialogControl);
         dialogControl.DialogClosedEventStream
             .Subscribe(_ => openDialogControls.Remove(dialogControl));
+
+        return dialogControl;
     }
 
     public void CloseAllOpenDialogs()
@@ -492,6 +526,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(issueAnalyzerControl);
         bb.BindExistingInstance(statusBarControl);
         bb.BindExistingInstance(editModeLyricsConverter);
+        bb.BindExistingInstance(songEditorPitchDetectionControl);
         bb.BindExistingInstance(this);
         bb.Bind(nameof(issueSideBarEntryUi)).ToExistingInstance(issueSideBarEntryUi);
         bb.Bind(nameof(songPropertySideBarEntryUi)).ToExistingInstance(songPropertySideBarEntryUi);

@@ -16,9 +16,6 @@ public class MobileBuildUtils
 
     private static readonly List<string> ignoredFoldersOfMobileBuild = new()
     {
-        "Assets/StreamingAssets/SpleeterMsvcExe",
-        "Assets/StreamingAssets/BasicPitchExe",
-        "Assets/StreamingAssets/SpeechRecognitionModels",
     };
 
     public static bool IsMobileBuild(BuildTarget optionsBuildTarget)

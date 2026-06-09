@@ -171,23 +171,6 @@ public static class ApplicationUtils
         "wav",
     }.ToHashSet();
 
-    public static readonly IReadOnlyCollection<string> supportedVocalsSeparationAudioFiles = new HashSet<string>
-    {
-        "wav",
-        "mp3",
-        "ogg",
-        "m4a",
-        "wma",
-        "flac",
-    }.ToHashSet();
-
-    public static readonly IReadOnlyCollection<string> supportedBasicPitchDetectionAudioFiles = new HashSet<string>
-    {
-        "wav",
-        "mp3",
-        "ogg",
-    }.ToHashSet();
-
     public static readonly IReadOnlyCollection<string> unitySupportedVideoFiles = new HashSet<string>
     {
         // See https://docs.unity3d.com/Manual/VideoSources-FileCompatibility.html#CompatibilityWithTargetPlatforms
@@ -215,6 +198,10 @@ public static class ApplicationUtils
         .Distinct()
         .OrderBy(format => format)
         .ToList();
+
+    public static readonly IReadOnlyCollection<string> supportedVocalsSeparationAudioFiles = allSupportedAudioFiles
+        .Union(allSupportedVideoFiles)
+        .ToHashSet(); 
 
     public static void OpenDirectory(string path)
     {
@@ -320,12 +307,6 @@ public static class ApplicationUtils
     {
         fileExtension = NormalizeFileExtension(fileExtension);
         return supportedVocalsSeparationAudioFiles.Contains(fileExtension);
-    }
-
-    public static bool IsSupportedBasicPitchDetectionAudioFormat(string fileExtension)
-    {
-        fileExtension = NormalizeFileExtension(fileExtension);
-        return supportedBasicPitchDetectionAudioFiles.Contains(fileExtension);
     }
 
     private static string NormalizeFileExtension(string fileExtension)

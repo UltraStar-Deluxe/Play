@@ -30,6 +30,9 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
     [Inject]
     private GameObject gameObject;
 
+    [Inject]
+    private AudioSampleLoader audioSampleLoader;
+
     private int lastNoteAreaMin;
     private int lastNoteAreaWidth;
     private bool isViewportDirty = true;
@@ -118,7 +121,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
             audioWaveFormVisualization.AudioWaveFormCalculator = new PrecalculatingAudioWaveFormCalculator();
         }
 
-        AudioClip audioClip = await SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
+        AudioClip audioClip = await SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings, audioSampleLoader);
         if (audioClip == null)
         {
             return;

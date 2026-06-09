@@ -13,28 +13,29 @@ public class PropertiesFileAssetPostprocessor : AssetPostprocessor
         string[] movedAssets,
         string[] movedFromAssetPaths)
     {
-        string currentLanguagePropertiesFileNameSuffix = PropertiesFileParser.GetLanguageAndRegionSuffix(TranslationConfig.Singleton.CurrentCultureInfo);
-        string currentPropertiesFileName = $"messages{currentLanguagePropertiesFileNameSuffix}";
-        bool propertiesFileChanged = false;
-
         string[][] pathArrays = { importedAssets, deletedAssets, movedAssets };
+        if (IsDefaultPropertiesFileChanged(pathArrays)
+            && DontDestroyOnLoadManager.Instance != null
+            && TranslationManager.Instance.generateConstantsOnResourceChange)
+        {
+            Debug.Log("Generating translation constants because default properties file changed");
+            GenerateTranslationConstantsMenuItems.GenerateTranslationConstants();
+        }
+    }
+
+    private static bool IsDefaultPropertiesFileChanged(string[][] pathArrays)
+    {
         foreach (string[] pathArray in pathArrays)
         {
             foreach (string path in pathArray)
             {
-                if (path.EndsWith(currentPropertiesFileName))
+                if (path.EndsWith("messages.properties"))
                 {
-                    propertiesFileChanged = true;
-                    Debug.Log("Reloading translations because of changed file: " + path);
-                    break;
+                    return true;
                 }
             }
         }
 
-        if (DontDestroyOnLoadManager.Instance != null
-            && TranslationManager.Instance.generateConstantsOnResourceChange)
-        {
-            GenerateTranslationConstantsMenuItems.GenerateTranslationConstants();
-        }
+        return false;
     }
 }

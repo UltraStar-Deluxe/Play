@@ -8,6 +8,7 @@ public class Settings : ISettings
     // Graphics settings
     public ScreenResolution ScreenResolution { get; set; } = new ScreenResolution(1280, 720, 60);
     public EFullScreenMode FullScreenMode { get; set; } = EFullScreenMode.Windowed;
+    public double ReferenceResolutionScaleFactor { get; set; } = 1;
     public int TargetFps { get; set; } = -1;
 
     // Audio settings
@@ -23,6 +24,8 @@ public class Settings : ISettings
     public bool PlayRecordedAudio { get; set; }
     public string SoundfontPath { get; set; } = "";
     public float PreviewFadeInDurationInSeconds { get; set; } = 2;
+    public EReplayGainMode ReplayGainMode { get; set; } = EReplayGainMode.Off;
+    public EDspBufferSize DspBufferSize { get; set; } = EDspBufferSize.Default;
 
     /**
      * Delay of the system audio backend until the samples are audible on the speaker.
@@ -173,8 +176,10 @@ public class Settings : ISettings
 
     // Media APIs
     public EApiUsage UnityMediaApiUsage { get; set; } = EApiUsage.Enabled;
-    public EApiUsage AvProApiUsage { get; set; } = EApiUsage.Preferred;
+    // TODO: AVPro is disabled by default due to crashes reported by users
+    public EApiUsage AvProApiUsage { get; set; } = EApiUsage.Disabled;
     public EApiUsage VlcApiUsage { get; set; } = EApiUsage.Preferred;
+    public EApiUsage FfmpegApiUsage { get; set; } = EApiUsage.Enabled;
 
     // Mods
     public List<string> EnabledMods { get; private set; } = new();

@@ -24,11 +24,14 @@
         "playsharedui",
         "UnityStandaloneFileBrowser",
         "Vuplex.WebView",
-        "com.whisper.unity",
         "VLCUnity",
         "OneJS.Common",
         "OneJS.CustomStyleSheets.6.3",
-        "AVProVideo.Runtime"
+        "AVProVideo.Runtime",
+        "Eitan.SherpaONNXUnity",
+        "FfmpegAudioSamplesLoader",
+        "VorbisPluginImpl",
+        "GeneratedConstants"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -46,7 +49,9 @@
         "Serilog.dll",
         "Serilog.Sinks.File.dll",
         "System.Text.Encoding.CodePages.dll",
-        "Utf8Json.dll"
+        "Utf8Json.dll",
+        "Microsoft.ML.OnnxRuntime.dll",
+        "NWaves.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
