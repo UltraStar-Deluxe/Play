@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+// TODO: Rename to UltraStarSongWriter, for symmetry with UltraStarSongParser
 public static class UltraStarFormatWriter
 {
     public static void WriteFile(string absolutePath, SongMeta songMeta, UltraStarSongFormatVersion version, bool writeByteOrderMark = true)
@@ -163,19 +164,27 @@ public static class UltraStarFormatWriter
         AppendNumberHeaderField(sb, "previewstart", version.IsBefore(UltraStarSongFormatVersion.v200) ? songMeta.TxtFilePreviewStartInSeconds : songMeta.PreviewStartInMillis);
         AppendNumberHeaderField(sb, "previewend", version.IsBefore(UltraStarSongFormatVersion.v200) ? songMeta.TxtFilePreviewEndInSeconds : songMeta.PreviewEndInMillis);
 
-        if (version.IsBefore(UltraStarSongFormatVersion.v200))
+        if (HasMedleyStartOrEnd(songMeta))
         {
-            AppendNumberHeaderField(sb, "medleystartbeat", songMeta.TxtFileMedleyStartBeat);
-            AppendNumberHeaderField(sb, "medleyendbeat", songMeta.TxtFileMedleyEndBeat);
-        }
-        else
-        {
-            AppendNumberHeaderField(sb, "medleystart", songMeta.MedleyStartInMillis);
-            AppendNumberHeaderField(sb, "medleyend", songMeta.MedleyEndInMillis);
+            if (version.IsBefore(UltraStarSongFormatVersion.v200))
+            {
+                AppendNumberHeaderField(sb, "medleystartbeat", songMeta.TxtFileMedleyStartBeat);
+                AppendNumberHeaderField(sb, "medleyendbeat", songMeta.TxtFileMedleyEndBeat);
+            }
+            else
+            {
+                AppendNumberHeaderField(sb, "medleystart", songMeta.MedleyStartInMillis);
+                AppendNumberHeaderField(sb, "medleyend", songMeta.MedleyEndInMillis);
+            }
         }
 
         songMeta.AdditionalHeaderEntries.ForEach(entry =>
             AppendHeaderField(sb, entry.Key, entry.Value));
+    }
+
+    private static bool HasMedleyStartOrEnd(UltraStarSongMeta songMeta)
+    {
+        return songMeta.MedleyStartInMillis != 0 || songMeta.MedleyEndInMillis != 0;
     }
 
     private static void AppendHeaderField(StringBuilder sb, string key, string value)

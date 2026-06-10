@@ -4,7 +4,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 public class UltraStarSongFormatTest
 {
@@ -26,6 +25,18 @@ public class UltraStarSongFormatTest
         SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/WithPhraseEndBeat.txt").SongMeta;
         string txt = UltraStarFormatWriter.ToUltraStarSongFormat(songMeta);
         Assert.IsTrue(Regex.IsMatch(txt, @"- \d"));
+    }
+
+    [Test]
+    public void ShouldNotWriteMedleyStartAndEndWhenNotSet()
+    {
+        // Given: GAP is non-zero, but medley start and end are zero.
+        SongMeta songMeta = UltraStarSongParser.ParseFile($"{folderPath}/Gap.txt").SongMeta;
+        
+        // In some txt format versions, TxtFileMedleyStartBeat differs from MedleyStartInMillis.
+        // This means one of the fields would be non-zerp. Nonetheless it should not be written to file when it has not been set explicitly.
+        string ultraStarSongFormat = UltraStarFormatWriter.ToUltraStarSongFormat(songMeta);
+        Assert.IsFalse(ultraStarSongFormat.Contains("medley", StringComparison.InvariantCultureIgnoreCase));
     }
 
     [Test]
