@@ -927,6 +927,7 @@ public static partial class R
         public const string supportTheProjectButton = "supportTheProjectButton";
         public const string supportTheProjectIcon = "supportTheProjectIcon";
         public const string syllableSeparatorTextField = "syllableSeparatorTextField";
+        public const string synchronizeViewportWithPlaybackPositionToggle = "synchronizeViewportWithPlaybackPositionToggle";
         public const string syncLyricsAreaToggle = "syncLyricsAreaToggle";
         public const string systemAudioBackendDelayChooser = "systemAudioBackendDelayChooser";
         public const string tabGroup = "tabGroup";

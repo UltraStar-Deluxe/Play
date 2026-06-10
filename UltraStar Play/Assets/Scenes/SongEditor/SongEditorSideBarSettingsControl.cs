@@ -186,6 +186,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.referenceResolutionScaleFactorChooser)]
     private Slider referenceResolutionScaleFactorChooser;
 
+    [Inject(UxmlName = R.UxmlNames.synchronizeViewportWithPlaybackPositionToggle)]
+    private Toggle synchronizeViewportWithPlaybackPositionToggle;
+
     [Inject]
     private SongMeta songMeta;
 
@@ -266,6 +269,10 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.AutoSave = newValue);
 
         // Music settings
+        Bind(synchronizeViewportWithPlaybackPositionToggle,
+            () => settings.SongEditorSettings.SynchronizeViewportWithPlaybackPosition,
+            newValue => settings.SongEditorSettings.SynchronizeViewportWithPlaybackPosition = newValue);
+        
         Bind(goToLastPlaybackPositionToggle,
             () => settings.SongEditorSettings.GoToLastPlaybackPosition,
             newValue => settings.SongEditorSettings.GoToLastPlaybackPosition = newValue);

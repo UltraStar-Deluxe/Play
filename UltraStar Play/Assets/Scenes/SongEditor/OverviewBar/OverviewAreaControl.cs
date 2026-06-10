@@ -40,6 +40,9 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private AudioSampleLoader audioSampleLoader;
+    
+    [Inject]
+    private NoteAreaControl noteAreaControl;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
     private ContextMenuControl contextMenuControl;
@@ -151,5 +154,6 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
         double xPercent = evt.localPosition.x / overviewArea.contentRect.width;
         double positionInMillis = songAudioPlayer.DurationInMillis * xPercent;
         songAudioPlayer.PositionInMillis = positionInMillis;
+        noteAreaControl.MoveViewportToPositionInMillis(positionInMillis);
     }
 }

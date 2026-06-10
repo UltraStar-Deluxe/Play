@@ -12,6 +12,7 @@
             <ui:Toggle name="splitSyllablesAfterAiToolsToggle" label="$songEditor_options_aiTools_splitSyllablesAfterwards"/>
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="musicGroup" label="$songEditor_options_playback_title">
+            <ui:Toggle name="synchronizeViewportWithPlaybackPositionToggle" label="$songEditor_options_synchronizeViewportWithPlaybackPosition"/>
             <ui:Toggle name="goToLastPlaybackPositionToggle" label="$songEditor_options_goToLastPlaybackPosition"/>
             <ui:Slider picking-mode="Ignore" value="42" high-value="100" name="musicVolumeSlider" label="$songEditor_options_volume" style="flex-direction: column;"/>
             <ui:Slider picking-mode="Ignore" value="42" high-value="1.5" name="musicPlaybackSpeedSlider" low-value="0.5" label="$songEditor_options_playbackSpeed" style="flex-direction: column;"/>

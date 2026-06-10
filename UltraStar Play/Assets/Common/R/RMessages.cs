@@ -660,6 +660,7 @@ public static partial class R
         public static readonly string songEditor_options_speechRecognition_prompt = "songEditor_options_speechRecognition_prompt";
         public static readonly string songEditor_options_speechRecognition_title = "songEditor_options_speechRecognition_title";
         public static readonly string songEditor_options_speechRecognitionWhenRecording = "songEditor_options_speechRecognitionWhenRecording";
+        public static readonly string songEditor_options_synchronizeViewportWithPlaybackPosition = "songEditor_options_synchronizeViewportWithPlaybackPosition";
         public static readonly string songEditor_options_syncLyricsArea = "songEditor_options_syncLyricsArea";
         public static readonly string songEditor_options_title = "songEditor_options_title";
         public static readonly string songEditor_options_volume = "songEditor_options_volume";

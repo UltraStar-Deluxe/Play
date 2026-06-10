@@ -82,6 +82,9 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private UIDocument uiDocument;
+    
+    [Inject]
+    private Settings settings;
 
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
@@ -225,17 +228,17 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     private void SetPositionInMillis(double positionInMillis)
     {
-        if (Mouse.current == null
-            || !Mouse.current.middleButton.isPressed)
-        {
+        if (settings.SongEditorSettings.SynchronizeViewportWithPlaybackPosition
             // Synchronize viewport with playback position, but only if not dragging the viewport manually.
+            && (Mouse.current == null || !Mouse.current.middleButton.isPressed))
+        {
             MoveViewportToPositionInMillis(positionInMillis);
         }
 
         UpdatePositionIndicator(positionInMillis);
     }
 
-    private void MoveViewportToPositionInMillis(double positionInMillis)
+    public void MoveViewportToPositionInMillis(double positionInMillis)
     {
         float viewportAutomaticScrollingLeft = ViewportX + ViewportWidth * ViewportAutomaticScrollingBoarderPercent;
         float viewportAutomaticScrollingRight = ViewportX + ViewportWidth * (1 - ViewportAutomaticScrollingBoarderPercent);
