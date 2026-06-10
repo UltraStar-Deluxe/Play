@@ -159,7 +159,7 @@ public class CreateSingAlongSongControl : INeedInjection
 
     private Job<VoidEvent> ForcedAlignmentJob(SongMeta songMeta, PipelineData pipelineData)
     {
-        Job<VoidEvent> forcedAlignmentJob = new(Translation.Of("Forced alignment"));
+        Job<VoidEvent> forcedAlignmentJob = new(Translation.Get(R.Messages.job_forcedAlignment));
         forcedAlignmentJob.SetAwaitable(async () =>
         {
             // Load vocals audio
