@@ -387,7 +387,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         }
 
         inputLegendContainer.Clear();
-        inputActionInfos.ForEach(inputActionInfo =>
+        inputActionInfos
+            .OrderBy(it => it.ActionText)
+            .ForEach(inputActionInfo =>
             inputLegendContainer.Add(CreateInputActionInfoUi(inputActionInfo)));
     }
 
