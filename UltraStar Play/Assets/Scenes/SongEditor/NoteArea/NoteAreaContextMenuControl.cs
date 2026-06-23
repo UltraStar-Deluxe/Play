@@ -107,6 +107,10 @@ public class NoteAreaContextMenuControl : ContextMenuControl
             contextMenu.AddSeparator();
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setGap), () => setMusicGapAction.ExecuteAndNotify(positionInMillis));
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setGapKeepNotePosition), () => setMusicGapAction.ExecuteAndNotify(positionInMillis, true));
+            contextMenu.AddSeparator();
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setStart), () => setSongPropertyAction.SetStartAndNotify(positionInMillis));
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setEnd), () => setSongPropertyAction.SetEndAndNotify(positionInMillis));
+            contextMenu.AddSeparator();
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyStart), () => setSongPropertyAction.SetMedleyStartAndNotify(positionInMillis));
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyEnd), () => setSongPropertyAction.SetMedleyEndAndNotify(positionInMillis));
         }

@@ -546,6 +546,7 @@ public static partial class R
         public static readonly string songEditor_action_moveToDetectedPitch = "songEditor_action_moveToDetectedPitch";
         public static readonly string songEditor_action_pasteNotes = "songEditor_action_pasteNotes";
         public static readonly string songEditor_action_resetVideoGap = "songEditor_action_resetVideoGap";
+        public static readonly string songEditor_action_setEnd = "songEditor_action_setEnd";
         public static readonly string songEditor_action_setGap = "songEditor_action_setGap";
         public static readonly string songEditor_action_setGapKeepNotePosition = "songEditor_action_setGapKeepNotePosition";
         public static readonly string songEditor_action_setMedleyEnd = "songEditor_action_setMedleyEnd";
@@ -555,6 +556,7 @@ public static partial class R
         public static readonly string songEditor_action_setNoteTypeNormal = "songEditor_action_setNoteTypeNormal";
         public static readonly string songEditor_action_setNoteTypeRap = "songEditor_action_setNoteTypeRap";
         public static readonly string songEditor_action_setNoteTypeRapGolden = "songEditor_action_setNoteTypeRapGolden";
+        public static readonly string songEditor_action_setStart = "songEditor_action_setStart";
         public static readonly string songEditor_action_showInstrumentalAudio = "songEditor_action_showInstrumentalAudio";
         public static readonly string songEditor_action_showOriginalAudio = "songEditor_action_showOriginalAudio";
         public static readonly string songEditor_action_showPlaybackAudio = "songEditor_action_showPlaybackAudio";
