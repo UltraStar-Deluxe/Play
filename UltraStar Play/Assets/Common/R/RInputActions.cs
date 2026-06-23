@@ -3,6 +3,7 @@ public static partial class R
 {
     public static class InputActions
     {
+        public static readonly string songEditor_addNote = "songEditor/addNote";
         public static readonly string songEditor_anyKeyboardKey = "songEditor/anyKeyboardKey";
         public static readonly string songEditor_assignToOwnSentence = "songEditor/assignToOwnSentence";
         public static readonly string songEditor_copy = "songEditor/copy";
@@ -24,6 +25,7 @@ public static partial class R
         public static readonly string songEditor_selectAll = "songEditor/selectAll";
         public static readonly string songEditor_selectNextNote = "songEditor/selectNextNote";
         public static readonly string songEditor_selectPreviousNote = "songEditor/selectPreviousNote";
+        public static readonly string songEditor_splitNotes = "songEditor/splitNotes";
         public static readonly string songEditor_toggleNoteTypeFreestyle = "songEditor/toggleNoteTypeFreestyle";
         public static readonly string songEditor_toggleNoteTypeGolden = "songEditor/toggleNoteTypeGolden";
         public static readonly string songEditor_toggleNoteTypeNormal = "songEditor/toggleNoteTypeNormal";

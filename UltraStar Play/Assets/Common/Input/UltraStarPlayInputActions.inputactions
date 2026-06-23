@@ -1848,10 +1848,28 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "splitNotes",
+                    "type": "Button",
+                    "id": "797ca378-4df8-497d-b1d6-a111e9d0683f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "addNote",
+                    "type": "Button",
+                    "id": "aee2140f-5106-4650-9d60-2d9b1292131a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "assignToOwnSentence",
                     "type": "Button",
                     "id": "5c364de4-a0da-40db-8abd-407a1e61e3e8",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -2623,6 +2641,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "mergeNotes",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e4725930-00ce-485d-9448-a3b8b43536da",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "splitNotes",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "915c641b-8a04-47bb-9555-d6acf648de02",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "addNote",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

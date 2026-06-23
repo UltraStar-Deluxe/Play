@@ -56,6 +56,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private SongMeta songMeta;
 
     [Inject]
+    private AddNoteAction addNoteAction;
+
+    [Inject]
     private DeleteNotesAction deleteNotesAction;
 
     [Inject]
@@ -76,6 +79,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private MergeNotesAction mergeNotesAction;
 
+    [Inject]
+    private SplitNotesAction splitNotesAction;
+    
     [Inject]
     private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
 
@@ -173,16 +179,27 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_assignToOwnSentence).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => AssignSelectedNotesToOwnSentence());        // Assign to own sentence
+
+        // Add note at pointer position
+        InputManager.GetInputAction(R.InputActions.songEditor_addNote).PerformedAsObservable()
+            .Where(_ => !AnyInputFieldHasFocus())
+            .Subscribe(_ => AddNoteAtPointer());
         
+        // Merge notes
         InputManager.GetInputAction(R.InputActions.songEditor_mergeNotes).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => MergeSelectedNotes());
+
+         // Split notes
+        InputManager.GetInputAction(R.InputActions.songEditor_splitNotes).PerformedAsObservable()
+            .Where(_ => !AnyInputFieldHasFocus())
+            .Subscribe(_ => SplitSelectedNotes());
         
+        // AI tools
         InputManager.GetInputAction(R.InputActions.songEditor_forcedAlignment).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => OpenForcedAlignmentDialog());
 
-        // AI tools
         InputManager.GetInputAction(R.InputActions.songEditor_pitchDetection).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => MoveSelectedNotesToDetectedPitch());
@@ -257,6 +274,17 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(context => noteAreaControl.ZoomVertical(-1));
     }
 
+    private void AddNoteAtPointer()
+    {
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        int beat = (int)Math.Round(noteAreaControl.GetHorizontalMousePositionInBeats());
+        int midiNote = noteAreaControl.GetVerticalMousePositionInMidiNote();
+        double lengthInBeats = selectedNotes.IsNullOrEmpty()
+            ? SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, 300)
+            : selectedNotes.FirstOrDefault()?.Length ?? 1;
+        addNoteAction.ExecuteAndNotify(songMeta, beat, midiNote, (int)Math.Round(lengthInBeats));
+    }
+
     private void OpenForcedAlignmentDialog()
     {
         NoteAreaRect lastSelectionRect = noteAreaControl.LastSelectionRect.Value;
@@ -317,6 +345,16 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes);
     }
     
+    private void SplitSelectedNotes()
+    {
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+        splitNotesAction.ExecuteAndNotify(selectedNotes);
+    }
+
     private void MergeSelectedNotes()
     {
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();

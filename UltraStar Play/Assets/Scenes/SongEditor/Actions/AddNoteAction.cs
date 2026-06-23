@@ -10,13 +10,13 @@ public class AddNoteAction : INeedInjection
     [Inject]
     private SongMetaChangedEventStream songMetaChangedEventStream;
 
-    public void Execute(SongMeta songMeta, int beat, int midiNote)
+    public void Execute(SongMeta songMeta, int beat, int midiNote, int lengthInBeats = 4)
     {
         List<Sentence> sentencesAtBeat = SongMetaUtils.GetSentencesAtBeat(songMeta, beat);
         if (sentencesAtBeat.Count == 0)
         {
             // Add sentence with note
-            Note newNote = new(ENoteType.Normal, beat - 2, 4, 0, "~");
+            Note newNote = new(ENoteType.Normal, beat, lengthInBeats, 0, "~");
             newNote.SetMidiNote(midiNote);
             Sentence newSentence = new(new List<Note> { newNote }, newNote.EndBeat);
             IReadOnlyCollection<Voice> voices = songMeta.Voices;
@@ -25,15 +25,15 @@ public class AddNoteAction : INeedInjection
         else
         {
             // Add note to existing sentence
-            Note newNote = new(ENoteType.Normal, beat - 2, 4, 0, "~");
+            Note newNote = new(ENoteType.Normal, beat, lengthInBeats, 0, "~");
             newNote.SetMidiNote(midiNote);
             newNote.SetSentence(sentencesAtBeat[0]);
         }
     }
 
-    public void ExecuteAndNotify(SongMeta songMeta, int beat, int midiNote)
+    public void ExecuteAndNotify(SongMeta songMeta, int beat, int midiNote, int lengthInBeats = 4)
     {
-        Execute(songMeta, beat, midiNote);
+        Execute(songMeta, beat, midiNote, lengthInBeats);
         songMetaChangedEventStream.OnNext(new NotesAddedEvent());
     }
 
