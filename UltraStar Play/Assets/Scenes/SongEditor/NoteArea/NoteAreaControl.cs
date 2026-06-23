@@ -105,6 +105,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     private SongEditorMicPitchIndicatorControl micPitchIndicatorControl;
 
     private PanelHelper panelHelper;
+    public PanelHelper PanelHelper => panelHelper;
 
     private readonly Subject<ViewportEvent> viewportEventStream = new();
     public IObservable<ViewportEvent> ViewportEventStream => viewportEventStream;

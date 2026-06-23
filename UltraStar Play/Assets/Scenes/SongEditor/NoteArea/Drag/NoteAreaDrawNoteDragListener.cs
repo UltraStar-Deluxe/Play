@@ -14,9 +14,6 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
     private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
-    private SongEditorSelectionControl selectionControl;
-
-    [Inject]
     private NoteAreaControl noteAreaControl;
 
     [Inject]
@@ -61,9 +58,11 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
 
     private void UpdateCursor()
     {
+        Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(noteAreaControl.PanelHelper, true);
         if (noteAreaControl.IsPointerOver()
             && InputUtils.IsKeyboardShiftPressed()
-            && selectionControl.IsSelectionEmpty)
+            && !editorNoteDisplayer.AnyNoteControlContainsPosition(pointerPosition)
+            && !editorNoteDisplayer.AnySentenceControlContainsPosition(pointerPosition))
         {
             cursorManager.SetCursorPencil();
         }
@@ -99,8 +98,7 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
         }
 
         // Check whether this is a drag gesture to extend the selection, not to draw notes
-        if (!(selectionControl.IsSelectionEmpty
-            && InputUtils.IsKeyboardShiftPressed()))
+        if (!InputUtils.IsKeyboardShiftPressed())
         {
             CancelDrag();
             return;
