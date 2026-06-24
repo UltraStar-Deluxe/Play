@@ -82,6 +82,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         "Plugins",
 
         // Project Libraries
+        "GeneratedConstants",
         "Common",
         "Scenes",
     };
