@@ -9,7 +9,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedListener
+public class CreateSingAlongSongControl : INeedInjection
 {
     [Inject]
     private AudioSeparationManager audioSeparationManager;
@@ -25,24 +25,26 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NoteHyphenator noteHyphenator;
 
     [Inject]
     private PitchDetectionManager pitchDetectionManager;
 
     [Inject]
+    private ForcedAlignmentManager forcedAlignmentManager;
+
+    [Inject]
     private SpeechRecognitionNoteCreator speechRecognitionNoteCreator;
+
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     private IJob lastProcessSongJob;
 
     private readonly Subject<SongMeta> createdSingAlongVersionEventStream = new();
     public IObservable<SongMeta> CreatedSingAlongVersionEventStream => createdSingAlongVersionEventStream;
-
-    private PitchDetectionNoteCreator pitchDetectionNoteCreator;
-
-    public void OnInjectionFinished()
-    {
-        pitchDetectionNoteCreator = new PitchDetectionNoteCreator(pitchDetectionManager);
-    }
 
     public async void CreateSingAlongSong(SongMeta songMeta, bool saveSongFile)
     {
@@ -89,8 +91,15 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         // Run vocals isolation
         parentJob.AddChildJob(AudioSeparationJob(songMeta, saveSongFile));
 
-        // Run speech recognition
-        parentJob.AddChildJob(SpeechRecognitionJob(songMeta, pipelineData));
+        // Run speech recognition or forced alignment
+        if (!nonPersistentSettings.ForcedAlignmentLyrics.IsNullOrEmpty())
+        {
+            parentJob.AddChildJob(ForcedAlignmentJob(songMeta, pipelineData));
+        }
+        else
+        {
+            parentJob.AddChildJob(SpeechRecognitionJob(songMeta, pipelineData));
+        }
 
         // Run pitch detection
         Job<VoidEvent> pitchDetectionJob = PitchDetectionJob(songMeta, pipelineData);
@@ -104,10 +113,10 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         Job<VoidEvent> pitchDetectionJob = new(Translation.Of("Pitch detection"));
         pitchDetectionJob.SetAwaitable(async () =>
         {
-            List<Note> loadedPitchDetectionNotes = await pitchDetectionNoteCreator.CreateNotesUsingBasicPitchAsync(songMeta);
+            PitchDetectionResult pitchDetectionResult = await pitchDetectionManager.ProcessSongMetaJob(songMeta).GetResultAsync();
 
             // Move notes of first player to detected pitch
-            MoveNotesToDetectedPitch(songMeta, pipelineData.CreatedNotes, loadedPitchDetectionNotes);
+            MoveNotesToDetectedPitch(songMeta, pipelineData.CreatedNotes, pitchDetectionResult);
 
             return VoidEvent.instance;
         });
@@ -119,12 +128,6 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         Job<VoidEvent> speechRecognitionJob = new(Translation.Of("Speech recognition"));
         speechRecognitionJob.SetAwaitable(async () =>
         {
-            // Load speech recognition model
-            SpeechRecognizerConfig speechRecognizerConfig = new(
-                SettingsUtils.GetSpeechRecognitionModelPath(settings),
-                SettingsUtils.GetSpeechRecognitionLanguage(settings),
-                settings.SongEditorSettings.SpeechRecognitionPrompt);
-
             // Load vocals audio
             AudioClip vocalsAudioClip = await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
             int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * SongMetaBpmUtils.BeatsPerSecond(songMeta));
@@ -134,7 +137,6 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             pipelineData.CreatedNotes = await speechRecognitionNoteCreator.CreateNotesFromSpeechRecognitionJob(
                 new CreateNotesFromSpeechRecognitionConfig
                 {
-                    SpeechRecognizerConfig = speechRecognizerConfig,
                     InputSamples = new SpeechRecognitionInputSamples(monoAudioSamples, 0, monoAudioSamples.Length - 1, vocalsAudioClip.frequency),
                     MidiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                     SongMeta = songMeta,
@@ -155,6 +157,47 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         return speechRecognitionJob;
     }
 
+    private Job<VoidEvent> ForcedAlignmentJob(SongMeta songMeta, PipelineData pipelineData)
+    {
+        Job<VoidEvent> forcedAlignmentJob = new(Translation.Get(R.Messages.job_forcedAlignment));
+        forcedAlignmentJob.SetAwaitable(async () =>
+        {
+            // Load vocals audio
+            AudioClip vocalsAudioClip = await AudioManager.LoadAudioClipFromUriAsync(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
+            int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * SongMetaBpmUtils.BeatsPerSecond(songMeta));
+
+            float[] monoAudioSamples = SongMetaAudioSampleUtils.GetMonoSamples(songMeta, vocalsAudioClip, 0, lengthInBeats);
+
+            ForcedAlignmentInput forcedAlignmentInput = new ForcedAlignmentInput(
+                nonPersistentSettings.ForcedAlignmentLyrics,
+                monoAudioSamples,
+                0,
+                monoAudioSamples.Length - 1,
+                vocalsAudioClip.frequency);
+
+            ForcedAlignmentResult forcedAlignmentResult = await forcedAlignmentManager.ProcessSongMetaJob(
+                    songMeta,
+                    forcedAlignmentInput)
+                .GetResultAsync();
+
+            if (forcedAlignmentResult == null || forcedAlignmentResult.Words.IsNullOrEmpty())
+            {
+                return VoidEvent.instance;
+            }
+
+            pipelineData.CreatedNotes = ForcedAlignmentUtils.CreateNotesFromForcedAlignmentResult(forcedAlignmentResult, songMeta, settings, noteHyphenator);
+
+            // Split created notes into sentences and assign to first player
+            AssignNotesToFirstPlayer(songMeta, pipelineData.CreatedNotes);
+
+            // Add Space between notes
+            SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(pipelineData.CreatedNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
+
+            return VoidEvent.instance;
+        });
+        return forcedAlignmentJob;
+    }
+
     private Job<VoidEvent> AudioSeparationJob(SongMeta songMeta, bool saveSongFile)
     {
         Job<VoidEvent> audioSeparationJob = new(Translation.Of("Audio separation"));
@@ -166,14 +209,14 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         return audioSeparationJob;
     }
 
-    private static void MoveNotesToDetectedPitch(SongMeta songMeta, List<Note> createdNotes, List<Note> loadedPitchDetectionNotes)
+    private static void MoveNotesToDetectedPitch(SongMeta songMeta, List<Note> createdNotes, PitchDetectionResult pitchDetectionResult)
     {
         try
         {
-            PitchDetectionNoteMover.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
+            PitchDetectionNoteMover.MoveNotesToDetectedPitch(
                 songMeta,
                 createdNotes,
-                loadedPitchDetectionNotes);
+                pitchDetectionResult);
         }
         catch (Exception ex)
         {

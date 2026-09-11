@@ -2,7 +2,9 @@
 using CommonOnlineMultiplayer;
 using PrimeInputActions;
 using SimpleHttpServerForUnity;
+using SteamOnlineMultiplayer;
 using UniInject;
+using UniInject.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -28,6 +30,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(ImageManager.Instance);
         bb.BindExistingInstance(FolderPreviewImageManager.Instance);
         bb.BindExistingInstance(AudioManager.Instance);
+        bb.BindExistingInstance(AudioSampleLoader.Instance);
         bb.BindExistingInstance(SfxManager.Instance);
         bb.BindExistingInstance(TranslationManager.Instance);
         bb.BindExistingInstance(ContextMenuPopupManager.Instance);
@@ -40,10 +43,13 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(BackgroundMusicManager.Instance);
         bb.BindExistingInstance(VfxManager.Instance);
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
+        bb.BindExistingInstance(ReferenceResolutionControl.Instance);
         bb.BindExistingInstance(DefaultFocusableNavigator.Instance);
         bb.BindExistingInstance(MicSampleRecorderManager.Instance);
         bb.BindExistingInstance(AchievementEventStream.Instance);
         bb.BindExistingInstance(ModManager.Instance);
+        bb.BindExistingInstance(SongMediaUriResolverManager.Instance);
+        bb.BindExistingInstance(SongCoverImageManager.Instance);
         bb.BindExistingInstance(RuntimeUiInspectionManager.Instance);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(DefaultFocusableNavigator.Instance);
 
@@ -60,11 +66,10 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(NetworkManager.Singleton);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
-        bb.BindExistingInstance(SpeechRecognizerProvider.Instance);
-        bb.BindExistingInstance(WhisperSpeechRecognizerProvider.Instance);
         bb.BindExistingInstance(SpeechRecognitionNoteCreator.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);
         bb.BindExistingInstance(PitchDetectionManager.Instance);
+        bb.BindExistingInstance(ForcedAlignmentManager.Instance);
         bb.BindExistingInstance(SongQueueManager.Instance);
         bb.BindExistingInstance(JobManager.Instance);   bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.BindExistingInstance(ThemeManager.Instance);
@@ -76,6 +81,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.Bind(typeof(IServerSideCompanionClientManager)).ToExistingInstance(ServerSideCompanionClientManager.Instance);
         bb.BindExistingInstance(ServerSideCompanionClientManager.Instance);
 
+        BindEditLyricsDependencies(bb);
+        
         EventSystem eventSystem = GameObjectUtils.FindComponentWithTag<EventSystem>("EventSystem");
         bb.BindExistingInstance(eventSystem);
 
@@ -91,5 +98,32 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstanceLazy(() => StatisticsManager.Instance.Statistics);
 
         return bb.GetBindings();
+    }
+
+    /**
+     * Dependencies for editing lyrics via special syntax.
+     */
+    // TODO: Ideally, this would only be needed in SongEditor scope. But it is also used in common package to create sing-along data.
+    private void BindEditLyricsDependencies(BindingBuilder bb)
+    {
+        // Prepare injector
+        Injector injector = UniInjectUtils.CreateInjector();
+        injector.AddBindingForInstance(SettingsManager.Instance.Settings);
+        
+        // Create and inject instances
+        EditModeLyricsSplitter editModeLyricsSplitter = new();
+        injector.Inject(editModeLyricsSplitter);
+        bb.BindExistingInstance(editModeLyricsSplitter);
+
+        EditModeLyricsConverter editModeLyricsConverter = new();
+        injector.Inject(editModeLyricsConverter);
+        bb.BindExistingInstance(editModeLyricsConverter);
+        
+        // TODO: This is super ugly because constructing the dependencies here manually contradicts the idea of using dependency injection.
+        injector.AddBindingForInstance(editModeLyricsSplitter);
+        injector.AddBindingForInstance(editModeLyricsConverter);
+        NoteHyphenator noteHyphenator = new();
+        injector.Inject(noteHyphenator);
+        bb.BindExistingInstance(noteHyphenator);
     }
 }

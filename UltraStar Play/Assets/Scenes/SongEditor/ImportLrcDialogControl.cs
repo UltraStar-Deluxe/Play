@@ -121,7 +121,7 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
                 "count", importedNotes.Count));
         }
 
-        songMetaChangedEventStream.OnNext(new ImportedNotesEvent());
+        songMetaChangedEventStream.OnNext(new ImportedNotesEvent(importedNotes));
     }
 
     private void ImportLrcFormat(EVoiceId voiceId)
@@ -151,7 +151,7 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
                 "count", importedNotes.Count));
         }
 
-        songMetaChangedEventStream.OnNext(new ImportedNotesEvent());
+        songMetaChangedEventStream.OnNext(new ImportedNotesEvent(importedNotes));
     }
 
     public void OpenDialog()

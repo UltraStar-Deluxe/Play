@@ -2,41 +2,40 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class AspectRatioPanel : VisualElement
+[UxmlElement]
+public partial class AspectRatioPanel : VisualElement
 {
-    public new class UxmlFactory : UxmlFactory<AspectRatioPanel, UxmlTraits> {}
-    
-    public new class UxmlTraits : VisualElement.UxmlTraits
+	private int aspectRatioX = 16;
+	[UxmlAttribute("aspect-ratio-x")]
+	public int AspectRatioX
 	{
-		readonly UxmlIntAttributeDescription aspectRatioX = new() { name = "aspect-ratio-x", defaultValue = 16, restriction = new UxmlValueBounds { min = "1" } };
-		readonly UxmlIntAttributeDescription aspectRatioY = new() { name = "aspect-ratio-y", defaultValue = 9, restriction = new UxmlValueBounds { min = "1" } };
-		readonly UxmlIntAttributeDescription balanceX = new() { name = "balance-x", defaultValue = 50, restriction = new UxmlValueBounds { min = "0", max = "100" } };
-		readonly UxmlIntAttributeDescription balanceY = new() { name = "balance-y", defaultValue = 50, restriction = new UxmlValueBounds { min = "0", max = "100" } };
-
-		public override IEnumerable<UxmlChildElementDescription> uxmlChildElementsDescription
-		{
-			get { yield break; }
-		}
-
-		public override void Init( VisualElement visualElement, IUxmlAttributes attributes, CreationContext creationContext )
-		{
-			base.Init( visualElement, attributes, creationContext );
-			AspectRatioPanel element = visualElement as AspectRatioPanel;
-			if (element != null)
-			{
-				element.AspectRatioX = Mathf.Max( 1, aspectRatioX.GetValueFromBag( attributes, creationContext ) );
-				element.AspectRatioY = Mathf.Max( 1, aspectRatioY.GetValueFromBag( attributes, creationContext ) );
-				element.BalanceX = Mathf.Clamp( balanceX.GetValueFromBag( attributes, creationContext ), 0, 100 );
-				element.BalanceY = Mathf.Clamp( balanceY.GetValueFromBag( attributes, creationContext ), 0, 100 );
-				element.FitToParent();
-			}
-		}
+		get => aspectRatioX;
+		set => aspectRatioX = Mathf.Max(1, value);
 	}
 
-	public int AspectRatioX { get; private set; } = 16;
-	public int AspectRatioY { get; private set; } = 9;
-	public int BalanceX { get; private set; } = 50;
-	public int BalanceY { get; private set; } = 50;
+	private int aspectRatioY = 9;
+	[UxmlAttribute("aspect-ratio-y")]
+	public int AspectRatioY
+	{
+		get => aspectRatioY;
+		set => aspectRatioY = Mathf.Max(1, value);
+	}
+
+	private int balanceX = 50;
+	[UxmlAttribute("balance-x")]
+	public int BalanceX
+	{
+		get => balanceX;
+		set => balanceX = Mathf.Clamp(value, 0, 100);
+	}
+
+	private int balanceY = 50;
+	[UxmlAttribute("balance-y")]
+	public int BalanceY
+	{
+		get => balanceY;
+		set => balanceY = Mathf.Clamp(value, 0, 100);
+	}
 
 	public AspectRatioPanel()
 	{

@@ -19,6 +19,9 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
 
     [Inject]
     private UIDocument uiDoc;
+    
+    [Inject]
+    private AudioSampleLoader audioSampleLoader;
 
     [Inject(UxmlName = R.UxmlNames.volumeChooser)]
     private Chooser volumeChooser;
@@ -74,8 +77,18 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection
             newValue => settings.BackgroundMusicVolumePercent = (int)newValue);
 
         ReplayGainChooserControl replayGainChooserControl = new(replayGainLoudnessNormalizationChooser);
-        replayGainChooserControl.Bind(() => ReplayGainChooserControl.GetReplayGainEnumValue(settings.VlcOptions),
-            newValue => ReplayGainChooserControl.SetReplayGainEnumValue(settings.VlcOptions, newValue));
+        replayGainChooserControl.Bind(() => settings.ReplayGainMode,
+            newValue =>
+            {
+                if (newValue == settings.ReplayGainMode)
+                {
+                    return;
+                }
+                
+                ReplayGainChooserControl.SetReplayGainEnumValue(settings, newValue);
+                // Clear cache because the audio sample volume might change depending on Replay Gain value.
+                audioSampleLoader.ClearCache();
+            });
 
         // Volume can be changed via REST API
         settings.ObserveEveryValueChanged(it => it.VolumePercent)

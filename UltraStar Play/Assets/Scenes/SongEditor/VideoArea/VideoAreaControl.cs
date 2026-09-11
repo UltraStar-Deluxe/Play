@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -34,6 +36,9 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     [Inject]
     private SongVideoPlayer songVideoPlayer;
 
+    [Inject]
+    private SongMediaUriResolverManager songMediaUriResolverManager;
+    
     [Inject(UxmlName = R.UxmlNames.videoAreaLabel)]
     private Label videoAreaLabel;
 
@@ -67,7 +72,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     public void OnInjectionFinished()
     {
         videoAreaLabel.HideByDisplay();
-        if (SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl))
+        if (VideoResourceExists())
         {
             ShowVideoImage();
         }
@@ -142,7 +147,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Video",
             SongMetaUtils.GetDirectoryPath(songMeta),
-            FileSystemDialogUtils.CreateExtensionFilters("Video Files", ApplicationUtils.supportedVideoFiles),
+            FileSystemDialogUtils.CreateExtensionFilters("Video Files", ApplicationUtils.allSupportedVideoFiles),
             () => songMeta.Video,
             newValue =>
             {
@@ -191,8 +196,8 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private void ShowVideoImage()
     {
-        videoImage.SetVisibleByDisplay(SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl));
-        noVideoImage.SetVisibleByDisplay(!SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl));
+        videoImage.SetVisibleByDisplay(VideoResourceExists());
+        noVideoImage.SetVisibleByDisplay(!VideoResourceExists());
         songBackgroundImage.HideByDisplay();
         songCoverImage.HideByDisplay();
     }
@@ -274,5 +279,10 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
         string relativePath = PathUtils.MakeRelativePath(directoryPath, path);
         return relativePath;
+    }
+    
+    private bool VideoResourceExists()
+    {
+        return SongMetaUtils.ResourceExists(songMeta, songMediaUriResolverManager.ResolveVideoUri(songMeta));
     }
 }

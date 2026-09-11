@@ -118,6 +118,9 @@ public class SettingsManager : AbstractSingletonBehaviour
 
         Debug.Log($"Using loaded CultureInfo: {settings.CultureInfoName}");
         TranslationConfig.Singleton.CurrentCultureInfo = SettingsUtils.GetCultureInfo(settings);
+
+        // Update audio configuration
+        AudioSettingsUtils.UpdateConfiguration(settings.DspBufferSize);
     }
 
     private static void OverwriteSettingsWithCommandLineArguments(Settings settings)

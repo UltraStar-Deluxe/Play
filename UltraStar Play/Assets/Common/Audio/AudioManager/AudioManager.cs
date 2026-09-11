@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Networking;
@@ -15,8 +13,13 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static AudioManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<AudioManager>();
 
-    private const int CriticalCacheSize = 10;
+    /**
+     * When the cache has reached this critical size
+     * then unused sprites are searched in the scene and removed from memory.
+     */
+    private const int CriticalCacheSize = 20;
     private readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
+    private readonly Dictionary<string, RunningRequest> runningRequests = new();
 
     [InjectedInInspector]
     public AudioMixerGroup pitchShifterAudioMixerGroup;
@@ -66,12 +69,40 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
             }
         }
 
+        // Multiple requests should load the AudioClip only once.
+        // And when eventually loaded, then all callers should receive the same instance.
+        if (runningRequests.TryGetValue(uri, out RunningRequest runningRequest))
+        {
+            Log.Verbose(() => $"Awaiting already running request for AudioClip: uri '{uri}'");
+            return await WaitForRunningRequest(runningRequest);
+        }
+        runningRequest = new();
+        runningRequests[uri] = runningRequest;
+        try
+        {
+            AudioClip audioClip = await DoLoadUncachedAudioClipFromUriAsync(uri, uriObject, streamAudio);
+            runningRequest.result = audioClip;
+            return audioClip;
+        }
+        catch (Exception e)
+        {
+            runningRequest.exception = e;
+            throw;
+        }
+        finally
+        {
+            runningRequests.Remove(uri);
+        }
+    }
+
+    private async Awaitable<AudioClip> DoLoadUncachedAudioClipFromUriAsync(string uri, Uri uriObject, bool streamAudio)
+    {
         try
         {
             using UnityWebRequest webRequest = CreateAudioClipRequest(uriObject, streamAudio);
             await WebRequestUtils.SendWebRequestAsync(webRequest);
 
-            AudioClip audioClip = (webRequest.downloadHandler as DownloadHandlerAudioClip).audioClip;
+            AudioClip audioClip = DownloadHandlerAudioClip.GetContent(webRequest);
             AddAudioClipToCache(uri, audioClip, streamAudio);
             return audioClip;
         }
@@ -97,8 +128,9 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private void ClearCache()
+    public void ClearCache()
     {
+        Log.Verbose(() => $"Clearing cache. current count: {audioClipCache.Count}");
         foreach (CachedAudioClip cachedAudioClip in new List<CachedAudioClip>(audioClipCache.Values))
         {
             RemoveCachedAudioClip(cachedAudioClip);
@@ -132,6 +164,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         if (oldest != null)
         {
             RemoveCachedAudioClip(oldest);
+            Log.Debug(() => $"Removed oldest AudioClip from cache. count after: {audioClipCache.Count}, path: '{oldest.Path}'");
         }
     }
 
@@ -142,11 +175,13 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         if (cachedAudioClip.StreamedAudioClip != null)
         {
             cachedAudioClip.StreamedAudioClip.UnloadAudioData();
+            Destroy(cachedAudioClip.StreamedAudioClip);
         }
 
         if (cachedAudioClip.FullAudioClip != null)
         {
             cachedAudioClip.FullAudioClip.UnloadAudioData();
+            Destroy(cachedAudioClip.FullAudioClip);
         }
     }
 
@@ -178,5 +213,23 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
         downloadHandler.streamAudio = streamAudio;
         return webRequest;
+    }
+    
+    private async Awaitable<AudioClip> WaitForRunningRequest(RunningRequest runningRequest)
+    {
+        while (runningRequest.result == null
+               && runningRequest.exception == null)
+        {
+            await Awaitable.EndOfFrameAsync();
+        }
+        return runningRequest.result ?? throw runningRequest.exception;
+    }
+    
+    // Custom solution to resolve multiple awaits because AwaitableCompletionSource did not work as expected.
+    private class RunningRequest
+    {
+        public string uri;
+        public AudioClip result;
+        public Exception exception;
     }
 }

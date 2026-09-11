@@ -84,12 +84,13 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     public bool IsFavoritesPlaylist(IPlaylist playlist)
     {
-        return playlist.Name == ApplicationUtils.FavoritesPlaylistName;
+        return playlist?.Name == ApplicationUtils.FavoritesPlaylistName;
     }
 
     public void SavePlaylist(UltraStarPlaylist playlist)
     {
-        if (playlist.FilePath.IsNullOrEmpty())
+        if (playlist == null
+            || playlist.FilePath.IsNullOrEmpty())
         {
             return;
         }
@@ -193,10 +194,13 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     public void RemoveSongFromPlaylist(UltraStarPlaylist playlist, SongMeta songMeta)
     {
         if (playlist == null
-            || songMeta == null)
+            || songMeta == null
+            || playlist is UltraStarAllSongsPlaylist)
         {
             return;
         }
+        nonPersistentSettings.LastEditedPlaylistName.Value = playlist.Name;
+        
         playlist.RemoveSongEntry(songMeta.Artist, songMeta.Title);
         playlistChangedEventStream.OnNext(new PlaylistChangedEvent(playlist, songMeta));
         SavePlaylist(playlist);
@@ -206,10 +210,13 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     {
         if (playlist == null
             || songMeta == null
+            || playlist is UltraStarAllSongsPlaylist
             || HasSongEntry(playlist, songMeta))
         {
             return;
         }
+        nonPersistentSettings.LastEditedPlaylistName.Value = playlist.Name;
+        
         playlist.AddLineEntry(new UltraStartPlaylistSongEntry(songMeta.Artist, songMeta.Title));
         playlistChangedEventStream.OnNext(new PlaylistChangedEvent(playlist, songMeta));
         SavePlaylist(playlist);
@@ -392,24 +399,28 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     public bool HasSongEntry(IPlaylist playlist, SongMeta songMeta)
     {
+        if (playlist == null)
+        {
+            return false;
+        }
+        
         return playlist.HasSongEntry(songMeta);
     }
 
     public List<SongMeta> GetSongMetas(IPlaylist playlist)
     {
+        if (playlist == null)
+        {
+            return new List<SongMeta>();
+        }
+
         IReadOnlyCollection<SongMeta> allSongMetas = songMetaManager.GetSongMetas();
         return allSongMetas.Where(songMeta => HasSongEntry(playlist, songMeta)).ToList();
     }
 
-    public IPlaylist GetPlaylistByName(string playlistName, IPlaylist fallback = null)
+    public IPlaylist GetPlaylistByName(string playlistName)
     {
-        IPlaylist playlist = playlists.FirstOrDefault(playlist => GetPlaylistName(playlist) == playlistName);
-        if (playlist != null)
-        {
-            return playlist;
-        }
-        
-        return fallback;
+        return playlists.FirstOrDefault(playlist => GetPlaylistName(playlist) == playlistName);
     }
 
     public List<IPlaylist> GetPlaylists(bool includeAllSongPlaylist, bool includeFavoritesPlaylist)

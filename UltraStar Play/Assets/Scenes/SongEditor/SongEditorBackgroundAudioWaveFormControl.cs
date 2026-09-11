@@ -30,6 +30,9 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
     [Inject]
     private GameObject gameObject;
 
+    [Inject]
+    private AudioSampleLoader audioSampleLoader;
+
     private int lastNoteAreaMin;
     private int lastNoteAreaWidth;
     private bool isViewportDirty = true;
@@ -96,8 +99,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
         if (!VisualElementUtils.HasGeometry(TargetElement)
             || noteAreaControl.MinMillisecondsInViewport == noteAreaControl.MaxMillisecondsInViewport
             || !songAudioPlayer.IsFullyLoaded
-            // Must be an audio format. Getting all the samples does not work with video files.
-            || !ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Audio))
+            || !SongEditorAudioWaveformUtils.IsSupportedAudioFormat(songMeta, settings)
             || !VisualElementUtils.HasGeometry(TargetElement)
             || lastUpdateAudioWaveformFrameCount == Time.frameCount)
         {
@@ -119,7 +121,7 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
             audioWaveFormVisualization.AudioWaveFormCalculator = new PrecalculatingAudioWaveFormCalculator();
         }
 
-        AudioClip audioClip = await SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
+        AudioClip audioClip = await SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings, audioSampleLoader);
         if (audioClip == null)
         {
             return;

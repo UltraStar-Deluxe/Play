@@ -2,35 +2,40 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class LabelWithSpacer : VisualElement
+[UxmlElement]
+public partial class LabelWithSpacer : VisualElement
 {
-    // UIToolkit factory classes
-    public new class UxmlFactory : UxmlFactory<LabelWithSpacer, UxmlTraits> {};
-
-    public new class UxmlTraits : VisualElement.UxmlTraits
+    [UxmlAttribute("label-text")]
+    public string LabelText
     {
-        // Additional XML attributes
-        private readonly UxmlStringAttributeDescription labelText = new() { name = "label-text", defaultValue = "Group Title"};
-
-        public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext cc)
+        get => label != null ? label.text : "";
+        set
         {
-            base.Init(visualElement, bag, cc);
-            LabelWithSpacer target = visualElement as LabelWithSpacer;
-
-            // Load UXML and add as child element
-            string path = "SongEditorSideBarGroupUi";
-            VisualTreeAsset visualTreeAsset = Resources.Load<VisualTreeAsset>(path);
-            if (visualTreeAsset == null)
+            if (label != null)
             {
-                Debug.LogError("Could not load " + path);
-                return;
+                label.text = value;
             }
-            visualTreeAsset.CloneTree()
-                .Children()
-                .ToList()
-                .ForEach(child => target.hierarchy.Add(child));
-
-            target.Q<Label>().text = labelText.GetValueFromBag(bag, cc);
         }
+    }
+
+    private readonly Label label;
+
+    public LabelWithSpacer()
+    {
+        // Load UXML and add as child element
+        string path = "SongEditorSideBarGroupUi";
+        VisualTreeAsset visualTreeAsset = Resources.Load<VisualTreeAsset>(path);
+        if (visualTreeAsset == null)
+        {
+            Debug.LogError("Could not load " + path);
+            return;
+        }
+        visualTreeAsset.CloneTree()
+            .Children()
+            .ToList()
+            .ForEach(child => hierarchy.Add(child));
+
+        label = this.Q<Label>();
+        LabelText = "Group Title";
     }
 }

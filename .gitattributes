@@ -1,0 +1,33 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# Binary files
+*.png binary
+*.jpg binary
+*.dll binary
+*.exe binary
+
+# Shell scripts (Unix)
+*.sh text eol=lf
+
+# Windows Batch and Command scripts
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# PowerShell scripts
+*.ps1 text eol=lf
+
+# Unity text-based assets
+*.meta text eol=lf
+*.unity text eol=lf
+*.prefab text eol=lf
+*.asset text eol=lf
+*.mat text eol=lf
+*.anim text eol=lf
+
+# C# scripts and text
+*.cs text eol=lf
+*.shader text eol=lf
+
+# Markdown
+*.md text eol=lf

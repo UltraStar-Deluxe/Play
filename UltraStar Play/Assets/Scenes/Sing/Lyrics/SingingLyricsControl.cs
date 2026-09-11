@@ -11,7 +11,6 @@ using UnityEngine.UIElements;
 
 public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 {
-    private const float SpaceWidthInPx = 8;
     private const float MinFontSize = 4;
     private const float MaxFontSizeIterations = 20;
 
@@ -262,7 +261,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private void SetCurrentSentence(Sentence sentence)
     {
-        previousSentence = CurrentSentence;
+        previousSentence = SongMetaUtils.GetSortedSentences(Voice).GetElementBefore(sentence, false);
         CurrentSentence = sentence;
         if (CurrentSentence != null)
         {
@@ -275,13 +274,25 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         }
         else
         {
-            // After last sentence => fade out the current lyrics
+            // After last sentence => fade out the lyrics box
             SortedNotes = new List<Note>();
-            LeanTween.value(gameObject, currentSentenceContainer.resolvedStyle.opacity, 0, 1f)
-                .setOnUpdate(interpolatedValue =>
-                {
-                    currentSentenceContainer.style.opacity = interpolatedValue;
-                });
+            AwaitableUtils.ExecuteAfterDelayInSecondsAsync(gameObject, 2, () =>
+            {
+                // Also hide noteContainers, to hide "scrolling notes current position in lyrics indicator vertical bar"
+                List<VisualElement> noteContainers = UIDocumentUtils.FindUIDocumentOrThrow().rootVisualElement
+                    .Query(R.UxmlNames.noteContainer)
+                    .ToList();
+                
+                LeanTween.value(gameObject, rootVisualElement.resolvedStyle.opacity, 0, 1f)
+                    .setOnUpdate(interpolatedValue =>
+                    {
+                        rootVisualElement.style.opacity = interpolatedValue;
+                        foreach (VisualElement noteContainer in noteContainers)
+                        {
+                            noteContainer.style.opacity = interpolatedValue;
+                        }
+                    });
+            });
         }
     }
 

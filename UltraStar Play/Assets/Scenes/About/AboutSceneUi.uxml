@@ -12,11 +12,11 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+        <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%;">
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="aboutTextsScrollView" vertical-scroller-visibility="AlwaysVisible" class="mr-3" style="min-width: 25%;">
                 <ToggleButton name="aboutTheGameButton" text="The Game" class="toggleButton mb-2" />
             </ui:ScrollView>
-            <ui:VisualElement name="centerContent" class="overlayBackground roundCorners" style="flex-grow: 1;">
+            <ui:VisualElement name="centerContent" class="overlayBackground roundCorners p-3" style="flex-grow: 1;">
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" focusable="true" name="aboutTextScrollView" style="flex-grow: 1; height: 400px;" />
             </ui:VisualElement>
         </ui:VisualElement>

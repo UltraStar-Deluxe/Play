@@ -18,9 +18,9 @@ public static class DefaultSettingsFactory
             try
             {
                 string internalSongFolder = AndroidUtils.GetAppSpecificStorageAbsolutePath(false) + "/Songs";
-                if (!System.IO.Directory.Exists(internalSongFolder))
+                if (!Directory.Exists(internalSongFolder))
                 {
-                    System.IO.Directory.CreateDirectory(internalSongFolder);
+                    Directory.CreateDirectory(internalSongFolder);
                 }
 
                 defaultSettings.SongDirs.Add(internalSongFolder);
@@ -38,6 +38,7 @@ public static class DefaultSettingsFactory
         if (DirectoryUtils.Exists(demoSongFolder))
         {
             defaultSettings.SongDirs.Add(demoSongFolder);
+            defaultSettings.DisabledSongFolders.Add(demoSongFolder);
         }
 
         // Add player profiles
@@ -62,38 +63,6 @@ public static class DefaultSettingsFactory
             Debug.LogError("Failed to create initial mic profiles");
         }
 
-        // Set speech recognition model
-        if (PlatformUtils.IsStandalone)
-        {
-            defaultSettings.SongEditorSettings.SpeechRecognitionModelPath =
-                ApplicationUtils.GetStreamingAssetsPath("SpeechRecognitionModels/WhisperModels/ggml-tiny.bin");
-        }
-
         return defaultSettings;
-    }
-
-    private static void TrySetCurrentLanguage(Settings defaultSettings, string language)
-    {
-        string countryCode = LocaleInfoUtils.GetTwoLetterCountryCode(language);
-        if (countryCode.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        CultureInfo steamCultureInfo = new CultureInfo(countryCode);
-        if (!IsTranslationAvailable(steamCultureInfo)
-            || string.Equals(TranslationConfig.Singleton.CurrentCultureInfo.ToString(), steamCultureInfo.ToString(), StringComparison.InvariantCultureIgnoreCase))
-        {
-            // No translation available or already the selected default
-            return;
-        }
-
-        TranslationConfig.Singleton.CurrentCultureInfo = steamCultureInfo;
-        defaultSettings.CultureInfoName = TranslationConfig.Singleton.CurrentCultureInfo.ToString();
-    }
-
-    private static bool IsTranslationAvailable(CultureInfo steamCultureInfo)
-    {
-        return ProTrans.Translation.GetPropertiesFile(steamCultureInfo) != null;
     }
 }

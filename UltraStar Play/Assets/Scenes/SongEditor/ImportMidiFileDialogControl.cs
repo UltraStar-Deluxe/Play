@@ -153,7 +153,15 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         midiAssignToPlayerChooserControl.Selection = EVoiceId.P1;
 
         midiFilePathTextField.DisableParseEscapeSequences();
-        midiFilePathTextField.RegisterValueChangedCallback(evt => UpdateControls());
+        midiFilePathTextField.RegisterValueChangedCallback(evt =>
+        {
+            UpdateControls();
+            
+            if (FileUtils.Exists(evt.newValue))
+            {
+                settings.SongEditorSettings.LastMidiFilePath = evt.newValue;
+            }
+        });
 
         midiLyricsTextField.DisableParseEscapeSequences();
 
@@ -282,7 +290,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         StopPreview();
 
-        EVoiceId voiceId;
+        EVoiceId? voiceId = null;
         if (assignToPlayerToggle.value
             && midiAssignToPlayerChooserControl.Selection is EVoiceId.P1)
         {
@@ -292,10 +300,6 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
                  && midiAssignToPlayerChooserControl.Selection is EVoiceId.P2)
         {
             voiceId = EVoiceId.P2;
-        }
-        else
-        {
-            voiceId = EVoiceId.P1;
         }
 
         midiFileImporter.ImportMidiFile(

@@ -84,12 +84,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
     [Inject(UxmlName = R.UxmlNames.helpButton)]
     private Button helpButton;
 
-    [Inject(UxmlName = R.UxmlNames.openSteamWorkshopButton)]
-    private Button openSteamWorkshopButton;
-
-    [Inject(UxmlName = R.UxmlNames.updateSteamWorkshopItemsButton)]
-    private Button updateSteamWorkshopItemsButton;
-
     [Inject(UxmlName = R.UxmlNames.issuesButton)]
     private Button issuesButton;
 
@@ -98,6 +92,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private SettingsManager settingsManager;
 
     [Inject]
     private ModManager modManager;
@@ -156,11 +153,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         backButton.RegisterCallbackButtonTriggered(_ => OnBack());
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
-    }
-
-    private void ReloadCurrentOptionsScene()
-    {
-        sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(loadedSceneRecipe.scene));
     }
 
     private void OnBack()
@@ -225,8 +217,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
         // Hide buttons in top row
         helpButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.HelpUri.IsNullOrEmpty());
         issuesButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasIssuesDialog);
-        openSteamWorkshopButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty());
-        updateSteamWorkshopItemsButton.SetVisibleByDisplay(openSteamWorkshopButton.IsVisibleByDisplay());
 
         // Scroll with mouse drag
         MouseEventScrollControl.RegisterMouseScrollEvents();
@@ -376,6 +366,8 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinde
 
     private void OnDestroy()
     {
+        settingsManager.SaveSettings();
+        
         UnloadLastOptionsScene();
     }
 }

@@ -116,6 +116,10 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
         Instantiate(inputManagerPrefab, commonSceneObjects.transform);
 
         loadedSceneRecipe = null;
+
+        // Unity does not know when changing scenes in this custom implementation.
+        // Thus, cleanup of unused assets needs to be triggered manually.
+        Resources.UnloadUnusedAssets();
     }
 
     private bool ShouldKeepLoadedGameObject(GameObject loadedGameObject)

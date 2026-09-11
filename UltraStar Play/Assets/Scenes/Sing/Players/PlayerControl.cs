@@ -336,4 +336,32 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
             SentenceIndex = sentenceIndex;
         }
     }
+
+    public void JumpToAudioPositionByUserAction(double oldPositionInMillis, double newPositionInMillis)
+    {
+        PlayerScoreControl?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+        PlayerMicPitchTracker?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+        PlayerUiControl?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+        PlayerNoteRecorder?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+        PlayerPerformanceAssessmentControl?.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+
+        if (newPositionInMillis >= oldPositionInMillis)
+        {
+            // Jump forward is handled by existing logic.
+            return;
+        }
+        
+        // Adjust DisplaySentenceIndex
+        double newBeat = SongMetaBpmUtils.MillisToBeats(songMeta, newPositionInMillis);
+        Sentence newDisplaySentence = SortedSentences.FirstOrDefault(sentence => newBeat < sentence.LinebreakBeat);
+
+        int newSentenceIndex = (newDisplaySentence != null)
+            ? SortedSentences.IndexOf(newDisplaySentence)
+            : SortedSentences.Count;
+
+        if (newSentenceIndex != displaySentenceIndex)
+        {
+            SetDisplaySentenceIndex(newSentenceIndex);
+        }
+    }
 }

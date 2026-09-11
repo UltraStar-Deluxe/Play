@@ -52,7 +52,7 @@ public static class SpaceBetweenNotesUtils
 
     public static void ShortenNotesByMillis(IReadOnlyCollection<Note> notes, int millis, SongMeta songMeta)
     {
-        if (notes.IsNullOrEmpty())
+        if (notes.IsNullOrEmpty() || millis <= 0)
         {
             return;
         }

@@ -26,7 +26,8 @@
         "Newtonsoft.Json.dll",
         "Serilog.dll",
         "Serilog.Sinks.File.dll",
-        "YamlDotNet.dll"
+        "YamlDotNet.dll",
+        "Utf8Json.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

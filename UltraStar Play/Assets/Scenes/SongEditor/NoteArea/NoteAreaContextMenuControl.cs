@@ -35,6 +35,18 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     private SongEditorCopyPasteManager songEditorCopyPasteManager;
 
     [Inject]
+    private SpeechRecognitionAction speechRecognitionAction;
+    
+    [Inject]
+    private ForcedAlignmentAction forcedAlignmentAction;
+    
+    [Inject]
+    private Settings settings;
+
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
+
+    [Inject]
     private NoteAreaDragControl noteAreaDragControl;
 
     [Inject]
@@ -52,6 +64,7 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
     {
         int beat = (int)noteAreaControl.GetHorizontalMousePositionInBeats();
+        double millis = (int)noteAreaControl.GetHorizontalMousePositionInMillis();
         int midiNote = noteAreaControl.GetVerticalMousePositionInMidiNote();
 
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_fitViewVertically), () => noteAreaControl.FitViewportVerticalToNotes());
@@ -94,8 +107,41 @@ public class NoteAreaContextMenuControl : ContextMenuControl
             contextMenu.AddSeparator();
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setGap), () => setMusicGapAction.ExecuteAndNotify(positionInMillis));
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setGapKeepNotePosition), () => setMusicGapAction.ExecuteAndNotify(positionInMillis, true));
+            contextMenu.AddSeparator();
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setStart), () => setSongPropertyAction.SetStartAndNotify(positionInMillis));
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setEnd), () => setSongPropertyAction.SetEndAndNotify(positionInMillis));
+            contextMenu.AddSeparator();
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyStart), () => setSongPropertyAction.SetMedleyStartAndNotify(positionInMillis));
             contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_setMedleyEnd), () => setSongPropertyAction.SetMedleyEndAndNotify(positionInMillis));
+        }
+
+        FillMenuForCurrentSelectionArea(contextMenu, millis);
+    }
+
+    private void FillMenuForCurrentSelectionArea(ContextMenuPopupControl contextMenu, double clickPositionInMillis)
+    {
+        NoteAreaRect lastSelectionRect = noteAreaControl.SelectionDragListener.LastSelectionRect.Value;
+        if (lastSelectionRect == null)
+        {
+            return;
+        }
+
+        if (clickPositionInMillis >= lastSelectionRect.MinMillis
+            && clickPositionInMillis <= lastSelectionRect.MaxMillis)
+        {
+            contextMenu.AddSeparator();
+
+            contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_forcedAlignmentInSelection), () =>
+            {
+                SongEditorForcedAlignmentUtils.ShowForcedAlignmentInSelectionDialog(
+                    songEditorSceneControl,
+                    forcedAlignmentAction,
+                    lastSelectionRect.MinBeat,
+                    lastSelectionRect.LengthInBeats,
+                    SongMetaUtils.GetLyrics(selectionControl.GetSelectedNotes()),
+                    speechRecognitionAction,
+                    settings);
+            });
         }
     }
 }

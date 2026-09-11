@@ -28,6 +28,9 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     [Inject]
     protected Settings settings;
 
+    [Inject]
+    protected SongMediaUriResolverManager songMediaUriResolverManager;
+
     protected SongMeta currentPreviewSongMeta;
 
     protected readonly Subject<SongMeta> startSongPreviewEventStream = new();
@@ -213,7 +216,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         }
 
         // Use the audio URL as video if the WebView can handle it (e.g. a YouTube video).
-        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
+        string videoUri = songMediaUriResolverManager.ResolveVideoUri(songMeta);
         if (!SongMetaUtils.ResourceExists(songMeta, videoUri))
         {
             songVideoPlayer.UnloadVideo();

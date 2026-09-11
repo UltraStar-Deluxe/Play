@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UniInject;
 using UnityEngine;
 
@@ -11,7 +13,13 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
     private SpeechRecognitionManager speechRecognitionManager;
 
     [Inject]
-    private SpeechRecognizerProvider speechRecognizerProvider;
+    private NoteHyphenator noteHyphenator;
+
+    [Inject]
+    private ForcedAlignmentManager forcedAlignmentManager;
+
+    [Inject]
+    private Settings settings;
 
     protected override object GetInstance()
     {
@@ -25,16 +33,11 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
 
         job.SetAwaitable(async () =>
         {
-            SpeechRecognizer speechRecognizer = await speechRecognizerProvider.GetSpeechRecognizerJob(config.SpeechRecognizerConfig).GetResultAsync();
-
-            await Awaitable.BackgroundThreadAsync();
             SpeechRecognitionResult speechRecognitionResult = await speechRecognitionManager.ProcessSongMetaJob(
-                config.InputSamples,
-                speechRecognizer)
+                config.InputSamples)
                 .GetResultAsync();
 
-            await Awaitable.MainThreadAsync();
-            List<Note> createdNotes = CreateNotesFromSpeechRecognitionResult(
+            List<Note> createdNotes = await CreateNotesFromSpeechRecognitionResult(
                 speechRecognitionResult,
                 config);
 
@@ -44,7 +47,40 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         return job;
     }
 
-    private List<Note> CreateNotesFromSpeechRecognitionResult(
+    private async Awaitable PerformForcedAlignment(CreateNotesFromSpeechRecognitionConfig config, List<Note> createdNotes)
+    {
+        if (!settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition)
+        {
+            return;
+        }
+        
+        string lyrics = ForcedAlignmentUtils.GetLyricsFromNotes(createdNotes);
+        if (!lyrics.IsNullOrEmpty())
+        {
+            ForcedAlignmentInput forcedAlignmentInput = new ForcedAlignmentInput(
+                lyrics,
+                config.InputSamples.MonoSamples,
+                config.InputSamples.StartIndex,
+                config.InputSamples.EndIndex,
+                config.InputSamples.SampleRate);
+
+            ForcedAlignmentResult forcedAlignmentResult = await forcedAlignmentManager.ProcessSongMetaJob(
+                    config.SongMeta,
+                    forcedAlignmentInput)
+                .GetResultAsync();
+
+            if (forcedAlignmentResult != null && !forcedAlignmentResult.Words.IsNullOrEmpty())
+            {
+                ForcedAlignmentUtils.MoveNotesToForcedAlignmentResult(
+                    config.SongMeta,
+                    createdNotes.OrderBy(it => it.StartBeat).ToList(),
+                    forcedAlignmentResult,
+                    config.OffsetInBeats);
+            }
+        }
+    }
+
+    private async Awaitable<List<Note>> CreateNotesFromSpeechRecognitionResult(
         SpeechRecognitionResult speechRecognitionResult,
         CreateNotesFromSpeechRecognitionConfig config)
     {
@@ -64,10 +100,26 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
                 noteEndInBeats = noteStartInBeats + 1;
             }
             int noteLengthInBeats = noteEndInBeats - noteStartInBeats;
+            
             string text = resultEntry.Text;
+            if (!text.IsNullOrEmpty())
+            {
+                text = text.Trim() + " ";
+            }
+            
             Note createdNote = new(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(config.MidiNote), text);
             return createdNote;
         }).ToList();
+
+        try
+        {
+            await PerformForcedAlignment(config, createdNotes);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError("Failed to perform forced alignment to optimize note positions of speech recognition result.");
+        }
 
         // Shorten new notes left and right to give a little space
         SpaceBetweenNotesUtils.ShortenNotesByMillis(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, config.SongMeta);
@@ -75,15 +127,7 @@ public class SpeechRecognitionNoteCreator : AbstractSingletonBehaviour, INeedInj
         // Split syllables if hyphenation is enabled
         if (config.Hyphenator != null)
         {
-            Dictionary<Note,List<Note>> noteToNotesAfterSplit = HyphenateNotesUtils.HypenateNotes(createdNotes, config.Hyphenator);
-            noteToNotesAfterSplit.ForEach(entry =>
-            {
-                Note note = entry.Key;
-                List<Note> notesAfterSplit = entry.Value;
-                List<Note> newNotes = new List<Note>(notesAfterSplit);
-                newNotes.Remove(note);
-                createdNotes.AddRange(newNotes);
-            });
+            HyphenationUtils.SplitNotesByHyphenation(settings, noteHyphenator, createdNotes);
         }
 
         // Shorten new notes left and right to give a little space

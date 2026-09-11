@@ -7,10 +7,10 @@ VisualElement
     background-image: url("project://database/Packages/playshared/Runtime/Graphics/Logos/LogoLarge.png");
     -unity-background-scale-mode: scale-to-fit;
     position: absolute;
-    top: 0;
+    top: 32px;
     left: 0;
     width: 100%;
-    height: 60%;
+    height: 50%;
 }
 
 #background {
@@ -459,4 +459,8 @@ Toggle.smallControl {
 .onlineMultiplayerHost {
     -unity-text-outline-width: 12px;
     -unity-text-outline-color: #0dcaf0;
+}
+
+.unity-base-text-field.fullwidth > .unity-base-text-field__input {
+    width: 100%;
 }

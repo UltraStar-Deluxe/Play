@@ -23,12 +23,6 @@ public class VideoPlayerVideoSupportProvider : AbstractVideoSupportProvider
         videoPlayer.errorReceived -= OnVideoPlayerErrorReceived;
     }
 
-    public override bool IsSupported(string videoUri, bool videoEqualsAudio)
-    {
-        return !WebViewUtils.CanHandleWebViewUrl(videoUri)
-            && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
-            && ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(videoUri));
-    }
 
     public override async Awaitable<VideoLoadedEvent> LoadAsync(string videoUri, double startPositionInMillis)
     {

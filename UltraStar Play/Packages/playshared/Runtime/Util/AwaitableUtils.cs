@@ -60,6 +60,6 @@ public static class AwaitableUtils
             action();
             await Awaitable.WaitForSecondsAsync(delayInSeconds);
         }
-        Log.Debug(() => $"Exited loop because until GameObject '{gameObjectName}' has been destroyed");
+        Log.Debug(() => $"Exited loop because GameObject '{gameObjectName}' has been destroyed");
     }
 }

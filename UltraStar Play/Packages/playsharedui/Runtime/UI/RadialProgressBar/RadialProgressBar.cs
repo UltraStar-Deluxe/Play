@@ -5,24 +5,9 @@ using UnityEngine.UIElements;
 /**
  * An element that displays progress inside a partially filled circle
  */
-public class RadialProgressBar : VisualElement
+[UxmlElement]
+public partial class RadialProgressBar : VisualElement
 {
-    public new class UxmlFactory : UxmlFactory<RadialProgressBar, UxmlTraits> { }
-    public new class UxmlTraits : VisualElement.UxmlTraits
-    {
-        UxmlFloatAttributeDescription Progress = new UxmlFloatAttributeDescription() { name = "progress", defaultValue = 0 };
-        UxmlBoolAttributeDescription ShowLabel = new UxmlBoolAttributeDescription() { name = "show-label", defaultValue = false };
-
-        public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
-        {
-            base.Init(ve, bag, cc);
-
-            RadialProgressBar target = ve as RadialProgressBar;
-            target.ProgressInPercent = Progress.GetValueFromBag(bag, cc);
-            target.ShowLabel = ShowLabel.GetValueFromBag(bag, cc);
-        }
-    }
-
     // These are USS class names for the control overall and the label.
     private static readonly string ussClassName = "radial-progress-bar";
     private static readonly string ussLabelClassName = "radial-progress-bar__label";
@@ -40,6 +25,7 @@ public class RadialProgressBar : VisualElement
     /// A value between 0 and 100
     /// </summary>
     private float progressInPercent;
+    [UxmlAttribute("progress")]
     public float ProgressInPercent
     {
         // The progress property is exposed in C#.
@@ -73,6 +59,7 @@ public class RadialProgressBar : VisualElement
         }
     }
 
+    [UxmlAttribute("show-label")]
     public bool ShowLabel
     {
         get => labelElement.IsVisibleByDisplay();

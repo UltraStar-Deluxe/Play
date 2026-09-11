@@ -58,24 +58,6 @@ class Build : NukeBuild
         {
             BuildMainGame("BuildMacOS");
         });
-    
-    Target BuildMainGameAndroidApk => _ => _
-        .Executes(() =>
-        {
-            BuildMainGame("BuildAndroidApk");
-        });
-    
-    Target BuildAndRunMainGameAndroidApk => _ => _
-        .Executes(() =>
-        {
-            BuildMainGame("BuildAndRunAndroidApk");
-        });
-    
-    Target BuildMainGameSignedAndroidAppBundle => _ => _
-        .Executes(() =>
-        {
-            BuildMainGame("BuildSignedAndroidAppBundle");
-        });
 
     Target BuildCompanionAppAndroidApk => _ => _
         .Executes(() =>
@@ -100,7 +82,7 @@ class Build : NukeBuild
         {
             AbsolutePath mainGameNuGetPackagesSourceFolder = GetNuGetPackagesProjectFolder(mainGameDir) / "bin";
             AbsolutePath mainGameNuGetPackagesTargetFolder = GetNuGetPackagesTargetFolder(mainGameDir);
-            AbsolutePath playsharedNuGetPackagesTargetFolder = mainGameDir / "Packages" / "playshared" / "Runtime" / "Plugins" / "NuGetPackages";
+            AbsolutePath playsharedNuGetPackagesTargetFolder = mainGameDir / "Packages/playshared/Runtime/Plugins/NuGetPackages";
 
             // Delete old packages
             DirectoryUtils.DeleteDirectory(mainGameNuGetPackagesSourceFolder);
@@ -123,6 +105,7 @@ class Build : NukeBuild
                 "System.Diagnostics.DiagnosticSource.dll", // transitive dependency of Serilog
                 "System.Runtime.CompilerServices.Unsafe.dll", // transitive dependency of Serilog
                 "System.Threading.Channels.dll", // transitive dependency of Serilog
+                "Utf8Json.dll",
                 "YamlDotNet.dll");
 
             // Move libraries for main game
@@ -133,7 +116,12 @@ class Build : NukeBuild
                 "NHyphenator.dll",
                 "Opportunity.LrcParser.dll",
                 "System.Linq.Dynamic.Core.dll",
-                "System.Text.Encoding.CodePages.dll"
+                "System.Text.Encoding.CodePages.dll",
+                "TagLibSharp.dll",
+                "Microsoft.ML.OnnxRuntime.dll",
+                "NWaves.dll",
+                "Ffmpeg.Autogen.dll",
+                "WindowsInput.dll" // Only used in mod "TriggerKeyStrokeToToggleMicWhenSinging"
                 );
         });
 
@@ -169,12 +157,12 @@ class Build : NukeBuild
 
     private AbsolutePath GetNuGetPackagesProjectFolder(AbsolutePath unityProjectDir)
     {
-        return unityProjectDir / "Packages" / "NuGetPackages";
+        return unityProjectDir / "Packages/NuGetPackages";
     }
 
     private AbsolutePath GetNuGetPackagesTargetFolder(AbsolutePath unityProjectDir)
     {
-        return unityProjectDir / "Assets" / "Plugins" / "NuGetPackages";
+        return unityProjectDir / "Assets/Plugins/NuGetPackages";
     }
 
     private void TestUnityProject(UnityProject unityProject, UnityTestPlatform unityTestPlatform)

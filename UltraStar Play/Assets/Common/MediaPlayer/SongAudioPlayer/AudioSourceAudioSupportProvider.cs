@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using UniInject;
-using UniRx;
+﻿using UniInject;
 using UnityEngine;
 
 public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
@@ -28,13 +25,6 @@ public class AudioSourceAudioSupportProvider : AbstractAudioSupportProvider
         audioSource.clip = loadedAudioClip;
         PositionInMillis = startPositionInMillis;
         return new AudioLoadedEvent(audioUri);
-    }
-
-    public override bool IsSupported(string audioUri)
-    {
-        return !WebViewUtils.CanHandleWebViewUrl(audioUri)
-            && settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Always
-            && ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(audioUri));
     }
 
     public override void Unload()

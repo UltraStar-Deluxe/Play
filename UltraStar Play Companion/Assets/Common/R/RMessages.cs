@@ -11,13 +11,13 @@ public static partial class R
         public static readonly string action_addTeam = "action_addTeam";
         public static readonly string action_addToPlaylist = "action_addToPlaylist";
         public static readonly string action_apply = "action_apply";
-        public static readonly string action_buyOnSteam = "action_buyOnSteam";
         public static readonly string action_cancel = "action_cancel";
         public static readonly string action_close = "action_close";
         public static readonly string action_confirmDelete = "action_confirmDelete";
         public static readonly string action_continue = "action_continue";
         public static readonly string action_delete = "action_delete";
         public static readonly string action_doubleTap = "action_doubleTap";
+        public static readonly string action_download = "action_download";
         public static readonly string action_downloadArchive = "action_downloadArchive";
         public static readonly string action_exitSong = "action_exitSong";
         public static readonly string action_import = "action_import";
@@ -377,6 +377,7 @@ public static partial class R
         public static readonly string options_recording_noConnectedMic = "options_recording_noConnectedMic";
         public static readonly string options_recording_noConnectedMic_hint = "options_recording_noConnectedMic_hint";
         public static readonly string options_recording_title = "options_recording_title";
+        public static readonly string options_recordingDevices = "options_recordingDevices";
         public static readonly string options_reduceAudioVolume = "options_reduceAudioVolume";
         public static readonly string options_reloadModsOnFileChange = "options_reloadModsOnFileChange";
         public static readonly string options_replayGainLoudnessNormalization = "options_replayGainLoudnessNormalization";
@@ -510,6 +511,7 @@ public static partial class R
         public static readonly string singScene_options_showLyricsOnNotes = "singScene_options_showLyricsOnNotes";
         public static readonly string singScene_options_showPitchArrow = "singScene_options_showPitchArrow";
         public static readonly string singScene_options_showPlayerAlongsideNotes = "singScene_options_showPlayerAlongsideNotes";
+        public static readonly string singScene_options_showPlayerImages = "singScene_options_showPlayerImages";
         public static readonly string singScene_options_showPlayerName = "singScene_options_showPlayerName";
         public static readonly string singScene_options_showPlayerScore = "singScene_options_showPlayerScore";
         public static readonly string singScene_options_showProgressBar = "singScene_options_showProgressBar";
@@ -606,6 +608,9 @@ public static partial class R
         public static readonly string songEditor_options_layout_showVirtualPiano = "songEditor_options_layout_showVirtualPiano";
         public static readonly string songEditor_options_layout_showWaveForm = "songEditor_options_layout_showWaveForm";
         public static readonly string songEditor_options_layout_title = "songEditor_options_layout_title";
+        public static readonly string songEditor_options_lyrics_syllableSeparator = "songEditor_options_lyrics_syllableSeparator";
+        public static readonly string songEditor_options_lyrics_title = "songEditor_options_lyrics_title";
+        public static readonly string songEditor_options_lyrics_wordSeparator = "songEditor_options_lyrics_wordSeparator";
         public static readonly string songEditor_options_microphone = "songEditor_options_microphone";
         public static readonly string songEditor_options_microphone_title = "songEditor_options_microphone_title";
         public static readonly string songEditor_options_microphoneDelay = "songEditor_options_microphoneDelay";
@@ -754,8 +759,6 @@ public static partial class R
         public static readonly string uri_howToSteamWorkshop = "uri_howToSteamWorkshop";
         public static readonly string uri_howToThemes = "uri_howToThemes";
         public static readonly string uri_logFiles = "uri_logFiles";
-        public static readonly string uri_melodyMania = "uri_melodyMania";
-        public static readonly string uri_melodyMania_onSteam = "uri_melodyMania_onSteam";
         public static readonly string uri_merchandiseShop = "uri_merchandiseShop";
         public static readonly string validation_missingValue = "validation_missingValue";
         public static readonly string webView_askToOpenWebsiteDialog_confirm = "webView_askToOpenWebsiteDialog_confirm";

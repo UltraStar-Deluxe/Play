@@ -1,7 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
+using ProTrans;
 using UniInject;
+using UniRx;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -46,9 +51,6 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
 
     private void Start()
     {
-        // Melody Mania does not check for a new version.
-        // This should be handled by the Steam platform.
-        
         // if (dialogWasShown)
         // {
         //     // The dialog has been shown before during this application execution. Do not show again.
@@ -60,139 +62,139 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
         // }
     }
 
-    // private void StartGetTagsRequest(string url)
-    // {
-    //     Debug.Log($"Getting tags from: {url}");
-    //     UnityWebRequest getTagsWebRequest = UnityWebRequest.Get(url);
-    //     getTagsWebRequest.SendWebRequest()
-    //         .AsAsyncOperationObservable()
-    //         .Subscribe(_ => UpdateGetTagsRequest(getTagsWebRequest),
-    //             exception => Debug.LogException(exception),
-    //             () => UpdateGetTagsRequest(getTagsWebRequest));
-    // }
-    //
-    // private void UpdateGetTagsRequest(UnityWebRequest webRequest)
-    // {
-    //     if (isGetTagsRequestDone
-    //         || !webRequest.isDone)
-    //     {
-    //         return;
-    //     }
-    //
-    //     isGetTagsRequestDone = true;
-    //     if (webRequest.result is not UnityWebRequest.Result.Success)
-    //     {
-    //         Debug.LogError($"Getting tags from '{webRequest.url}'"
-    //                        + $" has result {webRequest.result}.\n{webRequest.error}");
-    //         return;
-    //     }
-    //
-    //     string getTagsResponse = webRequest.downloadHandler.text;
-    //     List<RepositoryTagDto> repositoryTagDtos = JsonConverter.FromJson<List<RepositoryTagDto>>(getTagsResponse);
-    //     if (repositoryTagDtos == null)
-    //     {
-    //         return;
-    //     }
-    //
-    //     RepositoryTagDto newestTagDto = FindNewestTagDto(repositoryTagDtos);
-    //     if (newestTagDto == null)
-    //     {
-    //         return;
-    //     }
-    //
-    //     StartGetRemoteVersionFileRequest(newestTagDto.name);
-    // }
-    //
-    // private void StartGetRemoteVersionFileRequest(string branchOrTag)
-    // {
-    //     string url = GetRemoteVersionFileUrl(branchOrTag);
-    //     Debug.Log($"Getting version file from: {url}");
-    //     UnityWebRequest getVersionFileWebRequest = UnityWebRequest.Get(url);
-    //     getVersionFileWebRequest.SendWebRequest()
-    //         .AsAsyncOperationObservable()
-    //         .Subscribe(_ => UpdateGetRemoteVersionFileRequest(getVersionFileWebRequest),
-    //             exception => Debug.LogException(exception),
-    //             () => UpdateGetRemoteVersionFileRequest(getVersionFileWebRequest));
-    // }
-    //
-    // private void UpdateGetRemoteVersionFileRequest(UnityWebRequest webRequest)
-    // {
-    //     if (isGetVersionFileRequestDone
-    //         || !webRequest.isDone)
-    //     {
-    //         return;
-    //     }
-    //
-    //     isGetVersionFileRequestDone = true;
-    //     if (webRequest.result is not UnityWebRequest.Result.Success)
-    //     {
-    //         Debug.LogError($"Getting version file from '{webRequest.url}'"
-    //                        + $" has result {webRequest.result}.\n{webRequest.error}");
-    //         return;
-    //     }
-    //
-    //     string remoteVersionFileContent = webRequest.downloadHandler.text;
-    //     CheckForNewVersion(remoteVersionFileContent);
-    // }
-    //
-    // private void CheckForNewVersion(string remoteVersionFileContent)
-    // {
-    //     Dictionary<string, string> remoteVersionProperties = PropertiesFileParser.ParseText(remoteVersionFileContent);
-    //     Dictionary<string, string> localVersionProperties = PropertiesFileParser.ParseText(localVersionTextAsset.text);
-    //
-    //     remoteVersionProperties.TryGetValue("release", out string remoteRelease);
-    //     if (settings.IgnoredReleases.Contains("all")
-    //         || settings.IgnoredReleases.Contains(remoteRelease))
-    //     {
-    //         // The user did opt-out for notifications about this release or new releases in general.
-    //         Debug.Log("Ignoring new release: " + remoteRelease);
-    //         return;
-    //     }
-    //
-    //     localVersionProperties.TryGetValue("release", out string localRelease);
-    //
-    //     try
-    //     {
-    //         if (CompareVersionString(localRelease, remoteRelease) < 0)
-    //         {
-    //             // (localRelease is smaller)
-    //             // or ((localRelease is equal to remoteRelease) and (localBuildTimeStamp is smaller))
-    //             OpenNewVersionAvailableDialog(remoteVersionProperties);
-    //         }
-    //         else
-    //         {
-    //             Debug.Log($"No new release available (localRelease: {localRelease}, remoteRelease: {remoteRelease})");
-    //         }
-    //     }
-    //     catch (CompareVersionException ex)
-    //     {
-    //         Debug.LogException(ex);
-    //     }
-    // }
-    //
-    // private void OpenNewVersionAvailableDialog(Dictionary<string, string> remoteVersionProperties)
-    // {
-    //     VisualElement dialogRootVisualElement = newVersionDialogUxml.CloneTree().Children().FirstOrDefault();
-    //     dialogRootVisualElement.AddToClassList("overlay");
-    //     newVersionAvailableDialogControl = new(dialogRootVisualElement,
-    //         uiDocument.rootVisualElement,
-    //         remoteVersionProperties);
-    //     injector
-    //         .WithRootVisualElement(dialogRootVisualElement)
-    //         .Inject(newVersionAvailableDialogControl);
-    //     newVersionAvailableDialogControl.DialogClosedEventStream
-    //         .Subscribe(evt => newVersionAvailableDialogControl = null);
-    //     dialogWasShown = true;
-    // }
-    //
-    // public void CloseNewVersionAvailableDialog()
-    // {
-    //     if (newVersionAvailableDialogControl != null)
-    //     {
-    //         newVersionAvailableDialogControl.CloseDialog();
-    //     }
-    //     newVersionAvailableDialogControl = null;
-    // }
+    private void StartGetTagsRequest(string url)
+    {
+        Debug.Log($"Getting tags from: {url}");
+        UnityWebRequest getTagsWebRequest = UnityWebRequest.Get(url);
+        getTagsWebRequest.SendWebRequest()
+            .AsAsyncOperationObservable()
+            .Subscribe(_ => UpdateGetTagsRequest(getTagsWebRequest),
+                exception => Debug.LogException(exception),
+                () => UpdateGetTagsRequest(getTagsWebRequest));
+    }
+    
+    private void UpdateGetTagsRequest(UnityWebRequest webRequest)
+    {
+        if (isGetTagsRequestDone
+            || !webRequest.isDone)
+        {
+            return;
+        }
+    
+        isGetTagsRequestDone = true;
+        if (webRequest.result is not UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"Getting tags from '{webRequest.url}'"
+                           + $" has result {webRequest.result}.\n{webRequest.error}");
+            return;
+        }
+    
+        string getTagsResponse = webRequest.downloadHandler.text;
+        List<RepositoryTagDto> repositoryTagDtos = JsonConverter.FromJson<List<RepositoryTagDto>>(getTagsResponse);
+        if (repositoryTagDtos == null)
+        {
+            return;
+        }
+    
+        RepositoryTagDto newestTagDto = FindNewestTagDto(repositoryTagDtos);
+        if (newestTagDto == null)
+        {
+            return;
+        }
+    
+        StartGetRemoteVersionFileRequest(newestTagDto.name);
+    }
+    
+    private void StartGetRemoteVersionFileRequest(string branchOrTag)
+    {
+        string url = GetRemoteVersionFileUrl(branchOrTag);
+        Debug.Log($"Getting version file from: {url}");
+        UnityWebRequest getVersionFileWebRequest = UnityWebRequest.Get(url);
+        getVersionFileWebRequest.SendWebRequest()
+            .AsAsyncOperationObservable()
+            .Subscribe(_ => UpdateGetRemoteVersionFileRequest(getVersionFileWebRequest),
+                exception => Debug.LogException(exception),
+                () => UpdateGetRemoteVersionFileRequest(getVersionFileWebRequest));
+    }
+    
+    private void UpdateGetRemoteVersionFileRequest(UnityWebRequest webRequest)
+    {
+        if (isGetVersionFileRequestDone
+            || !webRequest.isDone)
+        {
+            return;
+        }
+    
+        isGetVersionFileRequestDone = true;
+        if (webRequest.result is not UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"Getting version file from '{webRequest.url}'"
+                           + $" has result {webRequest.result}.\n{webRequest.error}");
+            return;
+        }
+    
+        string remoteVersionFileContent = webRequest.downloadHandler.text;
+        CheckForNewVersion(remoteVersionFileContent);
+    }
+    
+    private void CheckForNewVersion(string remoteVersionFileContent)
+    {
+        PropertiesFile remoteVersionProperties = PropertiesFileParser.ParseText(remoteVersionFileContent, CultureInfo.InvariantCulture);
+        PropertiesFile localVersionProperties = PropertiesFileParser.ParseText(localVersionTextAsset.text, CultureInfo.InvariantCulture);
+    
+        remoteVersionProperties.TryGetValue("release", out string remoteRelease);
+        if (settings.IgnoredReleases.Contains("all")
+            || settings.IgnoredReleases.Contains(remoteRelease))
+        {
+            // The user did opt-out for notifications about this release or new releases in general.
+            Debug.Log("Ignoring new release: " + remoteRelease);
+            return;
+        }
+    
+        localVersionProperties.TryGetValue("release", out string localRelease);
+    
+        try
+        {
+            if (CompareVersionString(localRelease, remoteRelease) < 0)
+            {
+                // (localRelease is smaller)
+                // or ((localRelease is equal to remoteRelease) and (localBuildTimeStamp is smaller))
+                OpenNewVersionAvailableDialog(remoteVersionProperties);
+            }
+            else
+            {
+                Debug.Log($"No new release available (localRelease: {localRelease}, remoteRelease: {remoteRelease})");
+            }
+        }
+        catch (CompareVersionException ex)
+        {
+            Debug.LogException(ex);
+        }
+    }
+    
+    private void OpenNewVersionAvailableDialog(PropertiesFile remoteVersionProperties)
+    {
+        VisualElement dialogRootVisualElement = newVersionDialogUxml.CloneTree().Children().FirstOrDefault();
+        dialogRootVisualElement.AddToClassList("overlay");
+        newVersionAvailableDialogControl = new(dialogRootVisualElement,
+            uiDocument.rootVisualElement,
+            remoteVersionProperties);
+        injector
+            .WithRootVisualElement(dialogRootVisualElement)
+            .Inject(newVersionAvailableDialogControl);
+        newVersionAvailableDialogControl.DialogClosedEventStream
+            .Subscribe(evt => newVersionAvailableDialogControl = null);
+        dialogWasShown = true;
+    }
+    
+    public void CloseNewVersionAvailableDialog()
+    {
+        if (newVersionAvailableDialogControl != null)
+        {
+            newVersionAvailableDialogControl.CloseDialog();
+        }
+        newVersionAvailableDialogControl = null;
+    }
     
     /**
      * Compares the versions strings a and b.
@@ -241,28 +243,28 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
         return 0;
     }
     
-    // private string GetRemoteVersionFileUrl(string branchOrTag)
-    // {
-    //     return remoteVersionFileUrlPattern.Replace("{branchOrTag}", branchOrTag);
-    // }
-    //
-    // private RepositoryTagDto FindNewestTagDto(IEnumerable<RepositoryTagDto> tagDtos)
-    // {
-    //     RepositoryTagDto newestTagDto = null;
-    //     foreach (RepositoryTagDto tagDto in tagDtos)
-    //     {
-    //         if (newestTagDto == null
-    //             || CompareVersionString(newestTagDto.name, tagDto.name) < 0)
-    //         {
-    //             newestTagDto = tagDto;
-    //         }
-    //     }
-    //
-    //     return newestTagDto;
-    // }
-    //
-    // private class RepositoryTagDto
-    // {
-    //     public string name;
-    // }
+    private string GetRemoteVersionFileUrl(string branchOrTag)
+    {
+        return remoteVersionFileUrlPattern.Replace("{branchOrTag}", branchOrTag);
+    }
+    
+    private RepositoryTagDto FindNewestTagDto(IEnumerable<RepositoryTagDto> tagDtos)
+    {
+        RepositoryTagDto newestTagDto = null;
+        foreach (RepositoryTagDto tagDto in tagDtos)
+        {
+            if (newestTagDto == null
+                || CompareVersionString(newestTagDto.name, tagDto.name) < 0)
+            {
+                newestTagDto = tagDto;
+            }
+        }
+    
+        return newestTagDto;
+    }
+    
+    private class RepositoryTagDto
+    {
+        public string name;
+    }
 }

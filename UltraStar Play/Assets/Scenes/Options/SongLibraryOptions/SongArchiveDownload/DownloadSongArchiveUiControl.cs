@@ -71,6 +71,12 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
     private readonly Subject<string> finishEventStream = new();
     public IObservable<string> FinishEventStream => finishEventStream;
 
+    public string Url
+    {
+        get => urlTextField.value;
+        set => urlTextField.value = value;
+    }
+    
     public void OnInjectionFinished()
     {
         urlTextField.value = "";

@@ -105,7 +105,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         }
 
         // Select the "all songs" playlist
-        PartyModeSettings.SongSelectionSettings.SongPoolPlaylistName = "";
+        PartyModeSettings.SongSelectionSettings.SongPoolPlaylist = UltraStarAllSongsPlaylist.Instance;
     }
 
     private void OnBack()
@@ -161,8 +161,8 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private Translation GetSongSelectionConfigErrorMessage()
     {
-        IPlaylist playlist = playlistManager.GetPlaylistByName(PartyModeSettings.SongSelectionSettings.SongPoolPlaylistName, UltraStarAllSongsPlaylist.Instance);
-        if (playlist != null && playlist.IsEmpty)
+        if (PartyModeSettings.SongSelectionSettings.SongPoolPlaylist == null
+            || PartyModeSettings.SongSelectionSettings.SongPoolPlaylist.IsEmpty)
         {
             return Translation.Get(R.Messages.partyMode_error_emptyPlaylist);
         }

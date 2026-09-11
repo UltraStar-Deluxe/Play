@@ -6,6 +6,12 @@ using UnityEngine;
 
 public class LrcFormatImporter : INeedInjection
 {
+    [Inject]
+    private EditModeLyricsSplitter editModeLyricsSplitter;
+    
+    [Inject]
+    private EditModeLyricsConverter editModeLyricsConverter;
+    
     public Translation GetLrcFormatErrorMessage(string lrcText)
     {
         if (lrcText.IsNullOrEmpty())
@@ -51,7 +57,7 @@ public class LrcFormatImporter : INeedInjection
         return sentences;
     }
 
-    private static Sentence ImportLrcLine(SongMeta songMeta, double beatsPerCharacter, Settings settings, Line line, Line nextLine)
+    private Sentence ImportLrcLine(SongMeta songMeta, double beatsPerCharacter, Settings settings, Line line, Line nextLine)
     {
         string text = line.Content;
         int midiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes;
@@ -85,7 +91,7 @@ public class LrcFormatImporter : INeedInjection
             text);
 
         // Split note on space and semicolon characters
-        List<Note> notesAfterSplit = LyricsUtils.SplitNoteAndApplyEditModeText(note, note.Text);
+        List<Note> notesAfterSplit = editModeLyricsConverter.SplitNoteAndApplyEditModeText(note, note.Text);
 
         SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, settings.SongEditorSettings.SpaceBetweenNotesInMillis, songMeta);
 

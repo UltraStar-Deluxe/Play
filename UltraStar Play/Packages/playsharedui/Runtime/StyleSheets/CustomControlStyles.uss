@@ -655,7 +655,6 @@ AccordionItem.expanded #toggleAccordionItemContentIcon {
 }
 
 /**************************************************/
- */
 /* RADIAL PROGRESS BAR */
 /**************************************************/
 .radial-progress-bar {

@@ -18,7 +18,13 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 
     [Inject]
     private SongEditorLayerManager layerManager;
-
+    
+    [Inject]
+    private EditModeLyricsSplitter editModeLyricsSplitter;
+    
+    [Inject]
+    private EditModeLyricsConverter editModeLyricsConverter;
+    
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
@@ -27,7 +33,7 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 
     protected override string GetInitialText()
     {
-        string text = LyricsUtils.GetEditModeText(editorNoteControl.Note);
+        string text = editModeLyricsConverter.GetEditModeText(editorNoteControl.Note);
         return ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(text);
     }
 
@@ -35,7 +41,7 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
     {
         // Immediately apply changed lyrics to notes, but do not record it in the history.
         string whiteSpaceText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(newText);
-        List<string> syllables = LyricsUtils.ParseEditable(whiteSpaceText);
+        List<string> syllables = editModeLyricsConverter.ParseEditable(whiteSpaceText);
         string joinedSyllables = syllables.JoinWith("");
 
         editorNoteControl.Note.SetText(joinedSyllables);
@@ -50,11 +56,10 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 
     private void ApplyEditModeTextAndNotify(string newText, bool undoable)
     {
-        string whiteSpaceText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(newText);
-
         bool wasOnLayer = layerManager.TryGetEnumLayer(editorNoteControl.Note, out SongEditorEnumLayer songEditorLayer);
-        List<Note> notesAfterSplit = LyricsUtils.SplitNoteAndApplyEditModeText(editorNoteControl.Note, whiteSpaceText);
-        if (wasOnLayer && !notesAfterSplit.IsNullOrEmpty())
+        editModeLyricsSplitter.TryApplyEditModeText(editorNoteControl.Note, newText, out List<Note> notesAfterSplit);
+        if (wasOnLayer
+            && !notesAfterSplit.IsNullOrEmpty())
         {
             layerManager.RemoveNoteFromAllEnumLayers(editorNoteControl.Note);
             notesAfterSplit.ForEach(newNote => layerManager.AddNoteToEnumLayer(songEditorLayer.LayerEnum, newNote));

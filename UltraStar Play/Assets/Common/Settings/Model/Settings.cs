@@ -8,6 +8,7 @@ public class Settings : ISettings
     // Graphics settings
     public ScreenResolution ScreenResolution { get; set; } = new ScreenResolution(1280, 720, 60);
     public EFullScreenMode FullScreenMode { get; set; } = EFullScreenMode.Windowed;
+    public double ReferenceResolutionScaleFactor { get; set; } = 1;
     public int TargetFps { get; set; } = -1;
 
     // Audio settings
@@ -19,10 +20,12 @@ public class Settings : ISettings
     public int VocalsAudioVolumePercent { get; set; } = 100;
     public int SceneChangeSoundVolumePercent { get; set; } = 30;
     public int SfxVolumePercent { get; set; } = 30;
-    public bool PreferPortAudio { get; set; }
+    public bool PreferPortAudio { get; set; } = true;
     public bool PlayRecordedAudio { get; set; }
     public string SoundfontPath { get; set; } = "";
     public float PreviewFadeInDurationInSeconds { get; set; } = 2;
+    public EReplayGainMode ReplayGainMode { get; set; } = EReplayGainMode.Off;
+    public EDspBufferSize DspBufferSize { get; set; } = EDspBufferSize.Default;
 
     /**
      * Delay of the system audio backend until the samples are audible on the speaker.
@@ -89,7 +92,7 @@ public class Settings : ISettings
     public string ThemeName { get; set; } = ThemeManager.DefaultThemeName;
     public bool EnableDynamicThemes { get; set; } = true;
     public bool AnimatedBackground { get; set; } = true;
-    public int BackgroundLightIndex { get; set; } = 0;
+    public int BackgroundLightIndex { get; set; } = 4;
 
     // Design / presentation settings
     public ESceneChangeAnimation SceneChangeAnimation { get; set; } = ESceneChangeAnimation.Zoom;
@@ -102,7 +105,7 @@ public class Settings : ISettings
     public ESongBackgroundScaleMode SongBackgroundScaleMode { get; set; } = ESongBackgroundScaleMode.FitOutside;
 
     // Sing scene settings
-    public ENoteDisplayMode NoteDisplayMode { get; set; } = ENoteDisplayMode.SentenceBySentence;
+    public ENoteDisplayMode NoteDisplayMode { get; set; } = ENoteDisplayMode.ScrollingNoteStream;
     public int NoteDisplayLineCount { get; set; } = 0; // 0 for 'auto'
     public EStaticLyricsDisplayMode StaticLyricsDisplayMode { get; set; } = EStaticLyricsDisplayMode.Bottom;
     public bool WipeLyrics { get; set; } = true;
@@ -110,8 +113,9 @@ public class Settings : ISettings
     public bool ShowLyricsOnNotes { get; set; }
     public bool ShowPlayerInfoNextToNotes { get; set; }
     public bool ShowPlayerNames { get; set; } = true;
+    public bool ShowPlayerImages { get; set; } = true;
     public bool ShowScoreNumbers { get; set; } = true;
-    public ESongProgressBar ShowSongProgressBar { get; set; } = ESongProgressBar.Plain;
+    public ESongProgressBar ShowSongProgressBar { get; set; } = ESongProgressBar.Detailed;
     public bool AnalyzeBeatsWithoutTargetNote { get; set; } = true;
 
     // Song select settings
@@ -169,14 +173,20 @@ public class Settings : ISettings
     // Vlc settings
     public List<string> VlcOptions { get; set; } = new();
     public bool LogVlcOutput { get; set; }
-    public EThirdPartyLibraryUsage VlcToPlayMediaFilesUsage { get; set; } = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
+
+    // Media APIs
+    public EApiUsage UnityMediaApiUsage { get; set; } = EApiUsage.Enabled;
+    // TODO: AVPro is disabled by default due to crashes reported by users
+    public EApiUsage AvProApiUsage { get; set; } = EApiUsage.Disabled;
+    public EApiUsage VlcApiUsage { get; set; } = EApiUsage.Preferred;
+    public EApiUsage FfmpegApiUsage { get; set; } = EApiUsage.Enabled;
 
     // Mods
     public List<string> EnabledMods { get; private set; } = new();
     public bool ReloadModsOnFileChange { get; set; }
 
     // Online multiplayer
-    public EOnlineMultiplayerBackend EOnlineMultiplayerBackend { get; set; } = EOnlineMultiplayerBackend.Netcode;
+    public EOnlineMultiplayerBackend EOnlineMultiplayerBackend { get; set; } = EOnlineMultiplayerBackend.Steam;
     public string UnityTransportIpAddress { get; set; } = "127.0.0.1";
     public ushort UnityTransportPort { get; set; } = 7777;
     public ENetworkDelivery BeatAnalyzedEventNetworkDelivery { get; set; } = ENetworkDelivery.ReliableSequenced;

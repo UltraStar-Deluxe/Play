@@ -43,7 +43,7 @@ public class VisualElementSlideInControl
             else if (Math.Abs(lastSize.x - resolvedStyleSize.x) > 5f
                      || Math.Abs(lastSize.y - resolvedStyleSize.y) > 5f)
             {
-                Debug.Log($"VisualElementSlideInControl: size of {visualElement.name} changed from {lastSize} to {resolvedStyleSize}. Thus, updating position without transition.");
+                Log.Debug(() => $"VisualElementSlideInControl: size of {visualElement.name} changed from {lastSize} to {resolvedStyleSize}. Thus, updating position without transition.");
                 lastSize = resolvedStyleSize;
                 UpdatePositionWithoutTransition();
             }

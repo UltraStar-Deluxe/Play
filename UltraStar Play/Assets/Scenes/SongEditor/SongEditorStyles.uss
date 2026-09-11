@@ -1,4 +1,4 @@
-.songEditorRoot {
+.songEditorRoot, .panel {
     --font-color: rgb(208, 208, 208);
     --font-color-secondary: rgb(168, 168, 168);
     --font-color-inverted: rgb(64, 64, 64);
@@ -106,11 +106,13 @@ Button.selected:hover {
 #leftSideBarMainColumn {
     height: 100%;
     align-items: flex-start;
+    padding: 2px;
 }
 
 #leftSideBarMainColumn Button {
-    padding: 6px;
+    padding: 4px 2px;
     margin-bottom: 5px;
+    margin-left: 2px;
     width: 100%;
     flex-direction: row;
     justify-content: flex-start;
@@ -130,16 +132,22 @@ Button.selected:hover {
 
 #leftSideBarMainColumn.small Button {
     width: 30px;
+    justify-content: center;
 }
 
 #leftSideBarMainColumn MaterialIcon {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-l);
     width: auto;
     height: auto;
+    margin-right: 4px;
 }
 
 #leftSideBarMainColumn.small Label {
     display: none;
+}
+
+#leftSideBarMainColumn.small MaterialIcon {
+    margin-right: 0;
 }
 
 #leftSideBarMainColumn.small #smallIcon {
@@ -156,6 +164,18 @@ Button.selected:hover {
 
 #leftSideBarMainColumn.wide #wideIcon {
     display: flex;
+}
+
+#sideBarMainColumnSeparator {
+    height: 1px;
+    width: auto;
+    margin: 2px 20px;
+    background-color: var(--font-color);
+    opacity: 0.1;
+}
+
+#leftSideBarMainColumn.small #sideBarMainColumnSeparator {
+    margin: 2px 8px;
 }
 
 .unity-toggle {

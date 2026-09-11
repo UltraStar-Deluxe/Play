@@ -4,24 +4,11 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class RadialChildLayouter : VisualElement
+[UxmlElement]
+public partial class RadialChildLayouter : VisualElement
 {
-    public new class UxmlFactory : UxmlFactory<RadialChildLayouter, UxmlTraits> {};
-    public new class UxmlTraits : VisualElement.UxmlTraits
-    {
-        private readonly UxmlFloatAttributeDescription angleOffset = new() { name = "angle-offset", defaultValue = 0};
-        private readonly UxmlFloatAttributeDescription angleHighValue = new() { name = "angle-high-value", defaultValue = 360};
-        
-        public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
-        {
-            base.Init(ve, bag, cc);
-            RadialChildLayouter target = ve as RadialChildLayouter;
-            target.AngleOffset = angleOffset.GetValueFromBag(bag, cc);
-            target.AngleHighValue = angleHighValue.GetValueFromBag(bag, cc);
-        }
-    }
-
     private float angleOffset;
+    [UxmlAttribute("angle-offset")]
     public float AngleOffset
     {
         get => angleOffset;
@@ -32,7 +19,8 @@ public class RadialChildLayouter : VisualElement
         }
     }
 
-    private float angleHighValue;
+    private float angleHighValue = 360;
+    [UxmlAttribute("angle-high-value")]
     public float AngleHighValue
     {
         get => angleHighValue;

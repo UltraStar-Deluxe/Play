@@ -2,12 +2,9 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 // Derives from BaseField<bool> base class. Represents a container for its input part.
-public class SlideToggle : BaseField<bool>
+[UxmlElement]
+public partial class SlideToggle : BaseField<bool>
 {
-    public new class UxmlFactory : UxmlFactory<SlideToggle, UxmlTraits> { }
-
-    public new class UxmlTraits : BaseFieldTraits<bool, UxmlBoolAttributeDescription> { }
-
     // In the spirit of the BEM standard, the SlideToggle has its own block class and two element classes. It also
     // has a class that represents the enabled state of the toggle.
     public static readonly new string ussClassName = "slide-toggle";

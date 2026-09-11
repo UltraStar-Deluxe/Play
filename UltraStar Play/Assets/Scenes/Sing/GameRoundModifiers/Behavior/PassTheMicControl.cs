@@ -57,7 +57,9 @@ public class PassTheMicControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        passTheMicTimeInSeconds += Time.deltaTime;
+        if (!singSceneControl.IsPaused) {
+            passTheMicTimeInSeconds += Time.deltaTime;
+        }
         if (passTheMicTimeInSeconds >= settings.PassTheMicTimeInSeconds)
         {
             passTheMicTimeInSeconds -= settings.PassTheMicTimeInSeconds;

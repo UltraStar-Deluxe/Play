@@ -45,6 +45,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
     private List<Note> followingNotes = new();
 
     private readonly Dictionary<Note, Note> noteToSnapshotOfNoteMap = new();
+    private NoteAreaRect lastSelectionRectSnapshot;
     private bool isCanceled;
 
     private DragAction dragAction;
@@ -106,6 +107,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             followingNotes.Clear();
         }
 
+        lastSelectionRectSnapshot = noteAreaControl.LastSelectionRect.Value;
         CreateSnapshot(selectedNotes.Union(followingNotes));
     }
 
@@ -162,6 +164,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
 
     public void OnEndDrag(NoteAreaDragEvent dragEvent)
     {
+        selectedNotes = new List<Note>();
         if (noteToSnapshotOfNoteMap.Count > 0)
         {
             // Values have been directly applied to the notes. The snapshot can be cleared.
@@ -185,6 +188,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             note.CopyValues(snapshotOfNote);
         }
         noteToSnapshotOfNoteMap.Clear();
+        noteAreaControl.LastSelectionRect.Value = lastSelectionRectSnapshot;
 
         editorNoteDisplayer.UpdateNotesAndSentences();
     }
@@ -257,6 +261,15 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             }
         }
 
+        if (adjustFollowingNotesIfNeeded && lastSelectionRectSnapshot != null)
+        {
+            noteAreaControl.LastSelectionRect.Value = NoteAreaRect.CreateFromBeats(songMeta,
+                lastSelectionRectSnapshot.MinBeat + dragEvent.BeatDistance,
+                lastSelectionRectSnapshot.MaxBeat + dragEvent.BeatDistance,
+                lastSelectionRectSnapshot.MinMidiNote,
+                lastSelectionRectSnapshot.MaxMidiNote);
+        }
+
         if (SongEditorSettingsUtils.ShouldAdjustFollowingNotes(settings, adjustFollowingNotesIfNeeded))
         {
             MoveNotesHorizontal(dragEvent, followingNotes, false);
@@ -275,6 +288,15 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
                     note.SetEndBeat(newEndBeat);
                 }
             }
+        }
+
+        if (adjustFollowingNotesIfNeeded && lastSelectionRectSnapshot != null)
+        {
+            noteAreaControl.LastSelectionRect.Value = NoteAreaRect.CreateFromBeats(songMeta,
+                lastSelectionRectSnapshot.MinBeat,
+                lastSelectionRectSnapshot.MaxBeat + dragEvent.BeatDistance,
+                lastSelectionRectSnapshot.MinMidiNote,
+                lastSelectionRectSnapshot.MaxMidiNote);
         }
 
         if (SongEditorSettingsUtils.ShouldAdjustFollowingNotes(settings, adjustFollowingNotesIfNeeded))
@@ -296,6 +318,15 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
                     note.SetStartBeat(newStartBeat);
                 }
             }
+        }
+
+        if (lastSelectionRectSnapshot != null)
+        {
+            noteAreaControl.LastSelectionRect.Value = NoteAreaRect.CreateFromBeats(songMeta,
+                lastSelectionRectSnapshot.MinBeat + dragEvent.BeatDistance,
+                lastSelectionRectSnapshot.MaxBeat,
+                lastSelectionRectSnapshot.MinMidiNote,
+                lastSelectionRectSnapshot.MaxMidiNote);
         }
     }
 
@@ -328,6 +359,15 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             float newEndBeat = anchorBeatInSelection + (noteSnapshot.EndBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
             note.SetStartAndEndBeat((int)newStartBeat, (int)newEndBeat);
         }
+
+        if (lastSelectionRectSnapshot != null)
+        {
+            noteAreaControl.LastSelectionRect.Value = NoteAreaRect.CreateFromBeats(songMeta,
+                (int)(anchorBeatInSelection + (lastSelectionRectSnapshot.MinBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection)),
+                (int)(anchorBeatInSelection + (lastSelectionRectSnapshot.MaxBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection)),
+                lastSelectionRectSnapshot.MinMidiNote,
+                lastSelectionRectSnapshot.MaxMidiNote);
+        }
     }
 
     private void StretchNotesRight(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
@@ -358,6 +398,15 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             float newStartBeat = anchorBeatInSelection + (noteSnapshot.StartBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
             float newEndBeat = anchorBeatInSelection + (noteSnapshot.EndBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
             note.SetStartAndEndBeat((int)newStartBeat, (int)newEndBeat);
+        }
+
+        if (adjustFollowingNotesIfNeeded && lastSelectionRectSnapshot != null)
+        {
+            noteAreaControl.LastSelectionRect.Value = NoteAreaRect.CreateFromBeats(songMeta,
+                (int)(anchorBeatInSelection + (lastSelectionRectSnapshot.MinBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection)),
+                (int)(anchorBeatInSelection + (lastSelectionRectSnapshot.MaxBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection)),
+                lastSelectionRectSnapshot.MinMidiNote,
+                lastSelectionRectSnapshot.MaxMidiNote);
         }
 
         if (SongEditorSettingsUtils.ShouldAdjustFollowingNotes(settings, adjustFollowingNotesIfNeeded))

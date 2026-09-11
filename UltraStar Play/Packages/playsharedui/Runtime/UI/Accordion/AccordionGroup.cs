@@ -1,14 +1,9 @@
 using System.Linq;
 using UnityEngine.UIElements;
 
-public class AccordionGroup : VisualElement
+[UxmlElement]
+public partial class AccordionGroup : VisualElement
 {
-    // UIToolkit factory class
-    public new class UxmlFactory : UxmlFactory<AccordionGroup, UxmlTraits> {};
-    public new class UxmlTraits : VisualElement.UxmlTraits
-    {
-    }
-
     private readonly SetFirstAndLastChildClassControl setFirstAndLastChildClassControl;
 
     public AccordionGroup()

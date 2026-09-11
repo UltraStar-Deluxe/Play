@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using NUnit.Framework;
+using UnityEngine.TestTools;
+
+/**
+ * Tests the audio player support, including audio support provider selection.
+ * Therefore, it assumes the default provider priority (when all are enabled): Unity > AVPro > VLC.
+ */
+public class SongAudioPlayerFileFormatTest : AbstractMediaFileFormatTest
+{
+    private static readonly List<TestCaseData> supportedByUnity = new List<TestCaseData>()
+    {
+        new TestCaseData("mp3-ConstantBitRate.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
+        new TestCaseData("mp3-VariableBitRate.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
+        new TestCaseData("ogg.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
+        new TestCaseData("wav.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
+
+        // Video formats, supported via Unity VideoPlayer
+        new TestCaseData("avi.txt", typeof(VideoPlayerAudioSupportProvider)).Returns(null),
+        new TestCaseData("mp4.txt", typeof(VideoPlayerAudioSupportProvider)).Returns(null),
+        new TestCaseData("mp4-hvec.txt", typeof(VideoPlayerAudioSupportProvider)).Returns(null),
+        new TestCaseData("webm-vp8.txt", typeof(VideoPlayerAudioSupportProvider)).Returns(null),
+    };
+
+    // ogg and mp3 use Unity API preferred even if configured otherwise because Unity API works best for them.
+    private static readonly List<TestCaseData> preferredByUnity = new List<TestCaseData>()
+    {
+        new TestCaseData("mp3-ConstantBitRate.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
+        new TestCaseData("ogg.txt", typeof(AudioSourceAudioSupportProvider)).Returns(null),
+    };
+
+    private static readonly List<TestCaseData> supportedByMidiManager = new List<TestCaseData>()
+    {
+        new TestCaseData("midi.txt").Returns(null),
+    };
+    
+    [UnityTest]
+    [TestCaseSource(nameof(supportedByUnity))]
+    public IEnumerator ShouldLoadViaUnity(string txtFilePath, Type expectedAudioSupportProviderType)
+    {
+        ConfigureMediaApiSettings(EApiUsage.Enabled, EApiUsage.Disabled, EApiUsage.Disabled);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, expectedAudioSupportProviderType);
+    }
+
+    [UnityTest]
+    [TestCaseSource(nameof(supportedByMidiManager))]
+    public IEnumerator ShouldLoadMidi(string txtFilePath)
+    {
+        ConfigureMediaApiSettings(EApiUsage.Disabled, EApiUsage.Disabled, EApiUsage.Disabled);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, typeof(MidiAudioSupportProvider), 8000);
+    }
+    
+    [UnityTest]
+    [TestCaseSource(nameof(preferredByUnity))]
+    public IEnumerator ShouldLoadOggAndMp3ViaUnityPreferred(string txtFilePath, Type expectedAudioSupportProviderType)
+    {
+        // Unity is not configured as preferred, but ogg and mp3 are hard corded to still use Unity API.
+        ConfigureMediaApiSettings(EApiUsage.Enabled, EApiUsage.Preferred, EApiUsage.Preferred);
+        yield return SongAudioPlayerShouldLoadFileAsync(txtFilePath, expectedAudioSupportProviderType);
+    }
+    
+    private static void ConfigureMediaApiSettings(EApiUsage unity, EApiUsage avpro, EApiUsage vlc)
+    {
+        SettingsManager.Instance.Settings.UnityMediaApiUsage = unity;
+        SettingsManager.Instance.Settings.AvProApiUsage = avpro;
+        SettingsManager.Instance.Settings.VlcApiUsage = vlc;
+    }
+}

@@ -38,6 +38,12 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private GameObject gameObject;
 
+    [Inject]
+    private AudioSampleLoader audioSampleLoader;
+    
+    [Inject]
+    private NoteAreaControl noteAreaControl;
+
     private AudioWaveFormVisualization audioWaveFormVisualization;
     private ContextMenuControl contextMenuControl;
 
@@ -99,8 +105,7 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
     public async void UpdateAudioWaveForm()
     {
         if (!songAudioPlayer.IsFullyLoaded
-            // Must be an audio format. Getting all the samples does not work with video files.
-            || !ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Audio))
+            || !SongEditorAudioWaveformUtils.IsSupportedAudioFormat(songMeta, settings)
             || !VisualElementUtils.HasGeometry(overviewArea))
         {
             return;
@@ -108,8 +113,8 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
 
         if (audioWaveFormVisualization == null)
         {
-            int textureWidth = 512;
-            int textureHeight = 128;
+            int textureWidth = 1024;
+            int textureHeight = 64;
             audioWaveFormVisualization = new AudioWaveFormVisualization(
                 songEditorSceneControl.gameObject,
                 overviewAreaWaveform,
@@ -120,7 +125,7 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
             audioWaveFormVisualization.WaveformColor = overviewAreaLabel.resolvedStyle.color;
         }
 
-        AudioClip audioClip = await SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
+        AudioClip audioClip = await SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings, audioSampleLoader);
         SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioClip);
     }
 
@@ -149,5 +154,6 @@ public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
         double xPercent = evt.localPosition.x / overviewArea.contentRect.width;
         double positionInMillis = songAudioPlayer.DurationInMillis * xPercent;
         songAudioPlayer.PositionInMillis = positionInMillis;
+        noteAreaControl.MoveViewportToPositionInMillis(positionInMillis);
     }
 }

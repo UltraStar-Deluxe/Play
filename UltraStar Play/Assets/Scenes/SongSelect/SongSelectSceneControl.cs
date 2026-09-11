@@ -92,6 +92,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     [Inject]
     private SongIssueManager songIssueManager;
 
+    [Inject]
+    private SongMediaUriResolverManager songMediaUriResolverManager;
+
     [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
     private VisualElement noSongsFoundContainer;
 
@@ -122,6 +125,33 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
     public SongMeta SelectedSong => (songRouletteControl.SelectedEntry as SongSelectSongEntry)?.SongMeta;
 
+    public UltraStarPlaylist LastEditedPlaylist
+    {
+        get
+        {
+            string playlistName = nonPersistentSettings.LastEditedPlaylistName.Value;
+            if (playlistName.IsNullOrEmpty())
+            {
+                return playlistManager.FavoritesPlaylist;
+            }
+
+            return (playlistManager.GetPlaylistByName(playlistName) as UltraStarPlaylist) ?? playlistManager.FavoritesPlaylist;
+        }
+
+        set
+        {
+            UltraStarPlaylist newPlaylist = value;
+            if (newPlaylist == null
+                || newPlaylist is UltraStarAllSongsPlaylist)
+            {
+                nonPersistentSettings.LastEditedPlaylistName.Value = "";
+                return;
+            }
+            
+            nonPersistentSettings.LastEditedPlaylistName.Value = value.Name;
+        }
+    }
+
     private MessageDialogControl searchExpressionHelpDialogControl;
     private MessageDialogControl lyricsDialogControl;
     private MessageDialogControl noSingAlongDataDialogControl;
@@ -133,7 +163,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
     public bool IsPartyModeRandomSongSelection => HasPartyModeSceneData
                                                   && PartyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random;
     public bool UsePartyModePlaylist => IsPartyModeRandomSongSelection
-                                        && PartyModeSettings.SongSelectionSettings.SongPoolPlaylistName != null;
+                                        && PartyModeSettings.SongSelectionSettings.SongPoolPlaylist != null;
     public bool CanUseSongSelectionJoker => PartyModeSceneData.remainingJokerCount != 0;
 
     public SongSelectionPlaylistChooserControl SongSelectionPlaylistChooserControl { get; private set; } = new();
@@ -490,7 +520,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        string audioUri = songMediaUriResolverManager.ResolveAudioUri(songMeta);
+        if (!SongMetaUtils.ResourceExists(songMeta, audioUri))
         {
             NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioNotFound));
             return;
@@ -498,6 +529,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
 
         SongEditorSceneData editorSceneData = new();
         editorSceneData.SongMeta = songMeta;
+        editorSceneData.ForcedAlignmentLyrics = SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1, true);
 
         SingSceneData singSceneData = CreateSingSceneDataWithGivenSongAndSettings(songMeta, false);
         if (singSceneData != null)
@@ -547,9 +579,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         }
 
         // Check that the audio file exists
-        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        string audioUri = songMediaUriResolverManager.ResolveAudioUri(songMeta);
+        if (!SongMetaUtils.ResourceExists(songMeta, audioUri))
         {
-            string audioUri = SongMetaUtils.GetAudioUri(songMeta);
             Translation errorMessage = Translation.Get(R.Messages.songSelectScene_error_audioNotFound,
                 "name", audioUri);
             Debug.LogWarning(errorMessage);
@@ -557,20 +589,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
             return;
         }
 
-        // Check that the used audio format can be loaded.
-        try
-        {
-            await songAudioPlayer.LoadAndPlayAsync(songMeta);
-            StartSingSceneWithGivenSongAndSettings(songMeta, false, true);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            Debug.LogError( $"Failed to load audio '{songMeta.GetArtistDashTitle()}': {ex.Message}");
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.songSelectScene_error_audioFailedToLoad,
-                "name", songMeta.Audio,
-                "supportedFormats", ApplicationUtils.supportedAudioFiles.JoinWith(", ")));
-        }
+        // Start singing. Checking whether the audio can be loaded is done in SingScene.
+        StartSingSceneWithGivenSongAndSettings(songMeta, false, true);
     }
 
     private void ShowFailedToLoadVoicesDialog(SongMeta songMeta)
@@ -960,25 +980,34 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, II
         return new SongSelectSceneData();
     }
 
-    public void ToggleFavoritePlaylist()
+    public void ToggleLastEditedPlaylist()
     {
-        SongSelectionPlaylistChooserControl.ToggleFavoritePlaylist();
+        SongSelectionPlaylistChooserControl.TogglePlaylist(LastEditedPlaylist);
     }
 
-    public void ToggleSelectedSongIsFavorite()
+    public void ToggleSelectedSongInLastEditedPlaylist()
     {
         if (SelectedSong == null)
         {
             return;
         }
 
-        if (playlistManager.FavoritesPlaylist.HasSongEntry(SelectedSong))
+        UltraStarPlaylist targetPlaylist = LastEditedPlaylist;
+        if (PlaylistUtils.IsInPlaylist(targetPlaylist, SelectedSong))
         {
-            playlistManager.RemoveSongFromPlaylist(playlistManager.FavoritesPlaylist, SelectedSong);
+            playlistManager.RemoveSongFromPlaylist(targetPlaylist, SelectedSong);
+            if (targetPlaylist != playlistManager.FavoritesPlaylist)
+            {
+                NotificationManager.CreateNotification(Translation.Of($"Removed '{SelectedSong.GetArtistDashTitle()}' from '{targetPlaylist.Name}'"));
+            }
         }
         else
         {
-            playlistManager.AddSongToPlaylist(playlistManager.FavoritesPlaylist, SelectedSong);
+            playlistManager.AddSongToPlaylist(targetPlaylist, SelectedSong);
+            if (targetPlaylist != playlistManager.FavoritesPlaylist)
+            {
+                NotificationManager.CreateNotification(Translation.Of($"Added '{SelectedSong.GetArtistDashTitle()}' to '{targetPlaylist.Name}'"));
+            }
         }
     }
 

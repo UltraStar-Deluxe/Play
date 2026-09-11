@@ -1,27 +1,12 @@
 using UnityEngine.UIElements;
 
-public class ButtonGroup : VisualElement
+[UxmlElement]
+public partial class ButtonGroup : VisualElement
 {
     public enum ButtonGroupDirection { Horizontal, Vertical }
-    
-    // UIToolkit factory class
-    public new class UxmlFactory : UxmlFactory<ButtonGroup, UxmlTraits> {};
-    public new class UxmlTraits : VisualElement.UxmlTraits
-    {
-        private readonly UxmlEnumAttributeDescription<ButtonGroupDirection> direction = new() { name = "direction", defaultValue = ButtonGroupDirection.Vertical};
-
-        public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
-        {
-            base.Init(ve, bag, cc);
-            ButtonGroup target = ve as ButtonGroup;
-
-            // Read additional attributes from XML
-            // In the UIBuilder, the XML attributes and target object fields are synchronized implicitly by name.
-            target.Direction = direction.GetValueFromBag(bag, cc);
-        }
-    }
 
     private ButtonGroupDirection direction;
+    [UxmlAttribute("direction")]
     public ButtonGroupDirection Direction
     {
         get => direction;

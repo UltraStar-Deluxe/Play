@@ -30,8 +30,6 @@ MonoBehaviour:
   m_MatchMaterialPreset: 0
   m_MissingCharacterUnicode: 0
   m_ClearDynamicDataOnBuild: 1
-  m_EnableEmojiSupport: 0
-  m_EmojiFallbackTextAssets: []
   m_DefaultSpriteAsset: {fileID: 0}
   m_DefaultSpriteAssetPath: Sprite Assets/
   m_FallbackSpriteAssets: []
@@ -44,4 +42,5 @@ MonoBehaviour:
     m_LeadingCharacters: {fileID: 0}
     m_FollowingCharacters: {fileID: 0}
     m_UseModernHangulLineBreakingRules: 0
+  m_UseModernHangulLineBreakingRules: 0
   m_DisplayWarnings: 1

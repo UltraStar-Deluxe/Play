@@ -3,29 +3,10 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class AccordionItem : VisualElement
+[UxmlElement]
+public partial class AccordionItem : VisualElement
 {
-    // UIToolkit factory class
-    public new class UxmlFactory : UxmlFactory<AccordionItem, UxmlTraits> {};
-    public new class UxmlTraits : VisualElement.UxmlTraits
-    {
-        // Additional XML attributes
-        private readonly UxmlBoolAttributeDescription contentVisible = new() { name = "content-visible", defaultValue = true};
-        private readonly UxmlStringAttributeDescription title = new() { name = "label", defaultValue = "Title"};
-
-        public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
-        {
-            base.Init(ve, bag, cc);
-            AccordionItem target = ve as AccordionItem;
-
-            // Read additional attributes from XML
-            // In the UIBuilder, the XML attributes and target object fields are synchronized implicitly by name.
-            target.ContentVisible = contentVisible.GetValueFromBag(bag, cc);
-            target.Title = title.GetValueFromBag(bag, cc);
-            target.UpdateTargetHeight();
-        }
-    }
-
+    [UxmlAttribute("content-visible")]
     public bool ContentVisible
     {
         get { return this.ClassListContains("expanded"); }
@@ -42,6 +23,7 @@ public class AccordionItem : VisualElement
         }
     }
 
+    [UxmlAttribute("label")]
     public string Title
     {
         get { return TitleElement.text; }

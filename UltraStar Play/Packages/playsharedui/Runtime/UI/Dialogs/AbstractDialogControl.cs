@@ -15,6 +15,8 @@ public abstract class AbstractDialogControl : IDialogControl, INeedInjection, II
 
     protected static int instantiatedDialogCount;
 
+    public static bool AnyDialogOpen => instantiatedDialogCount > 0;
+    
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement DialogRootVisualElement { get; protected set; }
 
@@ -37,5 +39,6 @@ public abstract class AbstractDialogControl : IDialogControl, INeedInjection, II
         DialogRootVisualElement.RemoveFromHierarchy();
         dialogClosedEventStream.OnNext(VoidEvent.instance);
         disposables.ForEach(it => it.Dispose());
+        instantiatedDialogCount--;
     }
 }

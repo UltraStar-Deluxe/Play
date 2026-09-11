@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+// TODO: Rename to UltraStarSongWriter, for symmetry with UltraStarSongParser
 public static class UltraStarFormatWriter
 {
     public static void WriteFile(string absolutePath, SongMeta songMeta, UltraStarSongFormatVersion version, bool writeByteOrderMark = true)
@@ -55,7 +56,7 @@ public static class UltraStarFormatWriter
         if (appendVoiceId)
         {
             // P1 is optional when only having one voice
-            sb.AppendLine(voice.Id.ToString());
+            sb.AppendLineFeed(voice.Id.ToString());
         }
         List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(voice);
         for (int i = 0; i < sortedSentences.Count; i++)
@@ -80,15 +81,16 @@ public static class UltraStarFormatWriter
         {
             AppendNote(sb, note);
         }
+
         if (appendLinebreak)
         {
             // TODO: Linebreak timing could be optional but is required by some other tools, https://github.com/UltraStar-Deluxe/format/issues/64
-            sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+            sb.AppendLineFeed($"- {sentence.ExtendedMaxBeat}");
             // if (sentence.ExtendedMaxBeat > sentence.MaxBeat)
             // {
-            //     sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
+            //     sb.AppendLineFeed($"- {sentence.ExtendedMaxBeat}");
             // } else {
-            //     sb.AppendLine($"-");
+            //     sb.AppendLineFeed($"-");
             // }
         }
     }
@@ -105,7 +107,7 @@ public static class UltraStarFormatWriter
             return;
         }
 
-        sb.AppendLine($"{GetNoteTypePrefix(note.Type)} {note.StartBeat} {note.Length} {note.TxtPitch} {note.Text}");
+        sb.AppendLineFeed($"{GetNoteTypePrefix(note.Type)} {note.StartBeat} {note.Length} {note.TxtPitch} {note.Text}");
     }
 
     public static string GetNoteTypePrefix(ENoteType noteType)
@@ -162,26 +164,34 @@ public static class UltraStarFormatWriter
         AppendNumberHeaderField(sb, "previewstart", version.IsBefore(UltraStarSongFormatVersion.v200) ? songMeta.TxtFilePreviewStartInSeconds : songMeta.PreviewStartInMillis);
         AppendNumberHeaderField(sb, "previewend", version.IsBefore(UltraStarSongFormatVersion.v200) ? songMeta.TxtFilePreviewEndInSeconds : songMeta.PreviewEndInMillis);
 
-        if (version.IsBefore(UltraStarSongFormatVersion.v200))
+        if (HasMedleyStartOrEnd(songMeta))
         {
-            AppendNumberHeaderField(sb, "medleystartbeat", songMeta.TxtFileMedleyStartBeat);
-            AppendNumberHeaderField(sb, "medleyendbeat", songMeta.TxtFileMedleyEndBeat);
-        }
-        else
-        {
-            AppendNumberHeaderField(sb, "medleystart", songMeta.MedleyStartInMillis);
-            AppendNumberHeaderField(sb, "medleyend", songMeta.MedleyEndInMillis);
+            if (version.IsBefore(UltraStarSongFormatVersion.v200))
+            {
+                AppendNumberHeaderField(sb, "medleystartbeat", songMeta.TxtFileMedleyStartBeat);
+                AppendNumberHeaderField(sb, "medleyendbeat", songMeta.TxtFileMedleyEndBeat);
+            }
+            else
+            {
+                AppendNumberHeaderField(sb, "medleystart", songMeta.MedleyStartInMillis);
+                AppendNumberHeaderField(sb, "medleyend", songMeta.MedleyEndInMillis);
+            }
         }
 
         songMeta.AdditionalHeaderEntries.ForEach(entry =>
             AppendHeaderField(sb, entry.Key, entry.Value));
     }
 
+    private static bool HasMedleyStartOrEnd(UltraStarSongMeta songMeta)
+    {
+        return songMeta.MedleyStartInMillis != 0 || songMeta.MedleyEndInMillis != 0;
+    }
+
     private static void AppendHeaderField(StringBuilder sb, string key, string value)
     {
         if (!value.IsNullOrEmpty())
         {
-            sb.AppendLine($"#{key.ToUpper(CultureInfo.InvariantCulture)}:{value}");
+            sb.AppendLineFeed($"#{key.ToUpper(CultureInfo.InvariantCulture)}:{value}");
         }
     }
 

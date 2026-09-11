@@ -100,16 +100,6 @@ public static class StringExtensions
         return txt.Substring(0, 1).ToUpperInvariant() + txt.Substring(1, txt.Length - 1);
     }
 
-    public static void AppendLine(this StringBuilder sb, string line, int indentationInSpaces)
-    {
-        for (int i = 0; i < indentationInSpaces; i++)
-        {
-            sb.Append(" ");
-        }
-        sb.Append(line);
-        sb.Append("\n");
-    }
-
     // https://stackoverflow.com/questions/5796383/insert-spaces-between-words-on-a-camel-cased-token
     public static string SplitCamelCase( this string str )
     {
