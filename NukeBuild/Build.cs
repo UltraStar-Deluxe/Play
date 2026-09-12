@@ -17,6 +17,8 @@ class Build : NukeBuild
     [Parameter] readonly AbsolutePath buildOutput = RootDirectory / "Build";
     [Parameter] readonly AbsolutePath unityExecutable;
     [Parameter] readonly UnityTestPlatform testPlatform = UnityTestPlatform.EditMode;
+    [Parameter] readonly bool downloadAiModels;
+    [Parameter] readonly bool downloadFfmpegLibraries;
 
     private readonly AbsolutePath mainGameDir = RootDirectory / "UltraStar Play";
     private readonly AbsolutePath companionAppDir = RootDirectory / "UltraStar Play Companion";
@@ -127,7 +129,7 @@ class Build : NukeBuild
 
     Target RestoreMainGameDependencies => _ => _
         .DependsOn(RestoreMainGameNuGetDependencies)
-        .Executes(() => new MainGameDependencyDownloader(mainGameDir, cloneDepth).DownloadAsync());
+        .Executes(() => new MainGameDependencyDownloader(mainGameDir, cloneDepth, downloadAiModels, downloadFfmpegLibraries).DownloadAsync());
 
     Target RestoreCompanionAppNuGetDependencies => _ => _
         .DependsOn(RestoreMainGameNuGetDependencies) // Restore main game dependencies for playshared

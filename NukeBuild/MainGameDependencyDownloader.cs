@@ -9,7 +9,9 @@ namespace DefaultNamespace;
 
 public class MainGameDependencyDownloader(
     AbsolutePath unityProjectDir,
-    uint cloneDepth
+    uint cloneDepth,
+    bool downloadAiModels = false,
+    bool downloadFfmpegLibraries = false
 ) : BaseDependencyDownloader(unityProjectDir, cloneDepth) {
 
     public override async Task DownloadAsync()
@@ -18,8 +20,14 @@ public class MainGameDependencyDownloader(
 
         DownloadCSharpSynthForUnity();
         DownloadUnityStandaloneFileBrowser();
-        await DownloadAiModelsAsync();
-        await DownloadFfmpegLibrariesAsync();
+        if (downloadAiModels)
+        {
+            await DownloadAiModelsAsync();
+        }
+        if (downloadFfmpegLibraries)
+        {
+            await DownloadFfmpegLibrariesAsync();
+        }
     }
 
     private async Task DownloadAiModelsAsync()
