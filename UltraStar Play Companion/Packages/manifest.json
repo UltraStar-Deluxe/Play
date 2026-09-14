@@ -29,8 +29,8 @@
     "com.unity.ugui": "2.5.0",
     "com.unity.ui.builder": "2.0.0",
     "com.unity.vectorgraphics": "3.0.0-preview.7",
-    "com.yasirkula.androidruntimepermissions": "https://github.com/yasirkula/UnityAndroidRuntimePermissions.git",
-    "com.yasirkula.ingamedebugconsole": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.5.8",
+    "com.yasirkula.androidruntimepermissions": "https://github.com/yasirkula/UnityAndroidRuntimePermissions.git#v1.3.1",
+    "com.yasirkula.ingamedebugconsole": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.9.0",
     "jillejr.newtonsoft.json-for-unity.converters": "https://github.com/applejag/Newtonsoft.Json-for-Unity.Converters.git#1.6.3",
     "playshared": "file:../../UltraStar Play/Packages/playshared",
     "playsharedui": "file:../../UltraStar Play/Packages/playsharedui"

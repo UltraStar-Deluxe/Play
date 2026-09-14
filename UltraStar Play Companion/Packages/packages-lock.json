@@ -158,18 +158,18 @@
       "url": "https://packages.unity.com"
     },
     "com.yasirkula.androidruntimepermissions": {
-      "version": "https://github.com/yasirkula/UnityAndroidRuntimePermissions.git",
+      "version": "https://github.com/yasirkula/UnityAndroidRuntimePermissions.git#v1.3.1",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "6778d20ec4133dbac43cd526113426a608558249"
+      "hash": "b077d5e5391bf67b31643008eabcd1db114a886c"
     },
     "com.yasirkula.ingamedebugconsole": {
-      "version": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.5.8",
+      "version": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.9.0",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "2ee62e21eded65257454d14d545f5db7484743b0"
+      "hash": "73c1d9c582e0b49d63ddcd6efb48b0059f33d43c"
     },
     "jillejr.newtonsoft.json-for-unity.converters": {
       "version": "https://github.com/applejag/Newtonsoft.Json-for-Unity.Converters.git#1.6.3",
