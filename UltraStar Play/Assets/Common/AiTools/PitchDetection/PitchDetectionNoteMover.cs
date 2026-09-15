@@ -2,88 +2,67 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class PitchDetectionNoteMover
+public static class PitchDetectionNoteMover
 {
-     public static void MoveNotesToDetectedPitchUsingPitchDetectionLayer(
+    public static void MoveNotesToDetectedPitch(
         SongMeta songMeta,
         List<Note> notes,
-        List<Note> pitchDetectionLayerNotes)
+        PitchDetectionResult pitchDetectionResult)
     {
-        int minBeat = SongMetaUtils.GetMinBeat(notes);
-        int maxBeat = SongMetaUtils.GetMaxBeat(notes);
-        List<Note> pitchDetectionLayerNotesInRange = pitchDetectionLayerNotes
-            .Where(it => minBeat <= it.EndBeat && it.StartBeat <= maxBeat)
+        notes.ForEach(note => MoveNoteToDetectedPitch(songMeta, note, pitchDetectionResult));
+    }
+
+    private static void MoveNoteToDetectedPitch(
+        SongMeta songMeta,
+        Note note,
+        PitchDetectionResult pitchDetectionResult)
+    {
+        if (pitchDetectionResult == null
+            || pitchDetectionResult.Notes.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        double startInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat);
+        double endInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.EndBeat);
+
+        // Find pitch detection results that overlap with the note's time range
+        List<PitchDetectionResultNote> overlappingResults = pitchDetectionResult.Notes
+            .Where(resultNote => resultNote.StartInMillis < endInMillis
+                                 && resultNote.StartInMillis + resultNote.LengthInMillis > startInMillis)
             .ToList();
-        if (pitchDetectionLayerNotesInRange.IsNullOrEmpty())
+
+        if (overlappingResults.IsNullOrEmpty())
         {
             return;
         }
 
-        // Map beat to detected pitches
-        Dictionary<int, List<int>> beatToDetectedPitches = new();
-        foreach (Note pitchDetectionLayerNote in pitchDetectionLayerNotesInRange)
+        // Determine the best fitting midi note.
+        // We use the MidiNote that has the largest total overlap duration.
+        // This is necessary because the same MidiNote might be split across multiple pitchDetectionResult notes.
+        Dictionary<int, double> midiNoteToOverlapDuration = new();
+        foreach (PitchDetectionResultNote resultNote in overlappingResults)
         {
-            for (int beat = pitchDetectionLayerNote.StartBeat; beat < pitchDetectionLayerNote.EndBeat; beat++)
-            {
-                beatToDetectedPitches.AddInsideList(beat, pitchDetectionLayerNote.MidiNote);
-            }
-        }
+            double overlapStart = Math.Max(startInMillis, resultNote.StartInMillis);
+            double overlapEnd = Math.Min(endInMillis, resultNote.StartInMillis + resultNote.LengthInMillis);
+            double overlapDuration = overlapEnd - overlapStart;
 
-        int localAverageWindowSizeInBeats = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, 3000);
-        localAverageWindowSizeInBeats = NumberUtils.Limit(localAverageWindowSizeInBeats, 1, int.MaxValue);
-
-        foreach (Note note in notes)
-        {
-            // Move note to pitch that is closest to local average on pitch detection layer
-            List<int> detectedPitchesOfNote = new();
-            for (int beat = note.StartBeat; beat < note.EndBeat; beat++)
+            if (overlapDuration > 0)
             {
-                if (beatToDetectedPitches.ContainsKey(beat))
+                if (!midiNoteToOverlapDuration.TryAdd(resultNote.MidiNote, overlapDuration))
                 {
-                    List<int> detectedPitchesOfBeat = beatToDetectedPitches[beat];
-                    if (detectedPitchesOfBeat.Count == 1)
-                    {
-                        detectedPitchesOfNote.Add(detectedPitchesOfBeat[0]);
-                    }
-                    else if (detectedPitchesOfBeat.Count > 1)
-                    {
-                        if (TryFindLocalAveragePitch(pitchDetectionLayerNotes, beat, localAverageWindowSizeInBeats, out int localAveragePitch))
-                        {
-                            int detectedPitchOfBeatClosestToAverage = detectedPitchesOfBeat.FindMinElement(pitch => Math.Abs(pitch - localAveragePitch));
-                            detectedPitchesOfNote.Add(detectedPitchOfBeatClosestToAverage);
-                        }
-                        else
-                        {
-                            // Could not determine best candidate. Just take the first one.
-                            detectedPitchesOfNote.Add(detectedPitchesOfBeat.FirstOrDefault());
-                        }
-                    }
+                    midiNoteToOverlapDuration[resultNote.MidiNote] += overlapDuration;
                 }
             }
-
-            if (!detectedPitchesOfNote.IsNullOrEmpty())
-            {
-                int medianMidiNote = NumberUtils.Median(detectedPitchesOfNote);
-                note.SetMidiNote(medianMidiNote);
-            }
         }
-    }
 
-    private static bool TryFindLocalAveragePitch(List<Note> notes, int beat, int localAverageWindowSizeInBeats, out int localAveragePitch)
-    {
-        List<Note> notesInWindow = notes
-            .Where(note => note.StartBeat - localAverageWindowSizeInBeats <= beat
-                           && beat < note.EndBeat + localAverageWindowSizeInBeats)
-            .ToList();
-        if (notesInWindow.IsNullOrEmpty())
+        if (midiNoteToOverlapDuration.Count > 0)
         {
-            localAveragePitch = 0;
-            return false;
+            int bestMidiNote = midiNoteToOverlapDuration
+                .OrderByDescending(pair => pair.Value)
+                .First()
+                .Key;
+            note.SetMidiNote(bestMidiNote);
         }
-
-        localAveragePitch = (int)notesInWindow
-            .Select(note => note.MidiNote)
-            .Average();
-        return true;
     }
 }

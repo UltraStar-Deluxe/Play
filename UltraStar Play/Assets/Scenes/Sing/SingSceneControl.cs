@@ -14,6 +14,8 @@ using IBinding = UniInject.IBinding;
 
 public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
+    private const float VideoFadeInTimeInSeconds = 1f;
+
     private static SingSceneControl instance;
     public static SingSceneControl Instance
     {
@@ -675,15 +677,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         try
         {
-            string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(SongMeta, WebViewUtils.CanHandleWebViewUrl);
-            if (SongMetaUtils.ResourceExists(SongMeta, videoUri))
-            {
-                songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
-            }
-            else
-            {
-                songVideoPlayer.ShowBackgroundImage(SongMeta);
-            }
+            songVideoPlayer.VideoFadeInTimeInSeconds = VideoFadeInTimeInSeconds;
+            songVideoPlayer.LoadAndPlayVideoOrShowBackgroundImage(SongMeta);
         }
         catch (Exception ex)
         {
@@ -851,6 +846,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             SongMeta = SongMeta,
             PlayerProfileToMicProfileMap = sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap,
             SelectedPlayerProfiles = sceneData.SingScenePlayerData.SelectedPlayerProfiles,
+            ForcedAlignmentLyrics = SongMetaUtils.GetLyrics(SongMeta, EVoiceId.P1, true),
         };
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
         sceneNavigator.LoadScene(EScene.SongEditorScene, songEditorSceneData);
@@ -1268,12 +1264,21 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.LogError($"Failed to load audio: {ex.Message}");
+            Debug.LogError($"Failed to load audio '{SongMeta.GetArtistDashTitle()}': {ex.Message}");
 
             if (ex is not DestroyedAlreadyException)
             {
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
-                    "reason", ex.Message));
+                // Create notification after delay to avoid them being removed directly when changing scene.
+                // TODO: Preserve notifications across scenes until they fade-out.
+                AwaitableUtils.ExecuteAfterDelayInSecondsAsync(NotificationManager.Instance.gameObject, 0.1f, () =>
+                {
+                    NotificationManager.CreateNotification(Translation.Get(
+                        R.Messages.songSelectScene_error_audioFailedToLoad,
+                        "name", SongMeta.Audio,
+                        "supportedFormats", ApplicationUtils.allSupportedAudioFiles.JoinWith(", ")));
+                    NotificationManager.CreateNotification(Translation.Get(R.Messages.common_errorWithReason,
+                        "reason", ex.Message));
+                });
             }
             PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToCompanionClient());
             sceneNavigator.LoadScene(EScene.SongSelectScene);
@@ -1408,5 +1413,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 singingLyricsControl.FadeIn(animTimeInSeconds);
             }
         }
+    }
+
+    public void JumpToAudioPositionByUserAction(double newPositionInMillis)
+    {
+        double oldPositionInMillis = songAudioPlayer.PositionInMillis;
+        songAudioPlayer.PositionInMillis = newPositionInMillis;
+        PlayerControls.ForEach(playerControl =>
+            playerControl.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis));
     }
 }

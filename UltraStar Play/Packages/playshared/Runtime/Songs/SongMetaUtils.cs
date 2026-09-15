@@ -302,11 +302,21 @@ public static class SongMetaUtils
 
     public static string GetLyrics(List<Note> notes, bool removeTilde = false)
     {
+        Note lastNote = null;
+        
         StringBuilder sb = new();
-        notes.ForEach(note =>
+        foreach (Note note in notes)
         {
+            // Add space when sentence changed
+            if (lastNote != null && note.Sentence != lastNote.Sentence)
+            {
+                sb.Append(" ");
+            }
+            
             sb.Append(note.Text);
-        });
+
+            lastNote = note;
+        }
         string lyrics = sb.ToString();
         if (removeTilde)
         {
@@ -423,7 +433,7 @@ public static class SongMetaUtils
         return noteDistanceInBeats * SongMetaBpmUtils.MillisPerBeat(songMeta);
     }
 
-    public static string GetVideoUriPreferAudioUriIfWebView(SongMeta songMeta, Func<string, bool> canHandleUri = null)
+    public static string GetVideoUriPreferAudioUriIfWebView(SongMeta songMeta, Func<string, bool> canHandleUri)
     {
         if (songMeta == null)
         {

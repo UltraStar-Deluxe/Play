@@ -24,6 +24,9 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
 
     [Inject]
     private PitchDetectionAction pitchDetectionAction;
+    
+    [Inject]
+    private MoveNotesToPitchDetectionResultAction moveNotesToPitchDetectionResultAction;
 
     [Inject]
     private EditorSentenceControl sentenceControl;
@@ -46,11 +49,8 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
         contextMenu.AddSeparator();
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_editLyrics), () => sentenceControl.StartEditingLyrics());
         contextMenu.AddSeparator();
-        contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_speechRecognitionOnAudio,
-                "audio", settings.SongEditorSettings.SpeechRecognitionSamplesSource),
-            () => speechRecognitionAction.SetTextToAnalyzedSpeech(sentenceControl.Sentence.Notes.ToList(), settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
         contextMenu.AddButton(Translation.Get(R.Messages.songEditor_action_moveToDetectedPitch),
-            () => pitchDetectionAction.MoveNotesToDetectedPitchUsingPitchDetectionLayer(sentenceControl.Sentence.Notes.ToList(),true));
+            () => moveNotesToPitchDetectionResultAction.MoveNotesToDetectedPitch(sentenceControl.Sentence.Notes.ToList(),true));
         contextMenu.AddSeparator();
         contextMenu.AddButton(Translation.Get(R.Messages.action_delete), () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }

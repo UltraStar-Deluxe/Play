@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using SpleeterRunner;
+using Eitan.Sherpa.Onnx.Unity.Mono.Components;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -10,12 +9,18 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class AudioSeparationManager : MonoBehaviour, INeedInjection
+public class AudioSeparationManager : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
+    private const string InstrumentalStemName = "non-vocals";
+    private const string VocalsStemName = "vocals";
+    
     public static AudioSeparationManager Instance => DontDestroyOnLoadManager.FindComponentOrThrow<AudioSeparationManager>();
 
     private readonly SemaphoreSlim audioSeparationProcessSemaphore = new(1, 1);
 
+    [InjectedInInspector]
+    public SourceSeparationComponent sourceSeparationComponent;
+    
     [Inject]
     private UiManager uiManager;
 
@@ -32,6 +37,15 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     public IObservable<AudioSeparationFinishedEvent> AudioSeparationFinishedEventStream => audioSeparationFinishedEventStream
         .ObserveOnMainThread();
 
+    private bool isSourceSeparationModuleReady;
+    
+    public void OnInjectionFinished()
+    {
+        sourceSeparationComponent.SeparationReadyEvent.AddListener(OnSeparationReady);
+        sourceSeparationComponent.ErrorEvent.AddListener(OnError);
+        sourceSeparationComponent.InitializationStateChangedEvent.AddListener(OnInitializationStateChangedEvent);
+    }
+    
     public Job<AudioSeparationResult> ProcessSongMetaJob(
         SongMeta songMeta,
         bool saveSong)
@@ -75,18 +89,11 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
 
-        // Estimate duration
-        if (ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(audioUri)))
-        {
-            AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(audioUri, false);
-            int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
-            jobProgress.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
-        }
+        AudioClip audioClip = await AudioSampleLoader.Instance.LoadAsAudioClip(audioUri);
 
-        // Set path to Spleeter executable if needed
-        string fallbackAudioSeparationCommand = PlatformUtils.IsWindows
-            ? $"\"{ApplicationUtils.GetStreamingAssetsPath("SpleeterMsvcExe/Spleeter.exe").Replace("/", "\\")}\""
-            : "";
+        // Estimate duration
+        int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
+        jobProgress.EstimatedTotalDurationInMillis = (int)Math.Ceiling((double)lengthInMillis * 1.5);
 
         string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
         if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
@@ -94,25 +101,23 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             throw new AudioSeparationException($"Vocals isolation not supported for this audio file. Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.JoinWith(", ")}");
         }
 
-        await Awaitable.BackgroundThreadAsync();
-        AudioSeparationResult audioSeparationResult = await ProcessSongMetaWithSpleeterAsync(
+        AudioSeparationResult audioSeparationResult = await ProcessSongMetaWithAiAsync(
             songMeta,
             generatedSongFolderAbsolutePath,
             jobProgress.CancellationTokenSource.Token,
-            fallbackAudioSeparationCommand,
-            saveSong);
+            saveSong,
+            audioClip);
 
-        await Awaitable.MainThreadAsync();
         audioSeparationFinishedEventStream.OnNext(new AudioSeparationFinishedEvent(songMeta));
         return audioSeparationResult;
     }
 
-    private async Awaitable<AudioSeparationResult> ProcessSongMetaWithSpleeterAsync(
+    private async Awaitable<AudioSeparationResult> ProcessSongMetaWithAiAsync(
         SongMeta songMeta,
         string generatedSongFolderAbsolutePath,
         CancellationToken cancellationToken,
-        string fallbackAudioSeparationCommand,
-        bool saveSong)
+        bool saveSong,
+        AudioClip audioClip)
     {
         // Instant fail if already locked (timeout 0)
         if (!await audioSeparationProcessSemaphore.WaitAsync(0, cancellationToken))
@@ -120,25 +125,31 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             throw new JobAlreadyRunningException(new AudioSeparationException("Already performing vocals isolation"));
         }
 
+        // Make sure source separation module has been loaded.
+        if (!isSourceSeparationModuleReady)
+        {
+            if (!settings.SongEditorSettings.AudioSeparationModelName.IsNullOrEmpty())
+            {
+                sourceSeparationComponent.ModelId = settings.SongEditorSettings.AudioSeparationModelName;
+            }
+            sourceSeparationComponent.TryLoadModule();
+            await ConditionUtils.WaitForConditionAsync(() => isSourceSeparationModuleReady,
+                new WaitForConditionConfig { timeoutInMillis = 30_000 });
+        }
+
         try
         {
             Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
-
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
-
-            SpleeterParameters spleeterParameters = new();
-            spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
-            spleeterParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}.ogg";
-            spleeterParameters.Overwrite = true;
-
-            Debug.Log($"Calling SpleeterRunner with parameters {JsonConverter.ToJson(spleeterParameters)}");
-            SpleeterRunner.SpleeterRunner spleeterRunner = new(GetSpleeterCommand(fallbackAudioSeparationCommand), GetLogAction());
-            SpleeterResult spleeterResult = await spleeterRunner.RunAsync(spleeterParameters, cancellationToken);
-            Debug.Log($"Call to SpleeterRunner finished: ExitCode={spleeterResult.ExitCode}");
-
-            UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult, saveSong);
-
             string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
+
+            SourceSeparationComponent.SeparatedClipSet separatedClipSet = await sourceSeparationComponent.SeparateClipAsync(audioClip, false, cancellationToken);
+            if (separatedClipSet == null)
+            {
+                throw new AudioSeparationException("separatedClipSet is null");
+            }
+
+            SaveAudioFilesAndUpdateSongMeta(songMeta, generatedSongFolderAbsolutePath, saveSong, separatedClipSet);
+
             string vocalsAudioFilePath = songMeta.VocalsAudio;
             string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
             return new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath);
@@ -149,114 +160,75 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void UpdateSongMetaWithSpleeterResult(
+    private void SaveAudioFilesAndUpdateSongMeta(
         SongMeta songMeta,
         string generatedSongFolderAbsolutePath,
-        SpleeterResult spleeterResult,
-        bool saveSong)
+        bool saveSong,
+        SourceSeparationComponent.SeparatedClipSet separatedClipSet)
     {
-        if (spleeterResult.ExitCode != 0
-            || !spleeterResult.Errors.IsNullOrEmpty())
-        {
-            throw new AudioSeparationException($"Spleeter terminated with exit code {spleeterResult.ExitCode}. Error messages:\n" +
-                                               $"    - {spleeterResult.Errors.JoinWith("\n    - ")}");
-        }
-
-        if (spleeterResult.WrittenFiles.IsNullOrEmpty())
-        {
-            throw new AudioSeparationException("SpleeterResult.WrittenFiles is empty");
-        }
-
-        // Save the SongMeta if it changed
-        bool songMetaChanged = false;
-
+        // Prepare directory to save audio files.
         // Prepare directory to move created audio files.
-        string destinationFolder = SongMetaUtils.GetDirectoryPath(songMeta);
-        if (!settings.SaveVocalsAndInstrumentalAudioInFolderOfSong
-            && !DirectoryUtils.IsSubDirectory(SongMetaUtils.GetDirectoryPath(songMeta), generatedSongFolderAbsolutePath))
-        {
-            destinationFolder = ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, SongMetaUtils.GetDirectoryPath(songMeta));
-        }
-
+        string destinationFolder = DirectoryUtils.IsSubDirectory(SongMetaUtils.GetDirectoryPath(songMeta), generatedSongFolderAbsolutePath)
+            ? SongMetaUtils.GetDirectoryPath(songMeta)
+            : ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, SongMetaUtils.GetDirectoryPath(songMeta));
+        
         if (!destinationFolder.IsNullOrEmpty()
             && !Directory.Exists(destinationFolder))
         {
             Directory.CreateDirectory(destinationFolder);
         }
 
-        // Check voice audio
-        string vocalsAudioPath = spleeterResult.WrittenFiles
-            .FirstOrDefault(filePath => Path.GetFileName(filePath).Contains(".vocals."));
-        if (!vocalsAudioPath.IsNullOrEmpty()
-            && File.Exists(vocalsAudioPath))
+        // Save audio files
+        bool songMetaChanged = false;
+        foreach (SourceSeparationComponent.SeparatedStemClip stem in separatedClipSet.stems)
         {
-            Debug.Log("Voice audio written to: " + vocalsAudioPath);
+            string fileBaseName = stem.stemName.Replace(InstrumentalStemName, "instrumental");
+            string outputPath = $"{destinationFolder}/{fileBaseName}.ogg";
+            Debug.Log($"Saving separated audio file. stem: '{stem.stemName}', outputPath: '{outputPath}'");
+            OggFileWriter.WriteFile(outputPath, stem.clip);
 
-            string destinationVocalsAudioPath = destinationFolder + $"/vocals.ogg";
-            Debug.Log("Moving voice audio to: " + destinationVocalsAudioPath);
-            FileUtils.MoveFileOverwriteIfExists(vocalsAudioPath, destinationVocalsAudioPath);
-
-            songMeta.VocalsAudio = destinationVocalsAudioPath;
+            string relativeOrAbsoluteOutputPath = outputPath;
             if (destinationFolder == SongMetaUtils.GetDirectoryPath(songMeta))
             {
-                songMeta.VocalsAudio = PathUtils.MakeRelativePath(SongMetaUtils.GetDirectoryPath(songMeta), songMeta.VocalsAudio);
+                relativeOrAbsoluteOutputPath = PathUtils.MakeRelativePath(SongMetaUtils.GetDirectoryPath(songMeta), outputPath);
             }
-            songMetaChanged = true;
-        }
-        else
-        {
-            Debug.LogError($"Voice audio not found. Written files: {spleeterResult.WrittenFiles.JoinWith(", ")}");
-        }
 
-        // Check instrumental audio
-        string instrumentalAudioPath = spleeterResult.WrittenFiles
-            .FirstOrDefault(filePath => Path.GetFileName(filePath).Contains("accompaniment"));
-        if (!instrumentalAudioPath.IsNullOrEmpty()
-            && File.Exists(instrumentalAudioPath))
-        {
-            Debug.Log("Instrumental audio written to: " + instrumentalAudioPath);
-
-            string destinationInstrumentalAudioPath = destinationFolder + "/instrumental.ogg";
-            Debug.Log("Moving instrumental audio to: " + destinationInstrumentalAudioPath);
-            FileUtils.MoveFileOverwriteIfExists(instrumentalAudioPath, destinationInstrumentalAudioPath);
-
-            songMeta.InstrumentalAudio = destinationInstrumentalAudioPath;
-            if (destinationFolder == SongMetaUtils.GetDirectoryPath(songMeta))
+            if (stem.stemName == InstrumentalStemName)
             {
-                songMeta.InstrumentalAudio = PathUtils.MakeRelativePath(SongMetaUtils.GetDirectoryPath(songMeta), songMeta.InstrumentalAudio);
+                songMeta.InstrumentalAudio = relativeOrAbsoluteOutputPath;
+                songMetaChanged = true;
             }
-
-            songMetaChanged = true;
+            else if (stem.stemName == VocalsStemName)
+            {
+                songMeta.VocalsAudio = relativeOrAbsoluteOutputPath;
+                songMetaChanged = true;
+            }
         }
-        else
-        {
-            Debug.LogError($"Instrumental audio not found. Written files: {spleeterResult.WrittenFiles.JoinWith(", ")}");
-        }
-
-        // Remove folder that was created by spleeter
-        // string spleeterOutputFolder = Path.GetDirectoryName(instrumentalAudioPath);
-        // if (Directory.Exists(spleeterOutputFolder))
-        // {
-        //     Directory.Delete(spleeterOutputFolder);
-        // }
-
-        // Save song meta
-        if (songMetaChanged
-            && saveSong)
+        
+        // Update song meta
+        if (songMetaChanged && saveSong)
         {
             songMetaManager.SaveSong(songMeta, true);
         }
     }
 
-    private string GetSpleeterCommand(string fallbackAudioSeparationCommand)
+    private void OnInitializationStateChangedEvent(bool ready)
     {
-        return !settings.SongEditorSettings.AudioSeparationCommand.IsNullOrEmpty()
-            ? settings.SongEditorSettings.AudioSeparationCommand
-            : fallbackAudioSeparationCommand;
+        Debug.Log("Source separation state changed. ready: " + ready);
+        isSourceSeparationModuleReady = ready;
     }
 
-    private Action<string> GetLogAction()
+    private void OnError(string error)
     {
-        return message => Debug.Log($"SpleeterRunner: {message}");
+        Debug.LogError("Source separation failed: " + error);
+    }
+
+    private void OnSeparationReady(SourceSeparationComponent.SeparatedClipSet result)
+    {
+        Debug.Log($"Separation finished successfully. sourceName: '{result.sourceName}', model: {result.modelType}");
+        foreach (SourceSeparationComponent.SeparatedStemClip stem in result.stems)
+        {
+            Debug.Log($"Stem: {stem.stemName}, Clip: {stem.clip.name}, Channels: {stem.channels}, SampleRate: {stem.sampleRate}, Length: {stem.clip.length} s");
+        }
     }
 }

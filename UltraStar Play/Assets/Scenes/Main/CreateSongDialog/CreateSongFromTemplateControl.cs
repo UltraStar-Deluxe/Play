@@ -45,7 +45,8 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
         string title,
         bool createCover,
         bool createBackground,
-        bool createVideo)
+        bool createVideo,
+        string lyrics)
     {
         string artistAndTitle = $"{artist} - {title}";
 
@@ -160,17 +161,18 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
         {
             SongMeta newSongMeta = new LazyLoadedFromFileSongMeta(txtFile);
             songMetaManager.AddSongMeta(newSongMeta);
-            OpenSongEditorScene(newSongMeta, audioFileExists);
+            OpenSongEditorScene(newSongMeta, audioFileExists, lyrics);
         }
     }
 
-    private void OpenSongEditorScene(SongMeta songMeta, bool createSingAlongDataViaAiTools)
+    private void OpenSongEditorScene(SongMeta songMeta, bool createSingAlongDataViaAiTools, string lyrics)
     {
         sceneNavigator.LoadScene(EScene.SongEditorScene, new SongEditorSceneData
         {
             PreviousScene = EScene.MainScene,
             SongMeta = songMeta,
             CreateSingAlongDataViaAiTools = createSingAlongDataViaAiTools,
+            ForcedAlignmentLyrics = lyrics,
         });
     }
 

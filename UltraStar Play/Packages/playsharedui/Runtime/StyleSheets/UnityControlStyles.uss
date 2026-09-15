@@ -1,3 +1,42 @@
+/* TODO: Make use of built-in style variables of Unity ( https://docs.unity3d.com/Documentation/Manual/UIE-uss-built-in-variable-reference.html ) */
+
+
+/**************************************************/
+/* TAB GROUP and TAB */
+/**************************************************/
+.unity-tab-view {
+}
+
+.unity-tab__header {
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    background-color: var(--control-color);
+}
+
+.unity-tab__header:focus {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-tab__header:active {
+    background-color: var(--control-color-accent2);
+}
+
+.unity-tab__header:hover {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-tab__header-underline {
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    background-color: var(--control-color);
+}
+
+.unity-tab__header:hover > .unity-tab__header-underline {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-tab__header:checked > .unity-tab__header-underline {
+    background-color: var(--font-color-accent1);
+}
+
 /**************************************************/
 /* LIST VIEW */
 /**************************************************/
@@ -47,6 +86,10 @@
     -unity-text-align: middle-left;
     margin: 0;
     overflow: hidden;
+}
+
+.unity-base-text-field > .unity-base-text-field__input--multiline {
+    min-height: var(--control-height);
 }
 
 .unity-base-text-field.multiline .unity-text-element--inner-input-field-component {

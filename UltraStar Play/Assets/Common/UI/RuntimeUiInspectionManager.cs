@@ -124,6 +124,11 @@ public class RuntimeUiInspectionManager : AbstractSingletonBehaviour, INeedInjec
 
     private void UpdateInspectionLabel(VisualElement target)
     {
+        if (target == null)
+        {
+            return;
+        }
+
         if (inspectionLabel == null)
         {
             inspectionLabel = new();
@@ -141,6 +146,11 @@ public class RuntimeUiInspectionManager : AbstractSingletonBehaviour, INeedInjec
 
     private void UpdateInspectionFrame(VisualElement target)
     {
+        if (target == null)
+        {
+            return;
+        }
+
         if (inspectionFrame == null)
         {
             inspectionFrame = new();

@@ -12,7 +12,7 @@ public static class UnityUtils
     {
         string versionPropertyName = "m_EditorVersion";
 
-        return File.ReadAllLines(unityProjectDir / "ProjectSettings" / "ProjectVersion.txt")
+        return File.ReadAllLines(unityProjectDir / "ProjectSettings/ProjectVersion.txt")
             .Where(line => line.StartsWith(versionPropertyName))
             .Select(line => line.Replace($"{versionPropertyName}:", "").Trim())
             .First();

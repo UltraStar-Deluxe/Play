@@ -144,7 +144,7 @@ public static class MoveNotesToOtherVoiceUtils
     public static List<List<Note>> SplitIntoSentences(SongMeta songMeta, List<Note> inputNotes)
     {
         // Copy input list because splitting is done in-place.
-        inputNotes = inputNotes.ToList();
+        inputNotes = inputNotes.OrderBy(note => note.StartBeat).ToList();
 
         List<List<Note>> result = new() { inputNotes };
 

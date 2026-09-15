@@ -18,8 +18,8 @@
         "AndroidRuntimePermissions.Runtime",
         "UnityStandaloneFileBrowser",
         "Vuplex.WebView",
-        "com.whisper.unity",
-        "OneJS"
+        "Eitan.SherpaONNXUnity",
+        "GeneratedConstants"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -29,7 +29,9 @@
         "Facepunch.Steamworks.Win64.dll",
         "LiteNetLib.dll",
         "ICSharpCode.SharpZipLib.dll",
-        "System.Linq.Dynamic.Core.dll"
+        "System.Linq.Dynamic.Core.dll",
+        "LibVLCSharp.dll",
+        "TagLibSharp.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

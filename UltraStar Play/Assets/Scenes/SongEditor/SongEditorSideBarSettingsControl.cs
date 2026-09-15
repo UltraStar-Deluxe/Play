@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using NHyphenator;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -35,15 +33,30 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.resetMusicPlaybackSpeedButton)]
     private Button resetMusicPlaybackSpeedButton;
 
-    [Inject(UxmlName = R.UxmlNames.selectModelPathButton)]
-    private Button selectModelPathButton;
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentModelPathTextField)]
+    private TextField forcedAlignmentModelPathTextField;
 
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionLanguageChooser)]
-    private EnumField speechRecognitionLanguageChooser;
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentModelPathButton)]
+    private Button forcedAlignmentModelPathButton;
 
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionPromptTextField)]
-    private TextField speechRecognitionPromptTextField;
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentLyricsTextField)]
+    private TextField forcedAlignmentLyricsTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionModelPathTextField)]
+    private TextField pitchDetectionModelPathTextField;
 
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionModelPathButton)]
+    private Button pitchDetectionModelPathButton;
+    
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentWordStartPaddingMsSlider)]
+    private SliderInt forcedAlignmentWordStartPaddingMsSlider;
+
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentWordEndPaddingMsSlider)]
+    private SliderInt forcedAlignmentWordEndPaddingMsSlider;
+    
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentPaddingMaxWordLengthMsSlider)]
+    private SliderInt forcedAlignmentPaddingMaxWordLengthMsSlider;
+    
     [Inject(UxmlName = R.UxmlNames.micDeviceChooser)]
     private Chooser micDeviceChooser;
 
@@ -85,6 +98,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.showAudioWaveformInBackgroundToggle)]
     private Toggle showAudioWaveformInBackgroundToggle;
+    
+    [Inject(UxmlName = R.UxmlNames.showPitchDetectionResultToggle)]
+    private Toggle showPitchDetectionResultToggle;
 
     [Inject(UxmlName = R.UxmlNames.showStatusBarToggle)]
     private Toggle showStatusBarToggle;
@@ -94,7 +110,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.showVideoAreaToggle)]
     private Toggle showVideoAreaToggle;
-
+    
     [Inject(UxmlName = R.UxmlNames.showVirtualPianoToggle)]
     private Toggle showVirtualPianoToggle;
 
@@ -106,6 +122,15 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.sentenceLineSizeTextField)]
     private TextField sentenceLineSizeTextField;
+
+    [Inject(UxmlName = R.UxmlNames.audioSeparationModelNameTextField)]
+    private TextField audioSeparationModelNameTextField;
+
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionModelNameTextField)]
+    private TextField speechRecognitionModelNameTextField;
+
+    [Inject(UxmlName = R.UxmlNames.lyricsLanguageChooser)]
+    private EnumField lyricsLanguageChooser;
 
     [Inject(UxmlName = R.UxmlNames.videoArea)]
     private VisualElement videoArea;
@@ -122,23 +147,14 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.importMidiFileButton)]
     private Button importMidiFileButton;
 
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
-    private TextField speechRecognitionModelPathTextField;
-
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionPhrasesTextField)]
-    private TextField speechRecognitionPhrasesTextField;
-
-    [Inject(UxmlName = R.UxmlNames.audioSeparationButton)]
-    private Button audioSeparationButton;
-
     [Inject(UxmlName = R.UxmlNames.playbackAudioChooser)]
     private Chooser playbackAudioChooser;
 
     [Inject(UxmlName = R.UxmlNames.speechRecognitionAudioChooser)]
     private Chooser speechRecognitionAudioChooser;
-
-    [Inject(UxmlName = R.UxmlNames.pitchDetectionAudioChooser)]
-    private Chooser pitchDetectionAudioChooser;
+    
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentAudioChooser)]
+    private Chooser forcedAlignmentAudioChooser;
 
     [Inject(UxmlName = R.UxmlNames.timeLabelFormatChooser)]
     private Chooser timeLabelFormatChooser;
@@ -149,11 +165,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.settingsSideBarContainer)]
     private VisualElement settingsSideBarContainer;
 
-    [Inject(UxmlName = R.UxmlNames.splitSyllablesAfterSpeechRecognitionToggle)]
-    private Toggle splitSyllablesAfterSpeechRecognitionToggle;
-
-    [Inject(UxmlName = R.UxmlNames.splitSyllablesInSelectionButton)]
-    private Button splitSyllablesInSelectionButton;
+    [Inject(UxmlName = R.UxmlNames.splitSyllablesAfterAiToolsToggle)]
+    private Toggle splitSyllablesAfterAiToolsToggle;
+    
+    [Inject(UxmlName = R.UxmlNames.forcedAlignmentAfterSpeechRecognitionToggle)]
+    private Toggle forcedAlignmentAfterSpeechRecognitionToggle;
 
     [Inject(UxmlName = R.UxmlNames.playbackPreBeginTimeInMillisTextField)]
     private IntegerField playbackPreBeginTimeInMillisTextField;
@@ -161,14 +177,32 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.playbackPostEndTimeInMillisTextField)]
     private IntegerField playbackPostEndTimeInMillisTextField;
 
+    [Inject(UxmlName = R.UxmlNames.wordSeparatorTextField)]
+    private TextField wordSeparatorTextField;
+
+    [Inject(UxmlName = R.UxmlNames.syllableSeparatorTextField)]
+    private TextField syllableSeparatorTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.referenceResolutionScaleFactorChooser)]
+    private Slider referenceResolutionScaleFactorChooser;
+
+    [Inject(UxmlName = R.UxmlNames.synchronizeViewportWithPlaybackPositionToggle)]
+    private Toggle synchronizeViewportWithPlaybackPositionToggle;
+
     [Inject]
     private SongMeta songMeta;
+
+    [Inject]
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private Settings settings;
 
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
+
+    [Inject]
+    private DialogManager dialogManager;
 
     [Inject]
     private GameObject gameObject;
@@ -196,6 +230,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject]
     private HyphenateNotesAction hyphenateNotesAction;
+    
+    [Inject]
+    private ForcedAlignmentAction forcedAlignmentAction;
+
+    [Inject]
+    private PitchDetectionAction pitchDetectionAction;
 
     [Inject]
     private SongMetaChangedEventStream songMetaChangedEventStream;
@@ -203,14 +243,18 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private LabeledChooserControl<MicProfile> micDeviceChooserControl;
     private EnumChooserControl<ESongEditorSamplesSource> playbackAudioChooserControl;
     private EnumChooserControl<ESongEditorSamplesSource> speechRecognitionAudioChooserControl;
-    private EnumChooserControl<ESongEditorSamplesSource> pitchDetectionAudioChooserControl;
+    private EnumChooserControl<ESongEditorSamplesSource> forcedAlignmentAudioChooserControl;
     private EnumChooserControl<ESongEditorDrawNoteLayer> drawNoteLayerChooserControl;
 
     private readonly ImportMidiFileDialogControl importMidiFileDialogControl = new();
 
+    private double referenceResolutionScaleFactor;
+    
     public void OnInjectionFinished()
     {
         injector.Inject(importMidiFileDialogControl);
+
+        referenceResolutionScaleFactor = settings.SongEditorSettings.ReferenceResolutionScaleFactor;
 
         // Fold all AccordionItems
         settingsSideBarContainer.Query<AccordionItem>().ForEach(it => it.HideAccordionContent());
@@ -225,6 +269,10 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.AutoSave = newValue);
 
         // Music settings
+        Bind(synchronizeViewportWithPlaybackPositionToggle,
+            () => settings.SongEditorSettings.SynchronizeViewportWithPlaybackPosition,
+            newValue => settings.SongEditorSettings.SynchronizeViewportWithPlaybackPosition = newValue);
+        
         Bind(goToLastPlaybackPositionToggle,
             () => settings.SongEditorSettings.GoToLastPlaybackPosition,
             newValue => settings.SongEditorSettings.GoToLastPlaybackPosition = newValue);
@@ -344,98 +392,115 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
         importMidiFileButton.RegisterCallbackButtonTriggered(_ => importMidiFileDialogControl.OpenDialog());
 
-        // Speech recognition
-        Bind(speechRecognitionLanguageChooser,
-            () =>
-            {
-                if (Enum.TryParse(settings.SongEditorSettings.SpeechRecognitionLanguage, out EWhisperLanguage whisperLanguage))
-                {
-                    return whisperLanguage;
-                }
-                return EWhisperLanguage.English;
-            },
-            newValue => settings.SongEditorSettings.SpeechRecognitionLanguage = newValue.ToString());
-
-        Bind(speechRecognitionPromptTextField,
-            () => settings.SongEditorSettings.SpeechRecognitionPrompt,
-            newValue => settings.SongEditorSettings.SpeechRecognitionPrompt = newValue);
-
-        sentenceLineSizeTextField.DisableParseEscapeSequences();
-        Bind(speechRecognitionModelPathTextField,
-            () => settings.SongEditorSettings.SpeechRecognitionModelPath,
-            newValue => settings.SongEditorSettings.SpeechRecognitionModelPath = newValue);
-
-        speechRecognitionPhrasesTextField.DisableParseEscapeSequences();
-        Bind(speechRecognitionPhrasesTextField,
-            () => settings.SongEditorSettings.SpeechRecognitionPhrases,
-            newValue => settings.SongEditorSettings.SpeechRecognitionPhrases = newValue);
-
-        if (PlatformUtils.IsStandalone)
-        {
-            selectModelPathButton.RegisterCallbackButtonTriggered(_ =>
-            {
-                string oldFolder = FileUtils.Exists(speechRecognitionModelPathTextField.value)
-                    ? new FileInfo(speechRecognitionModelPathTextField.value).DirectoryName
-                    : "";
-                string selectedFile = FileSystemDialogUtils.OpenFileDialog(
-                    "Select Speech Recognition Model",
-                    oldFolder,
-                    FileSystemDialogUtils.CreateExtensionFilters("Model files", "bin"));
-                if (selectedFile.IsNullOrEmpty()
-                    || !FileUtils.Exists(selectedFile))
-                {
-                    return;
-                }
-
-                speechRecognitionModelPathTextField.value = selectedFile;
-            });
-        }
-        else
-        {
-            selectModelPathButton.HideByDisplay();
-        }
-
-        List<ESongEditorSamplesSource> speechAndPitchAnalysisSampleSources = new List<ESongEditorSamplesSource>
+        List<ESongEditorSamplesSource> aiSampleSources = new List<ESongEditorSamplesSource>
         {
             ESongEditorSamplesSource.OriginalMusic,
             ESongEditorSamplesSource.Vocals,
             ESongEditorSamplesSource.Recording,
         };
 
-        speechRecognitionAudioChooserControl = new(speechRecognitionAudioChooser, speechAndPitchAnalysisSampleSources);
+        speechRecognitionAudioChooserControl = new(speechRecognitionAudioChooser, aiSampleSources);
         speechRecognitionAudioChooserControl.Bind(
-            () => settings.SongEditorSettings.SpeechRecognitionSamplesSource,
-            newValue => settings.SongEditorSettings.SpeechRecognitionSamplesSource = newValue);
+            () => settings.SongEditorSettings.AiSamplesSource,
+            newValue => settings.SongEditorSettings.AiSamplesSource = newValue);
 
-        Bind(splitSyllablesAfterSpeechRecognitionToggle,
-            () => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition,
-            newValue => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition = newValue);
+        speechRecognitionModelNameTextField.DisableParseEscapeSequences();
+        Bind(speechRecognitionModelNameTextField,
+            () => settings.SongEditorSettings.SpeechRecognitionModelName,
+            newValue => settings.SongEditorSettings.SpeechRecognitionModelName = newValue);
 
-        splitSyllablesInSelectionButton.RegisterCallbackButtonTriggered(_ => SplitSyllablesInSelection());
+        forcedAlignmentAudioChooserControl = new(forcedAlignmentAudioChooser, aiSampleSources);
+        forcedAlignmentAudioChooserControl.Bind(
+            () => settings.SongEditorSettings.AiSamplesSource,
+            newValue => settings.SongEditorSettings.AiSamplesSource = newValue);
+        
+        Bind(splitSyllablesAfterAiToolsToggle,
+            () => settings.SongEditorSettings.SplitSyllablesAfterAiTools,
+            newValue => settings.SongEditorSettings.SplitSyllablesAfterAiTools = newValue);
+
+        Bind(forcedAlignmentAfterSpeechRecognitionToggle,
+            () => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition,
+            newValue => settings.SongEditorSettings.ForcedAlignmentAfterSpeechRecognition = newValue);
+
+        // Audio separation
+        audioSeparationModelNameTextField.DisableParseEscapeSequences();
+        Bind(audioSeparationModelNameTextField,
+            () => settings.SongEditorSettings.AudioSeparationModelName,
+            newValue => settings.SongEditorSettings.AudioSeparationModelName = newValue);
 
         // Pitch detection
-        pitchDetectionAudioChooserControl = new(pitchDetectionAudioChooser, speechAndPitchAnalysisSampleSources);
-        pitchDetectionAudioChooserControl.Bind(
-            () => settings.SongEditorSettings.PitchDetectionSamplesSource,
-            newValue => settings.SongEditorSettings.PitchDetectionSamplesSource = newValue);
+        Bind(pitchDetectionModelPathTextField,
+            () => settings.SongEditorSettings.PitchDetectionModelPath,
+            newValue => settings.SongEditorSettings.PitchDetectionModelPath = newValue);
 
-        audioSeparationButton.RegisterCallbackButtonTriggered(async _ =>
-        {
-            if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
-                && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
-            {
-                NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingInstrumentalAudio));
-                return;
-            }
-            await audioSeparationManager.ProcessSongMetaJob(songMeta, true).GetResultAsync();
-            audioSeparationButton.SetEnabled(false);
-        });
-        if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
-            && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
-        {
-            audioSeparationButton.SetEnabled(false);
-        }
+        pitchDetectionModelPathButton.RegisterCallbackButtonTriggered(_ =>
+            FileSystemDialogUtils.OpenFileDialogToSetPath(
+                Translation.Get(R.Messages.songEditor_options_pitchDetection_modelPath),
+                "",
+                FileSystemDialogUtils.CreateExtensionFilters("ONNX", "onnx"),
+                () => pitchDetectionModelPathTextField.value,
+                newValue => pitchDetectionModelPathTextField.value = newValue));
 
+        // Forced Alignment
+        Bind(forcedAlignmentModelPathTextField,
+            () => settings.SongEditorSettings.ForcedAlignmentModelPath,
+            newValue => settings.SongEditorSettings.ForcedAlignmentModelPath = newValue);
+
+        forcedAlignmentModelPathButton.RegisterCallbackButtonTriggered(_ =>
+            FileSystemDialogUtils.OpenFileDialogToSetPath(
+                Translation.Get(R.Messages.songEditor_options_forcedAlignment_modelPath),
+                "",
+                FileSystemDialogUtils.CreateExtensionFilters("Sherpa-ONNX model", "tar", "tar.gz", "zip", "yaml"),
+                () => forcedAlignmentModelPathTextField.value,
+                newValue => forcedAlignmentModelPathTextField.value = newValue));
+        
+        Bind(forcedAlignmentLyricsTextField,
+            () => nonPersistentSettings.ForcedAlignmentLyrics,
+            newValue => nonPersistentSettings.ForcedAlignmentLyrics = newValue);
+
+        Bind(forcedAlignmentWordStartPaddingMsSlider,
+            () => settings.SongEditorSettings.ForcedAlignmentStartPaddingMs,
+            newValue => settings.SongEditorSettings.ForcedAlignmentStartPaddingMs = newValue);
+        
+        Bind(forcedAlignmentWordEndPaddingMsSlider,
+            () => settings.SongEditorSettings.ForcedAlignmentEndPaddingMs,
+            newValue => settings.SongEditorSettings.ForcedAlignmentEndPaddingMs = newValue);
+        
+        Bind(forcedAlignmentPaddingMaxWordLengthMsSlider,
+            () => settings.SongEditorSettings.ForcedAlignmentPaddingMaxWordLengthMs,
+            newValue => settings.SongEditorSettings.ForcedAlignmentPaddingMaxWordLengthMs = newValue);
+        
+        // Lyrics editing separators
+        Bind(wordSeparatorTextField,
+            () => settings.SongEditorSettings.WordSeparator == SongEditorSettings.DefaultWordSeparator
+                ? ""
+                : settings.SongEditorSettings.WordSeparator.ToString(),
+            newValue => settings.SongEditorSettings.WordSeparator = newValue.IsNullOrEmpty()
+                ? SongEditorSettings.DefaultWordSeparator
+                : newValue[0]);
+
+        Bind(syllableSeparatorTextField,
+            () => settings.SongEditorSettings.SyllableSeparator == SongEditorSettings.DefaultSyllableSeparator
+                ? ""
+                : settings.SongEditorSettings.SyllableSeparator.ToString(),
+            newValue => settings.SongEditorSettings.SyllableSeparator = newValue.IsNullOrEmpty()
+                ? SongEditorSettings.DefaultSyllableSeparator
+                : newValue[0]);
+
+        // Lyrics language
+        lyricsLanguageChooser.Init(ELyricsLanguage.English);
+        Bind(lyricsLanguageChooser,
+            () => EnumUtils.Parse(settings.SongEditorSettings.LyricsLanguage, ELyricsLanguage.English),
+            newValue => settings.SongEditorSettings.LyricsLanguage = newValue.ToString().ToLowerInvariant());
+        
+        // UI Scale
+        FieldBindingUtils.Bind(referenceResolutionScaleFactorChooser,
+            () => (float)referenceResolutionScaleFactor,
+            newValue => referenceResolutionScaleFactor = newValue);
+        this.ObserveEveryValueChanged(it => it.referenceResolutionScaleFactor)
+            .Throttle(TimeSpan.FromMilliseconds(1000))
+            .Subscribe(newValue => settings.SongEditorSettings.ReferenceResolutionScaleFactor = newValue);
+        
         // Show / hide VisualElements
         Bind(showRightSideBarToggle,
             () => settings.SongEditorSettings.ShowRightSideBar,
@@ -443,6 +508,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(showAudioWaveformInBackgroundToggle,
             () => settings.SongEditorSettings.ShowAudioWaveformInBackground,
             newValue => settings.SongEditorSettings.ShowAudioWaveformInBackground = newValue);
+        Bind(showPitchDetectionResultToggle,
+            () => settings.SongEditorSettings.ShowPitchDetectionResult,
+            newValue => settings.SongEditorSettings.ShowPitchDetectionResult = newValue);
         Bind(showStatusBarToggle,
             () => settings.SongEditorSettings.ShowStatusBar,
             newValue => settings.SongEditorSettings.ShowStatusBar = newValue);
@@ -499,24 +567,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(playbackPostEndTimeInMillisTextField,
             () => settings.SongEditorSettings.PlaybackPostEndInMillis,
             newValue => settings.SongEditorSettings.PlaybackPostEndInMillis = newValue);
-    }
-
-    private void SplitSyllablesInSelection()
-    {
-        Hyphenator hyphenator = SettingsUtils.CreateHyphenator(settings);
-        if (hyphenator == null)
-        {
-            return;
-        }
-
-        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
-        if (selectedNotes.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        hyphenateNotesAction.ExecuteAndNotify(songMeta, selectedNotes, hyphenator);
-        songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 
     private void AddSpaceBetweenNotesInSelection()

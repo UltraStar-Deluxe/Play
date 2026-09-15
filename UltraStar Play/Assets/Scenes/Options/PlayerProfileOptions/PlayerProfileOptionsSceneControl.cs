@@ -153,6 +153,8 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             playerProfileImageChooserControl.Chooser.NextItemButton.HideByDisplay();
             onlinePlayerProfileIcon.SetInClassList("onlineMultiplayerHost", lobbyMemberPlayerProfile.IsHost);
             onlinePlayerProfileIconContainer.ShowByDisplay();
+
+            UpdateOnlineMultiplayerPlayerImage(lobbyMemberPlayerProfile, playerProfileImageChooserControl);
         }
         else
         {
@@ -160,6 +162,14 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         }
 
         return visualElement;
+    }
+
+    private async void UpdateOnlineMultiplayerPlayerImage(LobbyMemberPlayerProfile lobbyMemberPlayerProfile, PlayerProfileImageChooserControl playerProfileImageChooserControl)
+    {
+        if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Netcode)
+        {
+            playerProfileImageChooserControl.Chooser.ItemLabel.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(lobbyMemberPlayerProfile.Name));
+        }
     }
 
     public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=PlayerProfileImage";

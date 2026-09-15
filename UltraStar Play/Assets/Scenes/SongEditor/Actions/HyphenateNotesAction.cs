@@ -5,6 +5,9 @@ using UniInject;
 public class HyphenateNotesAction : INeedInjection
 {
     [Inject]
+    private SongMeta songMeta;
+    
+    [Inject]
     private SongMetaChangedEventStream songMetaChangedEventStream;
 
     [Inject]
@@ -19,18 +22,25 @@ public class HyphenateNotesAction : INeedInjection
     [Inject]
     private SpaceBetweenNotesAction spaceBetweenNotesAction;
     
-    public void Execute(SongMeta songMeta, List<Note> notes, Hyphenator hyphenator)
+    [Inject]
+    private NoteHyphenator noteHyphenator;
+
+    public void Execute(List<Note> notes)
     {
-        if (songMeta == null
-            || notes.IsNullOrEmpty()
-            || hyphenator == null)
+        if (notes.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        Hyphenator hyphenator = SettingsUtils.CreateHyphenator(settings);
+        if (hyphenator == null)
         {
             return;
         }
         
         int spaceBetweenNotesInMillis = settings.SongEditorSettings.SpaceBetweenNotesInMillis;
 
-        Dictionary<Note,List<Note>> noteToNotesAfterSplit = HyphenateNotesUtils.HypenateNotes(notes, hyphenator);
+        Dictionary<Note,List<Note>> noteToNotesAfterSplit = noteHyphenator.HypenateNotes(notes, hyphenator);
         noteToNotesAfterSplit.ForEach(entry =>
         {
             Note note = entry.Key;
@@ -56,9 +66,9 @@ public class HyphenateNotesAction : INeedInjection
         });
     }
 
-    public void ExecuteAndNotify(SongMeta songMeta, List<Note> selectedNotes, Hyphenator hyphenator)
+    public void ExecuteAndNotify(List<Note> selectedNotes)
     {
-        Execute(songMeta, selectedNotes, hyphenator);
+        Execute(selectedNotes);
         songMetaChangedEventStream.OnNext(new NotesChangedEvent());
     }
 }

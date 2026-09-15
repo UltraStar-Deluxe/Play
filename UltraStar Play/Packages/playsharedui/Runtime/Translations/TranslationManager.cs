@@ -63,6 +63,10 @@ public class TranslationManager : AbstractSingletonBehaviour, INeedInjection, IS
         root.Query<AccordionItem>().ForEach(accordionItem => ApplyTranslation(
             () => accordionItem.Title,
             newValue => accordionItem.SetTranslatedTitle(newValue)));
+        
+        root.Query<TextField>().ForEach(textField => ApplyTranslation(
+            () => textField.textEdition.placeholder,
+            newValue => textField.textEdition.SetTranslatedPlaceholder(newValue)));
     }
 
     private static void ApplyTranslation(

@@ -38,6 +38,7 @@ public static partial class R_PlayShared
         public const string circleButton = "circleButton";
         public const string comboBoxButton = "comboBoxButton";
         public const string comboBoxTextField = "comboBoxTextField";
+        public const string community_pack = "community-pack";
         public const string contextMenu = "contextMenu";
         public const string contextMenuButton = "contextMenuButton";
         public const string contextMenuSeparator = "contextMenuSeparator";
@@ -52,6 +53,7 @@ public static partial class R_PlayShared
         public const string currentLyrics = "currentLyrics";
         public const string currentNoteLyrics = "currentNoteLyrics";
         public const string dangerButton = "dangerButton";
+        public const string default_pack = "default-pack";
         public const string deviceInfoLabel = "deviceInfoLabel";
         public const string dialogBackground = "dialogBackground";
         public const string dialogButton = "dialogButton";
@@ -106,6 +108,7 @@ public static partial class R_PlayShared
         public const string modalDialogContainer = "modalDialogContainer";
         public const string mr_1 = "mr-1";
         public const string mt_2 = "mt-2";
+        public const string multiline = "multiline";
         public const string mx_2 = "mx-2";
         public const string nextLyrics = "nextLyrics";
         public const string noBackground = "noBackground";
@@ -166,6 +169,7 @@ public static partial class R_PlayShared
         public const string songIssueMessage = "songIssueMessage";
         public const string songIssueSongMetaTitle = "songIssueSongMetaTitle";
         public const string songLibraryNoSongsButton = "songLibraryNoSongsButton";
+        public const string song_package_card = "song-package-card";
         public const string songSelectLyricsPreview = "songSelectLyricsPreview";
         public const string songSelectSongEntryIcon = "songSelectSongEntryIcon";
         public const string squareButton = "squareButton";
@@ -183,6 +187,7 @@ public static partial class R_PlayShared
         public const string tooltip = "tooltip";
         public const string transparentBackgroundColor = "transparentBackgroundColor";
         public const string transparentButton = "transparentButton";
+        public const string unity3d = "unity3d";
         public const string unity_base_dropdown = "unity-base-dropdown";
         public const string unity_base_dropdown__checkmark = "unity-base-dropdown__checkmark";
         public const string unity_base_dropdown__container_inner = "unity-base-dropdown__container-inner";
@@ -227,6 +232,9 @@ public static partial class R_PlayShared
         public const string unity_scroller__vertical = "unity-scroller--vertical";
         public const string unity_scroll_view__content_and_vertical_scroll_container = "unity-scroll-view__content-and-vertical-scroll-container";
         public const string unity_scroll_view__content_container = "unity-scroll-view__content-container";
+        public const string unity_tab__header = "unity-tab__header";
+        public const string unity_tab__header_underline = "unity-tab__header-underline";
+        public const string unity_tab_view = "unity-tab-view";
         public const string unity_text_input = "unity-text-input";
         public const string unity_toggle = "unity-toggle";
         public const string unity_toggle__checkmark = "unity-toggle__checkmark";

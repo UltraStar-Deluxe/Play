@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -20,8 +19,15 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
     [Inject(UxmlName = R.UxmlNames.applyResolutionButton)]
     private Button applyResolutionButton;
 
+    [Inject(UxmlName = R.UxmlNames.referenceResolutionScaleFactorChooser)]
+    private Slider referenceResolutionScaleFactorChooser;
+    
+    [Inject]
+    private UIDocument uiDocument;
+    
     ScreenResolution lastScreenResolution;
     EFullScreenMode lastFullscreenMode;
+    private double referenceResolutionScaleFactor;
 
     protected override void Start()
     {
@@ -29,6 +35,7 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
 
         lastScreenResolution = settings.ScreenResolution;
         lastFullscreenMode = settings.FullScreenMode;
+        referenceResolutionScaleFactor = settings.ReferenceResolutionScaleFactor;
 
         applyResolutionButton.RegisterCallbackButtonTriggered(_ => ApplyGraphicSettings());
 
@@ -43,6 +50,10 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
             fullscreenModeChooser.HideByDisplay();
         }
 
+        FieldBindingUtils.Bind(referenceResolutionScaleFactorChooser,
+            () => (float)referenceResolutionScaleFactor,
+            newValue => referenceResolutionScaleFactor = newValue);
+        
         TargetFpsChooserControl targetFpsChooserControl = new(targetFpsChooser);
         targetFpsChooserControl.Bind(() => settings.TargetFps,
                 newValue => settings.TargetFps = newValue);
@@ -55,6 +66,9 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
             return;
         }
 
+        // Applying the scale factor to the UIDocument is handled in another class.
+        settings.ReferenceResolutionScaleFactor = referenceResolutionScaleFactor;
+        
         ScreenResolution res = settings.ScreenResolution;
         EFullScreenMode fullScreenMode = settings.FullScreenMode;
         if (res.Width > 0

@@ -43,19 +43,17 @@
 #innerSongEntryUi {
     transition: top 0.3s, width 0.3s, height 0.3s;
     top: 0;
-    width: 142px;
-    height: 142px;
+    width: 181px;
+    height: 181px;
 }
 
 #innerSongEntryUi #songImageOuter {
-    width: 142px;
-    height: 142px;
+    width: 181px;
+    height: 181px;
 }
 
 .unity-collection-view__item--selected #innerSongEntryUi {
     top: -20px;
-    /*width: 150px;*/
-    /*height: 150px;*/
 }
 
 #songEntryDarkOverlay {
@@ -761,6 +759,11 @@
     height: auto;
 }
 
+#loadedOptionsRoot > Slider {
+    margin-bottom: 16px;
+    height: auto;
+}
+
 #loadedOptionsRoot > TextField {
     margin-bottom: 16px;
 }
@@ -798,6 +801,38 @@
 #loadedOptionsRoot > ScrollView > Toggle {
     margin-bottom: 16px;
     height: auto;
+}
+
+/**************************************************/
+/* OPTIONS SCENE SONG PACKAGE CARD */
+/**************************************************/
+
+.song-package-card {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    border-color: rgba(255, 255, 255, 0.1);
+    border-width: 2px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.default-pack .song-package-card {
+    border-color: #00e676;
+}
+
+.default-pack Shadow {
+    color: #00E67620;
+}
+
+.community-pack .song-package-card {
+    border-color: #2979ff;
+}
+
+.community-pack Shadow {
+    color: #2979FF20;
 }
 
 /**************************************************/

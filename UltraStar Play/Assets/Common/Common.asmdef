@@ -9,7 +9,6 @@
         "Unity.Netcode.Runtime",
         "Unity.Netcode.Components",
         "Unity.Collections",
-        "Facepunch Transport for Netcode for GameObjects",
         "Plugins",
         "UniRx",
         "IngameDebugConsole.Runtime",
@@ -23,18 +22,16 @@
         "playshared",
         "playsharedui",
         "UnityStandaloneFileBrowser",
-        "Vuplex.WebView",
-        "com.whisper.unity",
-        "VLCUnity",
-        "OneJS"
+        "Eitan.SherpaONNXUnity",
+        "FfmpegAudioSamplesLoader",
+        "VorbisPluginImpl",
+        "GeneratedConstants"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "Facepunch.Steamworks.Win64.dll",
-        "LibVLCSharp.dll",
         "LiteNetLib.dll",
         "NHyphenator.dll",
         "Mono.CSharp.dll",
@@ -43,7 +40,10 @@
         "Newtonsoft.Json.dll",
         "Serilog.dll",
         "Serilog.Sinks.File.dll",
-        "System.Text.Encoding.CodePages.dll"
+        "System.Text.Encoding.CodePages.dll",
+        "Utf8Json.dll",
+        "Microsoft.ML.OnnxRuntime.dll",
+        "NWaves.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

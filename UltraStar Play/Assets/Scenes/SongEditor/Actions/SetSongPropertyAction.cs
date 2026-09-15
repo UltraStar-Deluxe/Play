@@ -22,14 +22,22 @@ public class SetSongPropertyAction : INeedInjection
 
     public void SetMedleyStart(double positionInMillis)
     {
-        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInMillis);
-        songMeta.MedleyStartInMillis = beat;
+        songMeta.MedleyStartInMillis = positionInMillis;
     }
 
     public void SetMedleyEnd(double positionInMillis)
     {
-        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInMillis);
-        songMeta.MedleyEndInMillis = beat;
+        songMeta.MedleyEndInMillis = positionInMillis;
+    }
+
+    public void SetStart(double positionInMillis)
+    {
+        songMeta.StartInMillis = positionInMillis;
+    }
+
+    public void SetEnd(double positionInMillis)
+    {
+        songMeta.EndInMillis = positionInMillis;
     }
 
     public void SetMedleyStartAndNotify(double positionInMillis)
@@ -42,5 +50,17 @@ public class SetSongPropertyAction : INeedInjection
     {
         SetMedleyEnd(positionInMillis);
         songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.MedleyEnd));
+    }
+
+    public void SetStartAndNotify(double positionInMillis)
+    {
+        SetStart(positionInMillis);
+        songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Start));
+    }
+
+    public void SetEndAndNotify(double positionInMillis)
+    {
+        SetEnd(positionInMillis);
+        songMetaChangedEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.End));
     }
 }

@@ -180,23 +180,6 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         }
     }
 
-    private void Update()
-    {
-        if (Keyboard.current != null
-            && Keyboard.current.rightCtrlKey.wasPressedThisFrame)
-        {
-            ClearRecordingBuffer();
-        }
-    }
-
-    private void ClearRecordingBuffer()
-    {
-        Array.Clear(RecordingBuffer, 0, RecordingBuffer.Length);
-        recordingIndex = 0;
-        recordingStartIndex = 0;
-        recordedSamplesChangedEventStream.OnNext(VoidEvent.instance);
-    }
-
     private void DoSpeechRecognitionForNewlyRecordedSamples()
     {
         if (!settings.SongEditorSettings.SpeechRecognitionWhenRecording
@@ -225,7 +208,6 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
             sampleRate,
             150,
             true,
-            speechRecognitionAction.CreateSpeechRecognizerParameters(),
             -(int)gapShiftInBeats);
     }
 

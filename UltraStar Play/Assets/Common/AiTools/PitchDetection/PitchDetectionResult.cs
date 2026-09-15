@@ -1,14 +1,14 @@
-﻿public class PitchDetectionResult
+﻿using System.Collections.Generic;
+
+public class PitchDetectionResult
 {
-    public string MidiFilePath { get; private set; }
+    public List<PitchDetectionResultNote> Notes { get; set; } = new();
+}
 
-    public PitchDetectionResult(string midiFilePath)
-    {
-        MidiFilePath = midiFilePath;
-    }
-
-    public override string ToString()
-    {
-        return $"{nameof(PitchDetectionResult)}(midiFilePath: {MidiFilePath})";
-    }
+public class PitchDetectionResultNote
+{
+    public double StartInMillis { get; set; }
+    public double LengthInMillis { get; set; }
+    public int MidiNote { get; set; }
+    public float Confidence { get; set; }
 }

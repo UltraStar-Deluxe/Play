@@ -102,6 +102,15 @@ public static class UltraStarSongParser
             headerFields.GetValueOrDefault("AUDIO", ""),
             voiceIdToDisplayName,
             version);
+        
+        // The GAP as well as BPM determine absolute millisecond positions in the song when given a beat.
+        // This is why these fields have to be loaded first.
+        string gap = headerFields.GetValueOrDefault("GAP", "");
+        if (!gap.IsNullOrEmpty())
+        {
+            songMeta.GapInMillis = ParseNumber("GAP", gap);
+        }
+
         foreach (KeyValuePair<string, string> item in headerFields)
         {
             try
@@ -351,7 +360,7 @@ public static class UltraStarSongParser
                 songMeta.EndInMillis = ParseNumber(key, value);
                 break;
             case "GAP":
-                songMeta.GapInMillis = ParseNumber(key, value);
+                // GAP is already parsed earlier because the timing of beats can depend on this field, similar to BPM.
                 break;
             case "GENRE":
                 songMeta.Genre = value;
@@ -435,17 +444,30 @@ public static class UltraStarSongParser
             case "YEAR":
                 songMeta.Year = (uint)ParseNumber(key, value);
                 break;
-            case "AUDIOAUTHOR":
-            case "AUDIOLICENSE":
-            case "AUDIOSOURCE":
-            case "BACKGROUNDAUTHOR":
-            case "BACKGROUNDLICENSE":
-            case "BACKGROUNDSOURCE":
+            case "ALBUM": // deprecated field
+            case "AUDIOAUTHOR": // deprecated field
+            case "AUDIOLICENSE": // deprecated field
+            case "AUDIOSOURCE": // deprecated field
+            case "AUTHOR": // deprecated field
+            case "BACKGROUNDAUTHOR": // deprecated field
+            case "BACKGROUNDLICENSE": // deprecated field
+            case "BACKGROUNDSOURCE": // deprecated field
+            case "CALCMEDLEY":
+            case "COMMENT":
             case "CREATOR":
+            case "DUETSINGERP1": // deprecated field
+            case "DUETSINGERP2": // deprecated field
             case "ENCODING":
-            case "FIXER":
+            case "FIXER": // deprecated field
+            case "LENGTH": // deprecated field
+            case "NOTESGAP": // deprecated field
             case "P1":
             case "P2":
+            case "PROVIDEDBY":
+            case "RELATIVE": // deprecated field
+            case "RESOLUTION": // deprecated field
+            case "SOURCE": // deprecated field
+            case "YOUTUBE": // deprecated field
                 // Known additional header entry
                 songMeta.SetAdditionalHeaderEntry(key, value);
                 break;

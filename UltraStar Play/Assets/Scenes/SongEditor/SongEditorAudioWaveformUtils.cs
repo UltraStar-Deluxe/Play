@@ -4,9 +4,29 @@ using UnityEngine;
 
 public static class SongEditorAudioWaveformUtils
 {
+    public static bool IsSupportedAudioFormat(SongMeta songMeta, Settings settings)
+    {
+        return IsSupportedAudioFormat(GetAudioUri(songMeta, GetAudioWaveformSamplesSource(settings)));
+    }
+
+    public static bool IsSupportedAudioFormat(string audioUri)
+    {
+        if (ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(new Uri(audioUri).LocalPath)))
+        {
+            return false;
+        }
+
+        // Must be an audio format supported by Unity to get all the samples
+        return ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(audioUri));
+        
+        // As alternative, if ffmpeg libraries are available, can load any format as samples.
+        // return true;
+    }
+    
     public static async Awaitable<AudioClip> GetAudioClipToDrawAudioWaveform(
         SongMeta songMeta,
-        Settings settings)
+        Settings settings,
+        AudioSampleLoader audioSampleLoader)
     {
         // using IDisposable d = new DisposableStopwatch($"Get audio clip to draw audio wave form");
 
@@ -18,27 +38,18 @@ public static class SongEditorAudioWaveformUtils
             audioUri = GetAudioUri(songMeta, ESongEditorSamplesSource.OriginalMusic);
         }
 
-        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        if (!SongMetaUtils.ResourceExists(songMeta, audioUri))
         {
             Debug.Log($"Audio file resource does not exist {audioUri}");
             return null;
         }
 
-        string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
-        if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
+        if (!IsSupportedAudioFormat(audioUri))
         {
-            // Cannot draw audio wave form of MIDI file.
             return null;
         }
 
-        if (!ApplicationUtils.IsUnitySupportedAudioFormat(fileExtension))
-        {
-            // Cannot load this format using Unity API.
-            return null;
-        }
-
-        // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-        AudioClip audioClip = await AudioManager.LoadAudioClipFromUriAsync(audioUri, false);
+        AudioClip audioClip = await audioSampleLoader.LoadAsAudioClip(audioUri);
         return audioClip;
     }
 
@@ -99,7 +110,7 @@ public static class SongEditorAudioWaveformUtils
         // using IDisposable d = new DisposableStopwatch($"Draw audio wave form");
         audioWaveFormVisualization.DrawAudioWaveForm(samples, minSample, maxSample);
     }
-
+    
     private static string GetAudioUri(SongMeta songMeta, ESongEditorSamplesSource samplesSource)
     {
         switch (samplesSource)

@@ -25,7 +25,7 @@
                 </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+        <ui:VisualElement name="row" style="flex-grow: 1;">
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="optionsSceneScrollView" vertical-scroller-visibility="AlwaysVisible" class="mr-3" style="min-width: 25%;">
                 <ToggleButton name="gameOptionsButton" class="optionsOverviewButton toggleButton">
                     <MaterialIcon icon="sports_esports" name="image" />
@@ -76,7 +76,7 @@
                     <ui:Label text="$options_development_button" name="label" />
                 </ToggleButton>
             </ui:ScrollView>
-            <ui:VisualElement name="loadedSceneContainer" style="flex-grow: 1;">
+            <ui:VisualElement name="loadedSceneContainer" class="roundCorners" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.5); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
                 <ui:VisualElement name="loadedSceneContent" style="flex-grow: 1;" />
             </ui:VisualElement>
         </ui:VisualElement>

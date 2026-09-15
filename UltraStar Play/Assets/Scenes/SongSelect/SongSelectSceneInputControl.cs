@@ -54,8 +54,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private readonly ReactiveProperty<string> fuzzySearchText = new("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
-    private static readonly float fuzzySearchResetTimeInSeconds = 0.75f;
+    private static readonly float fuzzySearchResetTimeInSeconds = 1.5f;
 
+    // ReSharper disable Unity.PerformanceAnalysis
     void Start()
     {
         focusableNavigator.NoNavigationTargetFoundInListViewCallback = OnNoNavigationTargetFoundInListView;
@@ -63,16 +64,16 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
         songListView.ReleaseMouse();
 
-        // Toggle song is favorite
-        InputManager.GetInputAction(R.InputActions.usplay_toggleFavorite).PerformedAsObservable()
-            .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).InputAction.ReadValue<float>() == 0)
-            .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavorite).InputAction.ReadValue<float>() >= 1)
-            .Subscribe(_ => songSelectSceneControl.ToggleSelectedSongIsFavorite());
+        // Toggle song entry in last edited playlist
+        InputManager.GetInputAction(R.InputActions.usplay_toggleLastEditedPlaylistEntry).PerformedAsObservable()
+            .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleLastEditedPlaylistActive).InputAction.ReadValue<float>() == 0)
+            .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleLastEditedPlaylistEntry).InputAction.ReadValue<float>() >= 1)
+            .Subscribe(_ => songSelectSceneControl.ToggleSelectedSongInLastEditedPlaylist());
 
-        // Toggle favorite playlist is active
-        InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).PerformedAsObservable()
-            .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).InputAction.ReadValue<float>() >= 1)
-            .Subscribe(_ => songSelectSceneControl.ToggleFavoritePlaylist());
+        // Toggle last edited playlist is active
+        InputManager.GetInputAction(R.InputActions.usplay_toggleLastEditedPlaylistActive).PerformedAsObservable()
+            .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleLastEditedPlaylistActive).InputAction.ReadValue<float>() >= 1)
+            .Subscribe(_ => songSelectSceneControl.ToggleLastEditedPlaylist());
 
         // Close search or leave scene with Back
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()

@@ -4,7 +4,7 @@ using System.Linq;
 using UniRx;
 using UnityEngine;
 
-public class SongCoverAndBackgroundImageProviderFromFolder : ISongCoverImageProvider, ISongBackgroundImageProvider
+public class SongCoverAndBackgroundImageProviderFromFolder : ICoverUriProvider, IBackgroundUriProvider
 {
     private static readonly List<string> imageFileExtensionPatterns = new List<string>()
     {
@@ -17,14 +17,14 @@ public class SongCoverAndBackgroundImageProviderFromFolder : ISongCoverImageProv
     private Dictionary<string, string> folderToCoverUri = new Dictionary<string, string>();
     private Dictionary<string, string> folderToBackgroundUri = new Dictionary<string, string>();
 
-    public async Awaitable<string> GetCoverImageUriAsync(SongMeta songMeta)
+    public async Awaitable<string> GetCoverUriAsync(SongMeta songMeta)
     {
         // Prefer image files that have "cover" or similar in their name.
         List<string> searchTerms = new List<string>() { "cover", "front", "album", "co" };
         return GetImageUriPreferSearchTermsAsync(songMeta, searchTerms, folderToCoverUri);
     }
 
-    public async Awaitable<string> GetBackgroundImageUriAsync(SongMeta songMeta)
+    public async Awaitable<string> GetBackgroundUriAsync(SongMeta songMeta)
     {
         // Prefer image files that have "cover" or similar in their name.
         List<string> searchTerms = new List<string>() { "background", "back", "bg" };

@@ -21,4 +21,9 @@ public static class TranslationExtensions
     {
         textElement.text = text;
     }
+    
+    public static void SetTranslatedPlaceholder(this ITextEdition textEdition, Translation text)
+    {
+        textEdition.placeholder = text;
+    }
 }

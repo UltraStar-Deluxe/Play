@@ -29,6 +29,9 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorHistoryManager historyManager;
 
+    [Inject]
+    private SongEditorSelectionControl songEditorSelectionControl;
+
     [Inject(UxmlName = R.UxmlNames.buttonRecordingLyricsTextField)]
     private TextField buttonRecordingLyricsTextField;
 
@@ -41,6 +44,12 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
     private int cursorIndex;
 
     private bool hasRecordedNotes;
+
+    // State for editing an already selected existing note
+    private bool isEditingSelectedNote;
+    private List<Note> sortedNotesInEditScope = new();
+    private int indexOfEditingNoteInSorted = -1;
+    private bool lastFrameButtonPressed;
 
     private void Start()
     {
@@ -103,16 +112,32 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
     private void UpdateRecordingViaButtonClick()
     {
         int currentBeat = (int)songAudioPlayer.GetCurrentBeat(true);
-        if (Keyboard.current != null
-            && Keyboard.current.anyKey.isPressed)
+
+        bool buttonPressed = IsRecordingButtonPressed();
+        bool buttonDown = buttonPressed && !lastFrameButtonPressed;
+        bool buttonUp = !buttonPressed && lastFrameButtonPressed;
+
+        if (buttonDown)
         {
-            // Check if the required key is pressed
-            List<string> pressedKeysDisplayNames = Keyboard.current.allControls
-                .Where(inputControl => inputControl.IsPressed())
-                .Select(inputControl => inputControl.displayName.ToUpperInvariant())
-                .ToList();
-            if (pressedKeysDisplayNames.Contains(settings.SongEditorSettings.ButtonDisplayNameForButtonRecording.ToUpperInvariant()))
+            List<Note> selectedNotes = songEditorSelectionControl.GetSelectedNotes();
+            if (selectedNotes.Count == 1)
             {
+                // Enter edit-existing-note mode
+                Note selected = selectedNotes[0];
+                StartEditSelectedNote(selected, currentBeat);
+            }
+        }
+
+        if (buttonPressed)
+        {
+            if (isEditingSelectedNote)
+            {
+                // Extend the selected note while holding
+                ContinueEditingSelectedNote(currentBeat);
+            }
+            else
+            {
+                // Create/extend notes in ButtonRecording layer
                 RecordNote(settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                     currentBeat,
                     ESongEditorLayer.ButtonRecording);
@@ -120,10 +145,19 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
         }
         else
         {
+            if (buttonUp && isEditingSelectedNote)
+            {
+                // On release, select next note
+                SelectNextNoteAfterEditing();
+                isEditingSelectedNote = false;
+            }
+
             lastRecordedNote = null;
             // The pitch is always detected (either the keyboard is down or not).
             lastPitchDetectedBeat = currentBeat;
         }
+
+        lastFrameButtonPressed = buttonPressed;
     }
 
     private void RecordNote(int midiNote, int beat, ESongEditorLayer targetLayer)
@@ -204,7 +238,11 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
             lastRecordedNote.SetEndBeat(currentBeat);
 
             // EndBeat of extended note is currentBeat. Overwrite notes that start before this beat.
-            OverwriteExistingNotes(currentBeat, targetLayer);
+            // Do not overwrite existing notes when editing an already selected existing note.
+            if (!isEditingSelectedNote)
+            {
+                OverwriteExistingNotes(currentBeat, targetLayer);
+            }
         }
     }
 
@@ -274,5 +312,94 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
     {
         int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInMillis);
         return beat;
+    }
+
+    private bool IsRecordingButtonPressed()
+    {
+        if (Keyboard.current == null || !Keyboard.current.anyKey.isPressed)
+        {
+            return false;
+        }
+
+        string target = settings.SongEditorSettings.ButtonDisplayNameForButtonRecording.ToUpperInvariant();
+        List<string> pressedKeysDisplayNames = Keyboard.current.allControls
+            .Where(inputControl => inputControl.IsPressed())
+            .Select(inputControl => inputControl.displayName.ToUpperInvariant())
+            .ToList();
+        return pressedKeysDisplayNames.Contains(target);
+    }
+
+    private void StartEditSelectedNote(Note selected, int currentBeat)
+    {
+        // Compute sorted list of notes in same scope (voice or enum layer) from original order at button down
+        sortedNotesInEditScope = GetNotesInSameScope(selected);
+        sortedNotesInEditScope.Sort(Note.comparerByStartBeat);
+        indexOfEditingNoteInSorted = sortedNotesInEditScope.IndexOf(selected);
+
+        // Move selected note to current playback position and set minimal length
+        lastRecordedNote = selected;
+        if (currentBeat <= lastPitchDetectedBeat)
+        {
+            // Ensure we only move forward similar to creation logic; still place at least at lastPitchDetectedBeat+1
+            currentBeat = lastPitchDetectedBeat + 1;
+        }
+        selected.SetStartBeat(currentBeat);
+        selected.SetEndBeat(currentBeat + 1);
+        editorNoteDisplayer.UpdateNotes();
+        hasRecordedNotes = true;
+        isEditingSelectedNote = true;
+        lastPitchDetectedBeat = currentBeat;
+        lastPitchDetectedFrame = Time.frameCount;
+    }
+
+    private void ContinueEditingSelectedNote(int currentBeat)
+    {
+        if (lastRecordedNote == null)
+        {
+            return;
+        }
+        if (currentBeat <= lastPitchDetectedBeat)
+        {
+            return;
+        }
+
+        if (currentBeat > lastRecordedNote.EndBeat)
+        {
+            lastRecordedNote.SetEndBeat(currentBeat);
+            editorNoteDisplayer.UpdateNotes();
+            lastPitchDetectedBeat = currentBeat;
+            lastPitchDetectedFrame = Time.frameCount;
+        }
+    }
+
+    private void SelectNextNoteAfterEditing()
+    {
+        if (sortedNotesInEditScope.IsNullOrEmpty() || indexOfEditingNoteInSorted < 0)
+        {
+            return;
+        }
+        int nextIndex = indexOfEditingNoteInSorted + 1;
+        if (nextIndex >= 0 && nextIndex < sortedNotesInEditScope.Count)
+        {
+            Note next = sortedNotesInEditScope[nextIndex];
+            songEditorSelectionControl.SetSelection(new List<Note> { next });
+        }
+    }
+
+    private List<Note> GetNotesInSameScope(Note reference)
+    {
+        // Same voice if note belongs to a voice; otherwise same enum layer
+        if (reference.Sentence?.Voice != null)
+        {
+            return songEditorLayerManager.GetVoiceLayerNotes(reference.Sentence.Voice.Id);
+        }
+
+        if (songEditorLayerManager.TryGetEnumLayer(reference, out SongEditorEnumLayer enumLayer))
+        {
+            return songEditorLayerManager.GetEnumLayerNotes(enumLayer.LayerEnum);
+        }
+
+        // Fallback: empty list
+        return new List<Note>();
     }
 }

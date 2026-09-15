@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using UniInject;
-using UniRx;
+﻿using UniInject;
 using UnityEngine;
 
 public class MidiAudioSupportProvider : AbstractAudioSupportProvider
@@ -24,12 +21,6 @@ public class MidiAudioSupportProvider : AbstractAudioSupportProvider
         PositionInMillis = startPositionInMillis;
         Play();
         return new AudioLoadedEvent(audioUri);
-    }
-
-    public override bool IsSupported(string audioUri)
-    {
-        return !WebViewUtils.CanHandleWebViewUrl(audioUri)
-               && ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(audioUri));
     }
 
     public override void Unload()

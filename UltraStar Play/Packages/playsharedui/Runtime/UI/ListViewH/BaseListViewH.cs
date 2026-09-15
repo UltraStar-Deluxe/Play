@@ -13,11 +13,12 @@ using UnityEngine.UIElements;
 /// Base class for a list view, a horizontally scrollable area that links to, and displays, a list of items.
 /// </para>
 ///      </summary>
-public abstract class BaseListViewH : BaseHorizontalCollectionView
+[UxmlElement]
+public abstract partial class BaseListViewH : BaseHorizontalCollectionView
 {
     private bool m_ShowBoundCollectionSize = true;
-    private bool m_ShowFoldoutHeader;
-    private string m_HeaderTitle;
+    private bool m_ShowFoldoutHeader = false;
+    private string m_HeaderTitle = string.Empty;
     private Label m_ListViewLabel;
     private Foldout m_Foldout;
     private TextField m_ArraySizeField;
@@ -29,7 +30,7 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
     private Action<IEnumerable<int>> m_ItemAddedCallback;
     private Action<IEnumerable<int>> m_ItemRemovedCallback;
     private Action m_ItemsSourceSizeChangedCallback;
-    private ListViewReorderMode m_ReorderMode;
+    private ListViewReorderMode m_ReorderMode = ListViewReorderMode.Simple;
 
     /// <summary>
     ///        <para>
@@ -150,6 +151,7 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
     /// This property controls whether the list view displays the collection size (number of items).
     /// </para>
     ///      </summary>
+    [UxmlAttribute]
     public bool showBoundCollectionSize
     {
         get => this.m_ShowBoundCollectionSize;
@@ -170,6 +172,7 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
     /// This property controls whether the list view displays a header, in the form of a foldout that can be expanded or collapsed.
     /// </para>
     ///      </summary>
+    [UxmlAttribute]
     public bool showFoldoutHeader
     {
         get => this.m_ShowFoldoutHeader;
@@ -234,6 +237,7 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
     /// This property controls the text of the foldout header when using showFoldoutHeader.
     /// </para>
     ///      </summary>
+    [UxmlAttribute]
     public string headerTitle
     {
         get => this.m_HeaderTitle;
@@ -251,6 +255,7 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
     /// This property controls whether a footer will be added to the list view.
     /// </para>
     ///      </summary>
+    [UxmlAttribute]
     public bool showAddRemoveFooter
     {
         get => this.m_Footer != null;
@@ -490,6 +495,7 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
     /// This property controls the drag and drop mode for the list view.
     /// </para>
     ///      </summary>
+    [UxmlAttribute]
     public ListViewReorderMode reorderMode
     {
         get => this.m_ReorderMode;
@@ -523,7 +529,11 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
     /// must all be set for the BaseListView to function properly.
     /// </para>
     ///      </summary>
-    public BaseListViewH() => this.AddToClassList(BaseListView.ussClassName);
+    public BaseListViewH()
+        : base()
+    {
+        this.AddToClassList(BaseListView.ussClassName);
+    }
 
     /// <summary>
     ///        <para>
@@ -543,79 +553,5 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
         this.UpdateArraySizeField();
         this.UpdateListViewLabel();
         base.PostRefresh();
-    }
-
-    /// <summary>
-    ///        <para>
-    /// Defines UxmlTraits for the BaseListView.
-    /// </para>
-    ///      </summary>
-    public new class UxmlTraits : BaseHorizontalCollectionView.UxmlTraits
-    {
-        private readonly UxmlBoolAttributeDescription m_ShowFoldoutHeader;
-        private readonly UxmlStringAttributeDescription m_HeaderTitle;
-        private readonly UxmlBoolAttributeDescription m_ShowAddRemoveFooter;
-        private readonly UxmlEnumAttributeDescription<ListViewReorderMode> m_ReorderMode;
-        private readonly UxmlBoolAttributeDescription m_ShowBoundCollectionSize;
-
-        /// <summary>
-        ///        <para>
-        /// Returns an empty enumerable, because list views usually do not have child elements.
-        /// </para>
-        ///      </summary>
-        /// <returns>
-        ///   <para>An empty enumerable.</para>
-        /// </returns>
-        public override IEnumerable<UxmlChildElementDescription> uxmlChildElementsDescription
-        {
-            get
-            {
-                yield break;
-            }
-        }
-
-        /// <summary>
-        ///        <para>
-        /// Initializes BaseListView properties using values from the attribute bag.
-        /// </para>
-        ///      </summary>
-        /// <param name="ve">The object to initialize.</param>
-        /// <param name="bag">The attribute bag.</param>
-        /// <param name="cc">The creation context; unused.</param>
-        public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
-        {
-            base.Init(ve, bag, cc);
-            BaseListViewH baseListView = (BaseListViewH)ve;
-            baseListView.reorderMode = this.m_ReorderMode.GetValueFromBag(bag, cc);
-            baseListView.showFoldoutHeader = this.m_ShowFoldoutHeader.GetValueFromBag(bag, cc);
-            baseListView.headerTitle = this.m_HeaderTitle.GetValueFromBag(bag, cc);
-            baseListView.showAddRemoveFooter = this.m_ShowAddRemoveFooter.GetValueFromBag(bag, cc);
-            baseListView.showBoundCollectionSize = this.m_ShowBoundCollectionSize.GetValueFromBag(bag, cc);
-        }
-
-        public UxmlTraits()
-        {
-            UxmlBoolAttributeDescription attributeDescription1 = new UxmlBoolAttributeDescription();
-            attributeDescription1.name = "show-foldout-header";
-            attributeDescription1.defaultValue = false;
-            this.m_ShowFoldoutHeader = attributeDescription1;
-            UxmlStringAttributeDescription attributeDescription2 = new UxmlStringAttributeDescription();
-            attributeDescription2.name = "header-title";
-            attributeDescription2.defaultValue = string.Empty;
-            this.m_HeaderTitle = attributeDescription2;
-            UxmlBoolAttributeDescription attributeDescription3 = new UxmlBoolAttributeDescription();
-            attributeDescription3.name = "show-add-remove-footer";
-            attributeDescription3.defaultValue = false;
-            this.m_ShowAddRemoveFooter = attributeDescription3;
-            UxmlEnumAttributeDescription<ListViewReorderMode> attributeDescription4 =
-                new UxmlEnumAttributeDescription<ListViewReorderMode>();
-            attributeDescription4.name = "reorder-mode";
-            attributeDescription4.defaultValue = ListViewReorderMode.Simple;
-            this.m_ReorderMode = attributeDescription4;
-            UxmlBoolAttributeDescription attributeDescription5 = new UxmlBoolAttributeDescription();
-            attributeDescription5.name = "show-bound-collection-size";
-            attributeDescription5.defaultValue = true;
-            this.m_ShowBoundCollectionSize = attributeDescription5;
-        }
     }
 }

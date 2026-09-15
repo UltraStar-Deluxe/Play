@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -465,5 +466,25 @@ public static class Log
                 Information(messageGetter);
                 break;
         }
+    }
+    
+    public static LogWithContext WithThreadContext()
+    {
+        return new LogWithContext(Thread.CurrentThread.ManagedThreadId.ToString());
+    }
+
+    public static LogWithContext WithClassContext(
+        [System.Runtime.CompilerServices.CallerFilePath] string filePath = "")
+    {
+        string className = Path.GetFileNameWithoutExtension(filePath);
+        return new LogWithContext(className);
+    }
+
+    public static LogWithContext WithMethodContext(
+        [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+        [System.Runtime.CompilerServices.CallerFilePath] string filePath = "")
+    {
+        string className = Path.GetFileNameWithoutExtension(filePath);
+        return new LogWithContext($"{className}.{memberName}");
     }
 }

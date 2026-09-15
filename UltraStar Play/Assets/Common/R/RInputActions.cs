@@ -3,14 +3,17 @@ public static partial class R
 {
     public static class InputActions
     {
+        public static readonly string songEditor_addNote = "songEditor/addNote";
         public static readonly string songEditor_anyKeyboardKey = "songEditor/anyKeyboardKey";
         public static readonly string songEditor_assignToOwnSentence = "songEditor/assignToOwnSentence";
         public static readonly string songEditor_copy = "songEditor/copy";
         public static readonly string songEditor_cut = "songEditor/cut";
         public static readonly string songEditor_delete = "songEditor/delete";
         public static readonly string songEditor_editLyrics = "songEditor/editLyrics";
+        public static readonly string songEditor_forcedAlignment = "songEditor/forcedAlignment";
         public static readonly string songEditor_jumpToEndOfSong = "songEditor/jumpToEndOfSong";
         public static readonly string songEditor_jumpToStartOfSong = "songEditor/jumpToStartOfSong";
+        public static readonly string songEditor_mergeNotes = "songEditor/mergeNotes";
         public static readonly string songEditor_navigateBackward = "songEditor/navigateBackward";
         public static readonly string songEditor_navigateForward = "songEditor/navigateForward";
         public static readonly string songEditor_openSearch = "songEditor/openSearch";
@@ -22,7 +25,7 @@ public static partial class R
         public static readonly string songEditor_selectAll = "songEditor/selectAll";
         public static readonly string songEditor_selectNextNote = "songEditor/selectNextNote";
         public static readonly string songEditor_selectPreviousNote = "songEditor/selectPreviousNote";
-        public static readonly string songEditor_speechRecognition = "songEditor/speechRecognition";
+        public static readonly string songEditor_splitNotes = "songEditor/splitNotes";
         public static readonly string songEditor_toggleNoteTypeFreestyle = "songEditor/toggleNoteTypeFreestyle";
         public static readonly string songEditor_toggleNoteTypeGolden = "songEditor/toggleNoteTypeGolden";
         public static readonly string songEditor_toggleNoteTypeNormal = "songEditor/toggleNoteTypeNormal";
@@ -66,10 +69,10 @@ public static partial class R
         public static readonly string usplay_skipToNextLyrics = "usplay/skipToNextLyrics";
         public static readonly string usplay_space = "usplay/space";
         public static readonly string usplay_start = "usplay/start";
-        public static readonly string usplay_toggleFavorite = "usplay/toggleFavorite";
-        public static readonly string usplay_toggleFavoritePlaylistActive = "usplay/toggleFavoritePlaylistActive";
         public static readonly string usplay_toggleFullscreen = "usplay/toggleFullscreen";
         public static readonly string usplay_toggleHelp = "usplay/toggleHelp";
+        public static readonly string usplay_toggleLastEditedPlaylistActive = "usplay/toggleLastEditedPlaylistActive";
+        public static readonly string usplay_toggleLastEditedPlaylistEntry = "usplay/toggleLastEditedPlaylistEntry";
         public static readonly string usplay_toggleMute = "usplay/toggleMute";
         public static readonly string usplay_togglePause = "usplay/togglePause";
         public static readonly string usplay_togglePlayers = "usplay/togglePlayers";

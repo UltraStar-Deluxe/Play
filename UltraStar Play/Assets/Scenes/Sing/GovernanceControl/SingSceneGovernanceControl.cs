@@ -314,6 +314,13 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         FieldBindingUtils.Bind(showPlayerNamesToggle,
             () => settings.ShowPlayerNames,
             newValue => settings.ShowPlayerNames = newValue);
+        
+        Toggle showPlayerImagesToggle = new();
+        showPlayerImagesToggle.SetTranslatedLabel(Translation.Get(R.Messages.singScene_options_showPlayerImages));
+        contextMenuPopup.AddVisualElement(showPlayerImagesToggle);
+        FieldBindingUtils.Bind(showPlayerImagesToggle,
+            () => settings.ShowPlayerImages,
+            newValue => settings.ShowPlayerImages = newValue);
 
         Toggle showScoreNumbers = new();
         showScoreNumbers.SetTranslatedLabel(Translation.Get(R.Messages.singScene_options_showPlayerScore));

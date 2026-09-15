@@ -53,18 +53,23 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             effectsContainer.Add(CreateRecordingPositionIndicator());
         }
 
-        upcomingNotes = voice.Sentences
-            .SelectMany(sentence => sentence.Notes)
-            .Where(note => medleyControl.IsNoteInMedleyRange(note))
-            .ToList();
-        upcomingNotes.Sort(Note.comparerByStartBeat);
-        upcomingSentences = voice.Sentences.ToList();
+        InitializeUpcomingNotesAndSentences();
 
         avgMidiNote = CalculateAvgMidiNote(voice.Sentences.SelectMany(sentence => sentence.Notes).ToList());
         maxNoteRowMidiNote = avgMidiNote + (noteRowCount / 2);
         minNoteRowMidiNote = avgMidiNote - (noteRowCount / 2);
 
         displayedBeats = (int)Math.Ceiling(SongMetaBpmUtils.BeatsPerSecond(songMeta) * DisplayedNoteDurationInSeconds);
+    }
+
+    private void InitializeUpcomingNotesAndSentences()
+    {
+        upcomingNotes = voice.Sentences
+            .SelectMany(sentence => sentence.Notes)
+            .Where(note => medleyControl.IsNoteInMedleyRange(note))
+            .ToList();
+        upcomingNotes.Sort(Note.comparerByStartBeat);
+        upcomingSentences = voice.Sentences.ToList();
     }
 
     public override void SetLineCount(int theLineCount)
@@ -595,6 +600,12 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             label.RemoveFromHierarchy();
             noteToLyricsContainerLabel.Remove(targetNoteControl.Note);
         }
+    }
+
+    public override void JumpToAudioPositionByUserAction(double oldPositionInMillis, double newPositionInMillis)
+    {
+        base.JumpToAudioPositionByUserAction(oldPositionInMillis, newPositionInMillis);
+        InitializeUpcomingNotesAndSentences();
     }
 
     private struct BeatRange

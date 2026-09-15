@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SFB;
 
 public static class FileSystemDialogUtils
 {
@@ -60,14 +61,13 @@ public static class FileSystemDialogUtils
 
     public static string OpenFolderDialog(string title, string directory)
     {
-// StandaloneFileBrowser does not work with IL2CPP scripting backend on Windows. This is why usage is guarded with ENABLE_IL2CPP.
-#if UNITY_STANDALONE && !ENABLE_IL2CPP
+#if UNITY_STANDALONE
         if (!DirectoryUtils.Exists(directory))
         {
             directory = "";
         }
 
-        string[] selectedPaths = SFB.StandaloneFileBrowser.OpenFolderPanel(title, directory, false);
+        string[] selectedPaths = StandaloneFileBrowser.OpenFolderPanel(title, directory, false);
         if (selectedPaths.IsNullOrEmpty()
             || !DirectoryUtils.Exists(selectedPaths.FirstOrDefault()))
         {
@@ -83,13 +83,13 @@ public static class FileSystemDialogUtils
 
     public static string OpenFileDialog(string title, string directory, ExtensionFilter[] extensionFilters)
     {
-#if UNITY_STANDALONE && !ENABLE_IL2CPP
+#if UNITY_STANDALONE
         if (!DirectoryUtils.Exists(directory))
         {
             directory = "";
         }
 
-        string[] selectedPaths = SFB.StandaloneFileBrowser.OpenFilePanel(title, directory, ToSfbExtensionFilters(extensionFilters), false);
+        string[] selectedPaths = StandaloneFileBrowser.OpenFilePanel(title, directory, extensionFilters, false);
         if (selectedPaths.IsNullOrEmpty()
             || !FileUtils.Exists(selectedPaths.FirstOrDefault()))
         {
@@ -101,32 +101,5 @@ public static class FileSystemDialogUtils
 #else
         return "";
 #endif
-    }
-
-#if UNITY_STANDALONE && !ENABLE_IL2CPP
-    private static SFB.ExtensionFilter[] ToSfbExtensionFilters(ExtensionFilter[] extensionFilters)
-    {
-        return extensionFilters
-            .Select(filter => new SFB.ExtensionFilter(filter.Name, filter.Extensions))
-            .ToArray();
-    }
-#endif
-}
-
-public struct ExtensionFilter
-{
-    public string Name { get; private set;  }
-    public string[] Extensions { get; private set; }
-
-    public ExtensionFilter(string name, string[] extensions)
-    {
-        Name = name;
-        Extensions = extensions;
-    }
-    
-    public ExtensionFilter(string name, string extension)
-    {
-        Name = name;
-        Extensions = new[] { extension };
     }
 }

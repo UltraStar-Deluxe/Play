@@ -21,9 +21,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.showFpsToggle)]
     private Toggle showFpsToggle;
 
-    [Inject(UxmlName = R.UxmlNames.maxConcurrentSongMediaConversionsChooser)]
-    private Chooser maxConcurrentSongMediaConversionsChooser;
-
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmChooser)]
     private Chooser pitchDetectionAlgorithmChooser;
 
@@ -57,6 +54,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.httpEndpointExampleLabel)]
     private Label httpEndpointExampleLabel;
 
+    [Inject(UxmlName = R.UxmlNames.platformLabel)]
+    private Label platformLabel;
+
     [Inject(UxmlName = R.UxmlNames.showConsoleButton)]
     private Button showConsoleButton;
 
@@ -72,6 +72,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.openPersistentDataPathButton)]
     private Button openPersistentDataPathButton;
 
+    [Inject(UxmlName = R.UxmlNames.openWebViewScriptsPathButton)]
+    private Button openWebViewScriptsPathButton;
+
     [Inject(UxmlName = R.UxmlNames.messageBufferTimeTextField)]
     private IntegerField messageBufferTimeTextField;
 
@@ -84,6 +87,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.songSelectSongPreviewDelay)]
     private IntegerField songSelectSongPreviewDelay;
 
+    [Inject(UxmlName = R.UxmlNames.dspBufferSizeChooser)]
+    private Chooser dspBufferSizeChooser;
+
+    [Inject(UxmlName = R.UxmlNames.searchMidiFilesWithLyricsToggle)]
+    private Toggle searchMidiFilesWithLyricsToggle;
     [Inject]
     private ThemeManager themeManager;
 
@@ -105,12 +113,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject]
     private InGameDebugConsoleManager inGameDebugConsoleManager;
 
-    [Inject(UxmlName = R.UxmlNames.audioSeparationCommandTextField)]
-    private TextField audioSeparationCommandTextField;
-
-    [Inject(UxmlName = R.UxmlNames.basicPitchCommandTextField)]
-    private TextField basicPitchCommandTextField;
-
     [Inject(UxmlName = R.UxmlNames.clientDiscoveryPortTextField)]
     private IntegerField clientDiscoveryPortTextField;
 
@@ -129,8 +131,17 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.songVideoPlaybackChooser)]
     private Chooser songVideoPlaybackChooser;
 
-    [Inject(UxmlName = R.UxmlNames.useVlcToPlayMediaFilesChooser)]
-    private Chooser useVlcToPlayMediaFilesChooser;
+    [Inject(UxmlName = R.UxmlNames.unityApiUsageChooser)]
+    private Chooser unityApiUsageChooser;
+    
+    [Inject(UxmlName = R.UxmlNames.avproApiUsageChooser)]
+    private Chooser avproApiUsageChooser;
+    
+    [Inject(UxmlName = R.UxmlNames.vlcApiUsageChooser)]
+    private Chooser vlcApiUsageChooser;
+    
+    [Inject(UxmlName = R.UxmlNames.ffmpegApiUsageChooser)]
+    private Chooser ffmpegApiUsageChooser;
 
     [Inject(UxmlName = R.UxmlNames.logVlcOutputToggle)]
     private Toggle logVlcOutputToggle;
@@ -152,6 +163,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlClass = "accordionItem")]
     private List<AccordionItem> accordionItems;
+
+    [Inject(UxmlName = R.UxmlNames.uploadWorkshopItemButton)]
+    private Button uploadWorkshopItemButton;
 
     [Inject(UxmlName = R.UxmlNames.defaultUltraStarFormatVersionForSave)]
     private Chooser defaultUltraStarFormatVersionForSave;
@@ -281,6 +295,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             httpEndpointExampleLabel.text = Translation.Get(R.Messages.options_httpServerNotSupported);
         }
 
+        platformLabel.text = $"Platform: {PlatformDetector.Detect()}";
+
         // View and copy log
         showConsoleButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
         openLogFolderButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(Log.logFileFolder));
@@ -307,18 +323,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             newValue => settings.CompanionClientMessageBufferTimeInMillis = newValue);
         messageBufferTimeTextField.DisableChangeValueByDragging();
 
-        // Spleeter command (audio separation)
-        audioSeparationCommandTextField.DisableParseEscapeSequences();
-        FieldBindingUtils.Bind(audioSeparationCommandTextField,
-            () => settings.SongEditorSettings.AudioSeparationCommand,
-            newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
-
-        // Basic Pitch command (pitch detection)
-        basicPitchCommandTextField.DisableParseEscapeSequences();
-        FieldBindingUtils.Bind(basicPitchCommandTextField,
-            () => settings.SongEditorSettings.BasicPitchCommand,
-            newValue => settings.SongEditorSettings.BasicPitchCommand = newValue);
-
         // Network config
         FieldBindingUtils.Bind(clientDiscoveryPortTextField,
             () => settings.ConnectionServerPort,
@@ -339,6 +343,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.WriteUltraStarTxtFileWithByteOrderMark,
             newValue => settings.WriteUltraStarTxtFileWithByteOrderMark = newValue);
 
+        FieldBindingUtils.Bind(searchMidiFilesWithLyricsToggle,
+            () => settings.SearchMidiFilesWithLyrics,
+            newValue => settings.SearchMidiFilesWithLyrics = newValue);
+
         // UltraStar format versions
         new EnumChooserControl<EKnownUltraStarSongFormatVersion>(defaultUltraStarFormatVersionForSave)
             .Bind(() => settings.DefaultUltraStarSongFormatVersionForSave,
@@ -353,11 +361,24 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .Bind(() => settings.SongVideoPlayback,
                 newValue => settings.SongVideoPlayback = newValue);
 
-        // VLC
-        new EnumChooserControl<EThirdPartyLibraryUsage>(useVlcToPlayMediaFilesChooser)
-            .Bind(() => settings.VlcToPlayMediaFilesUsage,
-                newValue => settings.VlcToPlayMediaFilesUsage = newValue);
+        // Media Api Preferences
+        new EnumChooserControl<EApiUsage>(unityApiUsageChooser)
+            .Bind(() => settings.UnityMediaApiUsage,
+                newValue => settings.UnityMediaApiUsage = newValue);
+        
+        new EnumChooserControl<EApiUsage>(avproApiUsageChooser)
+            .Bind(() => settings.AvProApiUsage,
+                newValue => settings.AvProApiUsage = newValue);
 
+        new EnumChooserControl<EApiUsage>(vlcApiUsageChooser)
+            .Bind(() => settings.VlcApiUsage,
+                newValue => settings.VlcApiUsage = newValue);
+        
+        new EnumChooserControl<EApiUsage>(ffmpegApiUsageChooser)
+            .Bind(() => settings.FfmpegApiUsage,
+                newValue => settings.FfmpegApiUsage = newValue);
+
+        // VLC Settings
         FieldBindingUtils.Bind(logVlcOutputToggle,
             () => settings.LogVlcOutput,
             newValue => settings.LogVlcOutput = newValue);
@@ -385,6 +406,17 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.EnableVfx,
             newValue => settings.EnableVfx = newValue);
 
+        // Dsp Buffer Size
+        EnumChooserControl<EDspBufferSize> dspBufferSizeChooserControl = new(dspBufferSizeChooser);
+        dspBufferSizeChooserControl.Bind(
+            () => settings.DspBufferSize,
+            newValue =>
+            {
+                settings.DspBufferSize = newValue;
+                AudioSettingsUtils.UpdateConfiguration(settings.DspBufferSize);
+            });
+
+        
         // Online multiplayer
         new EnumChooserControl<ENetworkDelivery>(beatAnalyzedEventNetworkDeliveryChooser)
             .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,
@@ -393,6 +425,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(simulateJitterInMillisField,
             () => settings.OnlineMultiplayerSimulatedJitterInMillis,
             newValue => settings.OnlineMultiplayerSimulatedJitterInMillis = newValue);
+
     }
 
     private void UpdateLogEventLevel()

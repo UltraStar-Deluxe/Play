@@ -15,6 +15,9 @@ public class PlayerPerformanceAssessmentControl : MonoBehaviour, INeedInjection,
 
     [Inject]
     private Voice voice;
+    
+    [Inject]
+    private SongMeta songMeta;
 
     private readonly Subject<NoteAssessedEvent> noteAssessedEventStream = new();
     public IObservable<NoteAssessedEvent> NoteAssessedEventStream => noteAssessedEventStream;
@@ -194,5 +197,22 @@ public class PlayerPerformanceAssessmentControl : MonoBehaviour, INeedInjection,
                 ? 0
                 : correctlySungBeatsPercent = (double)CorrectlySungBeats.Count / noteLengthSum;
         }
+    }
+
+    public void JumpToAudioPositionByUserAction(double oldPositionInMillis, double newPositionInMillis)
+    {
+        if (newPositionInMillis >= oldPositionInMillis)
+        {
+            // Jump forward is handled by existing logic.
+            return;
+        }
+        
+        // Jumped backwards: revert state
+        int newBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, newPositionInMillis);
+        processedBeats.RemoveWhere(beat => beat > newBeat);
+        noteToCorrectlySungBeats.Keys
+            .Where(note => note.StartBeat >= newBeat)
+            .ToList()
+            .ForEach(note => noteToCorrectlySungBeats.Remove(note));
     }
 }

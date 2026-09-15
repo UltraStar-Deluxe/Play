@@ -58,7 +58,7 @@
     "videoPreviewColor":"#CCCCCC",
 
     "lyricsOutlineColor": "#00000000",
-    "lyricsContainerGradient": "#000000, #1E232B",
+    "lyricsContainerGradient": "#00000099, #1E232B99",
 
     "dynamicBackground": {
         "imagePath": "backgrounds/dot-grid-with-vinyl-bottom-right.jpg"

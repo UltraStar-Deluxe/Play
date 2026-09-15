@@ -17,6 +17,8 @@ class Build : NukeBuild
     [Parameter] readonly AbsolutePath buildOutput = RootDirectory / "Build";
     [Parameter] readonly AbsolutePath unityExecutable;
     [Parameter] readonly UnityTestPlatform testPlatform = UnityTestPlatform.EditMode;
+    [Parameter] readonly bool downloadAiModels;
+    [Parameter] readonly bool downloadFfmpegLibraries;
 
     private readonly AbsolutePath mainGameDir = RootDirectory / "UltraStar Play";
     private readonly AbsolutePath companionAppDir = RootDirectory / "UltraStar Play Companion";
@@ -58,7 +60,7 @@ class Build : NukeBuild
         {
             BuildMainGame("BuildMacOS");
         });
-    
+
     Target BuildMainGameAndroidApk => _ => _
         .Executes(() =>
         {
@@ -100,7 +102,7 @@ class Build : NukeBuild
         {
             AbsolutePath mainGameNuGetPackagesSourceFolder = GetNuGetPackagesProjectFolder(mainGameDir) / "bin";
             AbsolutePath mainGameNuGetPackagesTargetFolder = GetNuGetPackagesTargetFolder(mainGameDir);
-            AbsolutePath playsharedNuGetPackagesTargetFolder = mainGameDir / "Packages" / "playshared" / "Runtime" / "Plugins" / "NuGetPackages";
+            AbsolutePath playsharedNuGetPackagesTargetFolder = mainGameDir / "Packages/playshared/Runtime/Plugins/NuGetPackages";
 
             // Delete old packages
             DirectoryUtils.DeleteDirectory(mainGameNuGetPackagesSourceFolder);
@@ -123,6 +125,7 @@ class Build : NukeBuild
                 "System.Diagnostics.DiagnosticSource.dll", // transitive dependency of Serilog
                 "System.Runtime.CompilerServices.Unsafe.dll", // transitive dependency of Serilog
                 "System.Threading.Channels.dll", // transitive dependency of Serilog
+                "Utf8Json.dll",
                 "YamlDotNet.dll");
 
             // Move libraries for main game
@@ -133,13 +136,18 @@ class Build : NukeBuild
                 "NHyphenator.dll",
                 "Opportunity.LrcParser.dll",
                 "System.Linq.Dynamic.Core.dll",
-                "System.Text.Encoding.CodePages.dll"
+                "System.Text.Encoding.CodePages.dll",
+                "TagLibSharp.dll",
+                "Microsoft.ML.OnnxRuntime.dll",
+                "NWaves.dll",
+                "Ffmpeg.Autogen.dll",
+                "WindowsInput.dll" // Only used in mod "TriggerKeyStrokeToToggleMicWhenSinging"
                 );
         });
 
     Target RestoreMainGameDependencies => _ => _
         .DependsOn(RestoreMainGameNuGetDependencies)
-        .Executes(() => new MainGameDependencyDownloader(mainGameDir, cloneDepth).DownloadAsync());
+        .Executes(() => new MainGameDependencyDownloader(mainGameDir, cloneDepth, downloadAiModels, downloadFfmpegLibraries).DownloadAsync());
 
     Target RestoreCompanionAppNuGetDependencies => _ => _
         .DependsOn(RestoreMainGameNuGetDependencies) // Restore main game dependencies for playshared
@@ -169,12 +177,12 @@ class Build : NukeBuild
 
     private AbsolutePath GetNuGetPackagesProjectFolder(AbsolutePath unityProjectDir)
     {
-        return unityProjectDir / "Packages" / "NuGetPackages";
+        return unityProjectDir / "Packages/NuGetPackages";
     }
 
     private AbsolutePath GetNuGetPackagesTargetFolder(AbsolutePath unityProjectDir)
     {
-        return unityProjectDir / "Assets" / "Plugins" / "NuGetPackages";
+        return unityProjectDir / "Assets/Plugins/NuGetPackages";
     }
 
     private void TestUnityProject(UnityProject unityProject, UnityTestPlatform unityTestPlatform)

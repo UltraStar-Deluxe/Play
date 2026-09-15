@@ -19,15 +19,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
 
-    [Inject(UxmlName = R.UxmlNames.doPitchDetectionInSelectionButton)]
-    private Button doPitchDetectionInSelectionButton;
-
-    [Inject(UxmlName = R.UxmlNames.pitchDetectionUsingBasicPitchButton)]
-    private Button pitchDetectionUsingBasicPitchButton;
-
-    [Inject(UxmlName = R.UxmlNames.doSpeechRecognitionButton)]
-    private Button doSpeechRecognitionButton;
-
     [Inject(UxmlName = R.UxmlNames.undoButton)]
     private Button undoButton;
 
@@ -126,6 +117,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     [Inject]
     private DialogManager dialogManager;
+    
+    [Inject]
+    private NoteAreaControl noteAreaControl;
 
     private readonly TabGroupControl sideBarTabGroupControl = new();
     private readonly SongEditorSideBarPropertiesControl propertiesControl = new();
@@ -163,9 +157,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             UpdateRecordingButton();
         });
         UpdateRecordingButton();
-
-        pitchDetectionUsingBasicPitchButton.RegisterCallbackButtonTriggered(_ => AnalyzePitchUsingBasicPitch());
-        doSpeechRecognitionButton.RegisterCallbackButtonTriggered(_ => DoSpeechRecognition());
 
         undoButton.RegisterCallbackButtonTriggered(_ => historyManager.Undo());
         redoButton.RegisterCallbackButtonTriggered(_ => historyManager.Redo());
@@ -211,17 +202,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         InitTabGroup();
     }
 
-    private void AnalyzePitchUsingBasicPitch()
-    {
-        if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
-        {
-            NotificationManager.CreateNotification(Translation.Get(R.Messages.songEditor_error_missingVocalsAudio));
-            return;
-        }
-
-        pitchDetectionAction.CreateNotesUsingBasicPitch(true);
-    }
-
     private void ShowSongEditorHelpDialog()
     {
         if (helpDialogControl != null)
@@ -229,24 +209,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             return;
         }
 
-        Dictionary<string, string> titleToContentMap = new()
-        {
-            { Translation.Get(R.Messages.songEditor_helpDialog_audioSeparation_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_audioSeparation) },
-            { Translation.Get(R.Messages.songEditor_helpDialog_pitchDetection_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_pitchDetection) },
-            { Translation.Get(R.Messages.songEditor_helpDialog_lyricsDictation_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_lyricsDictation) },
-            { Translation.Get(R.Messages.songEditor_helpDialog_buttonTapping_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_buttonTapping) },
-            { Translation.Get(R.Messages.songEditor_helpDialog_editingLyrics_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_editingLyrics) },
-            { Translation.Get(R.Messages.songEditor_helpDialog_layers_title),
-                Translation.Get(R.Messages.songEditor_helpDialog_layers) },
-        };
         helpDialogControl = dialogManager.CreateHelpDialogControl(
             Translation.Get(R.Messages.songEditor_helpDialog_title),
-            titleToContentMap);
+            new Dictionary<string, string>());
         helpDialogControl.DialogClosedEventStream.Subscribe(_ => helpDialogControl = null);
 
         // Add controls info
@@ -256,27 +221,10 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         AccordionItem controlsAccordionItem = new AccordionItem("Controls");
         controlsAccordionItem.Add(inputLegendContainer);
         helpDialogControl.DialogRootVisualElement.Q<AccordionGroup>().Add(controlsAccordionItem);
+        controlsAccordionItem.ShowAccordionContent();
 
         helpDialogControl.AddButton(Translation.Get(R.Messages.action_learnMore),
             _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToSongEditor)));
-    }
-
-    private void DoSpeechRecognition()
-    {
-        if (NoteAreaSelectionDragListener.lastSelectionRect.Value == null
-            || NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats <= 0)
-        {
-            return;
-        }
-
-        SpeechRecognizerConfig speechRecognizerConfig = speechRecognitionAction.CreateSpeechRecognizerParameters();
-        speechRecognitionAction.CreateNotesFromSpeechRecognition(
-            NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
-            NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
-            settings.SongEditorSettings.SpeechRecognitionSamplesSource,
-            150,
-            true,
-            speechRecognizerConfig);
     }
 
     private void UpdateRecordingButton()
@@ -420,13 +368,14 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             inputActionInfos.Add(new InputActionInfo("Draw new Note", "Shift+Drag (no selection)"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_editLyrics, "Edit Lyrics"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_assignToOwnSentence, "Assign To Own Sentence"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_mergeNotes, "Merge notes"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeFreestyle, "Toggle Note Type Freestyle"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeGolden, "Toggle Note Type Golden"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeNormal, "Toggle Note Type Normal"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeRap, "Toggle Note Type Rap"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_toggleNoteTypeRapGolden, "Toggle Note Type Rap Golden"));
             inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_pitchDetection, "Pitch Detection"));
-            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_speechRecognition, "Speech Recognition"));
+            inputActionInfos.Add(InputActionInfoFactory.Create(R.InputActions.songEditor_forcedAlignment, "Lyrics Alignment"));
         }
         else if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {
@@ -438,7 +387,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         }
 
         inputLegendContainer.Clear();
-        inputActionInfos.ForEach(inputActionInfo =>
+        inputActionInfos
+            .OrderBy(it => it.ActionText)
+            .ForEach(inputActionInfo =>
             inputLegendContainer.Add(CreateInputActionInfoUi(inputActionInfo)));
     }
 

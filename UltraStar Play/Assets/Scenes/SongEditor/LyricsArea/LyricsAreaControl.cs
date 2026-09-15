@@ -40,6 +40,12 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private EditModeLyricsConverter editModeLyricsConverter; 
+
+    [Inject]
+    private Settings settings; 
+
     private Voice voice;
     public Voice Voice
     {
@@ -193,15 +199,15 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     public void UpdateLyrics()
     {
         string text = lyricsAreaMode == LyricsAreaMode.ViewMode
-            ? LyricsUtils.GetViewModeText(Voice)
-            : LyricsUtils.GetEditModeText(Voice);
+            ? editModeLyricsConverter.GetViewModeText(Voice)
+            : editModeLyricsConverter.GetEditModeText(Voice);
         SetInputFieldText(text);
     }
 
     private void EnterEditMode()
     {
         lastEditModeText = null;
-        string editModeText = LyricsUtils.GetEditModeText(Voice);
+        string editModeText = editModeLyricsConverter.GetEditModeText(Voice);
         string newInputFieldText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(editModeText);
         SetInputFieldText(newInputFieldText);
 
@@ -211,7 +217,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     private void EnterViewMode()
     {
-        string viewModeText = LyricsUtils.GetViewModeText(Voice);
+        string viewModeText = editModeLyricsConverter.GetViewModeText(Voice);
         SetInputFieldText(viewModeText);
 
         lyricsAreaMode = LyricsAreaMode.ViewMode;
@@ -222,7 +228,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     {
         // Map edit-mode text to lyrics of notes
         string text = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
-        LyricsUtils.MapEditModeTextToNotes(text, Voice);
+        editModeLyricsConverter.MapEditModeTextToNotes(text, Voice);
         songMetaChangedEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }
 
@@ -251,7 +257,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         int relevantSentenceTextStartIndex = 0;
         for (int i = 0; i < text.Length && i < caretPosition; i++)
         {
-            if (text[i] == LyricsUtils.sentenceSeparator)
+            if (text[i] == settings.SongEditorSettings.SentenceSeparator)
             {
                 relevantSentenceIndex++;
                 relevantSentenceTextStartIndex = i + 1;
@@ -269,9 +275,9 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
         // Count note borders
         int sentenceLengthBeforeCaret = Math.Min(text.Length - relevantSentenceTextStartIndex,
-                                                 caretPosition - relevantSentenceTextStartIndex);
+            caretPosition - relevantSentenceTextStartIndex);
         string sentenceBeforeCaret = text.Substring(relevantSentenceTextStartIndex, sentenceLengthBeforeCaret);
-        int sentenceSyllablesBeforeCaret = LyricsUtils.ParseEditable(
+        int sentenceSyllablesBeforeCaret = editModeLyricsConverter.ParseEditable(
             ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(sentenceBeforeCaret)
         ).Count;
 

@@ -183,6 +183,7 @@
       "ButtonRecording": "#00FF00",
       "CopyPaste": "#FF00FF",
       "Import": "#FFFF00",
+      "PitchDetection": "#FF8033",
     }
 }
 

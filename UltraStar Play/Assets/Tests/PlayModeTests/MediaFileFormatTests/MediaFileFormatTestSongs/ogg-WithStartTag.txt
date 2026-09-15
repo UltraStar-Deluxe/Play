@@ -1,0 +1,11 @@
+﻿#VERSION:2.0.0
+#TITLE:OGG Format Test with START tag
+#ARTIST:Test Artist
+#MP3:ogg.ogg
+#BPM:200
+#START:2000
+- 0
+: 4 3 9 Hel
+: 8 3 9  lo 
+: 12 3 9  world!
+E

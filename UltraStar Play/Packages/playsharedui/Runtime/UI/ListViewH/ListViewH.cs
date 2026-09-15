@@ -11,7 +11,8 @@ using UnityEngine.UIElements;
 /// A ListView is a horizontally scrollable area that links to, and displays, a list of items.
 /// </para>
 ///      </summary>
-public class ListViewH : BaseListViewH
+[UxmlElement]
+public partial class ListViewH : BaseListViewH
 {
     private Func<VisualElement> m_MakeItem;
     private Action<VisualElement, int> m_BindItem;
@@ -89,23 +90,5 @@ public class ListViewH : BaseListViewH
         this.AddToClassList(BaseListView.ussClassName);
         this.makeItem = makeItem;
         this.bindItem = bindItem;
-    }
-
-    /// <summary>
-    ///        <para>
-    /// Instantiates a ListView using data from a UXML file.
-    /// </para>
-    ///      </summary>
-    public new class UxmlFactory : UnityEngine.UIElements.UxmlFactory<ListViewH, ListViewH.UxmlTraits>
-    {
-    }
-
-    /// <summary>
-    ///        <para>
-    /// Defines UxmlTraits for the ListView.
-    /// </para>
-    ///      </summary>
-    public new class UxmlTraits : BaseListViewH.UxmlTraits
-    {
     }
 }

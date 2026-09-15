@@ -1,0 +1,72 @@
+.ai-toolbar-panel {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.ai-toolbar-title {
+    font-weight: bold;
+}
+
+.ai-toolbar-workflow {
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+.ai-toolbar-step-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.ai-toolbar-step-indicator {
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(92, 92, 92);
+    border-style: solid;
+    background-color: rgb(35, 39, 42);
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 12px;
+    height: 12px;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 4px;
+}
+
+.ai-toolbar-step-icon {
+    align-self: center;
+    -unity-text-align: middle-center;
+    width: 12px;
+    height: 12px;
+    font-size: 14px;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+}
+
+.ai-toolbar-button-icon {
+    font-size: 12px;
+}
+
+.ai-toolbar-step-line {
+    width: 2px;
+    background-color: rgb(92, 92, 92);
+    margin-bottom: 0;
+    border-radius: 2px;
+    align-self: flex-start;
+    height: 12px;
+    margin-left: 4px;
+}
+
+.ai-toolbar-step-button {
+    -unity-text-align: middle-left;
+    padding-top: 2px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 2px;
+    width: 100px;
+}

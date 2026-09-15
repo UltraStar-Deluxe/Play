@@ -50,6 +50,9 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
     [Inject]
     private FocusableNavigator focusableNavigator;
+    
+    [Inject]
+    private SongCoverImageManager songCoverImageManager;
 
     [Inject(UxmlName = R.UxmlNames.songListView)]
     private VisualElement songListView;
@@ -155,15 +158,9 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         selectedSongArtist.SetTranslatedText(Translation.Empty);
         selectedSongTitle.SetTranslatedText(Translation.Empty);
         songIndexLabel.SetTranslatedText(Translation.Empty);
-        SongMetaImageUtils.SetDefaultSongImage(selectedSongImageOuter, selectedSongImageInner);
+        SongCoverImageManager.SetDefaultCoverImage(selectedSongImageOuter, selectedSongImageInner);
         songRatingIconControl.HideSongRatingIcons();
         UpdateHighScores(new List<HighScoreEntry>());
-    }
-
-    private bool IsFavorite(SongMeta songMeta)
-    {
-        return songMeta != null
-               && playlistManager.FavoritesPlaylist.HasSongEntry(songMeta);
     }
 
     public void OnSongSelectionChanged(SongSelectEntrySelection selection)
@@ -184,7 +181,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
         setSongDetailsCoverOrBackgroundImageCancellationTokenSource?.Cancel();
         setSongDetailsCoverOrBackgroundImageCancellationTokenSource = new CancellationTokenSource();
-        SongMetaImageUtils.SetCoverOrBackgroundImageAsync(
+        songCoverImageManager.SetCoverOrBackgroundImageAsync(
             setSongDetailsCoverOrBackgroundImageCancellationTokenSource.Token,
             selectedSong,
             selectedSongImageInner,

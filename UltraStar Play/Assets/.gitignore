@@ -37,11 +37,19 @@ Plugins/UnityStandaloneFileBrowser.meta
 ########################################
 ## Third-party assets from the Unity Asset Store
 
+# WebView by Vuplex
 Vuplex/
 Vuplex.meta
 
-OneJS/
-OneJS.meta
+# OneJs by Singtaa
+Singtaa/
+Singtaa.meta
+
+# AVPro Video by RenderHeads Ltd
+AVProVideo/
+AVProVideo.meta
+StreamingAssets/AVProVideoSamples/
+StreamingAssets/AVProVideoSamples.meta
 
 ######################################
 ## StreamingAssets
@@ -61,6 +69,12 @@ StreamingAssets/DemoSongs.meta
 
 StreamingAssets/ffmpeg/
 StreamingAssets/ffmpeg.meta
+
+StreamingAssets/sherpa-onnx/
+StreamingAssets/sherpa-onnx.meta
+
+StreamingAssets/AiModels/
+StreamingAssets/AiModels.meta
 
 ######################################
 ## Play Mode Tests

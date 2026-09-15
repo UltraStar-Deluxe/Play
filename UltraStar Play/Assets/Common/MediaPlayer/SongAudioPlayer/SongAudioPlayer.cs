@@ -16,6 +16,9 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
 
     [Inject]
     private SceneNavigator sceneNavigator;
+    
+    [Inject]
+    private SongMediaUriResolverManager songMediaUriResolverManager;
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSourceAudioSupportProvider audioSourceAudioSupportProvider;
@@ -55,7 +58,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
                                                         && ((pair.Previous + MinForwardJumpOffsetInMillis) < pair.Current
                                                             || (!IsPlaying && pair.Previous < pair.Current)));
 
-    // The current position in the song in milliseconds.
+    // The current position in the song in milliseconds, updated once per frame.
     private double positionInMillis;
     public double PositionInMillis
     {
@@ -94,7 +97,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
 
     public double PositionInSeconds
     {
-        get => positionInMillis / 1000.0;
+        get => PositionInMillis / 1000.0;
         set => PositionInMillis = value * 1000.0;
     }
 
@@ -252,7 +255,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
     }
 
     public async Awaitable<SongAudioLoadedEvent> LoadAndPlayAsync(SongMeta songMeta)
-        => await LoadAndPlayAsync(songMeta, 0);
+        => await LoadAndPlayAsync(songMeta, songMeta.StartInMillis);
 
     public async Awaitable<SongAudioLoadedEvent> LoadAndPlayAsync(
         SongMeta songMeta,
@@ -261,8 +264,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
     {
         UnloadAudio();
 
-        string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        string audioUri = GetAudioUri(songMeta);
+        if (!SongMetaUtils.ResourceExists(songMeta, audioUri))
         {
             throw new SongAudioPlayerException($"Audio resource does not exist: {audioUri}");
         }
@@ -271,15 +274,13 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         loadedSongMeta = songMeta;
         DurationInMillis = currentAudioSupportProvider.DurationInMillis;
         currentAudioSupportProvider.VolumeFactor = VolumeFactor;
-        if (IsPlaying)
-        {
-            currentAudioSupportProvider.Play();
-        }
+        isPlaying = true;
+        currentAudioSupportProvider.Play();
 
         loadedEventStream.OnNext(new SongAudioLoadedEvent(songMeta, evt.AudioUri));
         return new SongAudioLoadedEvent(songMeta, evt.AudioUri);
     }
-
+    
     private async Awaitable<AudioLoadedEvent> DoLoadAndPlayAsync(
         string audioUri,
         IAudioSupportProvider[] availableAudioSupportProviders,
@@ -288,8 +289,10 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
     {
         Log.Debug(() => $"SongAudioPlayer.DoLoadAndPlayAsObservable '{audioUri}'");
 
-        IAudioSupportProvider audioSupportProvider = availableAudioSupportProviders
-            .FirstOrDefault(it => it.IsSupported(audioUri));
+        IAudioSupportProvider audioSupportProvider = AudioSupportProviderSelectionStrategy.Select(
+            availableAudioSupportProviders,
+            audioUri,
+            settings);
         if (audioSupportProvider == null)
         {
             throw new SongAudioPlayerException($"Unsupported audio resource '{audioUri}'.");
@@ -301,6 +304,11 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         {
             AudioLoadedEvent evt = await audioSupportProvider.LoadAsync(audioUri, streamAudio, startPositionInMillis);
             currentAudioSupportProvider = audioSupportProvider;
+            if (!audioSupportProvider.IsPlaying)
+            {
+                audioSupportProvider.Play();
+            }
+            
             return evt;
         }
         catch (Exception ex)
@@ -317,12 +325,17 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
             IAudioSupportProvider[] remainingAudioSupportProviders = availableAudioSupportProviders
                 .Except(new List<IAudioSupportProvider>() { audioSupportProvider })
                 .ToArray();
-            Debug.LogError($"Failed to load audio '{audioUri}' via {audioSupportProvider}. Using one of {remainingAudioSupportProviders.JoinWith(", ")} as fallback: {ex.Message}");
-
-            if (remainingAudioSupportProviders.IsNullOrEmpty())
+            IAudioSupportProvider nextProvider = AudioSupportProviderSelectionStrategy.Select(
+                remainingAudioSupportProviders,
+                audioUri,
+                settings);
+            if (nextProvider == null)
             {
-                throw new AudioSupportProviderException($"Failed to load audio and no remaining audio support providers: {audioUri}", ex);
+                throw new AudioSupportProviderException($"Failed to load audio and no remaining suitable audio support providers. uri: {audioUri}");
             }
+
+            Debug.LogError($"Failed to load audio '{audioUri}' via {audioSupportProvider}. Trying {nextProvider} as fallback.");
+
             return await DoLoadAndPlayAsync(audioUri, remainingAudioSupportProviders, streamAudio, startPositionInMillis);
         }
     }
@@ -340,7 +353,14 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
 
     public void ReloadAudio()
     {
+        bool wasPlaying = IsPlaying;
+        
         LoadAndPlay(loadedSongMeta);
+        
+        if (!wasPlaying)
+        {
+            PauseAudio();
+        }
     }
 
     private void StopAudio()
@@ -444,5 +464,10 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection, ISongMediaPlayer<S
         {
             playbackSpeedChangedEventStream.OnNext(newPlaybackSpeed);
         }
+    }
+    
+    private string GetAudioUri(SongMeta songMeta)
+    {
+        return songMediaUriResolverManager.ResolveAudioUri(songMeta);
     }
 }

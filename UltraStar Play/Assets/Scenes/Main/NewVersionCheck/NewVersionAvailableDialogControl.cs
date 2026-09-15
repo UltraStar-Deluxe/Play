@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ProTrans;
 using UniInject;
 using UnityEngine.UIElements;
 
@@ -33,7 +34,7 @@ public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInj
 
     public NewVersionAvailableDialogControl(VisualElement dialogRootVisualElement,
         VisualElement parentVisualElement,
-        Dictionary<string, string> remoteVersionProperties)
+        PropertiesFile remoteVersionProperties)
     {
         this.DialogRootVisualElement = dialogRootVisualElement;
         this.parentVisualElement = parentVisualElement;

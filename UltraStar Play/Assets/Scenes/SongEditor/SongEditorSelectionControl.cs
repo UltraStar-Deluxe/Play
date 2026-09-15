@@ -32,6 +32,9 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private UIDocument uiDocument;
+    
+    [Inject]
+    private NoteAreaControl noteAreaControl;
 
     private readonly HashSet<Note> selectedNotes = new();
 
@@ -83,7 +86,12 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             minMidiNote = allNotes.Select(note => note.MidiNote).Min();
             maxMidiNote = allNotes.Select(note => note.MidiNote).Max();
         }
-        NoteAreaSelectionDragListener.lastSelectionRect.Value = NoteAreaRect.CreateFromMillis(songMeta, 0, (int)songAudioPlayer.DurationInMillis, minMidiNote, maxMidiNote);
+        noteAreaControl.SelectionDragListener.LastSelectionRect.Value = NoteAreaRect.CreateFromMillis(
+            songMeta,
+            0,
+            (int)songAudioPlayer.DurationInMillis,
+            minMidiNote,
+            maxMidiNote);
     }
 
     public void AddToSelection(List<EditorNoteControl> uiNotes)

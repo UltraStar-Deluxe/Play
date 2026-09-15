@@ -22,6 +22,9 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection
     [Inject(UxmlName = R.UxmlNames.sceneChangeDurationChooser)]
     private Chooser sceneChangeDurationChooser;
 
+    [Inject(UxmlName = R.UxmlNames.backgroundLightChooser)]
+    private Chooser backgroundLightChooser;
+
     [Inject(UxmlName = R.UxmlNames.songBackgroundScaleModeChooser)]
     private Chooser songBackgroundScaleModeChooser;
 

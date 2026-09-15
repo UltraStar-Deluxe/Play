@@ -1,54 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class ReplayGainChooserControl : EnumChooserControl<EReplayGainLoudnessNormalization>
+public class ReplayGainChooserControl : EnumChooserControl<EReplayGainMode>
 {
     private const string VlcOptionName = "--audio-replay-gain-mode";
 
     public ReplayGainChooserControl(Chooser chooser)
-        : base(chooser, EnumUtils.GetValuesAsList<EReplayGainLoudnessNormalization>())
+        : base(chooser, EnumUtils.GetValuesAsList<EReplayGainMode>())
     {
     }
 
-    public static EReplayGainLoudnessNormalization GetReplayGainEnumValue(List<string> vlcOptions)
+    public static void SetReplayGainEnumValue(Settings settings, EReplayGainMode newValue)
     {
-        if (vlcOptions.Contains(ReplayGainChooserControl.GetVlcOption(EReplayGainLoudnessNormalization.Track)))
+        settings.ReplayGainMode = newValue;
+        settings.VlcOptions.RemoveAll(line => line.Trim().StartsWith($"{VlcOptionName}="));
+
+        if (newValue is EReplayGainMode.Track)
         {
-            return EReplayGainLoudnessNormalization.Track;
+            settings.VlcOptions.Add(GetVlcOption(EReplayGainMode.Track));
         }
-        else if (vlcOptions.Contains(ReplayGainChooserControl.GetVlcOption(EReplayGainLoudnessNormalization.Album)))
+        else if (newValue is EReplayGainMode.Album)
         {
-            return EReplayGainLoudnessNormalization.Album;
-        }
-        else
-        {
-            return EReplayGainLoudnessNormalization.Disabled;
+            settings.VlcOptions.Add(GetVlcOption(EReplayGainMode.Album));
         }
     }
 
-    public static void SetReplayGainEnumValue(List<string> vlcOptions, EReplayGainLoudnessNormalization newValue)
-    {
-        vlcOptions.RemoveAll(line => line.Trim().StartsWith($"{VlcOptionName}="));
-
-        if (newValue is EReplayGainLoudnessNormalization.Track)
-        {
-            vlcOptions.Add(GetVlcOption(EReplayGainLoudnessNormalization.Track));
-        }
-        else if (newValue is EReplayGainLoudnessNormalization.Album)
-        {
-            vlcOptions.Add(GetVlcOption(EReplayGainLoudnessNormalization.Album));
-        }
-    }
-
-    private static string GetVlcOption(EReplayGainLoudnessNormalization value)
+    private static string GetVlcOption(EReplayGainMode value)
     {
         switch (value)
         {
-            case EReplayGainLoudnessNormalization.Disabled:
+            case EReplayGainMode.Off:
                 return "";
-            case EReplayGainLoudnessNormalization.Track:
+            case EReplayGainMode.Track:
                 return $"{VlcOptionName}=track";
-            case EReplayGainLoudnessNormalization.Album:
+            case EReplayGainMode.Album:
                 return $"{VlcOptionName}=album";
             default:
                 throw new ArgumentOutOfRangeException(nameof(value), value, null);

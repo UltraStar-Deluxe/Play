@@ -5,7 +5,7 @@
             <MaterialIcon name="micIcon" icon="mic" picking-mode="Ignore" class="textOutline ignoreTheme" style="width: 32px; height: 32px;" />
         </ui:Button>
         <ui:VisualElement name="labelContainer" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; justify-content: center;">
-            <ui:Label text="Mic01" display-tooltip-when-elided="true" name="nameLabel" style="white-space: normal;" />
+            <ui:Label text="Mic01" display-tooltip-when-elided="true" name="nameLabel" enable-rich-text="false" style="white-space: normal;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

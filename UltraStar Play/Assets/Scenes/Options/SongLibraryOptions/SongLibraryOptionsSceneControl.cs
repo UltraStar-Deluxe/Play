@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 #if UNITY_ANDROID
     using UnityEngine.Android;
 #endif
@@ -13,9 +15,9 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection
+public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, IInjectionFinishedListener, IBinder
 {
-    private static readonly string songArchiveInfoJsonUrl = "https://melodymania.org/downloads/song-archives-info.json";
+    public const string SongArchiveInfoJsonUrl = "https://melodymania.org/downloads/song-archives-info.json";
 
     [InjectedInInspector]
     public VisualTreeAsset songFolderListEntryUi;
@@ -29,6 +31,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [InjectedInInspector]
     public VisualTreeAsset songIssueSongEntryUi;
 
+    [InjectedInInspector]
+    public VisualTreeAsset songPackageCardUi;
+    
     [Inject]
     private UIDocument uiDocument;
 
@@ -53,9 +58,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject(UxmlName = R.UxmlNames.issuesIcon)]
     private VisualElement issuesIcon;
 
-    [Inject(UxmlName = R.UxmlNames.searchMidiFilesWithLyricsToggle)]
-    private Toggle searchMidiFilesWithLyricsToggle;
-
     [Inject(UxmlName = R.UxmlNames.songDataFetchTypeChooser)]
     private Chooser songDataFetchTypeChooser;
 
@@ -73,11 +75,18 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     private readonly List<SongFolderListEntryControl> songFolderListEntryControls = new();
     private readonly List<DownloadSongArchiveUiControl> downloadSongArchiveUiControls = new();
+    private readonly SongPackageListControl songPackageListControl = new();
 
     private MessageDialogControl deleteSongFolderDialog;
 
     private string settingsAtStart;
 
+    public void OnInjectionFinished()
+    {
+        injector
+            .Inject(songPackageListControl);
+    }
+    
     protected override void Start()
     {
         base.Start();
@@ -98,10 +107,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         addSongFolderButton.RegisterCallbackButtonTriggered(_ => AddNewSongFolder());
         downloadSongArchiveButton.RegisterCallbackButtonTriggered(_ => CreateDownloadSongArchiveUiControl());
-
-        FieldBindingUtils.Bind(searchMidiFilesWithLyricsToggle,
-            () => settings.SearchMidiFilesWithLyrics,
-            newValue => settings.SearchMidiFilesWithLyrics = newValue);
 
         new EnumChooserControl<EFetchType>(songDataFetchTypeChooser)
             .Bind(() => settings.SongDataFetchType,
@@ -130,7 +135,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         downloadSongArchiveUiControls.ForEach(it => it.UpdateProgress());
     }
 
-    private async void CreateDownloadSongArchiveUiControl()
+    public async Awaitable<DownloadSongArchiveUiControl> CreateDownloadSongArchiveUiControl()
     {
         VisualElement visualElement = downloadSongArchiveUi.CloneTreeAndGetFirstChild();
 
@@ -168,13 +173,15 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         UpdateSongFolderList();
 
         await UpdateSongArchiveEntriesAsync(downloadSongArchiveUiControl);
+
+        return downloadSongArchiveUiControl;
     }
 
     private async Awaitable UpdateSongArchiveEntriesAsync(DownloadSongArchiveUiControl downloadSongArchiveUiControl)
     {
         try
         {
-            using UnityWebRequest webRequest = UnityWebRequest.Get(new Uri(songArchiveInfoJsonUrl));
+            using UnityWebRequest webRequest = UnityWebRequest.Get(new Uri(SongArchiveInfoJsonUrl));
             string response = await WebRequestUtils.GetWebRequestResponseAsync(webRequest);
             downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(response);
         }
@@ -484,7 +491,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             "androidAppSpecificStorageRelativePath", AndroidUtils.GetAppSpecificStorageRelativePath(false)));
     }
 
-    private void UpdateSongFolderList()
+    public void UpdateSongFolderList()
     {
         songFolderList.Clear();
         songFolderListEntryControls.Clear();
@@ -626,5 +633,14 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             this.SongIssueData = songIssueData;
             this.Action = action;
         }
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new();
+        bb.BindExistingInstance(this);
+        bb.BindExistingInstance(gameObject);
+        bb.Bind(nameof(songPackageCardUi)).ToExistingInstance(songPackageCardUi);
+        return bb.GetBindings();
     }
 }

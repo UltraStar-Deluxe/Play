@@ -5,6 +5,4 @@ ${coverTag}
 ${backgroundTag}
 ${videoTag}
 #BPM:300
-: 10 8 5 La 
-: 20 12 7 la
 E

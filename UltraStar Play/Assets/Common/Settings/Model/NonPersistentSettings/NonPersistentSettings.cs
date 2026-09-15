@@ -9,6 +9,12 @@ public class NonPersistentSettings
 
     // Song select settings
     public ReactiveProperty<string> PlaylistName { get; private set; } = new("");
+    
+    /**
+     * The Playlist that was last used, i.e., where songs have been added or removed.
+     */
+    public ReactiveProperty<string> LastEditedPlaylistName { get; private set; } = new("");
+    
     public ReactiveProperty<bool> MicTestActive { get; private set; } = new();
     public Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveSearchPropertyFilters { get; private set; } = new();
     public ReactiveProperty<bool> IsShowOnlyDuetsFilterActive { get; private set; } = new();
@@ -20,6 +26,7 @@ public class NonPersistentSettings
     // Song editor settings
     public ReactiveProperty<float> SongEditorMusicPlaybackSpeed { get; set; } = new(1);
     public ReactiveProperty<bool> IsSongEditorRecordingEnabled { get; set; } = new();
+    public string ForcedAlignmentLyrics { get; set; } = "";
 
     // Online multiplayer related stuff
     public List<LobbyMemberPlayerProfile> LobbyMemberPlayerProfiles { get; set; } = new();

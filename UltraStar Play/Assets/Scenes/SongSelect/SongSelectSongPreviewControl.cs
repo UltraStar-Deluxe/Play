@@ -21,6 +21,9 @@ public class SongSelectSongPreviewControl : SongPreviewControl
 
     [Inject]
     private ThemeManager themeManager;
+    
+    [Inject]
+    private SongMediaUriResolverManager songMediaUriResolverManager;
 
     [Inject(UxmlName = R.UxmlNames.songPreviewVideoImage)]
     private VisualElement songPreviewVideoImage;
@@ -51,7 +54,7 @@ public class SongSelectSongPreviewControl : SongPreviewControl
                 return;
             }
 
-            string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
+            string videoUri = songMediaUriResolverManager.ResolveVideoUri(songMeta);
             if (SongMetaUtils.ResourceExists(songMeta, videoUri))
             {
                 songPreviewVideoImage.ShowByDisplay();

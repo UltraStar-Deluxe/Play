@@ -7,6 +7,7 @@ root = true
 [*]
 indent_style = space
 # (Please don't specify an indent_size here; that has too many unintended consequences.)
+end_of_line = lf
 
 # Style Sheets
 [*.{css, uss, scss}]
@@ -16,7 +17,8 @@ indent_size = 4
 [*.{cs,csx,vb,vbx}]
 indent_size = 4
 insert_final_newline = true
-charset = utf-8-bom
+charset = utf-8
+end_of_line = lf
 
 # XML project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
@@ -33,11 +35,28 @@ indent_size = 4
 # Powershell files
 [*.ps1]
 indent_size = 2
+end_of_line = lf
 
 # Shell script files
 [*.sh]
 end_of_line = lf
 indent_size = 2
+
+# Windows Batch and Command scripts (CRLF)
+[*.{bat,cmd}]
+end_of_line = crlf
+
+# Unity text-based assets (LF)
+[*.{meta,unity,prefab,asset,mat,anim}]
+end_of_line = lf
+
+# Shaders (LF)
+[*.shader]
+end_of_line = lf
+
+# Markdown (LF)
+[*.md]
+end_of_line = lf
 
 # Dotnet diagnostic settings
 [*.{cs,vb}]

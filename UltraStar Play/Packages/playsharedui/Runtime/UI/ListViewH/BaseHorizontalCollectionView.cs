@@ -17,16 +17,17 @@ using PointerType = UnityEngine.UIElements.PointerType;
 /// Base class for controls that display virtualized vertical content inside a scroll view.
 /// </para>
 ///      </summary>
-public abstract class BaseHorizontalCollectionView : BindableElement, ISerializationCallbackReceiver
+[UxmlElement]
+public abstract partial class BaseHorizontalCollectionView : BindableElement, ISerializationCallbackReceiver
 {
-    private SelectionType m_SelectionType;
+    private SelectionType m_SelectionType = SelectionType.Single;
     public static readonly List<ReusableCollectionItem> k_EmptyItems = new List<ReusableCollectionItem>();
     private bool mVerticalScrollingEnabled;
     [SerializeField] private AlternatingRowBackground m_ShowAlternatingRowBackgrounds = AlternatingRowBackground.None;
     internal static readonly int s_DefaultItemWidth = 22;
     internal float m_FixedItemWidth = (float)BaseHorizontalCollectionView.s_DefaultItemWidth;
     internal bool m_ItemWidthIsInline;
-    private CollectionVirtualizationMethod m_VirtualizationMethod;
+    private CollectionVirtualizationMethod m_VirtualizationMethod = CollectionVirtualizationMethod.Fixed;
     private readonly ScrollView m_ScrollView;
     private CollectionViewController m_ViewController;
     private CollectionVirtualizationController m_VirtualizationController;
@@ -220,6 +221,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     /// Controls the selection type.
     /// </para>
     ///      </summary>
+    [UxmlAttribute]
     public SelectionType selectionType
     {
         get => this.m_SelectionType;
@@ -306,6 +308,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     /// Enable this property to display a border around the collection view.
     /// </para>
     ///      </summary>
+    [UxmlAttribute]
     public bool showBorder
     {
         get => this.m_ScrollView.ClassListContains(BaseHorizontalCollectionView.borderUssClassName);
@@ -317,6 +320,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     /// Gets or sets a value that indicates whether the user can drag list items to reorder them.
     /// </para>
     ///      </summary>
+    [UxmlAttribute]
     public bool reorderable
     {
         // TODO: Implement
@@ -333,6 +337,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     /// does not fit in the visible area.
     /// </para>
     ///      </summary>
+    [UxmlAttribute]
     public bool verticalScrollingEnabled
     {
         get => this.mVerticalScrollingEnabled;
@@ -353,6 +358,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     /// Takes a value from the AlternatingRowBackground enum.
     /// </para>
     ///      </summary>
+    [UxmlAttribute]
     public AlternatingRowBackground showAlternatingRowBackgrounds
     {
         get => this.m_ShowAlternatingRowBackgrounds;
@@ -371,6 +377,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     /// Takes a value from the CollectionVirtualizationMethod enum.
     /// </para>
     ///      </summary>
+    [UxmlAttribute]
     public CollectionVirtualizationMethod virtualizationMethod
     {
         get => this.m_VirtualizationMethod;
@@ -390,6 +397,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     /// The width of a single item in the list, in pixels.
     /// </para>
     ///      </summary>
+    [UxmlAttribute("fixed-item-width")]
     public float fixedItemWidth
     {
         get => this.m_FixedItemWidth;
@@ -518,6 +526,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
         this.selectionType = SelectionType.Single;
         this.m_ScrollView = new ScrollView();
         this.m_ScrollView.AddToClassList(BaseHorizontalCollectionView.listScrollViewUssClassName);
+        this.verticalScrollingEnabled = false;
         this.m_ScrollView.horizontalScroller.valueChanged += (Action<float>)(h => this.OnScroll(new Vector2(h, 0)));
         this.m_ScrollView.RegisterCallback<GeometryChangedEvent>(
             new EventCallback<GeometryChangedEvent>(this.OnSizeChanged));
@@ -1315,100 +1324,4 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     }
 
     void ISerializationCallbackReceiver.OnAfterDeserialize() => this.RefreshItems();
-
-    /// <summary>
-    ///        <para>
-    /// Defines UxmlTraits for the BaseHorizontalCollectionView.
-    /// </para>
-    ///      </summary>
-    public new class UxmlTraits : BindableElement.UxmlTraits
-    {
-        private readonly UxmlIntAttributeDescription m_FixedItemWidth;
-        private readonly UxmlEnumAttributeDescription<CollectionVirtualizationMethod> m_VirtualizationMethod;
-        private readonly UxmlBoolAttributeDescription m_ShowBorder;
-        private readonly UxmlEnumAttributeDescription<SelectionType> m_SelectionType;
-        private readonly UxmlEnumAttributeDescription<AlternatingRowBackground> m_ShowAlternatingRowBackgrounds;
-        private readonly UxmlBoolAttributeDescription m_Reorderable;
-        private readonly UxmlBoolAttributeDescription m_HorizontalScrollingEnabled;
-
-        /// <summary>
-        ///        <para>
-        /// Returns an empty enumerable, because list views usually do not have child elements.
-        /// </para>
-        ///      </summary>
-        /// <returns>
-        ///   <para>An empty enumerable.</para>
-        /// </returns>
-        public override IEnumerable<UxmlChildElementDescription> uxmlChildElementsDescription
-        {
-            get
-            {
-                yield break;
-            }
-        }
-
-        /// <summary>
-        ///        <para>
-        /// Initializes BaseHorizontalCollectionView properties using values from the attribute bag.
-        /// </para>
-        ///      </summary>
-        /// <param name="ve">The object to initialize.</param>
-        /// <param name="bag">The attribute bag.</param>
-        /// <param name="cc">The creation context; unused.</param>
-        public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
-        {
-            base.Init(ve, bag, cc);
-            int num = 0;
-            BaseHorizontalCollectionView horizontalCollectionView = (BaseHorizontalCollectionView)ve;
-            horizontalCollectionView.reorderable = this.m_Reorderable.GetValueFromBag(bag, cc);
-            if (this.m_FixedItemWidth.TryGetValueFromBag(bag, cc, ref num))
-                horizontalCollectionView.fixedItemWidth = (float)num;
-            horizontalCollectionView.virtualizationMethod = this.m_VirtualizationMethod.GetValueFromBag(bag, cc);
-            horizontalCollectionView.showBorder = this.m_ShowBorder.GetValueFromBag(bag, cc);
-            horizontalCollectionView.selectionType = this.m_SelectionType.GetValueFromBag(bag, cc);
-            horizontalCollectionView.showAlternatingRowBackgrounds =
-                this.m_ShowAlternatingRowBackgrounds.GetValueFromBag(bag, cc);
-            horizontalCollectionView.verticalScrollingEnabled =
-                this.m_HorizontalScrollingEnabled.GetValueFromBag(bag, cc);
-        }
-
-        public UxmlTraits()
-        {
-            UxmlIntAttributeDescription attributeDescription1 = new UxmlIntAttributeDescription();
-            attributeDescription1.name = "fixed-item-width";
-            attributeDescription1.obsoleteNames = (IEnumerable<string>)new string[1] { "itemWidth, item-width" };
-            attributeDescription1.defaultValue = BaseHorizontalCollectionView.s_DefaultItemWidth;
-            this.m_FixedItemWidth = attributeDescription1;
-            UxmlEnumAttributeDescription<CollectionVirtualizationMethod> attributeDescription2 =
-                new UxmlEnumAttributeDescription<CollectionVirtualizationMethod>();
-            attributeDescription2.name = "virtualization-method";
-            attributeDescription2.defaultValue = CollectionVirtualizationMethod.Fixed;
-            this.m_VirtualizationMethod = attributeDescription2;
-            UxmlBoolAttributeDescription attributeDescription3 = new UxmlBoolAttributeDescription();
-            attributeDescription3.name = "show-border";
-            attributeDescription3.defaultValue = false;
-            this.m_ShowBorder = attributeDescription3;
-            UxmlEnumAttributeDescription<SelectionType> attributeDescription4 =
-                new UxmlEnumAttributeDescription<SelectionType>();
-            attributeDescription4.name = "selection-type";
-            attributeDescription4.defaultValue = SelectionType.Single;
-            this.m_SelectionType = attributeDescription4;
-            UxmlEnumAttributeDescription<AlternatingRowBackground> attributeDescription5 =
-                new UxmlEnumAttributeDescription<AlternatingRowBackground>();
-            attributeDescription5.name = "show-alternating-row-backgrounds";
-            attributeDescription5.defaultValue = AlternatingRowBackground.None;
-            this.m_ShowAlternatingRowBackgrounds = attributeDescription5;
-            UxmlBoolAttributeDescription attributeDescription6 = new UxmlBoolAttributeDescription();
-            attributeDescription6.name = "reorderable";
-            attributeDescription6.defaultValue = false;
-            this.m_Reorderable = attributeDescription6;
-            UxmlBoolAttributeDescription attributeDescription7 = new UxmlBoolAttributeDescription();
-            attributeDescription7.name = "horizontal-scrolling";
-            attributeDescription7.defaultValue = false;
-            this.m_HorizontalScrollingEnabled = attributeDescription7;
-
-            // ISSUE: explicit constructor call
-            // base.\u002Ector();
-        }
-    }
 }
