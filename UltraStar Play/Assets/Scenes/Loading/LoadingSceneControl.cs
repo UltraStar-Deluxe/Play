@@ -138,17 +138,16 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         {
             AddPreloadAction("Android permissions", () =>
             {
-                AndroidRuntimePermissions.Permission checkAudioPermission = AndroidRuntimePermissions.CheckPermission("android.permission.RECORD_AUDIO");
-                if (checkAudioPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
+                bool checkAudioPermission = AndroidRuntimePermissions.CheckPermission("android.permission.RECORD_AUDIO");
+                if (!checkAudioPermission)
                 {
-                    AndroidRuntimePermissions.RequestPermission("android.permission.RECORD_AUDIO");
+                    AndroidRuntimePermissions.RequestPermissionAsync("android.permission.RECORD_AUDIO");
                 }
 
-                AndroidRuntimePermissions.Permission checkCameraPermission =
-                    AndroidRuntimePermissions.CheckPermission("android.permission.CAMERA");
-                if (checkCameraPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
+                bool checkCameraPermission = AndroidRuntimePermissions.CheckPermission("android.permission.CAMERA");
+                if (!checkCameraPermission)
                 {
-                    AndroidRuntimePermissions.RequestPermission("android.permission.CAMERA");
+                    AndroidRuntimePermissions.RequestPermissionAsync("android.permission.CAMERA");
                 }
             });
         }
