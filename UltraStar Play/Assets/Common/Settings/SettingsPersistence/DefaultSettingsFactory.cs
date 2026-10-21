@@ -18,9 +18,9 @@ public static class DefaultSettingsFactory
             try
             {
                 string internalSongFolder = AndroidUtils.GetAppSpecificStorageAbsolutePath(false) + "/Songs";
-                if (!Directory.Exists(internalSongFolder))
+                if (!System.IO.Directory.Exists(internalSongFolder))
                 {
-                    Directory.CreateDirectory(internalSongFolder);
+                    System.IO.Directory.CreateDirectory(internalSongFolder);
                 }
 
                 defaultSettings.SongDirs.Add(internalSongFolder);

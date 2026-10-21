@@ -34,8 +34,8 @@
         "com.unity.render-pipelines.universal": "17.5.0",
         "com.unity.ugui": "2.5.0",
         "com.unity.xr.management": "4.5.4",
-        "com.yasirkula.androidruntimepermissions": "https://github.com/yasirkula/UnityAndroidRuntimePermissions.git",
-        "com.yasirkula.ingamedebugconsole": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.5.8",
+        "com.yasirkula.androidruntimepermissions": "https://github.com/yasirkula/UnityAndroidRuntimePermissions.git#v1.3.1",
+        "com.yasirkula.ingamedebugconsole": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.9.0",
         "jillejr.newtonsoft.json-for-unity.converters": "https://github.com/applejag/Newtonsoft.Json-for-Unity.Converters.git#1.6.3"
     }
 }
